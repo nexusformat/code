@@ -48,7 +48,13 @@
    NXstatus NXDgetalias(NXhandle file, NXdict dict, 
                         char *alias, void *pData);
    NXstatus NXDgetdef(NXhandle file, NXdict dict, char *pDefString, void *pData);
+   
+   NXstatus NXDinfoalias(NXhandle hFil, NXdict dict, char *pAlias, int *rank,
+                          int dimension[], int *iType);
 
+   NXstatus NXDinfodef(NXhandle hFil, NXdict dict, char *pDef, int *rank,
+                           int dimension[], int *iType);
+                           
    NXstatus NXDaliaslink(NXhandle file, NXdict dict, 
                          char *pAlias1, char *pAlias2);
    NXstatus NXDdeflink(NXhandle file, NXdict dict, 
