@@ -35,7 +35,7 @@ libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
                        native/NexusFile.c
 libjnexus_la_LIBADD 	= $(top_builddir)/src/libNeXus.la
 libjnexus_la_CFLAGS 	= -I$(top_srcdir)/include -Inative -I/usr/local/java/include \
-                      -I/usr/local/java/include/linux
+                      -I/usr/local/java/include/linux @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
 
 BUILT_SOURCES		= native/neutron_nexus_NexusFile.h
 nodist_noinst_HEADERS 	= native/neutron_nexus_NexusFile.h 

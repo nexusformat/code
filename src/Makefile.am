@@ -28,7 +28,7 @@
 #
 #====================================================================
 
-AM_CPPFLAGS=-I$(top_srcdir)/include
+AM_CPPFLAGS=-I$(top_srcdir)/include @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
 
 if HAVE_HDF4
 H4SRC = napi4.c
@@ -43,6 +43,7 @@ endif
 
 lib_LTLIBRARIES = libNeXus.la
 
+libNeXus_la_LIBADD = @HDF4_LDFLAGS@ @HDF5_LDFLAGS@
 libNeXus_la_SOURCES = napi.c $(H4SRC) $(H5SRC)
 
 ## The following part is the solution for automake >= 1.7

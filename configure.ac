@@ -36,9 +36,10 @@ see file COPYING for further information])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([1.6])
+
 AM_CONFIG_HEADER([include/nxconfig.h])
-AC_CANONICAL_HOST
 AC_PROG_LIBTOOL
 # Checks for programs.
 AC_ARG_WITH([cc],
@@ -138,16 +139,18 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
 	AC_MSG_RESULT($H4ROOT)
     fi
 fi
-if test ! -z "$H4ROOT"; then
+if test "$H4ROOT"; then
     H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
     case $H4VERSION in
 	4.[[12]]*) 
-    		LDFLAGS="$LDFLAGS -L$H4ROOT/lib";
-    		CPPFLAGS="$CPPFLAGS -I$H4ROOT/include -DHDF4" ;;
+    		HDF4_LDFLAGS="-L$H4ROOT/lib -lmfhdf -ldf -ljpeg";
+    		HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4" ;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
 		H4ROOT="";;
     esac		
 fi
+AC_SUBST(HDF4_LDFLAGS)
+AC_SUBST(HDF4_CPPFLAGS)
 
 # HDF5
 HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
@@ -162,16 +165,18 @@ if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
 	AC_MSG_RESULT($H5ROOT)
     fi
 fi
-if test ! -z "$H5ROOT"; then
+if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
 	1.[[6]]*)
-    		LDFLAGS="$LDFLAGS -L$H5ROOT/lib"
-    		CPPFLAGS="$CPPFLAGS -I$H5ROOT/include -DHDF5";;
+    		HDF5_LDFLAGS="-L$H5ROOT/lib -lhdf5 -lz -lm"
+    		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
 		H5ROOT="";;
     esac
 fi
+AC_SUBST(HDF5_LDFLAGS)
+AC_SUBST(HDF5_CPPFLAGS)
 
 # finally set LIBS variable if we 
 AC_CHECK_LIB(z, gzopen)
@@ -209,6 +214,8 @@ AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
+LINUX_DISTRIBUTION
+
 AC_CONFIG_FILES([Makefile
 		nexus.spec
 		include/Makefile
@@ -219,6 +226,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/f90/Makefile
                 bindings/java/Makefile
 		scripts/Makefile
+		scripts/nexus.pc
 		scripts/nxbuild])
 AC_OUTPUT
 
