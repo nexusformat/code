@@ -1,13 +1,18 @@
 <NXroot>
 <entry1 type="NXentry" NXS:source="fileName" NXS:mime_type="application/x-IPNS">
 <title  NXS:location="header.runTitle" />
-<start_date NXS:location="header.startDateTime" />
-<end_date NXS:location="header.endDateTime" />
+<start_time NXS:location="header.startDateTime" />
+<end_time NXS:location="header.endDateTime" />
 <userInfo type="NXuser">
-<user  NXS:location="header.userName" />
+<name  NXS:location="header.userName" />
 </userInfo>
-<data1 type="NX_DATA">
-<x NXS:location="data.ids[ 19 : 25]"/>
+<bank1 type="NXdetector">
+<time-of-flight axis="NX_FLOAT32:1" NXS:location="time.ids[ 19 : 25]"></time-of-flight>
+</bank1>
+<data1 type="NXdata">
+<data NXS:location="data.ids[ 19 : 25]" signal="1"/>
+<errors NXS:location="error.ids[ 19 : 25]" signal="1"/>
+<NAPIlink target="/entry1/bank1/time-of-flight"/>
 </data1>
 
 
