@@ -119,6 +119,7 @@ typedef char NXname[VGNAMELENMAX];
 #define NX_CHAR		DFNT_CHAR8
 
 /* Map NeXus compression methods to HDF compression methods */
+#define NX_COMP_NONE COMP_CODE_NONE
 #define NX_COMP_LZW COMP_CODE_DEFLATE
 #define NX_COMP_RLE COMP_CODE_RLE
 #define NX_COMP_HUF COMP_CODE_SKPHUFF          
@@ -177,7 +178,7 @@ extern "C" {
 #    define NXfopen		MANGLE(nxifopen)
 #    define NXfclose		MANGLE(nxifclose)
 #    define NXfmakedata		MANGLE(nxifmakedata)
-#    define NXfcompress		MANGLE(nxfcompress)
+#    define NXfcompress		MANGLE(nxifcompress)
 #    define NXfputattr		MANGLE(nxifputattr)
 #elif defined(_WIN32)
 /* 
