@@ -4,21 +4,34 @@ $!
 $! Build comamnd file for VMS
 $!
 $ SET VERIFY
-$ DEFINE HDF_ROOT AXPLIB$DISK:[HDF.]	! where you installed HDF, trailing "." is needed
-$!
-$! Create library NEXUS.OLB
+$ DEFINE HDF_ROOT AXPLIB$DISK:[HDF.]   ! where you installed HDF, trailing "." is needed
+$!=======================================================================
+$! Create library NEXUS.OLB (comment out either Fortran 77 or Fortran 90)
 $!
 $ CC/INCLUDE=HDF_ROOT:[INCLUDE] NAPI.C
+$!=======================================================================
+$!Fortran 77
 $ FORTRAN NAPIF.F
 $ LIBRARY/CREATE/OBJECT NEXUS NAPI,NAPIF
-$!
-$! Create C test program
+$!=======================================================================
+$!Fortran 90
+$! F90 NXmodule, NXUmodule
+$! LIBRARY/CREATE/OBJECT NEXUS NAPI,NXmodule,NXUmodule
+$!=======================================================================
+$! Create C test programs
 $!
 $ CC/INCLUDE=HDF_ROOT:[INCLUDE] NAPI_TEST.C
-$ LINK NAPI_TEST,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB
+$ LINK NAPI_TEST,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB
+$ CC/INCLUDE=HDF_ROOT:[INCLUDE] NAPI_TEST_READ.C
+$ LINK NAPI_TEST_READ,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB
+$!=======================================================================
 $!
 $! Create FORTRAN test program
 $!
 $ FORTRAN NAPIF_TEST.F
-$ LINK NAPIF_TEST,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB
+$ LINK NAPIF_TEST,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB
+$!=======================================================================
+$! Create Fortran 90 test program
 $!
+$! F90 NXtest
+$! LINK NXtest,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB
