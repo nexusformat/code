@@ -1,17 +1,46 @@
 /*---------------------------------------------------------------------------
-                            Nexus API header file
+  NeXus - Neutron & X-ray Common Data Format
+  
+  NeXus API header file
+  
+  Copyright (C) 1997, 1998, 1999 Mark Koennecke, Przemek Klosowski
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+ 
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+ 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  Contact : Mark Koennecke <Mark.Koennecke@psi.ch>
+            Labor fuer Neutronenstreuung
+            Paul Scherrer Institut             
+            CH-5232 Villigen-PSI
+            Switzerland
+            
+            Przemek Klosowski <Przemek.Klosowski@nist.gov>
+            NIST Center for Neutron Research
+            100 Bureau Drive, Stop 8562
+            Gaithersburg, MD 20899-8562
+            USA
+            
+  For further information, see <http://www.neutron.anl.gov/NeXus/>
 
-   $Id$
+  $Id$
 
-   copyleft: Mark Koennecke, March 1997 at LNS,PSI, Switzerland
-             Przemek Klosowski, U. of Maryland & NIST, USA       
-
-   No warranties of any kind taken.
 ----------------------------------------------------------------------------*/
+
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#define NEXUS_VERSION	"1.2.0"		/* major.minor.patch */
+#define NEXUS_VERSION	"1.2.1"		/* major.minor.patch */
 
 #ifdef GENIE_IMPLEMENTATION__		/* OpenGENIE is fussy about consts */
 #   define CONSTCHAR	const char

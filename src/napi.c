@@ -3,40 +3,36 @@
   
   Application Program Interface Routines
   
-  Copyright (C) 1997 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997, 1998, 1999 Mark Koennecke, Przemek Klosowski
   
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+ 
+  This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+ 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  Contact : Mark Koennecke <Mark.Koennecke@psi.ch>
+            Labor fuer Neutronenstreuung
+            Paul Scherrer Institut             
+            CH-5232 Villigen-PSI
+            Switzerland
+            
+            Przemek Klosowski <Przemek.Klosowski@nist.gov>
+            NIST Center for Neutron Research
+            100 Bureau Drive, Stop 8562
+            Gaithersburg, MD 20899-8562
+            USA
+            
+  For further information, see <http://www.neutron.anl.gov/NeXus/>
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-  No warranties of any kind, whether explicit or implied, taken.
-  Distributed under the GNU copyleft license as documented elsewhere.
-
-  Mark Koennecke                     Przemek Klosowski
-  Labor fuer Neutronenstreuung       U. of Maryland & NIST 
-  Paul Scherrer Institut             Przemek.Klosowski@nist.gov
-  CH-5232 Villigen-PSI
-  Switzerland                        Nick Maliszewskyj
-  Mark.Koennecke@psi.ch              NIST Center for Neutron Research 
-                                     NickM@rrdjazz.nist.gov
-
-  Version   Date       Name    Comments
-  -------   ----       ----    --------
-    0.8    Mar 1997    MK/PK   First beta version of NeXus API
-    0.9    Jun 1997     NM     Some changes made to allow for directory 
-                               searches in file reading.
-    0.95   Aug 1997    FAA     Merge in new interface definitions and modifications
-                               for C++ and FORTRAN calling
 ----------------------------------------------------------------------------*/
 
 static const char* rscid = "$Id$";	/* Revision interted by CVS */
