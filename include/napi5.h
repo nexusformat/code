@@ -27,7 +27,9 @@
 #define NX5SIGNATURE 959695
 
 #include <hdf5.h>
+/*
 #include "napi5.c"
+*/
 
 /* HDF5 interface */
 
