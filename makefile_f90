@@ -49,7 +49,7 @@ all: libNeXus90.a NXtest NXdump
 NXmodule.o: NXmodule.f90
 	$(F90) $(F90FLAGS) -c $(FROOT)/NXmodule.f90
 
-NXUmodule.o: NXUmodule.f90
+NXUmodule.o: NXUmodule.f90 NXmodule.o
 	$(F90) $(F90FLAGS) -c $(FROOT)/NXUmodule.f90
 
 NXtest.o: NXtest.f90
