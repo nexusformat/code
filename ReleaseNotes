@@ -1,3 +1,21 @@
+Changes in Version 1.3.1
+========================
+
+- Added NXgetgroupinfo, NXinitgroupdir, NXgetattrinfo, and NXinitattrdir
+  to the core C and F77 API's.  They were already present in the F90 API.
+
+- Updated the above routines in NXmodule.f90 so that they called the C
+  versions directly.  This removes the need for the F90 code to know the
+  internal details of the NXhandle C struct.
+
+- Released a new version of NXbrowse written in ISO C.  It is the version
+  that is now installed with the "make NXbrowse" command (on unix systems).
+  The ordering of array indices uses the C convention i.e. it is reversed
+  from the original F90 version.
+
+- Corrected the calculation of time zone offsets when compiled by
+  Metrowerks CodeWarrior for PowerPC Macs.
+
 Changes in Version 1.3.0
 ========================
 
@@ -10,7 +28,7 @@ Changes in Version 1.3.0
 - Added NXUsetcompress to F90 utility API to set default compression 
   parameters, and added call to NXcompress in NXUwritedata.
 
-- Changed attribute arguments in the F90 routine NXUwriteglobals to optional 
+- Changed attribute arguments in the F90 routine NXUwriteglobals to optional. 
 
 Changes in Version 1.2.1
 ========================
@@ -41,19 +59,19 @@ Changes in Version 1.2.0
 - Added definitions of NX_MAXRANK (max. no. of dataset dimensions = 32) to 
   and NX_MAXNAMELEN (max. length of dataset name = 64) to header files.
 
-- Made NXIReportError globally visible
+- Made NXIReportError globally visible.
 
 - Improved determination of local time zone when writing the global file
-  attribute "file_time"
+  attribute "file_time".
 
 - Added option to NXbrowse.f90 to allow display of individual array elements
-  of the specified index
+  of the specified index.
 
 - Added check for __ABSOFT macro in "napi.h" to make compatible with 
-  Absoft Pro Fortran for Linux
+  Absoft Pro Fortran for Linux.
 
 - Add __stdcall definition to C prototypes under WIN32 so they can link 
-  to FORTRAN 
+  to FORTRAN. 
 
 Changes in Version 1.1.0
 ========================
@@ -61,7 +79,7 @@ Changes in Version 1.1.0
 - First appearance of the Fortran 90 API.
 
 - Added reading and writing of non-character attributes to the Fortran 77 
-  interface
+  interface.
 
 - Corrected problems with linking groups by making NXgetgroupID 
   and NXmakelink use the HDF tag/ref pair in NXlink structures.
@@ -69,15 +87,15 @@ Changes in Version 1.1.0
 - Added VMS build file MAKE_VMS.COM.
 
 - Added NEXUS_VERSION CHARACTER constant to NAPIF.INC, with value as defined 
-  in napi.h
+  in napi.h.
 
 - Made the Fortran 77 interface treat both NX_UINT8 and NX_CHAR as strings, for
   consistency with the C implementation and also for backward compatability 
   reasons.
 
-- Fixed memory leak on Fortran 77 side on NXclose
+- Fixed memory leak on Fortran 77 side on NXclose.
 
-- NXdict added to the normal distribution
+- NXdict added to the normal distribution.
 
 - Added casts to HDF API calling parameters to eliminate type-mismatch
   compiler warnings.
@@ -90,7 +108,7 @@ Changes in Version 1.0.0
 ========================
 
 - Reversed array dimensions on going from C to FORTRAN, so that the 
-  "fastest varying index" is kept consistent
+  "fastest varying index" is kept consistent.
 
 - Incorporated fixes suggested by Markus Zolliker (markus.zolliker@psi.ch)
   for the following problems with the FORTRAN interface:
@@ -99,12 +117,12 @@ Changes in Version 1.0.0
   (2) NXgetentry gives an error message when NAME and CLASS are not
     initialised to blank.
 
-- Changed "data" from char* to void* in NXgetattr
+- Changed "data" from char* to void* in NXgetattr.
 
 - Changed value for NXACC_CREATE to be DFACC_CREATE rather than DFACC_ALL
-  in NAPIF.INC for consistency with C interface
+  in NAPIF.INC for consistency with C interface.
 
-- Added the following global attributes
+- Added the following global attributes :
   NeXus_version - updated whenever a file is opened "read/write", so it
                   will always contain the latest version of the interface
                   the file was written with
