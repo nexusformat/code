@@ -17,11 +17,11 @@ program NXbrowse
 
    use NXUmodule
    character(len=80) :: file_name, input_text, path
-   Type(NXhandle) :: file_id
+   type(NXhandle) :: file_id
    character(len=NX_MAXNAMELEN), allocatable :: name(:), class(:)
    character(len=NX_MAXNAMELEN) :: group_name, group_class, data_name, attr_name
-   integer :: status, n, i, NXrank, NXtype
-   integer :: NXdims(NX_MAXRANK)
+   integer :: status, n, i, NXrank, NXtype, NXdims(NX_MAXRANK)
+   logical :: single_element
    character(len=255) :: char_value
    integer(kind=NXi4) :: int_value
    integer(kind=NXi4), pointer :: int_array(:), int_2Darray(:,:), int_3Darray(:,:,:)
@@ -69,89 +69,177 @@ program NXbrowse
             if (NXopengroup (file_id, group_name, group_class) /= NX_OK) cycle
             !Add the group to the prompt string
             path = trim(path)//"/"//trim(group_name)
-         !Command is to print the values of the specified data (at least the first three elements)
+         !Command is to print the values of the data
+         !1) if the array index is specified, a single element is output
+         !2) if no index is given, the minimum and maximum values of the array are output
          case ("READ")
             input_text = adjustl(input_text(5:len_trim(input_text)))
-            read (input_text(1:index(input_text," ")), fmt="(a)") data_name
+            !Check for evidence that an individual element has been specified
+            if (index(input_text,"(") == 0) then
+               read (input_text(1:index(input_text," ")), fmt="(a)") data_name
+               single_element = .false.
+            else
+               read (input_text(1:index(input_text,"(")-1), fmt="(a)") data_name
+               single_element = .true.
+            end if
+            !Check the specified data item exists
             if (NXUfinddata (file_id, data_name) == NX_EOD) then
                call NXerror (trim(data_name)//" does not exist")
                cycle
             end if
+            !Open the data and obtain its type and rank details
             if (NXopendata (file_id, data_name) /= NX_OK) cycle
             if (NXgetinfo (file_id, NXrank, NXdims, NXtype) /= NX_OK) cycle
+            if (single_element) then
+               input_text = input_text(index(input_text,"(")+1:index(input_text,")")-1)
+               if (dimcount(input_text) /= NXrank) then
+                  call NXerror ("Invalid array index")
+                  cycle
+               end if
+               read (input_text, fmt=*) NXdims(1:NXrank)
+            end if
+            !Output data according to data type
             select case (NXtype)
                case (NX_CHAR)
                   if (NXUreaddata (file_id, data_name, char_value) /= NX_OK) cycle
                   print *, "  "//trim(data_name)//" ["//trim(NXdatatype(NXtype))//"] = "//trim(char_value)
                   char_value = " "
                case (NX_INT8,NX_UINT8,NX_INT16,NX_UINT16,NX_INT32,NX_UINT32)
+                  !Output data according to rank
                   select case (NXrank)
                      case (1)
-                        if (NXUreaddata (file_id, data_name, int_array) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",int_array(1:min(3,NXdims(1)))
-                           deallocate (int_array)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, int_array, data_start=NXdims, data_size=(/1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", int_array(1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, int_array) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(int_array), " to ", maxval(int_array)
+                           end if
                         end if
+                        deallocate (int_array, stat = status)
                      case (2)
-                        if (NXUreaddata (file_id, data_name, int_2Darray) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",int_2Darray(1:min(3,NXdims(1)),1)
-                           deallocate (int_2Darray)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, int_2Darray, data_start=NXdims, data_size=(/1,1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", int_2Darray(1,1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, int_2Darray) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(int_2Darray), " to ", maxval(int_2Darray)
+                           end if
                         end if
+                        deallocate (int_2Darray, stat = status)
                      case (3)
-                        if (NXUreaddata (file_id, data_name, int_3Darray) == NX_OK) then
-                           print *, "  "//NXdatatype(NXtype)//" : "//trim(data_name)//trim(dimstring(NXrank,NXdims))&
-                              //"] = ",int_3Darray(1:min(3,NXdims(1)),1,1)
-                           deallocate (int_3Darray)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, int_3Darray, data_start=NXdims, data_size=(/1,1,1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", int_3Darray(1,1,1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, int_3Darray) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(int_3Darray), " to ", maxval(int_3Darray)
+                           end if
                         end if
+                        deallocate (int_3Darray, stat = status)
                   end select
                case (NX_FLOAT32)
+                  !Output data according to rank
                   select case (NXrank)
                      case (1)
-                        if (NXUreaddata (file_id, data_name, real_array) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",real_array(1:min(3,NXdims(1)))
-                           deallocate (real_array)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, real_array, data_start=NXdims, data_size=(/1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", real_array(1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, real_array) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(real_array), " to ", maxval(real_array)
+                           end if
                         end if
+                        deallocate (real_array, stat = status)
                      case (2)
-                        if (NXUreaddata (file_id, data_name, real_2Darray) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",real_2Darray(1:min(3,NXdims(1)),1)
-                           deallocate (real_2Darray)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, real_2Darray, data_start=NXdims, data_size=(/1,1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", real_2Darray(1,1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, real_2Darray) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(real_2Darray), " to ", maxval(real_2Darray)
+                           end if
                         end if
+                        deallocate (real_2Darray, stat = status)
                      case (3)
-                        if (NXUreaddata (file_id, data_name, real_3Darray) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",real_3Darray(1:min(3,NXdims(1)),1,1)
-                           deallocate (real_3Darray)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, real_3Darray, data_start=NXdims, data_size=(/1,1,1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", real_3Darray(1,1,1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, real_3Darray) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(real_3Darray), " to ", maxval(real_3Darray)
+                           end if
                         end if
+                        deallocate (real_3Darray, stat = status)
                      end select
                case (NX_FLOAT64)
+                  !Output data according to rank
                   select case (NXrank)
                      case (1)
-                        if (NXUreaddata (file_id, data_name, dble_array) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",dble_array(1:min(3,NXdims(1)))
-                           deallocate (dble_array)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, dble_array, data_start=NXdims, data_size=(/1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", dble_array(1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, dble_array) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(dble_array), " to ", maxval(dble_array)
+                           end if
                         end if
+                        deallocate (dble_array, stat = status)
                      case (2)
-                        if (NXUreaddata (file_id, data_name, dble_2Darray) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",dble_2Darray(1:min(3,NXdims(1)),1)
-                           deallocate (dble_2Darray)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, dble_2Darray, data_start=NXdims, data_size=(/1,1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", dble_2Darray(1,1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, dble_2Darray) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(dble_2Darray), " to ", maxval(dble_2Darray)
+                           end if
                         end if
+                        deallocate (dble_2Darray, stat = status)
                      case (3)
-                        if (NXUreaddata (file_id, data_name, dble_3Darray) == NX_OK) then
-                           print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ",dble_3Darray(1:min(3,NXdims(1)),1,1)
-                           deallocate (dble_3Darray)
+                        if (single_element) then
+                           if (NXUreaddata (file_id, data_name, dble_3Darray, data_start=NXdims, data_size=(/1,1,1/)) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", dble_3Darray(1,1,1)
+                           end if
+                        else
+                           if (NXUreaddata (file_id, data_name, dble_3Darray) == NX_OK) then
+                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              //"] = ", minval(dble_3Darray), " to ", maxval(dble_3Darray)
+                           end if
                         end if
+                        deallocate (dble_3Darray, stat = status)
                   end select
             end select
-            !Output attribute information
+            if (single_element) cycle
+            !Check for attributes
             do
                status = NXgetnextattr (file_id, attr_name, n, NXtype)
                if (status /= NX_OK) exit
+               !Output attribute information according to type
                select case (NXtype)
                   case (NX_CHAR)
                      if (NXgetattr (file_id, attr_name, char_value) /= NX_OK) cycle
@@ -230,5 +318,37 @@ contains
       end if
 
    end function dimstring
+
+   !Outputs the number of dimensions specified in an input string
+   function dimcount (string) result (rank)
+
+      character(len=50), intent(in) :: string
+      integer :: rank
+      integer :: i
+      logical :: number_found
+
+      if (verify(trim(string)," 0123456789,") /= 0) then
+         rank = 0
+      else
+         i = 1
+         rank = 1
+         number_found = .false.
+         do
+            if (verify(string(i:i),"0123456789") == 0) then
+               number_found = .true.
+            else if (number_found .and. string(i:i) == ",") then
+               rank = rank + 1
+               number_found = .false.
+            else
+               rank = 0
+               exit
+            end if
+            i = i + 1
+            if (i > len_trim(string)) exit
+         end do
+         if (.not. number_found) rank = 0
+      end if
+
+   end function dimcount
 
 end program NXbrowse
