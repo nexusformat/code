@@ -1,0 +1,21 @@
+#--------------------------------------------------------------------------
+# Makefile for the test program for NXDICT
+# copyleft: Mark Koennecke, August 1997
+#------------------------------------------------------------------------ 
+
+OBJ= napi.o nxdict.o dict.o stringdict.o lld.o dynstring.o
+
+
+CFLAGS= -I/data/koenneck/include -I. -g -c
+LFLAG=  -L/data/koenneck/lib \
+       -lmfhdf -ldf -ljpeg -lz -lm -lc
+.c.o:
+	cc $(CFLAGS) $*.c
+
+
+dict: $(OBJ) 
+	cc -g -non_shared -o dict $(OBJ) $(LFLAG)
+
+clean:
+	rm *.o
+	rm dict
