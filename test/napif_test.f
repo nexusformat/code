@@ -50,12 +50,14 @@ C------------------------------------------------------------------------------
       REAL*4 R
       CHARACTER*64 NAME, CLASS, CH_BUFFER
       INTEGER FILEID(NXHANDLESIZE)
+      INTEGER*4 U_BUFFER(4), U_DIM(1)
       DATA I2_ARRAY /1000, 2000, 3000, 4000/
       DATA I4_ARRAY /1000000, 2000000, 3000000, 4000000/
       DATA R4_ARRAY /1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,
      +  15.,16.,17.,18.,19.,20./
       DATA R8_ARRAY/1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,
      +  15.,16.,17.,18.,19.,20./
+      DATA U_BUFFER /1,2,3,4/
 
       NXDIMS(1) = 2
       NXDIMS(2) = 2
@@ -106,6 +108,25 @@ C------------------------------------------------------------------------------
       IF (NXPUTATTR(FILEID, 'i4_attribute', 42, 1, NX_INT32) 
      +     .NE. NX_OK) STOP
       IF (NXPUTATTR(FILEID, 'r4_attribute', 3.14159265, 1, NX_FLOAT32) 
+     +     .NE. NX_OK) STOP
+      IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
+C*** unlimited dimension test, part 1
+      U_DIM(1) = NX_UNLIMITED
+      IF (NXMAKEDATA(FILEID, 'i9_data', NX_INT32, 1, U_DIM) 
+     +  .NE. NX_OK) STOP
+      IF (NXOPENDATA(FILEID, 'i9_data') .NE. NX_OK) STOP
+      SLAB_START(1) = 1
+      SLAB_SIZE(1) = 4
+      IF (NXPUTSLAB(FILEID, U_BUFFER, SLAB_START, SLAB_SIZE) 
+     +     .NE. NX_OK) STOP
+      IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
+C*** test of flush
+      IF(NXFLUSH(FILEID) .NE. NX_OK) STOP
+C*** unlimited dimension, part 2       
+      IF (NXOPENDATA(FILEID, 'i9_data') .NE. NX_OK) STOP
+      SLAB_START(1) = 5
+      SLAB_SIZE(1) = 4
+      IF (NXPUTSLAB(FILEID, U_BUFFER, SLAB_START, SLAB_SIZE) 
      +     .NE. NX_OK) STOP
       IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
       IF (NXCLOSEGROUP(FILEID) .NE. NX_OK) STOP

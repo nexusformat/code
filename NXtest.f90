@@ -38,6 +38,7 @@ program NXtest
    integer(kind=NXi1), dimension(4) :: i1_array = (/1, 2, 3, 4/)
    integer(kind=NXi2), dimension(4) :: i2_array = (/1000, 2000, 3000, 4000/)
    integer(kind=NXi4), dimension(4) :: i4_array = (/1000000, 2000000, 3000000, 4000000/)
+   integer(kind=NXi4), dimension(2) :: i9_array = (/1,2/)
    real(kind=NXr4), dimension(4,5) :: r4_array
    real(kind=NXr8), dimension(4,5) :: r8_array
    integer(kind=NXi4), dimension(4) :: i4_buffer
@@ -85,6 +86,14 @@ program NXtest
          if (NXputattr(fileid, "ch_attribute", "NeXus") /= NX_OK) stop
          if (NXputattr(fileid, "i4_attribute", 42) /= NX_OK) stop
          if (NXputattr(fileid, "r4_attribute", 3.14159265) /= NX_OK) stop
+      if (NXclosedata(fileid) /= NX_OK) stop
+      if (NXmakedata(fileid, "i9_data", NX_INT32, 1, (/0/)) /= NX_OK) stop
+      if (NXopendata(fileid, "i9_data") /= NX_OK) stop
+         if (NXputslab(fileid,i9_array, (/1/), (/2/)) /= NX_OK) stop
+      if (NXclosedata(fileid) /= NX_OK) stop
+   if (NXflush(fileid) /= NX_OK) stop
+      if (NXopendata(fileid, "i9_data") /= NX_OK) stop
+         if (NXputslab(fileid,i9_array, (/3/), (/2/)) /= NX_OK) stop
       if (NXclosedata(fileid) /= NX_OK) stop
    if (NXclosegroup(fileid) /= NX_OK) stop
    if (NXclose(fileid) /= NX_OK) stop

@@ -7,22 +7,22 @@
 #
 #====================================================================
 # Override compiler definitions if needed e.g.
-#CC=gcc
-#FC=g77
-#CFLAGS=-g
-#FFLAGS=-g
+CC=cc
+FC=f77
+CFLAGS1=-g
+FFLAGS=-g
 #====================================================================
 #The following compiler flags work with Absoft Pro Fortran on Linux
 #CFLAGS=-D__ABSOFT
 #FFLAGS=-f
-#F90=f90
+F90=f90
 #F90FLAGS=-YEXT_NAMES=LCS
 #====================================================================
+HDFROOT=/data/koenneck
 
 # -DNEXUS_LIBRARY=1 is only needed for building the NeXus library
-CFLAGS=$(CFLAGS) -DNEXUS_LIBRARY=1
+CFLAGS=$(CFLAGS1) 
 
-HDFROOT=/usr/local/hdf
 FILES=napi.c napi.h napi_test.c napif.f napif_test.f napif.inc \
 	napi_test_read.c NXmodule.f90 NXUmodule.f90 NXtest.f90 \
 	NXbrowse.c README README.FORTRAN README.FORTRAN90 README.WIN32 \
@@ -62,28 +62,26 @@ libNeXus.a : $(LIBNEXUS_OBJ)
 	ranlib $@
 
 napi_test : $(NAPITEST_OBJ)
-	$(CC) -o $@ $(NAPITEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
+	$(CC) -o $@ $(NAPITEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz $(HDFROOT)/lib/libjpeg.a
 
 napi_test_read : $(NAPITESTREAD_OBJ)
-	$(CC) -o $@ $(NAPITESTREAD_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
+	$(CC) -o $@ $(NAPITESTREAD_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz $(HDFROOT)/lib/libjpeg.a
 
 napif_test : $(NAPIFTEST_OBJ)
-	$(FC) -o $@ $(NAPIFTEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
+	$(FC) -o $@ $(NAPIFTEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz $(HDFROOT)/lib/libjpeg.a
 
 NXtest : $(NXTEST_OBJ)
-	$(F90) -o $@ $(NXTEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
-
+	$(F90) -o $@ $(NXTEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz $(HDFROOT)/lib/libjpeg.a
 NXbrowse : $(NXBROWSE_OBJ)
-	$(CC) -o $@ $(NXBROWSE_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
-
+	$(CC) -o $@ $(NXBROWSE_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz $(HDFROOT)/lib/libjpeg.a
 NXtest.o : NXtest.f90 NXmodule.o
-	$(F90) $(F90FLAGS) -c $?
+	$(F90) $(F90FLAGS) -c NXtest.f90
 
 NXUmodule.o : NXUmodule.f90
-	$(F90) $(F90FLAGS) -c $?
+	$(F90) $(F90FLAGS) -c NXUmodule.f90
 
 NXmodule.o : NXmodule.f90
-	$(F90) $(F90FLAGS) -c $?
+	$(F90) $(F90FLAGS) -c NXmodule.f90
 
 .c.o :
 	$(CC) $(CFLAGS) -I$(HDFROOT)/include -c $<

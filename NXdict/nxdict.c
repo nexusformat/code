@@ -1839,7 +1839,7 @@
      
      /* store global attributes */
      iStat = NXputattr(pFile,"file_name",filename, 
-                       strlen(filename)+1,DFNT_INT8);
+                       strlen(filename)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return NX_ERROR;
@@ -1848,7 +1848,7 @@
      /* write creation time */
      SNXFormatTime(pBueffel,512);
      iStat = NXputattr(pFile,"file_time",pBueffel,
-                       strlen(pBueffel)+1,DFNT_INT8);
+                       strlen(pBueffel)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return NX_ERROR;
@@ -1856,7 +1856,7 @@
 
      /* instrument name */
      iStat = NXputattr(pFile,"instrument",instrument,
-                       strlen(instrument)+1,DFNT_INT8);
+                       strlen(instrument)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return iStat;
@@ -1864,7 +1864,7 @@
 
      /* owner */
      iStat = NXputattr(pFile,"owner",owner,
-                       strlen(owner)+1,DFNT_INT8);
+                       strlen(owner)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return iStat;
@@ -1872,7 +1872,7 @@
 
      /* Adress */
      iStat = NXputattr(pFile,"owner_adress",adress,
-                       strlen(adress)+1,DFNT_INT8);
+                       strlen(adress)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
         return iStat;
@@ -1880,7 +1880,7 @@
 
      /* phone */
      iStat = NXputattr(pFile,"owner_telephone_number",phone,
-                       strlen(phone)+1,DFNT_INT8);
+                       strlen(phone)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
         return iStat;
@@ -1888,7 +1888,7 @@
 
      /* fax */
      iStat = NXputattr(pFile,"owner_fax_number",fax,
-                       strlen(fax)+1,DFNT_INT8);
+                       strlen(fax)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return iStat;
@@ -1896,7 +1896,7 @@
 
      /* email */
      iStat = NXputattr(pFile,"owner_email",email,
-                       strlen(email)+1,DFNT_INT8);
+                       strlen(email)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return iStat;

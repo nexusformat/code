@@ -581,8 +581,100 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     *fid = NULL;
     return NX_OK;
   }
-  
+/*---------------------------------------------------------------------------
+  For the same reasons as stated above we need a wrapper for the fortran
+  version of NXFlush
+  ---------------------------------------------------------------------------*/
+  NXstatus CALLING_STYLE NXfflush(NexusFile* pHandle)
+  {
+    NXhandle h;
+    NXstatus ret;
+    h = (NXhandle)malloc(sizeof(NexusFile));
+    memcpy(h, pHandle, sizeof(NexusFile));
+    ret = NXflush(&h);		/* modifies and reallocates h */
+    memcpy(pHandle, h, sizeof(NexusFile));
+    return ret;
+  }
+
+/*----------------------------------------------------------------------*/
+  NXstatus CALLING_STYLE NXflush(NXhandle *pHandle)
+  {
+    char *pFileName, *pCopy = NULL;
+    int access, dummy, iRet, i, iStack;
+    pNexusFile pFile = NULL;
+    NXaccess ac;
+    int *iRefs = NULL;
+
+    pFile = NXIassert(*pHandle);
+    
+    /*
+      The HDF4-API does not support a flush. We help ourselves with
+      inquiring the name and access type of the file, closing it and
+      opening it again. This is also the reason why this needs a pointer
+      to the handle structure as the handle changes. The other thing we
+      do is to store the refs of all open vGroups in a temporary array
+      in order to recover the position in the vGroup hierarchy before the
+      flush.
+    */
+    iRet = Hfidinquire(pFile->iVID,&pFileName,&access,&dummy);
+    if (iRet < 0) {
+      NXIReportError (NXpData, 
+        "ERROR: Failed to inquire file name for HDF file");
+      return NX_ERROR;
+    }
+    if(pFile->iAccess[0] == 'r') {
+      ac = NXACC_READ;
+    }else if(pFile->iAccess[0] == 'w') {
+      ac = NXACC_RDWR;
+    }
+    pCopy = (char *)malloc((strlen(pFileName)+10)*sizeof(char));
+    if(!pCopy) {
+      NXIReportError (NXpData, 
+        "ERROR: Failed to allocate data for filename copy");
+      return NX_ERROR;
+    }
+    memset(pCopy,0,strlen(pFileName)+10);
+    strcpy(pCopy,pFileName);      
+    
+    /* get refs for recovering vGroup position */
+    iStack = 0;
+    if(pFile->iStackPtr > 0) {
+      iStack = pFile->iStackPtr + 1;
+      iRefs = (int *)malloc(iStack*sizeof(int));
+      if(!iRefs){
+        NXIReportError (NXpData, 
+        "ERROR: Failed to allocate data for hierarchy copy");
+        return NX_ERROR;
+      }
+      for(i = 0; i < iStack; i++){
+         iRefs[i] = pFile->iStack[i].iVref;
+      }
+    }
+
+    iRet = NXclose(pHandle);
+    if(iRet != NX_OK) {
+      return iRet;
+    }
+
+    iRet = NXopen(pCopy, ac, pHandle);
+    free(pCopy);
    
+    /* return to position in vGroup hierarchy */
+    pFile = NXIassert(*pHandle);
+    if(iStack > 0){
+      pFile->iStackPtr = iStack - 1;
+      for(i = 0; i < iStack; i++){
+	pFile->iStack[i].iVref = iRefs[i];
+      }
+      free(iRefs);
+      pFile->iCurrentVG = Vattach(pFile->iVID,
+				  pFile->iStack[pFile->iStackPtr].iVref,
+				  pFile->iAccess);
+    }
+    
+    return iRet;
+  }  
+/*-----------------------------------------------------------------------*/   
   NXstatus CALLING_STYLE NXmakegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) 
   {
     pNexusFile pFile;
@@ -756,7 +848,12 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       NXIReportError (NXpData, pBuffer);
       return NX_ERROR;
     }
-    for (i = 0; i < rank; i++) {
+
+    /*
+      Check dimensions for consistency. The first dimension may be 0
+      thus denoting an unlimited dimension.
+    */
+    for (i = 1; i < rank; i++) {
       if (dimensions[i] <= 0) {
         sprintf (pBuffer,
                  "ERROR: invalid dimension %d, value %d given for SDS %s",
@@ -1414,7 +1511,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     } else {
       sRes->iTag = DFTAG_VG;
-      sRes->iRef = VQueryref(pFile->iCurrentVG);
+      sRes->iRef = pFile->iStack[pFile->iStackPtr].iVref;
       return NX_OK;
     }
     /* not reached */
@@ -1445,13 +1542,23 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXstatus CALLING_STYLE NXmakelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
+    int32 iVG, iRet;
   
     pFile = NXIassert (fid);
   
     if (pFile->iCurrentVG == 0) { /* root level, can not link here */
       return NX_ERROR;
     }
-    Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
+    if(sLink->iTag == DFTAG_VG)
+    {
+        iVG = Vattach (pFile->iVID, sLink->iRef,pFile->iAccess);
+        iRet = Vinsert(pFile->iCurrentVG,iVG);
+        iRet = Vdetach(iVG);
+    }
+    else
+    {
+       Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
+    }    
     return NX_OK;
   }
   

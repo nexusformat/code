@@ -51,14 +51,17 @@ int main()
    double r8_array[5][4] = 
    {1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.};
    int array_dims[2] = { 5, 4 };
+   int unlimited_dims[1] = {NX_UNLIMITED};
    int slab_start[2], slab_size[2];
    char name[64], class[64], char_buffer[128];
    NXhandle fileid;
+   NXlink glink, dlink;
 
 /* create file */
    if (NXopen("NXtest.nxs", NXACC_CREATE, &fileid) != NX_OK) return 1;
    if (NXmakegroup(fileid, "entry", "NXentry") != NX_OK) return 1;
    if (NXopengroup(fileid, "entry", "NXentry") != NX_OK) return 1;
+   /*NXgetgroupID(fileid,&glink); */
       NXlen = 10;
       if (NXmakedata (fileid, "ch_data", NX_CHAR, 1, &NXlen) != NX_OK) return 1;
       if (NXopendata (fileid, "ch_data") != NX_OK) return 1;
@@ -67,6 +70,7 @@ int main()
       if (NXmakedata (fileid, "i1_data", NX_INT8, 1, &array_dims[1]) != NX_OK) return 1;
       if (NXopendata (fileid, "i1_data") != NX_OK) return 1;
          if (NXputdata(fileid, i1_array) != NX_OK) return 1;
+         if(NXgetdataID(fileid,&dlink) != NX_OK) return 1;
       if (NXclosedata(fileid) != NX_OK) return 1;
       if (NXmakedata (fileid, "i2_data", NX_INT16, 1, &array_dims[1]) != NX_OK) return 1;
       if (NXopendata (fileid, "i2_data") != NX_OK) return 1;
@@ -94,6 +98,28 @@ int main()
          if (NXputattr(fileid, "r4_attribute", &r, 1, NX_FLOAT32) != NX_OK) return 1;
       if (NXclosedata(fileid) != NX_OK) return 1;
    if (NXclosegroup(fileid) != NX_OK) return 1;
+
+    /* test linking  */
+   if (NXmakegroup(fileid, "data", "NXdata") != NX_OK) return 1;
+   if (NXopengroup(fileid, "data", "NXdata") != NX_OK) return 1;
+   NXmakelink(fileid, &dlink);
+   if (NXclosegroup(fileid) != NX_OK) return 1;
+
+
+/* test flush and unlimited dimensions */
+   if(NXflush(&fileid) != NX_OK) return 1;
+   if(NXopengroup(fileid,"entry","NXentry") != NX_OK) return 1; 
+   if(NXmakedata(fileid,"r9_data",NX_INT32,1,unlimited_dims) 
+       != NX_OK) return 1;
+   slab_size[0] = 1;
+   for(i = 0; i < 7; i++) {
+    slab_start[0] = i;
+    if(NXopendata(fileid,"r9_data") != NX_OK) return 1;
+    if(NXputslab(fileid,&i,slab_start,slab_size) != NX_OK) return 1;
+    if(NXflush(&fileid) != NX_OK) return 1;
+   }
+   
+
    if (NXclose(&fileid) != NX_OK) return 1;
 /* read data */
    if (NXopen("NXtest.nxs", NXACC_READ, &fileid) != NX_OK) return 1;

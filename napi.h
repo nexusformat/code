@@ -40,7 +40,7 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#define NEXUS_VERSION	"1.3.2"		/* major.minor.patch */
+#define NEXUS_VERSION	"1.3.3"		/* major.minor.patch */
 
 #ifdef GENIE_IMPLEMENTATION__		/* OpenGENIE is fussy about consts */
 #   define CONSTCHAR	const char
@@ -102,6 +102,8 @@ typedef char NXname[VGNAMELENMAX];
 #define NX_OK 1
 #define NX_ERROR 0
 #define NX_EOD -1
+
+#define NX_UNLIMITED SD_UNLIMITED
 
 #define NX_MAXRANK 32
 #define NX_MAXNAMELEN 64
@@ -171,6 +173,7 @@ extern "C" {
 
 #    define NXopen 		MANGLE(nxiopen)
 #    define NXclose 		MANGLE(nxiclose)
+#    define NXflush             MANGLE(nxiflush)
 #    define NXmakegroup 	MANGLE(nximakegroup)
 #    define NXopengroup 	MANGLE(nxiopengroup)
 #    define NXclosegroup 	MANGLE(nxiclosegroup)
@@ -201,6 +204,7 @@ extern "C" {
 /* FORTRAN helpers - for NeXus internal use only */
 #    define NXfopen		MANGLE(nxifopen)
 #    define NXfclose		MANGLE(nxifclose)
+#    define NXfflush            MANGLE(nxifflush)
 #    define NXfmakedata		MANGLE(nxifmakedata)
 #    define NXfcompress		MANGLE(nxifcompress)
 #    define NXfputattr		MANGLE(nxifputattr)
@@ -231,6 +235,7 @@ extern "C" {
  */
 #       define NXopen 			MANGLE(NXIOPEN)
 #       define NXclose 			MANGLE(NXICLOSE)
+#       define NXflush                  MANGLE(NXIFLUSH)
 #       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
 #       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
@@ -261,6 +266,7 @@ extern "C" {
 /* FORTRAN helpers - for NeXus internal use only */
 #	define NXfopen 			MANGLE(NXIFOPEN)
 #	define NXfclose			MANGLE(NXIFCLOSE)
+#       define NXfflush                 MANGLE(NXIFFLUSH)
 #	define NXfmakedata		MANGLE(NXIFMAKEDATA)
 #	define NXfcompress		MANGLE(NXIFCOMPRESS)
 #	define NXfputattr		MANGLE(NXIFPUTATTR)
@@ -273,6 +279,7 @@ extern "C" {
  */
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXclose(NXhandle* pHandle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXflush(NXhandle* pHandle);
   
 NX_EXTERNAL  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);

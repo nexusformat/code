@@ -60,6 +60,8 @@ MODULE NXmodule
    INTEGER, PARAMETER, PUBLIC :: NX_COMP_RLE  = 1
    INTEGER, PARAMETER, PUBLIC :: NX_COMP_HUF  = 3
    INTEGER, PARAMETER, PUBLIC :: NX_COMP_NONE = 0
+! *** NeXus Unlimited parameters
+   INTEGER, PARAMETER, PUBLIC :: NX_UNLIMITED = 0
 ! *** NeXus limits
    INTEGER, PARAMETER, PUBLIC :: NX_MAXRANK = 32 !Defined by HDF in HLIMITS.H
    INTEGER, PARAMETER, PUBLIC :: NX_MAXNAMELEN = 64
@@ -108,7 +110,7 @@ MODULE NXmodule
    REAL(KIND=NXr8),    ALLOCATABLE, PRIVATE :: buffer_r8(:)
    INTEGER, PRIVATE :: NXrank, NXdims(NX_MAXRANK), NXtype, NXsize
 ! *** NeXus core functions ***
-   PUBLIC :: NXopen, NXclose
+   PUBLIC :: NXopen, NXclose, NXflush
    PUBLIC :: NXmakegroup, NXopengroup, NXclosegroup
    PUBLIC :: NXmakedata, NXopendata, NXcompress, NXclosedata
    PUBLIC :: NXgetdata, NXgetslab, NXgetattr, NXputdata, NXputslab, NXputattr
@@ -168,6 +170,20 @@ CONTAINS
       status = nxifclose (file_id)
 
    END FUNCTION NXclose
+!------------------------------------------------------------------------------
+!NXflush flushes all pending data to disk
+   FUNCTION NXflush (file_id) RESULT (status)
+
+      TYPE(NXhandle),   INTENT(out) :: file_id
+      TYPE(NXhandle) :: new_id
+      INTEGER :: status, nxifflush
+      EXTERNAL nxifflush
+
+      new_id = file_id
+      status = nxifflush (new_id)
+      file_id = new_id
+
+   END FUNCTION NXflush
 !------------------------------------------------------------------------------
 !NXmakegroup creates a NeXus group
    FUNCTION NXmakegroup (file_id, group_name, group_class) RESULT (status)
