@@ -1,52 +1,40 @@
-From Mark.Koennecke@psi.ch  Thu Aug  7 07:34:41 1997
-Received: from ptath.nd.rl.ac.uk by isolde.nd.rl.ac.uk; (5.65/1.1.8.2/07Aug95-0902AM)
-	id AA01537; Thu, 7 Aug 1997 07:34:41 +0100
-Resent-Message-Id: <9708070634.AA01537@isolde.nd.rl.ac.uk>
-Resent-Date: Thu, 07 Aug 1997 07:34:49 +0
-Resent-From: <faa@isise.rl.ac.uk>
-Resent-To: <faa@isolde.nd.rl.ac.uk>
-Received: from pss201.psi.ch by ptath.nd.rl.ac.uk (MX V4.1 AXP) with SMTP; Thu,
-          07 Aug 1997 07:34:48 +0
-Return-Path: <koennecke@psiclc.psi.ch>
-Received: from psiclc.psi.ch by pss201.psi.ch; Thu, 7 Aug 97 08:37:06 +0200
-Date: Thu, 7 Aug 1997 08:34:13 +0200
-Message-Id: <97080708341343@psiclc.psi.ch>
-From: Mark.Koennecke@psi.ch
-To: FAA@isise.rl.ac.uk
-Subject: napi.c
-X-Vms-To: FAA@ISISE.RL.AC.UK
-Status: RO
-
-
 /*---------------------------------------------------------------------------
-                         Nexus API implementation file.
+  NeXus - Neutron & X-ray Common Data Format
+  
+  Application Program Interface Routines
+  
+  Copyright (C) 1997 Mark Koennecke, Przemek Klosowski
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  For documentation see the Napim.tex file which comes with this 
-  distribution.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  copyleft: Mark Koennecke
-            Labor fuer Neutronenstreuung
-            Paul Scherrer Institut
-            CH-5232 Villigen-PSI
-            Switzerland
-            Mark.Koennecke@psi.ch
-            Przemek Klosowski
-            U. of Maryland & NIST        
-            przemek.klosowski@nist.gov 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
   No warranties of any kind, whether explicit or implied, taken.
   Distributed under the GNU copyleft license as documented elsewhere.
 
-  March 1997
+  Mark Koennecke                     Przemek Klosowski
+  Labor fuer Neutronenstreuung       U. of Maryland & NIST 
+  Paul Scherrer Institut             Przemek.Klosowski@nist.gov
+  CH-5232 Villigen-PSI
+  Switzerland                        Nick Maliszewskyj
+  Mark.Koennecke@psi.ch              NIST Center for Neutron Research 
+                                     NickM@rrdjazz.nist.gov
 
-  Version: 1.0
-
-  Nick Maliszewskyj, NIST Center for Neutron Research, July 1997        
-             nickm@rrdjazz.nist.gov          
-             Some changes made to allow for directory searches in file reading.
-             Disallow duplicate Vgroup and SDS creation at the same level
-               in the Vgroup hierarchy.     
-             General tidying up.
+  Version   Date       Name    Comments
+  -------   ----       ----    --------
+    0.8    Mar 1997    MK/PK   First beta version of NeXus API
+    0.9    Jun 1997     NM     Some changes made to allow for directory 
+                               searches in file reading.
 ----------------------------------------------------------------------------*/
 
 #include <stdlib.h>
@@ -55,28 +43,6 @@ Status: RO
 #include <mfhdf.h>
 #include "napi.h"
 
-#define NXMAXSTACK 50
-#define NXSIGNATURE 959697
-
-
-  
-  typedef struct __NexusFile {
-    int iNXID;
-    char iAccess[2];
-    int32 iVID;
-    int32 iSID;
-    int32 iCurrentVG;
-    int32 iCurrentSDS;
-    struct iStack {
-      int32 iVref;
-      int iNDir;
-      int iCurDir;
-      int32 *iRefDir;
-      int32 *iTagDir;
-    } iStack[NXMAXSTACK];
-    int iStackPtr;
-    struct iStack iAtt;
-  } NexusFile, *pNexusFile;
   
   
   /*---------------------------------------------------------------------*/
@@ -100,7 +66,7 @@ Status: RO
      {
         pNexusFile pRes;
   
-        assert(fid);
+        assert(fid != NULL);
         pRes = (pNexusFile)fid;
         assert(pRes->iNXID == NXSIGNATURE);
         return pRes;
@@ -108,21 +74,18 @@ Status: RO
   
   /*----------------------------------------------------------------------*/
   static int32
-  NXIFindVgroup (pNexusFile pFile, char *name, char *class)
+  NXIFindVgroup (pNexusFile pFile, char *name, char *nxclass)
   {
     int32 iNew, iRef, iTag;
     int iN, i;
     int32 *pArray = NULL;
     NXname pText;
   
-    assert (pFile);
+    assert (pFile != NULL);
   
     if (pFile->iCurrentVG == 0) { /* root level */
       /* get the number and ID's of all lone Vgroups in the file */
       iN = Vlone (pFile->iVID, NULL, 0);
-      if(iN == 0) {
-         return NX_EOD;
-      }
       pArray = (int32 *) malloc (iN * sizeof (int32));
       if (!pArray) {
         NXIReportError (NXpData, "ERROR: out of memory in NXIFindVgroup");
@@ -136,7 +99,7 @@ Status: RO
         Vgetname (iNew, pText);
         if (strcmp (pText, name) == 0) {
           Vgetclass (iNew, pText);
-          if (strcmp (pText, class) == 0) {
+          if (strcmp (pText, nxclass) == 0) {
             /* found ! */
             Vdetach (iNew);
             iNew = pArray[i];
@@ -158,7 +121,7 @@ Status: RO
           Vgetname (iNew, pText);
           if (strcmp (pText, name) == 0) {
             Vgetclass (iNew, pText);
-            if (strcmp (pText, class) == 0) {
+            if (strcmp (pText, nxclass) == 0) {
               /* found ! */
               Vdetach (iNew);
               return iRef;
@@ -209,7 +172,8 @@ Status: RO
       iN = Vntagrefs (self->iCurrentVG);
       for (i = 0; i < iN; i++) {
         Vgettagref (self->iCurrentVG, i, &iTag, &iRef);
-        if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG)) {
+        if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG) 
+           || (iTag == DFTAG_SDS) ) {
           iNew = SDreftoindex (self->iSID, iRef);
           iNew = SDselect (self->iSID, iNew);
           SDgetinfo (iNew, pNam, &iA, iDim, &iD2, &iD2);
@@ -324,19 +288,13 @@ Status: RO
   }
   
   
-  NXhandle
-  NXopen (char *filename, NXaccess am)
+  NXstatus
+  NXopen (char *filename, NXaccess am, NXhandle fileid)
   {
-    pNexusFile pNew = NULL;
+    pNexusFile pNew = (pNexusFile)fileid;
     char pBuffer[512];
     int iRet;
   
-    /* get memory */
-    pNew = (pNexusFile) malloc (sizeof (NexusFile));
-    if (!pNew) {
-      NXIReportError (NXpData, "ERROR: no memory to create File datastructure");
-      return NULL;
-    }
     memset (pNew, 0, sizeof (NexusFile));
   
     /* start SDS interface */
@@ -344,8 +302,7 @@ Status: RO
     if (pNew->iSID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
       NXIReportError (NXpData, pBuffer);
-      free (pNew);
-      return NULL;
+      return NX_ERROR;
     }
     /* 
      * Otherwise we try to create the file two times which makes HDF
@@ -367,14 +324,17 @@ Status: RO
     if (pNew->iVID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
       NXIReportError (NXpData, pBuffer);
-      free (pNew);
-      return NULL;
+      return NX_ERROR;
     }
-    Vstart (pNew->iVID);
+    iRet = Vstart (pNew->iVID);
+    if (iRet < 0) {
+      NXIReportError (NXpData, "ERROR: HDF cannot initalise Vgroup interface");
+  
+    }
     pNew->iNXID = NXSIGNATURE;
     pNew->iStack[0].iVref = 0;    /* root! */
   
-    return (NXhandle) pNew;
+    return NX_OK; 
   }
   
   
@@ -412,23 +372,14 @@ Status: RO
     return NX_OK;
   }
   
-   
-  NXstatus NXmakegroup (NXhandle fid, char *name, char *class) {
+  
+  NXstatus
+  NXmakegroup (NXhandle fid, char *name, char *nxclass)
+  {
     pNexusFile pFile;
     int32 iNew, iRet;
-    char pBuffer[256];
   
     pFile = NXIassert (fid);
-    /* 
-     * Make sure that a group with the same name and class does not
-     * already exist.
-     */
-    if ((iRet = NXIFindVgroup (pFile, name, class)) >= 0) {
-      sprintf (pBuffer, "ERROR: Vgroup %s, class %s already exists", 
-                        name, class);
-      NXIReportError (NXpData, pBuffer);
-      return NX_ERROR;
-    }
   
     /* create and configure the group */
     iNew = Vattach (pFile->iVID, -1, "w");
@@ -437,10 +388,9 @@ Status: RO
       return NX_ERROR;
     }
     Vsetname (iNew, name);
-    Vsetclass (iNew, class);
+    Vsetclass (iNew, nxclass);
   
     /* Insert it into the hierarchy, when appropriate */
-    iRet = 0;     
     if (pFile->iCurrentVG != 0) {
       iRet = Vinsert (pFile->iCurrentVG, iNew);
     }
@@ -455,7 +405,7 @@ Status: RO
   
   /*------------------------------------------------------------------------*/
   NXstatus
-  NXopengroup (NXhandle fid, char *name, char *class)
+  NXopengroup (NXhandle fid, char *name, char *nxclass)
   {
     pNexusFile pFile;
     int32 iNew, iRef;
@@ -463,9 +413,9 @@ Status: RO
   
     pFile = NXIassert (fid);
   
-    iRef = NXIFindVgroup (pFile, name, class);
+    iRef = NXIFindVgroup (pFile, name, nxclass);
     if (iRef < 0) {
-      sprintf (pBuffer, "ERROR: Vgroup %s, class %s NOT found", name, class);
+      sprintf (pBuffer, "ERROR: Vgroup %s, class %s NOT found", name, nxclass);
       NXIReportError (NXpData, pBuffer);
       return NX_ERROR;
     }
@@ -530,14 +480,6 @@ Status: RO
   
     pFile = NXIassert (fid);
   
-  
-    if ((iNew = NXIFindSDS (fid, name))>=0) {
-      sprintf (pBuffer, "ERROR: SDS %s already exists at this level", name);
-      NXIReportError (NXpData, pBuffer);
-      return NX_ERROR;
-    }
-  
-  
     /* Do some argument checking */
     switch (datatype) {
     case DFNT_FLOAT32: break;
@@ -576,14 +518,6 @@ Status: RO
       SDendaccess (pFile->iCurrentSDS);
       pFile->iCurrentSDS = 0;
     }
-  
-    /* Do not allow creation of SDS's at the root level */
-    if (pFile->iCurrentVG == 0) {
-      sprintf(pBuffer, "ERROR: SDS creation at root level is not permitted");
-      NXIReportError(NXpData, pBuffer);
-      return NX_ERROR;
-    }
-          
     /* dataset creation */
     iNew = SDcreate (pFile->iSID, name, datatype, rank, dimensions);
     if (iNew < 0) {
@@ -891,7 +825,7 @@ Status: RO
   
   
   int
-  NXgetnextentry (NXhandle fid, NXname name, NXname class, int *datatype)
+  NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile pFile;
     int iRet, iStackPtr, iCurDir;
@@ -926,7 +860,7 @@ Status: RO
         return NX_ERROR;
       }
       Vgetname (iTemp, name);
-      Vgetclass (iTemp, class);
+      Vgetclass (iTemp, nxclass);
       *datatype = DFTAG_VG;
       pFile->iStack[pFile->iStackPtr].iCurDir++;
       Vdetach (iTemp);
@@ -940,7 +874,7 @@ Status: RO
           return NX_ERROR;
         }
         Vgetname (iTemp, name);
-        Vgetclass (iTemp, class);
+        Vgetclass (iTemp, nxclass);
         *datatype = DFTAG_VG;
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         Vdetach (iTemp);
@@ -951,14 +885,14 @@ Status: RO
                               pFile->iStack[iStackPtr].iRefDir[iCurDir]);
         iTemp = SDselect (pFile->iSID, iTemp);
         SDgetinfo (iTemp, name, &iA, iDim, &iD1, &iD2);
-        strcpy (class, "SDS");
+        strcpy (nxclass, "SDS");
         *datatype = iD1;
         SDendaccess (iTemp);
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         return NX_OK;
       } else {                    /* unidentified */
         strcpy (name, "UNKNOWN");
-        strcpy (class, "UNKNOWN");
+        strcpy (nxclass, "UNKNOWN");
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         return NX_OK;
       }
@@ -1009,51 +943,49 @@ Status: RO
   }
   
   
-  NXlink
-  NXgetgroupID (NXhandle fileid)
+  NXstatus
+  NXgetgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile pFile;
-    NXlink sRes;
   
     pFile = NXIassert (fileid);
   
     if (pFile->iCurrentVG == 0) {
-      sRes.iTag = NX_ERROR;
-      return sRes;
+      sRes->iTag = NX_ERROR;
+      return NX_ERROR;
     } else {
-      sRes.iTag = DFTAG_VG;
-      sRes.iRef = pFile->iCurrentVG;
-      return sRes;
+      sRes->iTag = DFTAG_VG;
+      sRes->iRef = pFile->iCurrentVG;
+      return NX_OK;
     }
     /* not reached */
-    sRes.iTag = NX_ERROR;
-    return sRes;
-  }
-  
-  
-  NXlink
-  NXgetdataID (NXhandle fid)
-  {
-    pNexusFile pFile;
-    NXlink sRes;
-  
-    pFile = NXIassert (fid);
-  
-    if (pFile->iCurrentSDS == 0) {
-      sRes.iTag = NX_ERROR;
-      return sRes;
-    } else {
-      sRes.iTag = DFTAG_SDS;
-      sRes.iRef = SDidtoref (pFile->iCurrentSDS);
-      return sRes;
-    }
-    sRes.iTag = NX_ERROR;
-    return sRes;                  /* not reached */
+    sRes->iTag = NX_ERROR;
+    return NX_ERROR;
   }
   
   
   NXstatus
-  NXmakelink (NXhandle fid, NXlink sLink)
+  NXgetdataID (NXhandle fid, NXlink* sRes)
+  {
+    pNexusFile pFile;
+  
+    pFile = NXIassert (fid);
+  
+    if (pFile->iCurrentSDS == 0) {
+      sRes->iTag = NX_ERROR;
+      return NX_ERROR;
+    } else {
+      sRes->iTag = DFTAG_SDS;
+      sRes->iRef = SDidtoref (pFile->iCurrentSDS);
+      return NX_OK;
+    }
+    sRes->iTag = NX_ERROR;
+    return NX_ERROR;                  /* not reached */
+  }
+  
+  
+  NXstatus
+  NXmakelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
   
@@ -1062,13 +994,68 @@ Status: RO
     if (pFile->iCurrentVG == 0) { /* root level, can not link here */
       return NX_ERROR;
     }
-    if (sLink.iTag == DFTAG_VG) {
-      Vinsert (pFile->iCurrentVG, sLink.iRef);
+    if (sLink->iTag == DFTAG_VG) {
+      Vinsert (pFile->iCurrentVG, sLink->iRef);
     } else {
-      Vaddtagref (pFile->iCurrentVG, sLink.iTag, sLink.iRef);
+      Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
     }
     return NX_OK;
   }
-  
 
+/* allocate space for an array of given dimensions and type */
+  NXstatus
+  NXmalloc (void** data, int rank, int dimensions[], int datatype)
+  {
+	int i;
+	size_t size = 1;
+	*data = NULL;
+	for(i=0; i<rank; i++)
+	    size *= dimensions[i];
+	switch(datatype)
+	{
+	    case DFNT_INT8:
+	    case DFNT_UINT8:
+		break;		/* size is correct already */
 
+	    case DFNT_INT16:
+	    case DFNT_UINT16:
+		size *= 2;
+		break;
+
+	    case DFNT_INT32:
+	    case DFNT_UINT32:
+	    case DFNT_FLOAT32:
+		size *= 4;
+		break;
+
+	    case DFNT_FLOAT64:
+		size *= 8;
+		break;
+
+	    default:
+      		NXIReportError (NXpData, "ERROR: NXmalloc - unknown data type in array");
+		return NX_ERROR;
+		break;
+	}
+	*data = (void*)malloc(size);
+	return NX_OK;
+  }
+
+/* free space allocated by NXmalloc */
+  NXstatus
+  NXfree (void** data)
+  {
+	if (data == NULL)
+	{
+      	    NXIReportError (NXpData, "ERROR: passing NULL to NXfree");
+	    return NX_ERROR;
+	}
+	if (*data == NULL)
+	{
+      	    NXIReportError (NXpData, "ERROR: passing already freed pointer to NXfree");
+	    return NX_ERROR;
+	}
+        free(*data);
+        *data = NULL;
+	return NX_OK;
+  }
