@@ -72,7 +72,7 @@ NXtest : $(NXTEST_OBJ)
 NXbrowse : $(NXBROWSE_OBJ)
 	$(CC) -o $@ $(NXBROWSE_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
 	
-NXtest.o : NXtest.f90
+NXtest.o : NXtest.f90 NXmodule.o
 	$(F90) $(F90FLAGS) -c $?
 
 NXUmodule.o : NXUmodule.f90
