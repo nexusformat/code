@@ -24,16 +24,14 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
-# $Id$
-#
-# @configure_input@
+#  @configure_input@
 #
 #====================================================================
 
 # so   "make test"   is the same as   "make check"
 test: check
 
-SUBDIRS=include src bindings test applications scripts
+SUBDIRS=include src bindings test applications scripts contrib
 
 EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec autoversion.sh \
 		build_rpm.in

@@ -152,6 +152,8 @@ AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_PROG_CXX
+
 dnl These are used in build_rules.am to pass any approptiate 
 dnl tag to libtool for f90 building
 if test `$EGREP "available_tags=.*F77" libtool | wc -l` -gt 0; then
@@ -318,6 +320,9 @@ AC_CONFIG_FILES([Makefile
 		bindings/f77/Makefile
 		bindings/f90/Makefile
                 bindings/java/Makefile
+		contrib/Makefile
+		contrib/applications/Makefile
+		contrib/applications/NXdir/Makefile
 		scripts/Makefile
 		scripts/nexus.pc
 		scripts/nxbuild])

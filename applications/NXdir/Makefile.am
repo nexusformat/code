@@ -1,4 +1,7 @@
+## Process this file with automake to produce Makefile.in
 #====================================================================
+# $Id$
+#
 # Copyright (c) 2004, P.F.Peterson <petersonpf@ornl.gov>
 #               Spallation Neutron Source at Oak Ridge National Laboratory
 #
@@ -21,52 +24,31 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
+# @configure_input@
+#
 #====================================================================
-CPP=g++
-C_FLAGS=-c -g -fPIC
-INC_FLAGS=-I/usr/local/include
-LD_FLAGS=-lNeXus -lmfhdf -ldf -ljpeg -lhdf5
-######################################################################
-# do not edit below this point
-ALL=nxdir
-OBJ=main.o string_util.o tree.o data.o data_writer.o
-SRC=main.cpp string_util.cpp tree.cpp data.cpp nxdir.h nxdir_help.h \
-    data_writer.cpp Makefile CHANGES LICENSE README TODO
-VERS=0.2.5
-######################################################################
+LIBNEXUS=$(top_builddir)/src/libNeXus.la
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
-all: $(ALL)
+bin_PROGRAMS = nxdir
+nxdir_SOURCES = main.cpp string_util.cpp tree.cpp data.cpp data_writer.cpp \
+		nxdir.h nxdir_help.h
+nxdir_LDADD = $(LIBNEXUS)
+EXTRA_DIST = CHANGES LICENSE README TODO
 
-main.o: main.cpp nxdir.h nxdir_help.h
-	$(CPP) $(C_FLAGS) $(INC_FLAGS) main.cpp
+## extra dependencies (don;t thing needed now)
+##main.o: main.cpp nxdir.h nxdir_help.h
+##data.o: data.cpp nxdir.h
+##string_util.o: string_util.cpp nxdir.h
+##tree.o: tree.cpp nxdir.h
 
-data.o: data.cpp nxdir.h
-	$(CPP) $(C_FLAGS) $(INC_FLAGS) data.cpp
-
-string_util.o: string_util.cpp nxdir.h
-	$(CPP) $(C_FLAGS) $(INC_FLAGS) string_util.cpp
-
-tree.o: tree.cpp nxdir.h
-	$(CPP) $(C_FLAGS) $(INC_FLAGS) tree.cpp
-
-nxdir: $(OBJ)
-	$(CPP) $(OBJ) $(LD_FLAGS) -o nxdir
-
+#VERS=0.2.5
 # target taken from "Art of Unix Programming chp19sec02" by ESR
-NXdir-$(VERS).tar.gz: $(SRC)
-	@ls $(SRC) | sed s:^:NXdir-$(VERS)/: >MANIFEST
-	@(cd ..; ln -s NXdir NXdir-$(VERS))
-	(cd ..;tar -czvf NXdir/NXdir-$(VERS).tar.gz `cat NXdir/MANIFEST`)
-	@(cd ..; rm NXdir-$(VERS))
+#NXdir-$(VERS).tar.gz: $(SRC)
+#	@ls $(SRC) | sed s:^:NXdir-$(VERS)/: >MANIFEST
+#	@(cd ..; ln -s NXdir NXdir-$(VERS))
+#	(cd ..;tar -czvf NXdir/NXdir-$(VERS).tar.gz `cat NXdir/MANIFEST`)
+#	@(cd ..; rm NXdir-$(VERS))
 
-######################################################################
-test:
-
-clean:
-	rm *.o
-
-clean_out: clean
-	rm test*.nxs
-
-distclean: clean_out
-	rm $(ALL)
+include $(top_srcdir)/build_rules.am
