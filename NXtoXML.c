@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
    }
    
 /* Output XML header and global attributes */
-   fprintf (outId, "<?xml version=""1.0"" ?>\n");
+   fprintf (outId, "<?xml version=\"1.0\"?>\n");
    fprintf (outId, "<NXroot");
    PrintAttributes ();
    fprintf (outId, ">\n");
