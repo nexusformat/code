@@ -23,6 +23,9 @@ manually select the appropriate form of the MANGLE() function.
 Please refer to the "WINDOWS SPECIFIC CONFIGURATION" section of
 "napi.h" for further instructions.
 
+If you get a LINK error saying the function _htons@4 is undefined,
+add "wsock32.lib" to the list of libraries you link against
+
 *** Building a Dynamic Link Library (NEXUS.DLL) *** 
 
 These instructions are for Visual Studio 97 ... later versions should
