@@ -37,7 +37,7 @@ LDFLAGS=
 #Compiler flags for g77 and Absoft Pro Fortran 90 on Mac OS X
 #CC=cc
 #FC=g77
-#CFLAGS=-g -no-cpp-precomp 
+#CFLAGS=-g -no-cpp-precomp -D__unix
 #FFLAGS=-g -Wno-globals
 #F90=f95
 #F90FLAGS=-YEXT_NAMES=LCS -YEXT_SFX=_
@@ -46,7 +46,7 @@ LDFLAGS=
 #Compiler flags for Absoft Pro Fortran 90 on Linux
 #CC=cc
 #FC=g77
-#CFLAGS=-gdwarf -D__ABSOFT
+#CFLAGS=-gdwarf -D__ABSOFT -D__unix
 #FFLAGS=-f
 #F90=f90
 #F90FLAGS=-YEXT_NAMES=LCS
