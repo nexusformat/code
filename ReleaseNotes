@@ -1,3 +1,12 @@
+Changes in Version 1.3.0
+========================
+
+- added NXcompress to both the C- and F77 API. Compression works only with
+  Release 3 of the HDF-4.1 libraries or better. Note: on my DigitalUnix 4.0D
+  installation I had to link against the jpeg library supplied with HDF 
+  directly due to a conflict with a system shared library. Replace -ljpeg
+  by $HDFROOT/lib/libjpeg.a.
+
 Changes in Version 1.2.1
 ========================
 
