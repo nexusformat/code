@@ -110,7 +110,7 @@ program NXbrowse
                      case (1)
                         if (single_element) then
                            if (NXUreaddata (file_id, data_name, int_array, data_start=NXdims, data_size=(/1/)) == NX_OK) then
-                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              print *, "  "//trim(data_name)//"("//trim(input_text)//") ["//trim(NXdatatype(NXtype))&
                               //"] = ", int_array(1)
                            end if
                         else
@@ -158,7 +158,7 @@ program NXbrowse
                      case (1)
                         if (single_element) then
                            if (NXUreaddata (file_id, data_name, real_array, data_start=NXdims, data_size=(/1/)) == NX_OK) then
-                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              print *, "  "//trim(data_name)//"("//trim(input_text)//") ["//trim(NXdatatype(NXtype))&
                               //"] = ", real_array(1)
                            end if
                         else
@@ -206,7 +206,7 @@ program NXbrowse
                      case (1)
                         if (single_element) then
                            if (NXUreaddata (file_id, data_name, dble_array, data_start=NXdims, data_size=(/1/)) == NX_OK) then
-                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                              print *, "  "//trim(data_name)//"("//trim(input_text)//") ["//trim(NXdatatype(NXtype))&
                               //"] = ", dble_array(1)
                            end if
                         else
