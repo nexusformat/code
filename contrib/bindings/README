@@ -1,0 +1,7 @@
+This directory contains NeXus language bindings contributed by the 
+neutron community that are not (yet) part of the official NeXus 
+distribution. 
+
+See the individual directories for further details.
+
+$Id$
