@@ -12,6 +12,9 @@ nxpylib represents a convenience tool for scientists who want to store their sca
 
 nxpylib presents itself in a kind of object-oriented fashion and treats every entry and any piece of data in a nexus file as an object. As a consequence it has to implement a mapping of the state-dependant iteration mechanism of the NeXus API into something more manageable and object like when handling with NeXus components.
 
+nxpylib relies on the nxpython interface in order to access the C API
+
+
 the main goals of nxpylib are:
 ------------------------------
 1) hide the extensive and recurring NAPI function calling sequence required for any write and read process in NeXus files from the python programmer.
@@ -28,6 +31,9 @@ Moreover the generation of instrument specific validation mechanisms and the aut
 
 Installation Instructions
 =========================
+Note: remember that nxpylib needs the swig interface to the C API nxpython  
+so please install nxpython first, before testing nxpylib !!
+
 in order to get nxpylib running, you need:
 - the hdf libraries and the 3rdparty librarys hdf relies on (szip, zlib, jpeg)
 - a recent copy of the nexus cvs sources
