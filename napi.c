@@ -1120,8 +1120,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     else
     {
        /* write directly */ 
-       iRet = SDwritedata (pFile->iCurrentSDS,iStart, 
-			  iStride, iSize, data);
+       iRet = SDwritedata (pFile->iCurrentSDS,(int32*)iStart, 
+			  iStride, (int32*)iSize, data);
     }
 
     /* deal with HDF errors */
