@@ -10,14 +10,14 @@ Version: @PACKAGE_VERSION@
 # built into an RPM file; it should be incremented each RPM build and
 # then reset to 1 when a new version of the software is released
 Release: 1
-Copyright: GLGPL
+Copyright: LGPL
 # Group: there is more than one choice for this - maybe we need to split
 # nexus into separate packages (libraries + apps)
 Group: Development/Libraries
 #Group: Development/Tools
 Source: ftp://ftp.neutron.anl.gov/nexus/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.gz
 URL: http://www.neutron.anl.gov/NeXus/
-#Distribution:
+Distribution: @DISTRIBUTION@
 #Icon: nexus.xpm
 Vendor: NeXus International Advisory Committee (NIAC)
 Packager: NeXus Developers <nexus-developers@anl.gov>
@@ -29,11 +29,13 @@ Prefix: /usr/local
 # be specified here to allow   rpm --buildroot   to be used later
 # (it will get used for a   rpmbuild --recompile  of the the src.rpm)
 BuildRoot: /tmp/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
+
 %description
 NeXus is an international standard for exchanging data files
 among Neutron, Muon and X-ray science facilities. The underlying
 data is stored using the HDF format from NCSA. This package provides
 access routines, documentation, examples and a basic NeXus file browser.
+
 %prep
 %setup
 %build
@@ -50,11 +52,11 @@ make
 make install
 %files
 %doc README NEWS ChangeLog AUTHORS COPYING INSTALL
-%docdir /usr/local/nexus/doc
+# %docdir /usr/local/doc
 /usr/local/lib
 /usr/local/bin
 /usr/local/include
-/usr/local/nexus
+
 %clean
 # the rm line can be dangerous - build_root might be / !
 # leave commented out for moment, but we need to implement
@@ -75,7 +77,10 @@ if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
-* Sun Feb 22 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
-- Initial RPM kit version
+* Wed May 12 2004 Jens Krüger <jens.krueger@frm2.tum.de>
+- Change the License entry to LGPL
+- remove /usr/local/nexus /usr/local/doc from the file list
 * Wed Mar 24 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
 - Fix up prefix in nxbuild after an install so the RPM is now relocatable
+* Sun Feb 22 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+- Initial RPM kit version
