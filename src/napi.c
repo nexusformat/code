@@ -864,7 +864,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXgetdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
-    int32 iStart[MAX_VAR_DIMS], iEnd[MAX_VAR_DIMS];
+    int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS];
     NXname pBuffer;
     int32 iRank, iAtt, iType;
   
@@ -877,15 +877,15 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
     /* first read dimension information */
     memset (iStart, 0, MAX_VAR_DIMS * sizeof (int32));
-    SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iEnd, &iType, &iAtt);
+    SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iSize, &iType, &iAtt);
     /* actually read */
-    SDreaddata (pFile->iCurrentSDS, iStart, NULL, iEnd, data);
+    SDreaddata (pFile->iCurrentSDS, iStart, NULL, iSize, data);
     return NX_OK;
   }
   
   
   NXstatus
-  NXgetslab (NXhandle fid, void *data, int iStart[], int iEnd[])
+  NXgetslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
   
@@ -897,7 +897,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     /* actually read */
-    SDreaddata (pFile->iCurrentSDS, (int32*)iStart, NULL, (int32*)iEnd, data);
+    SDreaddata (pFile->iCurrentSDS, (int32*)iStart, NULL, (int32*)iSize, data);
     return NX_OK;
   }
   
@@ -974,7 +974,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXputdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
-    int32 iStart[MAX_VAR_DIMS], iEnd[MAX_VAR_DIMS], iStride[MAX_VAR_DIMS];
+    int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS], iStride[MAX_VAR_DIMS];
     NXname pBuffer;
     int32 iRank, iAtt, iType, iRet, i;
     char pError[512];
@@ -988,7 +988,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
     /* first read dimension information */
     memset (iStart, 0, MAX_VAR_DIMS * sizeof (int32));
-    SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iEnd, &iType, &iAtt);
+    SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iSize, &iType, &iAtt);
   
     /* initialise stride to 1 */
     for (i = 0; i < iRank; i++) {
@@ -996,7 +996,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
   
     /* actually write */
-    iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iEnd, data);
+    iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iSize, data);
     if (iRet < 0) {
       sprintf (pError, "ERROR: failure to write data to %s", pBuffer);
       NXIReportError (NXpData, pError);
@@ -1007,7 +1007,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   NXstatus
-  NXputslab (NXhandle fid, void *data, int iStart[], int iEnd[])
+  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
     int iRet;
@@ -1028,7 +1028,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
     /* actually write */
     iRet = SDwritedata (pFile->iCurrentSDS, (int32*)iStart, 
-			(int32*)iStride, (int32*)iEnd, data);
+			(int32*)iStride, (int32*)iSize, data);
     if (iRet < 0) {
       NXIReportError (NXpData, "ERROR: writing slab failed");
       return NX_ERROR;
