@@ -51,7 +51,6 @@ def main(args):
 	f.close()
 	
 	print "========================================================================"
-	return
 
 
 	#----------------------------------------------------------
@@ -264,22 +263,25 @@ def main(args):
 	print "================================================================"
 	
 	f = NXfile("nxtest.nxs", NXACC_RDWR)
-	
+	usr = f.readGroup("root:NXroot/entry:NXentry/user:NXuser")	
 	user_name = NXelem(name="name", nxtype=NX_CHAR, dims=[20], data="Hartmut Gilde")
 	user_role = NXelem(name="role", nxtype=NX_CHAR, dims=[20], data="observer")
 	user_mail = NXelem(name="email", nxtype=NX_CHAR, dims=[30], data="hartmut.gilde@frm2.tum.de")
 	
 	# write single group to specific location in tree
-	usr = NXuser(name="hartmut", path="root:NXroot/entry:NXentry/user:NXuser")
+	#usr = NXuser(name="hartmut", path="root:NXroot/entry:NXentry/user:NXuser")
 	usr.set_name(user_name)
 	usr.set_role(user_role)
 	usr.set_email(user_mail)
-
+	
+	f.writeGroup(usr)
+	
 	#write single element to specified location in tree
 	density = NXelem(path="root:NXroot/entry:NXentry/sample:NXsample/density:SDS", name="density", nxtype=NX_FLOAT32, dims=[4], data=[0.5, 0.5, 0.5, 0.5])
 	f.writeElem(density)
 	
 	density = None
+		
 	f.close()
 
 
@@ -402,7 +404,7 @@ def main(args):
 		traxisk.appendData(3.1)
 		traxisl.appendData(4.4)
 	
-	trdata2.plotData(axname="h", coords=[1,2])
+	#trdata2.plotData(axname="h", coords=[1,2])
 	
 	f.close()
 	print "\n\n"

@@ -204,12 +204,28 @@ class NXfile:
 				nlist=pathlist[:]
 				nlist.append((ename,"SDS"))
 				
-				if groupclass == "NXdata" and elemattrs.has_key("signal"):
-					elems[ename] = NXdataelem(	path=nlist, 
+				if groupclass == "NXdata":
+					if elemattrs.has_key("signal"):
+						elems[ename] = NXdataelem(	path=nlist, 
 														name=ename, 
 														nxtype=elemtype, 
 														dims=dims, 
 														attrs=elemattrs)
+					else:
+						if elemattrs.has_key("axis") or ename != "errors":
+							elems[ename] = NXaxis (	name=ename, 
+														nxtype=elemtype, 
+														dims=dims, 
+														attrs=elemattrs)
+						else:
+							# this must be the "errors" of the data
+							elems[ename] = NXelem(	path=nlist,
+														name=ename, 
+														nxtype=elemtype, 
+														dims=dims, 
+														attrs=elemattrs)
+
+								
 				else:
 					elems[ename] = NXelem(	path=nlist, 
 													name=ename, 
@@ -257,7 +273,10 @@ class NXfile:
 		subgrouptuple = split(subgroupid, ":", 2)
 		subgrouppath = metagroup.group.path[:]
 		subgrouppath.append((subgrouptuple[0], subgrouptuple[1]))
-		return self.readGroupFromFile(subgrouppath, self.FLAT)
+		subgroup = self.readGroupFromFile(subgrouppath, self.FLAT)
+		if subgroup != 0:
+			metagroup.setGroup(subgroup)
+		return subgroup
 		
 	
 	def readElem(self, pathstr):
@@ -459,10 +478,12 @@ class NXfile:
 		
 
 	def writeGroup(self, metagroup, mode=DEEP):
+		#print "writing metagroup: ", metagroup
 		return self.writeGroupToFile(metagroup.group, mode)
 
 
 	def writeGroupToFile(self, group, mode):
+		#print "writing group: ", group
 		if self.handle == None:
 			print "Error: handle hasn't been initialized yet"
 			return 0
@@ -486,6 +507,7 @@ class NXfile:
 		#print "path:", group.path
 		groupname = group.path[len(group.path)-1][0]
 		groupclass = group.path[len(group.path)-1][1]
+		#print "writeSingleGroup: ", group.name, groupname, groupclass
 
 		if groupclass != "NXroot":
 			status = NXinitgroupdir(self.handle)
@@ -496,6 +518,7 @@ class NXfile:
 				if nxclass == groupclass:
 					#check if group exists
 					if name == groupname:
+						#print "group exists"
 						status = NXopengroup(self.handle, groupname, groupclass)
 						found = 1
 					else:	
@@ -526,7 +549,7 @@ class NXfile:
 						print "NXputattr failed: ", attname, attval, atttype
 	
 
-	   
+		#print "group elems:", group.elems
 		#now write data and groups
 		if group.elems != None:
 			for elemname in group.elems.keys():

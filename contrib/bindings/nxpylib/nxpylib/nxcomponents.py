@@ -182,6 +182,7 @@ class NXelem:
 	def setData(self, data):
 		#checkTypeAndDim(data)
 		#set type and dim 
+		#print "setting data for ", self.name, " ; values: " , data
 		self.data = data
 
 	def setAttr(self, attr):
@@ -301,7 +302,6 @@ class NXgroup:
 				if type(elems[elemname]) == types.InstanceType:
 					return elems[elemname].getData()
 		
-
 	def setElemData(self, elemname, data):
 		if elemname in elems:
 			if elems[elemname] != None:
@@ -309,7 +309,7 @@ class NXgroup:
 					elems[elemname].setData(data)
 					return 1
 		return 0			
-	
+
 	def getGroup(self, groupname):
 		if groupname in groups:
 			if groups[groupname] != None:
@@ -413,8 +413,8 @@ class NXdataelem(NXelem):
 		if attrs == None:	attrs = {}	
 		if data == None: 	data = []
 		NXelem.__init__(self, parent=None, path=path, name=name, nxtype=nxtype, dims=dims, attrs=attrs, data=data)
-		self.attrs["axis"] = NXattr(name="axis", nxtype=NX_CHAR, value=axnames)
-		self.attrs["signal"] = NXattr(name="axis", nxtype=NX_CHAR, value="1")
+		self.attrs["axes"] = NXattr(name="axes", nxtype=NX_CHAR, value=axnames)
+		self.attrs["signal"] = NXattr(name="signal", nxtype=NX_CHAR, value="1")
 		self.cachefile = cachefile
 		self.axcachefile = axcachefile
 		self.nxcachefile = nxcachefile
@@ -530,6 +530,7 @@ class NXdataelem(NXelem):
 		if self.axes == None:
 			self.axes={}
 		self.axes[axisobj.name] = axisobj
+		#print "axis data:", self.axes[axisobj.name].data
 		
 		
 	def setUnit(self, unit):

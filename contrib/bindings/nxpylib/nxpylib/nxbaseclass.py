@@ -209,6 +209,9 @@ class NXdata(NXdatabase):
 		for ax in axlist:
 			self.setElem(ax)
 		return 1	
+	
+	def addAxis(self, axis):
+		self.setElem(axis)
 
 
 	

@@ -110,7 +110,11 @@ class NXfactory:
 
 				else:  #SDS
 					#print "name", item.name
-					elemcontent = item.children.listGetString(item.doc, 1)
+					try: 
+						elemcontent = item.children.listGetString(item.doc, 1)
+					except:
+						elemcontent = None
+						
 					attrs = None
 					elemtype = NX_CHAR
 					elemdims = []
@@ -165,11 +169,15 @@ class NXfactory:
 						print "opening data set %s failed. aborting"%(item.name)
 						return 0
 					#put data
-					status = NXputdata(nxhandle, self.convertXMLToNXData(elemcontent, elemdims, elemtype))
-					if status != 1:
-						print "putting data to dataset %s failed. aborting"%(item.name)
-						return 0
-					#print "data put into ", item.name, self.convertXMLToNXData(elemcontent, elemdims, elemtype)
+					if elemcontent != None:
+						#print "putting data:", elemcontent
+						status = NXputdata(nxhandle, self.convertXMLToNXData(elemcontent, elemdims, elemtype))
+						if status != 1:
+							print "putting data to dataset %s failed. aborting"%(item.name)
+							return 0
+						#print "data put into ", item.name, self.convertXMLToNXData(elemcontent, elemdims, elemtype)
+					else:
+						print "elemcontent of ", item.name, " was None"
 					
 					if item.properties != None:
 						for att in item.properties:

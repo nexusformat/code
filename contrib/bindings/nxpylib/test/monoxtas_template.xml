@@ -137,7 +137,7 @@ satisfying the NeXus procedure for identifying plottable data.
 			</NXinstrument>
 		  <!-- NXdata name_enums="off-off|off-on|on-off|on-o"-->
         <NXdata name="on-on">
-            <!--ei units="eV" type="NX_FLOAT32[5]" info="{Incident energies}?">0 0 0 0 0</ei>
+            <ei units="eV" type="NX_FLOAT32[5]" info="{Incident energies}?">0 0 0 0 0</ei>
             <ef units="eV" type="NX_FLOAT32[5]" info="{Final energies}?">0 0 0 0 0</ef>
             <de units="eV" type="NX_FLOAT32[5]" info="{Energy transfers}?">0 0 0 0 0</de>
             <q  units="inverse_angstroms" info="{Momentum transfers}?">0</q>
@@ -153,7 +153,7 @@ zero}" info="{vector of motor positions}?">0 0 0 0 0</sample_theta>
             <counts long_name="{Title of measurement}"
                     signal="1"
                     type="NX_INT32[5]"
-                    axis="[q]" info="{Array of intensities}">0</counts-->
+                    axis="[q]" info="{Array of intensities}">0 0 0 0 0</counts>
         </NXdata>
     </NXentry>
 </NXroot>
