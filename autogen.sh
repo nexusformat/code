@@ -1,5 +1,9 @@
 #!/bin/sh
-LIBTOOLIZE="libtoolize --force --copy --automake"
+LIBTOOLIZE=`which glibtoolize 2>/dev/null`
+if test -z "$LIBTOOLIZE" ; then
+	LIBTOOLIZE=`which libtoolize 2>/dev/null`
+fi
+LIBTOOLIZE="$LIBTOOLIZE --force --copy --automake"
 ACLOCAL="aclocal"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c"
