@@ -987,7 +987,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
-    int32 iNew;
+    int32 iNew, iType32;
     void *pData = NULL;
     int32 iLen, iRet;
     char pBuffer[256];
@@ -1010,11 +1010,13 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     /* get more info, allocate temporary data space */
+    iType32 = (int32)*iType;
     if (pFile->iCurrentSDS != 0) {
-      iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, (int32*)iType, &iLen);
+      iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, &iType32, &iLen);
     } else {
-      iRet = SDattrinfo (pFile->iSID, iNew, pNam, (int32*)iType, &iLen);
+      iRet = SDattrinfo (pFile->iSID, iNew, pNam, &iType32, &iLen);
     }
+    *iType = (int)iType32;
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: HDF could not read attribute info");
       NXIReportError (NXpData, pBuffer);
