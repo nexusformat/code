@@ -68,22 +68,34 @@ CONTAINS
                         email) RESULT (status)
 
       TYPE(NXhandle),   INTENT(in) :: file_id      
-      CHARACTER(len=*), INTENT(in) :: user, affiliation, address, phone, &
-                        fax, email
+      CHARACTER(len=*), INTENT(in), OPTIONAL :: user, affiliation, address, &
+                        phone, fax, email
       INTEGER :: status
 
-      status = NXputattr (file_id, "user", trim(user))
-      IF (status /= NX_OK) RETURN
-      status = NXputattr (file_id, "affiliation", trim(affiliation))
-      IF (status /= NX_OK) RETURN
-      status = NXputattr (file_id, "address", trim(address))
-      IF (status /= NX_OK) RETURN
-      status = NXputattr (file_id, "telephone_number", trim(phone))
-      IF (status /= NX_OK) RETURN
-      status = NXputattr (file_id, "fax_number", trim(fax))
-      IF (status /= NX_OK) RETURN
-      status = NXputattr (file_id, "email", trim(email))
-      IF (status /= NX_OK) RETURN
+      IF (PRESENT(user)) THEN
+         status = NXputattr (file_id, "user", trim(user))
+         IF (status /= NX_OK) RETURN
+      END IF
+      IF (PRESENT(affiliation)) THEN
+         status = NXputattr (file_id, "affiliation", trim(affiliation))
+         IF (status /= NX_OK) RETURN
+      END IF
+      IF (PRESENT(address)) THEN
+         status = NXputattr (file_id, "address", trim(address))
+         IF (status /= NX_OK) RETURN
+      END IF
+      IF (PRESENT(phone)) THEN
+         status = NXputattr (file_id, "telephone_number", trim(phone))
+         IF (status /= NX_OK) RETURN
+      END IF
+      IF (PRESENT(fax)) THEN
+         status = NXputattr (file_id, "fax_number", trim(fax))
+         IF (status /= NX_OK) RETURN
+      END IF
+      IF (PRESENT(email)) THEN
+         status = NXputattr (file_id, "email", trim(email))
+         IF (status /= NX_OK) RETURN
+      END IF
 
    END FUNCTION NXUwriteglobals
 !------------------------------------------------------------------------------
