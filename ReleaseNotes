@@ -1,3 +1,29 @@
+Changes in Version 1.3.2
+========================
+
+- NXbrowse now reads a filename as command line argument and only prompts if
+  none is specified.
+
+- Added "dump <data_name> <file_name>" command to NXbrowse, which dumps a 
+  NeXus data array into an ASCII file.
+  
+- Added a toggle command to NXbrowse, called "byteaschar", which forces 
+  NX_INT8, NX_UINT8 variables to be printed as character strings.  This is 
+  for backward compatibility with files created before the definition of the
+  NX_CHAR data type.  8-byte global attributes will be treated as characters
+  when the program begins, but, after that, the default is to treat NX_INT8
+  and NX_UINT8's as integers.
+  
+- Introduced proper typecasts for dimensions in data access routines.  This 
+  is to correct problems with systems that do not have 4-byte int's.
+
+- Added in the CALLING_STYLE macro to napi.h to allow correct calling of the
+  FORTRAN interface under WINDOWS.  Corrected definition of NXcompress() on 
+  PC.
+  
+- Added README.WIN32 to distribution discussing WINDOWS-specific compilation.
+
+
 Changes in Version 1.3.1
 ========================
 
