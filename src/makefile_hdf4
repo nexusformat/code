@@ -33,9 +33,10 @@ LIBNEXUS_OBJ=napi.o napif.o
 TEST4_OBJ=napi4_test.o
 NXBROWSE_OBJ=NXbrowse.o
 NXTOXML_OBJ=NXtoXML.o
+NXTODTD_OBJ=NXtoDTD.o
 NOPT=-DHDF4
 
-all: libNeXus.a napi4_test napif_test NXbrowse NXtoXML
+all: libNeXus.a napi4_test napif_test NXbrowse NXtoXML NXtoDTD
 
 .c.o :
 	$(CC) $(CFLAGS) $(NOPT) -I$(H4ROOT)/include -c $(FROOT)/$*.c
@@ -62,5 +63,9 @@ NXbrowse: libNeXus.a $(NXBROWSE_OBJ)
 
 NXtoXML: libNeXus.a $(NXTOXML_OBJ) 
 	$(CC) $(CFLAGS) -o NXtoXML $(NXTOXML_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz 
+
+NXtoDTD: libNeXus.a $(NXTODTD_OBJ) 
+	$(CC) $(CFLAGS) -o NXtoDTD $(NXTODTD_OBJ) $(FROOT)/libNeXus.a \
 	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz 
 

@@ -35,9 +35,10 @@ TEST4_OBJ=napi4_test.o
 TEST5_OBJ=napi5_test.o
 NXBROWSE_OBJ=NXbrowse.o
 NXTOXML_OBJ=NXtoXML.o
+NXTODTD_OBJ=NXtoDTD.o
 NOPT=-DHDF4 -DHDF5
 
-all: libNeXus.a napi4_test napi5_test napif_test NXbrowse NXtoXML
+all: libNeXus.a napi4_test napi5_test napif_test NXbrowse NXtoXML NXtoDTD
 
 .c.o :
 	$(CC) $(CFLAGS) $(NOPT) -I$(H4ROOT)/include -I$(H5ROOT)/include -c $(FROOT)/$*.c 
@@ -71,4 +72,7 @@ NXtoXML: libNeXus.a $(NXTOXML_OBJ)
 	$(CC) $(CFLAGS) -o NXtoXML $(NXTOXML_OBJ) $(FROOT)/libNeXus.a \
 	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -L$(H5ROOT)/lib -lhdf5 -lz 
 	
+NXtoDTD: libNeXus.a $(NXTODTD_OBJ) 
+	$(CC) $(CFLAGS) -o NXtoDTD $(NXTODTD_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -L$(H5ROOT)/lib -lhdf5 -lz 
 
