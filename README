@@ -7,6 +7,7 @@ napi.c           - ANSI C source code of NeXus API
 napi.h           - ANSI C header file of NeXus API
 napi_test.c      - Test code of C API
 napi_test_read.c - C code to read test file NXtest.nxs
+NXbrowse.c       - Simple interactive NeXus browser
 napif.f          - Fortran 77 wrapper for NeXus API
 napif.inc        - Fortran 77 include file
 napif_test.f     - Test code of Fortran 77 API
@@ -14,7 +15,6 @@ NXmodule.f90     - Fortran 90 wrapper module for NeXus API
 NXUmodule.f90    - Fortran 90 utilities module
 NXtest.f90       - Test code of Fortran 90 API
 NXdump.f90       - Fortran 90 program to print variables in a NeXus file
-NXbrowse.f90     - Simple interactive NeXus browser
 Makefile         - Make file for C and Fortran 77 interfaces
 make_vms.com     - Command file to build targets on VMS
 
