@@ -1,0 +1,10 @@
+*** Notes Specific for Compilation on PC/Windows ***
+
+Due to the availability of different calling conventions 
+on the PC, it may be necessary to edit "napi.h" and 
+manually select the appropriate form of the MANGLE() function.
+
+Please refer to the "WINDOWS SPECIFIC CONFIGURATION" section of
+"napi.h" for further instructions.
+ 
+$Id$

@@ -24,6 +24,7 @@ NXdict           - Folder containing NeXus dictionary code
 
 README.FORTRAN   - Notes on Fortran 77 wrapper
 README.FORTRAN90 - Notes on Fortran 90 wrapper
+README.WIN32     - Microsoft Windows specific notes
 gnu_license.txt  - GNU Lesser General Public License
 
 napi.tar.gz      - gzipped tar file containing all of the above
