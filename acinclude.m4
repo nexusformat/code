@@ -31,19 +31,21 @@
 # the output as well as check the status as sometimes the compiler 
 # will return success for invalid options
 #
-# Argument 1 must be "Fortran 77" or "C"
-# Argument 2 must be FFLAGS or CFLAGS as appropriate
-# Argument 3 is the compiler option to check
+# Argument 1 is printed and is the real name of the language
+# Argument 2 must be "Fortran 77" or "C" (language to "Push")
+# Argument 3 must be FFLAGS or CFLAGS as appropriate for argument 2
+# Argument 4 is the compiler option to check
+# Argumnet 5 is any extra program body for the test program
 #
 AC_DEFUN(
  [AC_CHECK_COMPILER_OPTION],
- [AC_MSG_CHECKING([for $1 compiler option $3])
-  AC_LANG_PUSH($1)
-  COMPFLAGS_SAVE=[$]$2
+ [AC_MSG_CHECKING([for $1 compiler option $4])
+  AC_LANG_PUSH($2)
+  COMPFLAGS_SAVE=[$]$3
   ac_compile="$ac_compile 2>check_compiler_option.$$"
-  $2="[$]$2 $3"
+  $3="[$]$3 $4"
   AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM],
+    [AC_LANG_PROGRAM(,[$5])],
     [COMPILER_OPTION=yes],
     [COMPILER_OPTION=no]) 
   if test $COMPILER_OPTION = "yes"; then
@@ -53,23 +55,37 @@ AC_DEFUN(
     AC_MSG_RESULT([yes])
   else
     AC_MSG_RESULT([no])
-    $2=$COMPFLAGS_SAVE
+    $3=$COMPFLAGS_SAVE
   fi
   rm -f check_compiler_option.$$
-  AC_LANG_POP($1)]
+  AC_LANG_POP($2)]
 )
 #
 # AC_CHECK_C_OPTION
 #
 AC_DEFUN(
  [AC_CHECK_C_OPTION],
- [AC_CHECK_COMPILER_OPTION(C,CFLAGS,$1)]
+ [AC_CHECK_COMPILER_OPTION(C,C,CFLAGS,[$1],[$2])]
 )
 #
 # AC_CHECK_F77_OPTION
 #
 AC_DEFUN(
  [AC_CHECK_F77_OPTION],
- [AC_CHECK_COMPILER_OPTION(Fortran 77,FFLAGS,$1)]
+ [AC_CHECK_COMPILER_OPTION(Fortran 77,Fortran 77,FFLAGS,[$1],[$2])]
 )
 #
+# AC_CHECK_F90_OPTION
+# We use the F77 test, but switch the name of the compiler
+#
+AC_DEFUN(
+ [AC_CHECK_F90_OPTION],
+ [F77_SAVE=[$]F77
+  FFLAGS_SAVE=[$]FFLAGS
+  F77=[$]F90
+  FFLAGS=[$]F90FLAGS
+  AC_CHECK_COMPILER_OPTION(Fortran 90,Fortran 77,FFLAGS,[$1],[$2])
+  F77=[$]F77_SAVE
+  FFLAGS=[$]FFLAGS_SAVE
+ ]
+)
