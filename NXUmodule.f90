@@ -1056,11 +1056,64 @@ CONTAINS
       TYPE(NXhandle),   INTENT(inout) :: file_id
       INTEGER,          INTENT(in)    :: axis, primary
       CHARACTER(len=*), INTENT(out)   :: data_name
-      INTEGER,          INTENT(out)   :: data_type, data_dimensions
+      INTEGER,          INTENT(out)   :: data_type, data_dimensions(NX_MAXRANK)
       CHARACTER(len=len(data_name)) :: name
       CHARACTER(len=NX_MAXNAMELEN) :: class, attr_name
-      INTEGER :: status, value
+      CHARACTER(len=255) :: axis_list
+      INTEGER :: status, signal, value, data_rank, i, j, k
 
+      !First find data with "signal" attribute to check for "axes" attribute
+      status = NXUfindsignal (file_id, signal, data_name, data_rank, &
+                        data_type, data_dimensions)
+      IF (status /= NX_OK) RETURN
+      !The axis number cannot be greater than the data rank
+      IF (axis > data_rank) THEN
+         CALL NXerror ("Axis number greater than the data rank")
+         status = NX_ERROR
+         RETURN
+      END IF
+      !Check for "axes" attribute
+      status = NXopendata (file_id, data_name)
+      IF (status /= NX_OK) RETURN
+      status = NXUfindattr (file_id, "axes")
+      IF (status == NX_ERROR) THEN
+         RETURN
+      ELSE IF (status == NX_OK) THEN !"axes" attribute found
+         status = NXgetattr (file_id, "axes", axis_list)
+         !Strip off brackets around axis list
+         IF (index(axis_list,"[") > 0) THEN 
+            axis_list = axis_list(index(axis_list,"[")+1:len(axis_list))
+         END IF
+         IF (index(axis_list,"]") > 0) THEN
+            axis_list = axis_list(1:index(axis_list,"]")-1)
+         END IF
+         !Find axis label by looking for the delimiting commas
+         j = 1
+         DO i = 1,axis
+            k = index(axis_list(j:),",") - 1
+            IF (k < 0) k = len(trim(axis_list)) - j + 1
+            IF (k < 0) THEN !We've run out of commas
+               CALL NXerror ("Data attribute ""axes"" is not correctly defined")
+               status = NX_ERROR
+               RETURN
+            END IF
+            name = axis_list(j:j+k-1)
+            j = j + k + 1
+         END DO
+         !Open data to retrieve information about the dimension scale
+         status = NXopendata (file_id, data_name)
+         IF (status /= NX_OK) RETURN
+         status = NXgetinfo (file_id, NXrank, NXdims, NXtype)
+         IF (status == NX_OK) THEN
+            data_name = name
+            data_type = NXtype
+            data_dimensions = NXdims(1)
+            RETURN
+         ELSE
+            RETURN
+         END IF
+      END IF   
+      !Otherwise, check for "axis" attribute in each NXdata item
       status = NXinitgroupdir (file_id)
       IF (status /= NX_OK) RETURN
       DO
