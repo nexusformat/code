@@ -49,6 +49,15 @@ endif
 
 test_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
 
+# for running tests via   "make check"
+check_PROGRAMS = $(test_PROGRAMS)	# what to build
+TESTS = $(test_PROGRAMS)		# what to run
+
+# this is an example of setting the test running environment - in case we
+# have got built shared we should pass the location of the HDF libraries
+# down and add them here; another day ...
+TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:/usr/local/lib
+
 napi4_test_SOURCES = napi4_test.c
 napi4_test_LDADD = $(LIBNEXUS)
 
