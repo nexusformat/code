@@ -55,6 +55,9 @@ typedef char NXname[VGNAMELENMAX];
 #define NX_ERROR 0
 #define NX_EOD -1
 
+#define NX_MAXRANK 32
+#define NX_MAXNAMELEN 64
+
 /*-------------------------------------------------------------------------
                 HDF Datatype values for datatype parameters 
                        in the Nexus API
