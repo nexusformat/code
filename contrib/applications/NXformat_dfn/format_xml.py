@@ -6,10 +6,15 @@ default_indent=2
 
 def trim(string):
     """Trim leading and trailing whitespace off of the supplied string"""
+
+    # exit early if supplied an empty string
+    if not string: return ""
+
     # default value for trimming
     begin=0
     end=string.__len__()-1 # index of last char is one less
                            # than string size
+
     # determine amount of leading whitespace
     while string[begin].isspace() and begin<end:
         begin=begin+1
@@ -42,6 +47,45 @@ def remove_extra_spaces(string):
             result=result+letter
 
     # remove the shortened result
+    return result
+
+def wrap_text(string,width,continue_additional_indent=""):
+    """This will perform \"word wrapping\" of text based on
+    spaces. The default indentation level is determined from the
+    number of spaces at the start of the string"""
+
+    # confirm that there is something to wrap
+    if string.__len__()<=width:
+        return string
+    
+    # determine the current indentation level
+    indent=""
+    for char in string:
+        if char.isspace():
+            indent=indent+char
+        else:
+            break
+
+    # add the continuation indentation
+    indent=indent+continue_additional_indent
+
+    # generate an array of strings of the correct with for formatting
+    result=string
+    str_array=[]
+    while result.__len__()>width:
+        line=result[0:width]
+        while not line[-1].isspace():
+            line=line[0:-1]
+        str_array.append(line+"\n")
+        result=indent+trim(result[line.__len__():])
+    str_array.append(result+"\n")
+            
+    # convert the string array into a single string
+    result=""
+    for str in str_array:
+        result=result+str
+
+    # return the wrapped string
     return result
 
 def get_def_ext():
@@ -114,26 +158,28 @@ class format_xml(object):
         # create the idiot version
         result="%s%s\n" % (indent,data)
 
-        # return the idiot version if it works
-        if(result.__len__()<=self.__width):
-            return result
-
-        # generate an array of strings of the correct with for formatting
-        str_array=[]
-        while result.__len__()>self.__width:
-            line=result[0:self.__width]
-            while not line[-1].isspace():
-                line=line[0:-1]
-            str_array.append(line+"\n")
-            result=indent+trim(result[line.__len__():])
-        str_array.append(result+"\n")
-
-        # convert the string array into a single string
-        result=""
-        for str in str_array:
-            result=result+str
-
-        return result
+        return wrap_text(result,self.__width)
+#
+#        # return the idiot version if it works
+#        if(result.__len__()<=self.__width):
+#            return result
+#
+#        # generate an array of strings of the correct with for formatting
+#        str_array=[]
+#        while result.__len__()>self.__width:
+#            line=result[0:self.__width]
+#            while not line[-1].isspace():
+#                line=line[0:-1]
+#            str_array.append(line+"\n")
+#            result=indent+trim(result[line.__len__():])
+#        str_array.append(result+"\n")
+#
+#        # convert the string array into a single string
+#        result=""
+#        for str in str_array:
+#            result=result+str
+#
+#        return result
 
     def format_attributes(self,node):
         """Format the node attributes for the output file"""
@@ -154,7 +200,7 @@ class format_xml(object):
         # format the attributes
         attr_string=self.format_attributes(node)
         # create the open tag
-        file.write("%s<%s%s>\n" % ((" "*self.__cur_indent),tag,attr_string))
+        file.write(wrap_text("%s<%s%s>\n" % ((" "*self.__cur_indent),tag,attr_string),self.__width,(" "*(self.__indent+2))))
         # increase the indent level
         self.__cur_indent=self.__cur_indent+self.__indent
         # recurse down into the tree
