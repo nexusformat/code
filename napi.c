@@ -52,21 +52,22 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #define NXSIGNATURE 959697
 
   typedef struct __NexusFile {
-    int iNXID;
-    char iAccess[2];
+    struct iStack {
+      int32 *iRefDir;
+      int32 *iTagDir;
+      int32 iVref;
+      int32 __iStack_pad;		/* for 64 bit alignment */
+      int iNDir;
+      int iCurDir;
+    } iStack[NXMAXSTACK];
+    struct iStack iAtt;
     int32 iVID;
     int32 iSID;
     int32 iCurrentVG;
     int32 iCurrentSDS;
-    struct iStack {
-      int32 iVref;
-      int iNDir;
-      int iCurDir;
-      int32 *iRefDir;
-      int32 *iTagDir;
-    } iStack[NXMAXSTACK];
+    int iNXID;
     int iStackPtr;
-    struct iStack iAtt;
+    char iAccess[2];
   } NexusFile, *pNexusFile;
   
   
