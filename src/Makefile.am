@@ -63,4 +63,6 @@ libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAG
 ## libNeXus_la_LIBADD += -lhdf5 
 ## endif
 
+EXTRA_DIST=nxio.h nxdataset.h
+
 include $(top_srcdir)/build_rules.am
