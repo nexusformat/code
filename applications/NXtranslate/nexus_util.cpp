@@ -433,11 +433,6 @@ extern void nexus_util::make_link(NXhandle *handle, const vector<string> &link, 
 
   // open to link's parent location
   nexus_util::open_path(handle,link,num_group,num_data);
-  if(is_group){ // create it and open it
-    Node node(*(source.rbegin()),"link");
-    open(handle,node);
-    num_group++;
-  }
 
   // create the link
   if(NXmakelink(*handle,link_id)!=NX_OK)
