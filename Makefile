@@ -13,9 +13,10 @@
 #
 HDFROOT=/usr/local/hdf
 FILES=napi.c napi.h napi_test.c napif.f napif_test.f napif.inc README \
-	README.FORTRAN NXdict.tex napi.tex
+	README.FORTRAN NXdict.tex napi.tex make_vms.com
 NAPITEST_OBJ=napi_test.o napi.o
 NAPIFTEST_OBJ=napif_test.o napif.o napi.o
+LIBNEXUS_OBJ=napif.o napi.o
 
 all :
 	@ echo "Possible targets are: kit napi_test napif_test"
@@ -30,6 +31,10 @@ tar :
 zip :
 	rm -f napi.zip
 	zip napi.zip $(FILES)
+
+libNeXus.a : $(LIBNEXUS_OBJ)
+	ar -cr $@ $(LIBNEXUS_OBJ)
+	ranlib $@
 
 napi_test : $(NAPITEST_OBJ)
 	$(CC) -o $@ $(NAPITEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz

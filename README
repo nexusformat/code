@@ -12,6 +12,7 @@ napif.f        - Fortran 77 wrapper for NeXus API
 napif.inc      - Fortran 77 include file
 napif_test.f   - Test code of Fortran API
 README.FORTRAN - Notes on FORTRAN wrapper
+make_vms.com   - Command file to build targets on VMS
 
 napi.tex       - LaTeX documentation of API
 NXdict.tex     - LaTeX documentation of proposed data dictionary
