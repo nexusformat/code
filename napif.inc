@@ -1,9 +1,9 @@
 C------------------------------------------------------------------------------
 C NeXus - Neutron & X-ray Common Data Format
 C  
-C API Fortran 77 Interface Definitions
+C Application Program Interface (Fortran 77) Header File
 C
-C Copyright (C) 1997, 1998, 1999, Freddie Akeroyd
+C Copyright (C) 1997-2002 Freddie Akeroyd, Mark Koennecke
 C
 C This library is free software; you can redistribute it and/or
 C modify it under the terms of the GNU Lesser General Public
@@ -19,18 +19,6 @@ C You should have received a copy of the GNU Lesser General Public
 C License along with this library; if not, write to the Free Software
 C Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 C
-C Contact : Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
-C           ISIS Facility
-C           Rutherford Appleton Laboratory
-C           Chilton, Didcot
-C           Oxfordshire
-C           OX11 0QX
-C           United Kingdom
-C
-C Updated to NAPI-2.1.0 with HDF-5 support:
-C
-C Mark Koennecke, August 2001, Mark.Koennecke@psi.ch
-C
 C For further information, see <http://www.neutron.anl.gov/NeXus/>
 C
 C $Id$
@@ -38,11 +26,11 @@ C------------------------------------------------------------------------------
 
 C *** Version of NeXus interface - should be consistent with napi.h!
       CHARACTER*5 NEXUS_VERSION
-      PARAMETER(NEXUS_VERSION='2.1.0')
+      PARAMETER(NEXUS_VERSION='2.0.0')
 C *** NXaccess enum - access modes for NXopen
       INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE, NXACC_CREATE5
       PARAMETER(NXACC_READ=1,NXACC_RDWR=2,NXACC_CREATE=3,
-     +    NXACC_CREATE5=4)
+     +    NXACC_CREATE4=4,NXACC_CREATE5=5)
 C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
 C *** large enough to hold an NXhandle structure
       INTEGER NXHANDLESIZE
@@ -85,6 +73,7 @@ C**** NeXus Unlimited Dimension
      +       NXGETNEXTENTRY, NXGETNEXTATTR, NXGETGROUPID, NXMAKELINK,
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
      +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA
+      LOGICAL NXSAMEID
       EXTERNAL NXOPEN, NXCLOSE, NXMAKEGROUP, NXOPENGROUP, NXCLOSEGROUP,
      +       NXMAKEDATA, NXOPENDATA, NXCLOSEDATA, NXGETDATA, 
      +       NXGETCHARDATA, NXGETSLAB, NXGETATTR, NXGETCHARATTR, 
@@ -92,7 +81,7 @@ C**** NeXus Unlimited Dimension
      +       NXPUTATTR, NXPUTCHARATTR, NXPUTDIM, NXGETINFO, 
      +       NXGETNEXTENTRY, NXGETNEXTATTR, NXGETGROUPID, NXMAKELINK,
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
-     +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA
+     +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA, NXSAMEID
 
 
 
