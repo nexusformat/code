@@ -544,6 +544,7 @@ void PrintData (void *data, int dataType, int numElements)
 {
    WriteData (stdout, data, dataType, numElements);
 }
+/* Searches group for requested group and return its class */
 int FindGroup (NXhandle fileId, char *groupName, char *groupClass)
 {
    int status, dataType;
