@@ -82,8 +82,8 @@ AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
 # f90 has a "module path" option - hard to get as you really need a
 # ready compiled module to point the option at so for now we are just
 # check that the option takes a directory and the compiler works
-AC_CHECK_F90_OPTION([-p$mytop/bindings/f90],[      INCLUDE 'NXmodule.f90])
-#AC_CHECK_F90_OPTION([-p$mytop/bindings/f90],[      INCLUDE 'NXmodule.f90])
+AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
+#AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 
 #
 # First any host specific bits
