@@ -1,22 +1,26 @@
-The NeXus Fortran 90 interface consists of a single Fortran 90 module 
-containing all the global parameters and function definitions. 
-The routines are called exactly like their C counterparts, although some 
+The NeXus Fortran 90 interface consists of a single Fortran 90 module
+containing all the global parameters and function definitions. The
+routines are called exactly like their C counterparts, although some
 arguments have been made optional because their values can be determined
-automatically.  See <http://www.neutron.anl.gov/NeXus/NeXus_F90.html> for details of the individual routines.
+automatically.  See <http://www.neutron.anl.gov/NeXus/NeXus_F90.html>
+for details of the individual routines.
 
 There must be a USE statement to incorporate the NeXus module e.g.
 
    use NXmodule
    
-(N.B. if the F90 utility module NXUmodule is USEd, it is not necessary to specify NXmodule as well.)
+(N.B. if the F90 utility module NXUmodule is USEd, it is not necessary
+to specify NXmodule as well.)
 
-The Fortran 90 interface uses two derived types for the NXhandle and NXLink
-structures.
+The Fortran 90 interface uses two derived types for the NXhandle and
+NXLink structures.
 
     type(NXhandle) :: file_id
     type(NXlink) :: link_id
 
-There are also several KIND parameters defined for producing different-length storage.  They are not guaranteed to produce the required result, but should work on most Fortran 90 compilers.
+There are also several KIND parameters defined for producing
+different-length storage.  They are not guaranteed to produce the
+required result, but should work on most Fortran 90 compilers.
 
     NXi1 - one-byte integers
     NXi2 - two-byte integers
@@ -24,23 +28,28 @@ There are also several KIND parameters defined for producing different-length st
     NXr4 - four-byte floating points
     NXr8 - eight-byte floating points (double precision)
     
-There is no way of distinguishing signed and unsigned integers, so unsigned integers are mapped to signed integers of the same length.  It is possible to read variables into arrays of different storage size, provided there is no overflow.
+There is no way of distinguishing signed and unsigned integers, so
+unsigned integers are mapped to signed integers of the same length.  It
+is possible to read variables into arrays of different storage size,
+provided there is no overflow.
 
 --- Compatibility Issues ---
-This version has been tested on Alpha/VMS, Windows NT, and Linux (using Absoft
-Pro Fortran 90).  We are aware of a problem that affects Digital Unix, and
-other systems with 64-bit pointers.  The derived type NXstack defined in 
-NXmodule.f90 should be equivalent to the iStack C struct defined in NAPI.C, 
-which contains two 32-bit pointers, iRefDir and iTagDir.  If the local 
-operating system uses 64-bit pointers, add two extra 4-byte integers as 
-padding to the beginning of the NXstack definition.  Currently, the Fortran 
-90 version only needs access to the final two integers in NXstack, iNdir 
-and iCurDir.
+
+This version has been tested on Alpha/VMS, Windows NT, and Linux (using
+Absoft Pro Fortran 90).  We are aware of a problem that affects Digital
+Unix, and other systems with 64-bit pointers.  The derived type NXstack
+defined in NXmodule.f90 should be equivalent to the iStack C struct
+defined in NAPI.C, which contains two 32-bit pointers, iRefDir and
+iTagDir.  If the local operating system uses 64-bit pointers, add two
+extra 4-byte integers as padding to the beginning of the NXstack
+definition.  Currently, the Fortran 90 version only needs access to the
+final two integers in NXstack, iNdir and iCurDir.
 
 --- Running the Examples ---
 
 You will need to get copies of the HDF (Hierarchical Data Format)
-libraries approriate for your operating system. These can be obtained from: 
+libraries approriate for your operating system. These can be obtained
+from:
 
     http://hdf.ncsa.uiuc.edu/
 
@@ -90,21 +99,24 @@ ch_attribute : NeXus
 i4_attribute : 42
 r4_attribute : 3.141593
 
-A file called "NXtest.nxs" is also created. The test program NXtest.f90 performs exactly the same operations as NAPIF_TEST.F (see README.FORTRAN).
+A file called "NXtest.nxs" is also created. The test program NXtest.f90
+performs exactly the same operations as NAPIF_TEST.F (see
+README.FORTRAN).
 
 *** Cross-checking the interfaces ***
 
-To check that the Fortran 90 interface produces an equivalent file to the 
-C interface, use "napi_test_read.c" to read the Fortran-generated file 
-"NXtest.nxs".
+To check that the Fortran 90 interface produces an equivalent file to
+the C interface, use "napi_test_read.c" to read the Fortran-generated
+file "NXtest.nxs".
 
 cc -c -I/usr/local/hdf/include napi_test_read.c
 cc -o napi_test_read napi_test_read.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
 
 ./napi_test_read
 
-This produces the same output as the Fortran 90 test program, except that
-the data types are printed with their numerical value e.g. NX_CHAR = 4.
+This produces the same output as the Fortran 90 test program, except
+that the data types are printed with their numerical value e.g. NX_CHAR
+= 4.
 
 --
 Ray Osborn
