@@ -11,7 +11,7 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#define NEXUS_VERSION	"1.1.0"		/* major.minor.patch */
+#define NEXUS_VERSION	"1.2.0"		/* major.minor.patch */
 
 #ifdef GENIE_IMPLEMENTATION__		/* OpenGENIE is fussy about consts */
 #   define CONSTCHAR	const char
@@ -108,7 +108,7 @@ extern "C" {
  * Define a macro for FORTRAN name mangling _ pften we have to add an "_"
  */
 #if defined(__VMS) || defined(__unix__) || defined(__MWERKS__)
-#    if defined(__VMS) || defined(__MWERKS__)
+#    if defined(__VMS) || defined(__MWERKS__) || defined(__ABSOFT)
 #        define MANGLE(__arg)	__arg
 #    else /* unix */
 #        define MANGLE(__arg)	CONCAT(__arg,_)
