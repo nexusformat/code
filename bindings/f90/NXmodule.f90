@@ -1160,44 +1160,20 @@ CONTAINS
    END FUNCTION NXmakelink
 !------------------------------------------------------------------------------
 !NXgetgroupinfo returns the number of entries, name and class of the open group
-   RECURSIVE FUNCTION NXgetgroupinfo (file_id, item_number, group_name, &
-                        group_class) RESULT (status)
+   FUNCTION NXgetgroupinfo (file_id, item_number, group_name, group_class) &
+                        RESULT (status)
 
       TYPE(NXhandle),   INTENT(in)  :: file_id
       INTEGER,          INTENT(out) :: item_number
       CHARACTER(len=*), INTENT(out), OPTIONAL :: group_name, group_class
       TYPE(NXlink) :: group_id, new_id
-      CHARACTER(len=NX_MAXNAMELEN) :: name, class
-      INTEGER :: status
+      INTEGER :: status, nxigetgroupinfo
+      INTEGER(kind=NXi1) :: Cname(NX_MAXNAMELEN), Cclass(NX_MAXNAMELEN)
+      EXTERNAL nxigetgroupinfo
 
-      !Call to NXgetnextentry initializes the group directory in file_id
-      status = NXgetnextentry (file_id, name, class, NXtype)
-      item_number = file_id%iStack(file_id%iStackPtr+1)%iNDir
-      !The only way to obtain the current group and class is to save
-      !the group ID, close the group, perform a group search from the 
-      !upper group level for the original ID
-      IF (PRESENT(group_name) .OR. PRESENT(group_class)) then
-         status = NXgetgroupID (file_id, group_id)
-         IF (status /= NX_OK) RETURN
-         status = NXclosegroup (file_id)
-         IF (status /= NX_OK) RETURN
-         DO
-            status = NXgetnextentry (file_id, name, class, NXtype)
-            IF (status == NX_OK) THEN
-               IF (class(1:2) == "NX") THEN
-                  status = NXopengroup (file_id, name, class)
-                  IF (status /= NX_OK) RETURN
-                  status = NXgetgroupID (file_id, new_id)
-                  IF (status /= NX_OK) RETURN
-                  IF (NXsameID (new_id, group_id)) EXIT
-                  status = NXclosegroup (file_id)
-                  IF (status /= NX_OK) RETURN
-               END IF       
-            END IF
-         END DO
-         IF (PRESENT(group_name)) group_name = trim(name)
-         IF (PRESENT(group_class)) group_class = trim(class)
-      END IF
+      status = nxigetgroupinfo (file_id, item_number, Cname, Cclass)
+      IF (PRESENT(group_name)) group_name = trim(NXFstring(Cname))
+      IF (PRESENT(group_class)) group_class = trim(NXFstring(Cclass))
 
    END FUNCTION NXgetgroupinfo
 !------------------------------------------------------------------------------
@@ -1205,11 +1181,10 @@ CONTAINS
    FUNCTION NXinitgroupdir (file_id) RESULT (status)
 
       TYPE(NXhandle), INTENT(inout) :: file_id
-      INTEGER :: status
-      CHARACTER(len=NX_MAXNAMELEN) :: name, class
+      INTEGER :: status, nxiinitgroupdir
+      EXTERNAL nxiinitgroupdir
 
-      status = NXgetnextentry (file_id, name, class, NXtype)
-      file_id%iStack(file_id%iStackPtr+1)%iCurDir = 0
+      status = nxiinitgroupdir (file_id)
 
   END FUNCTION NXinitgroupdir
 !------------------------------------------------------------------------------
@@ -1254,11 +1229,10 @@ CONTAINS
 
       TYPE(NXhandle),   INTENT(inout)  :: file_id
       INTEGER,          INTENT(out)    :: attr_number
-      INTEGER :: status
+      INTEGER :: status, nxigetattrinfo
+      EXTERNAL nxigetattrinfo
 
-      status = NXinitattrdir (file_id)
-      IF (status /= NX_OK) RETURN
-      attr_number = file_id%iAtt%iNDir
+      status = nxigetattrinfo (file_id, attr_number)
 
    END FUNCTION NXgetattrinfo
 !------------------------------------------------------------------------------
@@ -1266,11 +1240,10 @@ CONTAINS
    FUNCTION NXinitattrdir (file_id) RESULT (status)
 
       TYPE(NXhandle), INTENT(inout) :: file_id
-      INTEGER :: status
-      CHARACTER(len=NX_MAXNAMELEN) :: name
+      INTEGER :: status, nxiinitattrdir
+      EXTERNAL nxiinitattrdir
 
-      status = NXgetnextattr (file_id, name, NXsize, NXtype)
-      file_id%iAtt%iCurDir = 0
+      status = nxiinitattrdir (file_id)
 
   END FUNCTION NXinitattrdir
 !------------------------------------------------------------------------------
