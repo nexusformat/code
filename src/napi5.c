@@ -102,7 +102,7 @@
 
    ---------------------------------------------------------------------*/
 
-  NXstatus NX5open(CONSTCHAR *filename, NXaccess am, NXhandle* pHandle)
+  NXstatus CALLING_STYLE NX5open(CONSTCHAR *filename, NXaccess am, NXhandle* pHandle)
   {
   hid_t attr1,aid1, aid2;
   pNexusFile5 pNew = NULL;
@@ -151,7 +151,7 @@
     time_info = gmtime(&timer);
     if (time_info != NULL)
     {
-        gmt_offset = difftime(timer, mktime(time_info));
+        gmt_offset = (long)difftime(timer, mktime(time_info));
     }
     else
     {
@@ -378,7 +378,7 @@
 
   herr_t attr_check (hid_t loc_id, const char *member_name, void *opdata)
   {
-    char attr_name[8];
+    char attr_name[8+1];   /* need to leave space for \0 as well */
     
     strcpy(attr_name,"NX_class");
     return strstr(member_name, attr_name) ? 1 : 0;
@@ -515,7 +515,7 @@
         for (i=0; i<ii; i++) {
            *(u1name + i) = *(uname + i);
         }
-        *(u1name + i) = NULL;
+        *(u1name + i) = '\0';
         /*
         strncpy(u1name, uname, ii);
         */
@@ -538,29 +538,6 @@
     return NX_OK;
   }
   
-  /* --------------------------------------------------------------------- */
-
-  NXstatus CALLING_STYLE NX5makedata (NXhandle fid, CONSTCHAR *name, int datatype, 
-                                  int rank, int dimensions[])
-  {
-  pNexusFile5 pFile;
-  int chunk_size[H5S_MAX_RANK];
-  int i;
-  
-  pFile = NXI5assert (fid);
-  memset(chunk_size,0,H5S_MAX_RANK*sizeof(int));
-  if (dimensions[0] == NX_UNLIMITED)
-     {
-     for (i = 0; i < H5S_MAX_RANK; i++)
-       {
-         chunk_size[i]= 1;
-       } 
-     }    
-  return NX5compmakedata (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
-    
-  return NX_OK;
-  }
-
  /* --------------------------------------------------------------------- */
 
   NXstatus CALLING_STYLE NX5compmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
@@ -720,6 +697,31 @@
      return NX_OK;
   }
 
+
+  /* --------------------------------------------------------------------- */
+
+  NXstatus CALLING_STYLE NX5makedata (NXhandle fid, CONSTCHAR *name, int datatype, 
+                                  int rank, int dimensions[])
+  {
+  pNexusFile5 pFile;
+  int chunk_size[H5S_MAX_RANK];
+  int i;
+  
+  pFile = NXI5assert (fid);
+  memset(chunk_size,0,H5S_MAX_RANK*sizeof(int));
+  if (dimensions[0] == NX_UNLIMITED)
+     {
+     for (i = 0; i < H5S_MAX_RANK; i++)
+       {
+         chunk_size[i]= 1;
+       } 
+     }    
+  return NX5compmakedata (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
+    
+  return NX_OK;
+  }
+
+  
   /* --------------------------------------------------------------------- */
 
   NXstatus CALLING_STYLE NX5compress (NXhandle fid, int compress_type)
@@ -1013,7 +1015,7 @@
   NXstatus CALLING_STYLE NX5makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile5 pFile;
-    int iRet;
+/*    int iRet; */
     herr_t status;
     int size_type;
       
