@@ -40,6 +40,7 @@ int NXBdir (NXhandle fileId);
 int NXBopen (NXhandle fileId, NXname groupName);
 int NXBread (NXhandle fileId, NXname dataName, char *dimensions);
 int NXBdump (NXhandle fileId, NXname dataName, char *fileName);
+void ConvertUpperCase (char *string);
 void PrintAttributes (NXhandle fileId);
 void PrintDimensions (int rank, int dimensions[]);
 void PrintType (int dataType);
@@ -92,12 +93,14 @@ int main(int argc, char *argv[])
       command = strtok(inputText," ");
       /* Check if a command has been given */
       if (command == NULL) command = " ";
+      /* Convert it to upper case characters */
+      ConvertUpperCase (command);
       /* Command is to print a directory of the current group */
-      if (StrEq(command, "DIR") || StrEq(command, "dir")) {
+      if (StrEq(command, "DIR") || StrEq(command, "LS")) {
          status = NXBdir (fileId);
       }    
       /* Command is to open the specified group */
-      if (StrEq(command, "OPEN") || StrEq(command, "open")) {
+      if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
          stringPtr = strtok(NULL, " "); 
          if (stringPtr != NULL) {
             strcpy (groupName, stringPtr);
@@ -114,7 +117,7 @@ int main(int argc, char *argv[])
          }
       }
       /* Command is to  dump data values to a file */
-      if (StrEq(command, "DUMP") || StrEq(command, "dump")) {
+      if (StrEq(command, "DUMP")) {
          stringPtr = strtok (NULL, " ");
          if (stringPtr != NULL) {
             strcpy (dataName, stringPtr);
@@ -132,7 +135,7 @@ int main(int argc, char *argv[])
          }
       }
       /* Command is to print the values of the data */
-      if (StrEq(command, "READ") || StrEq(command, "read")) {
+      if (StrEq(command, "READ") || StrEq(command, "CAT")) {
          stringPtr = strtok (NULL, " [");
          if (stringPtr != NULL) {
             strcpy (dataName, stringPtr);
@@ -147,7 +150,7 @@ int main(int argc, char *argv[])
          }
       }
       /* Command is to close the current group */
-      if (StrEq(command, "CLOSE") || StrEq(command, "close")) {
+      if (StrEq(command, "CLOSE")) {
          if (groupLevel > 0) {
             if (NXclosegroup (fileId) == NX_OK) {
                /* Remove the group from the prompt string */
@@ -162,7 +165,7 @@ int main(int argc, char *argv[])
          }
       }
       /* Command is to print help information */
-      if (StrEq(command, "HELP") || StrEq(command, "help")) {
+      if (StrEq(command, "HELP") || StrEq(command, "INFO")) {
          printf ("NXbrowse commands : DIR\n");
          printf ("                    OPEN <groupName>\n");
          printf ("                    READ <dataName>\n");
@@ -174,15 +177,14 @@ int main(int argc, char *argv[])
          printf ("                    EXIT\n");
       }
       /* Command is to print byte as char information */
-      if (StrEq(command, "BYTEASCHAR") || StrEq(command, "byteaschar")) {
+      if (StrEq(command, "BYTEASCHAR")) {
          if (iByteAsChar == 1)
             iByteAsChar = 0;
          else
             iByteAsChar = 1;
       }
       /* Command is to exit the program */
-      if (StrEq(command, "EXIT") || StrEq(command, "exit") ||
-          StrEq(command, "QUIT") || StrEq(command, "quit")) {
+      if (StrEq(command, "EXIT") || StrEq(command, "QUIT")) {
          for (i = groupLevel; i > 0; i--) NXclosegroup (fileId);
          NXclose (&fileId);
          return NX_OK;
@@ -364,8 +366,8 @@ int NXBdump (NXhandle fileId, NXname dataName, char *fileName)
 
    /* Print a header */
    fprintf (fd,"File : %s, DataSet: %s \n", nxFile,  dataName);
-   for (i= 0; i < dataRank; i++) {
-     fprintf(fd," %d ", dataDimensions[i]);
+   for (i=0; i < dataRank; i++) {
+      fprintf(fd," %d ", dataDimensions[i]);
    }
    fprintf(fd,"\n");
 
@@ -377,6 +379,18 @@ int NXBdump (NXhandle fileId, NXname dataName, char *fileName)
    NXfree (&dataBuffer);
    return NX_OK;
 }
+
+/* Converts command string to upper case */
+void ConvertUpperCase (char *string)
+{
+   int i;
+   
+   for (i=0; string[i]!=0; i++) {
+      if (string[i] >= 97 & string[i] <= 122) {
+         string[i] = string[i] - 32;
+      }
+   }
+}   
 
 /* Checks for attributes and outputs their values */
 void PrintAttributes (NXhandle fileId)
