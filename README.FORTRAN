@@ -51,7 +51,7 @@ Both these test programs should print
     Attribute length 9: something	
 
 To the screen and create a file "nxtest.dat"
-(Note: FORTRAN prints 20 for length)
+(Note: FORTRAN prints 19 for length)
 
 *** FORTRAN Interface Notes ***
 

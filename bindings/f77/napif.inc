@@ -31,10 +31,11 @@ C *** Possible NXstatus values - these are returned by all NX routines
       PARAMETER(NX_OK=1,NX_ERROR=0,NX_EOD=-1)
 C *** HDF datatypes used by Nexus - see hntdefs.h in HDF distribution
       INTEGER DFNT_FLOAT32,DFNT_FLOAT64,DFNT_INT8,DFNT_UINT8,DFNT_INT16,
-     +        DFNT_UINT16,DFNT_INT32,DFNT_UINT32
+     +        DFNT_UINT16,DFNT_INT32,DFNT_UINT32,DFNT_UCHAR8,DFNT_CHAR8
       PARAMETER(DFNT_FLOAT32=5,DFNT_FLOAT64=6,DFNT_INT8=20,
      +          DFNT_UINT8=21,DFNT_INT16=22,DFNT_UINT16=23,
-     +          DFNT_INT32=24,DFNT_UINT32=25,DFNT_UCHAR8=3)
+     +          DFNT_INT32=24,DFNT_UINT32=25,DFNT_UCHAR8=3,
+     +          DFNT_CHAR8=4)
 C *** NeXus names for HDF parameters
       INTEGER NX_FLOAT32,NX_FLOAT64,NX_INT8,NX_UINT8,NX_INT16,
      +        NX_UINT16,NX_INT32,NX_UINT32,NX_CHAR

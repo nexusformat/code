@@ -40,7 +40,7 @@ C *** read data
           WRITE(6,*) DATA_ARRAY(I)
       ENDDO
       WRITE(6,1000) LENGTH,BUFFER
- 1000 FORMAT('Attribute length ',I2,': ',A)
+ 1000 FORMAT(' Attribute length ',I2,': ',A)
       IF (NXclosedata(fileid) .NE. NX_OK) STOP
       IF (NXclosegroup(fileid) .NE. NX_OK) STOP
       IF (NXclose(fileid) .NE. NX_OK) STOP
