@@ -1,7 +1,7 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  Makefile compiler and directory options
+#  Autoconf (configure script) generation file
 #  
 #  Copyright (C) 2004 Freddie Akeroyd
 #  
@@ -51,6 +51,7 @@ AC_CHECK_PROGS(F90,f90 f95)
 AC_SUBST(F90)
 AC_SUBST(F90FLAGS)
 #
+AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_SUBST(NXTARGET)
@@ -58,19 +59,8 @@ AC_SUBST(BINDINGS)
 NXTARGET=""
 BINDINGS=""
 
-AC_DEFUN(
- [AC_CHECK_C_OPTION],
- [AC_MSG_CHECKING([for C compiler option $1])
-  AC_LANG_PUSH(C)
-  CFLAGS_SAVE=$CFLAGS
-  CFLAGS="$CFLAGS $1"
-  AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM],
-    [AC_MSG_RESULT([yes])],
-    [AC_MSG_RESULT([no]) 
-     CFLAGS=$CFLAGS_SAVE]) 
-  AC_LANG_POP(C)]
-)
+AC_CHECK_C_OPTION([-no-cpp-precomp])
+AC_CHECK_C_OPTION([-some-invalid-option])
 
 #
 # First any host specific bits
@@ -80,9 +70,6 @@ case $host in
 	LDFLAGS="$LDFLAGS -non_shared"
 	;;
     *darwin*)
-	AC_CHECK_C_OPTION([-no-cpp-precomp])
-	AC_CHECK_C_OPTION([-some-invalid-option])
-#	CFLAGS="$CFLAGS -g -no-cpp-precomp -D__unix"
 	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
 	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
