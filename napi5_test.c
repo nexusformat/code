@@ -136,7 +136,7 @@ int main ()
   if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclose (&fileid) != NX_OK) return 1;
 
-  if (NXopen ("NXtest.nx4", NXACC_RDWR, &fileid) != NX_OK) return 1;
+  if (NXopen ("NXtest.nx5", NXACC_RDWR, &fileid) != NX_OK) return 1;
   NXgetattrinfo (fileid, &i);
   if (i > 0) {
      printf ("Number of global attributes: %d\n", i);
