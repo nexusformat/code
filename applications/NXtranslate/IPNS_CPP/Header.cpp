@@ -528,7 +528,7 @@ void Header::DetLocUnit(char *unit) {
 
 //return pseudo time unit
 void Header::PseudoTimeUnit(char *unit) {
-  strcpy(unit, pseudoTimeUnit);
+  *unit = pseudoTimeUnit[0];
 }
 
 //return source to sample distance
