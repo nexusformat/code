@@ -150,6 +150,7 @@ AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
 AC_CHECK_LIB(df, Hopen)
 AC_CHECK_LIB(mfhdf, ncopen)
+AC_CHECK_LIB(sz, SZ_Compress)
 AC_CHECK_LIB(hdf5, H5open)
 
 # Checks for header files.
