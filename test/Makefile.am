@@ -26,11 +26,11 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
-LIBNEXUS=../src/libNeXus.a
-LIBNEXUS77=../bindings/f77/libNeXus77.a
-LIBNEXUS90=../bindings/f90/libNeXus90.a
-AM_CPPFLAGS=-I. -I../include
-AM_FFLAGS=-I../bindings/f77
+LIBNEXUS=$(top_builddir)/src/libNeXus.la
+LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
+LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.a
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include
+AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 
 if HAVE_HDF4
 HDF4_TARGETS = napi4_test
@@ -55,10 +55,10 @@ napi5_test_LDADD = $(LIBNEXUS)
 
 napif_test_SOURCES = napif_test.f
 napif_test_LDADD = $(LIBNEXUS77)
-napif_test_LINK = $(F77) $(F77FLAGS) $(LDFLAGS) -o $@
+## napif_test_LINK = $(F77) $(F77FLAGS) $(LDFLAGS) -o $@
 
 NXtest_SOURCES = NXtest.f90
 NXtest_LDADD = $(LIBNEXUS90)
-NXtest_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
+## NXtest_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
 
 include $(top_srcdir)/build_rules.am
