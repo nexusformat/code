@@ -68,5 +68,5 @@ if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
-* Sun 22 Feb 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+* Sun Feb 22 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
 - Initial version
