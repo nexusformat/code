@@ -1,0 +1,48 @@
+#---------------------------------------------------------------------------
+# This file is meant to be the only one which needs editing in order to
+# compile and link the NeXus stuff. Every other makefile should include
+# this one and learn the NXFLAGS and the NXLDFLAGS from it for compiling
+# and linking. This file should also be the only one which needs to be
+# edited in order to reflect different locations of the HDF libraries.
+#
+#  Copyright (C) 2003 Mark Koennecke
+#  
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free 
+#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+#  MA  02111-1307  USA
+#             
+#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#-------------------------------------------------------------------------
+
+#--------- where are your HDF libraries? 
+HDF4ROOT=/data/lnslib
+HDF5ROOT=/data/lnslib
+
+#--------- which compilers shall be used
+CC=cc
+F77=f77
+
+#---------- uncomment this to build a HDF4 only version
+#NXFLAGS=-DHDF4 -I$(HDF4ROOT)/include
+#NXLDFLAGS=-L$(HDFROOT)/lib -lmfhdf -ldf -ljpeg -lz -lm
+
+#--------- uncomment this to build a HDF5 only version
+#NXFLAGS=-DHDF5 -I$(HDF5ROOT)/include
+#NXLDFLAGS=-L$(HDF5ROOT)/lib -lhdf5 -lz -lm
+
+#--------- uncomment this to build a HDF4 and HDF5 version
+NXFLAGS=-DHDF4 -DHDF5 -I$(HDF4ROOT)/include -I$(HDF5ROOT)/include
+NXLDFLAGS=-L$(HDF4ROOT)/lib -L$(HDF5ROOT)/lib -lmfhdf -ldf -ljpeg -lhdf5 \
+ -lz -lm 
+

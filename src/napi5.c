@@ -53,6 +53,11 @@
         char iAccess[2];
   } NexusFile5, *pNexusFile5;
 
+/* 
+   forward declaration of NX5closegroup in order to get rid of a nasty
+   warning
+*/
+NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /*--------------------------------------------------------------------*/
 
@@ -191,6 +196,12 @@
        iRet=H5Pget_cache(fapl,&mdc_nelmts,&rdcc_nelmts,&rdcc_nbytes,&rdcc_w0);
        rdcc_nbytes=(size_t)cacheSize;
        iRet = H5Pset_cache(fapl,mdc_nelmts,rdcc_nelmts,rdcc_nbytes,rdcc_w0);
+       /*
+	 setting the close degree is absolutely necessary in HDF5 
+         versions > 1.6. If you use a lessere version and the compiler 
+        complains, comment it out but keep this in mind.
+       */
+       H5Pset_fclose_degree(fapl,H5F_CLOSE_STRONG);
        am1 = H5F_ACC_TRUNC;
        pNew->iFID = H5Fcreate (filename, am1, H5P_DEFAULT, fapl);
     } else {
@@ -329,9 +340,29 @@
     pNexusFile5 pFile = NULL;
     int iRet;
  
-     pFile=NXI5assert(*fid);
+    pFile=NXI5assert(*fid);
+
     iRet=0;
+    /*
+    printf("HDF5 object count before close: %d\n",
+	   H5Fget_obj_count(pFile->iFID,H5F_OBJ_ALL));
+    */
     iRet = H5Fclose(pFile->iFID);
+   
+    /*
+      Please leave this here, it helps debugging HDF5 resource leakages
+    printf("HDF5 object count after close: %d\n",
+	   H5Fget_obj_count(H5F_OBJ_ALL,H5F_OBJ_ALL));
+    printf("HDF5 dataset count after close: %d\n",
+	   H5Fget_obj_count(H5F_OBJ_ALL,H5F_OBJ_DATASET));
+    printf("HDF5 group count after close: %d\n",
+	   H5Fget_obj_count(H5F_OBJ_ALL,H5F_OBJ_GROUP));
+    printf("HDF5 datatype count after close: %d\n",
+	   H5Fget_obj_count(H5F_OBJ_ALL,H5F_OBJ_DATATYPE));
+    printf("HDF5 attribute count after close: %d\n",
+	   H5Fget_obj_count(H5F_OBJ_ALL,H5F_OBJ_ATTR));
+    */
+
     if (iRet < 0) {
       NXIReportError (NXpData, "ERROR: HDF cannot close HDF file");
     }
@@ -345,6 +376,7 @@
     }
     free (pFile);
     *fid = NULL;
+    H5garbage_collect();
     return NX_OK;
   }
 
@@ -355,16 +387,17 @@
     pNexusFile5 pFile;
     hid_t iRet;
     hid_t attr1,aid1, aid2;
-    char pBuffer[1024];
+    char pBuffer[1024] = "";
     
     pFile = NXI5assert (fid);
     /* create and configure the group */
     if (pFile->iCurrentG==0)
     {
        iRet = H5Gcreate(pFile->iFID,(const char*)name, 0);
+       snprintf(pBuffer,1023,"/%s",name);
     } else
     {
-       sprintf(pBuffer,"/%s/%s",pFile->name_ref,name);
+       snprintf(pBuffer,1023,"/%s/%s",pFile->name_ref,name);
        iRet = H5Gcreate(pFile->iFID,(const char*)pBuffer, 0);
     }   
     if (iRet < 0) {
@@ -372,7 +405,7 @@
       return NX_ERROR;
     }
     pFile->iVID = iRet;
-    strcpy(pFile->name_ref,pBuffer);
+    strncpy(pFile->name_ref,pBuffer,1023);
     aid2 = H5Screate(H5S_SCALAR);
     aid1 = H5Tcopy(H5T_C_S1);
     H5Tset_size(aid1, strlen(nxclass));
@@ -827,10 +860,9 @@
   NXstatus CALLING_STYLE NX5putdata (NXhandle fid, void *data)
   {
     pNexusFile5 pFile;
-    NXname pBuffer;
     hid_t iRet;
     
-    char pError[512];
+    char pError[512] = "";
       
     pFile = NXI5assert (fid);
     
@@ -838,7 +870,7 @@
     iRet = H5Dwrite (pFile->iCurrentD, pFile->iCurrentT, H5S_ALL, H5S_ALL, 
                      H5P_DEFAULT, data);
     if (iRet < 0) {
-      sprintf (pError, "ERROR: failure to write data to %s", pBuffer);
+      snprintf (pError,511, "ERROR: failure to write data");
       NXIReportError (NXpData, pError);
       return NX_ERROR;
     }
@@ -1315,6 +1347,7 @@
            *datatype=iPtype;
            strcpy(nxclass, "SDS");
            H5Tclose(atype);
+	   H5Tclose(type);
            H5Dclose(grp);
         }
          return NX_OK;
@@ -1342,7 +1375,7 @@
   NXstatus CALLING_STYLE NX5getdata (NXhandle fid, void *data)
   {
     pNexusFile5 pFile;
-    int iStart[H5S_MAX_RANK];
+    int iStart[H5S_MAX_RANK], status;
     hid_t data_id, memtype_id, size_id, sign_id;    
     int dims;    
 
@@ -1405,7 +1438,18 @@
      }           
 
     /* actually read */    
-    H5Dread (pFile->iCurrentD, memtype_id, H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
+    status = H5Dread (pFile->iCurrentD, memtype_id, 
+		      H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
+    if(data_id == H5T_STRING)
+    {
+      H5Tclose(memtype_id);
+    }
+    if(status < 0)
+    {
+       NXIReportError (NXpData, "ERROR: failed to transfer dataset");
+       return NX_ERROR;
+      
+    }
     return NX_OK;
   }
     

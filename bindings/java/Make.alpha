@@ -1,10 +1,8 @@
 #--------------------------------------------------------------------------
 # Makefile for the NeXus Java API. Builds both the required Java class
 # files and the shared library with the native methods.
-#
-# This version for Redhat Linux 
 # 
-# Mark Koennecke, October 2003
+# Mark Koennecke, October 2000
 #--------------------------------------------------------------------------
 .SUFFIXES:
 .SUFFIXES: .java .class .c .o 
@@ -15,31 +13,27 @@
 
 include ../../make_general
 
-#Where to find the napi C stuff
-NAPIROOT=$(SINQDIR)/linux
-
-# Where Java lives
-JAVAROOT=/scratch/j2sdk1.4.2
+#-------Where Java lives
+JAVAROOT=/usr/opt/java131
 JAVABIN=$(JAVAROOT)/bin
 
 # The classpath for compiling java
 JCP=.:
 
 # The path to the include files for the jni-headers
-JINCLUDE= -I$(JAVAROOT)/include -I$(JAVAROOT)/include/linux 
+JINCLUDE= -I$(JAVAROOT)/include -I$(JAVAROOT)/include/alpha
 
 # The C-compiler to use
-CC=gcc
+CC=cc
 
 # Compiler flags to use for compiling
-CFLAGS= -g -c $(JINCLUDE) $(NXFLAGS) -I../../include \
-       -Inative
+CFLAGS= -g -c $(NXFLAGS) -pthread $(JINCLUDE)  -I../../include -Inative
 
 #Compiler flags used for linking
-LFLAGS= -g -shared -L../../src -lNeXus $(NXLDFLAGS)
+LFLAGS= -g -shared $(NXLDFLAGS)  
 
 #Target location for the shared library
-SHLIB=bin/rh62/libjnexus.so
+SHLIB=bin/du40/libjnexus.so
 
 ###########################################################################
 #     END OF C O N F I G U R A T I O N       S E C T I O N                #
@@ -47,7 +41,7 @@ SHLIB=bin/rh62/libjnexus.so
 ###########################################################################
 
 .java.class:
-	$(JAVABIN)/javac -g -target 1.1 -classpath $(JCP) $*.java
+	$(JAVABIN)/javac -target 1.1 -g -classpath $(JCP) $*.java
 
 .c.o:
 	$(CC) $(CFLAGS) -o $*.o $*.c
@@ -70,21 +64,35 @@ COBJ=native/hdfnativeImp.o \
      native/handle.o \
      native/NexusFile.o
 
-du40: all
-rh62: all
-
-
 all: jnexus.jar libjnexus.so test
+	
 
 jnexus.jar: $(JOBJ)
 	- rm jnexus.jar
 	$(JAVABIN)/jar cvf jnexus.jar $(JOBJ) \
 	  ncsa/hdf/hdflib/ArrayDescriptor.class
 
-libjnexus.so: $(COBJ)
-	$(CC)  -o $(SHLIB) $(COBJ)  \
-	 $(LFLAGS) -lz -lm 
+jnexus.zip: $(JOBJ)
+	- rm jnexus.jar
+	zip jnexus.zip $(JOBJ) \
+	  ncsa/hdf/hdflib/ArrayDescriptor.class
 
+
+#-------- uncomment this vor a general Tru64Unix System
+# Please note that many Tru64Unix version come with an old incompatible
+# libjpeg.so. If you get linker errors, first consider to link
+# directly against the version coming with HDF-4
+ 
+#libjnexus.so: $(COBJ)
+#	$(CC)  -o $(SHLIB) $(COBJ) ../../src/libNeXus.a \
+#	$(LFLAGS) 
+
+#---------- special version for PSI with broken HDF4 in inconvenient place
+libjnexus.so: $(COBJ)
+	$(CC) -shared  -o $(SHLIB) $(COBJ) ../../src/libNeXus.a \
+	$(HDF4ROOT)/lib/libmfhdf.a $(HDF4ROOT)/lib/libdf.a \
+	$(HDF4ROOT)/lib/libhdf5.a $(HDF4ROOT)/lib/libjpeg.a \
+	-lz -lm  
 
 header: neutron/nexus/NexusFile.class
 	$(JAVABIN)/javah -jni -d native neutron.nexus.NexusFile
@@ -96,4 +104,40 @@ clean:
 	- rm ncsa/hdf/hdflib/*.class
 	- rm native/*.o
 
+apidoc: $(JOBJ)
+	javadoc -d apidoc neutron.nexus ncsa.hdf.hdflib
+
+# Make distributions
+ALLDIS=apidoc test jnexus.jar *.html neutron/nexus/*.java \
+	ncsa/hdf/hdflib/*.java README.* COPY*.* NeXus.gif 
+
+disdu40: $(ALLDIS)
+	- rm jnexusdu40.tar.gz
+	tar cvf jnexusdu40.tar $(ALLDIS)
+	cp bin/du40/libjnexus.so .
+	tar uvf jnexusdu40.tar libjnexus.so
+	gzip jnexusdu40.tar
+	- rm *.so
+ 
+distux: $(ALLDIS)
+	- rm jnexustux.tar.gz
+	tar cvf jnexustux.tar $(ALLDIS)
+	cp bin/rh62/libjnexus.so .
+	tar uvf jnexustux.tar libjnexus.so
+	gzip jnexustux.tar
+	- rm *.so
+
+ZIP=/data/koenneck/bin/zip
+disw32: $(ALLDIS)
+	- rm jnexusw32.zip
+	$(ZIP) -r jnexusw32.zip $(ALLDIS)
+	cp bin/win32/*.dll .
+	$(ZIP) -g jnexusw32.zip *.dll
+	- rm *.dll
+
+WWW:
+	- rm www.tar
+	cp index.html japinotes.html
+	tar cvf www.tar apidoc test/TestJapi.java \
+	japinotes.html jnexustut.html *.zip *.tar.gz COPYING.NCSA
 

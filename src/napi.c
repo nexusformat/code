@@ -232,7 +232,8 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
       *gHandle = fHandle;
       return NX_OK;
     } else {
-      NXIReportError (NXpData,"ERROR: Format not readable by this NeXus library");
+      NXIReportError (NXpData,
+          "ERROR: Format not readable by this NeXus library");
       *gHandle = NULL;
       return NX_ERROR;
     }

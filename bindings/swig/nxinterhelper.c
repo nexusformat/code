@@ -16,7 +16,7 @@
   An own error handler. nx_getlasterror will return the test of
   the last NeXus error.
   --------------------------------------------------------------------*/
-static char errorText[256];
+static char errorText[256]= "";
 
 static void nxinterError(void *pData, char *error){
   strncpy(errorText,error,255);
@@ -108,6 +108,11 @@ char *nx_getnextentry(void *handle, char separator){
   status = NXgetnextentry(hfil,group, nxclass,&type);
   if(status == NX_OK){
     length = 30 + strlen(group) + strlen(nxclass);
+    /*
+      This introduces a memory leak. I had hoped, that swig would
+      kill it for me after use, but I'am afraid, this is not the
+      case. Unfortately I do not know how to fix the issue.
+    */
     resultBuffer = (char *)malloc(length*sizeof(char));
     if(resultBuffer == NULL){
       return NULL;
@@ -153,7 +158,23 @@ int  nx_initgroupdir(void *handle){
 /*========================== dataset handling =======================*/
 int nx_makedata(void *ptr, char *name, int rank, int type, 
 		    void *dimPtr){
-  return nx_compmakedata(ptr,name,rank,type,dimPtr,dimPtr);
+  int status;
+  NXhandle hfil;
+  pNXDS dimData;
+
+  hfil = (NXhandle)ptr;
+  dimData = (pNXDS)dimPtr;
+  if(dimData->type != NX_INT32){
+    NXIReportError(NULL,"ERROR: dimension data not integer");
+    return 0;
+  }
+  status = NXmakedata(hfil, name, type, rank, 
+		      dimData->u.iPtr);
+  if(status == NX_OK){
+    return 1;
+  } else {
+    return 0;
+  }
 }
 /*--------------------------------------------------------------------*/
 int nx_compmakedata(void *ptr, char *name, int rank, int type, 
@@ -165,9 +186,7 @@ int nx_compmakedata(void *ptr, char *name, int rank, int type,
   hfil = (NXhandle)ptr;
   dimData = (pNXDS)dimPtr;
   if(dimData->type != NX_INT32){
-    /*
-      TODO: error message
-    */
+    NXIReportError(NULL,"ERROR: dimension data not integer");
     return 0;
   }
   bufData = (pNXDS)bufPtr;
@@ -353,6 +372,11 @@ int   nx_putdata(void *handle, void *dataset){
   hfil = (NXhandle)handle;
   data = (pNXDS)dataset;
 
+  if(data == NULL){
+    NXIReportError(NULL,"ERROR: NULL data pointer in nx_putdata");
+    return 0;
+  }
+
   status = NXputdata(hfil,data->u.ptr);
   if(status != NX_OK){
     return 0;
@@ -411,6 +435,11 @@ char *nx_getnextattr(void *handle, char separator){
   hfil = (NXhandle)handle;
   status = NXgetnextattr(hfil,aName, &length, &type);
   if(status == NX_OK){
+    /*
+      This introduces a memory leak. I had hoped, that swig would
+      kill it for me after use, but I'am afraid, this is not the
+      case. Unfortately I do not know how to fix the issue.
+    */
     result = (char *)malloc((20+strlen(aName))*sizeof(char));
     if(result == NULL){
       return NULL;
@@ -450,7 +479,7 @@ void *nx_getattr(void *handle, char *name, int type, int length){
   /*
     prepare dataset
   */
-  dim[0] = length;
+  dim[0] = length+1;
   data = createNXDataset(1,type,dim);
   if(data == NULL){
     return NULL;

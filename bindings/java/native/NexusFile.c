@@ -29,11 +29,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include "neutron_nexus_NexusFile.h"
-#include "../../napi.h"
+#include <napi.h>
 #include "handle.h"
 
 #ifdef WIN32
-#include <mapiwin.h>
+/* commented  away for MINGW 
+#include <mapiwin.h> 
+*/
 #endif
 
 #define DEBUG 
@@ -98,6 +100,9 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_init
     fileName = (char *) (*env)->GetStringUTFChars(env,filename,0);    
     
     /* call NXopen */
+#ifdef DEBUG
+    fprintf(fd,"Calling NXopen on %s, with %d\n", fileName,access);
+#endif
     iRet = NXopen(fileName,access,&handle);
 
 #ifdef DEBUG
@@ -621,6 +626,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
         }
         (*env)->SetIntField(env,linki,fid,myLink.iRef);
 
+#ifdef HDF5
         /* 
          set HDF-5 String variables
 	*/
@@ -643,7 +649,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
         }
 	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
         (*env)->SetObjectField(env, linki, fid, jstr);
-        
+#endif        
     }
 }
 /*------------------------------------------------------------------------
@@ -693,6 +699,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
         }
         (*env)->SetIntField(env,linki,fid,myLink.iRef);
 
+#ifdef HDF5
         /* 
          set HDF-5 String variables
 	*/
@@ -715,6 +722,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
         }
 	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
         (*env)->SetObjectField(env, linki, fid, jstr);
+#endif
     }
 }
 /*------------------------------------------------------------------------
@@ -761,7 +769,8 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
           return;
      }
      myLink.iRef = (*env)->GetIntField(env,target,fid);
-    
+
+#ifdef HDF5    
      /*
        get the HDF-5 Strings
      */
@@ -788,7 +797,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
      cData = (*env)->GetStringUTFChars(env, jstr, 0);          
      strcpy(myLink.iRefd,cData);
      (*env)->ReleaseStringUTFChars(env, jstr, cData);
-
+#endif
 
      // do actually link
      iRet = NXmakelink(nxhandle, &myLink);

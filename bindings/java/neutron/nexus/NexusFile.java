@@ -31,8 +31,8 @@ public class  NexusFile implements NeXusFileInterface {
     public final static int NXACC_READ = 1;
     public final static int NXACC_RDWR = 2;
     public final static int NXACC_CREATE = 3;
-    public final static int NXACC_CREATE4 = 3;
-    public final static int NXACC_CREATE5 = 4;
+    public final static int NXACC_CREATE4 = 4;
+    public final static int NXACC_CREATE5 = 5;
     
     /**
       * constant denoting an unlimited dimension.

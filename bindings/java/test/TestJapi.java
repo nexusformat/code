@@ -16,7 +16,7 @@ public class TestJapi {
     static public void main(String args[])
     {
         String fileName = "JapiTest.nxs";
-        String fileName5 = "JapiTest.h5";
+        String fileName5 = "japitest.h5";
         String group = "entry1";
         String nxclass = "NXentry"; 
         int iData1[][] = new int[3][10];
@@ -31,12 +31,25 @@ public class TestJapi {
         String attname, vname, vclass;
         AttributeEntry atten;
         boolean HDF5 = false;
+        boolean readOnly = false , writeOnly = false;
 
         // check if we should do a HDF-5 test
 	if(args.length >= 1){
 	    if(args[0].indexOf("HDF5") >= 0){
 		HDF5 = true;
+		System.out.println("Testing HDF5");
             }
+        } else {
+	    System.out.println("Testing HDF4");
+	}
+        // check for read only tests, defunct for now!!!!
+        if(args.length >=2){
+	  if(args[1].indexOf("r") >=0){
+	    readOnly = true;
+	  }
+	  if(args[1].indexOf("w") >=0){
+	    writeOnly = true;
+	  }
         }
 
         // create some data
@@ -52,91 +65,91 @@ public class TestJapi {
 	{
            islab[i] = 10000 + i;
         }
+	
+	try{
+	   //create a NexusFile
+	      if(HDF5){ 
+		  nf = new NexusFile(fileName5,NexusFile.NXACC_CREATE5);
+	      } else {
+		  nf = new NexusFile(fileName,NexusFile.NXACC_CREATE);
+	      }
 
-        try{
-	 //create a NexusFile
-	    if(HDF5){ 
-                nf = new NexusFile(fileName5,NexusFile.NXACC_CREATE5);
-            } else {
-                nf = new NexusFile(fileName,NexusFile.NXACC_CREATE);
-            }
-	   
-         // error handling check
-	 try{
-             nf.opengroup(group,nxclass);
-         }catch(NexusException nex) {
-           System.out.println("Exception handling mechanism works");
-         }
-         // create and open a group
-         nf.makegroup(group,nxclass);
-         nf.opengroup(group,nxclass);
+	   // error handling check
+	   try{
+	       nf.opengroup(group,nxclass);
+	   }catch(NexusException nex) {
+	     System.out.println("Exception handling mechanism works");
+	   }
+	   // create and open a group
+	   nf.makegroup(group,nxclass);
+	   nf.opengroup(group,nxclass);
 
-         // get a link ID for this group
-         gid = nf.getgroupID();
+	   // get a link ID for this group
+	   gid = nf.getgroupID();
 
-         // create and open a dataset
-         iDim[0] = 3;
-         iDim[1] = 10;
-         nf.makedata("iData1",NexusFile.NX_INT32,2,iDim);
-         nf.opendata("iData1");
+	   // create and open a dataset
+	   iDim[0] = 3;
+	   iDim[1] = 10;
+	   nf.makedata("iData1",NexusFile.NX_INT32,2,iDim);
+	   nf.opendata("iData1");
 
-         // get a link ID to this data set
-         did = nf.getdataID();
+	   // get a link ID to this data set
+	   did = nf.getdataID();
 
-         // write data to it 
-         nf.putdata(iData1);
+	   // write data to it 
+	   nf.putdata(iData1);
 
-         // add attributes, the first one is also an example how to write
-         // strings (by converting to byte arrays)
-         String units = "MegaFarts";
-         nf.putattr("Units",units.getBytes(),NexusFile.NX_CHAR);
-         iStart[0] = 1;
-	 nf.putattr("signal",iStart,NexusFile.NX_INT32);
+	   // add attributes, the first one is also an example how to write
+	   // strings (by converting to byte arrays)
+	   String units = "MegaFarts";
+	   nf.putattr("Units",units.getBytes(),NexusFile.NX_CHAR);
+	   iStart[0] = 1;
+	   nf.putattr("signal",iStart,NexusFile.NX_INT32);
 
-         // closedata
-         nf.closedata();
+	   // closedata
+	   nf.closedata();
 
-         // write a compressed data set
-         nf.compmakedata("iData1_compressed",NexusFile.NX_INT32,2,iDim,
-                        NexusFile.NX_COMP_LZW,iDim);
-         nf.opendata("iData1_compressed");
-         nf.putdata(iData1);
-         nf.closedata();
+	   // write a compressed data set
+	   nf.compmakedata("iData1_compressed",NexusFile.NX_INT32,2,iDim,
+			  NexusFile.NX_COMP_LZW,iDim);
+	   nf.opendata("iData1_compressed");
+	   nf.putdata(iData1);
+	   nf.closedata();
 
-         // write a float data set
-         nf.makedata("fData1",NexusFile.NX_FLOAT32,2,iDim);
-         nf.opendata("fData1");
-         nf.putdata(fData1);
-         nf.closedata();
+	   // write a float data set
+	   nf.makedata("fData1",NexusFile.NX_FLOAT32,2,iDim);
+	   nf.opendata("fData1");
+	   nf.putdata(fData1);
+	   nf.closedata();
 
-         // write a dataset in slabs */
-         nf.makedata("slabbed",NexusFile.NX_INT32,2,iDim);
-         nf.opendata("slabbed");
-         iStart[1] = 0;
-         iEnd[1] = 10;
-         iEnd[0] = 1;
-         for(i = 0; i < 3; i++)
-	 {
-           iStart[0] = i;
-           nf.putslab(islab,iStart, iEnd);
-         }
-         nf.closedata();
+	   // write a dataset in slabs */
+	   nf.makedata("slabbed",NexusFile.NX_INT32,2,iDim);
+	   nf.opendata("slabbed");
+	   iStart[1] = 0;
+	   iEnd[1] = 10;
+	   iEnd[0] = 1;
+	   for(i = 0; i < 3; i++)
+	   {
+	     iStart[0] = i;
+	     nf.putslab(islab,iStart, iEnd);
+	   }
+	   nf.closedata();
 
-         // closegroup
-         nf.closegroup();
+	   // closegroup
+	   nf.closegroup();
 
-         // test linking code 
-         nf.makegroup("entry2","NXentry");
-         nf.opengroup("entry2","NXentry");
-         nf.makegroup("data","NXdata");
-         nf.opengroup("data","NXdata");
-         nf.makelink(did);
-	 // nf.debugstop();  
-         nf.closegroup();
+	   // test linking code 
+	   nf.makegroup("entry2","NXentry");
+	   nf.opengroup("entry2","NXentry");
+	   nf.makegroup("data","NXdata");
+	   nf.opengroup("data","NXdata");
+	   nf.makelink(did);
+	   // nf.debugstop();  
+	   nf.closegroup();
 
-         // close a file explicitly (recommended!)
-         nf.finalize();
-         System.out.println(" *** Writing Tests passed with flying banners"); 
+	   // close a file explicitly (recommended!)
+	   nf.finalize();
+	   System.out.println(" *** Writing Tests passed with flying banners");
 
 	 //**************** reading tests *******************************
         iData2[2][5] = 66666;
@@ -152,12 +165,18 @@ public class TestJapi {
          // test attribute enquiry routine at global attributes
          Hashtable h = nf.attrdir();
          Enumeration e = h.keys();
+	 byte bData[];
          while(e.hasMoreElements())
 	 {
            attname = (String)e.nextElement();
            atten = (AttributeEntry)h.get(attname);
            System.out.println("Found global attribute: " + attname +
-             " type: "+ atten.type + " ,length: " + atten.length); 
+             " type: "+ atten.type + " ,length: " + atten.length);
+	   bData = new byte[atten.length];
+	   iDim[0] = atten.length;
+	   iDim[1] = atten.type;
+	   nf.getattr(attname,bData,iDim);
+	   System.out.println(attname + "=" + new String(bData));
          }
 
          // test reading vGroup directory 
