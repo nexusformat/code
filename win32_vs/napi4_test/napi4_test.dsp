@@ -98,8 +98,6 @@ SOURCE=..\..\napi4_test.c
 
 !ELSEIF  "$(CFG)" == "napi4_test - Win32 Debug"
 
-# ADD CPP /I "c:\program files\hdf41r4\include"
-
 !ENDIF 
 
 # End Source File
