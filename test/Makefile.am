@@ -84,6 +84,7 @@ NXtest_LDADD = $(LIBNEXUS90)
 NXtest_LINK = $(F90LINK)
 else
 NXtest_SOURCES = dummy.c
+NXtest_LINK = $(LINK)
 endif
 
 include $(top_srcdir)/build_rules.am
