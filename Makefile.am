@@ -35,7 +35,8 @@ test: check
 
 SUBDIRS=include src bindings test applications scripts
 
-# We seem to fail a dependency check later with the install
-# kit if this line is missing
-EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec
+EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec autoversion.sh
 
+# Add any flags here that you want passed to configure when you do 
+# a "make distcheck"
+# DISTCHECK_CONFIGURE_FLAGS=--without-java
