@@ -45,7 +45,8 @@ F77_TARGETS = napif_test
 F90_TARGETS = NXtest
 
 
-EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4
+EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
+			NXtest.f90 napif_test.f
 
 TESTSUITE	= $(srcdir)/testsuite
 
