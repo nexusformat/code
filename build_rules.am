@@ -36,3 +36,9 @@ SUFFIXES = .f90 .o .java
 
 .f90.lo:
 	$(LTF90COMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+F90COMPILE = $(F90) $(AM_F90FLAGS) $(F90FLAGS)
+LTF90COMPILE = $(LIBTOOL) --mode=compile --tag=F77 $(F90) $(AM_FFLAGS) $(F90FLAGS)
+F90LD = $(F90)
+F90LINK = $(LIBTOOL) --mode=link --tag=CC $(F90LD) $(AM_F90FLAGS) $(F90FLAGS) \
+        $(AM_LDFLAGS) $(LDFLAGS) -o $@
