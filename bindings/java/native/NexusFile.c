@@ -14,6 +14,9 @@
 
    Updated for the NeXus XML-API, Mark Koennecke, October 2004
 
+   Updated for NXopengrouppath, NXopensourcepath
+   Mark Koennecke, December 2004
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -256,6 +259,36 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopenpath
     nxpath = (char *) (*env)->GetStringUTFChars(env,path,0);    
 
     iRet = NXopenpath(nxhandle, nxpath);
+
+#ifdef DEBUG
+    if(iRet != NX_OK)
+    {
+      fprintf(fd,"Cleanup code called after raising Exception\n");
+    }
+#endif
+    /* release strings */
+    (*env)->ReleaseStringUTFChars(env,path, nxpath);
+}
+/*------------------------------------------------------------------------
+                     nxopengrouppath
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengrouppath
+  (JNIEnv *env, jobject obj, jint handle, jstring path)
+{
+    char *nxpath;
+    NXhandle nxhandle;
+    int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* extract the name and class to char * */
+    nxpath = (char *) (*env)->GetStringUTFChars(env,path,0);    
+
+    iRet = NXopengrouppath(nxhandle, nxpath);
 
 #ifdef DEBUG
     if(iRet != NX_OK)
@@ -863,6 +896,24 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
 
      // do actually link
      iRet = NXmakelink(nxhandle, &myLink);
+}
+/*------------------------------------------------------------------------
+                     nxopensourcepath
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopensourcegroup
+  (JNIEnv *env, jobject obj, jint handle)
+{
+    NXhandle nxhandle;
+    int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXopensourcegroup(nxhandle);
+
 }
 /*----------------------------------------------------------------------
                            nxsetnumberformat

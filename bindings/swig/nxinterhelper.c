@@ -97,6 +97,19 @@ int nx_openpath(void *handle, char *path){
     return 0;
   }
 }
+/*---------------------------------------------------------------------*/
+int nx_opengrouppath(void *handle, char *path){
+  int status;
+  NXhandle hfil;
+
+  hfil = (NXhandle)handle;
+  status = NXopengrouppath(hfil,path);
+  if(status == NX_OK){
+    return 1;
+  } else {
+    return 0;
+  }
+}
 /*--------------------------------------------------------------------*/
 int nx_closegroup(void *handle){
   int status;
@@ -521,6 +534,20 @@ int nx_makelink(void *handle, void *link){
   lk = (NXlink *)link;
 
   status = NXmakelink(hfil,lk);
+  if(status == NX_OK){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+/*-----------------------------------------------------------------------*/
+int nx_opensourcegroup(void *handle){
+  NXhandle hfil;
+  int status;
+
+  hfil = (NXhandle)handle;
+
+  status = NXopensourcegroup(hfil);
   if(status == NX_OK){
     return 1;
   }else{

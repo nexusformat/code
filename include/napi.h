@@ -148,6 +148,7 @@ typedef struct {
 #    define NXmakegroup         MANGLE(nximakegroup)
 #    define NXopengroup         MANGLE(nxiopengroup)
 #    define NXopenpath          MANGLE(nxiopenpath)
+#    define NXopengrouppath     MANGLE(nxiopengrouppath)
 #    define NXclosegroup        MANGLE(nxiclosegroup)
 #    define NXmakedata          MANGLE(nximakedata)
 #    define NXcompmakedata      MANGLE(nxicompmakedata)
@@ -159,6 +160,7 @@ typedef struct {
 #    define NXputattr           MANGLE(nxiputattr)
 #    define NXgetdataID         MANGLE(nxigetdataid)
 #    define NXmakelink          MANGLE(nximakelink)
+#    define NXopensourcegroup   MANGLE(nxiopensourcegroup)
 #    define NXmalloc            MANGLE(nximalloc)
 #    define NXfree              MANGLE(nxifree)
 #    define NXflush             MANGLE(nxiflush)
@@ -220,6 +222,7 @@ typedef struct {
 #       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
 #       define NXopenpath 		MANGLE(NXIOPENPATH)
+#       define NXopengrouppath 		MANGLE(NXIOPENGROUPPATH)
 #       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
 #       define NXmakedata 		MANGLE(NXIMAKEDATA)
 #       define NXcompress 		MANGLE(NXICOMPRESS)
@@ -245,6 +248,7 @@ typedef struct {
 #       define NXgetgroupID 		MANGLE(NXIGETGROUPID)
 #       define NXgetdataID 		MANGLE(NXIGETDATAID)
 #       define NXmakelink 		MANGLE(NXIMAKELINK)
+#       define NXopensourcegroup        MANGLE(NXIOPENSOURCEGROUP)
 #       define NXmalloc 		MANGLE(NXIMALLOC)
 #       define NXfree 			MANGLE(NXIFREE)
 /* FORTRAN helpers - for NeXus internal use only */
@@ -274,6 +278,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXflush(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopenpath (NXhandle handle, CONSTCHAR *path);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopengrouppath (NXhandle handle, CONSTCHAR *path);
 
 NX_EXTERNAL  NXstatus CALLING_STYLE NXclosegroup(NXhandle handle);
   
@@ -289,6 +294,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXputslab(NXhandle handle, void* data, int s
 
 NX_EXTERNAL  NXstatus CALLING_STYLE NXgetdataID(NXhandle handle, NXlink* pLink);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXmakelink(NXhandle handle, NXlink* pLink);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopensourcegroup(NXhandle handle);
 
 NX_EXTERNAL  NXstatus CALLING_STYLE NXgetdata(NXhandle handle, void* data);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);

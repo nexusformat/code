@@ -383,8 +383,20 @@ static int determineFileType(CONSTCHAR *filename)
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxmakelink(pFunc->pNexusData, sLink);
   }
+  /* --------------------------------------------------------------------*/
+  NXstatus CALLING_STYLE NXopensourcegroup(NXhandle fid)
+  {
+    char target_path[512];
+    int status, type = NX_CHAR, length = 511;
 
-  
+    status = NXgetattr(fid,"target",target_path,&length,&type);
+    if(status != NX_OK)
+    {
+      NXIReportError(NXpData,"ERROR: item not linked");
+      return NX_ERROR;
+    }
+    return NXopengrouppath(fid,target_path);
+  }
   /*----------------------------------------------------------------------*/
 
   NXstatus CALLING_STYLE NXflush(NXhandle *pHandle)
@@ -758,6 +770,42 @@ static NXstatus stepOneUp(NXhandle hfil, char *name)
   NXIReportError (NXpData, pBueffel);
   return NX_ERROR;              
 }
+/*--------------------------------------------------------------------*/
+static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
+{
+  int status, datatype;
+  NXname name2, xclass;
+  char pBueffel[256];  
+
+  /*
+    catch the case when we are there: i.e. no further stepping
+    necessary. This can happen with paths like ../
+  */
+  if(strlen(name) < 1)
+  {
+      return NX_OK;
+  }
+  
+  NXinitgroupdir(hfil);
+  while(NXgetnextentry(hfil,name2,xclass,&datatype) != NX_EOD)
+  {
+    
+    if(strcmp(name2,name) == 0)
+    {
+      if(strcmp(xclass,"SDS") == 0)
+      {
+	return NX_EOD;
+      } 
+      else
+      {
+	return NXopengroup(hfil,name,xclass);
+      }
+    }
+  }
+  snprintf(pBueffel,255,"ERROR: NXopenpath cannot step into %s",name);
+  NXIReportError (NXpData, pBueffel);
+  return NX_ERROR;              
+}
 /*---------------------------------------------------------------------*/
 NXstatus CALLING_STYLE NXopenpath(NXhandle hfil, CONSTCHAR *path)
 {
@@ -789,6 +837,43 @@ NXstatus CALLING_STYLE NXopenpath(NXhandle hfil, CONSTCHAR *path)
       return status;
     }
     if(pPtr == NULL)
+    {
+      run = 0;
+    }
+  }
+  return NX_OK;
+}
+/*---------------------------------------------------------------------*/
+NXstatus CALLING_STYLE NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
+{
+  int status, run = 1;
+  NXname pathElement;
+  char *pPtr;
+
+  if(hfil == NULL || path == NULL)
+  {
+    NXIReportError(NXpData,
+     "ERROR: NXopendata needs both a file handle and a path string");
+    return NX_ERROR;
+  }
+
+  pPtr = moveDown(hfil,(char *)path,&status);
+  if(status != NX_OK)
+  {
+    NXIReportError (NXpData, 
+		    "ERROR: NXopendata failed to move down in hierarchy");
+    return status;
+  }
+
+  while(run == 1)
+  {
+    pPtr = extractNextPath(pPtr, pathElement);
+    status = stepOneGroupUp(hfil,pathElement);
+    if(status == NX_ERROR)
+    {
+      return status;
+    }
+    if(pPtr == NULL || status == NX_EOD)
     {
       run = 0;
     }

@@ -7,14 +7,25 @@
 .SUFFIXES:
 .SUFFIXES: .i .c .o
 
+HROOT=/afs/psi.ch/project/sinq/tru64
 CC=cc
-CFLAGS=-c -I/afs/psi.ch/project/sinq/tru64/include -DHDF4 -DHDF5
-LDFLAGS=-L/afs/psi.ch/project/sinq/tru64/lib -lNeXus -lmf -ldf -ljpeg -lhdf5 -lz -lm
+CFLAGS=-c -I$(HROOT)/include -DHDF4 -DHDF5 -DNXXML
+LDFLAGS=-L/afs/psi.ch/project/sinq/tru64/lib -lNeXus \
+	$(HROOT)/lib/libmfhdf.a $(HROOT)/lib/libdf.a -ljpeg \
+	-lhdf5 -lmxml -lz -lm
+
+#---------------------------------------------------------------------------
+# If this is compiled with XML support, then nxdataset.o is already included
+# in the NeXus library. 
+#--------------------------------------------------------------------------
+#OBJ=nxinterhelper.o nxdataset.o
+
+OBJ=nxinterhelper.o
 
 #----------- change this for other script languages
 SCRIPTFLAG=-tcl8 -ltclsh.i
 SCRIPTFLAG2=-tcl8 
-SCRIPTLIB=-L/data/lnslib/lib -ltcl8.0
+SCRIPTLIB=-L/usr/local/lib -ltcl8.0
 TCLOBJ=nxinter_wrap.o
 
 #---------- these define for mzscheme
@@ -29,7 +40,6 @@ GGOBJ=nxguile_wrap.o
 GGINC=/data/lnslib
 GGLIB=-L/data/lnslib/lib -lguile
 
-OBJ=nxinterhelper.o nxdataset.o
 
 .c.o:
 	$(CC) $(CFLAGS) $*.c

@@ -15,6 +15,9 @@
   * updated for NAPI-2.0, including HDF-5 support
   * @author Mark Koennecke, August 2001
   *
+  * updated for NXopengrouppath, NXopensourcepath, XML
+  * @author Mark Koennecke, December 2004
+  *
   * copyright: see accompanying COPYRIGHT file
   */
 package neutron.nexus;
@@ -69,6 +72,16 @@ public interface NeXusFileInterface {
       * @exception NexusException when something goes wrong.
       */   
     public void openpath(String path) throws 
+                           NexusException;
+    /**
+      * opengrouppath opens groups and datsets accroding to the path string
+      * given. The path syntax follows unix conventions. Both absolute
+      * and relative paths are possible. All objects of the path must
+      * exist. This function stops int the last group.
+      * @param path The path string
+      * @exception NexusException when something goes wrong.
+      */   
+    public void opengrouppath(String path) throws 
                            NexusException;
     /**
       * closegroup closes access to the current group and steps down one
@@ -282,6 +295,13 @@ public interface NeXusFileInterface {
       * @exception NexusException if an error occurs.
       */
     public void   makelink(NXlink target)throws
+                          NexusException;     
+    /**
+      * opensourcepath opens the group from which the current item was linked
+      * Returns an error if the current item is not linked.
+      * @exception NexusException if an error occurs.
+      */
+    public void   opensourcepath()throws
                           NexusException;     
 
 }

@@ -49,6 +49,7 @@ public class  NexusFile implements NeXusFileInterface {
     public final static int NX_INT8 = 20; 
     public final static int NX_BINARY = 20;
     public final static int NX_UINT8 = 21; 
+    public final static int NX_BOOLEAN = 21; 
     public final static int NX_INT16 = 22; 
     public final static int NX_UINT16 = 23; 
     public final static int NX_INT32 = 24; 
@@ -162,6 +163,7 @@ public class  NexusFile implements NeXusFileInterface {
     protected native void nxmakegroup(int handle, String name, String nxclass);
     protected native void nxopengroup(int handle, String name, String nxclass);
     protected native void nxopenpath(int handle, String path);
+    protected native void nxopengrouppath(int handle, String path);
     protected native void nxclosegroup(int handle);
 
     /** 
@@ -204,6 +206,20 @@ public class  NexusFile implements NeXusFileInterface {
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
 	nxopenpath(handle,path);
+    }
+    /**
+      * opengrouppath opens groups and datsets accroding to the path string
+      * given. The path syntax follows unix conventions. Both absolute
+      * and relative paths are possible. All objects of the path must
+      * exist. This opens only until the last group.
+      * @param path The path string
+      * @exception NexusException when something goes wrong.
+      */   
+    public void opengrouppath(String path) throws 
+                         NexusException
+    {
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	nxopengrouppath(handle,path);
     }
 
     /**
@@ -585,6 +601,7 @@ public class  NexusFile implements NeXusFileInterface {
     protected native void nxgetgroupid(int handle, NXlink link);
     protected native void nxgetdataid(int handle, NXlink link);
     protected native void nxmakelink(int handle, NXlink target); 
+    protected native void nxopensourcepath(int handle); 
     /**
       * getgroupID gets the data necessary for linking the current vGroup
       * somewhere else.
@@ -625,6 +642,18 @@ public class  NexusFile implements NeXusFileInterface {
       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
       nxmakelink(handle,target);
     }
+    /**
+      * opensourcepath opens the group from which the current item was linked
+      * Returns an error if the current item is not linked.
+      * @exception NexusException if an error occurs.
+      */
+    public void   opensourcepath()throws
+                          NexusException
+    {
+      if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+      nxopensourcepath(handle);
+    }
+	
 
     /**
       * checkType verifies if a parameter is a valid NeXus type code. 

@@ -20,6 +20,8 @@ void  nx_close(void *handle);
 /*--------------- group handling section ------------------------*/
 int nx_makegroup(void *handle, char *name, char *nxclass);
 int nx_opengroup(void *handle, char *name, char *nxclass);
+int nx_opengrouppath(void *handle, char *path);
+int nx_openpath(void *handle, char *path);
 int nx_closegroup(void *handle);
 char *nx_getnextentry(void *handle, char separator);
 void *nx_getgroupID(void *handle);
@@ -53,6 +55,7 @@ void *nx_getattr(void *handle, char *name, int type, int length);
 
 /*---------------------- link -----------------------------------*/
 int nx_makelink(void *handle, void *link);
+int nx_opensourcgroup(void *handle);
 /*----------------- error handling -----------------------------*/
 char *nx_getlasterr(void);
 
