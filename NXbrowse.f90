@@ -115,8 +115,13 @@ program NXbrowse
                            end if
                         else
                            if (NXUreaddata (file_id, data_name, int_array) == NX_OK) then
-                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ", minval(int_array), " to ", maxval(int_array)
+                              if (size(int_array) > 1) then
+                                 print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                                 //"] = ", minval(int_array), " to ", maxval(int_array)
+                              else
+                                 print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                                 //"] = ", int_array
+                              end if
                            end if
                         end if
                         deallocate (int_array, stat = status)
@@ -158,8 +163,13 @@ program NXbrowse
                            end if
                         else
                            if (NXUreaddata (file_id, data_name, real_array) == NX_OK) then
-                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ", minval(real_array), " to ", maxval(real_array)
+                              if (size(real_array) > 1) then
+                                 print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                                 //"] = ", minval(real_array), " to ", maxval(real_array)
+                              else
+                                 print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                                 //"] = ", real_array
+                              end if
                            end if
                         end if
                         deallocate (real_array, stat = status)
@@ -201,8 +211,13 @@ program NXbrowse
                            end if
                         else
                            if (NXUreaddata (file_id, data_name, dble_array) == NX_OK) then
-                              print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
-                              //"] = ", minval(dble_array), " to ", maxval(dble_array)
+                              if (size(dble_array) > 1) then
+                                 print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                                 //"] = ", minval(dble_array), " to ", maxval(dble_array)
+                              else
+                                 print *, "  "//trim(data_name)//trim(dimstring(NXrank,NXdims))//" ["//trim(NXdatatype(NXtype))&
+                                 //"] = ", dble_array
+                              end if
                            end if
                         end if
                         deallocate (dble_array, stat = status)
