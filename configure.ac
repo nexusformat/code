@@ -34,10 +34,10 @@ AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
-AM_INIT_AUTOMAKE([1.6])
-AC_CONFIG_SRCDIR([src/napi.c])
-AM_CONFIG_HEADER([include/nxconfig.h])
 AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_SRCDIR([src/napi.c])
+AM_INIT_AUTOMAKE([1.6])
+AM_CONFIG_HEADER([include/nxconfig.h])
 AC_CANONICAL_HOST
 AC_PROG_LIBTOOL
 # Checks for programs.
