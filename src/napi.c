@@ -713,7 +713,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     int32 iNew;
     char pBuffer[256];
     int i, iRet;
-  
+    int32 myDim[MAX_VAR_DIMS];  
+
     pFile = NXIassert (fid);
   
   
@@ -758,7 +759,14 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
         return NX_ERROR;
       }
     }
-  
+
+    /* cast the dimensions array properly for non 32-bit ints */
+    for(i = 0; i < rank; i++)
+    {
+      myDim[i] = (int32)dimensions[i];
+    }
+
+
     /* behave nicely, if there is still an SDS open */
     if (pFile->iCurrentSDS != 0) {
       SDendaccess (pFile->iCurrentSDS);
@@ -773,7 +781,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
           
     /* dataset creation */
-    iNew = SDcreate (pFile->iSID, (char*)name, datatype, rank, (int32*)dimensions);
+    iNew = SDcreate (pFile->iSID, (char*)name, (int32)datatype, 
+                     (int32)rank, myDim);
     if (iNew < 0) {
       sprintf (pBuffer, "ERROR: cannot create SDS %s, check arguments",
                name);
@@ -935,7 +944,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXgetslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
-  
+    int32 myStart[MAX_VAR_DIMS], mySize[MAX_VAR_DIMS];
+    int32 i, iRank, iType, iAtt;
+    NXname pBuffer;  
+
     pFile = NXIassert (fid);
   
     /* check if there is an SDS open */
@@ -943,9 +955,31 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       NXIReportError (NXpData, "ERROR: no SDS open");
       return NX_ERROR;
     }
-    /* actually read */
-    SDreaddata (pFile->iCurrentSDS, (int32*)iStart, NULL, (int32*)iSize, data);
-    return NX_OK;
+
+    /* if an int is not 32-bit we have to cast them properly in order
+       to kill a bug.
+    */
+    if(sizeof(int) != 4)
+    {
+         SDgetinfo (pFile->iCurrentSDS, pBuffer, 
+            &iRank, myStart, &iType, &iAtt);
+         for(i = 0; i < iRank; i++)
+	 {
+           myStart[i] = (int32)iStart[i];
+           mySize[i]  = (int32)iSize[i];
+         }
+        /* finally read  */
+        SDreaddata (pFile->iCurrentSDS, myStart, NULL, 
+                   mySize, data);
+        return NX_OK;
+    }
+    else
+    {
+        /* read directly  */
+        SDreaddata (pFile->iCurrentSDS, (int32*)iStart, NULL, 
+                   (int32*)iSize, data);
+        return NX_OK;
+    }
   }
   
   
@@ -1058,7 +1092,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   {
     pNexusFile pFile;
     int iRet;
-    int iStride[MAX_VAR_DIMS], i;
+    int32 iStride[MAX_VAR_DIMS];
+    int32 myStart[MAX_VAR_DIMS], mySize[MAX_VAR_DIMS];
+    int32 i, iRank, iType, iAtt;
+    NXname pBuffer;  
   
   
     pFile = NXIassert (fid);
@@ -1072,10 +1109,32 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     for (i = 0; i < MAX_VAR_DIMS; i++) {
       iStride[i] = 1;
     }
-  
-    /* actually write */
-    iRet = SDwritedata (pFile->iCurrentSDS, (int32*)iStart, 
-			(int32*)iStride, (int32*)iSize, data);
+
+    /* if an int is not 32-bit we have to cast them properly in order
+       to kill a bug.
+    */
+    if(sizeof(int) != 4)
+    {
+         SDgetinfo (pFile->iCurrentSDS, pBuffer, 
+            &iRank, myStart, &iType, &iAtt);
+         for(i = 0; i < iRank; i++)
+	 {
+           myStart[i] = (int32)iStart[i];
+           mySize[i]  = (int32)iSize[i];
+         }
+         /* finally write */
+         iRet = SDwritedata (pFile->iCurrentSDS, myStart, 
+			iStride, mySize, data);
+
+    }
+    else
+    {
+       /* write directly */ 
+       iRet = SDwritedata (pFile->iCurrentSDS,iStart, 
+			  iStride, iSize, data);
+    }
+
+    /* deal with HDF errors */
     if (iRet < 0) {
       NXIReportError (NXpData, "ERROR: writing slab failed");
       return NX_ERROR;
@@ -1099,12 +1158,12 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
     if (pFile->iCurrentSDS != 0) {
       /* SDS attribute */
-      iRet = SDsetattr (pFile->iCurrentSDS, (char*)name, iType,
-                        datalen, data);
+      iRet = SDsetattr (pFile->iCurrentSDS, (char*)name, (int32)iType,
+                        (int32)datalen, data);
     } else {
       /* global attribute */
-      iRet = SDsetattr (pFile->iSID, (char*)name, iType,
-                        datalen, data);
+      iRet = SDsetattr (pFile->iSID, (char*)name, (int32)iType,
+                        (int32)datalen, data);
   
     }
     if (iRet < 0) {
@@ -1120,7 +1179,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   {
     pNexusFile pFile;
     NXname pBuffer;
-    int32 iAtt;
+    int32 iAtt, myDim[MAX_VAR_DIMS], i, iRank, mType;
   
     pFile = NXIassert (fid);
   
@@ -1130,8 +1189,16 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     /* read information */
-    SDgetinfo (pFile->iCurrentSDS, pBuffer, (int32*)rank, (int32*)dimension, 
-	       (int32*)iType, &iAtt);
+    SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, myDim, 
+	       &mType, &iAtt);
+
+    /* conversion to proper ints for the platform */ 
+    *iType = (int)mType;
+    *rank = (int)iRank;
+    for(i = 0; i < iRank; i++)
+    {
+       dimension[i] = (int)myDim[i];
+    }
     return NX_OK;
   }
   
@@ -1449,3 +1516,4 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
         *data = NULL;
 	return NX_OK;
   }
+
