@@ -2,9 +2,10 @@ Changes in Version 2.0.0
 ========================
 
 - NeXus library updated to allow the reading and writing of HDF5 files
-  using the same API calls.  In creating a file, use NXACC_CREATE5.  As
-  long as both HDF4 and HDF5 libraries are linked, the API will read
-  both HDF4 and HDF5 files transparently.
+  using the same API calls.  In creating a file, use NXACC_CREATE4 for
+  HDF4 and NXACC_CREATE5 for HDF5.  As long as both HDF4 and HDF5 
+  libraries are linked, the API will read both HDF4 and HDF5 files 
+  transparently.
 
 - The Makefiles have been reorganized to allow HDF4 and/or HDF5 files to 
   be linked into the NeXus library, with compile and link options stored
@@ -15,6 +16,15 @@ Changes in Version 2.0.0
 
 - Added the routine NXsameID to the C interface to compare the ID of
   NeXus groups and data sets.
+
+- Added NXtoXML and NXtoDTD, utilities that translate a NeXus file to 
+  XML, respectively with and without the data.  Note that NXtoDTD does not
+  produce a true XML DTD file.  Instead, it produces a metaDTD as defined
+  on the NeXus web pages (although it will lack proper annotation). 
+
+- Changed NXUmodule.f90 so that NXUfindaxis uses the two accepted methods
+  of defining dimension scales, i.e. adding the "axis" attribute to the
+  axis data or adding the "axes" attribute to the signal data
 
 Changes in Version 1.3.3
 ========================
