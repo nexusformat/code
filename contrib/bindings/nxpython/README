@@ -7,12 +7,12 @@
 Introduction
 ============
 
-nypython represents just another interface to the core nexus library available for the C language.
+nxpython represents just another interface to the core nexus library available for the C language.
 it neither needs modification of the original c sources, nor does it require an additional python layer, 
-nor does it annoy the python programmer with the creation and handling of opaque pointers.
-the pointer handling and argument input, output conversion is dealt by the language-specific(python) 
-and function specific-typemaps supplied in a separate napi_typemaps.i file.  
-This way the python functions act just as a python programmer would expect them to do, 
+nor does it annoy the python programmer with the creation and handling of opaque c pointers.
+the pointer handling and argument input/output conversion is dealt by the language(python)-specific 
+and function-specific typemaps supplied in a separate napi_typemaps.i file.  
+This way the python functions act just as the python programmer would expect them to do, 
 although there is a pretty one to one correspondance between C functions and python functions.
 (take a look at the list of the available python routines below)
 
@@ -26,6 +26,8 @@ if you got hdf, nexus and swig installed on your system, just unpack the nxpytho
 in the contrib dir in the nexus root dir and run 
 
 ./setup.py install 
+
+(please do not forget to adapt the pathes in setup.py to point to the actual locations of hdf and nexus libs/includes.)
 
 this should automatically create and install the nexus libs into the python 3rdparty modules directory.
 starting the python interpreter, the nexus functions should be made available by typing
