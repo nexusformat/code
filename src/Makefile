@@ -22,7 +22,7 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
-# $Id: Makefile,v 2.00 2001/27/07 11:00:02
+# $Id$
 #
 #====================================================================
 
