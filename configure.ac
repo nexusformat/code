@@ -27,7 +27,7 @@
 #                       -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 #
-AC_PREREQ(2.57)
+AC_PREREQ(2.52)
 AC_REVISION($Revision$)
 AC_INIT([NeXus Library], [2.1.0], [nexus-developers@anl.gov], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
