@@ -47,25 +47,29 @@ AM_CONFIG_HEADER([include/nxconfig.h])
 AC_PROG_LIBTOOL
 # Checks for programs.
 AC_ARG_WITH([cc],
-	AC_HELP_STRING([--with-cc=c_compiler],
-                       [Specify name of C compiler]),
+	AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[if test $withval != no; then CC=$withval; fi])
 AC_ARG_WITH([f90],
-	AC_HELP_STRING([--with-f90=f90_compiler],
-                       [Specify name of FORTRAN 90 compiler]),
+	AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
 	[if test $withval != no; then F90=$withval; fi])
 AC_ARG_WITH([f77],
-	AC_HELP_STRING([--with-f77=f77_compiler],
-                       [Specify name of FORTRAN 77 compiler]),
+	AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
 	[if test $withval != no; then F77=$withval; fi])
 AC_PROG_CC
 AC_PROG_F77
 AC_CHECK_PROGS(F90,f90 f95)
-AC_CHECK_PROGS(JAVAC,javac)
-AC_CHECK_PROGS(JAVADOC,javadoc)
-AC_CHECK_PROGS(JAR,jar)
-AC_CHECK_PROGS(JAVA,java)
-AC_CHECK_PROGS(JAVAH,javah)
+
+AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
+	[if test $withval != yes -a $withval != no ; then JAVAC=$withval; fi], [with_java=yes])
+if test x$"with_java" != x"no" ; then
+	if test x"$with_java" = x"yes" ; then
+		AC_CHECK_PROGS(JAVAC, javac)
+	fi
+	AC_CHECK_PROGS(JAVADOC,	javadoc)
+	AC_CHECK_PROGS(JAR, jar)
+	AC_CHECK_PROGS(JAVA, java)
+	AC_CHECK_PROGS(JAVAH, javah)
+fi
 AC_SUBST(F90)
 AC_SUBST(F90FLAGS)
 AC_SUBST(SHARED_LDFLAGS)
@@ -242,7 +246,7 @@ HDF4SUPPORT=`if test -n "$H4ROOT" ; then echo yes ; else echo no ; echo "       
 HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "                found version $H5VERSION"; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$F90" ; then echo yes ; else echo no ; fi`
-JAVABINDING=`if test -n "$JAVA" ; then echo "$JAVA" ; else echo no java; fi` : `if test -n "$JAVAC" ; then echo "$JAVAC" ; else echo no javac; fi` : `if test -n "$JAR" ; then echo "$JAR" ; else echo no jar; fi` : `if test -n "$JAVADOC" ; then echo "$JAVADOC" ; else echo no javadoc; fi` : `if test -n "$JAVAH" ; then echo "$JAVAH" ; else echo no javah; fi`
+JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
 AC_MSG_RESULT([
 
 Configuration (NeXus):
