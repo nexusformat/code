@@ -28,15 +28,22 @@
 #
 #====================================================================
 # jni definitions
-lib_LTLIBRARIES=libjnexus.la
-libjnexus_la_SOURCES = native/hdfnativeImp.c \
+lib_LTLIBRARIES		= libjnexus.la
+libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
                        native/hdfexceptionImp.c \
                        native/handle.c \
                        native/NexusFile.c
-libjnexus_la_LIBADD = $(top_builddir)/src/libNeXus.la
-libjnexus_la_CFLAGS = -Inative -I/usr/local/java/include \
+libjnexus_la_LIBADD 	= $(top_builddir)/src/libNeXus.la
+libjnexus_la_CFLAGS 	= -I$(top_srcdir)/include -Inative -I/usr/local/java/include \
                       -I/usr/local/java/include/linux
-noinst_HEADERS = native/neutron_nexus_NexusFile.h
+
+BUILT_SOURCES		= native/neutron_nexus_NexusFile.h
+nodist_noinst_HEADERS 	= native/neutron_nexus_NexusFile.h 
+noinst_HEADERS		= native/handle.h
+
+AM_JAVACFLAGS	= 
+
+JAVAROOT	= .
 
 # jar file definitions
 jnexus_ARCHIVE = jnexus.jar
@@ -53,8 +60,30 @@ jnexus_CLASS = ncsa/hdf/hdflib/HDFArray.class \
                neutron/nexus/NexusFile.class \
                neutron/nexus/NXlink.class
 
+CLEANFILES	= $(jnexus_CLASS) $(jnexus_ARCHIVE) $(BUILT_SOURCES) 
+
+clean-local:
+		rm -rf apidoc
+
+noinst_JAVA	= ncsa/hdf/hdflib/HDFArray.java \
+		ncsa/hdf/hdflib/HDFConstants.java \
+		ncsa/hdf/hdflib/HDFException.java \
+		ncsa/hdf/hdflib/HDFJavaException.java \
+		ncsa/hdf/hdflib/HDFNativeData.java \
+		ncsa/hdf/hdflib/HDFNotImplementedException.java \
+		neutron/nexus/AttributeEntry.java \
+		neutron/nexus/NXlink.java \
+		neutron/nexus/NeXusFileInterface.java \
+		neutron/nexus/NexusException.java \
+		neutron/nexus/NexusFile.java \
+		test/TestJapi.java
+
+EXTRA_DIST	= $(noinst_JAVA)
 
 # specific targets
+
+neutron/nexus/NexusFile.class:	neutron/nexus/NexusFile.java
+
 native/neutron_nexus_NexusFile.h: neutron/nexus/NexusFile.class
 	$(JAVAH) -jni -d native neutron.nexus.NexusFile
 
@@ -63,8 +92,13 @@ jnexus.jar: $(jnexus_CLASS)
 
 all: $(jnexus_ARCHIVE) $(lib_LTLIBRARIES) javadoc
 
-javadoc:
-	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus \
+javadoc:	$(noinst_JAVA)
+	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath $(srcdir) \
                       neutron.nexus ncsa.hdf.hdflib
 
-include $(top_srcdir)/build_rules.am
+SUFFIXES = .java .class
+
+.java.class:
+	$(JAVAC) -d $(JAVAROOT) -classpath $(srcdir) $<
+
+## include $(top_srcdir)/build_rules.am
