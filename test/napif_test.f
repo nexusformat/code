@@ -161,7 +161,7 @@ C------------------------------------------------------------------------------
 C *** read data
       IF (NXOPEN('NXtest.nxs', NXACC_READ, FILEID) .NE. NX_OK) STOP
       IF (NXGETATTRINFO(FILEID, J) .NE. NX_OK) STOP
-      IF (I .GT. 0) WRITE(*,'(1X,A,I2)') 
+      IF (J .GT. 0) WRITE(*,'(1X,A,I2)') 
      +  'Number of global attributes: ', J
       DO I = 1,J
          ATTR_STATUS = NXGETNEXTATTR(FILEID,NAME,NXDIMS,NXTYPE)
@@ -169,7 +169,7 @@ C *** read data
             STOP
          ELSE IF (ATTR_STATUS .EQ. NX_OK) THEN
             NXLEN = LEN(CHAR_BUFFER)
-            IF (NXGETATTR(FILEID, NAME, CHAR_BUFFER_B, NXLEN, NXTYPE)
+            IF (NXGETCHARATTR(FILEID, NAME, CHAR_BUFFER, NXLEN, NXTYPE)
      +        .NE. NX_OK) STOP
             WRITE(*,'(4X,A)') NAME(1:LEN_TRIM(NAME))//' = '
      +        //CHAR_BUFFER(1:LEN_TRIM(CHAR_BUFFER))
