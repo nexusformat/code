@@ -171,8 +171,10 @@ C *** read data
             NXLEN = LEN(CHAR_BUFFER)
             IF (NXGETCHARATTR(FILEID, NAME, CHAR_BUFFER, NXLEN, NXTYPE)
      +        .NE. NX_OK) STOP
-            WRITE(*,'(4X,A)') NAME(1:LEN_TRIM(NAME))//' = '
-     +        //CHAR_BUFFER(1:LEN_TRIM(CHAR_BUFFER))
+	    IF ((NAME .NE. 'HDF_version') .AND. (NAME .NE. 'file_time')) THEN
+               WRITE(*,'(4X,A)') NAME(1:LEN_TRIM(NAME))//' = '
+     +           //CHAR_BUFFER(1:LEN_TRIM(CHAR_BUFFER))
+	    END IF
          END IF
       END DO
       IF (NXOPENGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
