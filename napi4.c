@@ -344,7 +344,7 @@
 #else
     time_info = gmtime(&timer);
     if (time_info != NULL) {
-      gmt_offset = difftime(timer, mktime(time_info));
+      gmt_offset = (long)difftime(timer, mktime(time_info));
     } else {
       NXIReportError(NXpData, "Your gmtime() function does not work ... timezone information will be incorrect\n");
       gmt_offset = 0;
@@ -376,7 +376,7 @@
  * write something that can be used by OLE
  */
     
-    if (am == NXACC_CREATE) {
+    if (am == NXACC_CREATE || am == NXACC_CREATE4) {
       if ( (file_id = Hopen(filename, am1, 0)) == -1 ) {
         sprintf (pBuffer, "ERROR: cannot open file_a: %s", filename);
         NXIReportError (NXpData, pBuffer);
@@ -421,7 +421,7 @@
           return NX_ERROR;
       }
     }
-    if (am == NXACC_CREATE) {
+    if (am == NXACC_CREATE || am == NXACC_CREATE4) {
       if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), (char*)filename) < 0) {
         NXIReportError (NXpData, "ERROR: HDF failed to store file_name attribute ");
         return NX_ERROR;
@@ -436,7 +436,7 @@
      * Otherwise we try to create the file two times which makes HDF
      * Throw up on us.
      */
-    if (am == NXACC_CREATE) {
+    if (am == NXACC_CREATE || am == NXACC_CREATE4) {
       am = NXACC_RDWR;
       am1 = DFACC_RDWR;
     }
