@@ -1,3 +1,27 @@
+/*---------------------------------------------------------------------------
+  NeXus - Neutron & X-ray Common Data Format
+  
+  Application Program Interface (HDF4) Routines
+  
+  Copyright (C) 1997-2002 Mark Koennecke, Przemek Klosowski
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+ 
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+ 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+             
+  For further information, see <http://www.neutron.anl.gov/NeXus/>
+
+----------------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -289,6 +313,8 @@
     *pHandle = NULL;
     /* map Nexus NXaccess types to HDF4 types */
     if (am == NXACC_CREATE) {
+      am1 = DFACC_CREATE;
+    } else if (am == NXACC_CREATE4) {
       am1 = DFACC_CREATE;
     } else if (am == NXACC_READ) { 
       am1 = DFACC_READ;
@@ -1644,7 +1670,7 @@
       return NX_ERROR;
     }
     *iN = iAtt;
-    return iRet;
+    return NX_OK;
   }
   
   /*-------------------------------------------------------------------------*/
@@ -1690,6 +1716,20 @@
     return NX_OK;
   }
   
+  /* ------------------------------------------------------------------- */
+
+  NXstatus CALLING_STYLE NX4sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
+  {
+    pNexusFile pFile;
+
+    pFile = NXIassert (fileid);
+    if ((pFirstID->iTag == pSecondID->iTag) & (pFirstID->iRef == pSecondID->iRef)) {
+       return NX_OK;
+    } else {
+       return NX_ERROR;
+    }
+  }
+
   /*-------------------------------------------------------------------------*/
 
   
