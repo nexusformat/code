@@ -29,6 +29,11 @@
 #include <string.h>
 #include <time.h>
 
+#include "napi.h"
+#include "napi4.h"
+
+extern	void *NXpData;
+
   typedef struct __NexusFile {
     struct iStack {
       int32 *iRefDir;
