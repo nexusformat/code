@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<!--
+URL: http://www.neutron.anl.gov/nexus/xml/NXmononxtas.xml
+Editor: Nicholas Maliszewskyj <nickm@nist.gov>
+Initial version: July 29, 2003
+$Id$
+
+Instrument Definition for a triple axis spectrometer
+
+In order to support polarized beam measurements, each triple
+axis data file will contain as many NXdata groups as there
+are polarizations. This is perhaps the best way to ensure
+that the needs of the measurement are met while still
+satisfying the NeXus procedure for identifying plottable data.
+-->
+
+<NXroot NeXus_version="2.1"
+        file_name="monoxtas_template.nxs"
+        user="pandaservice"
+        email="peter.link@frm2.tum.de"
+        address="FRM2"
+        telephone_number="+49(0)89 28914622"
+        >
+		  
+    <NXentry name="template_entry">
+        <title>template_entry</title>
+        <analysis>TRIAX</analysis>
+        <start_time type="ISO8601">2004-06-02 11:40:15+0100</start_time>
+        <end_time   type="ISO8601">2004-06-03 11:40:15+0100</end_time>
+        <duration   units="seconds" type="NX_INT32">23</duration>
+        <program_name>{name of instrument control program}</program_name>
+        <notes>{notes describing entry}</notes>
+        <NXuser name="user">
+            <name>Peter Link</name>
+            <address>FRM2</address>
+            <telephone_number>+49(0)89 28914622</telephone_number>
+            <email>peter.link@frm2.tum.de</email>
+        </NXuser>
+        <NXsample name="sample">
+            <name>template_sample</name>
+            <chemical_formula>NaCl</chemical_formula>
+            <environment>env1</environment>
+            <unit_cell type="NX_FLOAT32[6]">1.0 1.0 1.0 1.0 1.0 1.0</unit_cell>
+            <orientation_matrix type="NX_FLOAT32[9]">1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0</orientation_matrix>
+        </NXsample>
+        <NXinstrument name="PANDA">
+            <name>PANDA</name>
+            <local_contact>Peter Link</local_contact>
+            <NXsource name="FRM2">
+                <name>FRM2</name>
+                <type>Reactor</type>
+                <power units="MW" type="NX_FLOAT32">20.00</power>
+            </NXsource>
+            <NXcollimator name="pre_mono">
+                <distance>{distance to sample center}?</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXcrystal name="monochromator">
+                <distance units="m" type="NX_FLOAT32">30.0</distance>
+                <reflection type="NX_INT32[3]">1 2 3</reflection>
+                <lattice_parameter units="Angstrom" type="NX_FLOAT32">2.0</lattice_parameter>
+                <wavelength units="Angstrom" type="NX_FLOAT32">1.0</wavelength>
+                <horizontal_curvature units="degrees" type="NX_FLOAT32">1.0</horizontal_curvature>
+                <vertical_curvature units="degrees" type="NX_FLOAT32" >2.0</vertical_curvature>
+            </NXcrystal>
+            <NXdetector name="monitor">
+                <distance units="m" type="NX_FLOAT32">30.0</distance>
+                <type>Fission chamber</type>
+                <efficiency type="NX_FLOAT">2.1</efficiency>
+            </NXdetector>
+            <NXpolarizer name="pre_sample_pol">
+                <type>crystal</type>
+                <efficiency>polarizing efficiency</efficiency>
+            </NXpolarizer>
+            <NXflipper name="pre_sample_flip">
+                <type>{coil,current-sheet}</type>
+                <flip_turns>{Number of turns in flipping field coils}?</flip_turns>
+                <comp_turns>{Number of turns in compensating field coils}?</comp_turns>
+                <guide_turns>{Number of turns in guide field coils}?</guide_turns>
+                <flip_current  units="amperes">{Flipping field coil current in "on" state"}</flip_current>
+                <comp_current  units="amperes">{Compensating field coil current in "on" state"}</comp_current>
+                <guide_current units="amperes">{Guide field coil current in "on" state"}</guide_current>
+            </NXflipper>
+            <NXpolarizer name="post_sample_pol">
+                <type>{crystal}</type>
+                <efficiency>{polarizing efficiency}</efficiency>
+            </NXpolarizer>
+            <NXflipper name="post_sample_flip">
+                <type>{coil}</type>
+                <flip_turns>{Number of turns/cm in flipping field coils}?</flip_turns>
+                <comp_turns>{Number of turns/cm in compensating field coils}?</comp_turns>
+                <guide_turns>{Number of turns/cm in guide field coils}?</guide_turns>
+                <flip_current  units="amperes">{Flipping field coil current in "on" state"}</flip_current>
+                <comp_current  units="amperes">{Compensating field coil current in "on" state"}</comp_current>
+                <guide_current units="amperes">{Guide field coil current in "on" state"}</guide_current>
+                <thickness units="cm">3</thickness>
+            </NXflipper>
+            <NXcollimator name="pre_analyzer">
+                <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXcrystal name="analyzer">
+                <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
+                <reflection type="NX_INT32[3]" info="{[hkl] values of nominal reflection}">0 0 0</reflection>
+                <lattice_parameter units="Angstrom" type="NX_FLOAT32" info="{Lattice parameter of nominal reflection}">0.0</lattice_parameter>
+                <wavelength units="Angstrom" type="NX_FLOAT32" info="optimum diffracted wavelength">0.0</wavelength>
+                <horizontal_curvature units="degrees" type="NX_FLOAT32">0.0</horizontal_curvature>
+                <vertical_curvature units="degrees" type="NX_FLOAT32">0.0</vertical_curvature>
+            </NXcrystal>
+            <NXcollimator name="post_analyzer">
+                <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXdetector name="primary">
+                <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
+                <type>"He3 gas cylinder"</type>
+                <efficiency type="NX_FLOAT" info="{efficiency of detector}?">0.0</efficiency>
+            </NXdetector>
+        </NXinstrument>
+		  <!-- NXdata name_enums="off-off|off-on|on-off|on-o"-->
+        <NXdata name="on-on">
+            <!--ei units="eV" type="NX_FLOAT32[5]" info="{Incident energies}?">0 0 0 0 0</ei>
+            <ef units="eV" type="NX_FLOAT32[5]" info="{Final energies}?">0 0 0 0 0</ef>
+            <de units="eV" type="NX_FLOAT32[5]" info="{Energy transfers}?">0 0 0 0 0</de>
+            <q  units="inverse_angstroms" info="{Momentum transfers}?">0</q>
+            <h  type="NX_FLOAT32[5]" info="{H reciprocal space vector}?">0 0 0 0 0</h>
+            <k  type="NX_FLOAT32[5]" info="{K reciprocal space vector}?">0 0 0 0 0</k>
+            <l  type="NX_FLOAT32[5]" info="{L reciprocal space vector}?">0 0 0 0 0</l>
+            <flip_current_in  units="amperes" type="NX_FLOAT32[5]" info="{current in pre-sample flipper}?">0 0 0 0 0</flip_current_in>
+            <flip_current_out units="amperes" type="NX_FLOAT32[5]" info="{current in post-sample flipper}?">0 0 0 0 0</flip_current_out>
+              <sample_theta units="degrees" type="NX_FLOAT32[5]" offset="{motor
+zero}" info="{vector of motor positions}?">0 0 0 0 0</sample_theta>
+            <monitor type="NX_INT32[5]" info="{incident beam monitor counts}">0 0 0 0 0</monitor>            
+				<duration units="seconds" type="NX_FLOAT32[5]" info="{measured live time of each point}">0 0 0 0 0</duration>
+            <counts long_name="{Title of measurement}"
+                    signal="1"
+                    type="NX_INT32[5]"
+                    axis="[q]" info="{Array of intensities}">0</counts-->
+        </NXdata>
+    </NXentry>
+</NXroot>
