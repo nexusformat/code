@@ -17,7 +17,7 @@ C----------------------------------------------------------------------------
 
 C *** NXaccess enum - access modes for NXopen
       INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE
-      PARAMETER(NXACC_READ=1,NXACC_RDWR=3,NXACC_CREATE=7)
+      PARAMETER(NXACC_READ=1,NXACC_RDWR=3,NXACC_CREATE=4)
 C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
 C *** large enough to hold an NXhandle structure
       INTEGER NXHANDLESIZE
