@@ -1,3 +1,27 @@
+/*---------------------------------------------------------------------------
+  NeXus - Neutron & X-ray Common Data Format
+  
+  Application Program Interface (HDF5) Routines
+  
+  Copyright (C) 1997-2002 Mark Koennecke, Przemek Klosowski
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+ 
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+ 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+             
+  For further information, see <http://www.neutron.anl.gov/NeXus/>
+
+----------------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -648,7 +672,7 @@
       cparms = H5Pcreate(H5P_DATASET_CREATE);
       iNew = H5Pset_chunk(cparms,rank,chunkdims);
       if (iNew < 0) {
-        NXIReportError (NXpData, "ERROR: Size of chuncks could not be set!");
+        NXIReportError (NXpData, "ERROR: Size of chunks could not be set!");
         return NX_ERROR;
       }
       H5Pset_deflate(cparms,6); 
@@ -658,7 +682,7 @@
          cparms = H5Pcreate(H5P_DATASET_CREATE);
          iNew = H5Pset_chunk(cparms,rank,chunkdims);
          if (iNew < 0) {
-            NXIReportError (NXpData, "ERROR: Size1 of chuncks could not be set!");
+            NXIReportError (NXpData, "ERROR: Size of chunks could not be set!");
             return NX_ERROR;
          }
          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
@@ -666,11 +690,11 @@
          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT);
       }               
     } else {
-      NXIReportError (NXpData, "HDF5 don't support selected compression method! Dataset was saved without compression");
+      NXIReportError (NXpData, "HDF5 doesn't support selected compression method! Dataset was saved without compression");
       iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT); 
     }
     if (iRet < 0) {
-        NXIReportError (NXpData, "ERROR: Creating chuncked Dataset failed!");
+        NXIReportError (NXpData, "ERROR: Creating chunked dataset failed!");
         return NX_ERROR;
     } else {
         pFile->iCurrentD = iRet;
@@ -859,7 +883,7 @@
        }   
        if (H5Awrite(attr1,aid1,data) < 0) 
        {
-          NXIReportError (NXpData, "ERROR: HDf failed to store attribute ");
+          NXIReportError (NXpData, "ERROR: HDF failed to store attribute ");
           return NX_ERROR;
        }
        /* Close attribute dataspace */
@@ -920,7 +944,7 @@
     pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
     if (pFile->iCurrentD == 0) {
-      NXIReportError (NXpData, "ERROR: no Dataset open");
+      NXIReportError (NXpData, "ERROR: no dataset open");
       return NX_ERROR;
     }
     rank = H5Sget_simple_extent_ndims(pFile->iCurrentS);    
@@ -1413,7 +1437,7 @@
        pFile->iVID=H5Gopen(pFile->iFID,"/");
        iRet=H5Aiterate(pFile->iVID,&idx,attr_info,&iname);
     } else { 
-    iRet=H5Aiterate(pFile->iCurrentD,&idx,attr_info,&iname);
+       iRet=H5Aiterate(pFile->iCurrentD,&idx,attr_info,&iname);
     }
     if (iRet>0)
       {
@@ -1501,8 +1525,7 @@
         } 
         if (idx == 0)
         {
-        NXIReportError (NXpData, "Dataset has no attributes!");
-        return NX_EOD;
+           return NX_EOD;
         }
         
         return NX_EOD;
@@ -1768,6 +1791,22 @@
     return NX_ERROR;
   }  
  
+  /* ------------------------------------------------------------------- */
+
+  NXstatus CALLING_STYLE NX5sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
+  {
+    pNexusFile5 pFile;
+
+    pFile = NXI5assert (fileid);
+    if ((strcmp(pFirstID->iTag5,pSecondID->iTag5) == 0) &
+        (strcmp(pFirstID->iRef5,pSecondID->iRef5) == 0) & 
+        (strcmp(pFirstID->iRefd,pSecondID->iRefd) == 0)) {
+       return NX_OK;
+    } else {
+       return NX_ERROR;
+    }
+  }
+
   /*-------------------------------------------------------------------------*/
  
   NXstatus CALLING_STYLE NX5initattrdir (NXhandle fid)
