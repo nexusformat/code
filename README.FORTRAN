@@ -6,7 +6,7 @@ example program "napif_test.f")
 
 For a NXhandle, you use:
 
-    INTEGER FILEID(NXFILESIZE)
+    INTEGER FILEID(NXHANDLESIZE)
 
 And for an NXlink
 
