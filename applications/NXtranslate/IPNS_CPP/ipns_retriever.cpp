@@ -150,6 +150,94 @@ void IpnsRetriever::getData(Node &node, const std::string &location){
       value = (void *)data;
       node = Node(tLocation, value, data_rank, &(dims[0]), data_type);
     }
+    else if( location.substr(0, 5) == "time." ) {
+      int dims[2];
+      const int *dim_ptr;
+      dim_ptr = dims;
+      void *value;
+      int data_type;
+      int data_rank;
+      vector<vector<float> > vdata;
+      vector<int> idListVect;
+      float *data;
+      //data retrieved from list of ids
+      if ( location.substr(5, 3) == "ids" ) {
+	string idList = location.substr( 8, location.size()-8 );
+	// find & remove brackets
+	string::size_type start_brkt = idList.find("[");
+	string::size_type end_brkt = idList.find("]");
+	string intListStr = 
+	  idList.substr(start_brkt + 1, end_brkt - (start_brkt +1) );
+	// sort this string into a vector of integers
+	idListVect = int_list_str_to_intVect(intListStr);
+	int id;
+	vector<Segment *> segments = runFile->GetSegments();
+	vdata.resize(idListVect.size());
+	for (id = 0; id < idListVect.size(); id++) {
+	  vdata[id] = runFile->TimeChannelBoundaries(*segments[idListVect[id]], 1); 
+	}
+	data = new float[idListVect.size()*vdata[0].size()];
+	for (id = 0; id < idListVect.size(); id++) {
+	  //	  data[id] = new float[vdata[0].size()];
+	  if ( vdata[id].size() != vdata[0].size() ) {
+	    throw runtime_error("ipns_retriever: all data must match size\n");
+	  }
+	  for (int chan =0; chan < vdata[0].size(); chan++ ) {
+	    data[(id*vdata[0].size())+(chan)] = vdata[id][chan];
+	  }
+	}
+      }
+      dims[1] = vdata[0].size();
+      dims[0] = idListVect.size();
+      data_type = NX_FLOAT32;
+      data_rank =2;
+      value = (void *)data;
+      node = Node(tLocation, value, data_rank, &(dims[0]), data_type);
+    }
+    else if( location.substr(0, 6) == "error." ) {
+      int dims[2];
+      const int *dim_ptr;
+      dim_ptr = dims;
+      void *value;
+      int data_type;
+      int data_rank;
+      vector<vector<float> > vdata;
+      vector<int> idListVect;
+      float *data;
+      //data retrieved from list of ids
+      if ( location.substr(6, 3) == "ids" ) {
+	string idList = location.substr( 8, location.size()-8 );
+	// find & remove brackets
+	string::size_type start_brkt = idList.find("[");
+	string::size_type end_brkt = idList.find("]");
+	string intListStr = 
+	  idList.substr(start_brkt + 1, end_brkt - (start_brkt +1) );
+	// sort this string into a vector of integers
+	idListVect = int_list_str_to_intVect(intListStr);
+	int id;
+	vector<Segment *> segments = runFile->GetSegments();
+	vdata.resize(idListVect.size());
+	for (id = 0; id < idListVect.size(); id++) {
+	  vdata[id] = runFile->Get1DSpectrum(*segments[idListVect[id]], 1); 
+	}
+	data = new float[idListVect.size()*vdata[0].size()];
+	for (id = 0; id < idListVect.size(); id++) {
+	  //	  data[id] = new float[vdata[0].size()];
+	  if ( vdata[id].size() != vdata[0].size() ) {
+	    throw runtime_error("ipns_retriever: all data must match size\n");
+	  }
+	  for (int chan =0; chan < vdata[0].size(); chan++ ) {
+	    data[(id*vdata[0].size())+(chan)] = sqrt(vdata[id][chan]);
+	  }
+	}
+      }
+      dims[1] = vdata[0].size();
+      dims[0] = idListVect.size();
+      data_type = NX_FLOAT32;
+      data_rank =2;
+      value = (void *)data;
+      node = Node(tLocation, value, data_rank, &(dims[0]), data_type);
+    }
     else if( location.substr(0, 9) == "detector." ) {
       cout << "reading det from " << location.substr(9, location.size()-1);
       //      node = Node(tLocation, value, 1, &(dims[0]), data_type);
