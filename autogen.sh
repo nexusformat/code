@@ -1,14 +1,42 @@
 #!/bin/sh
-LIBTOOLIZE=`which glibtoolize 2>/dev/null`
-if test -z "$LIBTOOLIZE" ; then
-	LIBTOOLIZE=`which libtoolize 2>/dev/null`
-fi
-LIBTOOLIZE="$LIBTOOLIZE --force --copy --automake"
-ACLOCAL="aclocal"
-AUTOHEADER="autoheader"
-AUTOMAKE="automake -a -c"
-AUTOCONF="autoconf"
 
+for libtoolize in glibtoolize libtoolize ; do 
+	LIBTOOLIZE=`which $libtoolize 2>/dev/null`
+	if test "$LIBTOOLIZE" ; then
+		break;
+	fi
+done
+LIBTOOLIZE="$libtoolize --force --copy --automake"
+
+for automake in automake-1.8 automake-1.7 automake-1.6 automake-1.5 automake-1.4 automake ; do
+	AUTOMAKE=`which $automake 2>/dev/null`
+	if test "$AUTOMAKE" ; then
+		break;
+	fi
+done
+AUTOMAKE="$automake -a -c"
+case $automake in
+	automake-*)
+		version=`echo $automake | cut -f2 -d'-'`
+		ACLOCAL="aclocal-$version";;
+	*)
+		ACLOCAL="aclocal";
+esac
+	
+for autoconf in autoconf-2.59 autoconf-2.57 autoconf-2.53 autoconf ; do 
+	AUTOCONF=`which $autoconf 2>/dev/null`
+	if test "$AUTOCONF" ; then
+		break;
+	fi
+done
+AUTOCONF="$autoconf"
+case $autoconf in
+	autoconf-*)
+		version=`echo $autoconf | cut -f2 -d'-'`
+		AUTOHEADER="autoheader-$version";;
+	*)
+		AUTOHEADER="autoheader";;
+esac
 
 touch AUTHORS ChangeLog NEWS README
 
@@ -16,7 +44,6 @@ touch AUTHORS ChangeLog NEWS README
 autoconfversion=`$AUTOCONF --version | head -n 1`
 automakeversion=`$AUTOMAKE --version | head -n 1`
 libtoolversion=`$LIBTOOLIZE --version | head -n 1`
-
 
 echo "Using $autoconfversion"
 echo "Using $automakeversion"
@@ -33,22 +60,22 @@ case $autoconfversion in
 esac
 
 case $automakeversion in
-    *1.[6-8]*)
+    *1.[5-8]*)
 	;;
     *)
 	echo "This automake version is not supported by NeXus."
-	echo "NeXus only supports automake 1.[6-8].*."
+	echo "NeXus only supports automake 1.[5-8].*."
 	echo "You may download it from ftp://ftp.gnu.org/gnu/automake"
 	exit
 	;;
 esac
 
 case $libtoolversion in
-    *1.5*)
+    *1.[45]*)
 	;;
     *)
 	echo "This libtool version is not supported by NeXus."
-	echo "NeXus only supports libtool 1.5.*."
+	echo "NeXus only supports libtool 1.[45].*."
 	echo "You may download it from ftp://ftp.gnu.org/gnu/libtool"
 	exit
 	;;
