@@ -12,12 +12,12 @@ Changes in Version 1.2.0
 - All SDSes now created with the DFTAG_NDG tag, rather than DFTAG_SDG,
   which is now deprecated by HDF.
 
-- Excluded null terminator from string length check in REPLACE_STRING to
-  prevent error messages when the string is exactly the right length.
-
 - Expanded number of NeXus routines and data types checked by the test 
   programs "napi_test.c", "napif_test.f" and "NXtest.f90". 
   
+- Excluded null terminator from string length check in REPLACE_STRING to
+  prevent error messages when the string is exactly the right length.
+
 - Added definitions of NX_MAXRANK (max. no. of dataset dimensions = 32) to 
   and NX_MAXNAMELEN (max. length of dataset name = 64) to header files.
 
@@ -25,6 +25,12 @@ Changes in Version 1.2.0
 
 - Improved determination of local time zone when writing the global file
   attribute "file_time"
+
+- Added option to NXbrowse.f90 to allow display of individual array elements
+  of the specified index
+
+- Added check for __ABSOFT macro in "napi.h" to make compatible with 
+  Absoft Pro Fortran for Linux
 
 Changes in Version 1.1.0
 ========================
