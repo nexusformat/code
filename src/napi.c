@@ -344,6 +344,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	return ret;
   }
 
+#ifdef __VMS
+#define NO_LOCALTIME_GMTOFF
+#endif /* __VMS */
+
   NXstatus  NXopen(char * filename, NXaccess am, NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
@@ -353,6 +357,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     time_t timer;
     struct tm *time_info;
     const char* time_format;
+    long gmt_offset;
   
     *pHandle = NULL;
     /* get memory */
@@ -366,10 +371,16 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
  * get time in ISO 8601 format 
  */
     time(&timer);
+#ifdef NO_LOCALTIME_GMTOFF
+    time_info = gmtime(&timer);
+    gmt_offset = 0;
+#else
     time_info = localtime(&timer);
+    gmt_offset = time_info->tm_gmtoff;
+#endif /* NO_LOCALTIME_GMTOFF */
     if (time_info != NULL)
     {
-        if (time_info->tm_gmtoff < 0)
+        if (gmt_offset < 0)
         {
 	    time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
         }
@@ -384,8 +395,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	    time_info->tm_hour,
 	    time_info->tm_min,
 	    time_info->tm_sec,
-	    time_info->tm_gmtoff / 3600,
-	    time_info->tm_gmtoff / 60  -  60 * (time_info->tm_gmtoff / 3600)
+	    gmt_offset / 3600,
+	    gmt_offset / 60  -  60 * (gmt_offset / 3600)
         );
     }
     else
@@ -393,7 +404,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
         strcpy(time_buffer, "1970-01-01 00:00:00+0000");
     }
   
-#if WRITE_OLD_IDENT
+#if WRITE_OLD_IDENT	/* not used at moment */
 /*
  * write something that can be used by OLE
  */
