@@ -73,7 +73,7 @@ napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 
 if HAVE_F77
 napif_test_SOURCES = napif_test.f
-napif_test_LDADD = $(LIBNEXUS77) $(FLIBS)
+napif_test_LDADD = $(LIBNEXUS77) # $(FLIBS)
 else
 napif_test_SOURCES = dummy.c
 endif
@@ -81,6 +81,7 @@ endif
 if HAVE_F90
 NXtest_SOURCES = NXtest.f90
 NXtest_LDADD = $(LIBNEXUS90)
+NXtest_LINK = $(F90LINK)
 else
 NXtest_SOURCES = dummy.c
 endif

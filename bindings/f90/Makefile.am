@@ -30,15 +30,12 @@
 lib_LTLIBRARIES = libNeXus90.la
 
 libNeXus90_la_SOURCES = NXmodule.f90 NXUmodule.f90
-libNeXus90_la_LIBADD = $(top_builddir)/src/libNeXus.la
+libNeXus90_la_LIBADD = $(top_builddir)/bindings/f77/libNeXus77.la \
+			$(top_builddir)/src/libNeXus.la
 libNeXus90_la_LDFLAGS = @SHARED_LDFLAGS@
+libNeXus90_la_LINK = $(F90LINK)
 
 NXUmodule.o: NXUmodule.f90 NXmodule.o
 
-F90COMPILE = $(F90) $(AM_F90FLAGS) $(F90FLAGS)
-LTF90COMPILE = $(LIBTOOL) --mode=compile --tag=F77 $(F90) $(AM_FFLAGS) $(F90FLAGS)
-F90LD = $(F90)
-F90LINK = $(LIBTOOL) --mode=link $(F90LD) $(AM_F90FLAGS) $(F90FLAGS) \
-        $(AM_LDFLAGS) $(LDFLAGS) -o $@
-
 include $(top_srcdir)/build_rules.am
+
