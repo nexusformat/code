@@ -1060,7 +1060,7 @@ CONTAINS
       CHARACTER(len=len(data_name)) :: name
       CHARACTER(len=NX_MAXNAMELEN) :: class, attr_name
       CHARACTER(len=255) :: axis_list
-      INTEGER :: status, signal=1, value, data_rank, i, j, k
+      INTEGER :: status, signal=1, value, data_rank, C_axis, i, j, k
 
       !First find data with "signal" attribute to check for "axes" attribute
       status = NXUfindsignal (file_id, signal, data_name, data_rank, &
@@ -1087,17 +1087,19 @@ CONTAINS
          IF (index(axis_list,"]") > 0) THEN
             axis_list = axis_list(1:index(axis_list,"]")-1)
          END IF
+         !"axes" lists the axes in C (row-major) order so the axis numbers are reversed
+         C_axis = data_rank - axis + 1 
          !Find axis label by looking for the delimiting commas
          j = 1
-         DO i = 1,axis
-            k = index(axis_list(j:),",") - 1
+         DO i = 1,C_axis
+            k = scan(axis_list(j:),",:") - 1
             IF (k < 0) k = len(trim(axis_list)) - j + 1
-            IF (k < 0) THEN !We've run out of commas
+            IF (k < 0) THEN !We've run out of delimiters
                CALL NXerror ("Data attribute ""axes"" is not correctly defined")
                status = NX_ERROR
                RETURN
             END IF
-            name = axis_list(j:j+k-1)
+            name = adjustl(axis_list(j:j+k-1))
             j = j + k + 1
          END DO
          !Open data to retrieve information about the dimension scale
