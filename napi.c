@@ -3,7 +3,7 @@
   
   Application Program Interface Routines
   
-  Copyright (C) 1997, 1998, 1999 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2000 Mark Koennecke, Przemek Klosowski
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -397,6 +397,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     {
 	gmt_offset += 3600;
     }
+#elif defined(__MWERKS__)
+   gmt_offset = difftime (timer, mktime(gmtime(&timer)));
 #else
     gmt_offset = time_info->tm_gmtoff;
 #endif
@@ -1133,8 +1135,62 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }
   
+  /*-------------------------------------------------------------------------*/
+  NXstatus
+  NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  {
+    pNexusFile pFile;
+    int iRet;
   
-  int
+    pFile = NXIassert (fid);
+    /* check if there is a group open */
+    if (pFile->iCurrentVG == 0) {
+      pName = "root";
+      pClass = "NXroot";
+    }
+    else {
+      Vgetname (pFile->iCurrentVG, pName);
+      Vgetclass (pFile->iCurrentVG, pClass);
+    }
+    iRet = NXinitgroupdir (fid);
+    if (iRet == NX_OK)
+      *iN = pFile->iStack[pFile->iStackPtr].iNDir;
+    return iRet;
+  }
+  
+  /*-------------------------------------------------------------------------*/
+  NXstatus
+  NXgetattrinfo (NXhandle fid, int *iN)
+  {
+    pNexusFile pFile;
+    int iRet;
+  
+    pFile = NXIassert (fid);
+    iRet = NXinitattrdir (fid);
+    if (iRet == NX_OK)
+      *iN = pFile->iAtt.iNDir;
+    return iRet;
+  }
+
+  NXstatus
+  NXinitgroupdir (NXhandle fid)
+  {
+    pNexusFile pFile;
+    int iRet;
+    
+    pFile = NXIassert (fid);
+    NXIKillDir (fid);
+    iRet = NXIInitDir (pFile);
+    if (iRet < 0) {
+      NXIReportError (NXpData,
+                      "NX_ERROR: no memory to store directory info");
+      return NX_EOD;
+    }
+    return NX_OK;
+  }
+        
+  /*-------------------------------------------------------------------------*/
+  NXstatus
   NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile pFile;
@@ -1205,7 +1261,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       } else {                    /* unidentified */
         strcpy (name, "UNKNOWN");
         strcpy (nxclass, "UNKNOWN");
-	*datatype = pFile->iStack[iStackPtr].iTagDir[iCurDir];
+        *datatype = pFile->iStack[iStackPtr].iTagDir[iCurDir];
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         return NX_OK;
       }
@@ -1213,6 +1269,20 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_ERROR;              /* not reached */
   }
   
+  /*-------------------------------------------------------------------------*/
+  NXstatus
+  NXinitattrdir (NXhandle fid)
+  {
+    pNexusFile pFile;
+    int iRet;
+    
+    pFile = NXIassert (fid);
+    NXIKillAttDir (fid);
+    iRet = NXIInitAttDir (pFile);
+    if (iRet == NX_ERROR)
+      return NX_ERROR;
+    return NX_OK;
+  }
   
   /*-------------------------------------------------------------------------*/
   NXstatus
@@ -1295,7 +1365,6 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     sRes->iTag = NX_ERROR;
     return NX_ERROR;                  /* not reached */
   }
-  
   
   NXstatus
   NXmakelink (NXhandle fid, NXlink* sLink)
