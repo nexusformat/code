@@ -29,15 +29,17 @@
 #
 AC_PREREQ(2.57)
 AC_REVISION($Revision$)
-AC_INIT(NeXus Library, 2.0.0, nexus-developers@anl.gov, nexus)
+AC_INIT([NeXus Library], [2.0.0], [nexus-developers@anl.gov], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
-see file  gnu_licence.txt  for further information])
-AM_INIT_AUTOMAKE
+see file COPYING for further information])
+
+AM_INIT_AUTOMAKE([1.6])
 AC_CONFIG_SRCDIR([src/napi.c])
 AM_CONFIG_HEADER([include/nxconfig.h])
-AC_CONFIG_AUX_DIR(.)
+AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_HOST
+AC_PROG_LIBTOOL
 # Checks for programs.
 AC_ARG_WITH([cc],
 	AC_HELP_STRING([--with-cc=c_compiler],
@@ -162,7 +164,36 @@ AM_CONDITIONAL([HAVE_F77], [test ! -z "$F77"])
 AM_CONDITIONAL([HAVE_F90], [test ! -z "$F90"])
 AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
 AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
-AC_CONFIG_FILES([Makefile src/Makefile applications/Makefile
-		test/Makefile bindings/Makefile bindings/f77/Makefile
-		bindings/f90/Makefile scripts/nxbuild])
+
+AC_CONFIG_FILES([Makefile 
+		include/Makefile
+		src/Makefile 
+		applications/Makefile
+		test/Makefile 
+		bindings/Makefile 
+		bindings/f77/Makefile
+		bindings/f90/Makefile
+		scripts/Makefile
+		scripts/nxbuild])
 AC_OUTPUT
+
+echo "
+
+Configuration (NeXus):
+
+        Source code location:  ${srcdir}
+        Version:               ${VERSION}
+        Compiler:              ${CC},${CXX},${F77},${F90}
+
+build:
+        NeXus with:
+                HDF4 support:  `if test -n "$H4ROOT" ; then echo yes ; else echo no ; fi`
+                HDF5 support:  `if test -n "$H5ROOT" ; then echo yes ; else echo no ; fi`
+
+        bindings:
+                F77 :          `if test -n "$F77" ; then echo yes ; else echo no ; fi`
+                F90 :          `if test -n "$F90" ; then echo yes ; else echo no ; fi`
+
+Please check whether the configuration I detected matches what you
+would like to have.
+"
