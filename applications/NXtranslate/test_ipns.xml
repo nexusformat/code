@@ -3,18 +3,23 @@
 <title  NXS:location="header.runTitle" />
 <start_time NXS:location="header.startDateTime" />
 <end_time NXS:location="header.endDateTime" />
+<!-- NXuser  -->
 <userInfo type="NXuser">
 <name  NXS:location="header.userName" />
 </userInfo>
+<!-- NXdetector  -->
 <bank1 type="NXdetector">
-<time-of-flight axis="NX_FLOAT32:1" NXS:location="time.ids[ 19 : 25]"></time-of-flight>
+<detector_number type="NX_INT32[7]" axis="NX_INT32:2" > 19 20 21 22 23 24 25 </detector_number>
+<time-of-flight NXS:location="time.ids[ 19 : 25]" axis="NX_INT32:1" long_name="time-of-flight"/>
 </bank1>
+<!-- NXdata  -->
 <data1 type="NXdata">
-<data NXS:location="data.ids[ 19 : 25]" signal="1"/>
-<errors NXS:location="error.ids[ 19 : 25]" signal="1"/>
+<data NXS:location="data.ids[ 19 : 25]" signal="NX_INT32:1" long_name="Counts"/>
+<errors NXS:location="error.ids[ 19 : 25]"/>
 <NAPIlink target="/entry1/bank1/time-of-flight"/>
+<NAPIlink target="/entry1/bank1/detector_number"/>
 </data1>
 
-
 </entry1>
+
 </NXroot>
