@@ -29,10 +29,14 @@
 # @configure_input@
 #
 #====================================================================
+
+# so   "make test"   is the same as   "make check"
+test: check
+
 SUBDIRS=include src bindings test applications scripts
 
-# We see to fail a dependency check later with the install
-# kit if this is missing
+# We seem to fail a dependency check later with the install
+# kit if this line is missing
 EXTRA_DIST=build_rules.am
 
 DISTCHECK_CONFIGURE_FLAGS=--without-hdf5
