@@ -174,7 +174,7 @@ CONTAINS
 !NXflush flushes all pending data to disk
    FUNCTION NXflush (file_id) RESULT (status)
 
-      TYPE(NXhandle),   INTENT(out) :: file_id
+      TYPE(NXhandle), INTENT(inout) :: file_id
       TYPE(NXhandle) :: new_id
       INTEGER :: status, nxifflush
       EXTERNAL nxifflush
