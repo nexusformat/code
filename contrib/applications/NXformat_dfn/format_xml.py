@@ -44,6 +44,9 @@ def remove_extra_spaces(string):
     # remove the shortened result
     return result
 
+def get_def_ext():
+    return "xml"
+
 def get_command_line_doc():
     result = " --width     Specify the width the the document for wrapping. This does not \n"+ \
              "             apply to open or close tags. The default is %d.\n" %default_width + \
