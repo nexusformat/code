@@ -75,3 +75,8 @@ libjnexus.so: native/neutron_nexus_NexusFile.h $(jnexus_COBJ)
 	$(CC) -o libjnexus.so $(jnexus_COBJ) $(LFLAGS) -lz -lm
 
 test: test/TestJapi.class
+
+javadoc:
+	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus neutron.nexus ncsa.hdf.hdflib
+
+all: jnexus.jar libjnexus.so javadoc
