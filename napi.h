@@ -13,7 +13,30 @@
 
 #define NEXUS_VERSION	"1.1.0"		/* major.minor.patch */
 
-#include <mfhdf.h>
+#ifdef GENIE_IMPLEMENTATION__		/* OpenGENIE is fussy about consts */
+#   define CONSTCHAR	const char
+#else
+#   define CONSTCHAR	char
+#endif /* GENIE_IMPLEMENTATION__ */
+
+/*
+ * check for ints.h header on VMS - it defines conflicting types
+ */
+#if defined(__VMS) && defined(__INTS_LOADED)
+#   define int8 hdf_int8
+#   define int16 hdf_int16
+#   define uint16 hdf_uint16
+#   define int32 hdf_int32
+#   define uint32 hdf_uint32
+#   include <mfhdf.h>
+#   undef int8
+#   undef int16
+#   undef uint16
+#   undef int32
+#   undef uint32
+#else
+#   include <mfhdf.h>
+#endif /* defined(__VMS) && defined(__INTS_LOADED) */
 
 typedef enum {NXACC_READ = DFACC_READ, 
               NXACC_RDWR = DFACC_RDWR, 
@@ -154,15 +177,15 @@ extern "C" {
 /* 
  * Standard interface 
  */
-  NXstatus  NXopen(char * filename, NXaccess access_method, NXhandle* pHandle);
+  NXstatus  NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
   NXstatus  NXclose(NXhandle* pHandle);
   
-  NXstatus  NXmakegroup (NXhandle handle, char* Vgroup, char* NXclass);
-  NXstatus  NXopengroup (NXhandle handle, char* Vgroup, char* NXclass);
+  NXstatus  NXmakegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
+  NXstatus  NXopengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
   NXstatus  NXclosegroup(NXhandle handle);
   
-  NXstatus  NXmakedata (NXhandle handle, char* label, int datatype, int rank, int dim[]);
-  NXstatus  NXopendata (NXhandle handle, char* label);
+  NXstatus  NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
+  NXstatus  NXopendata (NXhandle handle, CONSTCHAR* label);
   NXstatus  NXclosedata(NXhandle handle);
   
   NXstatus  NXgetdata(NXhandle handle, void* data);
@@ -171,7 +194,7 @@ extern "C" {
   
   NXstatus  NXputdata(NXhandle handle, void* data);
   NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]);
-  NXstatus  NXputattr(NXhandle handle, char* name, void* data, int iDataLen, int iType);
+  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
   
   NXstatus  NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
   NXstatus  NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
