@@ -39,7 +39,7 @@ H5SRC = napi5.c
 endif
 
 if HAVE_XML
-XMLSRC = nxxml.c nxio.c nxdataset.c
+XMLSRC = nxxml.c nxio.c nxdataset.c stptok.c
 endif
 ##  the LIBS variable should contain all needed libs for the HDF support
 ##  It will be filled during the configuration run
