@@ -1,0 +1,24 @@
+-------------------------------------------------------------------------
+NeXus - a common format for neutron and X-ray scattering data
+-------------------------------------------------------------------------
+
+The following files are stored.
+
+napi.c         - ANSI C source code of NeXus API
+napi.h         - ANSI C header file of NeXus API
+napi_test.c    - Test code of C API
+napif.f        - Fortran 77 wrapper for NeXus API
+napif.inc      - Fortran 77 include file
+napif_test.f   - Test code of Fortran API
+README.FORTRAN - Notes on Fortran wrapper
+
+napi.tex       - LaTeX documentation of API
+NXdict.tex     - LaTeX documentation of proposed data dictionary
+
+napi.tar.gz    - gzipped tar file containing all of the above
+
+Argonne National Laboratory is operated by The University of Chicago for
+the U.S. Department of Energy under contract W-31-109-ENG-38.
+-------------------------------------------------------------------------
+Comments to : ROsborn@anl.gov
+-------------------------------------------------------------------------

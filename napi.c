@@ -318,19 +318,16 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus  NXfopen(char * filename, NXaccess* am, char* owner, char* owner_address, char* owner_telephone_number,
-                char* owner_fax_number, char* owner_email, char* owner_affiliation, NexusFile* pHandle)
+  NXstatus  NXfopen(char * filename, NXaccess* am, NexusFile* pHandle)
   {
 	int ret;
  	NXhandle fileid;
-	ret = NXopen(filename, *am, owner, owner_address, owner_telephone_number,
-			owner_fax_number, owner_email, owner_affiliation, &fileid);
+	ret = NXopen(filename, *am, &fileid);
 	memcpy(pHandle, fileid, sizeof(NexusFile));
 	return ret;
   }
 
-  NXstatus  NXopen(char * filename, NXaccess am, char* owner, char* owner_address, char* owner_telephone_number,
-                char* owner_fax_number, char* owner_email, char* owner_affiliation, NXhandle* pHandle)
+  NXstatus  NXopen(char * filename, NXaccess am, NXhandle* pHandle)
   {
 
     pNexusFile pNew = NULL;
@@ -363,8 +360,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
 
 /*
- * need to create global attributes         file_name file_time NeXus_version owner owner_address
- *                                          owner_telephone_number owner_fax_number owber_email owner_affiliation
+ * need to create global attributes         file_name file_time NeXus_version 
  * at some point for new files
 */
   

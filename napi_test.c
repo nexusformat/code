@@ -10,7 +10,7 @@ int main()
     int type, length;
     
     NXhandle fileid;
-    if (NXopen("nxtest.dat", NXACC_CREATE, "", "", "", "", "", "", &fileid) != NX_OK)
+    if (NXopen("nxtest.dat", NXACC_CREATE, &fileid) != NX_OK)
 	return 1;
     if (NXmakegroup(fileid, "mygroup", "myclass") != NX_OK)
 	return 1;
@@ -31,7 +31,7 @@ int main()
     if (NXclose(&fileid) != NX_OK)
 	return 1;
 /* read data */
-    if (NXopen("nxtest.dat", NXACC_READ, 0, 0, 0, 0, 0, 0, &fileid) != NX_OK)
+    if (NXopen("nxtest.dat", NXACC_READ, &fileid) != NX_OK)
 	return 1;
     if (NXopengroup(fileid, "mygroup", "myclass") != NX_OK)
 	return 1;

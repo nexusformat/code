@@ -103,8 +103,7 @@ extern "C" {
 /* 
  * Standard interface 
  */
-  NXstatus  NXopen(char * filename, NXaccess access_method, char* owner, char* owner_address, char* owner_telephone_number, 
-		char* owner_fax_number, char* owner_email, char* owner_affiliation, NXhandle* pHandle);
+  NXstatus  NXopen(char * filename, NXaccess access_method, NXhandle* pHandle);
   NXstatus  NXclose(NXhandle* pHandle);
   
   NXstatus  NXmakegroup (NXhandle handle, char* Vgroup, char* NXclass);

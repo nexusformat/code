@@ -9,8 +9,7 @@
       ENDDO
       ARRAY_DIMS(1) = 2
       ARRAY_DIMS(2) = 2
-      IF (NXOPEN('nxtest.dat', NXACC_CREATE, ' ', ' ', 
-     +           ' ', ' ', ' ', ' ', FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('nxtest.dat', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
       IF (NXMAKEGROUP(FILEID, 'mygroup', 'myclass') .NE. NX_OK) STOP
       IF (NXOPENGROUP(FILEID, 'mygroup', 'myclass') .NE. NX_OK) STOP
       IF (NXmakedata(fileid, 'mylabel', DFNT_FLOAT32, 2, array_dims) 
