@@ -28,9 +28,34 @@
 #
 #====================================================================
 
-AM_CPPFLAGS=-I. -I../include
+AM_CPPFLAGS=-I$(top_srcdir)/include
 
-lib_LIBRARIES = libNeXus.a
-libNeXus_a_SOURCES = napi.c
+if HAVE_HDF4
+H4SRC = napi4.c
+endif
+
+if HAVE_HDF5
+H5SRC = napi5.c
+endif
+
+##  the LIBS variable should contain all needed libs for the HDF support
+##  It will be filled during the configuration run
+
+lib_LTLIBRARIES = libNeXus.la
+
+libNeXus_la_SOURCES = napi.c $(H4SRC) $(H5SRC)
+
+## The following part is the solution for automake >= 1.7
+## 
+## libNeXus_la_LIBADD = -lz
+## if HAVE_HDF4 
+## libNeXus_la_SOURCES += napi4.c
+## libNeXus_la_LIBADD += -lmfhdf -ldf -ljpeg
+## endif
+
+## if HAVE_HDF5
+## libNeXus_la_SOURCES += napi5.c
+## libNeXus_la_LIBADD += -lhdf5 
+## endif
 
 include $(top_srcdir)/build_rules.am
