@@ -1,0 +1,95 @@
+#====================================================================
+#  NeXus - Neutron & X-ray Common Data Format
+#  
+#  Makefile compiler and directory options
+#  
+#  Copyright (C) 2004 Freddie Akeroyd
+#  
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free 
+#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+#  MA  02111-1307  USA
+#             
+#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#
+# $Id$
+#
+# @configure_input@
+#
+#====================================================================
+.SUFFIXES:
+.SUFFIXES: .so .a .o .c .f .f90 .h
+
+CC=@CC@
+F77=@F77@
+CFLAGS=@CFLAGS@
+CPPFLAGS=@CPPFLAGS@ -I. -I../include
+FFLAGS=@FFLAGS@
+F90=@F90@
+F90FLAGS=@F90FLAGS@
+LDFLAGS=@LDFLAGS@
+H4ROOT=@H4ROOT@
+H5ROOT=@H5ROOT@
+LIBS=@LIBS@
+FROOT=.
+NXTARGET=@NXTARGET@	# used to pass other appropriate build targets
+RANLIB=@RANLIB@
+#
+LIBNEXUS=../src/libNeXus.a
+LIBNEXUS77=../bindings/f77/libNeXus77.a
+LIBNEXUS90=../bindings/f90/libNeXus90.a
+NXBROWSE_OBJ=NXbrowse.o
+NXTOXML_OBJ=NXtoXML.o
+NXTODTD_OBJ=NXtoDTD.o
+NXTONX4_OBJ=NXtoNX4.o
+NXTONX5_OBJ=NXtoNX5.o
+NXDUMP_OBJ=NXdump.o
+
+all: NXbrowse NXtoXML NXtoDTD $(NXTARGET)
+
+nexus4: NXtoNX4 		# hdf4 only targets
+nexus5: NXtoNX5 		# hdf5 only targets
+nexus77:			# f77 only targets
+nexus90: NXdump			# f90 only targets
+
+clean :
+	rm -f NXbrowse NXtoXML NXtoDTD NXtoNX4 NXtoNX5 NXdump *.o
+
+NXbrowse: $(NXBROWSE_OBJ) 
+	$(CC) $(LDFLAGS) -o $@ $(NXBROWSE_OBJ) $(LIBNEXUS) $(LIBS)
+
+NXtoXML: $(NXTOXML_OBJ) 
+	$(CC) $(LDFLAGS) -o $@ $(NXTOXML_OBJ) $(LIBNEXUS) $(LIBS)
+	
+NXtoDTD: $(NXTODTD_OBJ) 
+	$(CC) $(LDFLAGS) -o $@ $(NXTODTD_OBJ) $(LIBNEXUS) $(LIBS)
+
+NXtoNX4: $(NXTONX4_OBJ) 
+	$(CC) $(LDFLAGS) -o $@ $(NXTONX4_OBJ) $(LIBNEXUS) $(LIBS)
+
+NXtoNX5: $(NXTONX5_OBJ) 
+	$(CC) $(LDFLAGS) -o $@ $(NXTONX5_OBJ) $(LIBNEXUS) $(LIBS)
+
+NXdump: $(NXDUMP_OBJ)
+	$(F90) $(F90FLAGS) $(LDFLAGS) -o $@ $(LIBNEXUS90) $(LIBS)
+#
+# general build rules
+#
+.c.o :
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $(FROOT)/$*.c 
+
+.f.o:
+	$(F77) $(FFLAGS) -c $(FROOT)/$*.f
+
+.f90.o:
+	$(F90) $(F90FLAGS) -c $(FROOT)/$*.f90
