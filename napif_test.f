@@ -23,6 +23,8 @@ C
       IF (NXputdata(fileid, array) .NE. NX_OK) STOP
       IF (NXputattr(fileid, 'attribute', ATTR, LEN(ATTR),NX_CHAR) 
      +           .NE. NX_OK) STOP
+      IF (NXputattr(fileid, 'int_attribute', 5, 1, NX_INT32) 
+     +           .NE. NX_OK) STOP
       IF (NXclosedata(fileid) .NE. NX_OK) STOP
       IF (NXclosegroup(fileid) .NE. NX_OK) STOP
       IF (NXclose(fileid) .NE. NX_OK) STOP
@@ -41,6 +43,11 @@ C *** read data
       ENDDO
       WRITE(6,1000) LENGTH,BUFFER
  1000 FORMAT(' Attribute length ',I2,': ',A)
+      LENGTH = 1
+      TYPE = NX_INT32
+      IF (NXgetattr(fileid, 'int_attribute', I, LENGTH, TYPE) 
+     +           .NE. NX_OK) STOP
+      WRITE(6,*) 'Integer attribute ', i
       IF (NXclosedata(fileid) .NE. NX_OK) STOP
       IF (NXclosegroup(fileid) .NE. NX_OK) STOP
       IF (NXclose(fileid) .NE. NX_OK) STOP

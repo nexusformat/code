@@ -29,6 +29,9 @@ int main()
 	return 1;
     if (NXputattr(fileid, "attribute", attr, strlen(attr), NX_CHAR) != NX_OK)
 	return 1;
+    i = 5;
+    if (NXputattr(fileid, "int_attribute", &i, 1, NX_INT32) != NX_OK)
+	return 1;
     if (NXclosedata(fileid) != NX_OK)
 	return 1;
     if (NXclosegroup(fileid) != NX_OK)
@@ -61,6 +64,11 @@ int main()
     for(i=0; i<4; i++)
 	printf("%f\n", data_array[i]);
     printf("Attribute length %d: %s\n", length, buffer);
+    length = 1;
+    type = NX_INT32;
+    if (NXgetattr(fileid, "int_attribute", &i, &length, &type) != NX_OK)
+	return 1;
+    printf("Integer attribute %d\n", i);
     if (NXclosedata(fileid) != NX_OK)
 	return 1;
     if (NXclosegroup(fileid) != NX_OK)
