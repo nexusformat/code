@@ -327,7 +327,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXstatus NXfopen(char * filename, NXaccess* am, NexusFile* pHandle)
   {
 	NXstatus ret;
- 	NXhandle fileid;
+ 	NXhandle fileid = NULL;
 	ret = NXopen(filename, *am, &fileid);
 	if (ret == NX_OK)
 	{
@@ -336,6 +336,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	else
 	{
 	    memset(pHandle, 0, sizeof(NexusFile));
+	}
+	if (fileid != NULL)
+	{
+	    free(fileid);
 	}
 	return ret;
   }
@@ -496,7 +500,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     NXstatus ret;
     h = (NXhandle)malloc(sizeof(NexusFile));
     memcpy(h, pHandle, sizeof(NexusFile));
-    ret = NXclose(&h);
+    ret = NXclose(&h);		/* does free(h) */
     memset(pHandle, 0, sizeof(NexusFile));
     return ret;
   }
