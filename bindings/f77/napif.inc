@@ -15,6 +15,9 @@ C 97/7/31 - Correct NXPUTATTR/NXGETATTR and make 'implicit none' clean
 C 97/8/7  - Update interface
 C----------------------------------------------------------------------------
 
+C *** Version of NeXus interface - should be consistent with napi.h!
+      CHARACTER*5 NEXUS_VERSION
+      PARAMETER(NEXUS_VERSION='1.0.0')
 C *** NXaccess enum - access modes for NXopen
       INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE
       PARAMETER(NXACC_READ=1,NXACC_RDWR=3,NXACC_CREATE=4)
