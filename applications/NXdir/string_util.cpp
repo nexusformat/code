@@ -25,6 +25,8 @@
 #include <iostream>
 #include "nxdir.h"
 #include <string>
+#include <algorithm>
+#include <stdio.h>
 
 #define ellipse std::string("...,")
 

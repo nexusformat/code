@@ -29,6 +29,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <fstream>
+#include <stdio.h>
 
 // -------------------- begin TIMING TEST stuff
 #ifdef TIMING_TEST
