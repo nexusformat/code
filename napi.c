@@ -35,7 +35,11 @@
     0.8    Mar 1997    MK/PK   First beta version of NeXus API
     0.9    Jun 1997     NM     Some changes made to allow for directory 
                                searches in file reading.
+    0.95   Aug 1997    FAA     Merge in new interface definitions and modifications
+                               for C++ and FORTRAN calling
 ----------------------------------------------------------------------------*/
+
+static const char* rscid = "$Id$";	/* Revision interted by CVS */
 
 #include <stdlib.h>
 #include <assert.h>
@@ -43,6 +47,30 @@
 #include <mfhdf.h>
 #include "napi.h"
 
+/* FORTRAN helpers */
+#define NXfopen 			MANGLE(nxifopen)
+#define NXfclose			MANGLE(nxifclose)
+
+#define NXMAXSTACK 50
+#define NXSIGNATURE 959697
+
+  typedef struct __NexusFile {
+    int iNXID;
+    char iAccess[2];
+    int32 iVID;
+    int32 iSID;
+    int32 iCurrentVG;
+    int32 iCurrentSDS;
+    struct iStack {
+      int32 iVref;
+      int iNDir;
+      int iCurDir;
+      int32 *iRefDir;
+      int32 *iTagDir;
+    } iStack[NXMAXSTACK];
+    int iStackPtr;
+    struct iStack iAtt;
+  } NexusFile, *pNexusFile;
   
   
   /*---------------------------------------------------------------------*/
@@ -86,6 +114,9 @@
     if (pFile->iCurrentVG == 0) { /* root level */
       /* get the number and ID's of all lone Vgroups in the file */
       iN = Vlone (pFile->iVID, NULL, 0);
+      if(iN == 0) {
+         return NX_EOD;
+      }
       pArray = (int32 *) malloc (iN * sizeof (int32));
       if (!pArray) {
         NXIReportError (NXpData, "ERROR: out of memory in NXIFindVgroup");
@@ -172,8 +203,7 @@
       iN = Vntagrefs (self->iCurrentVG);
       for (i = 0; i < iN; i++) {
         Vgettagref (self->iCurrentVG, i, &iTag, &iRef);
-        if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG) 
-           || (iTag == DFTAG_SDS) ) {
+        if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG)) {
           iNew = SDreftoindex (self->iSID, iRef);
           iNew = SDselect (self->iSID, iNew);
           SDgetinfo (iNew, pNam, &iA, iDim, &iD2, &iD2);
@@ -288,13 +318,32 @@
   }
   
   
-  NXstatus
-  NXopen (char *filename, NXaccess am, NXhandle fileid)
+  NXstatus  NXfopen(char * filename, NXaccess* am, char* owner, char* owner_address, char* owner_telephone_number,
+                char* owner_fax_number, char* owner_email, char* owner_affiliation, NexusFile* pHandle)
   {
-    pNexusFile pNew = (pNexusFile)fileid;
+	int ret;
+ 	NXhandle fileid;
+	ret = NXopen(filename, *am, owner, owner_address, owner_telephone_number,
+			owner_fax_number, owner_email, owner_affiliation, &fileid);
+	memcpy(pHandle, fileid, sizeof(NexusFile));
+	return ret;
+  }
+
+  NXstatus  NXopen(char * filename, NXaccess am, char* owner, char* owner_address, char* owner_telephone_number,
+                char* owner_fax_number, char* owner_email, char* owner_affiliation, NXhandle* pHandle)
+  {
+
+    pNexusFile pNew = NULL;
     char pBuffer[512];
     int iRet;
   
+    *pHandle = NULL;
+    /* get memory */
+    pNew = (pNexusFile) malloc (sizeof (NexusFile));
+    if (!pNew) {
+      NXIReportError (NXpData, "ERROR: no memory to create File datastructure");
+      return NX_ERROR;
+    }
     memset (pNew, 0, sizeof (NexusFile));
   
     /* start SDS interface */
@@ -302,6 +351,7 @@
     if (pNew->iSID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
       NXIReportError (NXpData, pBuffer);
+      free (pNew);
       return NX_ERROR;
     }
     /* 
@@ -311,6 +361,12 @@
     if (am == NXACC_CREATE) {
       am = NXACC_RDWR;
     }
+
+/*
+ * need to create global attributes         file_name file_time NeXus_version owner owner_address
+ *                                          owner_telephone_number owner_fax_number owber_email owner_affiliation
+ * at some point for new files
+*/
   
     /* Set Vgroup access mode */
     if (am == NXACC_READ) {
@@ -324,27 +380,36 @@
     if (pNew->iVID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
       NXIReportError (NXpData, pBuffer);
+      free (pNew);
       return NX_ERROR;
     }
-    iRet = Vstart (pNew->iVID);
-    if (iRet < 0) {
-      NXIReportError (NXpData, "ERROR: HDF cannot initalise Vgroup interface");
-  
-    }
+    Vstart (pNew->iVID);
     pNew->iNXID = NXSIGNATURE;
     pNew->iStack[0].iVref = 0;    /* root! */
   
-    return NX_OK; 
+    *pHandle = (NXhandle)pNew;
+    return NX_OK;
   }
   
   
   NXstatus
-  NXclose (NXhandle fid)
+  NXfclose (NexusFile* pHandle)
+  {
+    NXhandle h;
+    int ret;
+    h = pHandle;
+    ret = NXclose(&h);
+    memset(pHandle, 0, sizeof(NexusFile));
+    return ret;
+  }
+
+  NXstatus
+  NXclose (NXhandle* fid)
   {
     pNexusFile pFile = NULL;
     int iRet;
   
-    pFile = NXIassert (fid);
+    pFile = NXIassert(*fid);
     iRet = 0;
     /* close links into vGroups or SDS */
     if (pFile->iCurrentVG != 0) {
@@ -369,17 +434,27 @@
     /* release memory */
     NXIKillDir (pFile);
     free (pFile);
+    *fid = NULL;
     return NX_OK;
   }
   
-  
-  NXstatus
-  NXmakegroup (NXhandle fid, char *name, char *nxclass)
-  {
+   
+  NXstatus NXmakegroup (NXhandle fid, char *name, char *nxclass) {
     pNexusFile pFile;
     int32 iNew, iRet;
+    char pBuffer[256];
   
     pFile = NXIassert (fid);
+    /* 
+     * Make sure that a group with the same name and nxclass does not
+     * already exist.
+     */
+    if ((iRet = NXIFindVgroup (pFile, name, nxclass)) >= 0) {
+      sprintf (pBuffer, "ERROR: Vgroup %s, class %s already exists", 
+                        name, nxclass);
+      NXIReportError (NXpData, pBuffer);
+      return NX_ERROR;
+    }
   
     /* create and configure the group */
     iNew = Vattach (pFile->iVID, -1, "w");
@@ -391,6 +466,7 @@
     Vsetclass (iNew, nxclass);
   
     /* Insert it into the hierarchy, when appropriate */
+    iRet = 0;     
     if (pFile->iCurrentVG != 0) {
       iRet = Vinsert (pFile->iCurrentVG, iNew);
     }
@@ -480,6 +556,14 @@
   
     pFile = NXIassert (fid);
   
+  
+    if ((iNew = NXIFindSDS (fid, name))>=0) {
+      sprintf (pBuffer, "ERROR: SDS %s already exists at this level", name);
+      NXIReportError (NXpData, pBuffer);
+      return NX_ERROR;
+    }
+  
+  
     /* Do some argument checking */
     switch (datatype) {
     case DFNT_FLOAT32: break;
@@ -518,6 +602,14 @@
       SDendaccess (pFile->iCurrentSDS);
       pFile->iCurrentSDS = 0;
     }
+  
+    /* Do not allow creation of SDS's at the root level */
+    if (pFile->iCurrentVG == 0) {
+      sprintf(pBuffer, "ERROR: SDS creation at root level is not permitted");
+      NXIReportError(NXpData, pBuffer);
+      return NX_ERROR;
+    }
+          
     /* dataset creation */
     iNew = SDcreate (pFile->iSID, name, datatype, rank, dimensions);
     if (iNew < 0) {
@@ -647,15 +739,16 @@
   
   
   NXstatus
-  NXgetattr (NXhandle fid, char *name, char *data, int datalen)
+  NXgetattr (NXhandle fid, char *name, char *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
     int32 iNew;
     void *pData = NULL;
-    int32 iLen, iType, iRet;
+    int32 iLen, iRet;
     char pBuffer[256];
     NXname pNam;
   
+    *datalen = (*datalen) * DFKNTsize(*iType);
     pFile = NXIassert (fid);
   
     /* find attribute */
@@ -673,16 +766,17 @@
     }
     /* get more info, allocate temporary data space */
     if (pFile->iCurrentSDS != 0) {
-      iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, &iType, &iLen);
+      iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, iType, &iLen);
     } else {
-      iRet = SDattrinfo (pFile->iSID, iNew, pNam, &iType, &iLen);
+      iRet = SDattrinfo (pFile->iSID, iNew, pNam, iType, &iLen);
     }
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: HDF could not read attribute info");
       NXIReportError (NXpData, pBuffer);
       return NX_ERROR;
     }
-    iLen = iLen * DFKNTsize (iType);
+    iLen = iLen * DFKNTsize (*iType);
+    iLen = iLen * DFKNTsize (*iType);
     pData = (void *) malloc (iLen);
     if (!pData) {
       NXIReportError (NXpData, "ERROR: allocating memory in NXgetattr");
@@ -702,11 +796,12 @@
       return NX_ERROR;
     }
     /* copy data to caller */
-    memset (data, 0, datalen);
-    if (datalen < iLen) {
-      iLen = datalen - 1;
+    memset (data, 0, *datalen);
+    if ((*datalen < iLen) && (*iType == DFNT_UINT8)) {
+      iLen = *datalen - 1;
     }
     memcpy (data, pData, iLen);
+    *datalen = iLen / DFKNTsize(*iType);
     free (pData);
     return NX_OK;
   }
@@ -779,7 +874,7 @@
   
   
   NXstatus
-  NXputattr (NXhandle fid, char *name, char *data, int datalen)
+  NXputattr (NXhandle fid, char *name, void *data, int datalen, int iType)
   {
     pNexusFile pFile;
     int iRet;
@@ -788,11 +883,11 @@
   
     if (pFile->iCurrentSDS != 0) {
       /* SDS attribute */
-      iRet = SDsetattr (pFile->iCurrentSDS, name, DFNT_UINT8,
+      iRet = SDsetattr (pFile->iCurrentSDS, name, iType,
                         datalen, data);
     } else {
       /* global attribute */
-      iRet = SDsetattr (pFile->iSID, name, DFNT_UINT8,
+      iRet = SDsetattr (pFile->iSID, name, iType,
                         datalen, data);
   
     }
@@ -1001,7 +1096,7 @@
     }
     return NX_OK;
   }
-
+  
 /* allocate space for an array of given dimensions and type */
   NXstatus
   NXmalloc (void** data, int rank, int dimensions[], int datatype)

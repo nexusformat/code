@@ -1,15 +1,15 @@
 /*---------------------------------------------------------------------------
-  NeXus - Neutron & X-ray Common Data Format
-  
-  API Header File
-  
-  Copyright (C) 1997 Mark Koennecke, Przemek Klosowski 
-  
-  See NAPI.C for details
-  
+                            Nexus API header file
+
+   copyleft: Mark Koennecke, March 1997 at LNS,PSI, Switzerland
+             Przemek Klosowski, U. of Maryland & NIST, USA       
+
+   No warranties of any kind taken.
 ----------------------------------------------------------------------------*/
 #ifndef NEXUSAPI
 #define NEXUSAPI
+
+#define NEXUS_VERSION	"0.9"		/* major.minor */
 
 #include <mfhdf.h>
 
@@ -17,29 +17,8 @@ typedef enum {NXACC_READ = DFACC_READ,
               NXACC_RDWR = DFACC_RDWR, 
               NXACC_CREATE = DFACC_CREATE } NXaccess;
 
-#define NXMAXSTACK 50
-#define NXSIGNATURE 959697
-
-  typedef struct __NexusFile {
-    int iNXID;
-    int32 iVID;
-    int32 iSID;
-    int32 iCurrentVG;
-    int32 iCurrentSDS;
-    struct iStack {
-      int32 iVref;
-      int iNDir;
-      int iCurDir;
-      int32 *iRefDir;
-      int32 *iTagDir;
-    } iStack[NXMAXSTACK];
-    int iStackPtr;
-    struct iStack iAtt;
-    char iAccess[2];
-  } NexusFile, *pNexusFile;
-
-typedef pNexusFile NXhandle;
-typedef int  NXstatus;
+typedef void* NXhandle;		/* really a pointer to a NexusFile structure */
+typedef int NXstatus;
 typedef char NXname[VGNAMELENMAX];
 
     typedef struct {
@@ -47,10 +26,10 @@ typedef char NXname[VGNAMELENMAX];
                     int32 iRef;
                    } NXlink;
 
-
 #define NX_OK 1
 #define NX_ERROR 0
 #define NX_EOD -1
+
 /*-------------------------------------------------------------------------
                 HDF Datatype values for datatype parameters 
                        in the Nexus API
@@ -64,7 +43,7 @@ typedef char NXname[VGNAMELENMAX];
   DFNT_INT32       32 bit integer
   DFNT_UINT32      32 bit unsigned integer
 
-  This list is an edited version of the one found in the HDF header file
+  This list is a edited version of the one found in the HDF header file
   htndefs.h. That source will always be the real reference, this is
   documented here for your convenience.
 --------------------------------------------------------------------------*/ 
@@ -76,16 +55,17 @@ extern "C" {
 
 /* 
  *  Now, we have the interface visible from FORTRAN and C. On UNIX system
- *  FORTRAN routines get an extra training 
- *  Do not mangle using "_" and f2c mangles _ containing and non _
+ *  FORTRAN routines usually get an extra training 
+ *  Do not mangle using "_" as f2c mangles _ containing and non _
  *  containing names differently
- *  We must also lowercase anything that is called from fortran
+ *  We must also lowercase anything that is called from FORTRAN
+ *  else we can't link
  */
 
 #define CONCAT(__a,__b)	__a##__b	/* token concatenation */
 
 /* 
- * Define a macro for FORTRAN name mangling _ often we have to add an "_"
+ * Define a macro for FORTRAN name mangling _ pften we have to add an "_"
  */
 #if defined(__VMS)
 #define MANGLE(__arg)	__arg
@@ -120,36 +100,41 @@ extern "C" {
 #define NXmalloc 		MANGLE(nximalloc)
 #define NXfree 			MANGLE(nxifree)
 
+/* 
+ * Standard interface 
+ */
+  NXstatus  NXopen(char * filename, NXaccess access_method, char* owner, char* owner_address, char* owner_telephone_number, 
+		char* owner_fax_number, char* owner_email, char* owner_affiliation, NXhandle* pHandle);
+  NXstatus  NXclose(NXhandle* pHandle);
   
-  NXstatus  NXopen(char * filename, NXaccess access_method, NXhandle fileid);
-  NXstatus  NXclose(NXhandle fileid);
+  NXstatus  NXmakegroup (NXhandle handle, char* Vgroup, char* NXclass);
+  NXstatus  NXopengroup (NXhandle handle, char* Vgroup, char* NXclass);
+  NXstatus  NXclosegroup(NXhandle handle);
   
-  NXstatus  NXmakegroup (NXhandle fileid, char* Vgroup, char* NXclass);
-  NXstatus  NXopengroup (NXhandle fileid, char* Vgroup, char* NXclass);
-  NXstatus  NXclosegroup(NXhandle fileid);
+  NXstatus  NXmakedata (NXhandle handle, char* label, int datatype, int rank, int dim[]);
+  NXstatus  NXopendata (NXhandle handle, char* label);
+  NXstatus  NXclosedata(NXhandle handle);
   
-  NXstatus  NXmakedata (NXhandle fileid, char* label, int datatype, int rank, int dim[]);
-  NXstatus  NXopendata (NXhandle fileid, char* label);
-  NXstatus  NXclosedata(NXhandle fileid);
+  NXstatus  NXgetdata(NXhandle handle, void* data);
+  NXstatus  NXgetslab(NXhandle handle, void* data, int start[], int size[]);
+  NXstatus  NXgetattr(NXhandle handle, char* name, char* data, int* iDataLen, int* iType);
   
-  NXstatus  NXgetdata(NXhandle fileid, void* data);
-  NXstatus  NXgetslab(NXhandle fileid, void* data, int start[], int size[]);
-  NXstatus  NXgetattr(NXhandle fileid, char* name, char* data, int datalen);
-  NXstatus  NXgetdim (NXhandle fileid, int dimension, void * data);
+  NXstatus  NXputdata(NXhandle handle, void* data);
+  NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]);
+  NXstatus  NXputattr(NXhandle handle, char* name, void* data, int iDataLen, int iType);
   
-  NXstatus  NXputdata(NXhandle fileid, void* data);
-  NXstatus  NXputslab(NXhandle fileid, void* data, int start[], int size[]);
-  NXstatus  NXputattr(NXhandle fileid, char* name, char* data, int datalen);
-  NXstatus  NXputdim (NXhandle fileid, int dimension, void * data);
+  NXstatus  NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
+  NXstatus  NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
+  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
   
-  NXstatus  NXgetinfo     (NXhandle fileid, int* rank, int dimension[], int* datatype);
-  NXstatus  NXgetnextentry(NXhandle fileid, NXname name, NXname nxclass, int* datatype);
-  NXstatus  NXgetnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType);
+  NXstatus  NXgetgroupID(NXhandle handle, NXlink* pLink);
+  NXstatus  NXgetdataID(NXhandle handle, NXlink* pLink);
+  NXstatus  NXmakelink(NXhandle handle, NXlink* pLink);
   
-  NXstatus  NXgetgroupID(NXhandle fileid, NXlink* link);
-  NXstatus  NXgetdataID(NXhandle fileid, NXlink* link);
-  NXstatus  NXmakelink(NXhandle fileid, NXlink* link);
-  
+/* 
+ * Helper interface 
+ */
+
   NXstatus NXmalloc(void** data, int rank, int dimensions[], int datatype);
   NXstatus NXfree(void** data);
 

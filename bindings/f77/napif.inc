@@ -3,6 +3,8 @@ C NeXus - Neutron & X-ray Common Data Format
 C  
 C API Fortran Interface Definitions
 C  
+C $Id$
+C
 C Copyright (C) 1997, Freddie Akeroyd
 C                     ISIS Facility, Rutherford Appleton Laboratory
 C  
@@ -10,22 +12,18 @@ C See NAPI.C for details
 C
 C 97/7/30 - Initial Release
 C 97/7/31 - Correct NXPUTATTR/NXGETATTR and make 'implicit none' clean
+C 97/8/7  - Update interface
 C----------------------------------------------------------------------------
 
 C *** NXaccess enum - access modes for NXopen
       INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE
       PARAMETER(NXACC_READ=1,NXACC_RDWR=3,NXACC_CREATE=7)
-C *** NMAXSTACK definition
-      INTEGER NMAXSTACK
-      PARAMETER(NMAXSTACK=50)
-C *** NXFILESIZE should be the size of an INTEGER*4 array that is (at least)
-C *** large enough to hold a NexusFile structure
-C *** To be safe, we will assume all structure elements are padded 
-C *** to be 64bit aligned
-      INTEGER NXFILESIZE
-      PARAMETER(NXFILESIZE=2*(7+5*(NMAXSTACK+1)))
+C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
+C *** large enough to hold an NXhandle structure
+      INTEGER NXHANDLESIZE
+      PARAMETER(NXHANDLESIZE=600)
 C *** NXLINKSIZE is (at least) the size of an INTEGER*4 array that can hold
-C *** an NXlink structure: we'll again assume 64bit alignment for safety
+C *** an NXlink structure: we'll assume 64bit alignment of structure members for safety
       INTEGER NXLINKSIZE
       PARAMETER(NXLINKSIZE=4)
 C *** Possible NXstatus values - these are returned by all NX routines

@@ -34,9 +34,10 @@ Both these test programs should print
     2.000000
     3.000000
     4.000000
-    Attribute: something
+    Attribute length 9: something	
 
 To the screen and create a file "nxtest.dat"
+(Note: FORTRAN prints 20 for length)
 
 They have only been tested on Digital UNIX, but i hope they would
 work on others.
@@ -61,6 +62,7 @@ Also
 
 30/7/97 Initial release
 31/7/97 Correct NXPUTATTR/NXGETATTR and add in declarations for "implicit none" compiling
+7/8/97  Add in new interface definitions
 
 --
 Freddie Akeroyd
