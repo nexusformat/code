@@ -34,6 +34,15 @@ F90=f90
 F90FLAGS=
 LDFLAGS=
 #====================================================================
+#Compiler flags on DEC TRU64 UNIX
+#CC=cc
+#FC=f77
+#CFLAGS=-g 
+#FFLAGS=-g
+#F90=f90
+#F90FLAGS=
+#LDFLAGS=
+#====================================================================
 #Compiler flags for g77 and Absoft Pro Fortran 90 on Mac OS X
 #CC=cc
 #FC=g77
