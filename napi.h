@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------
   NeXus - Neutron & X-ray Common Data Format
   
-  NeXus API header file
+  Application Program Interface Header File
   
   Copyright (C) 2000-2003 Mark Koennecke, Uwe Filges
   
@@ -19,14 +19,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  
-  Contact : Mark Koennecke <Mark.Koennecke@psi.ch>
-            Uwe Filges <Uwe.Filges@psi.ch>
-            Labor fuer Neutronenstreuung
-            Paul Scherrer Institut             
-            CH-5232 Villigen-PSI
-            Switzerland
-            
-           
   For further information, see <http://www.neutron.anl.gov/NeXus/>
 
  ----------------------------------------------------------------------------*/
@@ -35,22 +27,22 @@
 #define NEXUSAPI
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION	"2.1.0."		/* major.minor.patch */
+#define NEXUS_VERSION   "2.0.0."                /* major.minor.patch */
 
-#define CONSTCHAR	char
+#define CONSTCHAR       char
 
 #define NX_EXTERNAL
 
-typedef void* NXhandle;		/* really a pointer to a NexusFile structure */
+typedef void* NXhandle;         /* really a pointer to a NexusFile structure */
 typedef int NXstatus;
 typedef char NXname[128];
 
-typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE5=4} NXaccess;
+typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, NXACC_CREATE5=5} NXaccess;
 
 typedef struct {
-	        char *iname;
-	        int   type;
-	       }info_type, *pinfo;  
+                char *iname;
+                int   type;
+               }info_type, *pinfo;  
  
 #define NX_OK 1
 #define NX_ERROR 0
@@ -79,22 +71,19 @@ typedef struct {
   NX_UINT32      32 bit unsigned integer
   NX_CHAR        8 bit character
 
-  This list is a edited version of the one found in the HDF header file
-  htndefs.h. That source will always be the real reference, this is
-  documented here for your convenience.
 --------------------------------------------------------------------------*/ 
 
   
 /* Map NeXus to HDF types */
 #define NX_FLOAT32   5
 #define NX_FLOAT64   6
-#define NX_INT8	    20	
+#define NX_INT8     20  
 #define NX_UINT8    21
-#define NX_INT16    22	
+#define NX_INT16    22  
 #define NX_UINT16   23
 #define NX_INT32    24
 #define NX_UINT32   25
-#define NX_CHAR	     4
+#define NX_CHAR      4
 
 /* Map NeXus compression methods to HDF compression methods */
 #define NX_COMP_NONE 100
@@ -124,52 +113,53 @@ typedef struct {
 
 #define NXMAXSTACK 50
 
-#define CONCAT(__a,__b)	__a##__b	/* token concatenation */
+#define CONCAT(__a,__b) __a##__b        /* token concatenation */
 
-#define MANGLE(__arg)	CONCAT(__arg,_)
+#define MANGLE(__arg)   CONCAT(__arg,_)
 
-#define CALLING_STYLE	/* blank */
+#define CALLING_STYLE   /* blank */
 
-#    define NXopen 		MANGLE(nxiopen)
-#    define NXclose 		MANGLE(nxiclose)
-#    define NXmakegroup 	MANGLE(nximakegroup)
-#    define NXopengroup 	MANGLE(nxiopengroup)
-#    define NXclosegroup 	MANGLE(nxiclosegroup)
-#    define NXmakedata 		MANGLE(nximakedata)
-#    define NXcompmakedata 	MANGLE(nxicompmakedata)
-#    define NXcompress 		MANGLE(nxicompress)
-#    define NXopendata 		MANGLE(nxiopendata)
-#    define NXclosedata 	MANGLE(nxiclosedata)
-#    define NXputdata 	        MANGLE(nxiputdata)
-#    define NXputslab    	MANGLE(nxiputslab)
-#    define NXputattr 	        MANGLE(nxiputattr)
-#    define NXgetdataID 	MANGLE(nxigetdataid)
-#    define NXmakelink 		MANGLE(nximakelink)
-#    define NXmalloc 		MANGLE(nximalloc)
-#    define NXfree 		MANGLE(nxifree)
+#    define NXopen              MANGLE(nxiopen)
+#    define NXclose             MANGLE(nxiclose)
+#    define NXmakegroup         MANGLE(nximakegroup)
+#    define NXopengroup         MANGLE(nxiopengroup)
+#    define NXclosegroup        MANGLE(nxiclosegroup)
+#    define NXmakedata          MANGLE(nximakedata)
+#    define NXcompmakedata      MANGLE(nxicompmakedata)
+#    define NXcompress          MANGLE(nxicompress)
+#    define NXopendata          MANGLE(nxiopendata)
+#    define NXclosedata         MANGLE(nxiclosedata)
+#    define NXputdata           MANGLE(nxiputdata)
+#    define NXputslab           MANGLE(nxiputslab)
+#    define NXputattr           MANGLE(nxiputattr)
+#    define NXgetdataID         MANGLE(nxigetdataid)
+#    define NXmakelink          MANGLE(nximakelink)
+#    define NXmalloc            MANGLE(nximalloc)
+#    define NXfree              MANGLE(nxifree)
 #    define NXflush             MANGLE(nxiflush)
 
-#    define NXgetinfo 		MANGLE(nxigetinfo)
-#    define NXgetnextentry 	MANGLE(nxigetnextentry)
-#    define NXgetdata 		MANGLE(nxigetdata)
+#    define NXgetinfo           MANGLE(nxigetinfo)
+#    define NXgetnextentry      MANGLE(nxigetnextentry)
+#    define NXgetdata           MANGLE(nxigetdata)
 
-#    define NXgetslab 		MANGLE(nxigetslab)
-#    define NXgetnextattr 	MANGLE(nxigetnextattr)
-#    define NXgetattr 		MANGLE(nxigetattr)
-#    define NXgetattrinfo 	MANGLE(nxigetattrinfo)
-#    define NXgetgroupID 	MANGLE(nxigetgroupid)
-#    define NXgetgroupinfo 	MANGLE(nxigetgroupinfo)
-#    define NXinitgroupdir 	MANGLE(nxiinitgroupdir)
-#    define NXinitattrdir 	MANGLE(nxiinitattrdir)
-#    define NXsetcache 	        MANGLE(nxisetcache)
+#    define NXgetslab           MANGLE(nxigetslab)
+#    define NXgetnextattr       MANGLE(nxigetnextattr)
+#    define NXgetattr           MANGLE(nxigetattr)
+#    define NXgetattrinfo       MANGLE(nxigetattrinfo)
+#    define NXgetgroupID        MANGLE(nxigetgroupid)
+#    define NXgetgroupinfo      MANGLE(nxigetgroupinfo)
+#    define NXsameID            MANGLE(nxisameid)
+#    define NXinitgroupdir      MANGLE(nxiinitgroupdir)
+#    define NXinitattrdir       MANGLE(nxiinitattrdir)
+#    define NXsetcache          MANGLE(nxisetcache)
 /* FORTRAN helpers - for NeXus internal use only */
-#    define NXfopen		MANGLE(nxifopen)
-#    define NXfclose		MANGLE(nxifclose)
+#    define NXfopen             MANGLE(nxifopen)
+#    define NXfclose            MANGLE(nxifclose)
 #    define NXfflush            MANGLE(nxifflush)
-#    define NXfmakedata		MANGLE(nxifmakedata)
-#    define NXfcompmakedata	MANGLE(nxifcompmakedata)
-#    define NXfcompress		MANGLE(nxifcompress)
-#    define NXfputattr		MANGLE(nxifputattr)
+#    define NXfmakedata         MANGLE(nxifmakedata)
+#    define NXfcompmakedata     MANGLE(nxifcompmakedata)
+#    define NXfcompress         MANGLE(nxifcompress)
+#    define NXfputattr          MANGLE(nxifputattr)
 
 /* 
  * Standard interface 
@@ -206,6 +196,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXgetattr(NXhandle handle, char* name, void*
 NX_EXTERNAL  NXstatus CALLING_STYLE NXgetattrinfo(NXhandle handle, int* no_items);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXgetgroupID(NXhandle handle, NXlink* pLink);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXgetgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXsameID(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID);
 
 NX_EXTERNAL  NXstatus CALLING_STYLE NXinitgroupdir(NXhandle handle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXinitattrdir(NXhandle handle);
