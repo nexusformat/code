@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------
 # Makefile for the NeXus Java API. Builds both the required Java class
 # files and the shared library with the native methods.
@@ -16,7 +17,7 @@
 # Usage: make du40
 #--------------------------------------------------------------------------
 # Where to find the HDF libraries: HDF4.1r3 is REQUIRED
-du40:= HDFROOT=/data/koenneck
+du40:= HDFROOT=/data/koenneck/hdf4r4
 
 #Where to find the napi C stuff
 du40:= NAPIROOT=../
@@ -39,7 +40,7 @@ du40:= CFLAGS= -g -c -pthread $(JINCLUDE) -I$(HDFROOT)/include -I$(NAPIROOT) \
        -Inative
 
 #Compiler flags used for linking
-du40:= LFLAGS= -g -shared -L$(HDFROOT)/lib -L$(NAPIROOT)
+du40:= LFLAGS= -G 0 -shared  
 
 #Target location for the shared library
 du40:= SHLIB=bin/du40/libjnexus.so
@@ -77,17 +78,23 @@ du40: all
 rh62: all
 
 
-all: jnexus.jar libjnexus.so test
+all: jnexus.jar libjnexus.so test jnexus.zip
 
 jnexus.jar: $(JOBJ)
 	- rm jnexus.jar
 	$(JAVABIN)/jar cvf jnexus.jar $(JOBJ) \
 	  ncsa/hdf/hdflib/ArrayDescriptor.class
 
+jnexus.zip: $(JOBJ)
+	- rm jnexus.jar
+	zip jnexus.zip $(JOBJ) \
+	  ncsa/hdf/hdflib/ArrayDescriptor.class
+
+
 libjnexus.so: $(COBJ)
-	$(CC) $(LFLAGS) -o $(SHLIB) $(COBJ) -lNeXus \
-	  -lmfhdf -ldf \
-	  $(HDFROOT)/lib/libjpeg.a -lz -lm 
+	$(CC) $(LFLAGS) -o $(SHLIB) $(COBJ)   ../libNeXus.a \
+	   $(HDFROOT)/lib/libmfhdf.a $(HDFROOT)/lib/libdf.a \
+	   $(HDFROOT)/lib/libjpeg.a $(HDFROOT)/lib/libz.a  -lm 
 
 
 header: neutron/nexus/NexusFile.class

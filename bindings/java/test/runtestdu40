@@ -6,6 +6,6 @@
 #
 # Mark Koennecke, October 2000
 #------------------------------------------------------------------------
-java -classpath /usr/lib/classes.zip:../jnexus.jar:. \
+java -mx32m -classpath  /usr/lib/classes.zip:../jnexus.jar:. \
  -Dneutron.nexus.JNEXUSLIB=../bin/du40/libjnexus.so TestJapi
  

@@ -139,13 +139,11 @@ public interface NeXusFileInterface {
       * getattr retrieves the data associated with the attribute 
       * name. 
       * @param name The name of the attribute.
-      * @param array an array with sufficient space for holding the attribute 
+      * @param data an array with sufficient space for holding the attribute 
       * data.
-      * @param start An integer array of dimension rank which holds
-      * the start position in the dataset where to start reading the
-      * slab.
-      * @param size An integer array of dimension rank which holds the
-      * size of the slab to read in each dimension.    
+      * @param args An integer array holding the number of data elements
+      * in data as args[0], and the type as args[1]. Both values will be
+      * updated while reading.
       * @exception NexusException when either an HDF error occurs or 
       * the attribute could not be found.
       */
@@ -156,10 +154,7 @@ public interface NeXusFileInterface {
     /**
       * putdata writes the data from array into a previously opened
       * dataset.
-      * @param array The data to read.
-      * @param args An integer array holding the number of data elements
-      * in array as args[0], and the type as args[1]. Both values will be
-      * updated while reading.
+      * @param array The data to write.
       * @exception NexusException when an HDF error occurs.
       */
     public void putdata(Object array) throws 

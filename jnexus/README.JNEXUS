@@ -63,10 +63,10 @@
 	(Makefile dor DigitalUnix4.0D or, Make.tux  for Redhat Linux 6.2)
 	and adapt the settings of the variables in the configuration 
 	section to the state of your system. You need to know:
-	- Where you Jaba binaries, include files, libraries reside.
+	- Where you Java binaries, include files, libraries reside.
 	- Where the HDF4.1r3 libraries are installed. 
 	- Furthermore adapt some compiler options in order to reflect the
-	  way how yor compiler builds shared libraries. 
+	  way how your compiler builds shared libraries. 
 
 
 	AUTHOR and Target for Comments:

@@ -30,7 +30,7 @@
 #include <mapiwin.h>
 #endif
 
-/* #define DEBUG */
+#define DEBUG 
 #ifdef DEBUG
 static FILE *fd = NULL;
 #endif

@@ -145,7 +145,7 @@ public class  NexusFile implements NeXusFileInterface {
       if(handle  >= 0)
       {
          close(handle);
-         handle = 0;
+         handle = -1;
       }
     }
 

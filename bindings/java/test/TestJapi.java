@@ -43,7 +43,7 @@ public class TestJapi {
         try{
 	 //create a NexusFile 
          nf = new NexusFile(fileName,NexusFile.NXACC_CREATE);
-         nf.debugstop();
+	//nf.debugstop();
 
          // error handling check
 	 try{
@@ -83,7 +83,7 @@ public class TestJapi {
          // write a compressed data set
          nf.makedata("iData1_compressed",NexusFile.NX_INT32,2,iDim);
          nf.opendata("iData1_compressed");
-	 nf.compress(NexusFile.NX_COMP_RLE);
+	 nf.compress(NexusFile.NX_COMP_LZW);
          nf.putdata(iData1);
          nf.closedata();
 

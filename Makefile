@@ -18,7 +18,7 @@ FFLAGS=-g
 F90=f90
 #F90FLAGS=-YEXT_NAMES=LCS
 #====================================================================
-HDFROOT=/data/koenneck
+HDFROOT=/data/koenneck/hdf4r4
 
 # -DNEXUS_LIBRARY=1 is only needed for building the NeXus library
 CFLAGS=$(CFLAGS1) 
