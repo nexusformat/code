@@ -56,6 +56,11 @@ AC_ARG_WITH([f77],
 AC_PROG_CC
 AC_PROG_F77
 AC_CHECK_PROGS(F90,f90 f95)
+AC_CHECK_PROGS(JAVAC,javac)
+AC_CHECK_PROGS(JAVADOC,javadoc)
+AC_CHECK_PROGS(JAR,jar)
+AC_CHECK_PROGS(JAVA,java)
+AC_CHECK_PROGS(JAVAH,javah)
 AC_SUBST(F90)
 AC_SUBST(F90FLAGS)
 #
@@ -179,6 +184,9 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL([HAVE_F77], [test ! -z "$F77"])
 AM_CONDITIONAL([HAVE_F90], [test ! -z "$F90"])
+AM_CONDITIONAL([HAVE_JAVA], [test ! -z "$JAVA"])
+AM_CONDITIONAL([HAVE_JAVAC], [test ! -z "$JAVAC"])
+AM_CONDITIONAL([HAVE_JAVADOC], [test ! -z "$JAVADOC"])
 AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
 AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
 
@@ -191,6 +199,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/Makefile 
 		bindings/f77/Makefile
 		bindings/f90/Makefile
+                bindings/java/Makefile
 		scripts/Makefile
 		scripts/nxbuild])
 AC_OUTPUT
@@ -209,9 +218,9 @@ build:
                 HDF5 support:  `if test -n "$H5ROOT" ; then echo yes ; else echo no ; fi`
 
         bindings:
-                F77 :          `if test -n "$F77" ; then echo yes ; else echo no ; fi`
-                F90 :          `if test -n "$F90" ; then echo yes ; else echo no ; fi`
-
+                F77  :  `if test -n "$F77" ; then echo "$F77" ; else echo no ; fi`
+                F90  :  `if test -n "$F90" ; then echo "$F90" ; else echo no ; fi`
+                JAVA :  `if test -n "$JAVA" ; then echo "$JAVA" ; else echo no java; fi` : `if test -n "$JAVAC" ; then echo "$JAVAC" ; else echo no javac; fi` : `if test -n "$JAR" ; then echo "$JAR" ; else echo no jar; fi` : `if test -n "$JAVADOC" ; then echo "$JAVADOC" ; else echo no javadoc; fi` : `if test -n "$JAVAH" ; then echo "$JAVAH" ; else echo no javah; fi`
 Please check whether the configuration I detected matches what you
 would like to have.
 "
