@@ -20,6 +20,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  
   For further information, see <http://www.neutron.anl.gov/NeXus/>
+  
+  $Id$
 
  ----------------------------------------------------------------------------*/
   
@@ -27,7 +29,7 @@
 #define NEXUSAPI
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "2.0.0."                /* major.minor.patch */
+#define NEXUS_VERSION   "2.0.1"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
