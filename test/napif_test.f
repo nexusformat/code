@@ -1,8 +1,37 @@
+C------------------------------------------------------------------------------
+C NeXus - Neutron & X-ray Common Data Format
+C  
+C Test program for NeXus FORTRAN 77 interface
+C
+C Copyright (C) 1997, 1998, 1999, Freddie Akeroyd
+C
+C This library is free software; you can redistribute it and/or
+C modify it under the terms of the GNU Lesser General Public
+C License as published by the Free Software Foundation; either
+C version 2 of the License, or (at your option) any later version.
+C
+C This library is distributed in the hope that it will be useful,
+C but WITHOUT ANY WARRANTY; without even the implied warranty of
+C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+C Lesser General Public License for more details.
+C
+C You should have received a copy of the GNU Lesser General Public
+C License along with this library; if not, write to the Free Software
+C Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+C
+C Contact : Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+C           ISIS Facility
+C           Rutherford Appleton Laboratory
+C           Chilton, Didcot
+C           Oxfordshire
+C           OX11 0QX
+C           United Kingdom
+C
+C For further information, see <http://www.neutron.anl.gov/NeXus/>
 C
 C $Id$
-C
-C *** Sample test program for NeXus FORTRAN 77 interface
-C
+C------------------------------------------------------------------------------
+
       INCLUDE 'napif.inc'
       INTEGER NXRANK,NXDIMS(NX_MAXRANK),NXTYPE
       INTEGER ENTRY_STATUS,ATTR_STATUS,LENGTH

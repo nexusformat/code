@@ -1,20 +1,36 @@
-C----------------------------------------------------------------------------
+C------------------------------------------------------------------------------
 C NeXus - Neutron & X-ray Common Data Format
 C  
-C API Fortran Interface
-C  
+C API Fortran 77 Interface
+C
+C Copyright (C) 1997, 1998, 1999, Freddie Akeroyd
+C
+C This library is free software; you can redistribute it and/or
+C modify it under the terms of the GNU Lesser General Public
+C License as published by the Free Software Foundation; either
+C version 2 of the License, or (at your option) any later version.
+C
+C This library is distributed in the hope that it will be useful,
+C but WITHOUT ANY WARRANTY; without even the implied warranty of
+C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+C Lesser General Public License for more details.
+C
+C You should have received a copy of the GNU Lesser General Public
+C License along with this library; if not, write to the Free Software
+C Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+C
+C Contact : Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+C           ISIS Facility
+C           Rutherford Appleton Laboratory
+C           Chilton, Didcot
+C           Oxfordshire
+C           OX11 0QX
+C           United Kingdom
+C
+C For further information, see <http://www.neutron.anl.gov/NeXus/>
+C
 C $Id$
-C
-C Copyright (C) 1997, Freddie Akeroyd
-C                     ISIS Facility, Rutherford Appleton Laboratory, UK
-C  
-C See NAPI.C for further details
-C
-C 22/2/98 - Correct an NXfclose problem (free() of FORTRAN memory)
-C 97/7/30 - Initial Release
-C 97/7/31 - Correct NXPUTATTR/NXGETATTR and make 'implicit none' clean
-C 97/8/7  - Update interface
-C----------------------------------------------------------------------------
+C------------------------------------------------------------------------------
 
 C *** Return length of a string, ignoring training blanks
       INTEGER FUNCTION TRUELEN(STRING)
