@@ -633,7 +633,7 @@ CONTAINS
       INTEGER(kind=NXi4), POINTER       :: data(:,:)
       CHARACTER(len=*),   INTENT(out), OPTIONAL :: units
       INTEGER,            INTENT(in),  OPTIONAL :: data_start(:), data_size(:)
-      INTEGER :: status, dimensions(NX_MAXRANK)
+      INTEGER :: status, dimensions(NX_MAXRANK), data_shape(2)
       INTEGER, ALLOCATABLE :: buffer(:)
 
       status = NXUconfirmdata (file_id, data_name, NX_INT32, 2, dimensions)
@@ -643,7 +643,8 @@ CONTAINS
          status = NXgetslab (file_id, buffer, data_start, data_size)
          IF (status == NX_OK) THEN
             ALLOCATE (data(data_size(1),data_size(2)))
-            data = RESHAPE (buffer, data_size(1:2))
+            data_shape = data_size(1:2)
+            data = RESHAPE (buffer, data_shape)
          END IF
       ELSE
          ALLOCATE (buffer(PRODUCT(dimensions(1:2))))
@@ -669,7 +670,7 @@ CONTAINS
       REAL(kind=NXr4),  POINTER       :: data(:,:)
       CHARACTER(len=*), INTENT(out), OPTIONAL :: units
       INTEGER,          INTENT(in),  OPTIONAL ::data_start(:), data_size(:)
-      INTEGER :: status, dimensions(NX_MAXRANK)
+      INTEGER :: status, dimensions(NX_MAXRANK), data_shape(2)
       REAL, ALLOCATABLE :: buffer(:)
 
       status = NXUconfirmdata (file_id, data_name, NX_FLOAT32, 2, dimensions)
@@ -679,7 +680,8 @@ CONTAINS
          status = NXgetslab (file_id, buffer, data_start, data_size)
          IF (status == NX_OK) THEN
             ALLOCATE (data(data_size(1),data_size(2)))
-            data = RESHAPE (buffer, data_size(1:2))
+            data_shape = data_size(1:2)
+            data = RESHAPE (buffer, data_shape)
          END IF
       ELSE
          ALLOCATE (buffer(PRODUCT(dimensions(1:2))))
@@ -705,7 +707,7 @@ CONTAINS
       REAL(kind=NXr8),  POINTER       :: data(:,:)
       CHARACTER(len=*), INTENT(out), OPTIONAL :: units
       INTEGER,          INTENT(in),  OPTIONAL ::data_start(:), data_size(:)
-      INTEGER :: status, dimensions(NX_MAXRANK)
+      INTEGER :: status, dimensions(NX_MAXRANK), data_shape(2)
       REAL, ALLOCATABLE :: buffer(:)
 
       status = NXUconfirmdata (file_id, data_name, NX_FLOAT64, 2, dimensions)
@@ -715,7 +717,8 @@ CONTAINS
          status = NXgetslab (file_id, buffer, data_start, data_size)
          IF (status == NX_OK) THEN
             ALLOCATE (data(data_size(1),data_size(2)))
-            data = RESHAPE (buffer, data_size(1:2))
+            data_shape = data_size(1:2)
+            data = RESHAPE (buffer, data_shape)
          END IF
       ELSE
          ALLOCATE (buffer(PRODUCT(dimensions(1:2))))
@@ -741,7 +744,7 @@ CONTAINS
       INTEGER(kind=NXi4), POINTER       :: data(:,:,:)
       CHARACTER(len=*),   INTENT(out), OPTIONAL :: units
       INTEGER,            INTENT(in),  OPTIONAL :: data_start(:), data_size(:)
-      INTEGER :: status, dimensions(NX_MAXRANK)
+      INTEGER :: status, dimensions(NX_MAXRANK), data_shape(3)
       INTEGER, ALLOCATABLE :: buffer(:)
 
       status = NXUconfirmdata (file_id, data_name, NX_INT32, 3, dimensions)
@@ -751,7 +754,8 @@ CONTAINS
          status = NXgetslab (file_id, buffer, data_start, data_size)
          IF (status == NX_OK) THEN
             ALLOCATE (data(data_size(1),data_size(2),data_size(3)))
-            data = RESHAPE (buffer, data_size(1:3))
+            data_shape = data_size(1:3)
+            data = RESHAPE (buffer, data_shape)
          END IF
       ELSE
          ALLOCATE (buffer(PRODUCT(dimensions(1:3))))
@@ -777,7 +781,7 @@ CONTAINS
       REAL(kind=NXr4),  POINTER       :: data(:,:,:)
       CHARACTER(len=*), INTENT(out), OPTIONAL :: units
       INTEGER,          INTENT(in),  OPTIONAL :: data_start(:), data_size(:)
-      INTEGER :: status, dimensions(NX_MAXRANK)
+      INTEGER :: status, dimensions(NX_MAXRANK), data_shape(3)
       REAL, ALLOCATABLE :: buffer(:)
 
       status = NXUconfirmdata (file_id, data_name, NX_FLOAT32, 3, dimensions)
@@ -787,7 +791,8 @@ CONTAINS
          status = NXgetslab (file_id, buffer, data_start, data_size)
          IF (status == NX_OK) THEN
             ALLOCATE (data(data_size(1),data_size(2),data_size(3)))
-            data = RESHAPE (buffer, data_size(1:3))
+            data_shape = data_size(1:3)
+            data = RESHAPE (buffer, data_shape)
          END IF
       ELSE
          ALLOCATE (buffer(PRODUCT(dimensions(1:3))))
@@ -813,7 +818,7 @@ CONTAINS
       REAL(kind=NXr8),  POINTER       :: data(:,:,:)
       CHARACTER(len=*), INTENT(out), OPTIONAL :: units
       INTEGER,          INTENT(in),  OPTIONAL :: data_start(:), data_size(:)
-      INTEGER :: status, dimensions(NX_MAXRANK)
+      INTEGER :: status, dimensions(NX_MAXRANK), data_shape(3)
       REAL, ALLOCATABLE :: buffer(:)
 
       status = NXUconfirmdata (file_id, data_name, NX_FLOAT64, 3, dimensions)
@@ -823,7 +828,8 @@ CONTAINS
          status = NXgetslab (file_id, buffer, data_start, data_size)
          IF (status == NX_OK) THEN
             ALLOCATE (data(data_size(1),data_size(2),data_size(3)))
-            data = RESHAPE (buffer, data_size(1:3))
+            data_shape = data_size(1:3)
+            data = RESHAPE (buffer, data_shape)
          END IF
       ELSE
          ALLOCATE (buffer(PRODUCT(dimensions(1:3))))
