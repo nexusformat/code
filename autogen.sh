@@ -11,7 +11,7 @@ LIBTOOLIZE="$libtoolize --force --copy --automake"
 # set up environment variables with the correct
 # version of autoconf and automake - this also needs
 # to be done in configure.ac to maintain consistancy
-. autoversion.sh
+. ./autoversion.sh
 
 touch AUTHORS ChangeLog NEWS README
 
@@ -77,7 +77,7 @@ else
 fi
 
 # 
-if { ! test -d config ; } ; then 
+if { test ! -d config ; } ; then 
 	mkdir config ; 
 else 
 	rm -rf config/* ;  
