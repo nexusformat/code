@@ -31,7 +31,15 @@
 
 #define CONSTCHAR       char
 
-#define NX_EXTERNAL
+#if defined(_WIN32) && defined(_DLL)
+#	ifdef NX45DLL_EXPORTS
+#		define NX_EXTERNAL __declspec(dllexport)
+#	else
+#		define NX_EXTERNAL __declspec(dllimport)
+#	endif
+#else
+#	define NX_EXTERNAL
+#endif
 
 typedef void* NXhandle;         /* really a pointer to a NexusFile structure */
 typedef int NXstatus;
@@ -95,6 +103,10 @@ typedef struct {
 #ifdef HDF4
 #include <mfhdf.h>
 #endif 
+
+#ifdef HDF5
+#include <hdf5.h>
+#endif                
 
 typedef struct {
 #ifdef HDF4
