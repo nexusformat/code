@@ -17,7 +17,7 @@ IPNS_CPP_SRC=IPNS_CPP/ipns_retriever.cpp IPNS_CPP/ipns_retriever.h \
     IPNS_CPP/TimeField.cpp IPNS_CPP/TimeField.h
 
 # directions for building the library
-IPNS_CPP/libIPNSRunfile.a: IPNS_CPP/Runfile.cpp
+IPNS_CPP/libIPNSRunfile.a: IPNS_CPP/Runfile.cpp $(IPNS_SRC)
 	cd IPNS_CPP && make libIPNSRunfile.a
 
 # directions for building the retriever
