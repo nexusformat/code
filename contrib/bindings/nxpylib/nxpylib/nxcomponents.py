@@ -704,7 +704,8 @@ class NXdataelem(NXelem):
 			status = NXputslab(self.nxhandle, [value], startslab, sizeslab)	
 			info[coords[len(coords)-1]] = infoval + 1
 		status = NXclosedata(self.nxhandle)
-
+		status = NXflush(self.nxhandle)
+		
 		# now write gridinfo
 		status = NXinitgroupdir(self.nxhandle)
 		status, nitems, path, nxclass = NXgetgroupinfo(self.nxhandle)
@@ -725,6 +726,7 @@ class NXdataelem(NXelem):
 			sizeslab.append(1)
 		status = NXputslab(self.nxhandle, info[coords[len(coords)-1]], startslab, sizeslab)	
 		status = NXclosedata(self.nxhandle)
+		status = NXflush(self.nxhandle)
 		return 1
 			
 			

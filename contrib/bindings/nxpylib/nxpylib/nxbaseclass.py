@@ -148,11 +148,6 @@ class NXgroupbase:
 		pass
 	
 	
-	def readSubGroup(self, subgroupid, file):
-		subgrouptuple = split(subgroupid, ":", 2)
-		subgrouppath = self.group.path[:]
-		subgrouppath.append((subgrouptuple[0], subgrouptuple[1]))
-		return file.readGroupFromFile(subgrouppath, nxfile.NXfile.FLAT)
 		
 
 

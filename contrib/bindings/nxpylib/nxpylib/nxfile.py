@@ -228,6 +228,12 @@ class NXfile:
 		return nx_classes[groupclass](group=group)
 	
 	
+	def readSubGroup(self, metagroup, subgroupid):
+		subgrouptuple = split(subgroupid, ":", 2)
+		subgrouppath = metagroup.group.path[:]
+		subgrouppath.append((subgrouptuple[0], subgrouptuple[1]))
+		return self.readGroupFromFile(subgrouppath, self.FLAT)
+		
 	
 	def readElem(self, pathstr):
 		pathlist = self.pathStringToList(pathstr)

@@ -1,10 +1,6 @@
 #!/usr/bin/python
 
 import sys
-#import types
-#import string
-import os
-import time
 
 from nxfile import *
 
@@ -124,10 +120,10 @@ def main(args):
 	f = NXfile("nxtest.nxs", NXACC_RDWR)
 	
 	root = f.getRoot()
-	entry = root.readSubGroup("entry:NXentry", f)
+	entry = f.readSubGroup(root, "entry:NXentry")
 	entry.setElem (NXelem(name="command_line", nxtype=NX_CHAR, dims=[20], data="/command") )
 	
-	sample = entry.readSubGroup("sample:NXsample", f)
+	sample = f.readSubGroup(entry, "sample:NXsample")
 	tvalues = [20.0, 21.0, 20.0, 20.0, 21.0, 20.0, 20.0, 21.0, 20.0, 20.0, 21.0, 20.0, 20.0, 21.0, 20.0, 20.0, 21.0, 20.0, 19.0, 18.0 ]
 	sample.setElem( NXelem(name="temperature", nxtype=NX_FLOAT32, dims=[20], data=tvalues) )
 	
@@ -221,8 +217,8 @@ def main(args):
 		for i in range(2):
 			for k in range(12):
 				print "writing", float((j+1)*(i+1)*(k+1)), " to [", j,"," , i, "]"
-				#time.sleep(0.0)
 				tsdata.appendData(float((j+1)*(i+1)*(k+1)), [j,i])
+				time.sleep(1)
 	for k in range(12):			
 		#time.sleep(0.2)
 		tsaxish.appendData(2.6)
