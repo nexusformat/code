@@ -1,6 +1,7 @@
 #include <libxml/parser.h>
 #include <iostream>
 #include <string>
+#include <stdarg.h>
 #include <stdexcept>
 #include <vector>
 #include "nexus_util.h"
@@ -489,12 +490,34 @@ static xmlEntityPtr my_getEntity(void *user_data, const xmlChar *name){
 }
 
 static void my_error(void *user_data, const char* msg, ...){
-  cerr << "SAX_ERROR:" << msg << endl;
+  static const string SAX_ERROR="SAX_ERROR: ";
+
+  // get the rest of the arguments
+  va_list ap;
+  va_start(ap,msg);
+
+  // print out the result
+  char str[70];
+  int num_out=vsprintf(str,msg,ap);
+  cerr << SAX_ERROR << str;
+
+  // set the status to failure
   ((UserData *)user_data)->status=-1;
 }
 
 static void my_fatalError(void *user_data, const char* msg, ...){
-  cerr << "FATAL_SAX_ERROR:" << msg << endl;
+  static const string FATAL_SAX_ERROR="FATAL_SAX_ERROR: ";
+
+  // get the rest of the arguments
+  va_list ap;
+  va_start(ap,msg);
+
+  // print out the result
+  char str[70];
+  int num_out=vsprintf(str,msg,ap);
+  cerr << FATAL_SAX_ERROR << str;
+
+  // set the status to failure
   ((UserData *)user_data)->status=-1;
 }
 
