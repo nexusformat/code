@@ -22,28 +22,12 @@ using std::runtime_error;
 using std::string;
 using std::vector;
 
-/*
- * This routine changes a node by giving it a value (from a string),
- * dimensions and a type.
+/**
+ * The void pointer passed to this function must have enough space
+ * allocated to be filled with values generated from the string.
  */
-extern void update_node_from_string(Node &node, string &char_data,
-                                      vector<int> &v_dims, Node::NXtype type){
-  int rank=0;
-  rank=v_dims.size();
-  if(type==NX_CHAR)
-    rank=1;
-  int dims[rank];
-  if(type==NX_CHAR){
-    dims[0]=char_data.size();
-  }else{
-    for( int i=0 ; i<rank ; i++ )
-      dims[i]=v_dims[i];
-  }
-
-  // allocate a space for the value
-  void *value;
-  NXmalloc(&value,rank,dims,type);
-
+extern void void_ptr_from_string(void *&value, string &char_data, int rank,
+                                       int *dims, Node::NXtype type){
   /*
    *    type    | napi4_test    | napi5_test    | nxbrowse
    * -----------|---------------|---------------|-----------
@@ -83,6 +67,32 @@ extern void update_node_from_string(Node &node, string &char_data,
   }else{
     throw runtime_error("unknown type in end_add_char()");
   }
+}
+
+/*
+ * This routine changes a node by giving it a value (from a string),
+ * dimensions and a type.
+ */
+extern void update_node_from_string(Node &node, string &char_data,
+                                      vector<int> &v_dims, Node::NXtype type){
+  // local variables to do the work
+  int rank=v_dims.size();
+  if(type==NX_CHAR)
+    rank=1;
+  int dims[rank];
+  if(type==NX_CHAR){
+    dims[0]=char_data.size();
+  }else{
+    for( int i=0 ; i<rank ; i++ )
+      dims[i]=v_dims[i];
+  }
+  void *value;
+
+  // allocate a space for the value
+  NXmalloc(&value,rank,dims,type);
+
+  // fill the void pointer with data generated from the string
+  void_ptr_from_string(value,char_data,rank,dims,type);
 
   // set the value of the data
   node.set_data(value,rank,dims,type);
