@@ -37,5 +37,15 @@ libNeXus90_la_LINK = $(F90LINK)
 
 NXUmodule.o: NXUmodule.f90 NXmodule.o
 
+# This is needed as f90 is not supported as a valid tag in libtool
+# and the relink command (used during an install) which is written to
+# libNeXus90.la will not work. 
+all: all-am libNeXus90.la_orig
+
+libNeXus90.la_orig: libNeXus90.la
+	mv libNeXus90.la $@
+	sed -e 's/--mode=relink/--mode=relink --tag=CC/' < $@ > libNeXus90.la
+	touch $@
+
 include $(top_srcdir)/build_rules.am
 
