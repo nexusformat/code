@@ -73,6 +73,7 @@ program NXtest
       if (NXclosedata(fileid) /= NX_OK) stop
       if (NXmakedata(fileid, "r4_data", NX_FLOAT32, 2, (/4,5/)) /= NX_OK) stop
       if (NXopendata(fileid, "r4_data") /= NX_OK) stop
+         if (NXcompress(fileid, NX_COMP_LZW) /= NX_OK) stop
          if (NXputdata(fileid, reshape(r4_array,(/size(r4_array)/))) /= NX_OK) stop
       if (NXclosedata(fileid) /= NX_OK) stop
       if (NXmakedata(fileid, "r8_data", NX_FLOAT64, 2, (/4,5/)) /= NX_OK) stop
