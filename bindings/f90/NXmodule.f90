@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------
 ! NeXus - Neutron & X-ray Common Data Format
 !  
-! API Fortran 90 Interface
+! Application Program Interface (Fortran 90)
 !
-! Copyright (C) 1999, Ray Osborn
+! Copyright (C) 1999-2002, Ray Osborn
 !
 ! This library is free software; you can redistribute it and/or
 ! modify it under the terms of the GNU Lesser General Public
@@ -19,12 +19,6 @@
 ! License along with this library; if not, write to the Free Software
 ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 !
-! Contact : R. Osborn <ROsborn@anl.gov>
-!           Materials Science Division
-!           Argonne National Laboratory
-!           Argonne, IL 60439-4845
-!           USA
-!
 ! For further information, see <http://www.neutron.anl.gov/NeXus/>
 !
 !$Id$
@@ -36,11 +30,13 @@ MODULE NXmodule
 
    PUBLIC
 ! *** NeXus version parameter
-   CHARACTER(len=*), PARAMETER, PUBLIC :: NeXus_version = "1.3.3"
+   CHARACTER(len=*), PARAMETER, PUBLIC :: NeXus_version = "2.0.0"
 ! *** NeXus file access parameters
    INTEGER, PARAMETER, PUBLIC :: NXACC_READ = 1
-   INTEGER, PARAMETER, PUBLIC :: NXACC_RDWR = 3
-   INTEGER, PARAMETER, PUBLIC :: NXACC_CREATE = 4
+   INTEGER, PARAMETER, PUBLIC :: NXACC_RDWR = 2
+   INTEGER, PARAMETER, PUBLIC :: NXACC_CREATE = 3
+   INTEGER, PARAMETER, PUBLIC :: NXACC_CREATE4 = 4
+   INTEGER, PARAMETER, PUBLIC :: NXACC_CREATE5 = 5
 ! *** NeXus status parameters
    INTEGER, PARAMETER, PUBLIC :: NX_OK = 1
    INTEGER, PARAMETER, PUBLIC :: NX_ERROR = 0
@@ -56,45 +52,31 @@ MODULE NXmodule
    INTEGER, PARAMETER, PUBLIC :: NX_INT32   = 24
    INTEGER, PARAMETER, PUBLIC :: NX_UINT32  = 25
 ! *** NeXus compression parameters
-   INTEGER, PARAMETER, PUBLIC :: NX_COMP_LZW  = 4 !Defined by HDF in HCOMP.H
-   INTEGER, PARAMETER, PUBLIC :: NX_COMP_RLE  = 1
-   INTEGER, PARAMETER, PUBLIC :: NX_COMP_HUF  = 3
-   INTEGER, PARAMETER, PUBLIC :: NX_COMP_NONE = 0
+   INTEGER, PARAMETER, PUBLIC :: NX_COMP_NONE = 100
+   INTEGER, PARAMETER, PUBLIC :: NX_COMP_LZW  = 200
+   INTEGER, PARAMETER, PUBLIC :: NX_COMP_RLE  = 300
+   INTEGER, PARAMETER, PUBLIC :: NX_COMP_HUF  = 400
 ! *** NeXus Unlimited parameters
-   INTEGER, PARAMETER, PUBLIC :: NX_UNLIMITED = 0
+   INTEGER, PARAMETER, PUBLIC :: NX_UNLIMITED = -1
 ! *** NeXus limits
-   INTEGER, PARAMETER, PUBLIC :: NX_MAXRANK = 32 !Defined by HDF in HLIMITS.H
+   INTEGER, PARAMETER, PUBLIC :: NX_MAXRANK = 32
    INTEGER, PARAMETER, PUBLIC :: NX_MAXNAMELEN = 64
    INTEGER, PARAMETER, PUBLIC :: NX_MAXSTACK = 50
 ! *** NeXus type definitions
    TYPE, PUBLIC :: NXstack
-! WARNING: 32bit pointer assumption; on e.g. Digital UNIX iRefDir
-!          and iTagDir need to be 64bit
-      INTEGER(kind=selected_int_kind(8)) :: iRefDir
-      INTEGER(kind=selected_int_kind(8)) :: iTagDir
-      INTEGER(kind=selected_int_kind(8)) :: iVref
-      INTEGER(kind=selected_int_kind(8)) :: pad
-      INTEGER :: iNDir
-      INTEGER :: iCurDir
+      CHARACTER(1048) :: stackBuffer
    END TYPE NXstack
    TYPE, PUBLIC :: NXhandle
-      TYPE(NXstack) :: iStack(NX_MAXSTACK)
-      TYPE(NXstack) :: iAtt
-      INTEGER(kind=selected_int_kind(8)) :: iVID
-      INTEGER(kind=selected_int_kind(8)) :: iSID
-      INTEGER(kind=selected_int_kind(8)) :: iCurrentVG
-      INTEGER(kind=selected_int_kind(8)) :: iCurrentSDS
-      INTEGER :: iNXID
-      INTEGER :: iStackPtr
-      CHARACTER(len=2) :: iAccess
-! If we are on Digital UNIX and haven't changed the type of iTagDir
-! and iRefDir, this will at least stop a memory overwrite by padding
-! out the structure to the same length as in C
-      INTEGER(kind=selected_int_kind(8)) :: morepad(2+2*NX_MAXSTACK)
+      TYPE(NXstack) :: Stack(NX_MAXSTACK)
+      TYPE(NXstack) :: Att
+      CHARACTER(len=2176) :: handleBuffer
    END TYPE
    TYPE, PUBLIC :: NXlink
       INTEGER(kind=selected_int_kind(8)) :: tag
       INTEGER(kind=selected_int_kind(8)) :: ref
+      CHARACTER(len=1024) :: tag5
+      CHARACTER(len=1024) :: ref5
+      CHARACTER(len=1024) :: refd
    END TYPE
 ! *** Kind parameters for different byte lengths (not guaranteed to work)
    INTEGER, PARAMETER, PUBLIC :: NXi1 = selected_int_kind(2)
@@ -115,10 +97,10 @@ MODULE NXmodule
    PUBLIC :: NXmakedata, NXopendata, NXcompress, NXclosedata
    PUBLIC :: NXgetdata, NXgetslab, NXgetattr, NXputdata, NXputslab, NXputattr
    PUBLIC :: NXgetinfo, NXgetnextentry, NXgetnextattr
-   PUBLIC :: NXgetgroupID, NXgetdataID, NXmakelink 
+   PUBLIC :: NXgetgroupID, NXgetdataID, NXsameID, NXmakelink 
    PUBLIC :: NXgetgroupinfo, NXinitgroupdir, NXgroupdir
    PUBLIC :: NXgetattrinfo, NXinitattrdir, NXattrdir
-   PUBLIC :: NXreverse, NXsameID, NXCstring, NXFstring, NXdatatype, NXerror
+   PUBLIC :: NXreverse, NXCstring, NXFstring, NXdatatype, NXerror
 ! *** NeXus generic interfaces ***
    INTERFACE NXgetdata
       MODULE PROCEDURE NXgeti1, NXgeti2, NXgeti4, NXgetr4, NXgetr8, NXgetchar
@@ -175,13 +157,10 @@ CONTAINS
    FUNCTION NXflush (file_id) RESULT (status)
 
       TYPE(NXhandle), INTENT(inout) :: file_id
-      TYPE(NXhandle) :: new_id
       INTEGER :: status, nxifflush
       EXTERNAL nxifflush
 
-      new_id = file_id
-      status = nxifflush (new_id)
-      file_id = new_id
+      status = nxifflush (file_id)
 
    END FUNCTION NXflush
 !------------------------------------------------------------------------------
@@ -222,18 +201,34 @@ CONTAINS
 
    END FUNCTION NXclosegroup
 !------------------------------------------------------------------------------
-!NXmakedata creates a NeXus data set
+!NXmakedata creates a NeXus data set (optionally with compression)
    FUNCTION NXmakedata (file_id, data_name, data_type, data_rank, &
-                        data_dimensions) RESULT (status)
+                        data_dimensions, compress_type, chunk_size) &
+                        RESULT (status)
 
       TYPE(NXhandle),   INTENT(in) :: file_id
       CHARACTER(len=*), INTENT(in) :: data_name
       INTEGER,          INTENT(in) :: data_type,data_rank,data_dimensions(:)
-      INTEGER :: status, nxifmakedata
-      EXTERNAL nxifmakedata
+      INTEGER, OPTIONAL,INTENT(in) :: compress_type, chunk_size(:)
+      INTEGER, ALLOCATABLE :: NXchunk_size(:)
+      INTEGER :: status, i, nxifmakedata, nxifcompmakedata
+      EXTERNAL nxifmakedata, nxifcompmakedata
 
-      status = nxifmakedata(file_id, NXCstring(data_name), data_type, &
+      IF (PRESENT(compress_type)) THEN
+         IF (PRESENT(chunk_size)) THEN
+            ALLOCATE (NXchunk_size(data_rank))
+            NXchunk_size = chunk_size
+         ELSE
+            ALLOCATE (NXchunk_size(data_rank))
+            NXchunk_size = (/(min(data_dimensions(i),10),i=1,data_rank)/)
+         END IF
+         status = nxifcompmakedata(file_id, NXCstring(data_name), data_type, &
+                        data_rank, data_dimensions, compress_type, NXchunk_size)
+         DEALLOCATE (NXchunk_size)
+      ELSE
+         status = nxifmakedata(file_id, NXCstring(data_name), data_type, &
                         data_rank, data_dimensions)
+      END IF
 
    END FUNCTION NXmakedata
 !------------------------------------------------------------------------------
@@ -1163,6 +1158,24 @@ CONTAINS
 
    END FUNCTION NXgetdataID
 !------------------------------------------------------------------------------
+!NXsameID checks that two group or data ID's are the same
+   FUNCTION NXsameID (file_id, first_id, second_id) RESULT (same)
+
+      TYPE(NXhandle), INTENT(in) :: file_id
+      TYPE(NXlink), INTENT(in)   :: first_id, second_id
+      LOGICAL :: same
+      INTEGER :: status, nxisameid
+      EXTERNAL nxisameid
+
+      status = nxisameid(file_id, first_id, second_id)
+      IF (status == NX_OK) THEN
+         same = .TRUE.
+      ELSE
+         same = .FALSE.
+      ENDIF
+
+   END FUNCTION NXsameID
+!------------------------------------------------------------------------------
 !NXmakelink links a data item (group or set) to another group 
    FUNCTION NXmakelink (file_id, link) RESULT (status)
 
@@ -1308,21 +1321,6 @@ CONTAINS
       END DO
 
   END FUNCTION NXreverse
-!------------------------------------------------------------------------------
-!NXsameID checks that two group or data ID's are the same
-   FUNCTION NXsameID (first_id, second_id) RESULT (same)
-
-      TYPE(NXlink), INTENT(in)  :: first_id, second_id
-      LOGICAL :: same
-
-      IF (first_id%tag == second_id%tag .AND. first_id%ref == second_id%ref) &
-                        THEN
-         same = .TRUE.
-      ELSE
-         same = .FALSE.
-      END IF
-
-   END FUNCTION NXsameID
 !------------------------------------------------------------------------------
 !NXCstring converts a Fortran string into a C string
    FUNCTION NXCstring (string) RESULT (array)
