@@ -262,7 +262,7 @@ void PrintValues (void *data, int dataType, int numElements)
              if (i < numElements-1) fprintf (outId, " ");
            break;
          case NX_UINT32:
-            fprintf (outId, "%d", ((uint *)data)[i]);
+            fprintf (outId, "%d", ((unsigned *)data)[i]);
              if (i < numElements-1) fprintf (outId, " ");
            break;
          case NX_FLOAT32:
@@ -294,7 +294,7 @@ void PrintArray (void *dataBuffer, int dataType, int dataLen, int stepSize, int 
       do {
          PrintIndent ();
          if (i+stepSize > dataLen) stepSize = dataLen - i;
-         PrintValues (dataBuffer+i*typeSize, dataType, stepSize);
+         PrintValues ((char*)dataBuffer+i*typeSize, dataType, stepSize);
          fprintf (outId, "\n");
          i += stepSize;
       } while (i < dataLen);
