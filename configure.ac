@@ -84,6 +84,12 @@ case $host in
 	FFLAGS="$FFLAGS -g -Wno-globals"
 	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	LDFLAGS="$LDFLAGS -flat_namespace"
+        if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
+           lt_int_apple_cc_single_mod=yes
+        fi
+        if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
+           archive_cmds='$CC -dynamiclib -single_module'
+	fi
 	;;
 esac
 #
