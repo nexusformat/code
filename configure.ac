@@ -119,7 +119,10 @@ if test x$"with_java" != x"no" ; then
 	AC_CHECK_PROGS(JAR, jar)
 	AC_CHECK_PROGS(JAVA, java)
 	AC_CHECK_PROGS(JAVAH, javah)
-	JAVAINCLUDE="-I/usr/local/java/include -I/usr/local/java/include/linux"
+dnl assume java is in the "$javaroot/bin" directory of the distribution
+	javapath=`which $JAVA`
+	javaroot=`dirname $javapath`/..
+	JAVAINCLUDE="-I$javaroot/include"
 else
 	JAVAC=
 	JAVAINCLUDE=
