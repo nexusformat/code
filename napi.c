@@ -44,6 +44,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
 #include <mfhdf.h>
 #include "napi.h"
 
@@ -342,8 +343,12 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXstatus  NXopen(char * filename, NXaccess am, NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
-    char pBuffer[512];
+    char pBuffer[512], time_buffer[64];
     int iRet;
+    int32 file_id, an_id, ann_id;
+    time_t timer;
+    struct tm *time_info;
+    const char* time_format;
   
     *pHandle = NULL;
     /* get memory */
@@ -353,7 +358,66 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     memset (pNew, 0, sizeof (NexusFile));
+/* 
+ * get time in ISO 8601 format 
+ */
+    time(&timer);
+    time_info = localtime(&timer);
+    if (time_info != NULL)
+    {
+        if (time_info->tm_gmtoff < 0)
+        {
+	    time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
+        }
+        else
+        {
+	    time_format = "%04d-%02d-%02d %02d:%02d:%02d+%02d%02d";
+        }
+        sprintf(time_buffer, time_format,
+	    1900 + time_info->tm_year,
+	    1 + time_info->tm_mon,
+	    time_info->tm_mday,
+	    time_info->tm_hour,
+	    time_info->tm_min,
+	    time_info->tm_sec,
+	    time_info->tm_gmtoff / 3600,
+	    time_info->tm_gmtoff / 60  -  60 * (time_info->tm_gmtoff / 3600)
+        );
+    }
+    else
+    {
+        strcpy(time_buffer, "1970-01-01 00:00:00+0000");
+    }
   
+#if WRITE_OLD_IDENT
+/*
+ * write something that can be used by OLE
+ */
+    if (am == NXACC_CREATE) 
+    {
+    	if ( (file_id = Hopen(filename, am, 0)) == -1 )
+	{
+           sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
+           NXIReportError (NXpData, pBuffer);
+           free (pNew);
+           return NX_ERROR;
+	}
+        an_id = ANstart(file_id);
+        ann_id = ANcreatef(an_id, AN_FILE_LABEL); /* AN_FILE_DESC */
+        ANwriteann(ann_id, "NeXus", 5);
+        ANendaccess(ann_id);
+        ANend(an_id);
+	if (Hclose(file_id) == -1)
+	{
+           sprintf (pBuffer, "ERROR: cannot close file: %s", filename);
+           NXIReportError (NXpData, pBuffer);
+           free (pNew);
+           return NX_ERROR;
+	}
+        am = NXACC_RDWR;
+    }
+#endif /* WRITE_OLD_IDENT */
+
     /* start SDS interface */
     pNew->iSID = SDstart (filename, am);
     if (pNew->iSID <= 0) {
@@ -362,6 +426,32 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       free (pNew);
       return NX_ERROR;
     }
+/*
+ * need to create global attributes         file_name file_time NeXus_version 
+ * at some point for new files
+ */
+    if (am != NXACC_READ) 
+    {
+        if (SDsetattr(pNew->iSID, "NeXus_version", DFNT_CHAR8, strlen(NEXUS_VERSION), NEXUS_VERSION) < 0)
+        {
+          NXIReportError (NXpData, "ERROR: HDF failed to store NeXus_version attribute ");
+          return NX_ERROR;
+        }
+    }
+    if (am == NXACC_CREATE) 
+    {
+        if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), filename) < 0)
+        {
+          NXIReportError (NXpData, "ERROR: HDF failed to store file_name attribute ");
+          return NX_ERROR;
+        }
+        if (SDsetattr(pNew->iSID, "file_time", DFNT_CHAR8, strlen(time_buffer), time_buffer) < 0)
+        {
+          NXIReportError (NXpData, "ERROR: HDF failed to store file_time attribute ");
+          return NX_ERROR;
+        }
+    }
+
     /* 
      * Otherwise we try to create the file two times which makes HDF
      * Throw up on us.
@@ -370,11 +460,6 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       am = NXACC_RDWR;
     }
 
-/*
- * need to create global attributes         file_name file_time NeXus_version 
- * at some point for new files
-*/
-  
     /* Set Vgroup access mode */
     if (am == NXACC_READ) {
       strcpy(pNew->iAccess,"r");
