@@ -119,10 +119,13 @@ if test x$"with_java" != x"no" ; then
 	AC_CHECK_PROGS(JAR, jar)
 	AC_CHECK_PROGS(JAVA, java)
 	AC_CHECK_PROGS(JAVAH, javah)
+	JAVAINCLUDE="-I/usr/local/java/include -I/usr/local/java/include/linux"
 else
 	JAVAC=
+	JAVAINCLUDE=
 fi
 AC_SUBST(SHARED_LDFLAGS)
+AC_SUBST(JAVAINCLUDE)
 
 AC_PROG_EGREP
 AC_PROG_MAKE_SET
@@ -136,6 +139,7 @@ case $host in
 	LDFLAGS="$LDFLAGS -non_shared"
 	;;
     *darwin*)
+	JAVAINCLUDE="-I/usr/local/java/include -I/usr/local/java/include/linux"
 	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
 dnl This is a hack for libtool - for some reason the F77 tag
@@ -144,6 +148,7 @@ dnl does not get set with the commands to create a shared library
 	sed -e "s/^archive_cmds=\"\"//" < libtool > libtool.$$
 	mv -f libtool.$$ libtool
 	chmod +x libtool
+	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	SHARED_LDFLAGS="-Wl,-single_module"
 dnl	LDFLAGS="$LDFLAGS -flat_namespace"
