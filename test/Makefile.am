@@ -33,7 +33,7 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 DISTCLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs
 
-testdir=$(prefix)/nexus/test
+## testdir=$(prefix)/nexus/test
 
 if HAVE_HDF4
 HDF4_TARGETS = napi4_test
@@ -48,11 +48,19 @@ if HAVE_F90
 F90_TARGETS = NXtest
 endif
 
-test_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
+EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4
+
+TESTSUITE	= $(srcdir)/testsuite
+
+TESTSUITE_AT	= ## dbase.at devices.at starter.at
+
+AUTOTEST	= $(AUTOM4TE) --language=autotest
+
+check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
 
 # for running tests via   "make check"
-check_PROGRAMS = $(test_PROGRAMS)	# what to build
-TESTS = $(test_PROGRAMS)		# what to run
+## check_PROGRAMS = $(test_PROGRAMS)	# what to build
+## TESTS = $(test_PROGRAMS)		# what to run
 
 # this sets the test running environment - in case we
 # have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
@@ -73,3 +81,30 @@ NXtest_LDADD = $(LIBNEXUS90)
 ## NXtest_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
 
 include $(top_srcdir)/build_rules.am
+
+$(srcdir)/package.m4:	$(top_srcdir)/configure.ac
+	{\
+		echo '# Signature of the current package.'; \
+		echo 'm4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])'; \
+		echo 'm4_define([AT_PACKAGE_TARNAME],   [@PACKAGE_TARNAME@])'; \
+		echo 'm4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])'; \
+		echo 'm4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])'; \
+		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
+	} > $(srcdir)/package.m4
+
+check-local:	atconfig atlocal $(TESTSUITE) 
+	$(SHELL) $(TESTSUITE)
+
+$(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
+	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
+	mv $@.tmp $@
+
+atconfig:	$(top_builddir)/config.status
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+
+clean-local:
+	$(SHELL) $(TESTSUITE) --clean
+
+CLEANFILES = NXtest.nx4 NXtest.nxs
+
+DISTCLEANFILES += atconfig

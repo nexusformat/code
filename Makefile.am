@@ -39,4 +39,3 @@ SUBDIRS=include src bindings test applications scripts
 # kit if this line is missing
 EXTRA_DIST=build_rules.am
 
-DISTCHECK_CONFIGURE_FLAGS=--without-hdf5

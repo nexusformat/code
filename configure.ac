@@ -105,6 +105,7 @@ case $host in
 	fi
 	;;
 esac
+
 #
 # * locate path to HDF libraries *
 #
@@ -138,9 +139,16 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     fi
 fi
 if test ! -z "$H4ROOT"; then
-    LDFLAGS="$LDFLAGS -L$H4ROOT/lib"
-    CPPFLAGS="$CPPFLAGS -I$H4ROOT/include -DHDF4"
+    H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
+    case $H4VERSION in
+	4.[[12]]*) 
+    		LDFLAGS="$LDFLAGS -L$H4ROOT/lib";
+    		CPPFLAGS="$CPPFLAGS -I$H4ROOT/include -DHDF4" ;;
+	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
+		H4ROOT="";;
+    esac		
 fi
+
 # HDF5
 HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
@@ -155,9 +163,16 @@ if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     fi
 fi
 if test ! -z "$H5ROOT"; then
-    LDFLAGS="$LDFLAGS -L$H5ROOT/lib"
-    CPPFLAGS="$CPPFLAGS -I$H5ROOT/include -DHDF5"
+    H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
+    case $H5VERSION in
+	1.[[6]]*)
+    		LDFLAGS="$LDFLAGS -L$H5ROOT/lib"
+    		CPPFLAGS="$CPPFLAGS -I$H5ROOT/include -DHDF5";;
+	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
+		H5ROOT="";;
+    esac
 fi
+
 # finally set LIBS variable if we 
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
@@ -190,12 +205,15 @@ AM_CONDITIONAL([HAVE_JAVADOC], [test ! -z "$JAVADOC"])
 AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
 AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
 
+AC_CONFIG_TESTDIR(test)
+AC_CONFIG_FILES(test/Makefile test/atlocal)
+AM_MISSING_PROG([AUTOM4TE], [autom4te])
+
 AC_CONFIG_FILES([Makefile
 		nexus.spec
 		include/Makefile
 		src/Makefile 
 		applications/Makefile
-		test/Makefile 
 		bindings/Makefile 
 		bindings/f77/Makefile
 		bindings/f90/Makefile
@@ -204,7 +222,12 @@ AC_CONFIG_FILES([Makefile
 		scripts/nxbuild])
 AC_OUTPUT
 
-echo "
+HDF4SUPPORT=`if test -n "$H4ROOT" ; then echo yes ; else echo no ; echo "                found version $H4VERSION"; fi`
+HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "                found version $H5VERSION"; fi`
+F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
+F90BINDING=`if test -n "$F90" ; then echo yes ; else echo no ; fi`
+JAVABINDING=`if test -n "$JAVA" ; then echo "$JAVA" ; else echo no java; fi` : `if test -n "$JAVAC" ; then echo "$JAVAC" ; else echo no javac; fi` : `if test -n "$JAR" ; then echo "$JAR" ; else echo no jar; fi` : `if test -n "$JAVADOC" ; then echo "$JAVADOC" ; else echo no javadoc; fi` : `if test -n "$JAVAH" ; then echo "$JAVAH" ; else echo no javah; fi`
+AC_MSG_RESULT([
 
 Configuration (NeXus):
 
@@ -214,13 +237,14 @@ Configuration (NeXus):
 
 build:
         NeXus with:
-                HDF4 support:  `if test -n "$H4ROOT" ; then echo yes ; else echo no ; fi`
-                HDF5 support:  `if test -n "$H5ROOT" ; then echo yes ; else echo no ; fi`
+                HDF4 support:  ${HDF4SUPPORT} 
+                HDF5 support:  ${HDF5SUPPORT}
 
         bindings:
-                F77  :  `if test -n "$F77" ; then echo "$F77" ; else echo no ; fi`
-                F90  :  `if test -n "$F90" ; then echo "$F90" ; else echo no ; fi`
-                JAVA :  `if test -n "$JAVA" ; then echo "$JAVA" ; else echo no java; fi` : `if test -n "$JAVAC" ; then echo "$JAVAC" ; else echo no javac; fi` : `if test -n "$JAR" ; then echo "$JAR" ; else echo no jar; fi` : `if test -n "$JAVADOC" ; then echo "$JAVADOC" ; else echo no javadoc; fi` : `if test -n "$JAVAH" ; then echo "$JAVAH" ; else echo no javah; fi`
+                F77 :          ${F77BINDING} 
+                F90 :          ${F90BINDING} 
+                JAVA:          ${JAVABINDING}
+
 Please check whether the configuration I detected matches what you
 would like to have.
-"
+])
