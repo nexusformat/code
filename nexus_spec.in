@@ -10,7 +10,7 @@ Version: @PACKAGE_VERSION@
 # built into an RPM file; it should be incremented each RPM build and
 # then reset to 1 when a new version of the software is released
 Release: 1
-Copyright: GLPL
+Copyright: GLGPL
 # Group: there is more than one choice for this - maybe we need to split
 # nexus into separate packages (libraries + apps)
 Group: Development/Libraries
@@ -31,7 +31,7 @@ Prefix: /usr/local
 BuildRoot: /tmp/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 %description
 NeXus is an international standard for exchanging data files
-amongst Neutron, Muon and X-ray science facilities. The underlying
+among Neutron, Muon and X-ray science facilities. The underlying
 data is stored using the HDF format from NCSA. This package provides
 access routines, documentation, examples and a basic NeXus file browser.
 %prep
@@ -45,6 +45,8 @@ else
 fi
 make
 %install
+# may want to consider   make DESTDIR=$RPM_BUILD_ROOT install    sometime
+# as automake supports it; configure --prefix is OK for now though
 make install
 %files
 %doc README NEWS ChangeLog AUTHORS COPYING INSTALL
@@ -54,12 +56,17 @@ make install
 /usr/local/include
 /usr/local/nexus
 %clean
-#this rm line can be dangerous - build_root might be / !
+# the rm line can be dangerous - build_root might be / !
 # leave commented out for moment, but we need to implement
 # some cleaning mechanism if we use alternative build roots
-#rm -fr $RPM_BUILD_ROOT
+###rm -fr $RPM_BUILD_ROOT
 %post
 if test `whoami` = root; then ldconfig; fi
 # also need to sort out nxbuild if we are not installed to /usr/local
 %postun
 if test `whoami` = root; then ldconfig; fi
+# %changelog date format as per  `date +"%a %d %b %Y"`
+# first line should be   date  user  email
+%changelog
+* Sun 22 Feb 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+- Initial version
