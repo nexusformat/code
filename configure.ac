@@ -1,5 +1,30 @@
+#====================================================================
+#  NeXus - Neutron & X-ray Common Data Format
+#  
+#  Makefile compiler and directory options
+#  
+#  Copyright (C) 2004 Freddie Akeroyd
+#  
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free 
+#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+#  MA  02111-1307  USA
+#             
+#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#
 #                       -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
+#
 AC_PREREQ(2.57)
 AC_REVISION($Revision$)
 AC_INIT(NeXus Library, 2.0.0, nexus-developers@anl.gov, nexus)
@@ -25,12 +50,28 @@ AC_PROG_F77
 AC_CHECK_PROGS(F90,f90 f95)
 AC_SUBST(F90)
 AC_SUBST(F90FLAGS)
+#
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_SUBST(NXTARGET)
 AC_SUBST(BINDINGS)
 NXTARGET=""
 BINDINGS=""
+
+AC_DEFUN(
+ [AC_CHECK_C_OPTION],
+ [AC_MSG_CHECKING([for C compiler option $1])
+  AC_LANG_PUSH(C)
+  CFLAGS_SAVE=$CFLAGS
+  CFLAGS="$CFLAGS $1"
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no]) 
+     CFLAGS=$CFLAGS_SAVE]) 
+  AC_LANG_POP(C)]
+)
+
 #
 # First any host specific bits
 #
@@ -39,7 +80,10 @@ case $host in
 	LDFLAGS="$LDFLAGS -non_shared"
 	;;
     *darwin*)
-	CFLAGS="$CFLAGS -g -no-cpp-precomp -D__unix"
+	AC_CHECK_C_OPTION([-no-cpp-precomp])
+	AC_CHECK_C_OPTION([-some-invalid-option])
+#	CFLAGS="$CFLAGS -g -no-cpp-precomp -D__unix"
+	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
 	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	LDFLAGS="$LDFLAGS -flat_namespace"
@@ -123,7 +167,7 @@ AC_FUNC_MKTIME
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
-# compiler specifi targets
+# compiler specific targets
 if test ! -z "$F77"; then 
     NXTARGET="$NXTARGET nexus77"
     BINDINGS="$BINDINGS bindings/f77"
