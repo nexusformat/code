@@ -83,6 +83,7 @@ C------------------------------------------------------------------------------
       IF (NXMAKEDATA(FILEID, 'r4_data', NX_FLOAT32, 2, NXDIMS) 
      +     .NE. NX_OK) STOP
       IF (NXOPENDATA(FILEID, 'r4_data') .NE. NX_OK) STOP
+      IF (NXCOMPRESS(FILEID, NX_COMP_LZW) .NE. NX_OK) STOP
       IF (NXPUTDATA(FILEID, R4_ARRAY) .NE. NX_OK) STOP
       IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
       IF (NXMAKEDATA(FILEID, 'r8_data', NX_FLOAT64, 2, NXDIMS) 
