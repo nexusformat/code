@@ -4,7 +4,7 @@ import time
 import string
 
 from nexus import *
-from nxplot import *
+#from nxplot import *
 
 
 
@@ -542,37 +542,37 @@ class NXdataelem(NXelem):
 		self.setAttrValue("primary", primary)
 	
 	
-	def plotData(self, axname, coords=None):
-		p = NXplot()
+	#def plotData(self, axname, coords=None):
+	#	p = NXplot()
 		# transform data into list
-		if type(coords) != types.TupleType and type(coords) != types.ListType:
-			print "coordinates must be passed as tuple or list of integers"
-			return 0
+	#	if type(coords) != types.TupleType and type(coords) != types.ListType:
+	#		print "coordinates must be passed as tuple or list of integers"
+	#		return 0
 			
-		if len(coords) != len(self.dims)-1:
-			print "unsufficient coordinate information."
-			return 0
+	#	if len(coords) != len(self.dims)-1:
+	#		print "unsufficient coordinate information."
+	#		return 0
 	
-		for i in range(len(coords)):
-			if coords[i] >= self.dims[i+1]:
-				print "coordinates are out of bounds"
-				return 0
-
-		if type(coords[0]) != types.IntType:
-			print "coords represent indices. please provide them as integers"
-			return 0
-		
-		data = self.data
-		for i in range(len(coords)):
-			while len(data) <= coords[i]:
-				data.append([])
-			data = data[coords[i]]
-	
-		if axname not in self.axes.keys():
-			print "nxdata does not contain axes with name %s"%(axname)
-			return 0
-		
-		p.plotData(data, self.axes[axname].data)
+	#	for i in range(len(coords)):
+	#		if coords[i] >= self.dims[i+1]:
+	#			print "coordinates are out of bounds"
+	#			return 0
+#
+#		if type(coords[0]) != types.IntType:
+#			print "coords represent indices. please provide them as integers"
+#			return 0
+#		
+#		data = self.data
+#		for i in range(len(coords)):
+#			while len(data) <= coords[i]:
+#				data.append([])
+#			data = data[coords[i]]
+#	
+#		if axname not in self.axes.keys():
+#			print "nxdata does not contain axes with name %s"%(axname)
+#			return 0
+#		
+#		p.plotData(data, self.axes[axname].data)
 		
 		
 	def appendData(self, value, coords=None, cache="yes"):
