@@ -3,6 +3,7 @@
 
 namespace string_util{
   extern bool   starts_with(const std::string &, const std::string &);
+  extern std::string trim(const std::string &);
   extern long   str_to_int(const std::string &);
   extern ulong  str_to_uint(const std::string &);
   extern double str_to_float(const std::string &);
@@ -18,5 +19,6 @@ namespace string_util{
   extern void str_to_ulongArray(std::string &,ulong *, const uint);
   extern void str_to_floatArray(std::string &,float *, const uint);
   extern void str_to_doubleArray(std::string &,double *, const uint);
+  extern std::vector<int> int_list_str_to_intVect(std::string &);
   extern std::string intVec_to_str(const std::vector<int> &);
 }

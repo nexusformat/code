@@ -54,6 +54,35 @@ extern bool string_util::starts_with(const string &str1, const string &str2){
   return (cmp_str==str2);
 }
 
+/*
+ * strip leading and trailing spaces from the string.
+ */
+extern string string_util::trim (const string &str) {
+  typedef string::size_type string_size;
+  string new_str="";
+  string_size i=0;
+  while(i<str.size()){
+    //skip initial whitespace
+    while(i<str.size() && isspace(str[i])) {
+      i++;
+    }
+
+    // find the extent of ending whitespace
+    string_size  j=str.size();
+    while(j>i && isspace(str[j-1])) {
+      j--;
+      }
+
+    //copy the non-whitespace into the new string
+    
+    if (i!=j){
+      new_str+=str.substr(i,j-i);
+      i=j;
+    }
+  }
+  return new_str;
+}
+
 extern long string_util::str_to_int(const string &str){
   if(str.substr(0,1)=="-")
     return -1*str_to_int(str.substr(1,str.size()));
@@ -347,6 +376,45 @@ extern void string_util::str_to_ucharArray(std::string &str,unsigned char *array
   StrVecIter strIt=splitted.begin();
   for( uint i=0 ; i<len ; i++ )
     *(array+i)=(unsigned char)str_to_int(*(strIt+i));
+}
+
+/*
+ * This method takes a string as an argument and attempts to convert this 
+ * string into a vector of integers.  The string is in the form of a comma 
+ * separated list.  Each element in the list is a single integer or a range
+ * of integers specified by a starting value and ending value separated by
+ * a colon.  i.e. 1,2,4:7 translates to a vector that contains the values
+ * 1,2,4,5,6,7. Note that ranges must be increasing
+ */
+extern vector<int> string_util::int_list_str_to_intVect(std::string &intListStr){
+
+  vector<int> intListVect;
+  StrVec strVecList = split( intListStr );
+  int ii;
+  for (ii=0; ii< strVecList.size(); ii++) {
+    string::size_type colon_pos = strVecList[ii].find(":");
+    if ( colon_pos == string::npos ) {     //only one integer
+      intListVect.resize(intListVect.size() + 1);
+      intListVect[intListVect.size() - 1] = str_to_int(trim(strVecList[ii]));
+    }
+    else{
+      string lowStr = strVecList[ii].substr(0, colon_pos);
+      int lowInt = str_to_int(trim(lowStr));
+      string highStr = 
+	strVecList[ii].substr(colon_pos+1, strVecList[ii].size());
+      int highInt = str_to_int(trim(highStr));
+      int oldSize = intListVect.size();
+      if ( highInt < lowInt ) {
+	throw runtime_error("intList: Ranges must be increasing\n");
+      }
+      intListVect.resize(oldSize + (highInt - lowInt + 1));
+      int jj;
+      for (jj = lowInt; jj <= highInt; jj++) {
+	intListVect[oldSize + jj-lowInt] = lowInt + (jj-lowInt);;
+      }
+    }
+  }
+  return intListVect;
 }
 
 extern string string_util::int_to_str(const int num){
