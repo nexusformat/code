@@ -344,9 +344,9 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	return ret;
   }
 
-#ifdef __VMS
-#define NO_LOCALTIME_GMTOFF
-#endif /* __VMS */
+#if defined(__VMS) && (__VMS_VER < 70000000)
+#define NO_LOCALTIME_GMTOFF	/* prior to VMS 7.0 localtime() relative to UTC */
+#endif /* __VMS && __VMS_VER < 70000000 */
 
   NXstatus  NXopen(char * filename, NXaccess am, NXhandle* pHandle)
   {
@@ -371,11 +371,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
  * get time in ISO 8601 format 
  */
     time(&timer);
+    time_info = localtime(&timer);
 #ifdef NO_LOCALTIME_GMTOFF
-    time_info = gmtime(&timer);
     gmt_offset = 0;
 #else
-    time_info = localtime(&timer);
     gmt_offset = time_info->tm_gmtoff;
 #endif /* NO_LOCALTIME_GMTOFF */
     if (time_info != NULL)
