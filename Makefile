@@ -30,13 +30,19 @@ NXBROWSE_OBJ=NXbrowse.o NXUmodule.o NXmodule.o napi.o
 LIBNEXUS_OBJ=napif.o napi.o
 #====================================================================
 
-all :
-	@ echo "Possible targets are: kit napi_test napi_test_read \
+default :
+	@ echo "Possible targets are: all lib kit napi_test napi_test_read \
 	napif_test NXtest NXbrowse"
 
 
+all : lib napi_test napi_test_read napif_test NXtest NXbrowse
+
+lib : libNeXus.a
+
 kit : tar zip
 
+clean :
+	rm -f *.o libNeXus.a napi.tar napi.zip
 tar :
 	rm -f napi.tar
 	tar cf napi.tar $(FILES)
@@ -46,6 +52,7 @@ zip :
 	zip napi.zip $(FILES)
 
 libNeXus.a : $(LIBNEXUS_OBJ)
+	@echo "*** Creating NeXus interface library libNeXus.a ***"
 	ar -cr $@ $(LIBNEXUS_OBJ)
 	ranlib $@
 
