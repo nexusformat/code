@@ -115,6 +115,9 @@ typedef struct {
 
 #define CONCAT(__a,__b) __a##__b        /* token concatenation */
 
+
+#if defined(__unix)
+
 #define MANGLE(__arg)   CONCAT(__arg,_)
 
 #define CALLING_STYLE   /* blank */
@@ -161,10 +164,84 @@ typedef struct {
 #    define NXfcompress         MANGLE(nxifcompress)
 #    define NXfputattr          MANGLE(nxifputattr)
 
+#elif defined(_WIN32)
+/* 
+ * START OF WINDOWS SPECIFIC CONFIGURATION
+ *
+ * Added by Freddie Akeroyd 9/8/2002
+ *
+ * Various PC calling conventions - you need only uncomment one of the following definitions of MANGLE()
+ * anlong with the appropriate CALLING_STYLE
+ * The choice arises because under Windows the default way FORTRAN calls FORTRAN is different
+ * from the dafault way C calls C, and so when you need to have FORTRAN calling C you must
+ * force them to use the same convention. Notice the use of "default way" above ... by choice
+ * of compiler options (or compiler vendor) you may actually have FORTRAN calling in the C way 
+ * etc., so you might need to experiment with the options below until you get no "unresolved symbols" 
+ *
+ * Choice 1: Should allow both FORTRAN and C NeXus interfaces to work in a "default" setup 
+ * Choice 2: For when choice 1: gives problems and you only require the C interface
+ * Choice 3: An alternative to 1: which may allow both FORTRAN and C in a non-default setup
+ */
+#	define MANGLE(__arg)		__arg				/* Choice 1 */
+#	define CALLING_STYLE		__stdcall			/* Choice 1 */
+/* #	define MANGLE(__arg)		__arg				/* Choice 2 */
+/* #    define CALLING_STYLE						/* Choice 2 */
+/* #	define MANGLE(__arg)		CONCAT(__arg,_)			/* Choice 3 */
+/* #    define CALLING_STYLE		__stdcall			/* Choice 3 */
+/* 
+ * END OF WINDOWS SPECIFIC CONFIGURATION 
+ */
+#       define NXopen 			MANGLE(NXIOPEN)
+#       define NXclose 			MANGLE(NXICLOSE)
+#       define NXflush                  MANGLE(NXIFLUSH)
+#       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
+#       define NXopengroup 		MANGLE(NXIOPENGROUP)
+#       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
+#       define NXmakedata 		MANGLE(NXIMAKEDATA)
+#       define NXcompress 		MANGLE(NXICOMPRESS)
+#       define NXopendata 		MANGLE(NXIOPENDATA)
+#       define NXclosedata 		MANGLE(NXICLOSEDATA)
+#       define NXgetdata 		MANGLE(NXIGETDATA)
+#       define NXgetslab 		MANGLE(NXIGETSLAB)
+#       define NXgetattr 		MANGLE(NXIGETATTR)
+#       define NXgetdim 		MANGLE(NXIGETDIM)
+#       define NXputdata 		MANGLE(NXIPUTDATA)
+#       define NXputslab 		MANGLE(NXIPUTSLAB)
+#       define NXputattr 		MANGLE(NXIPUTATTR)
+#       define NXputdim 		MANGLE(NXIPUTDIM)
+#       define NXgetinfo 		MANGLE(NXIGETINFO)
+#       define NXgetgroupinfo 		MANGLE(NXIGETGROUPINFO)
+#       define NXsameID            MANGLE(NXISAMEID)
+#       define NXinitgroupdir 		MANGLE(NXIINITGROUPDIR)
+#       define NXgetnextentry 		MANGLE(NXIGETNEXTENTRY)
+#       define NXgetattrinfo 		MANGLE(NXIGETATTRINFO)
+#       define NXinitattrdir 		MANGLE(NXIINITATTRDIR)
+#       define NXgetnextattr 		MANGLE(NXIGETNEXTATTR)
+#       define NXgetgroupID 		MANGLE(NXIGETGROUPID)
+#       define NXgetdataID 		MANGLE(NXIGETDATAID)
+#       define NXmakelink 		MANGLE(NXIMAKELINK)
+#       define NXmalloc 		MANGLE(NXIMALLOC)
+#       define NXfree 			MANGLE(NXIFREE)
+/* FORTRAN helpers - for NeXus internal use only */
+#	define NXfopen 			MANGLE(NXIFOPEN)
+#	define NXfclose			MANGLE(NXIFCLOSE)
+#       define NXfflush                 MANGLE(NXIFFLUSH)
+#	define NXfmakedata		MANGLE(NXIFMAKEDATA)
+#   define NXfcompmakedata  MANGLE(NXIFCOMPMAKEDATA)
+#	define NXfcompress		MANGLE(NXIFCOMPRESS)
+#	define NXfputattr		MANGLE(NXIFPUTATTR)
+#else
+#   error Cannot compile - unknown operating system
+#endif
+
+
 /* 
  * Standard interface 
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXclose(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXflush(NXhandle* pHandle);
@@ -214,6 +291,10 @@ NX_EXTERNAL  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *p
   another special function for setting the default cache size for HDF-5
 */
 NX_EXTERNAL  NXstatus CALLING_STYLE NXsetcache(long newVal);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /*NEXUSAPI*/
 

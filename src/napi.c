@@ -31,35 +31,39 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <time.h>
 #include "napi.h"
 
+/*
+ * We need to include CALLING_STYLE in the function pointer definition
+ * or else we get a type mismatch on Win32
+ */
   typedef struct {
         NXhandle *pNexusData;   
-        NXstatus (*nxclose)(NXhandle* pHandle);
-        NXstatus (*nxflush)(NXhandle* pHandle);
-        NXstatus (*nxmakegroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
-        NXstatus (*nxopengroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
-        NXstatus (*nxclosegroup)(NXhandle handle);
-        NXstatus (*nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
-        NXstatus (*nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
-        NXstatus (*nxcompress) (NXhandle handle, int compr_type);
-        NXstatus (*nxopendata) (NXhandle handle, CONSTCHAR* label);
-        NXstatus (*nxclosedata)(NXhandle handle);
-        NXstatus (*nxputdata)(NXhandle handle, void* data);
-        NXstatus (*nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
-        NXstatus (*nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
-        NXstatus (*nxgetdataID)(NXhandle handle, NXlink* pLink);
-        NXstatus (*nxmakelink)(NXhandle handle, NXlink* pLink);
-        NXstatus (*nxgetdata)(NXhandle handle, void* data);
-        NXstatus (*nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
-        NXstatus (*nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
-        NXstatus (*nxgetslab)(NXhandle handle, void* data, int start[], int size[]);
-        NXstatus (*nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
-        NXstatus (*nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
-        NXstatus (*nxgetattrinfo)(NXhandle handle, int* no_items);
-        NXstatus (*nxgetgroupID)(NXhandle handle, NXlink* pLink);
-        NXstatus (*nxgetgroupinfo)(NXhandle handle, int* no_items, NXname name, NXname nxclass);
-        NXstatus (*nxsameID)(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID);
-        NXstatus (*nxinitgroupdir)(NXhandle handle);
-        NXstatus (*nxinitattrdir)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxclose)(NXhandle* pHandle);
+        NXstatus (CALLING_STYLE *nxflush)(NXhandle* pHandle);
+        NXstatus (CALLING_STYLE *nxmakegroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
+        NXstatus (CALLING_STYLE *nxopengroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
+        NXstatus (CALLING_STYLE *nxclosegroup)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
+        NXstatus (CALLING_STYLE *nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
+        NXstatus (CALLING_STYLE *nxcompress) (NXhandle handle, int compr_type);
+        NXstatus (CALLING_STYLE *nxopendata) (NXhandle handle, CONSTCHAR* label);
+        NXstatus (CALLING_STYLE *nxclosedata)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxputdata)(NXhandle handle, void* data);
+        NXstatus (CALLING_STYLE *nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
+        NXstatus (CALLING_STYLE *nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
+        NXstatus (CALLING_STYLE *nxgetdataID)(NXhandle handle, NXlink* pLink);
+        NXstatus (CALLING_STYLE *nxmakelink)(NXhandle handle, NXlink* pLink);
+        NXstatus (CALLING_STYLE *nxgetdata)(NXhandle handle, void* data);
+        NXstatus (CALLING_STYLE *nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
+        NXstatus (CALLING_STYLE *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
+        NXstatus (CALLING_STYLE *nxgetslab)(NXhandle handle, void* data, int start[], int size[]);
+        NXstatus (CALLING_STYLE *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
+        NXstatus (CALLING_STYLE *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+        NXstatus (CALLING_STYLE *nxgetattrinfo)(NXhandle handle, int* no_items);
+        NXstatus (CALLING_STYLE *nxgetgroupID)(NXhandle handle, NXlink* pLink);
+        NXstatus (CALLING_STYLE *nxgetgroupinfo)(NXhandle handle, int* no_items, NXname name, NXname nxclass);
+        NXstatus (CALLING_STYLE *nxsameID)(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID);
+        NXstatus (CALLING_STYLE *nxinitgroupdir)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxinitattrdir)(NXhandle handle);
   } NexusFunction, *pNexusFunction;
   
   static int iFortifyScope;
