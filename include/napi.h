@@ -148,6 +148,7 @@ extern "C" {
 #    else /* unix */
 #        define MANGLE(__arg)	CONCAT(__arg,_)
 #    endif
+#    define CALLING_STYLE	/* blank */
 
 #    define NXopen 		MANGLE(nxiopen)
 #    define NXclose 		MANGLE(nxiclose)
@@ -189,6 +190,7 @@ extern "C" {
  * START OF WINDOWS SPECIFIC CONFIGURATION
  *
  * Various PC calling conventions - you need only uncomment one of the following definitions of MANGLE()
+ * anlong with the appropriate CALLING_STYLE
  * The choice arises because under Windows the default way FORTRAN calls FORTRAN is different
  * from the dafault way C calls C, and so when you need to have FORTRAN calling C you must
  * force them to use the same convention. Notice the use of "default way" above ... by choice
@@ -197,23 +199,24 @@ extern "C" {
  *
  * Choice 1: Should allow both FORTRAN and C NeXus interfaces to work in a "default" setup 
  * Choice 2: For when choice 1: gives problems and you only require the C interface
- * Choice 3: An alternative for choice 1:
- * Choice 4: A variation of 2:
+ * Choice 3: An alternative to 1: which may allow both FORTRAN and C in a non-default setup
  */
-#	define MANGLE(__arg)		__stdcall __arg			/* Choice 1 */
-/* #	define MANGLE(__arg)		CONCAT(__arg,_)			/* Choice 2 */
-/* #	define MANGLE(__arg)		__stdcall CONCAT(__arg,_)	/* Choice 3 */
-/* #	define MANGLE(__arg)		__arg				/* Choice 4 */
+#	define MANGLE(__arg)		__arg				/* Choice 1 */
+#	define CALLING_STYLE		__stdcall			/* Choice 1 */
+/* #	define MANGLE(__arg)		__arg				/* Choice 2 */
+/* #    define CALLING_STYLE						/* Choice 2 */
+/* #	define MANGLE(__arg)		CONCAT(__arg,_)			/* Choice 3 */
+/* #    define CALLING_STYLE		__stdcall			/* Choice 3 */
 /* 
  * END OF WINDOWS SPECIFIC CONFIGURATION 
  */
-#       define NXopen 			NXIOPEN_
-#       define NXclose 			NXICLOSE_
+#       define NXopen 			MANGLE(NXIOPEN)
+#       define NXclose 			MANGLE(NXICLOSE)
 #       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
 #       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
-#       define NXmakedata 		NXIMAKEDATA_
-#       define NXcompress 		NXICOMPRESS_
+#       define NXmakedata 		MANGLE(NXIMAKEDATA)
+#       define NXcompress 		MANGLE(NXICOMPRESS)
 #       define NXopendata 		MANGLE(NXIOPENDATA)
 #       define NXclosedata 		MANGLE(NXICLOSEDATA)
 #       define NXgetdata 		MANGLE(NXIGETDATA)
@@ -222,7 +225,7 @@ extern "C" {
 #       define NXgetdim 		MANGLE(NXIGETDIM)
 #       define NXputdata 		MANGLE(NXIPUTDATA)
 #       define NXputslab 		MANGLE(NXIPUTSLAB)
-#       define NXputattr 		NXIPUTATTR_
+#       define NXputattr 		MANGLE(NXIPUTATTR)
 #       define NXputdim 		MANGLE(NXIPUTDIM)
 #       define NXgetinfo 		MANGLE(NXIGETINFO)
 #       define NXgetgroupinfo 		MANGLE(NXIGETGROUPINFO)
@@ -249,49 +252,49 @@ extern "C" {
 /* 
  * Standard interface 
  */
-  NXstatus  NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
-  NXstatus  NXclose(NXhandle* pHandle);
+  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
+  NXstatus CALLING_STYLE NXclose(NXhandle* pHandle);
   
-  NXstatus  NXmakegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
-  NXstatus  NXopengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
-  NXstatus  NXclosegroup(NXhandle handle);
+  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
+  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
+  NXstatus CALLING_STYLE NXclosegroup(NXhandle handle);
   
-  NXstatus  NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
-  NXstatus  NXopendata (NXhandle handle, CONSTCHAR* label);
-  NXstatus  NXcompress (NXhandle handle, int compr_type);
-  NXstatus  NXclosedata(NXhandle handle);
+  NXstatus CALLING_STYLE NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
+  NXstatus CALLING_STYLE NXopendata (NXhandle handle, CONSTCHAR* label);
+  NXstatus CALLING_STYLE NXcompress (NXhandle handle, int compr_type);
+  NXstatus CALLING_STYLE NXclosedata(NXhandle handle);
   
-  NXstatus  NXgetdata(NXhandle handle, void* data);
-  NXstatus  NXgetslab(NXhandle handle, void* data, int start[], int size[]);
-  NXstatus  NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+  NXstatus CALLING_STYLE NXgetdata(NXhandle handle, void* data);
+  NXstatus CALLING_STYLE NXgetslab(NXhandle handle, void* data, int start[], int size[]);
+  NXstatus CALLING_STYLE NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
   
-  NXstatus  NXputdata(NXhandle handle, void* data);
-  NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]);
-  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
+  NXstatus CALLING_STYLE NXputdata(NXhandle handle, void* data);
+  NXstatus CALLING_STYLE NXputslab(NXhandle handle, void* data, int start[], int size[]);
+  NXstatus CALLING_STYLE NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
   
-  NXstatus  NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
-  NXstatus  NXgetgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
-  NXstatus  NXinitgroupdir(NXhandle handle);
-  NXstatus  NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
-  NXstatus  NXgetattrinfo(NXhandle handle, int* no_items);
-  NXstatus  NXinitattrdir(NXhandle handle);
-  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
+  NXstatus CALLING_STYLE NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
+  NXstatus CALLING_STYLE NXgetgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
+  NXstatus CALLING_STYLE NXinitgroupdir(NXhandle handle);
+  NXstatus CALLING_STYLE NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
+  NXstatus CALLING_STYLE NXgetattrinfo(NXhandle handle, int* no_items);
+  NXstatus CALLING_STYLE NXinitattrdir(NXhandle handle);
+  NXstatus CALLING_STYLE NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
   
-  NXstatus  NXgetgroupID(NXhandle handle, NXlink* pLink);
-  NXstatus  NXgetdataID(NXhandle handle, NXlink* pLink);
-  NXstatus  NXmakelink(NXhandle handle, NXlink* pLink);
+  NXstatus CALLING_STYLE NXgetgroupID(NXhandle handle, NXlink* pLink);
+  NXstatus CALLING_STYLE NXgetdataID(NXhandle handle, NXlink* pLink);
+  NXstatus CALLING_STYLE NXmakelink(NXhandle handle, NXlink* pLink);
   
 /* 
  * Helper interface 
  */
 
-  NXstatus NXmalloc(void** data, int rank, int dimensions[], int datatype);
-  NXstatus NXfree(void** data);
+  NXstatus CALLING_STYLE NXmalloc(void** data, int rank, int dimensions[], int datatype);
+  NXstatus CALLING_STYLE NXfree(void** data);
 
 /*-----------------------------------------------------------------------
     A non Nexus standard function to set an error handler 
 */
-  void NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
+  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
 
 #ifdef __cplusplus
 }

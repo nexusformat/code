@@ -76,7 +76,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
      void *NXpData = NULL;
      void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
   /*---------------------------------------------------------------------*/
-     void NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
+     void CALLING_STYLE NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
      {
         NXpData = pData;
         NXIReportError = NewError;
@@ -321,7 +321,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
    * NXhandle. We could store the NXhandle value in the FORTRAN array
    * instead, but that would mean writing far more wrappers
    */
-  NXstatus NXfopen(char * filename, NXaccess* am, NexusFile* pHandle)
+  NXstatus CALLING_STYLE NXfopen(char * filename, NXaccess* am, NexusFile* pHandle)
   {
 	NXstatus ret;
  	NXhandle fileid = NULL;
@@ -352,13 +352,12 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 
 #if defined(_WIN32)
 #   define NEED_TZSET		/* call tzset() to initialise time variables */
-#   define USE_TIMEZONE		/* use timezone and daylight variables */
 #elif (defined(__VMS) && (__VMS_VER < 70000000))
 #   define USE_FTIME		/* use ftime() function */
 #   include <sys/timeb.h>
 #endif /* __VMS && __VMS_VER < 70000000 */
 
-  NXstatus  NXopen(CONSTCHAR * filename, NXaccess am, NXhandle* pHandle)
+  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess am, NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
     char pBuffer[512], time_buffer[64];
@@ -397,10 +396,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     {
 	gmt_offset += 3600;
     }
-#elif defined(__MWERKS__)
+#elif (defined(__MWERKS__) || defined(_WIN32))
    gmt_offset = difftime (timer, mktime(gmtime(&timer)));
 #else
-    gmt_offset = time_info->tm_gmtoff;
+   gmt_offset = time_info->tm_gmtoff;
 #endif
     if (time_info != NULL)
     {
@@ -528,8 +527,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
  * array holding the NexusFile structure. We need to malloc()
  * a temporary copy as NXclose will try to free() this
  */
-  NXstatus
-  NXfclose (NexusFile* pHandle)
+  NXstatus CALLING_STYLE NXfclose (NexusFile* pHandle)
   {
     NXhandle h;
     NXstatus ret;
@@ -540,8 +538,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return ret;
   }
 
-  NXstatus
-  NXclose (NXhandle* fid)
+  NXstatus CALLING_STYLE NXclose (NXhandle* fid)
   {
     pNexusFile pFile = NULL;
     int iRet;
@@ -576,7 +573,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
    
-  NXstatus NXmakegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) {
+  NXstatus CALLING_STYLE NXmakegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) 
+  {
     pNexusFile pFile;
     int32 iNew, iRet;
     char pBuffer[256];
@@ -617,8 +615,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   /*------------------------------------------------------------------------*/
-  NXstatus
-  NXopengroup (NXhandle fid, CONSTCHAR *name, char *nxclass)
+  NXstatus CALLING_STYLE NXopengroup (NXhandle fid, CONSTCHAR *name, char *nxclass)
   {
     pNexusFile pFile;
     int32 iNew, iRef;
@@ -650,8 +647,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXclosegroup (NXhandle fid)
+  NXstatus CALLING_STYLE NXclosegroup (NXhandle fid)
   {
     pNexusFile pFile;
   
@@ -681,7 +677,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }
   
-  NXstatus NXfmakedata(NXhandle fid, char *name, int *pDatatype,
+  NXstatus CALLING_STYLE NXfmakedata(NXhandle fid, char *name, int *pDatatype,
 		int *pRank, int dimensions[])
   {
     NXstatus ret;
@@ -706,7 +702,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return ret;
   }
 
-  NXstatus NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
+  NXstatus CALLING_STYLE NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
               int dimensions[])
   {
     pNexusFile pFile;
@@ -802,8 +798,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXopendata (NXhandle fid, CONSTCHAR *name)
+  NXstatus CALLING_STYLE NXopendata (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFile pFile;
     int32 iNew;
@@ -843,13 +838,12 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus NXfcompress(NXhandle fid, int *compr_type)
+  NXstatus CALLING_STYLE NXfcompress(NXhandle fid, int *compr_type)
   { 
       return NXcompress(fid,*compr_type);
   }
   
-  NXstatus
-  NXcompress (NXhandle fid, int compress_type)
+  NXstatus CALLING_STYLE NXcompress (NXhandle fid, int compress_type)
   {
     pNexusFile pFile;
     int32 iRank, iAtt, iType, iRet, i, e;
@@ -892,8 +886,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }  
   
-  NXstatus
-  NXclosedata (NXhandle fid)
+  NXstatus CALLING_STYLE NXclosedata (NXhandle fid)
   {
     pNexusFile pFile;
     int iRet;
@@ -916,8 +909,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXgetdata (NXhandle fid, void *data)
+  NXstatus CALLING_STYLE NXgetdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
     int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS];
@@ -940,8 +932,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXgetslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus CALLING_STYLE NXgetslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
     int32 myStart[MAX_VAR_DIMS], mySize[MAX_VAR_DIMS];
@@ -983,8 +974,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+  NXstatus CALLING_STYLE NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
     int32 iNew, iType32;
@@ -1053,8 +1043,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXputdata (NXhandle fid, void *data)
+  NXstatus CALLING_STYLE NXputdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
     int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS], iStride[MAX_VAR_DIMS];
@@ -1089,8 +1078,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }
   
-  NXstatus
-  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus CALLING_STYLE NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
     int iRet;
@@ -1144,14 +1132,13 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }
   
-  NXstatus 
-  NXfputattr(NXhandle fid, char *name, void *data, int *pDatalen, int *pIType)
+  NXstatus CALLING_STYLE NXfputattr(NXhandle fid, char *name, void *data, int *pDatalen, int *pIType)
   {
     return NXputattr(fid, name, data, *pDatalen, *pIType);
   }
 
   NXstatus
-  NXputattr (NXhandle fid, CONSTCHAR *name, void *data, int datalen, int iType)
+  CALLING_STYLE NXputattr (NXhandle fid, CONSTCHAR *name, void *data, int datalen, int iType)
   {
     pNexusFile pFile;
     int iRet;
@@ -1177,7 +1164,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   NXstatus
-  NXgetinfo (NXhandle fid, int *rank, int dimension[], int *iType)
+  CALLING_STYLE NXgetinfo (NXhandle fid, int *rank, int dimension[], int *iType)
   {
     pNexusFile pFile;
     NXname pBuffer;
@@ -1206,7 +1193,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   /*-------------------------------------------------------------------------*/
   NXstatus
-  NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  CALLING_STYLE NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile pFile;
   
@@ -1227,7 +1214,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   /*-------------------------------------------------------------------------*/
   NXstatus
-  NXgetattrinfo (NXhandle fid, int *iN)
+  CALLING_STYLE NXgetattrinfo (NXhandle fid, int *iN)
   {
     pNexusFile pFile;
     int iRet;
@@ -1252,7 +1239,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
 
   NXstatus
-  NXinitgroupdir (NXhandle fid)
+  CALLING_STYLE NXinitgroupdir (NXhandle fid)
   {
     pNexusFile pFile;
     int iRet;
@@ -1270,7 +1257,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
         
   /*-------------------------------------------------------------------------*/
   NXstatus
-  NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
+  CALLING_STYLE NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile pFile;
     int iRet, iStackPtr, iCurDir;
@@ -1350,7 +1337,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   /*-------------------------------------------------------------------------*/
   NXstatus
-  NXinitattrdir (NXhandle fid)
+  CALLING_STYLE NXinitattrdir (NXhandle fid)
   {
     pNexusFile pFile;
     int iRet;
@@ -1365,7 +1352,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   /*-------------------------------------------------------------------------*/
   NXstatus
-  NXgetnextattr (NXhandle fileid, NXname pName,
+  CALLING_STYLE NXgetnextattr (NXhandle fileid, NXname pName,
                  int *iLength, int *iType)
   {
     pNexusFile pFile;
@@ -1406,7 +1393,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   NXstatus
-  NXgetgroupID (NXhandle fileid, NXlink* sRes)
+  CALLING_STYLE NXgetgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile pFile;
   
@@ -1427,7 +1414,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   NXstatus
-  NXgetdataID (NXhandle fid, NXlink* sRes)
+  CALLING_STYLE NXgetdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile pFile;
   
@@ -1445,8 +1432,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_ERROR;                  /* not reached */
   }
   
-  NXstatus
-  NXmakelink (NXhandle fid, NXlink* sLink)
+  NXstatus CALLING_STYLE NXmakelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
   
@@ -1460,8 +1446,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
 /* allocate space for an array of given dimensions and type */
-  NXstatus
-  NXmalloc (void** data, int rank, int dimensions[], int datatype)
+  NXstatus CALLING_STYLE NXmalloc (void** data, int rank, int dimensions[], int datatype)
   {
 	int i;
 	size_t size = 1;
@@ -1501,8 +1486,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
 
 /* free space allocated by NXmalloc */
-  NXstatus
-  NXfree (void** data)
+  NXstatus CALLING_STYLE NXfree (void** data)
   {
 	if (data == NULL)
 	{
