@@ -22,7 +22,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+#ifndef NXDIR_H
+#define NXDIR_H
 /* Default values for various command line options */
 #define DEFAULT_MAX_LENGTH 10   // number of array elements to print
 #define DEFAULT_RECURSE    1    // negative value means all
@@ -38,6 +39,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <ostream>
 
 #define GROUP_STRING_LEN 128
 #define SDS "SDS"
@@ -111,3 +113,4 @@ extern bool compPath(const Path path1, const Path path2);
 extern void write_data(std::ostream &out,NXhandle handle, const Tree &tree,
                                                     const PrintConfig &config);
 extern Tree remove_nondata(const Tree &tree);
+#endif
