@@ -1,11 +1,14 @@
 Changes in Version 1.3.0
 ========================
 
-- added NXcompress to both the C- and F77 API. Compression works only with
+- Added NXcompress to the C, F77, and F90 API's. Compression works only with
   Release 3 of the HDF-4.1 libraries or better. Note: on my DigitalUnix 4.0D
   installation I had to link against the jpeg library supplied with HDF 
   directly due to a conflict with a system shared library. Replace -ljpeg
   by $HDFROOT/lib/libjpeg.a.
+- Added NXUsetcompress to F90 utility API to set default compression 
+  parameters, and added call to NXcompress in NXUwritedata.
+- Changed attribute arguments in the F90 routine NXUwriteglobals to optional 
 
 Changes in Version 1.2.1
 ========================
@@ -24,7 +27,7 @@ Changes in Version 1.2.0
   and NXPUTSLAB in Fortran 77 interface for improved compatibility with the 
   C interface.
 
-- All SDSes now created with the DFTAG_NDG tag, rather than DFTAG_SDG,
+- All SDSes created with the DFTAG_NDG tag, rather than DFTAG_SDG,
   which is now deprecated by HDF.
 
 - Expanded number of NeXus routines and data types checked by the test 
