@@ -95,7 +95,7 @@ int PrintGroup ()
    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], dataLen;     
    NXname name, class;
 
-   indent = indent + 3;
+   indent += 3;
    do {
       status = NXgetnextentry (inId, name, class, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
@@ -127,7 +127,7 @@ int PrintGroup ()
       else if (status == NX_EOD) {
          if (NXgetgroupinfo (inId, &dataRank, name, class) != NX_OK) return NX_ERROR;
          if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
-         indent = indent - 3;
+         indent -= 3;
          PrintIndent ();
          fprintf (outId, "</%s>\n", class);
          return NX_OK;
@@ -202,10 +202,11 @@ int PrintData ()
 /* Checks for data attributes and prints their values as XML attributes*/
 int PrintAttributes ()
 {
-   int status, attrLen, attrType;
+   int status, i, attrLen, attrType;
    NXname attrName;
    void *attrBuffer;
 
+   i = 0;
    do {
       status = NXgetnextattr (inId, attrName, &attrLen, &attrType);
       if (status == NX_ERROR) return NX_ERROR;
@@ -213,10 +214,18 @@ int PrintAttributes ()
          attrLen++; /* Add space for string termination */
          if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return NX_ERROR;
          if (NXgetattr (inId, attrName, attrBuffer, &attrLen , &attrType) != NX_OK) return NX_ERROR;
+         if (i >= 2) {
+            fprintf (outId, "\n");
+            indent++;
+            PrintIndent ();
+            indent--;
+            i = 0;
+         }
          fprintf (outId, " %s=\"", &attrName);
          PrintValues (attrBuffer, attrType, attrLen);
          fprintf (outId, "\"");
          if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
+         i++;
       }
    } while (status != NX_EOD);
    return NX_OK;
@@ -287,7 +296,7 @@ void PrintArray (void *dataBuffer, int dataType, int dataLen, int stepSize, int 
          if (i+stepSize > dataLen) stepSize = dataLen - i;
          PrintValues (dataBuffer+i*typeSize, dataType, stepSize);
          fprintf (outId, "\n");
-         i = i + stepSize;
+         i += stepSize;
       } while (i < dataLen);
       indent--;
       PrintIndent ();
