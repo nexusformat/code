@@ -127,12 +127,15 @@ typedef struct {
 
 #define CONCAT(__a,__b) __a##__b        /* token concatenation */
 
+#if defined(__unix) || defined(__unix__) || defined (__VMS)
 
-#if defined(__unix)
+#    ifdef __VMS
+#        define MANGLE(__arg)	__arg 
+#    else
+#        define MANGLE(__arg)   CONCAT(__arg,_)
+#    endif
 
-#define MANGLE(__arg)   CONCAT(__arg,_)
-
-#define CALLING_STYLE   /* blank */
+#    define CALLING_STYLE   /* blank */
 
 #    define NXopen              MANGLE(nxiopen)
 #    define NXclose             MANGLE(nxiclose)
