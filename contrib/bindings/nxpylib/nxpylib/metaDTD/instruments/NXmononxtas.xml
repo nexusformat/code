@@ -1,0 +1,158 @@
+<?xml version="1.0" ?>
+<!--
+URL: http://www.neutron.anl.gov/nexus/xml/NXmononxtas.xml
+Editor: Nicholas Maliszewskyj <nickm@nist.gov>
+Initial version: July 29, 2003
+$Id$
+
+Instrument Definition for a triple axis spectrometer
+
+In order to support polarized beam measurements, each triple
+axis data file will contain as many NXdata groups as there
+are polarizations. This is perhaps the best way to ensure
+that the needs of the measurement are met while still
+satisfying the NeXus procedure for identifying plottable data.
+-->
+
+<NXroot NeXus_version="{Version of NeXus API}"
+        file_name="{Name of file when originally created}"
+        file_time="{Time when this file was originally created}"
+        user="{Name of file owner}"
+        email="{email of owner}"
+        affiliation="{affiliation of owner}"
+        address="{address of owner}"
+        telephone_number="{telephone of owner}"
+        fax_number="{fax of owner}">
+		  
+    <NXentry name="{Entry name}">+
+        <title>{Extended title for entry}</title>
+        <analysis>TRIAX</analysis>
+        <start_time type="ISO8601">{starting time of measurement}</start_time>
+        <end_time   type="ISO8601">{ending time of measurement}</end_time>
+        <duration   units="seconds" type="NX_INT32">{duration}</duration>
+        <program_name>{name of instrument control program}</program_name>
+        <notes>{notes describing entry}</notes>
+        <NXuser name="user">
+            <name>{name of user responsible for this entry}</name>
+            <affiliation>{affiliation of user}</affiliation>
+            <address>{address of user}</address>
+            <telephone_number>{telephone of user}?</telephone_number>
+            <fax_number>{fax of user}?</fax_number>
+            <email>{email of user}?</email>
+        </NXuser>
+        <NXsample name="sample">*
+            <name>{Descriptive name of sample}</name>
+            <chemical_formula>{Chemical formula}</chemical_formula>
+            <environment>{Type of sample environment}</environment>
+            <unit_cell type="NX_FLOAT32[6]">{Unit cell lengths and angles}</unit_cell>
+            <orientation_matrix type="NX_FLOAT32[9]">{Orientation matrix of single crystal}</orientation_matrix>
+        </NXsample>
+        <NXinstrument name="name">
+            <name>{name of instrument}</name>
+            <local_contact>{name of instrument scientist}</local_contact>
+            <NXsource name="name">
+                <name>{name of facility}</name>
+                <type>"Reactor"</type>
+                <power units="MW" type="NX_FLOAT32">{reactor power}</power>
+            </NXsource>
+            <NXcollimator name="pre_mono">
+                <distance>{distance to sample center}?</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXcrystal name="monochromator">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <reflection type="NX_INT32[3]">{[hkl] values of nominal reflection}</reflection>
+                <lattice_parameter units="Angstrom" type="NX_FLOAT32">{Lattice parameter of nominal reflection}</lattice_parameter>
+                <wavelength units="Angstrom" type="NX_FLOAT32">{optimum diffracted wavelength}</wavelength>
+                <horizontal_curvature units="degrees" type="NX_FLOAT32">{horizontal curvature}?</horizontal_curvature>
+                <vertical_curvature units="degrees" type="NX_FLOAT32" >{vertical curvature}?</vertical_curvature>
+            </NXcrystal>
+            <NXcollimator name="post_mono">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXdetector name="monitor">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <type>"Fission chamber"</type>
+                <efficiency type="NX_FLOAT">{efficiency of detector}</efficiency>
+            </NXdetector>
+            <NXpolarizer name="pre_sample_pol">
+                <type>{crystal}</type>
+                <efficiency>{polarizing efficiency}</efficiency>
+            </NXpolarizer>
+            <NXflipper name="pre_sample_flip">
+                <type>{coil,current-sheet}</type>
+                <flip_turns>{Number of turns in flipping field coils}?</flip_turns>
+                <comp_turns>{Number of turns in compensating field coils}?</comp_turns>
+                <guide_turns>{Number of turns in guide field coils}?</guide_turns>
+                <flip_current  units="amperes">{Flipping field coil current in "on" state"}</flip_current>
+                <comp_current  units="amperes">{Compensating field coil current in "on" state"}</comp_current>
+                <guide_current units="amperes">{Guide field coil current in "on" state"}</guide_current>
+            </NXflipper>
+            <NXpolarizer name="post_sample_pol">
+                <type>{crystal}</type>
+                <efficiency>{polarizing efficiency}</efficiency>
+            </NXpolarizer>
+            <NXflipper name="post_sample_flip">
+                <type>{coil}</type>
+                <flip_turns>{Number of turns/cm in flipping field coils}?</flip_turns>
+                <comp_turns>{Number of turns/cm in compensating field coils}?</comp_turns>
+                <guide_turns>{Number of turns/cm in guide field coils}?</guide_turns>
+                <flip_current  units="amperes">{Flipping field coil current in "on" state"}</flip_current>
+                <comp_current  units="amperes">{Compensating field coil current in "on" state"}</comp_current>
+                <guide_current units="amperes">{Guide field coil current in "on" state"}</guide_current>
+                <thickness units="cm"></thickness>
+            </NXflipper>
+            <NXcollimator name="pre_analyzer">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXcrystal name="analyzer">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <reflection type="NX_INT32[3]">{[hkl] values of nominal reflection}</reflection>
+                <lattice_parameter units="Angstrom" type="NX_FLOAT32">{Lattice parameter of nominal reflection}</lattice_parameter>
+                <wavelength units="Angstrom" type="NX_FLOAT32">{optimum diffracted wavelength}</wavelength>
+                   <!-- wavelength may be less obviously useful for the analyzer -->
+                <horizontal_curvature units="degrees" type="NX_FLOAT32"></horizontal_curvature>
+                <vertical_curvature units="degrees" type="NX_FLOAT32" ></vertical_curvature>
+            </NXcrystal>
+            <NXcollimator name="post_analyzer">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <type>"Soller"</type>
+                <length>{length of blades}?</length>
+                <soller_angle>{angular divergence}</soller_angle>
+            </NXcollimator>
+            <NXdetector name="primary">
+                <distance units="m" type="NX_FLOAT32">{distance to sample center}?</distance>
+                <type>"He3 gas cylinder"</type>
+                <efficiency type="NX_FLOAT">{efficiency of detector}?</efficiency>
+            </NXdetector>
+        </NXinstrument>
+        <NXdata name="off-off|off-on|on-off|on-on">
+            <ei units="eV" type="NX_FLOAT32[i]">{Incident energies}? </ei>
+            <ef units="eV" type="NX_FLOAT32[i]">{Final energies}?    </ef>
+            <de units="eV" type="NX_FLOAT32[i]">{Energy transfers}?  </de>
+            <q  units="inverse_angstroms">{Momentum transfers}?</q>
+            <h  type="NX_FLOAT32[i]">{H reciprocal space vector}?</h>
+            <k  type="NX_FLOAT32[i]">{K reciprocal space vector}?</k>
+            <l  type="NX_FLOAT32[i]">{L reciprocal space vector}?</l>
+            <flip_current_in  units="amperes" type="NX_FLOAT32[i]">{current in pre-sample flipper}?</flip_current_in>
+            <flip_current_out units="amperes" type="NX_FLOAT32[i]">{current in post-sample flipper}?</flip_current_out>
+            <!-- Provide a vector for each individual motor position as well -->
+              <sample_theta units="degrees" type="NX_FLOAT32[i]" offset="{motor
+zero}">{vector of motor positions}?</sample_theta>
+            <monitor type="NX_INT32[i]">{incident beam monitor counts}</monitor>            
+				<duration units="seconds" type="NX_FLOAT32[i]">{measured live time of each point}</duration>
+            <counts long_name="{Title of measurement}"
+                    signal="1"
+                    type="NX_INT32[i]"
+                    axis="[q]">{Array of intensities}</counts>
+        </NXdata>
+    </NXentry>
+</NXroot>

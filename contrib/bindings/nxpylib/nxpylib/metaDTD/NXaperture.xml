@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+URL:     http://www.neutron.anl.gov/nexus/xml/NXaperture.xml
+Editor:  NIAC
+$Id$
+
+Template of a beamline aperture.
+
+-->
+<NXaperture name="{Name of aperture}">
+   <distance type="NX_FLOAT" units="m">{Distance from sample}?</distance>
+   <shape type="NX_CHAR">"Rectangular"|"Circular"|"Elliptical"?</shape>
+   <horizontal_aperture type="NX_FLOAT" units="cm">{Horizontal aperture}?</horizontal_aperture>
+   <vertical_aperture type="NX_FLOAT" units="cm">{Vertical aperture}?</vertical_aperture>
+   <radius type="NX_FLOAT" units="cm">{Radius of aperture (if circular)}?</radius>
+</NXaperture>

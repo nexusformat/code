@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+URL:     http://www.neutron.anl.gov/nexus/xml/NXfilter.xml
+Editor:  Mark Koennecke
+$Id$
+
+NXfilter: for specifying the status of something like Beryllium filters.
+
+-->
+<NXfilter name="some_filter">
+  <type type="NX_CHAR">
+    {Description of filter}?
+  </type>
+  <status type="NX_CHAR"> {in | out}?
+  </status>
+  <position type="NX_FLOAT[3]" units="cm">
+    {position of the element in relation to whatever coordinate
+     system we agree upon}?
+  </position>
+</NXfilter>

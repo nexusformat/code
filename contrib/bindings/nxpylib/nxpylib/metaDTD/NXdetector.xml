@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+URL:     http://www.neutron.anl.gov/nexus/xml/NXdetector.xml
+Editor:  NIAC
+$Id$
+
+Ttemplate of a detector, detector bank, or multidetector. 
+
+-->
+<NXdetector name="{Name of detector bank}">
+   <id type="NX_INT[i]">{Identifier of detector element}?</id>
+   <description type="NX_CHAR">{name/manufacturer/model/etc. information}?</description>
+   <NXgeometry name="">{Position and orientation of detector element}?</NXgeometry>
+   <distance type="NX_FLOAT[i]" units="meter">{Effective distance from scattering centre (secondary flight path)}?</distance>
+   <translation type="NX_FLOAT[2]" units="centimeter">{translation normal to direct beam}?</translation>
+   <polar_angle type="NX_FLOAT[i]" units="degree">{Polar angle of detector element}?</polar_angle>
+   <azimuthal_angle type="NX_FLOAT[i]" units="degree">{Azimuthal angle of detector element}?</azimuthal_angle>
+   <solid_angle type="NX_FLOAT[i]" units="steradians">{Solid angle subtended by the detector at the sample}?</solid_angle>
+   <dead_time type="NX_FLOAT[i]">{Detector dead time}?</dead_time>
+   <hold_off type="NX_FLOAT[i]" units="micro.second">{Delay in detector registering an event}?</hold_off>
+   <gas_pressure type="NX_FLOAT[i]" units="bars">{Detector gas pressure}?</gas_pressure>
+   <detection_gas_path type="NX_FLOAT" units="cm">{maximum drift space dimension}?</detection_gas_path>
+   <crate type="NX_INT[i]" local_name="{Equivalent local term}">{Crate number of detector}?</crate>
+   <slot type="NX_INT[i]" local_name="{Equivalent local term}">{Slot number of detector}?</slot>
+   <input type="NX_INT[i]" local_name="{Equivalent local term}">{Input number of detector}?</input>
+   <type type="NX_CHAR">"He3 gas cylinder"|He3 PSD"|"He3 planar multidetector"| "He3 curved multidetector"| "multi-tube He3 PSD"|"BF3 gas"|"scintillator"|"fission chamber"?</type>
+   <time_of_flight  type="NX_FLOAT[i]" units="microsecond">{Neutron time-of-flight}?</time_of_flight>
+   <NXdata name="efficiency">{Efficiency of detector with respect to e.g. wavelength}?</NXdata>
+   <calibration_date type="ISO8601">{date of last calibration (geometry and/or efficiency)  measurements}?</calibration_date>
+   <calibration_method type="NXnote">{summary of conversion of array data to pixels  (e.g.
+polynomial approximations) and location of details of the calibrations}?</calibration_method>
+   <pixel_centre type="NX_FLOAT[:]">{Coordinates of the pixel of the direct beam centre (1D or 2D)}?</pixel_centre>
+   <pixel_size type="NX_FLOAT[:]" units="millimetre">{Size of the pixel (1D or 2D)}?</pixel_size>
+   <pixel_raster type="NX_CHAR">"+x+y"|"+x-y"|"-x+y"|"-x-y"|"+y+x"|"+y-x"|"-y+x"|"-y-x"{numbering/labelling scheme for pixels: +x+y would mean number along the x axis in a positive direction and then move up y in a positive diection (so bottom right to top left as viewed from the moderator)}?</pixel_raster>  
+</NXdetector>
