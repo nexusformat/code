@@ -92,14 +92,19 @@ AC_DEFUN(
 AC_DEFUN([LINUX_DISTRIBUTION],
 [
 	AC_REQUIRE([AC_CANONICAL_TARGET])
+	DISTRIBUTION=""
 	case "$target" in
 		i[[3456]]86-*-linux-* | i[[3456]]86-*-linux)
 			if test -f /etc/lsb-release ; then
 				DISTRIBUTION=`(. /etc/lsb-release; echo $DISTRIB_DESCRIPTION)`
-			else
-				DISTRIBUTION=`cat /etc/*-release | head -1`
+			fi
+			if test -z "$DISTRIBUTION"; then
+				for i in /etc/*-release; do
+				    if test "$i" != lsb-release; then DISTRIBUTION=`cat $i | head -1`; fi
+				done
 			fi
 			;;
 	esac
+	if test -z "$DISTRIBUTION"; then DISTRIBUTION="Unknown"; fi
 	AC_SUBST([DISTRIBUTION])
 ])
