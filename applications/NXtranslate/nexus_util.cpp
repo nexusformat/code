@@ -44,7 +44,10 @@ static bool node_exists(NXhandle *handle, const Node &node){
 }
 
 extern void nexus_util::open(NXhandle *handle, const Node &node){
-  //std::cout << "open(" << node.name() << ")" << std::endl; // REMOVE
+#ifdef DEBUG2_NEXUS_UTIL
+  std::cout << "nexus_util::open(handle," << node.name() << ":" << node.type()
+            << ")" << std::endl;
+#endif
   // do nothing with a root
   if(node.name()==NXROOT) return;
 
@@ -168,7 +171,10 @@ extern void nexus_util::make_data(NXhandle *handle, const TreeNode &tree){
 }
 
 extern void nexus_util::close(NXhandle *handle, const Node &node){
-  //std::cout << "close(" << node.name() << ")" << std::endl; // REMOVE
+#ifdef DEBUG2_NEXUS_UTIL
+  std::cout << "nexus_util::close(handle," << node.name() << ":" 
+            << node.type() << ")" << std::endl;
+#endif
 
   // do nothing with a root
   if(node.name()==NXROOT) return;
@@ -225,24 +231,31 @@ static bool node_is_okay(const SimpleNode& node){
 }
 
 static SimpleNodeVec get_groups(NXhandle *handle){
-  //std::cout << "get_groups(handle)" << std::endl;
+  //std::cout << "get_groups(handle)" << std::endl; // REMOVE
+
   // reset the directory
   if(NXinitgroupdir(*handle)!=NX_OK)
     throw runtime_error("NXinitgroupdir failed");
 
-  // get the listing
-  int num_groups=num_group(handle);
-  SimpleNode node;
+  // determine the number of groups at the current location
+  int num_groups;
+  try{
+    num_groups=num_group(handle);
+  }catch(runtime_error &e){
+    // let it drop on the floor
+  }
+
+  // set up for the listing
   SimpleNodeVec result;
+  if(num_groups<=0) return result;
+
+  // get the listing
+  SimpleNode node;
   for( int i=0 ; i<num_groups ; i++ ){
     node=get_next_group(handle);
     if(node_is_okay(node))
       result.push_back(node);
   }
-
-  // reset the directory
-  if(NXinitgroupdir(*handle)!=NX_OK)
-    throw runtime_error("NXinitgroupdir failed");
 
   return result;
 }
