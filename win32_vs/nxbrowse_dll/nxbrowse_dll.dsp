@@ -96,6 +96,10 @@ SOURCE=..\..\NXbrowse.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=..\..\napi.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
