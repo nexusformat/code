@@ -387,30 +387,8 @@ extern void string_util::str_to_ucharArray(std::string &str,unsigned char *array
  * 1,2,4,5,6,7. Note that ranges must be increasing
  */
 extern vector<int> string_util::int_list_str_to_intVect(std::string &intListStr){
-  static const string COLON=":";
-  typedef string::size_type string_size;
-
   vector<int> intListVect;
-  StrVec strVecList = split( intListStr );
-  for( StrVec::const_iterator it=strVecList.begin() ; it!=strVecList.end() ; it++ ){
-    string_size colon_pos = it->find(COLON);
-    if( colon_pos == string::npos ){     // only one integer
-      intListVect.push_back(str_to_int(trim(*it)));
-    }else{                               // determine range
-      // convert end points to integers
-      long lowInt  = str_to_int(trim(it->substr(0,colon_pos)));
-      long highInt = str_to_int(trim(it->substr(colon_pos+1)));
-
-      // error check
-      if ( highInt < lowInt )
-	throw runtime_error("intList: Ranges must be increasing: "
-                            +int_to_str(lowInt)+">"+int_to_str(highInt)+"\n");
-
-      // add to the result vector
-      for( long j = lowInt; j <= highInt; j++)
-	intListVect.push_back(j);
-    }
-  }
+  intListStr_to_intVec(intListStr,intListVect);
   return intListVect;
 }
 

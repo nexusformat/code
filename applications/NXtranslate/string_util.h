@@ -1,5 +1,8 @@
+#ifndef __STRING_UTIL_H_GUARD
+#define __STRING_UTIL_H_GUARD
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 namespace string_util{
   extern bool   starts_with(const std::string &, const std::string &);
@@ -21,4 +24,48 @@ namespace string_util{
   extern void str_to_doubleArray(std::string &,double *, const uint);
   extern std::vector<int> int_list_str_to_intVect(std::string &);
   extern std::string intVec_to_str(const std::vector<int> &);
+/*
+ * This method takes a string as an argument and attempts to convert this 
+ * string into a vector of integers.  The string is in the form of a comma 
+ * separated list.  Each element in the list is a single integer or a range
+ * of integers specified by a starting value and ending value separated by
+ * a colon.  i.e. 1,2,4:7 translates to a vector that contains the values
+ * 1,2,4,5,6,7. Note that ranges must be increasing
+ */
+  template <class T>
+  extern void intListStr_to_intVec(const std::string &intList,
+                                                       std::vector<T> &intVec){
+    
+    using std::string;
+    typedef string::size_type string_size;
+    typedef std::vector<string> StrVec;
+    static const string COLON=":";
+
+    using string_util::trim;
+    using string_util::str_to_int;
+    using string_util::int_to_str;
+
+    StrVec strVecList = split( intList );
+    for( StrVec::const_iterator it=strVecList.begin() ; it!=strVecList.end() ; it++ ){
+      string_size colon_pos = it->find(COLON);
+      if( colon_pos == string::npos ){     // only one integer
+        intVec.push_back(str_to_int(trim(*it)));
+      }else{                               // determine range
+        // convert end points to integers
+        long lowInt  = str_to_int(trim(it->substr(0,colon_pos)));
+        long highInt = str_to_int(trim(it->substr(colon_pos+1)));
+
+        // error check
+        if ( highInt < lowInt )
+          throw std::runtime_error("intList: Ranges must be increasing: "
+                             +int_to_str(lowInt)+">"+int_to_str(highInt)+"\n");
+
+        // add to the result vector
+        for( long j = lowInt; j <= highInt; j++)
+          intVec.push_back(j);
+      }
+    }
+  }
+
 }
+#endif
