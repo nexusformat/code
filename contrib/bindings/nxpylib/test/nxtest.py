@@ -16,10 +16,10 @@ def main(args):
 
 	f = NXfile(filename="monoxtas_template.nxs", 
 				  mode=NXACC_CREATE5, 
-				  template="monoxtas_template.xml")
+				  template="/home/hgilde/nexus/nexus/contrib/bindings/nxpylib/test/monoxtas_template.xml")
 	
 	root = f.getRoot()
-	myentry 	= f.readGroup("root:NXroot/template_entry:NXentry")
+	myentry 	= f.readGroup("root:NXroot/entry:NXentry")
 	mydata = myentry.getGroup("on-on", "NXdata") 
    
 	h_vector = NXelem(name="h", nxtype=NX_FLOAT32, dims=[5], data=[0.0,0.0,0.0,0.0,0.0])

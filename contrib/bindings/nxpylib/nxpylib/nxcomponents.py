@@ -190,8 +190,9 @@ class NXelem:
 			if groupclass[0:2] != "NX":
 				groupclass = self.path[len(self.path)-2][1]
 				if groupclass[0:2] != "NX":
-					print "elem %s doesn't belong to a group. no validation possible \n-> validate when appending to group!!!!"%(self.name)
+					pass
 					#print "Error in elem path"
+					#print "elem %s doesn't belong to a group. no validation possible \n-> validate when appending to group!!!!"%(self.name)
 					#return 0
 			if not attname in nxtemplates.group_types[groupclass].elems[self.name].attrs.keys():
 				print "attr not valid !!" 
@@ -208,7 +209,8 @@ class NXelem:
 			if groupclass[0:2] != "NX":
 				groupclass = self.path[len(self.path)-2][1]
 				if groupclass[0:2] != "NX":
-					print "elem %s doesn't belong to a group. no validation possible \n-> validate when appending to group!!!!"%(self.name)
+					pass
+					#print "elem %s doesn't belong to a group. no validation possible \n-> validate when appending to group!!!!"%(self.name)
 					#return 0
 		
 			

@@ -22,9 +22,9 @@ satisfying the NeXus procedure for identifying plottable data.
         telephone_number="+49(0)89 28914622"
         >
 		  
-    <NXentry name="template_entry">
-        <title>template_entry</title>
-        <analysis>TRIAX</analysis>
+    <NXentry name="entry">
+        <title>entry</title>
+        <!--analysis>TRIAX</analysis-->
         <start_time type="ISO8601">2004-06-02 11:40:15+0100</start_time>
         <end_time   type="ISO8601">2004-06-03 11:40:15+0100</end_time>
         <duration   units="seconds" type="NX_INT32">23</duration>
@@ -37,25 +37,31 @@ satisfying the NeXus procedure for identifying plottable data.
             <email>peter.link@frm2.tum.de</email>
         </NXuser>
         <NXsample name="sample">
-            <name>template_sample</name>
+            <name>sample</name>
             <chemical_formula>NaCl</chemical_formula>
-            <environment>env1</environment>
-            <unit_cell type="NX_FLOAT32[6]">1.0 1.0 1.0 1.0 1.0 1.0</unit_cell>
-            <orientation_matrix type="NX_FLOAT32[9]">1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0</orientation_matrix>
+					<NXenvironment name="{Name of sample environment}">
+						<name type="NX_CHAR">{Apparatus identification code/model number; e.g.  OC100 011 }?</name>
+						<short_name type="NX_CHAR">{Alternative short name, perhaps for dashboard display like a present Seblock name}?</short_name>
+						<type type="NX_CHAR">{Type of apparatus.  This could be the SE codes in scheduling database; e.g. OC/100}?</type>
+						<description type="NX_CHAR">{Description of the apparatus; e.g.  100mm bore orange cryostat with Roots pump }?</description>
+						<program type="NX_CHAR">{Program controlling the apparatus; e.g. LabView VI name}?</program>
+				</NXenvironment>
+            <unit_cell type="NX_FLOAT32[1,6]">0 0 0 0 0 0</unit_cell>
+            <orientation_matrix type="NX_FLOAT32[1,3,3]">0 0 0 0 0 0 0 0 0</orientation_matrix>
         </NXsample>
         <NXinstrument name="PANDA">
             <name>PANDA</name>
-            <local_contact>Peter Link</local_contact>
+            <!--local_contact>Peter Link</local_contact-->
             <NXsource name="FRM2">
                 <name>FRM2</name>
-                <type>Reactor</type>
+                <type>Reactor Neutron Source</type>
                 <power units="MW" type="NX_FLOAT32">20.00</power>
             </NXsource>
             <NXcollimator name="pre_mono">
-                <distance>{distance to sample center}?</distance>
+                <distance type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
                 <type>"Soller"</type>
-                <length>{length of blades}?</length>
-                <soller_angle>{angular divergence}</soller_angle>
+                <length type="NX_FLOAT32" info="{length of blades}?">0.0</length>
+                <soller_angle type="NX_FLOAT32" info="{angular divergence}">0.0</soller_angle>
             </NXcollimator>
             <NXcrystal name="monochromator">
                 <distance units="m" type="NX_FLOAT32">30.0</distance>
@@ -68,7 +74,10 @@ satisfying the NeXus procedure for identifying plottable data.
             <NXdetector name="monitor">
                 <distance units="m" type="NX_FLOAT32">30.0</distance>
                 <type>Fission chamber</type>
-                <efficiency type="NX_FLOAT">2.1</efficiency>
+					 <NXdata name="efficiency">
+					 	 <efficiency type="NX_FLOAT" info="{efficiency of detector}?">0.0</efficiency>
+					 </NXdata>
+                <!--efficiency type="NX_FLOAT">2.1</efficiency-->
             </NXdetector>
             <NXpolarizer name="pre_sample_pol">
                 <type>crystal</type>
@@ -76,12 +85,12 @@ satisfying the NeXus procedure for identifying plottable data.
             </NXpolarizer>
             <NXflipper name="pre_sample_flip">
                 <type>{coil,current-sheet}</type>
-                <flip_turns>{Number of turns in flipping field coils}?</flip_turns>
-                <comp_turns>{Number of turns in compensating field coils}?</comp_turns>
-                <guide_turns>{Number of turns in guide field coils}?</guide_turns>
-                <flip_current  units="amperes">{Flipping field coil current in "on" state"}</flip_current>
-                <comp_current  units="amperes">{Compensating field coil current in "on" state"}</comp_current>
-                <guide_current units="amperes">{Guide field coil current in "on" state"}</guide_current>
+                <flip_turns type="NX_FLOAT32" info="{Number of turns in flipping field coils}?">0.0</flip_turns>
+                <comp_turns type="NX_FLOAT32" info="{Number of turns in compensating field coils}?">0.0</comp_turns>
+                <guide_turns type="NX_FLOAT32" info="{Number of turns in guide field coils}?">0.0</guide_turns>
+                <flip_current type="NX_FLOAT32" units="amperes" info="{Flipping field coil current in 'on' state}">0.0</flip_current>
+                <comp_current type="NX_FLOAT32" units="amperes" info="{Compensating field coil current in 'on' state}">0.0</comp_current>
+                <guide_current units="amperes" type="NX_FLOAT32" info="{Guide field coil current in 'on' state}">0.0</guide_current>
             </NXflipper>
             <NXpolarizer name="post_sample_pol">
                 <type>{crystal}</type>
@@ -89,19 +98,19 @@ satisfying the NeXus procedure for identifying plottable data.
             </NXpolarizer>
             <NXflipper name="post_sample_flip">
                 <type>{coil}</type>
-                <flip_turns>{Number of turns/cm in flipping field coils}?</flip_turns>
-                <comp_turns>{Number of turns/cm in compensating field coils}?</comp_turns>
-                <guide_turns>{Number of turns/cm in guide field coils}?</guide_turns>
-                <flip_current  units="amperes">{Flipping field coil current in "on" state"}</flip_current>
-                <comp_current  units="amperes">{Compensating field coil current in "on" state"}</comp_current>
-                <guide_current units="amperes">{Guide field coil current in "on" state"}</guide_current>
-                <thickness units="cm">3</thickness>
+                <flip_turns type="NX_FLOAT32" info="{Number of turns/cm in flipping field coils}?">0.0</flip_turns>
+                <comp_turns type="NX_FLOAT32" info="{Number of turns/cm in compensating field coils}?">0.0</comp_turns>
+                <guide_turns type="NX_FLOAT32" info="{Number of turns/cm in guide field coils}?">0.0</guide_turns>
+                <flip_current type="NX_FLOAT32" units="amperes" info="{Flipping field coil current in 'on' state}">0.0</flip_current>
+                <comp_current type="NX_FLOAT32" units="amperes" info="{Compensating field coil current in 'on' state">0.0</comp_current>
+                <guide_current units="amperes" type="NX_FLOAT32" info="{Guide field coil current in 'on' state}">0.0</guide_current>
+                <thickness type="NX_FLOAT32" units="cm">0.0</thickness>
             </NXflipper>
             <NXcollimator name="pre_analyzer">
                 <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
                 <type>"Soller"</type>
-                <length>{length of blades}?</length>
-                <soller_angle>{angular divergence}</soller_angle>
+                <length type="NX_FLOAT32" info="{length of blades}?">0.0</length>
+                <soller_angle type="NX_FLOAT32" info="{angular divergence}">0.0</soller_angle>
             </NXcollimator>
             <NXcrystal name="analyzer">
                 <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
@@ -114,15 +123,18 @@ satisfying the NeXus procedure for identifying plottable data.
             <NXcollimator name="post_analyzer">
                 <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
                 <type>"Soller"</type>
-                <length>{length of blades}?</length>
-                <soller_angle>{angular divergence}</soller_angle>
+                <length type="NX_FLOAT32" info="{length of blades}?">0.0</length>
+                <soller_angle type="NX_FLOAT32" info="{angular divergence}">0.0</soller_angle>
             </NXcollimator>
             <NXdetector name="primary">
-                <distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
-                <type>"He3 gas cylinder"</type>
-                <efficiency type="NX_FLOAT" info="{efficiency of detector}?">0.0</efficiency>
-            </NXdetector>
-        </NXinstrument>
+						<distance units="m" type="NX_FLOAT32" info="{distance to sample center}?">0.0</distance>
+						<type>"He3 gas cylinder"</type>
+						<NXdata name="efficiency">
+							<efficiency type="NX_FLOAT" info="{efficiency of detector}?">0.0</efficiency>
+						</NXdata>
+					<!--efficiency type="NX_FLOAT" info="{efficiency of detector}?">0.0</efficiency-->
+				</NXdetector>
+			</NXinstrument>
 		  <!-- NXdata name_enums="off-off|off-on|on-off|on-o"-->
         <NXdata name="on-on">
             <!--ei units="eV" type="NX_FLOAT32[5]" info="{Incident energies}?">0 0 0 0 0</ei>

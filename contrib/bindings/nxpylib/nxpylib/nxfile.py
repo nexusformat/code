@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import types
 import cPickle
+import types
 import time
 from string import *
 
@@ -96,17 +96,17 @@ class NXfile:
 		status, nattrs = NXgetattrinfo(self.handle)
 		if status == 1:
 			for i in range(nattrs):
-				status,name,length,type = NXgetnextattr(self.handle)
+				status,name,length,ntype = NXgetnextattr(self.handle)
 				if status != 1:
 					print "NXgetnextattr failed"
 					continue
-				status,value,type = NXgetattr(self.handle, name, type)
+				status,value,ntype = NXgetattr(self.handle, name, ntype)
 				if status != 1:
 					print "NXgetattr failed"
 					continue
 					
 				if nxtemplates.group_types[groupclass].hasAttr(name):
-					attrs[name] = NXattr(path=pathlist, name=name, value=value, nxtype=type) 
+					attrs[name] = NXattr(path=pathlist, name=name, value=value, nxtype=ntype) 
 				else:
 					pass
 					#print "group %s has no attribute %s	"%(groupclass, name)
@@ -126,7 +126,7 @@ class NXfile:
 			
 		#print "\n\n\nnitems: ", nitems
 		for i in range(nitems):
-			status,ename,nxclass,type = NXgetnextentry(self.handle)
+			status,ename,nxclass,ntype = NXgetnextentry(self.handle)
 			if status != 1:
 				print "NXgetnextentry failed .unknown class %s"%(nxclass)
 				continue
@@ -189,7 +189,11 @@ class NXfile:
 					for i in range(len(temp_dims)):
 						if temp_dims[i] >= 0:
 							if dims[i] != temp_dims[i]:
-								print "WARNING: dimension ranges don't match, elem %s loaded though."%(ename)
+								if type(temp_dims[i]) != types.StringType: 
+									print "WARNING: dimension ranges don't match, elem %s loaded though."%(ename)
+								else:
+									pass
+									#print "WARNING: dimension has to match other dim values declared with",temp_dims[i] 
 					#check type	
 					#print elemtype, nxtemplates.group_types[groupclass].elems[ename].types
 					if elemtype not in nxtemplates.group_types[groupclass].elems[ename].types:
