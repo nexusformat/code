@@ -10,7 +10,6 @@
 !  
 ! See NAPI.C or <http://www.neutron.anl.gov/NeXus/> for details
 !
-! 99/7/11 - Initial Release
 !------------------------------------------------------------------------------
 
 MODULE NXmodule
@@ -19,7 +18,7 @@ MODULE NXmodule
 
    PUBLIC
 ! *** NeXus version parameter
-   CHARACTER(len=*), PARAMETER, PUBLIC :: NeXus_version = "1.1.0"
+   CHARACTER(len=*), PARAMETER, PUBLIC :: NeXus_version = "1.2.0"
 ! *** NeXus file access parameters
    INTEGER, PARAMETER, PUBLIC :: NXACC_READ = 1
    INTEGER, PARAMETER, PUBLIC :: NXACC_RDWR = 3
