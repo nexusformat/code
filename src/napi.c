@@ -77,8 +77,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
      }
   /*---------------------------------------------------------------------*/
      static void *NXpData = NULL;
-     static void (*NXIReportError)(void *pData, char *string) =
-                  NXNXNXReportError;
+     void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
   /*---------------------------------------------------------------------*/
      void NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
      {
@@ -164,7 +163,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   static int32
-  NXIFindSDS (NXhandle fid, char *name)
+  NXIFindSDS (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFile self;
     int32 iNew, iRet, iTag, iRef;
@@ -200,6 +199,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       iN = Vntagrefs (self->iCurrentVG);
       for (i = 0; i < iN; i++) {
         Vgettagref (self->iCurrentVG, i, &iTag, &iRef);
+        /* we are now writing using DFTAG_NDG, but need others for backward compatability */
         if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG) || (iTag == DFTAG_SDS)) {
           iNew = SDreftoindex (self->iSID, iRef);
           iNew = SDselect (self->iSID, iNew);
@@ -344,11 +344,11 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	return ret;
   }
 
-#if defined(__VMS) && (__VMS_VER < 70000000)
+#if (defined(__VMS) && (__VMS_VER < 70000000)) || defined(_WIN32)
 #define NO_LOCALTIME_GMTOFF	/* prior to VMS 7.0 localtime() relative to UTC */
 #endif /* __VMS && __VMS_VER < 70000000 */
 
-  NXstatus  NXopen(char * filename, NXaccess am, NXhandle* pHandle)
+  NXstatus  NXopen(CONSTCHAR * filename, NXaccess am, NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
     char pBuffer[512], time_buffer[64];
@@ -370,10 +370,11 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 /* 
  * get time in ISO 8601 format 
  */
+    tzset();
     time(&timer);
     time_info = localtime(&timer);
 #ifdef NO_LOCALTIME_GMTOFF
-    gmt_offset = 0;
+    gmt_offset = -timezone + ( (daylight != 0) ? 3600 : 0 );
 #else
     gmt_offset = time_info->tm_gmtoff;
 #endif /* NO_LOCALTIME_GMTOFF */
@@ -454,7 +455,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
     if (am == NXACC_CREATE) 
     {
-        if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), filename) < 0)
+        if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), (char*)filename) < 0)
         {
           NXIReportError (NXpData, "ERROR: HDF failed to store file_name attribute ");
           return NX_ERROR;
@@ -551,7 +552,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
    
-  NXstatus NXmakegroup (NXhandle fid, char *name, char *nxclass) {
+  NXstatus NXmakegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) {
     pNexusFile pFile;
     int32 iNew, iRet;
     char pBuffer[256];
@@ -561,7 +562,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
      * Make sure that a group with the same name and nxclass does not
      * already exist.
      */
-    if ((iRet = NXIFindVgroup (pFile, name, nxclass)) >= 0) {
+    if ((iRet = NXIFindVgroup (pFile, (char*)name, nxclass)) >= 0) {
       sprintf (pBuffer, "ERROR: Vgroup %s, class %s already exists", 
                         name, nxclass);
       NXIReportError (NXpData, pBuffer);
@@ -593,7 +594,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   /*------------------------------------------------------------------------*/
   NXstatus
-  NXopengroup (NXhandle fid, char *name, char *nxclass)
+  NXopengroup (NXhandle fid, CONSTCHAR *name, char *nxclass)
   {
     pNexusFile pFile;
     int32 iNew, iRef;
@@ -601,7 +602,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
     pFile = NXIassert (fid);
   
-    iRef = NXIFindVgroup (pFile, name, nxclass);
+    iRef = NXIFindVgroup (pFile, (char*)name, nxclass);
     if (iRef < 0) {
       sprintf (pBuffer, "ERROR: Vgroup %s, class %s NOT found", name, nxclass);
       NXIReportError (NXpData, pBuffer);
@@ -682,7 +683,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return ret;
   }
 
-  NXstatus NXmakedata (NXhandle fid, char *name, int datatype, int rank,
+  NXstatus NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
               int dimensions[])
   {
     pNexusFile pFile;
@@ -749,7 +750,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
           
     /* dataset creation */
-    iNew = SDcreate (pFile->iSID, name, datatype, rank, (int32*)dimensions);
+    iNew = SDcreate (pFile->iSID, (char*)name, datatype, rank, (int32*)dimensions);
     if (iNew < 0) {
       sprintf (pBuffer, "ERROR: cannot create SDS %s, check arguments",
                name);
@@ -758,7 +759,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
     /* link into Vgroup, if in one */
     if (pFile->iCurrentVG != 0) {
-      iRet = Vaddtagref (pFile->iCurrentVG, DFTAG_SDG, SDidtoref (iNew));
+      iRet = Vaddtagref (pFile->iCurrentVG, DFTAG_NDG, SDidtoref (iNew));
     }
     iRet = SDendaccess (iNew);
     if (iRet < 0) {
@@ -770,7 +771,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   NXstatus
-  NXopendata (NXhandle fid, char *name)
+  NXopendata (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFile pFile;
     int32 iNew;
@@ -1017,7 +1018,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
 
   NXstatus
-  NXputattr (NXhandle fid, char *name, void *data, int datalen, int iType)
+  NXputattr (NXhandle fid, CONSTCHAR *name, void *data, int datalen, int iType)
   {
     pNexusFile pFile;
     int iRet;
@@ -1026,11 +1027,11 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
     if (pFile->iCurrentSDS != 0) {
       /* SDS attribute */
-      iRet = SDsetattr (pFile->iCurrentSDS, name, iType,
+      iRet = SDsetattr (pFile->iCurrentSDS, (char*)name, iType,
                         datalen, data);
     } else {
       /* global attribute */
-      iRet = SDsetattr (pFile->iSID, name, iType,
+      iRet = SDsetattr (pFile->iSID, (char*)name, iType,
                         datalen, data);
   
     }
@@ -1118,6 +1119,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         Vdetach (iTemp);
         return NX_OK;
+        /* we are now writing using DFTAG_NDG, but need others for backward compatability */
       } else if ((pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_SDG) ||
                  (pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_NDG) ||
                  (pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_SDS)) {
@@ -1216,7 +1218,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       sRes->iTag = NX_ERROR;
       return NX_ERROR;
     } else {
-      sRes->iTag = DFTAG_SDS;
+      sRes->iTag = DFTAG_NDG;
       sRes->iRef = SDidtoref (pFile->iCurrentSDS);
       return NX_OK;
     }
