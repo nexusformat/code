@@ -1,0 +1,85 @@
+Changes in Version 1.2.0
+========================
+
+- NXGETCHARDATA, NXGETCHARATTR, NXPUTCHARDATA and NXPUTCHARATTR added 
+  to Fortran 77 interface to correct problems with handling character data 
+  and attributes.
+
+- Reversed dimension order and adjusted starting indices in NXGETSLAB 
+  and NXPUTSLAB in Fortran 77 interface for improved compatibility with the 
+  C interface.
+
+- All SDSes now created with the DFTAG_NDG tag, rather than DFTAG_SDG,
+  which is now deprecated by HDF.
+
+- Excluded null terminator from string length check in REPLACE_STRING to
+  prevent error messages when the string is exactly the right length.
+
+- Expanded number of NeXus routines and data types checked by the test 
+  programs "napi_test.c", "napif_test.f" and "NXtest.f90". 
+  
+- Added definitions of NX_MAXRANK (max. no. of dataset dimensions = 32) to 
+  and NX_MAXNAMELEN (max. length of dataset name = 64) to header files.
+
+- Made NXIReportError globally visible
+
+- Improved determination of local time zone when writing the global file
+  attribute "file_time"
+
+Changes in Version 1.1.0
+========================
+
+- First appearance of the Fortran 90 API.
+
+- Added reading and writing of non-character attributes to the Fortran 77 
+  interface
+
+- Corrected problems with linking groups by making NXgetgroupID 
+  and NXmakelink use the HDF tag/ref pair in NXlink structures.
+
+- Added VMS build file MAKE_VMS.COM.
+
+- Added NEXUS_VERSION CHARACTER constant to NAPIF.INC, with value as defined 
+  in napi.h
+
+- Made the Fortran 77 interface treat both NX_UINT8 and NX_CHAR as strings, for
+  consistency with the C implementation and also for backward compatability 
+  reasons.
+
+- Fixed memory leak on Fortran 77 side on NXclose
+
+- NXdict added to the normal distribution
+
+- Added casts to HDF API calling parameters to eliminate type-mismatch
+  compiler warnings.
+
+- Modified time creation functions to handle non-working gmtime()
+  function on VMS 6.2. 
+
+
+Changes in Version 1.0.0
+========================
+
+- Reversed array dimensions on going from C to FORTRAN, so that the 
+  "fastest varying index" is kept consistent
+
+- Incorporated fixes suggested by Markus Zolliker (markus.zolliker@psi.ch)
+  for the following problems with the FORTRAN interface:
+
+  (1) NXopen ends with a "Segmentation fault" if the file is not HDF.
+  (2) NXgetentry gives an error message when NAME and CLASS are not
+    initialised to blank.
+
+- Changed "data" from char* to void* in NXgetattr
+
+- Changed value for NXACC_CREATE to be DFACC_CREATE rather than DFACC_ALL
+  in NAPIF.INC for consistency with C interface
+
+- Added the following global attributes
+  NeXus_version - updated whenever a file is opened "read/write", so it
+                  will always contain the latest version of the interface
+                  the file was written with
+  file_name     - set on file creation, then left unchanged
+  file_time     - set on file creation, then left unchanged
+
+$Id$
