@@ -249,7 +249,6 @@ void Runfile::LoadV4(ifstream *inFile) {
   detectorRot2.resize(header->NDet() + 1);
   char iName[4];
   header->IName(iName);
-  cout << "dMap size; " <<detectorMap.size() << "\n";;
   if ( (strcmp(iName, "scd0") == 0) ||
        (strcmp(iName, "sad0") == 0) ||
        (strcmp(iName, "sad1") == 0) ||
@@ -1241,11 +1240,8 @@ vector<float> Runfile::Get1DSpectrum(Segment seg, int hist) {
   int wordLength;
   
   /*  if ( leaveOpen == false){
-    cout << "GetSpectrum1D opening file\n";
     runfile = new RandomAccessRunfile(runfileName, "r");
     }*/
-  cout << "Get1DSpectrum: detID, SegID: " << seg.DetID() << ", " << 
-    seg.SegID() << "\n";
   int detID = seg.DetID();
   if ( !((psdOrder[detID] == 2) && (header->VersionNumber() < 5 )) ) {
     index = seg.SegID() + (hist-1) * header->NDet();
@@ -1257,9 +1253,7 @@ vector<float> Runfile::Get1DSpectrum(Segment seg, int hist) {
 
     }
     tfType = detectorMap[index]->GetTFType();
-    cout << "tfType" << tfType << "\n";
     numOfTimeChannels = timeField[tfType]->GetNumOfChannels();
-    cout << "Get1DSpectrum: numOfTimeChannels " << numOfTimeChannels << "\n";;
     //add one element since start readRunFloatVectorFromXXXX has empty first
     //element
     data.resize(numOfTimeChannels + 1);
@@ -1274,9 +1268,7 @@ vector<float> Runfile::Get1DSpectrum(Segment seg, int hist) {
 	header->HistStartAddress() + 4;
     }
     
-    cout << "here\n";
     runFile->seekg(offset);
-    cout << "here\n";
     if (numOfTimeChannels !=0){
       
       if (header->VersionNumber() < 4){
@@ -1318,24 +1310,6 @@ vector<float> Runfile::Get1DSpectrum(Segment seg, int hist) {
       runFile->seekg( ioffset + ii * sliceInterval );
       int ovOffset = ioffset + ii * sliceInterval - header->HistStartAddress();
       data[ii] = (float)runFile->readRunShort();
-      /*      nbytes = runfile.read ( bdata, 0, 2 );
-      if (bdata[0] < 0 ) {
-	data[ii] += 
-	  (bdata[0] + 256);
-	
-      }
-      else {
-	data[ii] += bdata[0];
-      }
-      if (bdata[1] < 0 ) {
-	data[ii] += 
-	  (bdata[1] + 256) * 256;
-	
-      }
-      else {
-	data[ii] += bdata[1] * 256;
-      }
-      */
       
       if (header->NumOfOverflows() > 0) {
 	char sdone = false;

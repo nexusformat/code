@@ -83,7 +83,6 @@ void IpnsRetriever::getData(Node &node, const std::string &location){
 	head.StartTime((char *)time);
 	string sVal = this->fixDate( date, time );
 	value = (void *)sVal.c_str();
-	cout << (char *)value << '\n';
 	dims[0] = (string((char *)value)).size();
 	data_type = NX_CHAR;
 	data_rank = 1;
@@ -96,7 +95,6 @@ void IpnsRetriever::getData(Node &node, const std::string &location){
 
 	string sVal = this->fixDate( date, time );
 	value = (void *)sVal.c_str();
-	cout << (char *)value << '\n';
 	dims[0] = (string((char *)value)).size();
 	data_type = NX_CHAR;
 	data_rank = 1;
@@ -118,7 +116,6 @@ void IpnsRetriever::getData(Node &node, const std::string &location){
       //data retrieved from list of ids
       if ( location.substr(5, 3) == "ids" ) {
 	string idList = location.substr( 8, location.size()-8 );
-	cout << "ids to be processed: " << idList << "\n";
 	// find & remove brackets
 	string::size_type start_brkt = idList.find("[");
 	string::size_type end_brkt = idList.find("]");
@@ -130,7 +127,6 @@ void IpnsRetriever::getData(Node &node, const std::string &location){
 	vector<Segment *> segments = runFile->GetSegments();
 	vdata.resize(idListVect.size());
 	for (id = 0; id < idListVect.size(); id++) {
-	  cout << "-*-*-*-*" << idListVect[id] << "\n";
 	  vdata[id] = runFile->Get1DSpectrum(*segments[idListVect[id]], 1); 
 	  
 	}
@@ -146,9 +142,6 @@ void IpnsRetriever::getData(Node &node, const std::string &location){
 	  }
 	}
       }
-      cout << "reading data from " << location.substr(5, location.size()-1) 
-	   << "\n";
-	//      float data[10]={0.,1.,2.,3.,4.,5.,6.,7.,8.,9.};
       
       dims[1] = vdata[0].size();
       dims[0] = idListVect.size();
