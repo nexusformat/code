@@ -65,11 +65,9 @@ TextPlainRetriever::TextPlainRetriever(const string &str): source(str),current_l
 TextPlainRetriever::~TextPlainRetriever(){
   //cout << "~TextPlainRetriever()" << endl;
 
-  // release the file handle
-  if(infile){
+  // close the file
+  if(infile)
     infile.close();
-    //delete infile;
-  }
 }
 
 /**
