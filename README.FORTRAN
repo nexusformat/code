@@ -42,16 +42,33 @@ f77 -o napif_test napif_test.o napif.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf 
 
 ./napif_test
 
-Both these test programs should print 
+Both these test programs should print the following:
 
-    1.000000
-    2.000000
-    3.000000
-    4.000000
-    Attribute length 9: something	
+ch_data : 4
+Values : NeXus data
+i1_data : 20
+Values : 1 2 3 4
+i2_data : 22
+Values : 1000 2000 3000 4000
+i4_data : 24
+Values : 1000000 2000000 3000000 4000000
+r4_data : 5
+Values : 1.000000 2.000000 3.000000 4.000000
+       : 5.000000 6.000000 7.000000 8.000000
+       : 9.000000 10.000000 11.000000 12.000000
+       : 13.000000 14.000000 15.000000 16.000000
+       : 17.000000 18.000000 19.000000 20.000000
+r8_data : 6
+Values : 1.000000 2.000000 3.000000 4.000000
+       : 5.000000 6.000000 7.000000 8.000000
+       : 9.000000 10.000000 11.000000 12.000000
+       : 13.000000 14.000000 15.000000 16.000000
+       : 17.000000 18.000000 19.000000 20.000000
+ch_attribute : NeXus
+i4_attribute : 42
+r4_attribute : 3.141593
 
-To the screen and create a file "nxtest.dat"
-(Note: FORTRAN prints 19 for length)
+A file called "NXtest.nxs" is also created.
 
 *** FORTRAN Interface Notes ***
 
