@@ -29,6 +29,7 @@
 #define NX_FLOAT64   6
 #define NX_INT8     20  
 #define NX_UINT8    21
+#define NX_BINARY   21
 #define NX_INT16    22  
 #define NX_UINT16   23
 #define NX_INT32    24
@@ -48,6 +49,7 @@ extern void  nx_close(void *handle);
 %section "Navigating Groups"
 extern int nx_makegroup(void *handle, char *name, char *nxclass);
 extern int nx_opengroup(void *handle, char *name, char *nxclass);
+extern int nx_openpath(void *handle, char *path);
 extern int nx_closegroup(void *handle);
 extern char *nx_getnextentry(void *handle, char separator);
 extern void *nx_getgroupID(void *handle);

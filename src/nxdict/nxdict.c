@@ -1,4 +1,7 @@
 
+
+
+
 /*---------------------------------------------------------------------------
                  Nexus Dictionary API implementation file.
 
@@ -34,9 +37,8 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
-#include <mfhdf.h>
 #include "lld.h"
-#include "../napi.h"
+#include "napi.h"
 #include "stringdict.h"
 #include "dynstring.h"
 #include "nxdict.h"
@@ -543,6 +545,31 @@
 #endif
      return pReplaced;
    }
+/*------------------------------------------------------------------------*/
+   NXstatus NXDdefget(NXdict handle, char *pKey, char *pBuffer, int iBufLen)
+   {
+     int status;
+     pDynString pRep = NULL;
+
+     status = NXDget(handle,pKey,pBuffer,iBufLen);
+     if(status != NX_OK)
+     {
+       return status;
+     }
+     
+     pRep = NXDItextreplace(handle,pBuffer);
+     if(pRep)
+     {
+       strncpy(pBuffer,GetCharArray(pRep),iBufLen);
+       status = NX_OK;
+       DeleteDynString(pRep);
+     } 
+     else 
+     {
+       status = NX_ERROR;
+     }
+     return status;
+   }
 /*--------------------------------------------------------------------------*/
    NXstatus NXDtextreplace(NXdict handle, char *pDefString, 
                            char *pBuffer, int iBufLen)
@@ -866,7 +893,7 @@
        int iRet, i;
 
         /* initialise dimensions to 0 */
-        for(i = 0; i < MAX_VAR_DIMS; i++)
+        for(i = 0; i < NX_MAXRANK; i++)
         {
           iDim[i] = 0;
         }
@@ -909,15 +936,24 @@
    }
 /*------------------------------------------------------------------------*/
    static TokDat tDatType[] = {
-                      {"DFNT_FLOAT32",DFNT_FLOAT32},   
-                      {"DFNT_FLOAT64",DFNT_FLOAT64},    
-                      {"DFNT_INT8",DFNT_INT8},  
-                      {"DFNT_UINT8",DFNT_UINT8},
-                      {"DFNT_INT16",DFNT_INT16},      
-                      {"DFNT_UINT16",DFNT_UINT16},
-                      {"DFNT_INT32",DFNT_INT32},
-                      {"DFNT_UINT32",DFNT_UINT32},
-                      {"DFNT_CHAR",DFNT_CHAR},
+                      {"DFNT_FLOAT32",NX_FLOAT32},   
+                      {"DFNT_FLOAT64",NX_FLOAT64},    
+                      {"DFNT_INT8",NX_INT8},  
+                      {"DFNT_UINT8",NX_UINT8},
+                      {"DFNT_INT16",NX_INT16},      
+                      {"DFNT_UINT16",NX_UINT16},
+                      {"DFNT_INT32",NX_INT32},
+                      {"DFNT_UINT32",NX_UINT32},
+                      {"DFNT_CHAR",NX_CHAR},
+                      {"NX_FLOAT32",NX_FLOAT32},   
+                      {"NX_FLOAT64",NX_FLOAT64},    
+                      {"NX_INT8",NX_INT8},  
+                      {"NX_UINT8",NX_UINT8},
+                      {"NX_INT16",NX_INT16},      
+                      {"NX_UINT16",NX_UINT16},
+                      {"NX_INT32",NX_INT32},
+                      {"NX_UINT32",NX_UINT32},
+                      {"NX_CHAR",NX_CHAR},
                       {NULL,-122} };
 
 
@@ -956,14 +992,14 @@
 /*-------------------------------------------------------------------------*/
    static int NXDIParseSDS(NXhandle hfil, ParDat *pParse)
    {
-      int iType = DFNT_FLOAT32;
+      int iType = NX_FLOAT32;
       int iRank = 1;
       int iCompress = NX_COMP_NONE;
-      int32 iDim[MAX_VAR_DIMS], iChunk[MAX_VAR_DIMS];
+      int iDim[NX_MAXRANK], iChunk[NX_MAXRANK];
       int iList, iChunkDefined = 0 ;
       int iRet, iStat, i;
       char pError[256];
-      char pName[MAX_NC_NAME];
+      char pName[NX_MAXNAMELEN];
       void (*ErrFunc)(void *pData, char *pErr);
       AttItem sAtt; 
 
@@ -1833,7 +1869,7 @@
                  return iRet;
             }
             iRet = NXputattr(hFil, "Units",pUnits,
-                             strlen(pUnits) + 1,DFNT_INT8);
+                             strlen(pUnits) + 1,NX_INT8);
             if(iRet != NX_OK)
             { 
                  /* a comment on this one has already been written! */
@@ -1845,7 +1881,7 @@
 /*-----------------------------------------------------------------------*/
    NXstatus NXUallocSDS(NXhandle hFil, void **pData)
    {
-      int iDIM[MAX_VAR_DIMS];
+      int iDIM[NX_MAXRANK];
       int iRank,iType;
       int iRet, i;
       long lLength;
@@ -1865,31 +1901,30 @@
       }
       switch(iType)
       {
-        case DFNT_FLOAT32:
-             lLength *= sizeof(float32);
+        case NX_FLOAT32:
+             lLength *= sizeof(float);
              break;
-        case DFNT_FLOAT64:
-             lLength *= sizeof(float64);
+        case NX_FLOAT64:
+             lLength *= sizeof(double);
              break;
-        case DFNT_INT8:
-        case DFNT_CHAR:
-        case DFNT_UCHAR8:
-             lLength *= sizeof(int8);
+        case NX_INT8:
+        case NX_CHAR:
+             lLength *= sizeof(char);
              break;
-        case DFNT_UINT8:
-             lLength *= sizeof(uint8);
+        case NX_UINT8:
+             lLength *= sizeof(unsigned char);
              break;
-        case DFNT_INT16:
-             lLength *= sizeof(int16);
+        case NX_INT16:
+             lLength *= sizeof(short);
              break;
-        case DFNT_UINT16:
-             lLength *= sizeof(uint16);
+        case NX_UINT16:
+             lLength *= sizeof(unsigned short);
              break;
-        case DFNT_INT32:
-             lLength *= sizeof(int32);
+        case NX_INT32:
+             lLength *= sizeof(int);
              break;
-        case DFNT_UINT32:
-             lLength *= sizeof(uint32);
+        case NX_UINT32:
+             lLength *= sizeof(int);
              break;
         default:
              NXIReportError(NXpData,"ERROR: Internal: number type not recoginized");

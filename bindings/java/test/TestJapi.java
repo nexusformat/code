@@ -281,6 +281,12 @@ public class TestJapi {
          // reading success
          System.out.println(" *** Data Reading routines appear to work");
 
+	 // test openpath
+	 nf.openpath("/entry2/data/iData1");
+	 nf.openpath("/entry2/data/iData1");
+	 nf.openpath("../");
+	 System.out.println("*** openpath seems to work");
+
          // the success message
          System.out.println(" ***** CONGATULATION *****");
          System.out.println(" When you see this, the likelihood of " +

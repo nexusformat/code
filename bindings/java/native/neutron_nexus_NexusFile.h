@@ -46,6 +46,13 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakegroup
  */
 JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengroup
   (JNIEnv *, jobject, jint, jstring, jstring);
+/*
+ * Class:     neutron_nexus_NexusFile
+ * Method:    nxopenpath
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopenpath
+  (JNIEnv *, jobject, jint, jstring);
 
 /*
  * Class:     neutron_nexus_NexusFile

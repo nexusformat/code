@@ -166,6 +166,10 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
       /* HDF4 type */
 #ifdef HDF4
       retstat = NX4open((const char *)filename,am,&hdf4_handle);
+      if(retstat != NX_OK){
+	free(fHandle);
+	return retstat;
+      }
       fHandle->pNexusData=hdf4_handle;
       fHandle->nxclose=NX4close;
       fHandle->nxflush=NX4flush;
@@ -205,6 +209,10 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
       /* HDF5 type */
 #ifdef HDF5
       retstat = NX5open(filename,am,&hdf5_handle);
+      if(retstat != NX_OK){
+	free(fHandle);
+	return retstat;
+      }
       fHandle->pNexusData=hdf5_handle;
       fHandle->nxclose=NX5close;
       fHandle->nxflush=NX5flush;
@@ -548,6 +556,229 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxinitgroupdir(pFunc->pNexusData);
   }
+/*------------------------------------------------------------------------
+  Implementation of NXopenpath. 
+  --------------------------------------------------------------------------*/
+static int isDataSetOpen(NXhandle hfil)
+{
+  NXlink id;
+  
+  /*
+    This uses the (sensible) feauture that NXgetdataID returns NX_ERROR
+    when no dataset is open
+  */
+  if(NXgetdataID(hfil,&id) == NX_ERROR)
+  {
+    return 0;
+  }
+  else 
+  {
+    return 1;
+  }
+}
+/*----------------------------------------------------------------------*/
+static int isRoot(NXhandle hfil)
+{
+  NXlink id;
+  
+  /*
+    This uses the feauture that NXgetgroupID returns NX_ERROR
+    when we are at root level
+  */
+  if(NXgetgroupID(hfil,&id) == NX_ERROR)
+  {
+    return 1;
+  }
+  else 
+  {
+    return 0;
+  }
+}
+/*--------------------------------------------------------------------
+  copies the next path element into element.
+  returns a pointer into path beyond the extracted path
+  ---------------------------------------------------------------------*/
+static char *extractNextPath(char *path, NXname element)
+{
+  char *pPtr, *pStart;
+  int length;
+
+  pPtr = path;
+  /*
+    skip over leading /
+  */
+  if(*pPtr == '/')
+  {
+    pPtr++;
+  }
+  pStart = pPtr;
+  
+  /*
+    find next /
+  */
+  pPtr = strchr(pStart,'/');
+  if(pPtr == NULL)
+  {
+    /*
+      this is the last path element
+    */
+    strcpy(element,pStart);
+    return NULL;
+  } else {
+    length = pPtr - pStart;
+    strncpy(element,pStart,length);
+    element[length] = '\0';
+  }
+  return pPtr + 1;
+}
+/*-------------------------------------------------------------------*/
+static NXstatus gotoRoot(NXhandle hfil)
+{
+    int status;
+
+    if(isDataSetOpen(hfil))
+    {
+      status = NXclosedata(hfil);
+      if(status == NX_ERROR)
+      {
+	return status;
+      }
+    }
+    while(!isRoot(hfil))
+    {
+      status = NXclosegroup(hfil);
+      if(status == NX_ERROR)
+      {
+	return status;
+      }
+    }
+    return NX_OK;
+}
+/*--------------------------------------------------------------------*/
+static int isRelative(char *path)
+{
+  if(path[0] == '.' && path[1] == '.')
+    return 1;
+  else
+    return 0;
+}
+/*------------------------------------------------------------------*/
+static NXstatus moveOneDown(NXhandle hfil)
+{
+  if(isDataSetOpen(hfil))
+  {
+    return NXclosedata(hfil);
+  } 
+  else
+  {
+    return NXclosegroup(hfil);
+  }
+}
+/*-------------------------------------------------------------------
+  returns a pointer to the remaining path string to move up
+  --------------------------------------------------------------------*/
+static char *moveDown(NXhandle hfil, char *path, int *code)
+{
+  int status;
+  NXname pathElem;
+  char *pPtr;
+
+  *code = NX_OK;
+
+  if(path[0] == '/')
+  {
+    *code = gotoRoot(hfil);
+    return path;
+  } 
+  else 
+  {
+    pPtr = path;
+    while(isRelative(pPtr))
+    {
+      status = moveOneDown(hfil);
+      if(status == NX_ERROR)
+      {
+	*code = status;
+	return pPtr;
+      }
+      pPtr += 3;
+    }
+    return pPtr;
+  }
+} 
+/*--------------------------------------------------------------------*/
+static NXstatus stepOneUp(NXhandle hfil, char *name)
+{
+  int status, datatype;
+  NXname name2, xclass;
+  char pBueffel[256];  
+
+  /*
+    catch the case when we are there: i.e. no further stepping
+    necessary. This can happen with paths like ../
+  */
+  if(strlen(name) < 1)
+  {
+      return NX_OK;
+  }
+  
+  NXinitgroupdir(hfil);
+  while(NXgetnextentry(hfil,name2,xclass,&datatype) != NX_EOD)
+  {
+    
+    if(strcmp(name2,name) == 0)
+    {
+      if(strcmp(xclass,"SDS") == 0)
+      {
+	return NXopendata(hfil,name);
+      } 
+      else
+      {
+	return NXopengroup(hfil,name,xclass);
+      }
+    }
+  }
+  snprintf(pBueffel,255,"ERROR: NXopenpath cannot step into %s",name);
+  NXIReportError (NXpData, pBueffel);
+  return NX_ERROR;              
+}
+/*---------------------------------------------------------------------*/
+NXstatus CALLING_STYLE NXopenpath(NXhandle hfil, CONSTCHAR *path)
+{
+  int status, run = 1;
+  NXname pathElement;
+  char *pPtr;
+
+  if(hfil == NULL || path == NULL)
+  {
+    NXIReportError(NXpData,
+     "ERROR: NXopendata needs both a file handle and a path string");
+    return NX_ERROR;
+  }
+
+  pPtr = moveDown(hfil,(char *)path,&status);
+  if(status != NX_OK)
+  {
+    NXIReportError (NXpData, 
+		    "ERROR: NXopendata failed to move down in hierarchy");
+    return status;
+  }
+
+  while(run == 1)
+  {
+    pPtr = extractNextPath(pPtr, pathElement);
+    status = stepOneUp(hfil,pathElement);
+    if(status != NX_OK)
+    {
+      return status;
+    }
+    if(pPtr == NULL)
+    {
+      run = 0;
+    }
+  }
+  return NX_OK;
+}
 /*----------------------------------------------------------------------
                  F77 - API - Support - Routines
   ----------------------------------------------------------------------*/

@@ -61,6 +61,16 @@ public interface NeXusFileInterface {
     public void opengroup(String name, String nxclass) throws 
                              NexusException;
     /**
+      * openpath opens groups and datsets accroding to the path string
+      * given. The path syntax follows unix conventions. Both absolute
+      * and relative paths are possible. All objects of the path must
+      * exist.
+      * @param path The path string
+      * @exception NexusException when something goes wrong.
+      */   
+    public void openpath(String path) throws 
+                           NexusException;
+    /**
       * closegroup closes access to the current group and steps down one
       * step in group hierarchy.
       * @exception NexusException when an HDF error occurs during this

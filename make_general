@@ -26,8 +26,8 @@
 #-------------------------------------------------------------------------
 
 #--------- where are your HDF libraries? 
-HDF4ROOT=/data/lnslib
-HDF5ROOT=/data/lnslib
+HDF4ROOT=/afs/psi.ch/project/sinq/tru64
+HDF5ROOT=/afs/psi.ch/project/sinq/tru64
 
 #--------- which compilers shall be used
 CC=cc
@@ -36,13 +36,16 @@ F77=f77
 #---------- uncomment this to build a HDF4 only version
 #NXFLAGS=-DHDF4 -I$(HDF4ROOT)/include
 #NXLDFLAGS=-L$(HDFROOT)/lib -lmfhdf -ldf -ljpeg -lz -lm
+#NXOBJ=napi4.o
 
 #--------- uncomment this to build a HDF5 only version
 #NXFLAGS=-DHDF5 -I$(HDF5ROOT)/include
 #NXLDFLAGS=-L$(HDF5ROOT)/lib -lhdf5 -lz -lm
+#NXOBJ=napi5.o
 
 #--------- uncomment this to build a HDF4 and HDF5 version
 NXFLAGS=-DHDF4 -DHDF5 -I$(HDF4ROOT)/include -I$(HDF5ROOT)/include
-NXLDFLAGS=-L$(HDF4ROOT)/lib -L$(HDF5ROOT)/lib -lmfhdf -ldf -ljpeg -lhdf5 \
- -lz -lm 
-
+NXLDFLAGS=-L$(HDF4ROOT)/lib -L$(HDF5ROOT)/lib $(HDF4ROOT)/lib/libmfhdf.a \
+	$(HDF4ROOT)/lib/libdf.a \
+	$(HDF4ROOT)/lib/libjpeg.a -lhdf5 -lz -lm 
+NXOBJ=napi4.o napi5.o

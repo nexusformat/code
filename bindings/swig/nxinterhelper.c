@@ -84,6 +84,19 @@ int nx_opengroup(void *handle, char *name, char *nxclass){
     return 0;
   }
 }
+/*---------------------------------------------------------------------*/
+int nx_openpath(void *handle, char *path){
+  int status;
+  NXhandle hfil;
+
+  hfil = (NXhandle)handle;
+  status = NXopenpath(hfil,path);
+  if(status == NX_OK){
+    return 1;
+  } else {
+    return 0;
+  }
+}
 /*--------------------------------------------------------------------*/
 int nx_closegroup(void *handle){
   int status;

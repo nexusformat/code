@@ -159,6 +159,7 @@ public class  NexusFile implements NeXusFileInterface {
     //native methods for this section
     protected native void nxmakegroup(int handle, String name, String nxclass);
     protected native void nxopengroup(int handle, String name, String nxclass);
+    protected native void nxopenpath(int handle, String path);
     protected native void nxclosegroup(int handle);
 
     /** 
@@ -188,6 +189,21 @@ public class  NexusFile implements NeXusFileInterface {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
 	nxopengroup(handle, name, nxclass);
     }
+    /**
+      * openpath opens groups and datsets accroding to the path string
+      * given. The path syntax follows unix conventions. Both absolute
+      * and relative paths are possible. All objects of the path must
+      * exist.
+      * @param path The path string
+      * @exception NexusException when something goes wrong.
+      */   
+    public void openpath(String path) throws 
+                         NexusException
+    {
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	nxopenpath(handle,path);
+    }
+
     /**
       * closegroup closes access to the current group and steps down one
       * step in group hierarchy.

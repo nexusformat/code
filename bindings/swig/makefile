@@ -52,7 +52,8 @@ clean:
 nxinter: $(OBJ) $(TCLOBJ)
 	$(CC) $(EXFLAG) -g -o nxinter  $(TCLOBJ) $(OBJ) $(SCRIPTLIB) \
 	-L../../src -lNeXus $(NXLDFLAGS)
-#	$(CC) -shared -o nxinter.so  $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
+	$(CC) -shared -o nxinter.so  $(OBJ) $(TCLOBJ) $(SCRIPTLIB) \
+	-L../../src -lNeXus $(NXLDFLAGS)
 
 nxscheme: $(OBJ) $(MZOBJ)
 	$(CC) -shared -o nxscheme.so $(MZOBJ) $(OBJ) $(MZLIB) \

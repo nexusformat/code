@@ -29,7 +29,7 @@
 #define NEXUSAPI
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "2.0.1"                /* major.minor.patch */
+#define NEXUS_VERSION   "2.1.0"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
@@ -80,6 +80,7 @@ typedef struct {
   NX_INT32       32 bit integer
   NX_UINT32      32 bit unsigned integer
   NX_CHAR        8 bit character
+  NX_BINARY      lump of binary data == NX_UINT8
 
 --------------------------------------------------------------------------*/ 
 
@@ -94,6 +95,7 @@ typedef struct {
 #define NX_INT32    24
 #define NX_UINT32   25
 #define NX_CHAR      4
+#define NX_BINARY   21
 
 /* Map NeXus compression methods to HDF compression methods */
 #define NX_COMP_NONE 100
@@ -143,6 +145,7 @@ typedef struct {
 #    define NXclose             MANGLE(nxiclose)
 #    define NXmakegroup         MANGLE(nximakegroup)
 #    define NXopengroup         MANGLE(nxiopengroup)
+#    define NXopenpath          MANGLE(nxiopenpath)
 #    define NXclosegroup        MANGLE(nxiclosegroup)
 #    define NXmakedata          MANGLE(nximakedata)
 #    define NXcompmakedata      MANGLE(nxicompmakedata)
@@ -213,6 +216,7 @@ typedef struct {
 #       define NXflush                  MANGLE(NXIFLUSH)
 #       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
+#       define NXopenpath 		MANGLE(NXIOPENPATH)
 #       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
 #       define NXmakedata 		MANGLE(NXIMAKEDATA)
 #       define NXcompress 		MANGLE(NXICOMPRESS)
@@ -265,6 +269,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXflush(NXhandle* pHandle);
   
 NX_EXTERNAL  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopenpath (NXhandle handle, CONSTCHAR *path);
+
 NX_EXTERNAL  NXstatus CALLING_STYLE NXclosegroup(NXhandle handle);
   
 NX_EXTERNAL  NXstatus CALLING_STYLE NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
