@@ -217,6 +217,37 @@ class format_xml(object):
         # create the close tag
         file.write("%s</%s>\n" % ((" "*self.__cur_indent),tag))
 
+    def format_comment_section(self,file,node):
+        # get the data, if there is a problem, just return
+        full_comment=""
+        try:
+            full_comment=trim(node.data)
+        except AttributeError:
+            return
+        if not full_comment: return
+
+        # divide the data into lines
+        lines=full_comment.splitlines()
+
+        # compress the lines into header and overview
+        header=""
+        overview=""
+        is_header=True
+        for line in lines:
+            if is_header:
+                header=header+line+"\n"
+                if line.startswith("$Id"):
+                    is_header=False
+            else:
+                overview=overview+line+" "
+
+        # remove leading and trailing whitespace
+        header=trim(header)
+        overview=wrap_text(trim(overview),self.__width)
+
+        # format the result into the file
+        file.write("<!--\n%s\n\n%s-->\n" % (header,overview))
+
     def format(self,doc,file): # take from NXconvert.HTMLelement
         """The public method for formating a DOM"""
         # put in the header
@@ -227,9 +258,6 @@ class format_xml(object):
                 tag=childNode.tagName
                 self.format_node(file,tag,childNode)
             except AttributeError:
-                try:
-                    file.write("<!--\n%s\n-->\n" % trim(childNode.data))
-                except AttributeError:
-                    pass
+                self.format_comment_section(file,childNode)
         # put in the footer
         file.write(self.format_foot())
