@@ -29,7 +29,7 @@
 #define NEXUSAPI
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "2.1.0"                /* major.minor.patch */
+#define NEXUS_VERSION   "3.0.0"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
@@ -47,7 +47,7 @@ typedef void* NXhandle;         /* really a pointer to a NexusFile structure */
 typedef int NXstatus;
 typedef char NXname[128];
 
-typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, NXACC_CREATE5=5} NXaccess;
+typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, NXACC_CREATE5=5, NXACC_CREATEXML=6} NXaccess;
 
 typedef struct {
                 char *iname;
@@ -90,6 +90,7 @@ typedef struct {
 #define NX_FLOAT64   6
 #define NX_INT8     20  
 #define NX_UINT8    21
+#define NX_BOOLEAN NX_UINT
 #define NX_INT16    22  
 #define NX_UINT16   23
 #define NX_INT32    24
@@ -122,7 +123,8 @@ typedef struct {
                 char iTag5[1024];     /* HDF5 variable */ 
                 char iRef5[1024];     /* HDF5 variable */
                 char iRefd[1024];     /* HDF5 variable */
-#endif                
+#endif  
+                char targetPath[1024]; /* XML path */
                } NXlink;
 
   
@@ -174,6 +176,7 @@ typedef struct {
 #    define NXsameID            MANGLE(nxisameid)
 #    define NXinitgroupdir      MANGLE(nxiinitgroupdir)
 #    define NXinitattrdir       MANGLE(nxiinitattrdir)
+#    define NXsetnumberformat       MANGLE(nxisetnumberformat)
 #    define NXsetcache          MANGLE(nxisetcache)
 /* FORTRAN helpers - for NeXus internal use only */
 #    define NXfopen             MANGLE(nxifopen)
@@ -237,6 +240,7 @@ typedef struct {
 #       define NXgetnextentry 		MANGLE(NXIGETNEXTENTRY)
 #       define NXgetattrinfo 		MANGLE(NXIGETATTRINFO)
 #       define NXinitattrdir 		MANGLE(NXIINITATTRDIR)
+#       define NXsetnumberformat 	MANGLE(NXISETNUMBERFORMAT)
 #       define NXgetnextattr 		MANGLE(NXIGETNEXTATTR)
 #       define NXgetgroupID 		MANGLE(NXIGETGROUPID)
 #       define NXgetdataID 		MANGLE(NXIGETDATAID)
@@ -300,21 +304,62 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXsameID(NXhandle handle, NXlink* pFirstID, 
 
 NX_EXTERNAL  NXstatus CALLING_STYLE NXinitgroupdir(NXhandle handle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXinitattrdir(NXhandle handle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXsetnumberformat(NXhandle handle,
+						      int type, char *format);
 
 NX_EXTERNAL  NXstatus CALLING_STYLE NXmalloc(void** data, int rank, int dimensions[], int datatype);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXfree(void** data);
 
 
 /*-----------------------------------------------------------------------
-    A non Nexus standard function to set an error handler 
-*/
+    NAPI internals 
+------------------------------------------------------------------------*/
 NX_EXTERNAL  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
+void (*NXIReportError)(void *pData,char *text);
 
 /*
   another special function for setting the default cache size for HDF-5
 */
 NX_EXTERNAL  NXstatus CALLING_STYLE NXsetcache(long newVal);
 
+/*
+ * We need to include CALLING_STYLE in the function pointer definition
+ * or else we get a type mismatch on Win32
+ */
+  typedef struct {
+        NXhandle *pNexusData;   
+        NXstatus (CALLING_STYLE *nxclose)(NXhandle* pHandle);
+        NXstatus (CALLING_STYLE *nxflush)(NXhandle* pHandle);
+        NXstatus (CALLING_STYLE *nxmakegroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
+        NXstatus (CALLING_STYLE *nxopengroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
+        NXstatus (CALLING_STYLE *nxclosegroup)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
+        NXstatus (CALLING_STYLE *nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
+        NXstatus (CALLING_STYLE *nxcompress) (NXhandle handle, int compr_type);
+        NXstatus (CALLING_STYLE *nxopendata) (NXhandle handle, CONSTCHAR* label);
+        NXstatus (CALLING_STYLE *nxclosedata)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxputdata)(NXhandle handle, void* data);
+        NXstatus (CALLING_STYLE *nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
+        NXstatus (CALLING_STYLE *nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
+        NXstatus (CALLING_STYLE *nxgetdataID)(NXhandle handle, NXlink* pLink);
+        NXstatus (CALLING_STYLE *nxmakelink)(NXhandle handle, NXlink* pLink);
+        NXstatus (CALLING_STYLE *nxgetdata)(NXhandle handle, void* data);
+        NXstatus (CALLING_STYLE *nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
+        NXstatus (CALLING_STYLE *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
+        NXstatus (CALLING_STYLE *nxgetslab)(NXhandle handle, void* data, int start[], int size[]);
+        NXstatus (CALLING_STYLE *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
+        NXstatus (CALLING_STYLE *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+        NXstatus (CALLING_STYLE *nxgetattrinfo)(NXhandle handle, int* no_items);
+        NXstatus (CALLING_STYLE *nxgetgroupID)(NXhandle handle, NXlink* pLink);
+        NXstatus (CALLING_STYLE *nxgetgroupinfo)(NXhandle handle, int* no_items, NXname name, NXname nxclass);
+        NXstatus (CALLING_STYLE *nxsameID)(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID);
+        NXstatus (CALLING_STYLE *nxinitgroupdir)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxinitattrdir)(NXhandle handle);
+        NXstatus (CALLING_STYLE *nxsetnumberformat)(NXhandle handle,
+						    int type,char *format);
+  } NexusFunction, *pNexusFunction;
+  /*---------------------*/
+  extern long nx_cacheSize;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

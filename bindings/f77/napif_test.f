@@ -62,7 +62,7 @@ C------------------------------------------------------------------------------
       DATA U_BUFFER /0,1,2,3,4,5,6/
       EQUIVALENCE (CHAR_BUFFER, CHAR_BUFFER_B)
 
-      IF (NXOPEN('NXtest.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('NXtest.nxs', NXACC_CREATEXML, FILEID) .NE. NX_OK) STOP
       IF (NXMAKEGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
       IF (NXOPENGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
          IF (NXMAKEDATA(FILEID, 'ch_data', NX_CHAR, 1, 10) .NE. NX_OK) 
@@ -131,7 +131,8 @@ C------------------------------------------------------------------------------
                IF (NXPUTDATA(FILEID, COMP_ARRAY) .NE. NX_OK) STOP
             IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
             IF (NXFLUSH(FILEID) .NE. NX_OK) STOP
-            UDIMS(1) = NX_UNLIMITED
+C            UDIMS(1) = NX_UNLIMITED
+            UDIMS(1) = 7*SLAB_SIZE(1)
             IF (NXMAKEDATA(FILEID, 'flush_data', NX_INT32, 1, UDIMS) 
      +        .NE. NX_OK) STOP
                SLAB_SIZE(1) = 1

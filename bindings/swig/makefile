@@ -11,12 +11,12 @@ include ../../make_general
 
 #-------- where is your swig?
 #SWIG=/data/lnslib/bin/swig
-SWIG=/usr/bin/swig
+SWIG=swig
 
 #----------- change this for other script languages
 SCRIPTFLAG=-tcl8 -ltclsh.i
 SCRIPTFLAG2=-tcl8 
-SCRIPTLIB=-L/data/lnslib/lib -ltcl
+SCRIPTLIB= -ltcl
 TCLOBJ=nxinter_wrap.o
 
 #---------- these define for mzscheme

@@ -54,19 +54,23 @@ int main (int argc, char *argv[])
   int cdims[2];
   int nx_creation_code;
   char nxFile[80];
+  int xmlFlag = 0;
 
-#if defined(HDF5)
+  if(strstr(argv[0],"napi5_test") != NULL){
     nx_creation_code = NXACC_CREATE5;
-    strcpy(nxFile,"NXtest.nx5");
-#elif defined(HDF4)
+    strcpy(nxFile,"NXtest.h5");
+  }else if(strstr(argv[0],"napix_test") != NULL){
+    nx_creation_code = NXACC_CREATEXML;
+    strcpy(nxFile,"NXtest.xml");
+    xmlFlag = 1;
+  } else {
     nx_creation_code = NXACC_CREATE;
-    strcpy(nxFile,"NXtest.nx4");
-#else
-	exit(77);
-#endif
+    strcpy(nxFile,"NXtest.hdf");
+  }
 
 /* create file */
   if (NXopen (nxFile, nx_creation_code, &fileid) != NX_OK) return 1;
+  NXsetnumberformat(nxFile,NX_FLOAT32,"%9.3f");
   if (NXmakegroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
      NXlen = 10;
@@ -122,15 +126,17 @@ int main (int argc, char *argv[])
            if (NXputdata (fileid, comp_array) != NX_OK) return 1;
         if (NXclosedata (fileid) != NX_OK) return 1;  
         if (NXflush (&fileid) != NX_OK) return 1;
-        if (NXmakedata (fileid, "flush_data", NX_INT32, 1, unlimited_dims) != NX_OK) return 1;
-        slab_size[0] = 1;
-        for (i = 0; i < 7; i++)
-        {
-            slab_start[0] = i;
-            if (NXopendata (fileid, "flush_data") != NX_OK) return 1;
-               if (NXputslab (fileid, &i, slab_start, slab_size) != NX_OK) return 1;
-               if (NXflush (&fileid) != NX_OK) return 1;
-         }
+	if(!xmlFlag){
+	  if (NXmakedata (fileid, "flush_data", NX_INT32, 1, unlimited_dims) != NX_OK) return 1;
+	  slab_size[0] = 1;
+	  for (i = 0; i < 7; i++)
+	    {
+	      slab_start[0] = i;
+	      if (NXopendata (fileid, "flush_data") != NX_OK) return 1;
+	        if (NXputslab (fileid, &i, slab_start, slab_size) != NX_OK) return 1;
+		if (NXflush (&fileid) != NX_OK) return 1;
+	    }
+	}
      if (NXclosegroup (fileid) != NX_OK) return 1;
      if (NXmakegroup (fileid, "sample", "NXsample") != NX_OK) return 1;
      if (NXopengroup (fileid, "sample", "NXsample") != NX_OK) return 1;
@@ -148,24 +154,23 @@ int main (int argc, char *argv[])
   if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclose (&fileid) != NX_OK) return 1;
 
+  /*
+    read test
+  */
   if (NXopen (nxFile, NXACC_RDWR, &fileid) != NX_OK) return 1;
   NXgetattrinfo (fileid, &i);
   if (i > 0) {
      printf ("Number of global attributes: %d\n", i);
   }
-  do {
+  do { 
      attr_status = NXgetnextattr (fileid, name, NXdims, &NXtype);
      if (attr_status == NX_ERROR) return 1;
      if (attr_status == NX_OK) {
         switch (NXtype) {
            case NX_CHAR:
               NXlen = sizeof (char_buffer);
-              if (NXgetattr (fileid, name, char_buffer, &NXlen, &NXtype) != NX_OK) return 1;
-#if defined(HDF5)
-		if (strcmp(name, "HDF5_Version") && strcmp(name, "file_time"))
-#else
-		if (strcmp(name, "HDF_version") && strcmp(name, "file_time"))
-#endif
+              if (NXgetattr (fileid, name, char_buffer, &NXlen, &NXtype) 
+		  != NX_OK) return 1;
                  printf ("   %s = %s\n", name, char_buffer);
               break;
         }
@@ -193,7 +198,7 @@ int main (int argc, char *argv[])
                     print_data (" = ", data_buffer, NXtype, 10);
               } else if (NXtype != NX_FLOAT32 && NXtype != NX_FLOAT64) {
                  if (NXgetdata (fileid, data_buffer) != NX_OK) return 1;
-                    print_data (" =", data_buffer, NXtype, 4);
+                    print_data (" = ", data_buffer, NXtype, 4);
               } else {
                  slab_start[0] = 0;
                  slab_start[1] = 0;
@@ -291,23 +296,23 @@ print_data (const char *prefix, void *data, int type, int num)
            break;
 
         case NX_INT8:
-           printf (" %d", ((unsigned char *) data)[i]);
+           printf ("%d ", ((unsigned char *) data)[i]);
            break;
 
         case NX_INT16:
-           printf (" %d", ((short *) data)[i]);
+           printf ("%d ", ((short *) data)[i]);
            break;
 
         case NX_INT32:
-           printf (" %d", ((int *) data)[i]);
+           printf ("%d ", ((int *) data)[i]);
            break;
 
         case NX_FLOAT32:
-           printf (" %f", ((float *) data)[i]);
+           printf ("%f ", ((float *) data)[i]);
            break;
 
         case NX_FLOAT64:
-           printf (" %f", ((double *) data)[i]);
+           printf ("%f ", ((double *) data)[i]);
            break;
 
         default:

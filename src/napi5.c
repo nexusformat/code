@@ -215,7 +215,9 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
         } else {
           am1 = H5F_ACC_RDWR;
         }    
-        pNew->iFID = H5Fopen (filename, am1, H5P_DEFAULT);
+        fapl = H5Pcreate(H5P_FILE_ACCESS);
+	H5Pset_fclose_degree(fapl,H5F_CLOSE_STRONG);
+        pNew->iFID = H5Fopen (filename, am1, fapl);
     }  
     if (pNew->iFID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
@@ -862,6 +864,8 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /* ------------------------------------------------------------------- */
   
+
+
   NXstatus CALLING_STYLE NX5putdata (NXhandle fid, void *data)
   {
     pNexusFile5 pFile;
@@ -1082,7 +1086,8 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     if(pFile->iCurrentD <= 0){
       return NX_ERROR;
     }
-    strcpy(sRes->iRef5,pFile->name_ref);
+    strcpy(sRes->iRef5,"/");
+    strcat(sRes->iRef5,pFile->name_ref);
     strcpy(sRes->iRefd,pFile->iCurrentLD);
     return NX_OK;
   }
@@ -1093,10 +1098,11 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   {
     pNexusFile5 pFile;
 /*    int iRet; */
-    herr_t status;
+    herr_t status, dataID, aid1, aid2, attID;
     int size_type;
     char buffer[1024];
-      
+    char name[] = "target";
+
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
       return NX_ERROR;
@@ -1124,6 +1130,36 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
       strcat(sLink->iTag5,sLink->iRefd);
     }
     status = H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->iRef5, sLink->iTag5);
+    if(size_type > 0)
+    {
+      dataID = H5Dopen(pFile->iFID,sLink->iRef5);
+      /*
+	remove old attribute if existing
+      */
+      status = H5Aopen_name(dataID,name);
+      if(status > 0)
+      {
+	H5Aclose(status);
+	status = H5Adelete(dataID,name);
+	if(status < 0)
+	{
+	  return NX_OK;
+	}
+      }
+      aid2 = H5Screate(H5S_SCALAR);
+      aid1 = H5Tcopy(H5T_C_S1);
+      H5Tset_size(aid1,strlen(sLink->iRef5));
+      attID = H5Acreate(dataID,name,aid1,aid2,H5P_DEFAULT);
+      if(attID < 0)
+      {
+	return NX_OK;
+      }
+      H5Awrite(attID,aid1,sLink->iRef5);
+      H5Tclose(aid1);
+      H5Sclose(aid2); 
+      H5Aclose(attID); 
+      H5Dclose(dataID);
+    }
     return NX_OK;
    }
  
@@ -1280,10 +1316,13 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     if (iRet > 0)
       {
         pFile->iStack5[pFile->iStackPtr].iCurrentIDX++;
-        strcpy(name,op_data.iname);
         if (op_data.iname != NULL) {
+	  strcpy(name,op_data.iname);
            free(op_data.iname);
-        } 
+        } else {
+	  pFile->iStack5[pFile->iStackPtr].iCurrentIDX = 0;   
+	  return NX_EOD;
+	}	  
         if (op_data.type == H5G_GROUP)
         {
            strcpy(ph_name,"");
@@ -2059,3 +2098,35 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     NXI5KillDir (fid);
     return NX_OK;
   }
+/*------------------------------------------------------------------------*/
+void NX5assignFunctions(pNexusFunction fHandle)
+{
+      fHandle->nxclose=NX5close;
+      fHandle->nxflush=NX5flush;
+      fHandle->nxmakegroup=NX5makegroup;
+      fHandle->nxopengroup=NX5opengroup;
+      fHandle->nxclosegroup=NX5closegroup;
+      fHandle->nxmakedata=NX5makedata;
+      fHandle->nxcompmakedata=NX5compmakedata;
+      fHandle->nxcompress=NX5compress;
+      fHandle->nxopendata=NX5opendata;
+      fHandle->nxclosedata=NX5closedata;
+      fHandle->nxputdata=NX5putdata;
+      fHandle->nxputattr=NX5putattr;
+      fHandle->nxputslab=NX5putslab;    
+      fHandle->nxgetdataID=NX5getdataID;
+      fHandle->nxmakelink=NX5makelink;
+      fHandle->nxgetdata=NX5getdata;
+      fHandle->nxgetinfo=NX5getinfo;
+      fHandle->nxgetnextentry=NX5getnextentry;
+      fHandle->nxgetslab=NX5getslab;
+      fHandle->nxgetnextattr=NX5getnextattr;
+      fHandle->nxgetattr=NX5getattr;
+      fHandle->nxgetattrinfo=NX5getattrinfo;
+      fHandle->nxgetgroupID=NX5getgroupID;
+      fHandle->nxgetgroupinfo=NX5getgroupinfo;
+      fHandle->nxsameID=NX5sameID;
+      fHandle->nxinitgroupdir=NX5initgroupdir;
+      fHandle->nxinitattrdir=NX5initattrdir;
+
+}

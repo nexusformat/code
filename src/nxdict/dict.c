@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <mfhdf.h>
 #include "dynstring.h"
-#include "napi45.h"
+#include "napi.h"
 #include "nxdict.h"
 
    int main(int argc, char *argv[])

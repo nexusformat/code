@@ -3,18 +3,18 @@
 # copyleft: Mark Koennecke, August 1997
 #------------------------------------------------------------------------ 
 
-OBJ= napi.o nxdict.o dict.o stringdict.o lld.o dynstring.o
+OBJ= nxdict.o dict.o stringdict.o lld.o dynstring.o
 
 
-CFLAGS= -I/data/koenneck/include -I. -g -c
-LFLAG=  -L/data/koenneck/lib \
-       -lmfhdf -ldf -ljpeg -lz -lm -lc
+CFLAGS= -I../../include -I/afs/psi.ch/project/sinq/tru64/include -I. -g -c
+LFLAG=  -L../ -L/afs/psi.ch/project/sinq/tru64/lib \
+       -lhdf5  -lmfhdf -ldf -ljpeg -lz -lm -lc
 .c.o:
 	cc $(CFLAGS) $*.c
 
 
 dict: $(OBJ) 
-	cc -g -non_shared -o dict $(OBJ) $(LFLAG)
+	cc -g -non_shared -o dict $(OBJ) ../napi.o ../napi4.o ../napi5.o $(LFLAG)
 
 clean:
 	rm *.o

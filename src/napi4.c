@@ -31,7 +31,7 @@
 
 #include "napi.h"
 #include "napi4.h"
-
+ 
 extern	void *NXpData;
 
   typedef struct __NexusFile {
@@ -52,8 +52,7 @@ extern	void *NXpData;
     int iStackPtr;
     char iAccess[2];
   } NexusFile, *pNexusFile;
-   
-    
+
    /*--------------------------------------------------------------------*/
 
   static pNexusFile NXIassert(NXhandle fid)
@@ -292,8 +291,28 @@ extern	void *NXpData;
     self->iAtt.iCurDir = 0;
     self->iAtt.iNDir = 0;
   }
+/*------------------------------------------------------------------*/
+  static void NXIbuildPath(pNexusFile pFile, char *buffer, int bufLen)
+  {
+    int i;
+    int32 groupID, iA, iD1, iD2, iDim[MAX_VAR_DIMS];
+    NXname pText;
 
- 
+    buffer[0] = '\0';
+    for(i = 0; i < pFile->iStackPtr; i++){
+      strncat(buffer,"/",bufLen-strlen(buffer));
+      groupID = Vattach(pFile->iVID,pFile->iStack[pFile->iStackPtr].iVref,
+			 "r");
+      Vgetname(groupID, pText);
+      strncat(buffer,pText,bufLen-strlen(buffer));
+      Vdetach(groupID);
+    }
+    if(pFile->iCurrentSDS != 0){
+      strncat(buffer,"/",bufLen-strlen(buffer));
+      SDgetinfo(pFile->iCurrentSDS,pText,&iA,iDim,&iD1,&iD2);
+      strncat(buffer,pText,bufLen-strlen(buffer));
+    }
+  } 
   /* ---------------------------------------------------------------------- 
   
                           Definition of NeXus API
@@ -1137,7 +1156,7 @@ extern	void *NXpData;
     }
     iType = type;
     if (iRet < 0) {
-      NXIReportError (NXpData, "ERROR: HDf failed to store attribute ");
+      NXIReportError (NXpData, "ERROR: HDF failed to store attribute ");
       return NX_ERROR;
     }
     return NX_OK;
@@ -1215,6 +1234,7 @@ extern	void *NXpData;
     } else {
       sRes->iTag = DFTAG_NDG;
       sRes->iRef = SDidtoref (pFile->iCurrentSDS);
+      NXIbuildPath(pFile,sRes->targetPath,1024);
       return NX_OK;
     }
     sRes->iTag = NX_ERROR;
@@ -1228,14 +1248,24 @@ extern	void *NXpData;
   NXstatus CALLING_STYLE NX4makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
-    int32 iVG, iRet;
+    int32 iVG, iRet, dataID, type = DFNT_CHAR8, length;
+    char name[] = "target";
   
     pFile = NXIassert (fid);
   
     if (pFile->iCurrentVG == 0) { /* root level, can not link here */
       return NX_ERROR;
     }
-    Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
+    Vaddtagref(pFile->iCurrentVG, sLink->iTag, sLink->iRef);
+    if(sLink->iTag == DFTAG_SDG || sLink->iTag == DFTAG_NDG ||
+       sLink->iTag == DFTAG_SDS)
+    {
+      dataID = SDreftoindex(pFile->iSID,sLink->iRef);
+      dataID = SDselect(pFile->iSID,dataID);
+      length = strlen(sLink->targetPath);
+      SDsetattr(dataID,name,type,length,sLink->targetPath);
+      SDendaccess(dataID);
+    }
     return NX_OK;
   }
   
@@ -1694,6 +1724,7 @@ extern	void *NXpData;
     } else {
       sRes->iTag = DFTAG_VG;
       sRes->iRef = VQueryref(pFile->iCurrentVG);
+      NXIbuildPath(pFile,sRes->targetPath,1024);
       return NX_OK;
     }
     /* not reached */
@@ -1772,3 +1803,34 @@ extern	void *NXpData;
     return NX_OK;
   }
  
+/*--------------------------------------------------------------------*/
+void NX4assignFunctions(pNexusFunction fHandle)
+{
+      fHandle->nxclose=NX4close;
+      fHandle->nxflush=NX4flush;
+      fHandle->nxmakegroup=NX4makegroup;
+      fHandle->nxopengroup=NX4opengroup;
+      fHandle->nxclosegroup=NX4closegroup;
+      fHandle->nxmakedata=NX4makedata;
+      fHandle->nxcompmakedata=NX4compmakedata;
+      fHandle->nxcompress=NX4compress;
+      fHandle->nxopendata=NX4opendata;
+      fHandle->nxclosedata=NX4closedata;
+      fHandle->nxputdata=NX4putdata;
+      fHandle->nxputattr=NX4putattr;
+      fHandle->nxputslab=NX4putslab;    
+      fHandle->nxgetdataID=NX4getdataID;
+      fHandle->nxmakelink=NX4makelink;
+      fHandle->nxgetdata=NX4getdata;
+      fHandle->nxgetinfo=NX4getinfo;
+      fHandle->nxgetnextentry=NX4getnextentry;
+      fHandle->nxgetslab=NX4getslab;
+      fHandle->nxgetnextattr=NX4getnextattr;
+      fHandle->nxgetattr=NX4getattr;
+      fHandle->nxgetattrinfo=NX4getattrinfo;
+      fHandle->nxgetgroupID=NX4getgroupID;
+      fHandle->nxgetgroupinfo=NX4getgroupinfo;
+      fHandle->nxsameID=NX4sameID;
+      fHandle->nxinitgroupdir=NX4initgroupdir;
+      fHandle->nxinitattrdir=NX4initattrdir;
+}

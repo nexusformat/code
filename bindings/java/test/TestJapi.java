@@ -17,6 +17,7 @@ public class TestJapi {
     {
         String fileName = "JapiTest.nxs";
         String fileName5 = "japitest.h5";
+        String fileNameX = "japitest.xml";
         String group = "entry1";
         String nxclass = "NXentry"; 
         int iData1[][] = new int[3][10];
@@ -25,32 +26,28 @@ public class TestJapi {
         int islab[] = new int[10];
         int iDim[] = new int[2], i, j;
         int iStart[] = new int[2];
+	int signal[] = new int[1];
         int iEnd[] = new int[2];
         NexusFile nf = null;
         NXlink gid, did;
         String attname, vname, vclass;
         AttributeEntry atten;
-        boolean HDF5 = false;
+        int fileType = 0; // 0 = HDF4, 1 = HDF2, 2 = XML
         boolean readOnly = false , writeOnly = false;
 
         // check if we should do a HDF-5 test
 	if(args.length >= 1){
 	    if(args[0].indexOf("HDF5") >= 0){
-		HDF5 = true;
+		fileType = 1;
 		System.out.println("Testing HDF5");
+            }
+	    if(args[0].indexOf("XML") >= 0){
+		fileType = 2;
+		System.out.println("Testing XML");
             }
         } else {
 	    System.out.println("Testing HDF4");
 	}
-        // check for read only tests, defunct for now!!!!
-        if(args.length >=2){
-	  if(args[1].indexOf("r") >=0){
-	    readOnly = true;
-	  }
-	  if(args[1].indexOf("w") >=0){
-	    writeOnly = true;
-	  }
-        }
 
         // create some data
         for(i = 0; i < 3; i++)
@@ -68,8 +65,10 @@ public class TestJapi {
 	
 	try{
 	   //create a NexusFile
-	      if(HDF5){ 
+	      if(fileType == 1){ 
 		  nf = new NexusFile(fileName5,NexusFile.NXACC_CREATE5);
+	      } else if(fileType == 2){
+		  nf = new NexusFile(fileNameX,NexusFile.NXACC_CREATEXML);
 	      } else {
 		  nf = new NexusFile(fileName,NexusFile.NXACC_CREATE);
 	      }
@@ -104,7 +103,8 @@ public class TestJapi {
 	   String units = "MegaFarts";
 	   nf.putattr("Units",units.getBytes(),NexusFile.NX_CHAR);
 	   iStart[0] = 1;
-	   nf.putattr("signal",iStart,NexusFile.NX_INT32);
+           signal[0] = 1;
+	   nf.putattr("signal",signal,NexusFile.NX_INT32);
 
 	   // closedata
 	   nf.closedata();
@@ -156,8 +156,10 @@ public class TestJapi {
         fData1[2][5] = (float)66666.66;
 
          // reopen the file
-	 if(HDF5){ 
+	 if(fileType == 1){ 
             nf = new NexusFile(fileName5,NexusFile.NXACC_READ);
+	 } else if(fileType == 2){
+            nf = new NexusFile(fileNameX,NexusFile.NXACC_READ);
          } else {
             nf = new NexusFile(fileName,NexusFile.NXACC_READ);
          }

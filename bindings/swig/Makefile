@@ -8,8 +8,8 @@
 .SUFFIXES: .i .c .o
 
 CC=cc
-CFLAGS=-c -I/data/lnslib/include -DHDF4 -DHDF5
-LDFLAGS=-L/data/lnslib/lib -lNeXus -lLNSmfhdf -lLNSdf -lLNSjpeg -lhdf5 -lz -lm
+CFLAGS=-c -I/afs/psi.ch/project/sinq/tru64/include -DHDF4 -DHDF5
+LDFLAGS=-L/afs/psi.ch/project/sinq/tru64/lib -lNeXus -lmf -ldf -ljpeg -lhdf5 -lz -lm
 
 #----------- change this for other script languages
 SCRIPTFLAG=-tcl8 -ltclsh.i
@@ -48,7 +48,7 @@ clean:
 
 nxinter: $(OBJ) $(TCLOBJ)
 	$(CC) -o nxinter  $(TCLOBJ) $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
-#	$(CC) -shared -o nxinter.so  $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
+	$(CC) -shared -o nxinter.so  $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
 
 nxscheme: $(OBJ) $(MZOBJ)
 	$(CC) -shared -o nxscheme.so $(MZOBJ) $(OBJ) $(MZLIB) $(LDFLAGS) 
@@ -61,7 +61,7 @@ nxinter_wrap.o: nxinter.i nxdataset.i
 	$(CC) $(CFLAGS) nxinter_wrap.c
 
 nxscheme_wrap.o: nxinter.i nxdataset.i
-	/data/lnslib/bin/swig $(MZFLAG) -o nxscheme_wrap.c  nxinter.i
+	swig $(MZFLAG) -o nxscheme_wrap.c  nxinter.i
 	$(CC) $(CFLAGS) -ieee_with_inexact -assume noaligned_objects \
 	-I$(MZINC)/include  nxscheme_wrap.c
 

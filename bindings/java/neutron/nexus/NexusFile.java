@@ -33,6 +33,7 @@ public class  NexusFile implements NeXusFileInterface {
     public final static int NXACC_CREATE = 3;
     public final static int NXACC_CREATE4 = 4;
     public final static int NXACC_CREATE5 = 5;
+    public final static int NXACC_CREATEXML = 6;
     
     /**
       * constant denoting an unlimited dimension.
@@ -46,6 +47,7 @@ public class  NexusFile implements NeXusFileInterface {
     public final static int NX_FLOAT32 = 5; 
     public final static int NX_FLOAT64 = 6; 
     public final static int NX_INT8 = 20; 
+    public final static int NX_BINARY = 20;
     public final static int NX_UINT8 = 21; 
     public final static int NX_INT16 = 22; 
     public final static int NX_UINT16 = 23; 
@@ -498,8 +500,24 @@ public class  NexusFile implements NeXusFileInterface {
     // inquiry
     //native methods for this section
     protected native void nxgetinfo(int handle, int iDim[], int args[]);
+    protected native void nxsetnumberformat(int handle, int type, 
+					    String format);
     protected native int nextentry(int handle, String names[]);
     protected native int nextattr(int handle, String names[], int args[]);
+    /**
+     * setnumberformat sets the number format for printing number when
+     * using the XML-NeXus format. For HDF4 and HDF5 this is ignored.
+     * If a dataset is open, the format for the dataset is set, if none 
+     * is open the default setting for the number type is changed.
+     * The format must be a ANSII-C language format string.
+     * @param type The NeXus type to set the format for. 
+     * @param format The new format to use.
+     */
+    public void setnumberformat(int type, String format) 
+	throws NexusException{
+       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+       nxsetnumberformat(handle,type,format);
+    }
     /**
       * getinfo retrieves information about a previously opened dataset.
       * @param iDim An array which will be filled with the size of

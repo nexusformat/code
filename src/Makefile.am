@@ -60,3 +60,8 @@ libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@
 ## endif
 
 include $(top_srcdir)/build_rules.am
+
+
+
+
+

@@ -228,6 +228,17 @@ public interface NeXusFileInterface {
     public void getinfo(int iDim[], int args[]) throws 
                           NexusException;
     /**
+     * setnumberformat sets the number format for printing number when
+     * using the XML-NeXus format. For HDF4 and HDF5 this is ignored.
+     * If a dataset is open, the format for the dataset is set, if none 
+     * is open the default setting for the number type is changed.
+     * The format must be a ANSII-C language format string.
+     * @param type The NeXus type to set the format for. 
+     * @param format The new format to use.
+     */
+    public void setnumberformat(int type, String format) 
+	throws NexusException;
+    /**
       * groupdir will retrieve the content of the currently open vGroup.
       * groupdir is similar to an ls in unix. 
       * @return A Hashtable  which will hold the names of the items in 

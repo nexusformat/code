@@ -12,6 +12,8 @@
 
    Mark Koennecke, August 2001
 
+   Updated for the NeXus XML-API, Mark Koennecke, October 2004
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -680,6 +682,15 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
 	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
         (*env)->SetObjectField(env, linki, fid, jstr);
 #endif        
+        fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
+        if(fid == 0)
+	{
+	    NXIReportError(env,
+	       "ERROR: failed to locate targetPath in nxgetgroupid");
+            return;
+        }
+	jstr = (*env)->NewStringUTF(env,myLink.targetPath);
+        (*env)->SetObjectField(env, linki, fid, jstr);
     }
 }
 /*------------------------------------------------------------------------
@@ -753,6 +764,16 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
 	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
         (*env)->SetObjectField(env, linki, fid, jstr);
 #endif
+        fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
+        if(fid == 0)
+	{
+	    NXIReportError(env,
+	       "ERROR: failed to locate targetPath in nxgetdataid");
+            return;
+        }
+	jstr = (*env)->NewStringUTF(env,myLink.targetPath);
+        (*env)->SetObjectField(env, linki, fid, jstr);
+
     }
 }
 /*------------------------------------------------------------------------
@@ -828,9 +849,50 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
      strcpy(myLink.iRefd,cData);
      (*env)->ReleaseStringUTFChars(env, jstr, cData);
 #endif
+     fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate targetPath in nxmakelink");
+          return;
+     }
+     jstr = (*env)->GetObjectField(env, target, fid);
+     cData = (*env)->GetStringUTFChars(env, jstr, 0);          
+     strcpy(myLink.targetPath,cData);
+     (*env)->ReleaseStringUTFChars(env, jstr, cData);
 
      // do actually link
      iRet = NXmakelink(nxhandle, &myLink);
+}
+/*----------------------------------------------------------------------
+                           nxsetnumberformat
+-----------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxsetnumberformat
+    (JNIEnv *env, jobject obj, jint handle, jint type, jstring format)
+{
+    NXhandle nxhandle;
+    char *cformat;
+    int iRet;
+
+   /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /*
+      extract format string
+    */
+    cformat = (char *) (*env)->GetStringUTFChars(env,format,0);
+
+    /*
+      call
+    */
+    iRet = NXsetnumberformat(nxhandle,type,cformat);
+    /*
+      release format string
+    */ 
+    (*env)->ReleaseStringUTFChars(env,format, cformat);
 }
 /*------------------------------------------------------------------------
                                nxgetinfo

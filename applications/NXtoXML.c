@@ -235,11 +235,17 @@ int PrintAttributes ()
 void PrintValues (void *data, int dataType, int numElements)
 {
    int i;
+   char c;
 
    for (i=0; i<numElements; i++) {
       switch(dataType) {
          case NX_CHAR:
-            fprintf (outId, "%c", ((char *)data)[i]);
+	    c = ((char *)data)[i];
+            if(c == '\0'){
+	      return;
+            } else {
+	      fprintf (outId, "%c",c);
+	    }
             break;
          case NX_INT8:
             fprintf (outId, "%d", ((char *)data)[i]);

@@ -7,16 +7,20 @@
   * updated for Napi-2.0 with HDF-5
   * Mark Koennecke, August 2001
   *
-  * copyright: see accomanying COPYRIGHT file 
+  * updated for NAPI-3.0 with XML
+  * Mark Koennecke, October 2004
+  *
+  * copyright: see accompanying COPYRIGHT file 
   */
 package neutron.nexus;
 
 public class NXlink {
     public int tag, ref;
-    public String ref5, refd;
+    public String ref5, refd, targetPath;
    
     public NXlink(){
        ref5 = new String("");
        refd = new String("");
+       targetPath = new String("");
     }
 }

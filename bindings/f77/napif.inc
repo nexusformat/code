@@ -3,7 +3,7 @@ C NeXus - Neutron & X-ray Common Data Format
 C  
 C Application Program Interface (Fortran 77) Header File
 C
-C Copyright (C) 1997-2002 Freddie Akeroyd, Mark Koennecke
+C Copyright (C) 1997-2004 Freddie Akeroyd, Mark Koennecke
 C
 C This library is free software; you can redistribute it and/or
 C modify it under the terms of the GNU Lesser General Public
@@ -26,11 +26,11 @@ C------------------------------------------------------------------------------
 
 C *** Version of NeXus interface - should be consistent with napi.h!
       CHARACTER*5 NEXUS_VERSION
-      PARAMETER(NEXUS_VERSION='2.1.0')
+      PARAMETER(NEXUS_VERSION='3.0.0')
 C *** NXaccess enum - access modes for NXopen
       INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE, NXACC_CREATE5
       PARAMETER(NXACC_READ=1,NXACC_RDWR=2,NXACC_CREATE=3,
-     +    NXACC_CREATE4=4,NXACC_CREATE5=5)
+     +    NXACC_CREATE4=4,NXACC_CREATE5=5,NXACC_CREATEXML=6)
 C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
 C *** large enough to hold an NXhandle structure
       INTEGER NXHANDLESIZE
@@ -72,7 +72,8 @@ C**** NeXus Unlimited Dimension
      +       NXPUTATTR, NXPUTCHARATTR, NXPUTDIM, NXGETINFO, 
      +       NXGETNEXTENTRY, NXGETNEXTATTR, NXGETGROUPID, NXMAKELINK,
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
-     +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA, NXOPENPATH
+     +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA, NXOPENPATH,
+     +       NXSETNUMBERFORMAT
       LOGICAL NXSAMEID
       EXTERNAL NXOPEN, NXCLOSE, NXMAKEGROUP, NXOPENGROUP, NXCLOSEGROUP,
      +       NXMAKEDATA, NXOPENDATA, NXCLOSEDATA, NXGETDATA, 
@@ -82,7 +83,7 @@ C**** NeXus Unlimited Dimension
      +       NXGETNEXTENTRY, NXGETNEXTATTR, NXGETGROUPID, NXMAKELINK,
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
      +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA, NXSAMEID, 
-     +       NXOPENPATH
+     +       NXOPENPATH,NXSETNUMBERFORMAT
 
 
 

@@ -92,6 +92,7 @@ libjnexus.so: $(COBJ)
 	$(CC) -shared  -o $(SHLIB) $(COBJ) ../../src/libNeXus.a \
 	$(HDF4ROOT)/lib/libmfhdf.a $(HDF4ROOT)/lib/libdf.a \
 	$(HDF4ROOT)/lib/libhdf5.a $(HDF4ROOT)/lib/libjpeg.a \
+	-L/afs/psi.ch/project/sinq/tru64/lib -lmxml\
 	-lz -lm  
 
 header: neutron/nexus/NexusFile.class

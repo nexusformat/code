@@ -31,40 +31,6 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <time.h>
 #include "napi.h"
 
-/*
- * We need to include CALLING_STYLE in the function pointer definition
- * or else we get a type mismatch on Win32
- */
-  typedef struct {
-        NXhandle *pNexusData;   
-        NXstatus (CALLING_STYLE *nxclose)(NXhandle* pHandle);
-        NXstatus (CALLING_STYLE *nxflush)(NXhandle* pHandle);
-        NXstatus (CALLING_STYLE *nxmakegroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
-        NXstatus (CALLING_STYLE *nxopengroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
-        NXstatus (CALLING_STYLE *nxclosegroup)(NXhandle handle);
-        NXstatus (CALLING_STYLE *nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
-        NXstatus (CALLING_STYLE *nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
-        NXstatus (CALLING_STYLE *nxcompress) (NXhandle handle, int compr_type);
-        NXstatus (CALLING_STYLE *nxopendata) (NXhandle handle, CONSTCHAR* label);
-        NXstatus (CALLING_STYLE *nxclosedata)(NXhandle handle);
-        NXstatus (CALLING_STYLE *nxputdata)(NXhandle handle, void* data);
-        NXstatus (CALLING_STYLE *nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
-        NXstatus (CALLING_STYLE *nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
-        NXstatus (CALLING_STYLE *nxgetdataID)(NXhandle handle, NXlink* pLink);
-        NXstatus (CALLING_STYLE *nxmakelink)(NXhandle handle, NXlink* pLink);
-        NXstatus (CALLING_STYLE *nxgetdata)(NXhandle handle, void* data);
-        NXstatus (CALLING_STYLE *nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
-        NXstatus (CALLING_STYLE *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
-        NXstatus (CALLING_STYLE *nxgetslab)(NXhandle handle, void* data, int start[], int size[]);
-        NXstatus (CALLING_STYLE *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
-        NXstatus (CALLING_STYLE *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
-        NXstatus (CALLING_STYLE *nxgetattrinfo)(NXhandle handle, int* no_items);
-        NXstatus (CALLING_STYLE *nxgetgroupID)(NXhandle handle, NXlink* pLink);
-        NXstatus (CALLING_STYLE *nxgetgroupinfo)(NXhandle handle, int* no_items, NXname name, NXname nxclass);
-        NXstatus (CALLING_STYLE *nxsameID)(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID);
-        NXstatus (CALLING_STYLE *nxinitgroupdir)(NXhandle handle);
-        NXstatus (CALLING_STYLE *nxinitattrdir)(NXhandle handle);
-  } NexusFunction, *pNexusFunction;
   
   static int iFortifyScope;
 /*------------------------------------------------------------------------
@@ -81,11 +47,28 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
   }
   return NX_ERROR;
 }
+/*-----------------------------------------------------------------------*/
+static NXstatus NXisXML(CONSTCHAR *filename)
+{
+  FILE *fd = NULL;
+  char line[132];
+
+  fd = fopen(filename,"r");
+  if(fd) {
+    fgets(line,131,fd);
+    fclose(fd);
+    if(strstr(line,"?xml") != NULL){
+      return NX_OK;
+    }
+  }
+  return NX_ERROR;
+}
+/*-------------------------------------------------------------------------*/
  
 
    /*---------------------------------------------------------------------*/
 
-  static void NXNXNXReportError(void *pData, char *string)
+  void NXNXNXReportError(void *pData, char *string)
   {
     printf("%s \n",string);
   }
@@ -97,7 +80,8 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
 
   /*---------------------------------------------------------------------*/
 
-  void CALLING_STYLE NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
+  NX_EXTERNAL void CALLING_STYLE NXMSetError(void *pData, 
+			      void (*NewError)(void *pD, char *text))
   {
     NXpData = pData;
     NXIReportError = NewError;
@@ -109,23 +93,62 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
 #ifdef HDF4
 #include "napi4.h"
 #endif
-  
+#ifdef NXXML
+#include "nxxml.h"
+#endif  
 
   /* ---------------------------------------------------------------------- 
   
                           Definition of NeXus API
 
    ---------------------------------------------------------------------*/
-
-
+static int determineFileType(CONSTCHAR *filename)
+{
+  FILE *fd = NULL;
+  int iRet;
+  
+  /*
+    this is for reading, check for existence first
+  */
+  fd = fopen(filename,"r");
+  if(fd == NULL){
+    return -1;
+  }
+  fclose(fd);
+#ifdef HDF5
+  iRet=H5Fis_hdf5((const char*)filename);
+  if( iRet > 0){
+    return 2;
+  }
+#endif  
+#ifdef HDF4
+  iRet=Hishdf((const char*)filename);
+  if( iRet > 0){
+    return 1;
+  }
+#endif
+#ifdef NXXML
+  iRet = NXisXML(filename);
+  if(iRet == NX_OK){
+    return 3;
+  }
+#endif
+  /*
+    file type not recognized
+  */
+  return 0;
+}
+/*-----------------------------------------------------------------------*/
   NXstatus CALLING_STYLE  NXopen(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
   {
     int hdf_type=0;
     int iRet=0;
     NXhandle hdf5_handle;
     NXhandle hdf4_handle;
+    NXhandle xmlHandle;
     pNexusFunction fHandle;
     NXstatus retstat;
+    char error[1024];
         
     /* configure fortify 
     iFortifyScope = Fortify_EnterScope();
@@ -146,21 +169,25 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
     } else if (am==NXACC_CREATE5) {
       /* HDF5 will be used ! */
       hdf_type=2;   
+    } else if (am==NXACC_CREATEXML) {
+      /* XML will be used ! */
+      hdf_type=3;   
     } else {
-      /* check file type hdf4/hdf5 for reading */
-#ifdef HDF5
-      iRet=H5Fis_hdf5((const char*)filename);
-#endif
-      if (iRet>0) {
-        hdf_type=2; 
-      } else {
-#ifdef HDF4
-        iRet=Hishdf((const char*)filename);
-#endif
-        if (iRet>0) {
-          hdf_type=1; 
-        } 
+      /* check file type hdf4/hdf5/XML for reading */
+      iRet = determineFileType(filename);
+      if(iRet < 0) {
+	snprintf(error,1023,"failed to open %s for reading",
+		 filename);
+	NXIReportError(NXpData,error);
+	return NX_ERROR;
       }
+      if(iRet == 0){
+	snprintf(error,1023,"failed to detrmine filetype for %s ",
+		 filename);
+	NXIReportError(NXpData,error);
+	return NX_ERROR;
+      }
+      hdf_type = iRet;
     }
     if (hdf_type==1) {
       /* HDF4 type */
@@ -171,36 +198,11 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
 	return retstat;
       }
       fHandle->pNexusData=hdf4_handle;
-      fHandle->nxclose=NX4close;
-      fHandle->nxflush=NX4flush;
-      fHandle->nxmakegroup=NX4makegroup;
-      fHandle->nxopengroup=NX4opengroup;
-      fHandle->nxclosegroup=NX4closegroup;
-      fHandle->nxmakedata=NX4makedata;
-      fHandle->nxcompmakedata=NX4compmakedata;
-      fHandle->nxcompress=NX4compress;
-      fHandle->nxopendata=NX4opendata;
-      fHandle->nxclosedata=NX4closedata;
-      fHandle->nxputdata=NX4putdata;
-      fHandle->nxputattr=NX4putattr;
-      fHandle->nxputslab=NX4putslab;    
-      fHandle->nxgetdataID=NX4getdataID;
-      fHandle->nxmakelink=NX4makelink;
-      fHandle->nxgetdata=NX4getdata;
-      fHandle->nxgetinfo=NX4getinfo;
-      fHandle->nxgetnextentry=NX4getnextentry;
-      fHandle->nxgetslab=NX4getslab;
-      fHandle->nxgetnextattr=NX4getnextattr;
-      fHandle->nxgetattr=NX4getattr;
-      fHandle->nxgetattrinfo=NX4getattrinfo;
-      fHandle->nxgetgroupID=NX4getgroupID;
-      fHandle->nxgetgroupinfo=NX4getgroupinfo;
-      fHandle->nxsameID=NX4sameID;
-      fHandle->nxinitgroupdir=NX4initgroupdir;
-      fHandle->nxinitattrdir=NX4initattrdir;
+      NX4assignFunctions(fHandle);
       *gHandle = fHandle;
 #else
-      NXIReportError (NXpData,"ERROR: Attempt to create HDF4 file when not linked with HDF4");
+      NXIReportError (NXpData,
+         "ERROR: Attempt to create HDF4 file when not linked with HDF4");
       *gHandle = NULL;
       retstat = NX_ERROR;
 #endif /* HDF4 */
@@ -214,46 +216,41 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
 	return retstat;
       }
       fHandle->pNexusData=hdf5_handle;
-      fHandle->nxclose=NX5close;
-      fHandle->nxflush=NX5flush;
-      fHandle->nxmakegroup=NX5makegroup;
-      fHandle->nxopengroup=NX5opengroup;
-      fHandle->nxclosegroup=NX5closegroup;
-      fHandle->nxmakedata=NX5makedata;
-      fHandle->nxcompmakedata=NX5compmakedata;
-      fHandle->nxcompress=NX5compress;
-      fHandle->nxopendata=NX5opendata;
-      fHandle->nxclosedata=NX5closedata;
-      fHandle->nxputdata=NX5putdata;
-      fHandle->nxputattr=NX5putattr;
-      fHandle->nxputslab=NX5putslab;    
-      fHandle->nxgetdataID=NX5getdataID;
-      fHandle->nxmakelink=NX5makelink;
-      fHandle->nxgetdata=NX5getdata;
-      fHandle->nxgetinfo=NX5getinfo;
-      fHandle->nxgetnextentry=NX5getnextentry;
-      fHandle->nxgetslab=NX5getslab;
-      fHandle->nxgetnextattr=NX5getnextattr;
-      fHandle->nxgetattr=NX5getattr;
-      fHandle->nxgetattrinfo=NX5getattrinfo;
-      fHandle->nxgetgroupID=NX5getgroupID;
-      fHandle->nxgetgroupinfo=NX5getgroupinfo;
-      fHandle->nxsameID=NX5sameID;
-      fHandle->nxinitgroupdir=NX5initgroupdir;
-      fHandle->nxinitattrdir=NX5initattrdir;
+      NX5assignFunctions(fHandle);
       *gHandle = fHandle;
 #else
-      NXIReportError (NXpData,"ERROR: Attempt to create HDF5 file when not linked with HDF5");
+      NXIReportError (NXpData,
+	 "ERROR: Attempt to create HDF5 file when not linked with HDF5");
       *gHandle = NULL;
       retstat = NX_ERROR;
 #endif /* HDF5 */
       return retstat;
+    } else if(hdf_type == 3){
+      /*
+	XML type
+      */
+#ifdef NXXML
+      retstat = NXXopen(filename,am,&xmlHandle);
+      if(retstat != NX_OK){
+	free(fHandle);
+	return retstat;
+      }
+      fHandle->pNexusData=xmlHandle;
+      NXXassignFunctions(fHandle);
+      *gHandle = fHandle;
+#else
+      NXIReportError (NXpData,
+	 "ERROR: Attempt to create XML file when not linked with XML");
+      *gHandle = NULL;
+      retstat = NX_ERROR;
+#endif
     } else {
       NXIReportError (NXpData,
           "ERROR: Format not readable by this NeXus library");
       *gHandle = NULL;
       return NX_ERROR;
     }
+    return NX_OK;
   }
 
 /* ------------------------------------------------------------------------- */
@@ -547,6 +544,25 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxinitattrdir(pFunc->pNexusData);
   }
+  /*-------------------------------------------------------------------------*/
+  
+  NXstatus CALLING_STYLE NXsetnumberformat (NXhandle fid, 
+					    int type, char *format)
+  {
+    pNexusFunction pFunc = (pNexusFunction)fid;
+    if(pFunc->nxsetnumberformat != NULL)
+    {
+      return pFunc->nxsetnumberformat(pFunc->pNexusData,type,format);
+    }
+    else
+    {
+      /*
+	silently ignore this. Most NeXus file formats do not require
+        this
+      */
+      return NX_OK;
+    }
+  }
   
   
   /*-------------------------------------------------------------------------*/
@@ -778,6 +794,78 @@ NXstatus CALLING_STYLE NXopenpath(NXhandle hfil, CONSTCHAR *path)
     }
   }
   return NX_OK;
+}
+/*--------------------------------------------------------------------
+  format NeXus time. Code needed in every NeXus file driver
+  ---------------------------------------------------------------------*/
+char *NXIformatNeXusTime(){
+    char *timeData;
+    time_t timer;
+    char* time_buffer = NULL;
+    struct tm *time_info;
+    const char* time_format;
+    long gmt_offset;
+#ifdef USE_FTIME
+    struct timeb timeb_struct;
+#endif 
+
+    time_buffer = (char *)malloc(64*sizeof(char));
+    if(!time_buffer){
+      NXIReportError(NXpData,"Failed to allocate buffer for time data");
+      return NULL;
+    }
+
+#ifdef NEED_TZSET
+    tzset();
+#endif 
+    time(&timer);
+#ifdef USE_FTIME
+    ftime(&timeb_struct);
+    gmt_offset = -timeb_struct.timezone * 60;
+    if (timeb_struct.dstflag != 0)
+    {
+        gmt_offset += 3600;
+    }
+#else
+    time_info = gmtime(&timer);
+    if (time_info != NULL)
+    {
+        gmt_offset = (long)difftime(timer, mktime(time_info));
+    }
+    else
+    {
+        NXIReportError (NXpData, 
+        "Your gmtime() function does not work ... timezone information will be incorrect\n");
+        gmt_offset = 0;
+    }
+#endif 
+    time_info = localtime(&timer);
+    if (time_info != NULL)
+    {
+        if (gmt_offset < 0)
+        {
+            time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
+        }
+        else
+        {
+            time_format = "%04d-%02d-%02d %02d:%02d:%02d+%02d%02d";
+        }
+        sprintf(time_buffer, time_format,
+            1900 + time_info->tm_year,
+            1 + time_info->tm_mon,
+            time_info->tm_mday,
+            time_info->tm_hour,
+            time_info->tm_min,
+            time_info->tm_sec,
+            abs(gmt_offset / 3600),
+            abs((gmt_offset % 3600) / 60)
+        );
+    }
+    else
+    {
+        strcpy(time_buffer, "1970-01-01 00:00:00+0000");
+    }
+    return time_buffer;
 }
 /*----------------------------------------------------------------------
                  F77 - API - Support - Routines
