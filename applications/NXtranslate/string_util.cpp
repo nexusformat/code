@@ -123,7 +123,7 @@ static bool is_bracket(char c){
   return find(BRACKETS.begin(),BRACKETS.end(),c)!=BRACKETS.end();
 }
 
-static bool is_comma(char c){
+extern bool string_util::is_comma(char c){
   static const string COMMA=",";
   return find(COMMA.begin(),COMMA.end(),c)!=COMMA.end();
 }
@@ -131,7 +131,7 @@ static bool is_comma(char c){
 /*
  * split a string up using commas as the delimiter
  */
-static StrVec split(const string &str){
+extern StrVec string_util::split(const string &str){
   StrVec result;
   typedef string::size_type string_size;
 
@@ -245,7 +245,7 @@ static StrVec shrink_and_split(string &str){
   while(str.substr(str.size()-1,str.size())==COMMA)
     str.erase(str.size()-1,str.size());
 
-  return split(str);
+  return string_util::split(str);
 }
 
 extern void string_util::str_to_shortArray(std::string & str,short *array, const uint len){
