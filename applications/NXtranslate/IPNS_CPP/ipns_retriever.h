@@ -11,6 +11,7 @@ class IpnsRetriever: public Retriever{
   ~IpnsRetriever();
   void getData(const std::string &, tree<Node> &);
   std::string toString() const;
+  std::string fixDate(char *, char *);
   static const std::string MIME_TYPE;
  private:
   void IpnsRetriever::getData(Node &, const std::string &);
