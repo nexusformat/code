@@ -1,3 +1,24 @@
+2004-05-05 17:00  jk
+	* bindings/java/Makefile.am: Improve the build of the JAVA
+	  interface to NeXus
+	* Makefile.am, configure.ac, test/Makefile.am, test/atlocal.in,
+	  test/testsuite.at, test/test?_test.[cf]: Add a new testsuite to 
+	  the distribution.
+		
+2004-05-03 17:00  jk
+	* autogen.sh: Improve the search for the newest autotools on the
+	  developer machine.
+	* configure.ac: Reduce the required autoconf version 
+	
+2004-03-01 17:00  jk
+	* configure.ac: Improve the check for the HDF libraries. If the
+	  HDF libraries found, check the versions. For HDF4 we need at least
+	  4.1 and for HDF 1.6
+	* configure.ac, test/Makefile.am, test/testsuite.at,
+	  test/atlocal.in: Add the automatic generated testsuite. 
+	* test/napi[45f]_test.c: Remove the output of the HDF_version and
+	  file_time because the are not fixed.
+	
 2004-02-20 10:00  jk
 	* autogen.sh: autogen.sh contains all calls to autotools necessary
 	  to create the complete infrastructure to use the configure
