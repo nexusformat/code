@@ -122,12 +122,15 @@ program NXtest
       attr_status = NXgetnextattr(fileid, name, NXlen, NXtype)
       if (attr_status == NX_ERROR) stop
       if (attr_status == NX_OK) then
-         select case (NXtype)
-            case (NX_CHAR)
-               NXlen = len(char_buffer)
-               if (NXgetattr(fileid, name, char_buffer, NXlen, NXtype) /= NX_OK) stop
-                  print *, "   "//trim(name)//" = "//trim(char_buffer)
-         end select
+	     if ((name /= "HDF_version") .and. (name /= "HDF5_Version") .and. &
+	         (name /= "file_time")) then
+            select case (NXtype)
+               case (NX_CHAR)
+                  NXlen = len(char_buffer)
+                  if (NXgetattr(fileid, name, char_buffer, NXlen, NXtype) /= NX_OK) stop
+                     print *, "   "//trim(name)//" = "//trim(char_buffer)
+            end select
+         end if
       end if
    end do
    if (NXopengroup(fileid, "entry", "NXentry") /= NX_OK) stop
@@ -144,10 +147,10 @@ program NXtest
       else if (entry_status == NX_OK) then
          if (NXopendata(fileid, name) /= NX_OK) stop
             if (NXgetinfo(fileid, NXrank, NXdims, NXtype) /= NX_OK) stop
-            print *, "   "//trim(name)//" : ", NXdatatype(NXtype)
+            print *, "   "//trim(name)//" : ", trim(NXdatatype(NXtype))
             if (NXtype == NX_CHAR) then
                if (NXgetdata(fileid, char_buffer) /= NX_OK) stop
-               print *, "   Values : ", char_buffer
+               print *, "   Values : ", trim(char_buffer)
             else if (NXtype == NX_INT8 .or. NXtype == NX_INT16 .or. NXtype == NX_INT32) then
                if (NXgetdata(fileid, i4_buffer) /= NX_OK) stop
                print *, "   Values : ", i4_buffer
@@ -172,7 +175,7 @@ program NXtest
                else if (attr_status == NX_OK) then
                   if (NXtype == NX_CHAR) then
                      if (NXgetattr(fileid, name, char_buffer) /= NX_OK) stop
-                     print *, "   "//trim(name)//" : ", char_buffer
+                     print *, "   "//trim(name)//" : ", trim(char_buffer)
                   else if (NXtype == NX_INT32) then
                      if (NXgetattr(fileid, name, i) /= NX_OK) stop
                      print *, "   "//trim(name)//" : ", i
