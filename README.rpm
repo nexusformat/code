@@ -1,0 +1,25 @@
+Unless you plan to build the rpm files as root you will need to do the
+following:
+
+(1) Create a   ~/.rpmmacros   file with a line similar to the following
+
+%_topdir	/home/faa/mybuilds
+
+(note: that is a tab separating the two parts)
+
+(2) create the corresponding RPM build directories
+
+    cd /home/faa/mybuilds
+    mkdir BUILD RPMS SOURCES SPECS SRPMS
+    cd RPMS
+    mkdir i386 i486 i586 i686
+
+(i.e. this should look like the default build area /usr/src/redhat)
+
+(3) Now you should be able to run the  build_rpm  script - this
+    will generate src and binary rpms from the current 
+    nexus*.tar.gz created from the last "make distcheck" or "make dist"
+
+Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+
+$Id$

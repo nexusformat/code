@@ -165,7 +165,8 @@ AM_CONDITIONAL([HAVE_F90], [test ! -z "$F90"])
 AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
 AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
 
-AC_CONFIG_FILES([Makefile 
+AC_CONFIG_FILES([Makefile
+		nexus.spec
 		include/Makefile
 		src/Makefile 
 		applications/Makefile
