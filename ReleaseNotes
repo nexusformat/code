@@ -32,6 +32,9 @@ Changes in Version 1.2.0
 - Added check for __ABSOFT macro in "napi.h" to make compatible with 
   Absoft Pro Fortran for Linux
 
+- Add __stdcall definition to C prototypes under WIN32 so they can link 
+  to FORTRAN 
+
 Changes in Version 1.1.0
 ========================
 
