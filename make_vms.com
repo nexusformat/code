@@ -11,7 +11,7 @@ $ DEFINE HDF_ROOT AXPLIB$DISK:[HDF.]   ! where you installed HDF, trailing "." i
 $!=======================================================================
 $! Create library NEXUS.OLB (comment out either Fortran 77 or Fortran 90)
 $!
-$ CC/INCLUDE=HDF_ROOT:[INCLUDE] NAPI.C
+$ CC/INCLUDE=HDF_ROOT:[INCLUDE]/DEFINE=(NEXUS_LIBRARY=1) NAPI.C
 $!=======================================================================
 $!Fortran 77
 $ FORTRAN NAPIF.F

@@ -49,6 +49,25 @@
 #endif /* GENIE_IMPLEMENTATION__ */
 
 /*
+ * Set up NX_EXTERNAL macro for declaring functions for import/export from
+ * a Windows DLL. We need to do this differently for building the library and for a user program,
+ * so we check the NEXUS_LIBRARY macro which is defined only when compiling the library
+ */
+#ifdef NEXUS_LIBRARY	/* we are building the library, so need to export */
+#  ifdef _WIN32
+#    define NX_EXTERNAL	__declspec( dllexport )
+#  else
+#    define NX_EXTERNAL
+#  endif /* _WIN32 */
+#else			/* we are building an application, so need to import */
+#  ifdef _WIN32
+#    define NX_EXTERNAL	__declspec( dllimport )
+#  else
+#    define NX_EXTERNAL
+#  endif /* _WIN32 */
+#endif /* NEXUS_LIBRARY */
+
+/*
  * check for ints.h header on VMS - it defines conflicting types
  */
 #if defined(__VMS) && defined(__INTS_LOADED)
@@ -252,49 +271,49 @@ extern "C" {
 /* 
  * Standard interface 
  */
-  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
-  NXstatus CALLING_STYLE NXclose(NXhandle* pHandle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXclose(NXhandle* pHandle);
   
-  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
-  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
-  NXstatus CALLING_STYLE NXclosegroup(NXhandle handle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXclosegroup(NXhandle handle);
   
-  NXstatus CALLING_STYLE NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
-  NXstatus CALLING_STYLE NXopendata (NXhandle handle, CONSTCHAR* label);
-  NXstatus CALLING_STYLE NXcompress (NXhandle handle, int compr_type);
-  NXstatus CALLING_STYLE NXclosedata(NXhandle handle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopendata (NXhandle handle, CONSTCHAR* label);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXcompress (NXhandle handle, int compr_type);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXclosedata(NXhandle handle);
   
-  NXstatus CALLING_STYLE NXgetdata(NXhandle handle, void* data);
-  NXstatus CALLING_STYLE NXgetslab(NXhandle handle, void* data, int start[], int size[]);
-  NXstatus CALLING_STYLE NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetdata(NXhandle handle, void* data);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetslab(NXhandle handle, void* data, int start[], int size[]);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
   
-  NXstatus CALLING_STYLE NXputdata(NXhandle handle, void* data);
-  NXstatus CALLING_STYLE NXputslab(NXhandle handle, void* data, int start[], int size[]);
-  NXstatus CALLING_STYLE NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXputdata(NXhandle handle, void* data);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXputslab(NXhandle handle, void* data, int start[], int size[]);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
   
-  NXstatus CALLING_STYLE NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
-  NXstatus CALLING_STYLE NXgetgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
-  NXstatus CALLING_STYLE NXinitgroupdir(NXhandle handle);
-  NXstatus CALLING_STYLE NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
-  NXstatus CALLING_STYLE NXgetattrinfo(NXhandle handle, int* no_items);
-  NXstatus CALLING_STYLE NXinitattrdir(NXhandle handle);
-  NXstatus CALLING_STYLE NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXinitgroupdir(NXhandle handle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetattrinfo(NXhandle handle, int* no_items);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXinitattrdir(NXhandle handle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
   
-  NXstatus CALLING_STYLE NXgetgroupID(NXhandle handle, NXlink* pLink);
-  NXstatus CALLING_STYLE NXgetdataID(NXhandle handle, NXlink* pLink);
-  NXstatus CALLING_STYLE NXmakelink(NXhandle handle, NXlink* pLink);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetgroupID(NXhandle handle, NXlink* pLink);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXgetdataID(NXhandle handle, NXlink* pLink);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXmakelink(NXhandle handle, NXlink* pLink);
   
 /* 
  * Helper interface 
  */
 
-  NXstatus CALLING_STYLE NXmalloc(void** data, int rank, int dimensions[], int datatype);
-  NXstatus CALLING_STYLE NXfree(void** data);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXmalloc(void** data, int rank, int dimensions[], int datatype);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXfree(void** data);
 
 /*-----------------------------------------------------------------------
     A non Nexus standard function to set an error handler 
 */
-  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
+NX_EXTERNAL  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
 
 #ifdef __cplusplus
 }

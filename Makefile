@@ -18,6 +18,10 @@
 #F90=f90
 #F90FLAGS=-YEXT_NAMES=LCS
 #====================================================================
+
+# -DNEXUS_LIBRARY=1 is only needed for building the NeXus library
+CFLAGS=$(CFLAGS) -DNEXUS_LIBRARY=1
+
 HDFROOT=/usr/local/hdf
 FILES=napi.c napi.h napi_test.c napif.f napif_test.f napif.inc \
 	napi_test_read.c NXmodule.f90 NXUmodule.f90 NXtest.f90 \
