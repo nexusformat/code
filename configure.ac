@@ -104,11 +104,11 @@ AC_ARG_WITH([hdf5],
 # otherwise try and find HDF path, but not if
 # e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
 # first HDF4
-HDF4SEARCH="/usr/local/hdf /usr/local/hdf4"
+HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /sw"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
     for i in $HDF4SEARCH; do
-	if test -d $i; then H4ROOT=$i; fi
+	if test -r ${i}/lib/libdf.a; then H4ROOT=$i; fi
     done
     if test -z "$H4ROOT"; then 
 	AC_MSG_RESULT(unknown)
@@ -121,11 +121,11 @@ if test ! -z "$H4ROOT"; then
     CPPFLAGS="$CPPFLAGS -I$H4ROOT/include -DHDF4"
 fi
 # HDF5
-HDF5SEARCH="/usr/local/hdf5"
+HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /sw"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
     for i in $HDF5SEARCH; do
-	if test -d $i; then H5ROOT=$i; fi
+	if test -r ${i}/lib/libhdf5.a; then H5ROOT=$i; fi
     done
     if test -z "$H5ROOT"; then 
 	AC_MSG_RESULT(unknown)
