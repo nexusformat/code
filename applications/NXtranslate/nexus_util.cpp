@@ -140,12 +140,6 @@ extern void nexus_util::make_data(NXhandle *handle, const Node& node){
   if(NXputdata(*handle,data)!=NX_OK)
     throw runtime_error("NXputdata failed");
   NXfree(&data);
-  /*
-  if(node.data()==NULL)
-    throw runtime_error("CANNOT ADD NULL DATA");// << std::endl;
-  if(NXputdata(*handle,node.data())!=NX_OK)
-    throw runtime_error("NXputdata failed");
-  */
 }
 
 static void recurse_make_data(NXhandle *handle, const TreeNode &tree, const TreeNode::sibling_iterator &begin, const TreeNode::sibling_iterator &end){
@@ -341,7 +335,9 @@ extern void nexus_util::open_path(NXhandle *handle, const StringVec &path, int &
   std::cout << "," << num_group << "," << num_data << ")" << std::endl;
 #endif
   for( StringVec::const_iterator it=path.begin() ; it!=path.end() ; it++ ){
+    std::cout << "  ** " << *it; // REMOVE
     string type=get_type(handle,*it);
+    std::cout << " : " << type << std::endl; // REMOVE
     if(type.size()<=0){
       close_path(handle,num_group,num_data);
       throw runtime_error("Path ["+path_to_str(path)+"] did not exist");
@@ -378,6 +374,9 @@ extern void nexus_util::close_path(NXhandle *handle, int &num_group, int &num_da
 }
 
 extern size_t nexus_util::calc_size(int rank, int *dims, int type){
+  // check that the rank is reasonable
+  if(rank<=0) throw invalid_argument("Do not understand rank<=0");
+
   // determine how much to copy
   size_t size=1;
   for( int i=0 ; i<rank ; i++ )
