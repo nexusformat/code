@@ -20,6 +20,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
              
   For further information, see <http://www.neutron.anl.gov/NeXus/>
+  
+  $Id$
 
 ----------------------------------------------------------------------------*/
 #include <stdlib.h>
