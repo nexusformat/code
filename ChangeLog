@@ -1,3 +1,9 @@
+2004-10-21 15:00  jk
+	* autogen.sh autoversion.h: Enable the automake versions 1.9.X
+	* binding/f77/napif.inc: Set the NeXus version number 2.1.0
+	* test/: Improve the testing for F77 binding depending on F77,
+	  HDF4, and HDF5 using
+
 2004-05-05 17:00  jk
 	* bindings/java/Makefile.am: Improve the build of the JAVA
 	  interface to NeXus
