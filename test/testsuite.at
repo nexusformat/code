@@ -138,7 +138,7 @@ AT_CHECK([NXtest], [],
  Group: entry(NXentry) contains  8 items
     ch_data : NX_CHAR 
     Values : NeXus data 
-     Subgroup: data(NXdata)
+    Subgroup: data(NXdata)
     i1_data : NX_INT8 
     Values :  1 2 3 4
     i2_data : NX_INT16 
