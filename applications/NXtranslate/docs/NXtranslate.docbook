@@ -7,7 +7,8 @@
  <!ENTITY mime_type   "<parameter>NXS:mime_type</parameter>">
  <!ENTITY source      "<parameter>NXS:source</parameter>">
  <!ENTITY location    "<parameter>NXS:location</parameter>">
- <!ENTITY make_link   "<parameter>NXS:make_link</parameter>">
+ <!ENTITY make_link   "<parameter>target</parameter>">
+ <!ENTITY link_tag    "<parameter>NAPIlink</parameter>">
 ]>
  
 <book id="NXtranslate" lang="en">

@@ -110,12 +110,17 @@ the NeXus retriever this is a path to a particular node in the file
 which will be written out to the resulting NeXus
 file.</para></listitem></varlistentry>
 
-<varlistentry><term>&make_link</term><listitem><para>The node
-containing this attribute will have all other information ignored,
-instead a link from it to the location denoted by the attribute value
-will be made. The syntax for describing location is the same as for
-the <link linkend="nexus">NeXus
-retriever</link>.</para></listitem></varlistentry>
+<varlistentry><term>&link_tag</term><listitem><para>This denotes a
+node that is a link to another node in the file. It must have a
+&make_link attribute. All other attributes will be
+ignored</para></listitem></varlistentry>
+
+<varlistentry><term>&make_link</term><listitem><para>The attribute
+denoting what a &link_tag node should be linked to. The syntax for
+describing location is the same as for the <link linkend="nexus">NeXus
+retriever</link>. If this attribute appears in a node other than
+&link_tag it will be treated as a normal
+attribute.</para></listitem></varlistentry>
 
 <varlistentry><term>primative type</term><listitem><para>Any of the
 following types (ignoring bit-length): <parameter>NX_UINT</parameter>
@@ -143,8 +148,8 @@ set global values for &mime_type and &source .</para></listitem>
 <listitem><para>Only groups can exist directly inside the
 root. This is a constraint of the NeXus API.</para></listitem>
 
-<listitem><para>Every node (except the <parameter>NXroot</parameter>)
-needs a <parameter>name</parameter> and
+<listitem><para>Every node (except the <parameter>NXroot</parameter>
+and &link_tag ) needs a <parameter>name</parameter> and
 <parameter>type</parameter>. If the node has a &location then the type
 can be omitted since the retriever will provide it.</para></listitem>
 
@@ -154,9 +159,8 @@ restriction in the NeXus API and does not constrain the contents of
 resulting NeXus files in any way.</para></listitem>
 
 <listitem><para>Groups cannot have any data in them. In other words
-things similar to <parameter><![CDATA[<data
-type="NXdata">1,2,3,4</data>]]></parameter> are
-incorrect.</para></listitem>
+things similar to <parameter><![CDATA[<data type="NXdata">1 2 3
+4</data>]]></parameter> are incorrect.</para></listitem>
 
 <listitem><para>To specify the dimensions of a field, use square
 brackets [] affter the type. A single precision floating point array
@@ -164,6 +168,12 @@ with five elements would have
 <parameter>type="NX_FLOAT32[5]"</parameter>. If the field has only one
 element, or is a character array, the dimensions can be left off. For
 character arrays, the dimensions are ignored.</para></listitem>
+
+<listitem><para>To specify the type of a attribute denote the
+primative type separated from the value using square brackets. For
+numeric types only scalars are allowed. If no type is specified it is
+assumed to be a character array (length is determined
+automatically).</para></listitem>
 
 </itemizedlist>
 </para>
@@ -181,34 +191,44 @@ information will be taken from any other file.</para>
 <example id="simple_translation_xml"><title>Simple translation file <filename>test_simple.xml</filename></title>
 <programlisting role="XML" linenumbering="numbered">
 <![CDATA[<NXroot>
-  <entry1 type="NXentry">
-    <note type="NXnote">
+  <NXentry name="entry1">
+    <NXnote name="note">
       <author type="NX_CHAR">George User</author>
       <type type="NX_CHAR">text/plain</type>
-      <data type="NX_CHAR">The data is a simple parabola, f(x)=x^2</data>
-    </note>
-    <parabola_1D type="NXdata">
-      <x type="NX_INT8[11]" axis="1" units="number">
-            [0,1,2,3,4,5,6,7,8,9,10]</x>
-      <f_x type="NX_INT16[11]" signal="1" units="number">
-            0,1,4,9,16,25,36,49,64,81,100</f_x>
-    </parabola_1D>
-  </entry1>
-  <entry2 type="NXentry">
-    <note type="NXnote">
+      <data type="NX_CHAR">The data is a simple parabola, f(x)=x^2
+      </data>
+    </NXnote>
+    <NXdata name="parabola_1D">
+      <x type="NX_INT8[11]" axis="NX_INT:1" units="number">
+            0 1 2 3  4  5  6  7  8  9  10
+      </x>
+      <f_x type="NX_INT16[11]" signal="NX_INT:1" units="number">
+            0 1 4 9 16 25 36 49 64 81 100
+      </f_x>
+    </NXdata>
+  </NXentry>
+  <NXentry name="entry2">
+    <NXnote name="note">
       <author type="NX_CHAR">George User</author>
       <type type="NX_CHAR">text/plain</type>
-      <data type="NX_CHAR">
-            The data is a two dimensional parabola, f(x,y)=x^2+y^2</data>
-    </note>
-    <parabola_2D type="NXdata">
-      <x type="NX_FLOAT32[4]" axis="1" units="number">1.0,4.7,2.3,1.6</x>
-      <y type="NX_FLOAT32[3]" axis="2" units="number">3.3,6.2,9.2</y>
-      <f_x_y type="NX_FLOAT64[4,3]" signal="1" axes="x,y" units="number">
-            [11.89,32.98,16.18][13.45,39.44,60.53]
-            [43.73,41.00,85.64][106.73,89.93,87.20]</f_x_y>
-    </parabola_2D>
-  </entry2>
+      <data type="NX_CHAR">The data is a two dimensional parabola,
+                           f(x,y)=x^2+y^2</data>
+    </NXnote>
+    <NXdata name="parabola_2D">
+      <x type="NX_FLOAT32[4]" axis="NX_INT:1" units="number">
+           1.0 4.7 2.3 1.6
+      </x>
+      <y type="NX_FLOAT32[3]" axis="NX_INT:2" units="number">
+           3.3 6.2 9.2
+      </y>
+      <f_x_y type="NX_FLOAT64[4,3]" signal="NX_INT:1" axes="x,y" units="number">
+            11.89 32.98 16.18
+            13.45 39.44 60.53
+            43.73 41.00 85.64
+           106.73 89.93 87.20
+      </f_x_y>
+    </NXdata>
+  </NXentry>
 </NXroot>]]>
 </programlisting>
 </example>
@@ -336,15 +356,13 @@ the copy without direct comparison of ids using the NeXus api. Links
 can be either to a group or field. Links to attributes are not
 supported by the &napi . A link to a group and field are both shown in
 <xref linkend="two_links_xml">. The first link is to a group whose
-name was <parameter>group1</parameter>, and will be named
-<parameter>group1</parameter> in the link (the tag name is
-ignored). The second link is to a field, its new name will be ignored
-as well.</para>
+name was <parameter>group1</parameter>, while the second link is to a
+field <parameter>array1</parameter>.</para>
 
 <example id="two_links_xml"><title>Two links</title>
 <programlisting role="XML">
-<![CDATA[<a NXS:make_link="/entry/group1"/>
-<b NXS:make_link="/entry/group1/array1"/>]]>
+<![CDATA[<NAPIlink target="/entry/group1"/>
+<NAPIlink target="/entry/group1/array1"/>]]>
 </programlisting>
 </example>
 
