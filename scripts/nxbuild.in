@@ -64,7 +64,7 @@ LIBNEXUS90="libNeXus90.a"
 CFLAGS="@CFLAGS@"
 FFLAGS="@FFLAGS@"
 DEFS="@DEFS@"
-CPPFLAGS="@CPPFLAGS@ -I../include"
+CPPFLAGS="@CPPFLAGS@ -I../include -I${prefix}/include"
 LDFLAGS="@LDFLAGS@"
 LIBS="@LIBS@"
 
