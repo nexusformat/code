@@ -1,9 +1,9 @@
 C------------------------------------------------------------------------------
 C NeXus - Neutron & X-ray Common Data Format
 C  
-C API Fortran 77 Interface
+C Application Program Interface (Fortran 77)
 C
-C Copyright (C) 1997, 1998, 1999, Freddie Akeroyd
+C Copyright (C) 1997-2002 Freddie Akeroyd, Mark Koennecke
 C
 C This library is free software; you can redistribute it and/or
 C modify it under the terms of the GNU Lesser General Public
@@ -19,19 +19,7 @@ C You should have received a copy of the GNU Lesser General Public
 C License along with this library; if not, write to the Free Software
 C Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 C
-C Contact : Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
-C           ISIS Facility
-C           Rutherford Appleton Laboratory
-C           Chilton, Didcot
-C           Oxfordshire
-C           OX11 0QX
-C           United Kingdom
-C
 C For further information, see <http://www.neutron.anl.gov/NeXus/>
-C
-C Updated for the Nexus-2.1.0 API supoorting HDF-5
-C
-C Mark Koennecke, August 2001
 C
 C $Id$
 C------------------------------------------------------------------------------
@@ -61,7 +49,7 @@ C *** Convert FORTRAN string STRING into NULL terminated C string ISTRING
       ENDDO
       ISTRING(ILEN+1) = 0
       RETURN
- 9000 FORMAT('NeXus(NAPIF/EXTRACT_STRING): String too long -'
+ 9000 FORMAT('NeXus(NAPIF/EXTRACT_STRING): String too long -',
      +       'buffer needs increasing from ', i4,' to at least ',i4)
       END
 
@@ -353,6 +341,17 @@ C *** Reverse dimension array as C is ROW major, FORTRAN column major
       INTEGER FILEID(*), LINK(*), NXIMAKELINK
       EXTERNAL NXIMAKELINK
       NXMAKELINK = NXIMAKELINK(FILEID, LINK)
+      END
+
+      LOGICAL FUNCTION NXSAMEID(FILEID, LINK1, LINK2)
+      INTEGER FILEID(*), LINK1(*), LINK2(*), NXISAMEID, STATUS
+      EXTERNAL NXISAMEID
+      STATUS = NXISAMEID(FILEID, LINK1, LINK2)
+      IF (STATUS .EQ. 1) THEN
+         NXSAMEID = .TRUE.
+      ELSE
+         NXSAMEID = .FALSE.
+      ENDIF
       END
 
       INTEGER FUNCTION NXGETGROUPINFO(FILEID, NUM, NAME, CLASS)
