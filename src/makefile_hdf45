@@ -1,0 +1,40 @@
+#
+# $Id: Makefile,v 2.00 2001/27/07 11:00:02
+# Makefile for building all NEXUS libraries
+#
+
+#NX_PARA=lib4
+
+CC=cc
+CFLAGS1=-g
+HROOT=/data/lnslib
+FROOT=/data/filges/nexus-45
+CFLAGS=$(CFLAGS1)
+LIBNEXUS45_OBJ=napi45.o
+TEST4_OBJ=napi45_4test.o
+TEST5_OBJ=napi45_5test.o
+NOPT=-DHDF4 -DHDF5
+
+all: libNeXus45.a test4 test5
+
+.c.o :
+	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45.c -I$(HROOT)/include -c 
+	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45_4test.c -I$(HROOT)/include -c
+	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45_5test.c -I$(HROOT)/include -c
+
+
+libNeXus45.a : $(LIBNEXUS45_OBJ)
+	@echo "*** Creating NeXus interface based on HDF4/HDF5 library libNeXus45.a ***"
+	- rm $@
+	ar -cr $@ $(LIBNEXUS45_OBJ)
+	ranlib $@
+
+test4: libNeXus45.a $(TEST4_OBJ)
+	$(CC) $(CFLAGS) -o test4 $(TEST4_OBJ) $(FROOT)/libNeXus45.a \
+	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lhdf5 -lz 
+
+test5: libNeXus45.a $(TEST5_OBJ)
+	$(CC) $(CFLAGS) -o test5 $(TEST5_OBJ) $(FROOT)/libNeXus45.a \
+	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lhdf5 -lz 
+	
+

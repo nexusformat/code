@@ -1,0 +1,41 @@
+# Microsoft Developer Studio Generated Dependency File, included by hdf45_4.mak
+
+..\napi45.c : \
+	"..\..\hdf4\hdf41r4\include\hbitio.h"\
+	"..\..\hdf4\hdf41r4\include\hcomp.h"\
+	"..\..\hdf4\hdf41r4\include\hdf.h"\
+	"..\..\hdf4\hdf41r4\include\hdf2netcdf.h"\
+	"..\..\hdf4\hdf41r4\include\hdfi.h"\
+	"..\..\hdf4\hdf41r4\include\herr.h"\
+	"..\..\hdf4\hdf41r4\include\hlimits.h"\
+	"..\..\hdf4\hdf41r4\include\hntdefs.h"\
+	"..\..\hdf4\hdf41r4\include\hproto.h"\
+	"..\..\hdf4\hdf41r4\include\htags.h"\
+	"..\..\hdf4\hdf41r4\include\mfgr.h"\
+	"..\..\hdf4\hdf41r4\include\mfhdf.h"\
+	"..\..\hdf4\hdf41r4\include\netcdf.h"\
+	"..\..\hdf4\hdf41r4\include\vg.h"\
+	"..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\napi4.c"\
+	"..\napi4.h"\
+	"..\napi45.h"\
+	
+
+..\napi45_4test.c : \
+	"..\..\hdf4\hdf41r4\include\hbitio.h"\
+	"..\..\hdf4\hdf41r4\include\hcomp.h"\
+	"..\..\hdf4\hdf41r4\include\hdf.h"\
+	"..\..\hdf4\hdf41r4\include\hdf2netcdf.h"\
+	"..\..\hdf4\hdf41r4\include\hdfi.h"\
+	"..\..\hdf4\hdf41r4\include\herr.h"\
+	"..\..\hdf4\hdf41r4\include\hlimits.h"\
+	"..\..\hdf4\hdf41r4\include\hntdefs.h"\
+	"..\..\hdf4\hdf41r4\include\hproto.h"\
+	"..\..\hdf4\hdf41r4\include\htags.h"\
+	"..\..\hdf4\hdf41r4\include\mfgr.h"\
+	"..\..\hdf4\hdf41r4\include\mfhdf.h"\
+	"..\..\hdf4\hdf41r4\include\netcdf.h"\
+	"..\..\hdf4\hdf41r4\include\vg.h"\
+	"..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\napi45.h"\
+	
