@@ -167,7 +167,7 @@ extern "C" {
   
   NXstatus  NXgetdata(NXhandle handle, void* data);
   NXstatus  NXgetslab(NXhandle handle, void* data, int start[], int size[]);
-  NXstatus  NXgetattr(NXhandle handle, char* name, char* data, int* iDataLen, int* iType);
+  NXstatus  NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
   
   NXstatus  NXputdata(NXhandle handle, void* data);
   NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]);

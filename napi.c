@@ -778,7 +778,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   
   
   NXstatus
-  NXgetattr (NXhandle fid, char *name, char *data, int* datalen, int* iType)
+  NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
     int32 iNew;
