@@ -335,9 +335,7 @@ extern void nexus_util::open_path(NXhandle *handle, const StringVec &path, int &
   std::cout << "," << num_group << "," << num_data << ")" << std::endl;
 #endif
   for( StringVec::const_iterator it=path.begin() ; it!=path.end() ; it++ ){
-    std::cout << "  ** " << *it; // REMOVE
     string type=get_type(handle,*it);
-    std::cout << " : " << type << std::endl; // REMOVE
     if(type.size()<=0){
       close_path(handle,num_group,num_data);
       throw runtime_error("Path ["+path_to_str(path)+"] did not exist");
