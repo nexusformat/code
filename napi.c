@@ -328,7 +328,14 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	NXstatus ret;
  	NXhandle fileid;
 	ret = NXopen(filename, *am, &fileid);
-	memcpy(pHandle, fileid, sizeof(NexusFile));
+	if (ret == NX_OK)
+	{
+	    memcpy(pHandle, fileid, sizeof(NexusFile));
+	}
+	else
+	{
+	    memset(pHandle, 0, sizeof(NexusFile));
+	}
 	return ret;
   }
 
