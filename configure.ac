@@ -1,32 +1,32 @@
-#====================================================================
-#  NeXus - Neutron & X-ray Common Data Format
-#  
-#  Autoconf (configure script) generation file
-#  
-#  $Id$
-#
-#  Copyright (C) 2004 Freddie Akeroyd
-#  
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
-# 
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
-# 
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free 
-#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
-#  MA  02111-1307  USA
-#             
-#  For further information, see <http://www.neutron.anl.gov/NeXus/>
-#
-#                       -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-#
+dnl====================================================================
+dnl  NeXus - Neutron & X-ray Common Data Format
+dnl  
+dnl  Autoconf (configure script) generation file
+dnl  
+dnl  $Id$
+dnl
+dnl  Copyright (C) 2004 Freddie Akeroyd
+dnl  
+dnl  This library is free software; you can redistribute it and/or
+dnl  modify it under the terms of the GNU Lesser General Public
+dnl  License as published by the Free Software Foundation; either
+dnl  version 2 of the License, or (at your option) any later version.
+dnl 
+dnl  This library is distributed in the hope that it will be useful,
+dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl  Lesser General Public License for more details.
+dnl 
+dnl  You should have received a copy of the GNU Lesser General Public
+dnl  License along with this library; if not, write to the Free 
+dnl  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+dnl  MA  02111-1307  USA
+dnl             
+dnl  For further information, see <http://www.neutron.anl.gov/NeXus/>
+dnl
+dnl                       -*- Autoconf -*-
+dnl Process this file with autoconf to produce a configure script.
+dnl
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
@@ -35,7 +35,7 @@ AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
-# check for correct autoconf version - the same check is done in autogen.sh
+dnl check for correct autoconf version - the same check is done in autogen.sh
 . autoversion.sh
 
 AC_CONFIG_AUX_DIR(config)
@@ -45,61 +45,87 @@ AM_INIT_AUTOMAKE([1.6])
 
 AM_CONFIG_HEADER([include/nxconfig.h])
 AC_PROG_LIBTOOL
-# Checks for programs.
-AC_ARG_WITH([cc],
-	AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
-	[if test $withval != no; then CC=$withval; fi])
-AC_ARG_WITH([f90],
-	AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
-	[if test $withval != no; then F90=$withval; fi])
-AC_ARG_WITH([f77],
-	AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[if test $withval != no; then F77=$withval; fi])
-AC_PROG_CC
-AC_PROG_F77
-AC_CHECK_PROGS(F90,f90 f95)
+dnl Checks for programs.
+AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
+	[], [with_cc=yes])
+if test x"$with_cc" != x"no" ; then
+	if test x"$with_cc" = x"yes" ; then
+		AC_PROG_CC
+	else
+		AC_CHECK_PROGS(CC, ["$with_cc"])
+	fi
+	dnl Check C compiler options
+	dnl -no-cpp-precomp needed on MacOS-X (and others?)
+	AC_CHECK_C_OPTION([-no-cpp-precomp])
+	AC_CHECK_C_OPTION([-fno-common])
+else
+	AC_MSG_ERROR([You need a C compiler to compile this package])
+fi
+
+AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
+	[], [with_f77=yes])
+if test x"$with_f77" != x"no" ; then
+	if test x"$with_f77" = x"yes" ; then
+		AC_PROG_F77
+	else
+		AC_CHECK_PROGS(F77, ["$with_f77"])
+	fi
+	dnl Check FORTRAN compiler options
+	dnl 	AC_CHECK_F77_OPTION([-Wno-globals])
+	dnl 	AC_CHECK_F77_OPTION([-fno-common])  # use with caution
+	mytop=`pwd`
+	dnl get right F77 include option
+	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
+	AC_F77_LIBRARY_LDFLAGS
+else
+	F77=
+fi
+
+AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
+	[], [with_f90=yes])
+if test x"$with_f90" != x"no" ; then
+	if test x"$with_f90" = x"yes" ; then
+		AC_CHECK_PROGS(F90, [f90 f95])
+	else
+		AC_CHECK_PROGS(F90, ["$with_f90"])
+	fi
+	dnl f90 has a "module path" option - hard to get as you really need a
+	dnl ready compiled module to point the option at so for now we are just
+	dnl check that the option takes a directory and the compiler works
+	mytop=`pwd`
+	F90FLAGS="$F90FLAGS -I$mytop/bindings/f90"
+	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
+	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
+	AC_SUBST(F90)
+	AC_SUBST(F90FLAGS)
+else
+	F90=
+fi
 
 AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
-	[if test $withval != yes -a $withval != no ; then JAVAC=$withval; fi], [with_java=yes])
+	[], [with_java=yes])
 if test x$"with_java" != x"no" ; then
 	if test x"$with_java" = x"yes" ; then
 		AC_CHECK_PROGS(JAVAC, javac)
+	else
+		AC_CHECK_PROGS(JAVAC, ["$with_java"])
 	fi
 	AC_CHECK_PROGS(JAVADOC,	javadoc)
 	AC_CHECK_PROGS(JAR, jar)
 	AC_CHECK_PROGS(JAVA, java)
 	AC_CHECK_PROGS(JAVAH, javah)
+else
+	JAVAC=
 fi
-AC_SUBST(F90)
-AC_SUBST(F90FLAGS)
 AC_SUBST(SHARED_LDFLAGS)
-#
+
 AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-# Check C compiler options
-# -no-cpp-precomp needed on MacOS-X (and others?)
-AC_CHECK_C_OPTION([-no-cpp-precomp])
-AC_CHECK_C_OPTION([-fno-common])
-
-# Check FORTRAN compiler options
-#AC_CHECK_F77_OPTION([-Wno-globals])
-#AC_CHECK_F77_OPTION([-fno-common])  # use with caution
-mytop=`pwd`
-# get right F77 include option
-AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
-# f90 has a "module path" option - hard to get as you really need a
-# ready compiled module to point the option at so for now we are just
-# check that the option takes a directory and the compiler works
-F90FLAGS="$F90FLAGS -I$mytop/bindings/f90"
-#AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
-#AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
-
-AC_F77_LIBRARY_LDFLAGS
-#
-# First any host specific bits
-#
+dnl
+dnl First any host specific bits
+dnl
 case $host in
     alpha*-dec-osf*)
 	LDFLAGS="$LDFLAGS -non_shared"
@@ -107,23 +133,23 @@ case $host in
     *darwin*)
 	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
-#	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	SHARED_LDFLAGS="-Wl,-single_module"
-#	LDFLAGS="$LDFLAGS -flat_namespace"
-#        if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
-#           lt_int_apple_cc_single_mod=yes
-#        fi
-#        if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
-#           archive_cmds='$CC -dynamiclib -single_module'
-#	fi
+dnl	LDFLAGS="$LDFLAGS -flat_namespace"
+dnl     if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
+dnl           lt_int_apple_cc_single_mod=yes
+dnl     fi
+dnl     if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
+dnl           archive_cmds='$CC -dynamiclib -single_module'
+dnl	fi
 	;;
 esac
 
-#
-# * locate path to HDF libraries *
-#
-# first see if one has been given
-#
+dnl
+dnl * locate path to HDF libraries *
+dnl
+dnl first see if one has been given
+dnl
 H4ROOT=""
 H5ROOT=""
 AC_SUBST(H4ROOT)
@@ -136,9 +162,9 @@ AC_ARG_WITH([hdf5],
 	AC_HELP_STRING([--with-hdf5=/path/to/hdf5],
                        [Specify location of HDF5 files]),
 	[if test $withval != no; then H5ROOT=$withval; fi])
-# otherwise try and find HDF path, but not if
-# e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
-# first HDF4
+dnl otherwise try and find HDF path, but not if
+dnl e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
+dnl first HDF4
 HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
@@ -164,7 +190,7 @@ fi
 AC_SUBST(HDF4_LDFLAGS)
 AC_SUBST(HDF4_CPPFLAGS)
 
-# HDF5
+dnl HDF5
 HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
@@ -190,7 +216,7 @@ fi
 AC_SUBST(HDF5_LDFLAGS)
 AC_SUBST(HDF5_CPPFLAGS)
 
-# finally set LIBS variable if we 
+dnl finally set LIBS variable if we 
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
 AC_CHECK_LIB(df, Hopen)
@@ -198,16 +224,16 @@ AC_CHECK_LIB(mfhdf, ncopen)
 AC_CHECK_LIB(sz, SZ_Compress)
 AC_CHECK_LIB(hdf5, H5open)
 
-# Checks for header files.
+dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
+dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
 
-# Checks for library functions.
+dnl Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_MKTIME
