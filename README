@@ -3,10 +3,143 @@ NeXus - a common format for neutron and X-ray scattering data
              http://www.neutron.anl.gov/NeXus/
 -------------------------------------------------------------------------
 
+Installation Instructions
+=========================
+
+Unix
+----
+1) Ensure that you have current versions of the HDF4 and/or the HDF5 
+   libraries.  It is now possible to link the NeXus libraries against 
+   either or both libraries, depending on the selected make option.
+ 
+   The libraries, which are available as precompiled binaries for a wide
+   range of systems, may be downloaded from:
+   
+    http://hdf.ncsa.uiuc.edu/
+
+   The NeXus libraries link against the following libraries:
+   
+   HDF4: libmfhdf.a, libdf.a, libjpeg.a, libz.a
+   HDF5: libhdf5.a, libz.a
+   
+   The libjpeg and libz libraries may be separately installed
+   (e.g in /usr/lib).  
+   
+2) Edit the file "makefile_options" to set the compilation and linking
+   options for your system, e.g. the name of the compiler and the path
+   to the NeXus source code and HDF libraries.  Some examples are
+   provided.
+   
+     N.B. You will need to edit the make files themselves if you do not
+          have a Fortran 77 compiler, i.e. remove all Fortran targets.
+
+3) Run the makefile with one of the following target:
+
+   make lib45        - Version linking to both HDF4 and HDF5
+   make lib4         - Version only linking to HDF4
+   make lib5         - Version only linking to HDF5
+   
+   This will create the library libNeXus.a, containing both the C and 
+   Fortran 77 APIs, as well as NXbrowse and the C and F77 test programs.
+
+4) If you have a Fortran 90 compiler, run the makefile again:
+
+   make libf90       - Fortran 90 library
+   
+   This creates a separate library, libNeXus90.a and a Fortran 90
+   version of the test program.
+   
+     N.B. libNeXus90.a contains the complete (F90+C) NeXus library.  You
+          do not need to link to libNeXus.a as well.  
+
+5) Run the test programs to check the installation.
+
+   ./napi4_test      - Tests C creation of NXtest.nx4, an HDF4 file
+   ./napi5_test      - Tests C creation of NXtest.nx5, an HDF5 file
+   ./napif_test      - Tests F77 creation of NXtest.nxs (currently HDF4)
+   ./NXtest          - Tests F90 creation of NXtest.nxs (currently HDF5)
+   
+   In all cases, the output should look like the following:
+
+ Number of global attributes:  4
+    NeXus_version = 2.1.0.
+    file_name = NXtest.nx5
+    HDF5_Version = 1.4.3
+    file_time = 2002-05-17 14:40:24-0600
+ Group: entry(NXentry) contains  8 items
+    ch_data( 4)
+    Values : NeXus data
+    Subgroup: data(NXdata)
+    i1_data(20)
+    Values :   1  2  3  4
+    i2_data(22)
+    Values :   1000  2000  3000  4000
+    i4_data(24)
+    Values :      1000000     2000000     3000000     4000000
+    r4_data( 5)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+    r8_data( 6)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+       ch_attribute : NeXus
+       i4_attribute :    42
+       r4_attribute :   3.141593
+    Subgroup: sample(NXsample)
+ Link Check OK
+
+   There are small differences in the formatting of the C and Fortran 
+   files.  All of them may be viewed by NXbrowse using, e.g.:
+   
+   ./NXbrowse NXtest.nxs
+
+6) Move NXbrowse, libNeXus.a, and/or libNeXus90.a to standard locations
+   for future linking.  You will need to link NeXus utilities to both 
+   the NeXus and HDF4/5 libraries.  See the make files for examples.
+   
+VMS
+----
+1) There is no VMS version of HDF5, so it is only possible to link to 
+   the HDF4 libraries.  Ensure that you have the current versions, 
+   which are available as precompiled binaries at:
+   
+    http://hdf.ncsa.uiuc.edu/
+
+   The NeXus libraries link against the following libraries:
+   
+2) Edit MAKE_VMS.COM to specify the correct location of the HDF 
+   libraries, and choose either the F77 or F90 options.
+   
+3) If you are installing the Fortran 90 library, edit NXtest.f90 to 
+   replace NXACC_CREATE5 with NXACC_CREATE4 in the first call to NXopen.
+
+4) Run MAKE_VMS.COM (i.e. type @MAKE_VMS) to build the NeXus libraries 
+   and utilities.
+
+5) Run the test programs to check the installation.
+
+   $ RUN NAPI4_TEST           (Tests C creation of NXtest.nx4)
+   $ RUN NAPIF_TEST or NXtest (Tests Fortran creation of NXtest.nxs)
+
+6) Install the NeXus library NEXUS.OLB and the include (or module) files
+   in a standard location for building other NeXus programs.
+   
+Included Files
+==============
 napi.c           - ANSI C source code of NeXus API
 napi.h           - ANSI C header file of NeXus API
-napi_test.c      - Test code of C API
-napi_test_read.c - C code to read test file NXtest.nxs
+napi4.c          - ANSI C source code for HDF4 version of NeXus API
+napi4.h          - ANSI C header file for HDF4 version of NeXus API
+napi5.c          - ANSI C source code for HDF5 version of NeXus API
+napi5.h          - ANSI C header file for HDF5 version of NeXus API
+napi4_test.c     - Test code of C API (using HDF4 API)
+napi5_test.c     - Test code of C API (using HDF5 API)
 NXbrowse.c       - Simple interactive NeXus browser
 napif.f          - Fortran 77 wrapper for NeXus API
 napif.inc        - Fortran 77 include file
@@ -14,9 +147,13 @@ napif_test.f     - Test code of Fortran 77 API
 NXmodule.f90     - Fortran 90 wrapper module for NeXus API
 NXUmodule.f90    - Fortran 90 utilities module
 NXtest.f90       - Test code of Fortran 90 API
-NXdump.f90       - Fortran 90 program to print variables in a NeXus file
-Makefile         - Make file for C and Fortran 77 interfaces
-make_vms.com     - Command file to build targets on VMS
+Makefile         - Make file for building NeXus libraries and utilities
+makefile_options - Compilation and linking options for the make files
+makefile_hdf45   - Make file for HDF4 and HDF5 combined version
+makefile_hdf4    - Make file for HDF4 version alone
+makefile_hdf5    - Make file for HDF5 version alone
+makefile_f90     - Make file for Fortran 90 library
+make_vms.com     - Command file to build HDF4 targets on VMS
 
 napi.tex         - LaTeX documentation of C API
 NXdict.tex       - LaTeX documentation of NeXus data dictionary
@@ -29,11 +166,10 @@ gnu_license.txt  - GNU Lesser General Public License
 
 napi.tar.gz      - gzipped tar file containing all of the above
 
+Comments to : ROsborn@anl.gov
+
 Argonne National Laboratory is operated by The University of Chicago for
 the U.S. Department of Energy under contract W-31-109-ENG-38.
--------------------------------------------------------------------------
-Comments to : ROsborn@anl.gov
--------------------------------------------------------------------------
 LEGAL POSTLUDE
 --------------
 The NeXus API is free software; you can redistribute it and/or modify

@@ -27,10 +27,6 @@
 
  For further information, see <http://www.neutron.anl.gov/NeXus/>
 
- Updated to use new NeXus PI for HDF4 and HDF5:
-  
- Mark Koennecke, August 2001 
-
  $Id$
 !----------------------------------------------------------------------------*/
 
@@ -55,7 +51,7 @@ int FindGroup (NXhandle fileId, char *groupName, char *groupClass);
 int FindData (NXhandle fileId, char *dataName);
 
 /* if iByteAsChar, NX_INT8 and NX_UINT8 are treated as characters */
-static int iByteAsChar = 0; /* Assume global attributes are all characters */
+static int iByteAsChar = 1; /* Assume global attributes are all characters */
 static char nxFile[256];
 
 int main(int argc, char *argv[])
@@ -86,7 +82,7 @@ int main(int argc, char *argv[])
       return NX_ERROR;
    }
    PrintAttributes (fileId);
-   iByteAsChar = 1; /* Display remaining NX_INT8 and NX_UINT8 variables as integers by default */
+   iByteAsChar = 0; /* Display remaining NX_INT8 and NX_UINT8 variables as integers by default */
 /* Input commands until the EXIT command is given */
    strcpy (path, "NX");
    do {

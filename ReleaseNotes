@@ -1,3 +1,21 @@
+Changes in Version 2.0.0
+========================
+
+- NeXus library updated to allow the reading and writing of HDF5 files
+  using the same API calls.  In creating a file, use NXACC_CREATE5.  As
+  long as both HDF4 and HDF5 libraries are linked, the API will read
+  both HDF4 and HDF5 files transparently.
+
+- The Makefiles have been reorganized to allow HDF4 and/or HDF5 files to 
+  be linked into the NeXus library, with compile and link options stored
+  in "makefile_options".
+
+- Rearranged the NeXus libraries so that libNeXus.a contains the standard
+  C and F77 interfaces and libNeXus90.a contains the C and F90 interfaces.
+
+- Added the routine NXsameID to the C interface to compare the ID of
+  NeXus groups and data sets.
+
 Changes in Version 1.3.3
 ========================
 

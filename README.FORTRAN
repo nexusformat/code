@@ -12,76 +12,47 @@ And for an NXlink
 
     INTEGER LINK(NXLINKSIZE)
 
-The two test programs perform exactly the same operations, but one is in
-C and the other FORTRAN
-
 --- Running the Examples ---
 
-You will need to get copies of the HDF (Hierarchical Data Format)
-libraries approriate for your operating system. These can be obtained from: 
+The Fortran 77 library is now built by the standard Makefile. See the 
+README file for installation instructions.
+   
+The test program, napif_test, should print the following:
 
-    http://hdf.ncsa.uiuc.edu/
-
-The default installation is to put the C header files into
-/usr/local/hdf/include and the libraries into /usr/local/hdf/lib
-
-*** Running C interface test ***
-
-cc -c -I/usr/local/hdf/include napi.c
-cc -c -I/usr/local/hdf/include napi_test.c
-cc -o napi_test napi_test.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
-
-./napi_test
-
-*** Running FORTRAN interface test ***
-
-cc -c -I/usr/local/hdf/include napi.c
-f77 -c napif.f 
-f77 -c napif_test.f
-f77 -o napif_test napif_test.o napif.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
-
-./napif_test
-
-Both these test programs should print the following:
-
-ch_data : 4
-Values : NeXus data
-i1_data : 20
-Values : 1 2 3 4
-i2_data : 22
-Values : 1000 2000 3000 4000
-i4_data : 24
-Values : 1000000 2000000 3000000 4000000
-r4_data : 5
-Values : 1.000000 2.000000 3.000000 4.000000
-       : 5.000000 6.000000 7.000000 8.000000
-       : 9.000000 10.000000 11.000000 12.000000
-       : 13.000000 14.000000 15.000000 16.000000
-       : 17.000000 18.000000 19.000000 20.000000
-r8_data : 6
-Values : 1.000000 2.000000 3.000000 4.000000
-       : 5.000000 6.000000 7.000000 8.000000
-       : 9.000000 10.000000 11.000000 12.000000
-       : 13.000000 14.000000 15.000000 16.000000
-       : 17.000000 18.000000 19.000000 20.000000
-ch_attribute : NeXus
-i4_attribute : 42
-r4_attribute : 3.141593
+ Number of global attributes:  4
+    NeXus_version = 2.0.0.
+    file_name = NXtest.nxs
+    HDF5_Version = 1.4.3
+    file_time = 2002-05-17 14:40:24-0600
+ Group: entry(NXentry) contains  8 items
+    ch_data( 4)
+    Values : NeXus data
+    Subgroup: data(NXdata)
+    i1_data(20)
+    Values :   1  2  3  4
+    i2_data(22)
+    Values :   1000  2000  3000  4000
+    i4_data(24)
+    Values :      1000000     2000000     3000000     4000000
+    r4_data( 5)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+    r8_data( 6)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+       ch_attribute : NeXus
+       i4_attribute :    42
+       r4_attribute :   3.141593
+    Subgroup: sample(NXsample)
+ Link Check OK
 
 A file called "NXtest.nxs" is also created.
-
-*** Cross-checking the interfaces ***
-
-To check that the Fortran 77 interface produces the equivalent file to the 
-C interface, use "napi_test_read.c" to read the Fortran-generated file 
-"NXtest.nxs".
-
-cc -c -I/usr/local/hdf/include napi_test_read.c
-cc -o napi_test_read napi_test_read.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
-
-./napi_test_read
-
-This produces the same output as the other test programs.
 
 *** FORTRAN Interface Notes ***
 
