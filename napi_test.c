@@ -78,6 +78,7 @@ int main()
       if (NXclosedata(fileid) != NX_OK) return 1;
       if (NXmakedata (fileid, "r4_data", NX_FLOAT32, 2, array_dims) != NX_OK) return 1;
       if (NXopendata (fileid, "r4_data") != NX_OK) return 1;
+	 if (NXcompress (fileid,NX_COMP_LZW) != NX_OK) return 1; 
          if (NXputdata(fileid, r4_array) != NX_OK) return 1;
       if (NXclosedata(fileid) != NX_OK) return 1;
       if (NXmakedata (fileid, "r8_data", NX_FLOAT64, 2, array_dims) != NX_OK) return 1;
