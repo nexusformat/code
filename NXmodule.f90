@@ -220,7 +220,7 @@ CONTAINS
             NXchunk_size = chunk_size
          ELSE
             ALLOCATE (NXchunk_size(data_rank))
-            NXchunk_size = (/(min(data_dimensions(i),10),i=1,data_rank)/)
+            NXchunk_size = (/(data_dimensions(i),i=1,data_rank)/)
          END IF
          status = nxifcompmakedata(file_id, NXCstring(data_name), data_type, &
                         data_rank, data_dimensions, compress_type, NXchunk_size)
