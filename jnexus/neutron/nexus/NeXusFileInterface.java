@@ -1,0 +1,249 @@
+/**
+  *
+  * The NeXus-API for Java. NeXus is an attempt to define a common data 
+  * format for neutron and x-ray diffraction. NeXus is built on top of the
+  * Hierarchical Data Format from NCSA. There exist already API's to
+  * NeXus files for F77, F90, C and C++. This is the interface definition
+  * for a Java API to NeXus files.
+  *
+  * Some changes to the API have been necessary however, due to the 
+  * different calling standards between C and Java. 
+  *
+  *
+  * @author Mark Koennecke, October 2000
+  *
+  * copyright: see accompanying COPYRIGHT file
+  */
+package neutron.nexus;
+
+import java.util.Hashtable;
+
+public interface NeXusFileInterface {
+
+    // general functions
+    /**
+      * flush writes all previously unsaved data to disk. All directory
+      * searches are invalidated. Any open SDS is closed.
+      * @exception NexusException if an HDF error occurs.
+      */
+    public void flush() throws NexusException;
+    /**
+      * finalize closes the file. It is supposed to be called by the
+      * garbage collector when the object is collected. As this happens
+      * at discretion of the garbage collector it is safer to call finalize
+      * yourself, when a NeXus file needs to be closed. Multiple calls to
+      * finalize do no harm.
+      * @exception Throwable because it is required by the definition of
+      * finalize. 
+      */
+    public void finalize() throws Throwable;
+    // group functions
+    /** 
+      * makegroup creates a new group below the current group within
+      * the NeXus file hierarchy.
+      * @param name The name of the group to create.
+      * @param nxclass The classname of the group.
+      * @exception NexusException if an error occurs during this operation.
+      */ 
+    public void makegroup(String name, String nxclass) throws 
+                            NexusException;
+    /**
+      * opengroup opens the group name with class nxclass. 
+      * The group must exist, otherwise an exception is thrown. opengroup is
+      * similar to a cd name in a filesystem.
+      * @param name the name of the group to open.
+      * @param nxclass the classname of the group to open. 
+      * @exception NexusException when something goes wrong.
+      */   
+    public void opengroup(String name, String nxclass) throws 
+                             NexusException;
+    /**
+      * closegroup closes access to the current group and steps down one
+      * step in group hierarchy.
+      * @exception NexusException when an HDF error occurs during this
+      * operation.
+      */ 
+    public void closegroup() throws 
+                             NexusException;
+
+    // data set handling
+    /**
+      * makedata creates a new dataset with the specified characteristics 
+      * in the current group.
+      * @param name The name of the dataset.
+      * @param type The number type of the dataset. Usually a constant from
+      * a selection of values.
+      * @param rank The rank or number of dimensions of the dataset.
+      * @param dim An array containing the length of each dimension. dim must
+      * have at least rank entries. The first dimension can be 0 which
+      * means it is an unlimited dimension.
+      * @exception NexusException when the dataset could not be created.
+      */ 
+    public void makedata(String name, int type, int rank, int dim[]) throws
+	                   NexusException; 
+    /**
+      * opendata opens an existing dataset for access. For instance for 
+      * reading or writing.
+      * @param name The name of the dataset to open.
+      * @exception NexusException when the dataset does not exist or 
+      * something else is wrong.
+      */
+    public void opendata(String name)throws 
+                           NexusException;
+    /**
+      * closedata closes an opened dataset. Then no further access is 
+      * possible without a call to opendata.
+      * @exception NexusException when an HDF error occurrs.
+      */
+    public void closedata() throws
+                           NexusException;
+    /**
+      * causes the currently open dataset to be compressed on file.
+      * This must be called after makedata and before writing to the
+      * dataset.
+      * @param compression_type determines the type of compression 
+      * to use.
+      * @exception NexusException when no dataset is open or an HDF error 
+      * occurs.
+      */ 
+    public void compress(int compression_type) throws 
+                           NexusException;
+
+    // data set reading
+    /**
+      * getdata reads the data from an previously openend dataset into
+      * array.
+      * @param array An n-dimensional array of the appropriate number
+      * type for the dataset. Make sure to have the right type and size
+      * here.
+      * @exception NexusException when either an HDF error occurs or 
+      * no dataset is open or array is not of the right type to hold
+      * the data.
+      */
+    public void getdata(Object arrary)throws 
+                          NexusException;
+    /**
+      * getslab reads a subset of a large dataset into array.
+      * @param start An array of dimension rank which contains the start 
+      * position in the dataset from where to start reading.
+      * @param size An array of dimension rank which contains the size
+      * in each dimension of the data subset to read.
+      * @param array An array for holding the returned data values.
+      * @exception NexusException when either an HDF error occurs or 
+      * no dataset is open or array is not of the right type to hold
+      * the data.
+      */
+    public void getslab(int start[], int size[],Object array)throws
+                          NexusException;
+    /**
+      * getattr retrieves the data associated with the attribute 
+      * name. 
+      * @param name The name of the attribute.
+      * @param array an array with sufficient space for holding the attribute 
+      * data.
+      * @param start An integer array of dimension rank which holds
+      * the start position in the dataset where to start reading the
+      * slab.
+      * @param size An integer array of dimension rank which holds the
+      * size of the slab to read in each dimension.    
+      * @exception NexusException when either an HDF error occurs or 
+      * the attribute could not be found.
+      */
+    public void getattr(String name,Object data, int args[])throws
+                          NexusException;
+
+    // data set writing
+    /**
+      * putdata writes the data from array into a previously opened
+      * dataset.
+      * @param array The data to read.
+      * @param args An integer array holding the number of data elements
+      * in array as args[0], and the type as args[1]. Both values will be
+      * updated while reading.
+      * @exception NexusException when an HDF error occurs.
+      */
+    public void putdata(Object array) throws 
+	                  NexusException;
+    /**
+      * putslab writes a subset of a larger dataset to a previously opened
+      * dataset.
+      * @param array The data to write.
+      * @param start An integer array of dimension rank which holds the
+      * startcoordinates of the data subset in the larger dataset.
+      * @param size An integer array of dimension rank whidh holds the
+      * size in each dimension of the data subset to write.
+      * @exception NexusException when an HDF error occurs.
+      */ 
+    public void putslab(Object array, int start[], int size[]) throws
+                          NexusException;
+    /**
+      * putattr adds a named attribute to a previously opened dataset or
+      * a global attribute if no dataset is open.
+      * @param name The name of the attribute.
+      * @param array The data of the attribute.
+      * @param iType The number type of the attribute.
+      * @exception NexusException if an HDF error occurs.
+      */  
+    public void putattr(String name, Object array, int iType) throws
+                          NexusException;
+
+    // inquiry
+    /**
+      * getinfo retrieves information about a previously opened dataset.
+      * @param iDim An array which will be filled with the size of
+      * the dataset in each dimension.
+      * @param args An integer array which will hold more information about
+      * the dataset after return. The fields: args[0] is the rank, args[1] is
+      * the number type.
+      * @exception NexusException when  an HDF error occurs.
+      */ 
+    public void getinfo(int iDim[], int args[]) throws 
+                          NexusException;
+    /**
+      * groupdir will retrieve the content of the currently open vGroup.
+      * groupdir is similar to an ls in unix. 
+      * @return A Hashtable  which will hold the names of the items in 
+      * the group as keys and the NeXus classname for vGroups or the 
+      * string 'SDS' for datasets as values. 
+      * @exception NexusException if an HDF error occurs
+      */
+    public Hashtable groupdir()throws
+                          NexusException;
+    /**
+      * attrdir returns the attributes of the currently open dataset or
+      * the file global attributes if no dataset is open.
+      * @return A Hashtable which will hold the names of the attributes
+      * as keys. For each key there is an AttributeEntry class as value.
+      * @exception NexusException when an HDF error occurs.
+      */ 
+    public Hashtable attrdir()throws
+                          NexusException;
+    
+    // linking 
+    /**
+      * getgroupID gets the data necessary for linking the current vGroup
+      * somewhere else.
+      * @return A NXlink object holding the link data.
+      * @exception NexusException if an HDF error occurs.
+      */
+    public NXlink getgroupID() throws
+                          NexusException;
+    /**
+      * getdataID gets the data necessary for linking the current dataset
+      * somewhere else.
+      * @return A NXlink object holding the link data.
+      * @exception NexusException if an HDF error occurs.
+      */
+    public NXlink getdataID()throws
+                          NexusException;
+    /**
+      * makelink links the object described by target into the current
+      * vGroup.
+      * @param target The Object to link into the current group.
+      * @exception NexusException if an error occurs.
+      */
+    public void   makelink(NXlink target)throws
+                          NexusException;     
+
+}
+  

@@ -70,7 +70,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   /*---------------------------------------------------------------------*/
      static void NXNXNXReportError(void *pData, char *string)
      {
-#if defined(_WIN32) && ( defined(_DLL) || defined(_HDFDLL_) ) && !defined(_CONSOLE)
+#if defined(_WIN32) && ( defined(_DLL) || defined(_HDFDLL_) ) && !defined(_CONSOLE) && !defined(JNEXUS)
 /*
  * printf() output may get lost in Windows applications without a console ... this code
  * makes them appear in Dialog boxes. To use printf(), you would probably have to create

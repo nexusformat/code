@@ -1,0 +1,11 @@
+#!/sbin/sh
+#------------------------------------------------------------------------
+# shell script for running the test program for the Java NeXus API
+#
+# Version for DigitalUnix4.0D
+#
+# Mark Koennecke, October 2000
+#------------------------------------------------------------------------
+java -classpath /usr/lib/classes.zip:../jnexus.jar:. \
+ -Dneutron.nexus.JNEXUSLIB=../bin/du40/libjnexus.so TestJapi
+ 
