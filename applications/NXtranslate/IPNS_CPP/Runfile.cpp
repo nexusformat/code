@@ -3,6 +3,7 @@
 #include <stdexcept>
 //#include <algorithm.h>
 float PI = 3.14159;
+float MEV_FROM_VEL = 5227037.09524;
 using std::string;
 
 Runfile::Runfile(){}
@@ -1329,6 +1330,104 @@ vector<float> Runfile::Get1DSpectrum(Segment seg, int hist) {
       runfile.close();
       }*/
     return data;
+  }
+}
+
+/**
+   Retrieves the time channel boundaries for a given spectrum.  Note that 
+   since this is histogram data, there is one more boundary value than 
+   there are elements in a spectrum.
+   @param seg - Detector ID.
+   @param hist - Histogram number.
+   @return Array of boundaries with 1 + number of channels values.
+*/
+vector<float> Runfile::TimeChannelBoundaries(Segment seg, int hist){
+  float us_correction;
+  int id = seg.DetID();
+  if ( id > header->NumOfElements() || 
+       hist > header->NumOfHistograms() ) {
+    throw runtime_error("TimeChannelBoundaries:  seg or hist out of bounds");
+  }
+  int index = header->NumOfElements() * (hist - 1) + seg.SegID();
+  
+  if ( !((psdOrder[id] == 2) && (header->VersionNumber() < 5 )) ) {
+    if (detectorMap[index]->GetTFType() == 0 ) {
+      cout << "invalid id in TimeChannelBoundaries" <<
+			  "(seg,hist), returning null";
+      throw runtime_error("invalid id in TimeChannelBoundaries (seg,hist), returning null");
+    }
+    
+    int tfType = detectorMap[index]->GetTFType();
+    int numberOfChannels = timeField[tfType]->GetNumOfChannels();
+    vector<float> channel;
+    channel.resize(numberOfChannels + 1);
+    
+    float min = (float)timeField[tfType]->GetTMin();
+    float max = (float)timeField[tfType]->GetTMax();
+    float step = (float)timeField[tfType]->GetTStep();
+    
+    float timeToSample = (float)(header->SourceToSample() / 
+				 sqrt( header->EnergyIn()/MEV_FROM_VEL));
+    char psu;
+    header->PseudoTimeUnit(&psu);
+    switch (psu ) {
+      
+    case ('I'): {
+      if ( timeField[tfType]->GetTimeFocusBit() == 0 ) {  //Det not focused
+	if ( header->VersionNumber() < 5 ) {
+	  us_correction = - (float)(header->HardTimeDelay() * 
+				    header->StandardClock()) + 
+	    (float)(floor(timeToSample/header->StandardClock()) *
+		    header->StandardClock());
+	}
+	else {
+	  us_correction = 0;
+	}
+      }
+      else {						//Det focused
+	us_correction = timeToSample;
+	
+      }
+      min = min + us_correction;
+      max = max + us_correction;
+      break;
+    }
+    default: {
+      min = min;
+      max = max;
+    }
+    }
+    if (  timeField[tfType]->GetLogBinBit() == 0 ) { //  check for const t
+      //  binning
+      for (int chan = 0; chan <= numberOfChannels; chan++) {
+	channel[chan] = (float)( min + chan * step );
+      }
+    }
+    else {       // assume dt/t binning
+      channel[0] = min;
+      for ( int chan = 1; chan <= numberOfChannels; chan++ ) {
+	float clock = (float)header->StandardClock(); 
+	channel[chan] = (float)channel[chan-1] * (1.0f + step);
+	float fjunk = channel[chan] / clock;
+	channel[chan] = round( fjunk ) * clock;
+	
+      }
+    }
+    return channel;
+  }
+  else {
+    float minWave = header->MinWavelength();
+    float maxWave = header->MaxWavelength();
+    int numWaves = header->NumOfWavelengths();
+    float stepWave = (maxWave - minWave)/numWaves;
+    
+    vector<float> channel;
+    channel.resize(numWaves + 1);
+    for ( int ii = 0; ii <= numWaves; ii++ ) {
+      channel[ii] = minWave + ii* stepWave;
+    }
+    //	    return channel;
+    return areaStartTime;
   }
 }
 

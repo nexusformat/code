@@ -79,6 +79,7 @@ class Runfile {
   Runfile( char * );
   Header getHeader();
   vector<float> Get1DSpectrum(Segment seg, int hist);
+  vector<float> TimeChannelBoundaries(Segment seg, int hist);
   vector<Segment *> GetSegments();
 
  private:
