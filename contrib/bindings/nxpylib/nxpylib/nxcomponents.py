@@ -4,10 +4,14 @@ import time
 import string
 
 from nexus import *
+from nxplot import *
 
 
 
 def checkTypes(pytype, nxtype):
+	""" test if nexus type and python type match together
+		- args : ...
+	"""
 	int_types 	= [NX_INT8, NX_UINT8, NX_INT16, NX_UINT16, NX_INT32, NX_UINT32]	
 	float_types = [NX_FLOAT32, NX_FLOAT64]
 	str_types 	= [NX_CHAR]
@@ -348,6 +352,7 @@ class NXaxis(NXelem):
 
 	def attachToNXData(self, nxdata):
 		self.nxdata = nxdata
+		nxdata.attachAxis(self)
 	
 	def getNXData(self):
 		return self.nxdata
@@ -409,6 +414,7 @@ class NXdataelem(NXelem):
 		self.cachefile = cachefile
 		self.axcachefile = axcachefile
 		self.nxcachefile = nxcachefile
+		self.axes = None
 		
 		#if nxcachefile!="":
 		#	self.nxcachefile = nxcachefile
@@ -418,6 +424,7 @@ class NXdataelem(NXelem):
 		
 		if len(dims) > 0:
 			self.gridinfo = self.initGridInfo(0)
+			print self.gridinfo
 			
 		
 	def initGridInfo(self, level):
@@ -515,6 +522,12 @@ class NXdataelem(NXelem):
 		else:	
 			self.attrs["axis"] = NXattr(name="axis", nxtype=NX_CHAR, value=axnames)
 	
+	def attachAxis(self, axisobj):
+		if self.axes == None:
+			self.axes={}
+		self.axes[axisobj.name] = axisobj
+		
+		
 	def setUnit(self, unit):
 		#TODO: check if types match (maybe check in NXelem)
 		self.setAttrValue("unit", unit)
@@ -528,6 +541,40 @@ class NXdataelem(NXelem):
 	def setPrimary(self, primary):	
 		self.setAttrValue("primary", primary)
 	
+	
+	def plotData(self, axname, coords=None):
+		p = NXplot()
+		# transform data into list
+		if type(coords) != types.TupleType and type(coords) != types.ListType:
+			print "coordinates must be passed as tuple or list of integers"
+			return 0
+			
+		if len(coords) != len(self.dims)-1:
+			print "unsufficient coordinate information."
+			return 0
+	
+		for i in range(len(coords)):
+			if coords[i] >= self.dims[i+1]:
+				print "coordinates are out of bounds"
+				return 0
+
+		if type(coords[0]) != types.IntType:
+			print "coords represent indices. please provide them as integers"
+			return 0
+		
+		data = self.data
+		for i in range(len(coords)):
+			while len(data) <= coords[i]:
+				data.append([])
+			data = data[coords[i]]
+	
+		if axname not in self.axes.keys():
+			print "nxdata does not contain axes with name %s"%(axname)
+			return 0
+		
+		p.plotData(data, self.axes[axname].data)
+		
+		
 	def appendData(self, value, coords=None, cache="yes"):
 		#check if types correspond
 		if coords == None:
@@ -684,16 +731,22 @@ class NXdataelem(NXelem):
 			if type(coords[0]) != types.IntType:
 				print "coords represent indices. please provide them as integers"
 				return 0
-				
+			
+			#go through array, but only to the forelast subarray 
+			#(this ist because we need the handle, in order to change the value later)
+			
 			info = self.gridinfo
 			for i in range(len(coords)-1):
 				info = info[coords[i]]
 			
+			# now get last subarrray value
 			infoval = info[coords[len(coords)-1]]
 			if infoval >= self.dims[len(self.dims)-1]:	
 				print "warning: data exceeds dimension boundary", infoval, self.dims[len(self.dims)-1]
 				return 0
 			
+			#construct slab array 
+			#append all coords, then append value of the gridinfo in the corresponding coords position
 			startslab = []
 			sizeslab=[]
 			for i in range(len(coords)):
@@ -702,10 +755,13 @@ class NXdataelem(NXelem):
 			startslab.append(infoval)
 			sizeslab.append(1)
 			status = NXputslab(self.nxhandle, [value], startslab, sizeslab)	
+			#now we need the previously mentioned handle in order to modify the subarray object
+			#just increment value by one	
 			info[coords[len(coords)-1]] = infoval + 1
+			
 		status = NXclosedata(self.nxhandle)
 		status = NXflush(self.nxhandle)
-		
+	
 		# now write gridinfo
 		status = NXinitgroupdir(self.nxhandle)
 		status, nitems, path, nxclass = NXgetgroupinfo(self.nxhandle)
@@ -775,7 +831,6 @@ class NXdataelem(NXelem):
 		# CAUTION: -> get data gets the hole array -> we need only the array of size gridinfo ->
 		# FIX IT
 		# we must either work with NXgetslab or just cut the array according to gridinfo 
-		
 		status, self.data = NXgetdata(self.nxhandle)			
 		status = NXclosedata(self.nxhandle)
 
@@ -789,7 +844,7 @@ class NXdataelem(NXelem):
 		if dims != self.dims[0:len(self.dims)-1]:
 			print "dimensions don't match. cannot load data set"
 			return 0
-	
+		
 		status, self.gridinfo = NXgetdata(self.nxhandle)			
 		status = NXflush(self.nxhandle)
 		status = NXclose(self.nxhandle)
@@ -901,7 +956,7 @@ class NXdataelem(NXelem):
 			status = NXopengroup(self.nxhandle, "entry", "NXentry")
 			status = NXmakegroup(self.nxhandle, "data", "NXdata")
 			status = NXopengroup(self.nxhandle, "data", "NXdata")
-			status = NXmakedata(self.nxhandle, axis.name+"_gridinfo", NX_INT32, 1, [1])
+			#status = NXmakedata(self.nxhandle, axis.name+"_gridinfo", NX_INT32, 1, [1])
 			status = NXmakedata(self.nxhandle, axis.name, axis.nxtype, 1, axis.dims)
 			status = NXopendata(self.nxhandle, axis.name)
 			
@@ -957,22 +1012,23 @@ class NXdataelem(NXelem):
 		status = NXputslab(self.nxhandle, [value], startslab, sizeslab)
 		if status:
 			axis.gridinfo = axis.gridinfo+1
+		status = NXputattr(self.nxhandle, "cursor", axis.gridinfo, NX_INT32)	
 		status = NXclosedata(self.nxhandle)		
 		
-		status, nitems, path, nxclass = NXgetgroupinfo(self.nxhandle)
-		status = NXinitgroupdir(self.nxhandle)
-		gridinfoname = axis.name+"_gridinfo"
-		found = 0
-		for i in range(nitems):
-			status, name, nxclass, nxtype = NXgetnextentry(self.nxhandle)
-			if name == gridinfoname and nxclass == "SDS":
-				status = NXopendata(self.nxhandle, gridinfoname)
-				found = 1
-		if found == 0:
-			status = NXmakedata(self.nxhandle, gridinfoname, NX_INT32, 1, [1])
-			status = NXopendata(self.nxhandle, gridinfoname)
-		status = NXputdata(self.nxhandle, axis.gridinfo)	
-		status = NXclosedata(self.nxhandle)
+		#status, nitems, path, nxclass = NXgetgroupinfo(self.nxhandle)
+		#status = NXinitgroupdir(self.nxhandle)
+		#gridinfoname = axis.name+"_gridinfo"
+		#found = 0
+		#for i in range(nitems):
+		#	status, name, nxclass, nxtype = NXgetnextentry(self.nxhandle)
+		#	if name == gridinfoname and nxclass == "SDS":
+		#		status = NXopendata(self.nxhandle, gridinfoname)
+		#		found = 1
+		#if found == 0:
+		#	status = NXmakedata(self.nxhandle, gridinfoname, NX_INT32, 1, [1])
+		#	status = NXopendata(self.nxhandle, gridinfoname)
+		#status = NXputdata(self.nxhandle, axis.gridinfo)	
+		#status = NXclosedata(self.nxhandle)
 		return 1
 
 	
@@ -997,25 +1053,31 @@ class NXdataelem(NXelem):
 			return 0
 	
 		status, axis.data = NXgetdata(self.nxhandle)		
-		status = NXclosedata(self.nxhandle)
-		
-		status = NXopendata(self.nxhandle, axis.name+"_gridinfo")
-		if status!=1:
+		status, axis.gridinfo, type = NXgetattr(self.nxhandle, "cursor", NX_INT32)
+		if status != 1:
 			print "axis gridinfo not found in nxfile %s"%(self.nxcachefile)
 			print "WARNING: initializing to Null -> ax data gets overwritten"
 			axis.gridinfo = 0
-			return 0
-		status,rank,dims,nxtype = NXgetinfo(self.nxhandle)
-		if nxtype != NX_INT32:
-			print "types don't match. cannot load data set"
-			return 0
-		if dims != [1]:
-			print "dimensions don't match. cannot load data set"
-			return 0
+		status = NXclosedata(self.nxhandle)
+		
+		#status = NXopendata(self.nxhandle, axis.name+"_gridinfo")
+		#if status!=1:
+		#	print "axis gridinfo not found in nxfile %s"%(self.nxcachefile)
+		#	print "WARNING: initializing to Null -> ax data gets overwritten"
+		#	axis.gridinfo = 0
+		#	return 0
+		#status,rank,dims,nxtype = NXgetinfo(self.nxhandle)
+		#if nxtype != NX_INT32:
+		#	print "types don't match. cannot load data set"
+		#	return 0
+		#if dims != [1]:
+		#	print "dimensions don't match. cannot load data set"
+		#	return 0
 	
-		status, axis.gridinfo = NXgetdata(self.nxhandle)		
-		status = NXflush(self.nxhandle)
-		status = NXclose(self.nxhandle)
+		#status, axis.gridinfo = NXgetdata(self.nxhandle)		
+		#status = NXflush(self.nxhandle)
+		#status = NXclose(self.nxhandle)
+		
 		self.nxhandle = None
 		axis.trimAxDataToGridinfo()
 		return 1

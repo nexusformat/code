@@ -9,6 +9,8 @@ from string import *
 from nexus import *
 
 import nxtemplates
+import nxparse
+
 from nxcomponents import *
 from nxobjects import *
 from nxclasses import *
@@ -19,11 +21,16 @@ class NXfile:
 	FLAT = 0
 	DEEP = 1
 	
-	def __init__(self, filename, mode):
+	def __init__(self, filename, mode, template=""):
+		if template != "":
+			if mode == NXACC_CREATE5:
+				self.readFromXMLTemplate(template, filename)
+				mode = NXACC_RDWR
 		status, self.handle = NXopen(filename, mode)
 		if status != 1:
 			print "Error. can't open file: %s" %(filename)
 		self.root = self.readRoot()	
+		
 
 
 	def readRoot(self):
@@ -74,7 +81,7 @@ class NXfile:
 
 
 	def readSingleGroup(self, groupname, groupclass, mode, pathlist):
-		#print "pathlist init: ", pathlist
+		print "pathlist init: ", pathlist
 		group = None
 		groups = {}
 		elems  = {}
@@ -127,7 +134,7 @@ class NXfile:
 				#got a Data Set
 				if groupclass != "NXdata":
 					if not nxtemplates.group_types[groupclass].hasElem(ename):
-						print "group %s has no elem %s	"%(groupname, ename)
+						print "group %s of class %s has no elem %s	"%(groupname,groupclass, ename)
 						continue
 					
 				status = NXopendata(self.handle, ename)
@@ -545,6 +552,7 @@ class NXfile:
 				#now for the attributes 
 				if group.elems[elemname].attrs != None:
 					if len(group.elems[elemname].attrs) > 0:
+						#print "group.elems[elemname].attrs:", group.elems[elemname].attrs
 						for attname in group.elems[elemname].attrs.keys():
 							attval = group.elems[elemname].attrs[attname].getValue()
 							atttype = group.elems[elemname].attrs[attname].getType()
@@ -723,7 +731,7 @@ class NXfile:
 		if not self.closePath():
 			return 0
 			
-		path2 = path[1:]	
+		path2 = path[1:]
 		for groupitem in path2:
 			if groupitem[1][0:2]=="NX":
 				status = NXopengroup(self.handle, groupitem[0], groupitem[1])
@@ -767,3 +775,9 @@ class NXfile:
 		stauts = NXclose(self.handle)
 		return status
 
+
+	def readFromXMLTemplate(self, template, filename):
+		nxf = nxparse.NXfactory()
+		return nxf.readFromXMLTemplate(template, filename)
+		
+		

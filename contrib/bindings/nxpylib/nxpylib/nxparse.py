@@ -3,6 +3,8 @@ import sys
 import libxml2
 import string
 import os
+import time
+import types
 
 from nexus import *
 from nxtemplatecomponents import *
@@ -21,6 +23,238 @@ class NXfactory:
 		self.dictclassfile = dictclassfile
 		self.buildTypeDict()	
 		
+
+	def readFromXMLTemplate(self, template, filename):
+		if not self.fileExists(template):
+			print "error: template file %s found" %(template)
+			return 0
+		
+		doc = libxml2.parseFile(template)
+		
+		if doc.name != template:
+			print "doc.name failed"
+			sys.exit(1)
+
+		root = doc.children
+		while root.type=="comment":
+			root = root.next
+			
+		self.metagroup.nxclass = root.name
+
+		status, nxhandle = NXopen(filename, NXACC_CREATE5)
+		#print "opening filename", filename
+		
+		nxhandle = self.parseTemplateRootAttrs(root, nxhandle)
+		nxhandle = self.parseTemplateNode(root.children, nxhandle)
+		
+		doc.freeDoc()
+	
+		status = NXflush(nxhandle)
+		if status != 1:
+			print "warning: flushing NeXus file failed"
+		status = NXclose(nxhandle)
+		if status != 1:
+			print "warning: closing Nexus file failed" 
+	
+	
+	def parseTemplateRootAttrs(self, item, nxhandle):
+		if item.properties != None:
+			for att in item.properties:
+				if att.type == "attribute":
+					# got an attribute
+					#todo: convert attcontent to type !!!!
+					#too complicated -> where to get type info !?!?
+					#always treat attributes as strings
+					#alternatively: check if string may be converted to float or int
+					NXputattr(nxhandle, att.name, self.convertXMLToNXAtt(att.content), NX_CHAR)
+		return nxhandle
+	
+	
+	def parseTemplateNode(self, item, nxhandle):
+		""" running through the xml tree using libxml2"""
+		while item != None:
+			if item.type == "element":
+				if item.name[0:2] == "NX":
+					if item.properties != None:
+						for att in item.properties:
+							if att.type == "attribute":
+								if att.name != "name":
+									#print "putting a group element attribute", att.name, att.content 
+									NXputattr(nxhandle, att.name, att.content, NX_CHAR)	
+								
+				if item.name[0:2] == "NX": #NXgroup
+					groupname = item.name
+					for att in item.properties:
+						if att.type == "attribute":
+							if att.name == "name":
+								groupname = att.content
+					#make group
+					#print "making group", groupname, item.name
+					status = NXmakegroup(nxhandle, groupname, item.name)
+					if status != 1:
+						print "creating group %s of class %s failed"%(groupname, item.name)
+						return 0
+					#open group 
+					#print "try to open group"
+					status = NXopengroup(nxhandle, groupname, item.name)
+					if status != 1:
+						print "opening group %s of class %s failed"%(groupname, item.name)
+						return 0
+					#print "stepping a level deeper", item.name, groupname  	
+					nxhandle = self.parseTemplateNode(item.children, nxhandle)
+					if nxhandle == 0:
+						return 0
+					
+					#print "closing group"
+					NXclosegroup(nxhandle)
+
+				else:  #SDS
+					print "name", item.name
+					elemcontent = item.children.listGetString(item.doc, 1)
+					attrs = None
+					elemtype = NX_CHAR
+					elemdims = []
+					if item.properties != None:
+						for att in item.properties:
+							if att.type == "attribute":
+								attcontent = att.content
+								if att.name == "type":
+									dimstring = att.content
+									if string.find(attcontent, "[")>-1: 
+										dimstring = attcontent[string.find(attcontent, "[")+1:string.find(attcontent[0], "]")]
+										if string.find(dimstring, ",")>-1:
+											tdims = map(string.strip, string.split(dimstring, ","))
+											for i in range(len(tdims)):
+												if tdims[i] != "":
+													if tdims[i][0] >= "0" and tdims[i][0] <="9":
+														elemdims.append(string.atoi(tdims[i]))
+													else:
+														elemdims.append(tdims[i])	
+										else:
+											elemdims = [int(dimstring)] 
+									else:
+										elemdims = None
+											
+									if string.find(attcontent, "[")>-1: 
+										cutstring = attcontent[string.find(attcontent, "["):string.find(attcontent, "]")+1]
+										if cutstring != "":
+											typestring = string.replace(attcontent, cutstring, "")
+										elemtype = self.StringToNXType(self.correctTypeString(typestring))
+									else:
+										elemtype = self.StringToNXType(self.correctTypeString(attcontent))
+										
+										
+									if elemdims == None or dimstring=="":
+										if elemtype == NX_CHAR:
+											elemdims = [len(elemcontent)]
+										else:
+											elemdims = [1]
+										
+									break	
+					if elemtype == NX_CHAR and elemdims==[]:
+						elemdims = [len(elemcontent)]
+						
+					#make data set
+					status = NXmakedata(nxhandle, item.name, elemtype, len(elemdims), elemdims)
+					if status != 1:
+						print "making data set %s failed. aborting"%(item.name)
+						return 0
+					#open dataset
+					status = NXopendata(nxhandle, item.name)
+					if status != 1:
+						print "opening data set %s failed. aborting"%(item.name)
+						return 0
+					#put data
+					status = NXputdata(nxhandle, self.convertXMLToNXData(elemcontent, elemdims, elemtype))
+					if status != 1:
+						print "putting data to dataset %s failed. aborting"%(item.name)
+						return 0
+					#print "data put into ", item.name, self.convertXMLToNXData(elemcontent, elemdims, elemtype)
+					
+					if item.properties != None:
+						for att in item.properties:
+							if att.type == "attribute":
+								if att.name != "type":
+									#print "'%s'"%(att.name)
+									#print "putting an attribute", att.name, att.content 
+									NXputattr(nxhandle, att.name, att.content, NX_CHAR)
+					status = NXclosedata(nxhandle)
+					if status != 1:
+						print "closing dataset %s failed"%(item.name)
+						return 0
+			#print " "			
+			item = item.next			
+		return nxhandle	
+
+
+
+	def convertXMLToNXData(self, xmldata, dims, type):
+		int_types 	= [NX_INT8, NX_UINT8, NX_INT16, NX_UINT16, NX_INT32, NX_UINT32]	
+		float_types = [NX_FLOAT32, NX_FLOAT64]
+		str_types 	= [NX_CHAR]
+		
+		totaldimcounts = 1
+		for i in range(len(dims)):
+			totaldimcounts = totaldimcounts*dims[i]
+			
+		if type in int_types:
+			ints = []
+			int_toks = string.split(xmldata)
+			for i in range(len(int_toks)):
+				ints.append(int(int_toks[i]))
+				
+			if totaldimcounts != len(ints):
+				print "warning: count of int data elems does not match dimensions", totaldimcounts, len(ints), xmldata
+				
+			return ints
+			
+		elif type in float_types:	
+			floats = []
+			float_toks = string.split(xmldata)
+			for i in range(len(float_toks)):
+				floats.append(float(float_toks[i]))
+			
+			if totaldimcounts != len(floats):
+				print "warning: count of float data elems does not match dimensions", totaldimcounts, len(floats), xmldata
+
+			return floats	
+			
+		elif type in str_types:
+			return xmldata
+	
+	
+	
+	def checkTypes(self, pytype, nxtype):
+		int_types 	= [NX_INT8, NX_UINT8, NX_INT16, NX_UINT16, NX_INT32, NX_UINT32]	
+		float_types = [NX_FLOAT32, NX_FLOAT64]
+		str_types 	= [NX_CHAR]
+		
+		if pytype == types.IntType:
+			if not nxtype in int_types:
+				print "types don't match"
+				return 0
+		elif pytype == types.LongType:
+			if not nxtype in int_types:
+				print "types don't match"
+				return 0
+		elif pytype == types.FloatType:
+			if not nxtype in float_types:
+				print "types don't match"
+				return 0
+		elif pytype == types.StringType:
+			if not nxtype in str_types:
+				print "types don't match"
+				return 0
+		else:	
+			print "unknown type:", 
+			return 0
+
+		return 1	
+	
+	
+	def convertXMLToNXAtt(self, xmlvalue):
+		return xmlvalue
+
 
 
 	def parseMetaDTD(self, xmlfilename):	
@@ -50,6 +284,7 @@ class NXfactory:
 				# got an attribute
 					print "ATTRIBUTE: ", att.name
 					attcontent = att.content
+
 					if att.name == "type":
 						#extract dims and type
 						if string.find(attcontent, "{")>-1: 
@@ -107,7 +342,6 @@ class NXfactory:
 
 	def parseNxNode(self, item):
 		""" running through the xml tree using libxml2"""
-		ident = 1
 
 		while item != None:
 			if item.type == "element":
@@ -629,7 +863,14 @@ class NXfactory:
 	def checkXML(self, filename): 
 		return filename.endswith(".xml")
 
-
+	def fileExists(self, filename):
+		try:
+			f = file(filename, 'r')
+		except: 
+			return 0
+		return 1
+		
+		
 def main(args):
 	""" the entry point for testig purposes"""
 	

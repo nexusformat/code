@@ -3,11 +3,14 @@
 import sys
 
 from nxfile import *
+import math
 
 	
 
 def main(args):
 	""" the entry point for testing purposes """
+	
+
 	
 	#----------------------------------------------------------
 	# EXAMPLE 1:  BUILD GROUP TREE FROM SCRATCH AND FILL NXDATA
@@ -15,7 +18,8 @@ def main(args):
 	print "========================================================="
 
 	#create a new nexus file from scratch
-	f = NXfile("nxtest.nxs", NXACC_CREATE5)
+	f = NXfile(filename="nxtest.nxs", mode=NXACC_CREATE5, template="monoxtas_template.xml")
+	#f = NXfile("nxtest.nxs", NXACC_CREATE5)
 
 	root = f.getRoot()
 	
@@ -55,6 +59,26 @@ def main(args):
 	mysample = None
 	mydata = None
 	print "\n\n"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	#---------------------------------------------------
@@ -113,6 +137,26 @@ def main(args):
 	print "\n\n"
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	#Example 3: OPEN NEXUS FILE AND SUBSEQUENTLY READ SUBGROUPS
 	print "OPEN NEXUS FILE AND SUBSEQUENTLY READ SUBGROUPS"
 	print "==================================================="
@@ -142,6 +186,34 @@ def main(args):
 	#close nexus file
 	f.close()
 	print "\n\n"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -185,6 +257,32 @@ def main(args):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	#Example 6: INTERRUPT SCAN PROCESS(WRITE PROCESS TO NXDATA) AND RECOVER FROM SAVED DATA
 	print "INTERRUPT SCAN PROCESS(WRITE PROCESS TO NXDATA) AND RECOVER FROM SAVED DATA"
 	print "================================================================"
@@ -218,13 +316,13 @@ def main(args):
 			for k in range(12):
 				print "writing", float((j+1)*(i+1)*(k+1)), " to [", j,"," , i, "]"
 				tsdata.appendData(float((j+1)*(i+1)*(k+1)), [j,i])
-				time.sleep(1)
-	for k in range(12):			
-		#time.sleep(0.2)
-		tsaxish.appendData(2.6)
+				#time.sleep(1)
+	for k in range(12):
+		print "write %d to hkl"%(k)
+		time.sleep(0.2)
+		tsaxish.appendData(math.sin(k))
 		tsaxisk.appendData(3.1)
 		tsaxisl.appendData(4.4)
-		
 	f = None
 	
 	# now try to recover	
@@ -258,10 +356,12 @@ def main(args):
 				time.sleep(0.1)
 				trdata2.appendData(float((j+1)*(i+1)*(k+1)), [j,i])
 	for k in range(0,4):			
-		traxish.appendData(2.6)
+		traxish.appendData(math.sin(k))
 		traxisk.appendData(3.1)
 		traxisl.appendData(4.4)
-
+	
+	trdata2.plotData(axname="h", coords=[1,2])
+	
 	f.close()
 	print "\n\n"
 	
