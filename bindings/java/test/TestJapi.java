@@ -3,6 +3,10 @@
   * serve as an example for the usage of the NeXus API for Java.
   *
   * Mark Koennecke, October 2000
+  *
+  * updated for NAPI-2 with HDF-5 support
+  * 
+  * Mark Koennecke, August 2001
   */
 import neutron.nexus.*;
 import java.util.Hashtable;
@@ -12,6 +16,7 @@ public class TestJapi {
     static public void main(String args[])
     {
         String fileName = "JapiTest.nxs";
+        String fileName5 = "JapiTest.h5";
         String group = "entry1";
         String nxclass = "NXentry"; 
         int iData1[][] = new int[3][10];
@@ -25,6 +30,14 @@ public class TestJapi {
         NXlink gid, did;
         String attname, vname, vclass;
         AttributeEntry atten;
+        boolean HDF5 = false;
+
+        // check if we should do a HDF-5 test
+	if(args.length >= 1){
+	    if(args[0].indexOf("HDF5") >= 0){
+		HDF5 = true;
+            }
+        }
 
         // create some data
         for(i = 0; i < 3; i++)
@@ -41,10 +54,13 @@ public class TestJapi {
         }
 
         try{
-	 //create a NexusFile 
-         nf = new NexusFile(fileName,NexusFile.NXACC_CREATE);
-	//nf.debugstop();
-
+	 //create a NexusFile
+	    if(HDF5){ 
+                nf = new NexusFile(fileName5,NexusFile.NXACC_CREATE5);
+            } else {
+                nf = new NexusFile(fileName,NexusFile.NXACC_CREATE);
+            }
+	   
          // error handling check
 	 try{
              nf.opengroup(group,nxclass);
@@ -81,9 +97,9 @@ public class TestJapi {
          nf.closedata();
 
          // write a compressed data set
-         nf.makedata("iData1_compressed",NexusFile.NX_INT32,2,iDim);
+         nf.compmakedata("iData1_compressed",NexusFile.NX_INT32,2,iDim,
+                        NexusFile.NX_COMP_LZW,iDim);
          nf.opendata("iData1_compressed");
-	 nf.compress(NexusFile.NX_COMP_LZW);
          nf.putdata(iData1);
          nf.closedata();
 
@@ -115,7 +131,8 @@ public class TestJapi {
          nf.makegroup("data","NXdata");
          nf.opengroup("data","NXdata");
          nf.makelink(did);
-         // nf.makelink(gid);
+	 // nf.debugstop();  
+         nf.makelink(gid);
          nf.closegroup();
 
          // close a file explicitly (recommended!)
@@ -127,7 +144,11 @@ public class TestJapi {
         fData1[2][5] = (float)66666.66;
 
          // reopen the file
-         nf = new NexusFile(fileName,NexusFile.NXACC_READ);
+	 if(HDF5){ 
+            nf = new NexusFile(fileName5,NexusFile.NXACC_READ);
+         } else {
+            nf = new NexusFile(fileName,NexusFile.NXACC_READ);
+         }
 
          // test attribute enquiry routine at global attributes
          Hashtable h = nf.attrdir();
@@ -141,6 +162,7 @@ public class TestJapi {
          }
 
          // test reading vGroup directory 
+         //nf.debugstop();
          nf.opengroup(group,nxclass);
          h = nf.groupdir();
          e = h.keys();

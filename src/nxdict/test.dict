@@ -6,7 +6,7 @@
 
 Linda = /entry1,NXentry/Wuerfelometer,NXinstrument/SDS Counts \
  -type DFNT_INT32 -rank 2 -dim {20,20} -attr {Units,Wuerfel} \
- -attr {axis,1}
+ -LZW -chunk {20,20} -attr {axis,1}
 Eva   = \
  /entry1,NXentry/NXVGROUP
 Chloe = /entry1,NXentry/NXLINK Linda

@@ -1,6 +1,4 @@
 
-#line 2264 "nxdict.w"
-
 /*---------------------------------------------------------------------------
                  Nexus Dictionary API implementation file.
 
@@ -20,7 +18,16 @@
   August, 1997
 
   Version: 1.0
+
+  Version 1.1
+
+  Updated to use the combined HDF4 HDF5 API. New keyword -chunk which
+  defines the chunk buffer size for a SDS.
+
+  Mark Koennecke, August 2001
+
 -----------------------------------------------------------------------------*/
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,7 +36,7 @@
 #include <time.h>
 #include <mfhdf.h>
 #include "lld.h"
-#include "napi.h"
+#include "../napi.h"
 #include "stringdict.h"
 #include "dynstring.h"
 #include "nxdict.h"
@@ -41,14 +48,13 @@
        extern void *NXpData;
        extern void (*NXIReportError)(void *pData, char *pBuffer);  
 /*--------------------------------------------------------------------------*/
-/*#define DEFDEBUG 1*/
+/* #define DEFDEBUG 1 */
 /* define DEFDEBUG when you wish to print your definition strings before
    action. This can help a lot to resolve mysteries when working with
    dictionaries.
 */
 /*-------------------------------------------------------------------------*/
 
-#line 362 "nxdict.w"
 
     typedef struct __NXdict
                            {
@@ -58,7 +64,6 @@
 /*------------------ verbosity level -------------------------------------*/
    static int iVerbosity = 0 ;
 
-#line 2311 "nxdict.w"
 
 /*-------------------------------------------------------------------------*/
   static char *NXDIReadFile(FILE *fd)
@@ -100,7 +105,6 @@
   }
 /*--------------------------------------------------------------------------*/
 
-#line 490 "nxdict.w"
 
 #define FWORD 1
 #define FHASH 2
@@ -173,11 +177,9 @@
    }
     
 
-#line 2351 "nxdict.w"
 
 /*------------------------------------------------------------------------*/
 
-#line 566 "nxdict.w"
 
 #define AMODE 0
 #define DMODE 1
@@ -266,7 +268,6 @@
      }
   }
 
-#line 2353 "nxdict.w"
 
 /*--------------------------------------------------------------------------*/
   NXstatus NXDinitfromfile(char *filename, NXdict *pData)
@@ -277,7 +278,6 @@
      char pError[512];
 
 
-#line 383 "nxdict.w"
 
      /* allocate a new NXdict structure */
      if(iVerbosity == NXalot)
@@ -302,10 +302,6 @@
      }
 
 
-#line 2362 "nxdict.w"
-
-
-#line 410 "nxdict.w"
 
      /* is there a file name argument */
      if(filename == NULL)
@@ -318,10 +314,6 @@
         return NX_OK;
      }
 
-#line 2363 "nxdict.w"
-
-
-#line 424 "nxdict.w"
 
       fd = fopen(filename,"rb");
       if(!fd)
@@ -333,12 +325,6 @@
          return NX_ERROR;
       }
 
-
-
-#line 2364 "nxdict.w"
- 
-
-#line 444 "nxdict.w"
 
        /* read the file contents */
        if(iVerbosity == NXalot)
@@ -363,8 +349,6 @@
        }
        NXDIParse(pBuffer, pNew->pDictionary);
 
-#line 2365 "nxdict.w"
-
 
        if(iVerbosity == NXalot)
        {
@@ -376,8 +360,6 @@
   }   
 /*--------------------------------------------------------------------------*/
 
-#line 660 "nxdict.w"
-
    NXdict NXDIAssert(NXdict handle)
    {
       NXdict self = NULL;
@@ -387,11 +369,8 @@
       return self;
    }
 
-#line 2376 "nxdict.w"
 
 /*-------------------------------------------------------------------------*/
-
-#line 671 "nxdict.w"
 
    NXstatus NXDclose(NXdict handle, char *filename)
    {
@@ -441,11 +420,7 @@
       return NX_OK;
    }
 
-#line 2378 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 724 "nxdict.w"
 
    NXstatus NXDadd(NXdict handle, char *alias, char *pDef)
    {
@@ -491,14 +466,7 @@
      }
      return NX_OK;
    }
-
-
-#line 2380 "nxdict.w"
-
 /*-----------------------------------------------------------------------*/
-
-#line 776 "nxdict.w"
-
 #define NORMAL 1
 #define ALIAS  2
    pDynString NXDItextreplace(NXdict handle, char *pDefString)
@@ -595,23 +563,12 @@
      return NX_OK;
    }
 
-#line 2382 "nxdict.w"
-
 /*------------------- The Defintion String Parser -----------------------*/
 /*------- Data structures */
-
-#line 886 "nxdict.w"
-
   typedef struct {
                   char pText[20];
                   int iCode;
                  }  TokDat;
-
-#line 2385 "nxdict.w"
-
-
-#line 896 "nxdict.w"
-
 #define TERMSDS 100
 #define TERMVG  200
 #define TERMLINK 300
@@ -625,31 +582,14 @@
                     int iTerminal;
                   } ParDat;
 
-#line 2386 "nxdict.w"
-
-
-#line 1101 "nxdict.w"
-
    static void DummyError(void *pData, char *pError)
    {
      return;
    }
-
-#line 2387 "nxdict.w"
-
-
-#line 1215 "nxdict.w"
-
   typedef struct {
                    char name[256];
                    char value[256];
                   }AttItem;
-
-#line 2388 "nxdict.w"
- 
-/*------------------------------------------------------------------------*/
-
-#line 918 "nxdict.w"
 
 /*---------------- Token name defines ---------------------------*/
 #define DSLASH 0
@@ -668,10 +608,11 @@
 #define DLZW   14
 #define DHUF   15
 #define DRLE   16
+#define CHUNK  17
 
 /*----------------- Keywords ----------------------------------------*/
 
-  static TokDat TokenList[11] = { 
+  static TokDat TokenList[12] = { 
                                 {"SDS",DSDS},
                                 {"NXLINK",DLINK},
                                 {"NXVGROUP",DGROUP},
@@ -679,6 +620,7 @@
                                 {"-type",DTYPE},
                                 {"-rank",DRANK},
                                 {"-attr",DATTR},
+                                {"-chunk",CHUNK},
                                 {"-LZW",DLZW},
                                 {"-HUF",DHUF},
                                 {"-RLE",DRLE},
@@ -765,11 +707,7 @@
    }
 
 
-#line 2390 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1114 "nxdict.w"
 
    int NXDIParsePath(NXhandle hfil, ParDat *pParse)
    {
@@ -861,11 +799,7 @@
        return NX_ERROR;
    }
 
-#line 2392 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1481 "nxdict.w"
 
    static int NXDIParseAttr(ParDat *pParse, int iList)
    {
@@ -925,12 +859,7 @@
      return NX_OK;
    }
 
-#line 2394 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1428 "nxdict.w"
-
    static int NXDIParseDim(ParDat *pParse, int *iDim)
    {
        char pError[256];
@@ -978,13 +907,7 @@
         }
         return NX_OK;
    }
-
-#line 2396 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1379 "nxdict.w"
-
    static TokDat tDatType[] = {
                       {"DFNT_FLOAT32",DFNT_FLOAT32},   
                       {"DFNT_FLOAT64",DFNT_FLOAT64},    
@@ -1030,20 +953,15 @@
       return NX_ERROR;      
    }
 
-#line 2398 "nxdict.w"
-
 /*-------------------------------------------------------------------------*/
-
-#line 1223 "nxdict.w"
-
    static int NXDIParseSDS(NXhandle hfil, ParDat *pParse)
    {
       int iType = DFNT_FLOAT32;
       int iRank = 1;
-      int iCompress = 0;
-      int32 iDim[MAX_VAR_DIMS];
-      int iList;
-      int iRet, iStat;
+      int iCompress = NX_COMP_NONE;
+      int32 iDim[MAX_VAR_DIMS], iChunk[MAX_VAR_DIMS];
+      int iList, iChunkDefined = 0 ;
+      int iRet, iStat, i;
       char pError[256];
       char pName[MAX_NC_NAME];
       void (*ErrFunc)(void *pData, char *pErr);
@@ -1087,6 +1005,15 @@
                        }
                        iRank = atoi(pParse->pToken);
                        break;
+            case CHUNK: /* chunk size for compression  */
+                     iRet = NXDIParseDim(pParse, iChunk);
+                     if(iRet == NX_ERROR)
+                     {
+                        LLDdelete(iList);
+                        return iRet;
+                     } 
+                     iChunkDefined = 1;
+                     break;
             case DDIM:
                      iRet = NXDIParseDim(pParse, iDim);
                      if(iRet == NX_ERROR)
@@ -1132,8 +1059,19 @@
           }
           NXDIDefToken(pParse);
        }
+
+       /* whew! got all information for doing the SDS 
+          However, if the chunk sizes for compression have not 
+          been set, default them to the dimensions of the data set
+       */
+       if(iChunkDefined == 0)
+       {
+	 for(i = 0; i < iRank; i++)
+	 {
+	   iChunk[i] = iDim[i];
+         }
+       }
        
-       /* whew! got all information for doing the SDS */
        /* first install dummy error handler, try open it, then
           deinstall again and create if allowed 
        */
@@ -1153,7 +1091,8 @@
           /* we need to create it, if we may */
           if(pParse->iMayCreate)
           {
-            iRet = NXmakedata(hfil,pName,iType, iRank,iDim);
+            iRet = NXcompmakedata(hfil,pName,iType, iRank,iDim,
+                                  iCompress,iChunk);
             if(iRet != NX_OK)
             { 
                  /* a comment on this one has already been written! */
@@ -1167,15 +1106,7 @@
                  LLDdelete(iList);
                  return iRet;
             }
-            /* deal with compression, if appropriate */
-            if(iCompress != 0)
-	    {
-                iRet = NXcompress(hfil,iCompress);
-                if(!iRet)
-		{
-                    NXIReportError(NXpData,"Failed to compress data set");
-                }
-            }
+
             /* put attributes in */
             iRet = LLDnodePtr2First(iList);
             while(iRet != 0)
@@ -1205,13 +1136,7 @@
        }
        return NX_OK;
    }
-
-#line 2400 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1544 "nxdict.w"
-
    static int NXDIParseLink(NXhandle hfil, NXdict pDict,ParDat *pParse)
    {
      char pError[256];
@@ -1240,13 +1165,7 @@
      return NXDopenalias(hfil, pDict, pParse->pToken);
 
    }
-
-#line 2402 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1034 "nxdict.w"
-
     int NXDIDefParse(NXhandle hFil, NXdict pDict, ParDat *pParse)
     {
        int iRet;
@@ -1297,13 +1216,7 @@
        }
        return NX_OK;
     }
-
-#line 2404 "nxdict.w"
-
 /*----------------------------------------------------------------------*/
-
-#line 1576 "nxdict.w"
-
   NXstatus NXDIUnwind(NXhandle hFil, int iDepth)
   {
      int i, iRet;
@@ -1318,13 +1231,7 @@
      }
      return NX_OK;
   }
-
-#line 2406 "nxdict.w"
-
 /*-------------------- The Data Transfer Functions ----------------------*/
-
-#line 1597 "nxdict.w"
-
    NXstatus NXDopendef(NXhandle hfil, NXdict dict, char *pDef)
    {
      NXdict pDict;
@@ -1358,24 +1265,18 @@
      /* do not rewind on links */
      return iRet;
    }
-
-#line 2408 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1637 "nxdict.w"
-
    NXstatus NXDopenalias(NXhandle hfil, NXdict dict, char *pAlias)
    {
      NXdict pDict;
      int iRet;
-     char pDefinition[1024];
+     char pDefinition[2048];
      pDynString pReplaced = NULL;
 
      pDict = NXDIAssert(dict);
      
      /* get Definition String  */
-     iRet = NXDget(pDict,pAlias,pDefinition,1023);
+     iRet = NXDget(pDict,pAlias,pDefinition,2047);
      if(iRet != NX_OK)
      {
         sprintf(pDefinition,"ERROR: alias %s not recognized",pAlias);
@@ -1395,13 +1296,7 @@
      DeleteDynString(pReplaced);
      return iRet;
    }
-
-#line 2410 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1674 "nxdict.w"
-
    NXstatus NXDputdef(NXhandle hFil, NXdict dict, char *pDef, void *pData)
    {
      NXdict pDict;
@@ -1448,24 +1343,18 @@
      }
      return iStat;
    }
-
-#line 2412 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1725 "nxdict.w"
-
   NXstatus NXDputalias(NXhandle hFil, NXdict dict, char *pAlias, void *pData)
   {
      NXdict pDict;
      int iRet;
-     char pDefinition[1024];
+     char pDefinition[2048];
      pDynString pReplaced = NULL;
 
      pDict = NXDIAssert(dict);
      
      /* get Definition String  */
-     iRet = NXDget(pDict,pAlias,pDefinition,1023);
+     iRet = NXDget(pDict,pAlias,pDefinition,2047);
      if(iRet != NX_OK)
      {
         sprintf(pDefinition,"ERROR: alias %s not recognized",pAlias);
@@ -1485,13 +1374,7 @@
      DeleteDynString(pReplaced);
      return iRet;
   }
-
-#line 2414 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1760 "nxdict.w"
-
    NXstatus NXDgetdef(NXhandle hFil, NXdict dict, char *pDef, void *pData)
    {
      NXdict pDict;
@@ -1540,26 +1423,18 @@
      return iStat;
    }
 
-
-
-
-#line 2416 "nxdict.w"
-
 /*------------------------------------------------------------------------*/
-
-#line 1812 "nxdict.w"
-
   NXstatus NXDgetalias(NXhandle hFil, NXdict dict, char *pAlias, void *pData)
   {
      NXdict pDict;
      int iRet;
-     char pDefinition[1024];
+     char pDefinition[2048];
      pDynString pReplaced = NULL;
 
      pDict = NXDIAssert(dict);
      
      /* get Definition String  */
-     iRet = NXDget(pDict,pAlias,pDefinition,1023);
+     iRet = NXDget(pDict,pAlias,pDefinition,2047);
      if(iRet != NX_OK)
      {
         sprintf(pDefinition,"ERROR: alias %s not recognized",pAlias);
@@ -1579,10 +1454,6 @@
      DeleteDynString(pReplaced);
      return iRet;
   }
-
-#line 2418 "nxdict.w"
-
-
 /*------------------------------------------------------------------------*/
 
    NXstatus NXDinfodef(NXhandle hFil, NXdict dict, char *pDef, int *rank,
@@ -1641,13 +1512,13 @@
   {
      NXdict pDict;
      int iRet;
-     char pDefinition[1024];
+     char pDefinition[2048];
      pDynString pReplaced = NULL;
 
      pDict = NXDIAssert(dict);
      
      /* get Definition String  */
-     iRet = NXDget(pDict,pAlias,pDefinition,1023);
+     iRet = NXDget(pDict,pAlias,pDefinition,2047);
      if(iRet != NX_OK)
      {
         sprintf(pDefinition,"ERROR: alias %s not recognized",pAlias);
@@ -1669,10 +1540,6 @@
   }
 
 /*------------------------------------------------------------------------*/
-
-
-#line 1849 "nxdict.w"
-
   NXstatus NXDdeflink(NXhandle hFil, NXdict dict, 
                       char *pTarget, char *pVictim)
   {
@@ -1761,7 +1628,7 @@
   NXstatus NXDaliaslink(NXhandle hFil, NXdict dict, 
                       char *pTarget, char *pVictim)
   {
-    char pTargetDef[1024], pVictimDef[1024];
+    char pTargetDef[2048], pVictimDef[2048];
     int iRet;
     NXdict pDict;
     pDynString pRep1 = NULL, pRep2 = NULL;
@@ -1769,7 +1636,7 @@
      pDict = NXDIAssert(dict);
      
      /* get Target Definition String  */
-     iRet = NXDget(pDict,pTarget,pTargetDef,1023);
+     iRet = NXDget(pDict,pTarget,pTargetDef,2047);
      if(iRet != NX_OK)
      {
         sprintf(pTargetDef,"ERROR: alias %s not recognized",pTarget);
@@ -1778,7 +1645,7 @@
      }       
 
      /* get Victim definition string */
-     iRet = NXDget(pDict,pVictim,pVictimDef,1023);
+     iRet = NXDget(pDict,pVictim,pVictimDef,2047);
      if(iRet != NX_OK)
      {
         sprintf(pTargetDef,"ERROR: alias %s not recognized",pTarget);
@@ -1804,14 +1671,6 @@
      DeleteDynString(pRep2);
      return iRet;
   }
-
-
-#line 2420 "nxdict.w"
-
-/*-----------------------------------------------------------------------*/
-
-#line 1986 "nxdict.w"
-
 /*-------------------------------------------------------------------------*/
   static void SNXFormatTime(char *pBuffer, int iBufLen)
   {
@@ -1837,15 +1696,16 @@
      char pBueffel[512];
      int iStat;
      
-     /* store global attributes */
+     /* store global attributes, now done by NXopen
      iStat = NXputattr(pFile,"file_name",filename, 
                        strlen(filename)+1,NX_CHAR);
      if(iStat == NX_ERROR)
      {
        return NX_ERROR;
      }
+     */
      
-     /* write creation time */
+     /* write creation time, now done by NXopen
      SNXFormatTime(pBueffel,512);
      iStat = NXputattr(pFile,"file_time",pBueffel,
                        strlen(pBueffel)+1,NX_CHAR);
@@ -1853,6 +1713,7 @@
      {
        return NX_ERROR;
      }
+     */
 
      /* instrument name */
      iStat = NXputattr(pFile,"instrument",instrument,
@@ -1903,13 +1764,7 @@
      }
      return NX_OK;
    }
-
-#line 2422 "nxdict.w"
-
 /*-----------------------------------------------------------------------*/
-
-#line 2082 "nxdict.w"
-
    NXstatus NXUentergroup(NXhandle hFil, char *name, char *class)
    {
        void (*ErrFunc)(void *pData, char *pErr); 
@@ -1944,13 +1799,7 @@
        }
        return NX_OK;
    }
-
-#line 2424 "nxdict.w"
-
 /*-----------------------------------------------------------------------*/
-
-#line 2119 "nxdict.w"
-
    NXstatus NXUenterdata(NXhandle hFil, char *label, int datatype,
                          int rank, int dim[], char *pUnits)
    {
@@ -1993,13 +1842,7 @@
        }
        return NX_OK;
    }
-
-#line 2426 "nxdict.w"
-
 /*-----------------------------------------------------------------------*/
-
-#line 2165 "nxdict.w"
-
    NXstatus NXUallocSDS(NXhandle hFil, void **pData)
    {
       int iDIM[MAX_VAR_DIMS];
@@ -2064,19 +1907,11 @@
       memset(*pData,0,lLength);
       return NX_OK;
    }
-
-#line 2428 "nxdict.w"
-
 /*----------------------------------------------------------------------*/
-
-#line 2229 "nxdict.w"
-
    NXstatus NXUfreeSDS(void **pData)
    {
       free(*pData);
       *pData = NULL;
       return NX_OK;
    }
-
-#line 2430 "nxdict.w"
 

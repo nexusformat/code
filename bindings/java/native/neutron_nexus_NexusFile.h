@@ -65,6 +65,14 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakedata
 
 /*
  * Class:     neutron_nexus_NexusFile
+ * Method:    nxmakecompdata
+ * Signature: (ILjava/lang/String;II[II[I)V
+ */
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakecompdata
+  (JNIEnv *, jobject, jint, jstring, jint, jint, jintArray, jint, jintArray);
+
+/*
+ * Class:     neutron_nexus_NexusFile
  * Method:    nxopendata
  * Signature: (ILjava/lang/String;)V
  */

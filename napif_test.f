@@ -43,7 +43,7 @@ C------------------------------------------------------------------------------
       REAL*8 R8_ARRAY(4,5)
       BYTE I1_BUFFER(4)
       INTEGER*2 I2_BUFFER(4)
-      INTEGER*4 I4_BUFFER(4)
+      INTEGER*4 I4_BUFFER(8)
       REAL*4 R4_BUFFER(4)
       REAL*8 R8_BUFFER(16)
       INTEGER*4 I
@@ -61,7 +61,9 @@ C------------------------------------------------------------------------------
 
       NXDIMS(1) = 2
       NXDIMS(2) = 2
-      IF (NXOPEN('NXtest.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
+
+C      IF (NXOPEN('NXtest.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('NXtest.h5', NXACC_CREATE5, FILEID) .NE. NX_OK) STOP
       IF (NXMAKEGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
       IF (NXOPENGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
       IF (NXMAKEDATA(FILEID, 'ch_data', NX_CHAR, 1, 10) .NE. NX_OK) STOP
@@ -82,10 +84,9 @@ C------------------------------------------------------------------------------
       IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
       NXDIMS(1) = 4
       NXDIMS(2) = 5
-      IF (NXMAKEDATA(FILEID, 'r4_data', NX_FLOAT32, 2, NXDIMS) 
-     +     .NE. NX_OK) STOP
+      IF (NXCOMPMAKEDATA(FILEID, 'r4_data', NX_FLOAT32, 2, NXDIMS,
+     +              NX_COMP_LZW, NXDIMS) .NE. NX_OK) STOP
       IF (NXOPENDATA(FILEID, 'r4_data') .NE. NX_OK) STOP
-      IF (NXCOMPRESS(FILEID, NX_COMP_LZW) .NE. NX_OK) STOP
       IF (NXPUTDATA(FILEID, R4_ARRAY) .NE. NX_OK) STOP
       IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
       IF (NXMAKEDATA(FILEID, 'r8_data', NX_FLOAT64, 2, NXDIMS) 
@@ -132,7 +133,8 @@ C*** unlimited dimension, part 2
       IF (NXCLOSEGROUP(FILEID) .NE. NX_OK) STOP
       IF (NXCLOSE(FILEID) .NE. NX_OK) STOP
 C *** read data
-      IF (NXOPEN('NXtest.nxs', NXACC_READ, FILEID) .NE. NX_OK) STOP
+C      IF (NXOPEN('NXtest.nxs', NXACC_READ, FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('NXtest.h5', NXACC_READ, FILEID) .NE. NX_OK) STOP
       IF (NXOPENGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
   100 ENTRY_STATUS=NXGETNEXTENTRY(FILEID,NAME,CLASS,NXTYPE)
       IF (ENTRY_STATUS .EQ. NX_ERROR) STOP

@@ -28,9 +28,10 @@ public class  NexusFile implements NeXusFileInterface {
     /**
       * possible access codes, @see #NexusFile.
       */
-    public final static int NXACC_READ = HDFConstants.DFACC_READ;
-    public final static int NXACC_RDWR = HDFConstants.DFACC_RDWR;
-    public final static int NXACC_CREATE = HDFConstants.DFACC_CREATE; 
+    public final static int NXACC_READ = 1;
+    public final static int NXACC_RDWR = 2;
+    public final static int NXACC_CREATE = 3;
+    public final static int NXACC_CREATE5 = 4;
     
     /**
       * constant denoting an unlimited dimension.
@@ -41,23 +42,23 @@ public class  NexusFile implements NeXusFileInterface {
       * constants for number types. @see #makedata, @see #putattr 
       * and others.
       */
-    public final static int NX_FLOAT32 = HDFConstants.DFNT_FLOAT32; 
-    public final static int NX_FLOAT64 = HDFConstants.DFNT_FLOAT64; 
-    public final static int NX_INT8 = HDFConstants.DFNT_INT8; 
-    public final static int NX_UINT8 = HDFConstants.DFNT_UINT8; 
-    public final static int NX_INT16 = HDFConstants.DFNT_INT16; 
-    public final static int NX_UINT16 = HDFConstants.DFNT_UINT16; 
-    public final static int NX_INT32 = HDFConstants.DFNT_INT32; 
-    public final static int NX_UINT32 = HDFConstants.DFNT_UINT32; 
-    public final static int NX_CHAR   = HDFConstants.DFNT_CHAR8;
+    public final static int NX_FLOAT32 = 5; 
+    public final static int NX_FLOAT64 = 6; 
+    public final static int NX_INT8 = 20; 
+    public final static int NX_UINT8 = 21; 
+    public final static int NX_INT16 = 22; 
+    public final static int NX_UINT16 = 23; 
+    public final static int NX_INT32 = 24; 
+    public final static int NX_UINT32 = 25; 
+    public final static int NX_CHAR   = 4;
 
     /**
       * constants for compression schemes @see #compress
       */
-    public final static int NX_COMP_NONE = HDFConstants.COMP_CODE_NONE;
-    public final static int NX_COMP_LZW = HDFConstants.COMP_CODE_DEFLATE;
-    public final static int NX_COMP_RLE = HDFConstants.COMP_CODE_RLE;
-    public final static int NX_COMP_HUF = HDFConstants.COMP_CODE_SKPHUFF;
+    public final static int NX_COMP_NONE = 100;
+    public final static int NX_COMP_LZW =  200;
+    public final static int NX_COMP_RLE =  300;
+    public final static int NX_COMP_HUF =  400;
 
     /**
       * Maximum name length, must be VGNAMELENMAX in hlimits.h
@@ -121,6 +122,9 @@ public class  NexusFile implements NeXusFileInterface {
     public NexusFile(String filename, int access) throws NexusException 
     {
          handle = init(filename,access);
+         if(handle < 0){
+	    throw new NexusException("Failed to open " + filename);
+	 }
     }
     /**
       * flushes all pending data to disk. Closes any open SDS's.
@@ -200,9 +204,45 @@ public class  NexusFile implements NeXusFileInterface {
     // native methods for this section
     protected native void nxmakedata(int handle, String name, int type,
                                   int rank, int dim[]);
+    protected native void nxmakecompdata(int handle, String name, int type,
+                                  int rank, int dim[], int iCompress, 
+                                  int iChunk[]);
     protected native void nxopendata(int handle, String name);
     protected native void nxclosedata(int handle);
     protected native void nxcompress(int handle, int compression_type);
+    /**
+      * compmakedata creates a new dataset with the specified characteristics 
+      * in the current group. This data set will be compressed.
+      * @param name The name of the dataset.
+      * @param type The number type of the dataset. Usually a constant from
+      * a selection of values.
+      * @param rank The rank or number of dimensions of the dataset.
+      * @param dim An array containing the length of each dimension. dim must
+      * have at least rank entries. The first dimension can be 0 which
+      * means it is an unlimited dimension.
+      * @param compression_type determines the compression type. 
+      * @param iChunk With HDF-5, slabs can be written to compressed data 
+      * sets. The size of these slabs is specified through the chunk array.
+      * This must have the rank values for the size of the chunk to
+      * be written in each dimension. 
+      * @exception NexusException when the dataset could not be created.
+      */ 
+    public void compmakedata(String name, int type, int rank, int dim[],
+                             int compression_type, int iChunk[]) throws
+			     NexusException {
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+        checkType(type);
+        switch(compression_type) {
+	case NexusFile.NX_COMP_NONE:
+	case NexusFile.NX_COMP_LZW:
+	    break;
+	default:
+	    throw new NexusException("Invalid compression code requested");
+
+	}
+	nxmakecompdata(handle,name,type,rank,dim,compression_type, iChunk);
+    }
+
     /**
       * makedata creates a new dataset with the specified characteristics 
       * in the current group.

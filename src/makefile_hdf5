@@ -8,15 +8,17 @@ CFLAGS1=-g
 HROOT=/data/lnslib
 FROOT=/data/filges/nexus-45
 CFLAGS=$(CFLAGS1)
-LIBNEXUS45_OBJ=napi45.o
+LIBNEXUS45_OBJ=napi45.o napif.o
 TEST5_OBJ=napi45_5test.o
 NOPT=-DHDF5
+NXBROWSE_OBJ=NXbrowse.o
 
-all: libNeXus45_5.a test5o	
+all: libNeXus45_5.a test5o NXbrowse napif5_test	
 
 .c.o :
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45.c -I$(HROOT)/include -c 
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45_5test.c -I$(HROOT)/include -c
+	$(CC) $(CFLAGS) $(NOPT) -I$(HROOT)/include -c $(FROOT)/$*.c
+.f.o:
+	f77 -g -c $(FROOT)/$*.f
 
 libNeXus45_5.a : $(LIBNEXUS45_OBJ)
 	@echo "*** Creating NeXus interface based on HDF5 library (libNeXus45_5.a) ***"
@@ -24,7 +26,14 @@ libNeXus45_5.a : $(LIBNEXUS45_OBJ)
 	ar -cr $@ $(LIBNEXUS45_OBJ)
 	ranlib $@
 
-test5o: libNeXus45_5.a $(TEST5_OBJ)
+test5o: libNeXus45_5.a $(TEST5_OBJ) 
 	$(CC) $(CFLAGS) -o test5o $(TEST5_OBJ) $(FROOT)/libNeXus45_5.a \
-	-L$(HROOT)/lib -lhdf5 -lz 	
+	-L$(HROOT)/lib -lhdf5 -lz 
+		
+NXbrowse: libNeXus45_5.a $(NXBROWSE_OBJ) 
+	$(CC) $(CFLAGS) -o NXbrowse $(NXBROWSE_OBJ) $(FROOT)/libNeXus45_5.a \
+	-L$(HROOT)/lib -lhdf5 -lz
 	
+napif5_test: libNeXus45_5.a napif5_test.o
+	f77 -o napif5_test napif5_test.o $(FROOT)/libNeXus45_5.a \
+	-L$(HROOT)/lib -lhdf5 -lz

@@ -14,7 +14,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NX5opengroup (NXhandle handle, CONSTCHAR *na
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5closegroup(NXhandle handle);
   
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5makedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
-NX_EXTERNAL  NXstatus CALLING_STYLE NX5compmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize);
+NX_EXTERNAL  NXstatus CALLING_STYLE NX5compmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
+NX_EXTERNAL  NXstatus CALLING_STYLE NX5compress (NXhandle handle, int compr_type);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5opendata (NXhandle handle, CONSTCHAR* label);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5closedata(NXhandle handle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5putdata(NXhandle handle, void* data);

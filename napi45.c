@@ -2,13 +2,7 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
-#include "napi45.h"
-#ifdef HDF5
-#include "napi5.h"
-#endif
-#ifdef HDF4
-#include "napi4.h"
-#endif
+#include "napi.h"
 
   typedef struct {
         NXhandle *pNexusData;   
@@ -18,7 +12,7 @@
         NXstatus (*nxopengroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
         NXstatus (*nxclosegroup)(NXhandle handle);
         NXstatus (*nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
-        NXstatus (*nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize);
+        NXstatus (*nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
         NXstatus (*nxcompress) (NXhandle handle, int compr_type);
         NXstatus (*nxopendata) (NXhandle handle, CONSTCHAR* label);
         NXstatus (*nxclosedata)(NXhandle handle);
@@ -40,27 +34,51 @@
         NXstatus (*nxinitattrdir)(NXhandle handle);
   } NexusFunction, *pNexusFunction;
   
+  static int iFortifyScope;
+/*------------------------------------------------------------------------
+  HDF-5 cache size special stuff
+  -------------------------------------------------------------------------*/
+static long cacheSize =  1024000; /* 1MB, HDF-5 default */
+
+NXstatus CALLING_STYLE NXsetcache(long newVal)
+{
+  if(newVal > 0)
+  {
+    cacheSize = newVal;
+    return NX_OK;
+  }
+  return NX_ERROR;
+}
+ 
+
    /*---------------------------------------------------------------------*/
 
-  static void NXNXNXReportError45(void *pData, char *string)
+  static void NXNXNXReportError(void *pData, char *string)
   {
     printf("%s \n",string);
   }
      
   /*---------------------------------------------------------------------*/
 
-  void *NXpData45 = NULL;
-  void (*NXIReportError45)(void *pData, char *string) = NXNXNXReportError45;
+  void *NXpData = NULL;
+  void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
 
   /*---------------------------------------------------------------------*/
 
-  void CALLING_STYLE NXMSetError45(void *pData, void (*NewError)(void *pD, char *text))
+  void CALLING_STYLE NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
   {
-    NXpData45 = pData;
-    NXIReportError45 = NewError;
+    NXpData = pData;
+    NXIReportError = NewError;
   }
   
+#ifdef HDF5
+#include "napi5.h"
+#endif
+#ifdef HDF4
+#include "napi4.h"
+#endif
   
+
   /* ---------------------------------------------------------------------- 
   
                           Definition of NeXus API
@@ -76,9 +94,14 @@
     NXhandle hdf4_handle;
     pNexusFunction fHandle;
         
+    /* configure fortify 
+    iFortifyScope = Fortify_EnterScope();
+    Fortify_CheckAllMemory();
+    */
+
     fHandle = (pNexusFunction)malloc(sizeof(NexusFunction));
     if (fHandle == NULL) {
-      NXIReportError45 (NXpData45,"ERROR: no memory to create Function structure");
+      NXIReportError (NXpData,"ERROR: no memory to create Function structure");
       return NX_ERROR;
     }
     if (am==NXACC_CREATE) {
@@ -149,6 +172,7 @@
       fHandle->nxclosegroup=NX5closegroup;
       fHandle->nxmakedata=NX5makedata;
       fHandle->nxcompmakedata=NX5compmakedata;
+      fHandle->nxcompress=NX5compress;
       fHandle->nxopendata=NX5opendata;
       fHandle->nxclosedata=NX5closedata;
       fHandle->nxputdata=NX5putdata;
@@ -171,7 +195,7 @@
       *gHandle = fHandle;
       return NX_OK;
     } else {
-      NXIReportError45 (NXpData45,"ERROR: Format couldn't be handled!");
+      NXIReportError (NXpData,"ERROR: Format couldn't be handled!");
       *gHandle = NULL;
       return NX_ERROR;
     }
@@ -189,7 +213,10 @@
     hfil = pFunc->pNexusData;
     status =  pFunc->nxclose(&hfil);
     pFunc->pNexusData = hfil;
-    free(pFunc); 
+    free(pFunc);
+    /* 
+    Fortify_CheckAllMemory();
+    */
     return status;   
   }
 
@@ -230,7 +257,7 @@
  /* --------------------------------------------------------------------- */
   
   NXstatus CALLING_STYLE NXcompmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
-                           int rank, int dimensions[],int compress_type, int chunk_size)
+                           int rank, int dimensions[],int compress_type, int chunk_size[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid; 
     return pFunc->nxcompmakedata (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size); 
@@ -344,10 +371,11 @@
         size *= 8;
       }
       else {
-        NXIReportError45 (NXpData45, "ERROR: NXmalloc - unknown data type in array");
+        NXIReportError (NXpData, "ERROR: NXmalloc - unknown data type in array");
         return NX_ERROR;
     }
     *data = (void*)malloc(size);
+     memset(*data,0,size);
     return NX_OK;
   }
     
@@ -356,11 +384,11 @@
   NXstatus CALLING_STYLE NXfree (void** data)
   {
     if (data == NULL) {
-       NXIReportError45 (NXpData45, "ERROR: passing NULL to NXfree");
+       NXIReportError (NXpData, "ERROR: passing NULL to NXfree");
        return NX_ERROR;
     }
     if (*data == NULL) {
-       NXIReportError45 (NXpData45,"ERROR: passing already freed pointer to NXfree");
+       NXIReportError (NXpData,"ERROR: passing already freed pointer to NXfree");
        return NX_ERROR;
     }
     free(*data);
@@ -465,5 +493,131 @@
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxinitgroupdir(pFunc->pNexusData);
   }
+/*----------------------------------------------------------------------
+                 F77 - API - Support - Routines
+  ----------------------------------------------------------------------*/
+  /*
+   * We store the whole of the NeXus file in the array - that way
+   * we can just pass the array name to C as it will be a valid
+   * NXhandle. We could store the NXhandle value in the FORTRAN array
+   * instead, but that would mean writing far more wrappers
+   */
+  NXstatus CALLING_STYLE NXfopen(char * filename, NXaccess* am, 
+                                 NexusFunction* pHandle)
+  {
+	NXstatus ret;
+ 	NXhandle fileid = NULL;
+	ret = NXopen(filename, *am, &fileid);
+	if (ret == NX_OK)
+	{
+	    memcpy(pHandle, fileid, sizeof(NexusFunction));
+	}
+	else
+	{
+	    memset(pHandle, 0, sizeof(NexusFunction));
+	}
+	if (fileid != NULL)
+	{
+	    free(fileid);
+	}
+	return ret;
+  }
+/* 
+ * The pHandle from FORTRAN is a pointer to a static FORTRAN
+ * array holding the NexusFunction structure. We need to malloc()
+ * a temporary copy as NXclose will try to free() this
+ */
+  NXstatus CALLING_STYLE NXfclose (NexusFunction* pHandle)
+  {
+    NXhandle h;
+    NXstatus ret;
+    h = (NXhandle)malloc(sizeof(NexusFunction));
+    memcpy(h, pHandle, sizeof(NexusFunction));
+    ret = NXclose(&h);		/* does free(h) */
+    memset(pHandle, 0, sizeof(NexusFunction));
+    return ret;
+  }
   
-  
+/*---------------------------------------------------------------------*/  
+  NXstatus CALLING_STYLE NXfflush(NexusFunction* pHandle)
+  {
+    NXhandle h;
+    NXstatus ret;
+    h = (NXhandle)malloc(sizeof(NexusFunction));
+    memcpy(h, pHandle, sizeof(NexusFunction));
+    ret = NXflush(&h);		/* modifies and reallocates h */
+    memcpy(pHandle, h, sizeof(NexusFunction));
+    return ret;
+  }
+/*----------------------------------------------------------------------*/
+  NXstatus CALLING_STYLE NXfmakedata(NXhandle fid, char *name, int *pDatatype,
+		int *pRank, int dimensions[])
+  {
+    NXstatus ret;
+    static char buffer[256];
+    int i, *reversed_dimensions;
+    reversed_dimensions = (int*)malloc(*pRank * sizeof(int));
+    if (reversed_dimensions == NULL)
+    {
+        sprintf (buffer, 
+        "ERROR: Cannot allocate space for array rank of %d in NXfmakedata", 
+                *pRank);
+        NXIReportError (NXpData, buffer);
+	return NX_ERROR;
+    }
+/*
+ * Reverse dimensions array as FORTRAN is column major, C row major
+ */
+    for(i=0; i < *pRank; i++)
+    {
+	reversed_dimensions[i] = dimensions[*pRank - i - 1];
+    }
+    ret = NXmakedata(fid, name, *pDatatype, *pRank, reversed_dimensions);
+    free(reversed_dimensions);
+    return ret;
+  }
+
+
+  NXstatus CALLING_STYLE NXfcompmakedata(NXhandle fid, char *name, 
+                int *pDatatype,
+		int *pRank, int dimensions[],
+                int *compression_type, int chunk[])
+  {
+    NXstatus ret;
+    static char buffer[256];
+    int i, *reversed_dimensions, *reversed_chunk;
+    reversed_dimensions = (int*)malloc(*pRank * sizeof(int));
+    reversed_chunk = (int*)malloc(*pRank * sizeof(int));
+    if (reversed_dimensions == NULL || reversed_chunk == NULL)
+    {
+        sprintf (buffer, 
+      "ERROR: Cannot allocate space for array rank of %d in NXfcompmakedata", 
+         *pRank);
+        NXIReportError (NXpData, buffer);
+	return NX_ERROR;
+    }
+/*
+ * Reverse dimensions array as FORTRAN is column major, C row major
+ */
+    for(i=0; i < *pRank; i++)
+    {
+	reversed_dimensions[i] = dimensions[*pRank - i - 1];
+	reversed_chunk[i] = chunk[*pRank - i - 1];
+    }
+    ret = NXcompmakedata(fid, name, *pDatatype, *pRank, 
+        reversed_dimensions,*compression_type, reversed_chunk);
+    free(reversed_dimensions);
+    free(reversed_chunk);
+    return ret;
+  }
+/*-----------------------------------------------------------------------*/
+  NXstatus CALLING_STYLE NXfcompress(NXhandle fid, int *compr_type)
+  { 
+      return NXcompress(fid,*compr_type);
+  }
+/*-----------------------------------------------------------------------*/
+  NXstatus CALLING_STYLE NXfputattr(NXhandle fid, char *name, void *data, 
+                                   int *pDatalen, int *pIType)
+  {
+    return NXputattr(fid, name, data, *pDatalen, *pIType);
+  }

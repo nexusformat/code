@@ -40,8 +40,8 @@ int HHMakeHandle(void *pData)
        pointerArray[i] = pData;
        return i;
      }
-     return -1;
   }
+  return -1;
 }
 /*---------------------------------------------------------------------*/
 void  *HHGetPointer(int handle)

@@ -29,6 +29,10 @@ C           United Kingdom
 C
 C For further information, see <http://www.neutron.anl.gov/NeXus/>
 C
+C Updated for the Nexus-2.1.0 API supoorting HDF-5
+C
+C Mark Koennecke, August 2001
+C
 C $Id$
 C------------------------------------------------------------------------------
 
@@ -133,6 +137,19 @@ C *** Wrapper routines for NXAPI interface
       EXTERNAL NXIFMAKEDATA
       CALL EXTRACT_STRING(ILABEL, 256, LABEL)
       NXMAKEDATA = NXIFMAKEDATA(FILEID, ILABEL, DATATYPE, RANK, DIM) 
+      END
+
+      INTEGER FUNCTION NXCOMPMAKEDATA(FILEID, LABEL, DATATYPE, RANK, 
+     &                                DIM, COMPRESSION_TYPE, CHUNK)  
+      INTEGER FILEID(*), DATATYPE, RANK, DIM(*)
+      INTEGER COMPRESSION_TYPE, CHUNK(*)
+      INTEGER NXIFCOMPMAKEDATA
+      CHARACTER*(*) LABEL
+      BYTE ILABEL(256)
+      EXTERNAL NXIFMAKEDATA
+      CALL EXTRACT_STRING(ILABEL, 256, LABEL)
+      NXCOMPMAKEDATA = NXIFCOMPMAKEDATA(FILEID, ILABEL, DATATYPE, 
+     &                      RANK, DIM, COMPRESSION_TYPE, CHUNK) 
       END
 
       INTEGER FUNCTION NXOPENDATA(FILEID, LABEL)

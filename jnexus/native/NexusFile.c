@@ -6,6 +6,12 @@
 
    Version: 1.0
 
+   Version 1.1
+
+   Updated for using both HDF5 and HDF4 
+
+   Mark Koennecke, August 2001
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -23,7 +29,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "neutron_nexus_NexusFile.h"
-#include <napi.h>
+#include "../../napi.h"
 #include "handle.h"
 
 #ifdef WIN32
@@ -272,6 +278,42 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakedata
     (*env)->ReleaseIntArrayElements(env,dim,iDim,0);  
 
 }
+/*-----------------------------------------------------------------------
+                               nxcompmakedata
+-------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakecompdata
+  (JNIEnv *env, jobject obj, jint handle, jstring name, jint type, 
+   jint rank, jintArray dim, jint compression_type, jintArray chunk)
+{
+   char *Name;
+   NXhandle nxhandle;
+   jint *iDim, *iChunk;
+   int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    /* access dim array */
+    iDim = (*env)->GetIntArrayElements(env,dim,0);
+
+    /* access the chunksize array */
+    iChunk = (*env)->GetIntArrayElements(env,chunk,0);
+
+    iRet = NXcompmakedata(nxhandle,Name,type,rank,iDim,
+                          compression_type,iChunk);
+
+    /* clean up */ 
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseIntArrayElements(env,dim,iDim,0);  
+    (*env)->ReleaseIntArrayElements(env,chunk,iChunk,0);  
+}
+
 /*------------------------------------------------------------------------
                                nxopendata
 --------------------------------------------------------------------------*/
@@ -412,13 +454,13 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputattr
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
-
+   
     /* convert java types to C types*/
     bdata = (*env)->GetByteArrayElements(env,data,0);
     iDataLen = (*env)->GetArrayLength(env,data);
     iDataLen /=  DFKNTsize(type);
     Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
-
+   
     iRet = NXputattr(nxhandle,Name, bdata, iDataLen, type);
 
     /* cleanup */
@@ -543,6 +585,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
     int iRet;
     jclass cls;
     jfieldID fid;
+    jstring jstr;
 
     /* set error handler */
     NXMSetError(env,JapiError);
@@ -577,6 +620,30 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
             return;
         }
         (*env)->SetIntField(env,linki,fid,myLink.iRef);
+
+        /* 
+         set HDF-5 String variables
+	*/
+        fid = (*env)->GetFieldID(env,cls,"ref5","Ljava/lang/String;");
+        if(fid == 0)
+	{
+	    NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxgetgroupid");
+            return;
+        }
+	jstr = (*env)->NewStringUTF(env,myLink.iRef5);
+        (*env)->SetObjectField(env, linki, fid, jstr);
+
+        fid = (*env)->GetFieldID(env,cls,"refd","Ljava/lang/String;");
+        if(fid == 0)
+	{
+	    NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxgetgroupid");
+            return;
+        }
+	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
+        (*env)->SetObjectField(env, linki, fid, jstr);
+        
     }
 }
 /*------------------------------------------------------------------------
@@ -590,6 +657,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
     int iRet;
     jclass cls;
     jfieldID fid;
+    jstring jstr;
 
     /* set error handler */
     NXMSetError(env,JapiError);
@@ -624,6 +692,29 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
             return;
         }
         (*env)->SetIntField(env,linki,fid,myLink.iRef);
+
+        /* 
+         set HDF-5 String variables
+	*/
+        fid = (*env)->GetFieldID(env,cls,"ref5","Ljava/lang/String;");
+        if(fid == 0)
+	{
+	    NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxgetdataid");
+            return;
+        }
+	jstr = (*env)->NewStringUTF(env,myLink.iRef5);
+        (*env)->SetObjectField(env, linki, fid, jstr);
+
+        fid = (*env)->GetFieldID(env,cls,"refd","Ljava/lang/String;");
+        if(fid == 0)
+	{
+	    NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxgetdataid");
+            return;
+        }
+	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
+        (*env)->SetObjectField(env, linki, fid, jstr);
     }
 }
 /*------------------------------------------------------------------------
@@ -637,6 +728,8 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
     int iRet;
     jclass cls;
     jfieldID fid;
+    jstring jstr;
+    const char *cData;
 
     /* set error handler */
     NXMSetError(env,JapiError);
@@ -669,6 +762,34 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
      }
      myLink.iRef = (*env)->GetIntField(env,target,fid);
     
+     /*
+       get the HDF-5 Strings
+     */
+     fid = (*env)->GetFieldID(env,cls,"ref5","Ljava/lang/String;");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxmakelink");
+          return;
+     }
+     jstr = (*env)->GetObjectField(env, target, fid);
+     cData = (*env)->GetStringUTFChars(env, jstr, 0);          
+     strcpy(myLink.iRef5,cData);
+     (*env)->ReleaseStringUTFChars(env, jstr, cData);
+
+     fid = (*env)->GetFieldID(env,cls,"refd","Ljava/lang/String;");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxmakelink");
+          return;
+     }
+     jstr = (*env)->GetObjectField(env, target, fid);
+     cData = (*env)->GetStringUTFChars(env, jstr, 0);          
+     strcpy(myLink.iRefd,cData);
+     (*env)->ReleaseStringUTFChars(env, jstr, cData);
+
+
      // do actually link
      iRet = NXmakelink(nxhandle, &myLink);
 }

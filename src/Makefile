@@ -17,4 +17,7 @@ lib5:
 lib45: 
 	make -f makefile_hdf45	
 
-
+clean:
+	- rm *.o
+	- rm *.a
+	- rm test4 test5 NXbrowse

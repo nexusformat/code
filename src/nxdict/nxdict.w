@@ -933,7 +933,7 @@ This is the tokenizer:
 
 /*----------------- Keywords ----------------------------------------*/
 
-  static TokDat TokenList[8] = { 
+  static TokDat TokenList[9] = { 
                                 {"SDS",DSDS},
                                 {"NXLINK",DLINK},
                                 {"NXVGROUP",DGROUP},
@@ -1227,7 +1227,7 @@ parsing:
       int iRank = 1;
       int32 iDim[MAX_VAR_DIMS];
       int iList;
-      int iRet, iStat;
+      int iRet, iStat, i;
       char pError[256];
       char pName[MAX_NC_NAME];
       void (*ErrFunc)(void *pData, char *pErr);

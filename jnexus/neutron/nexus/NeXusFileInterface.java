@@ -12,6 +12,9 @@
   *
   * @author Mark Koennecke, October 2000
   *
+  * updated for NAPI-2.0, including HDF-5 support
+  * @author Mark Koennecke, August 2001
+  *
   * copyright: see accompanying COPYRIGHT file
   */
 package neutron.nexus;
@@ -79,7 +82,27 @@ public interface NeXusFileInterface {
       * means it is an unlimited dimension.
       * @exception NexusException when the dataset could not be created.
       */ 
-    public void makedata(String name, int type, int rank, int dim[]) throws
+    public void makedata(String name, int type, int rank, int dim[]) 
+	throws NexusException;
+    /**
+      * compmakedata creates a new dataset with the specified characteristics 
+      * in the current group. This data set will be compressed.
+      * @param name The name of the dataset.
+      * @param type The number type of the dataset. Usually a constant from
+      * a selection of values.
+      * @param rank The rank or number of dimensions of the dataset.
+      * @param dim An array containing the length of each dimension. dim must
+      * have at least rank entries. The first dimension can be 0 which
+      * means it is an unlimited dimension.
+      * @param compression_type determines the compression type. 
+      * @param iChunk With HDF-5, slabs can be written to compressed data 
+      * sets. The size of these slabs is specified through the chunk array.
+      * This must have the rank values for the size of the chunk to
+      * be written in each dimension. 
+      * @exception NexusException when the dataset could not be created.
+      */ 
+    public void compmakedata(String name, int type, int rank, int dim[],
+                             int compression_type, int iChunk[]) throws
 	                   NexusException; 
     /**
       * opendata opens an existing dataset for access. For instance for 

@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include "napi45.h"
+#include "napi.h"
 
 static void print_data (const char *prefix, void *data, int type, int num);
 
 int main ()
 {
-  int i, u, NXrank, NXdims[32], NXtype, NXlen, entry_status, attr_status;
+  int i, j, u, NXrank, NXdims[32], NXtype, NXlen, entry_status, attr_status;
   double r;
   void *data_buffer;
   unsigned char i1_array[4] = {1, 2, 3, 4};
@@ -17,17 +17,24 @@ int main ()
   {1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18., 19., 20.};
   int array_dims[2] = {5, 4};
   int unlimited_dims[1] = {NX_UNLIMITED};
-  int chunk_size;
+  int chunk_size[2]={5,4};
   int slab_start[2], slab_size[2];
   char name[64], char_class[64], char_buffer[128];
   char group_name[64], class_name[64];
   NXhandle fileid;
   NXlink glink, dlink;
+  int comp_array[1000][20];
+  int dims[2];
+  int cdims[2];
 
 /* create file */
   if (NXopen ("NXtest.h5", NXACC_CREATE5, &fileid) != NX_OK) return 1;
   if (NXmakegroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
+  if (NXmakegroup (fileid, "det", "NXdetector") != NX_OK) return 1;
+  if (NXopengroup (fileid, "det", "NXdetector") != NX_OK) return 1;
+  if (NXmakegroup (fileid, "da", "NXdata") != NX_OK) return 1;
+  if (NXopengroup (fileid, "da", "NXdata") != NX_OK) return 1;
   NXgetgroupID (fileid, &glink);
      NXlen = 10;
      if (NXmakedata (fileid, "ch_data", NX_CHAR, 1, &NXlen) != NX_OK) return 1;
@@ -43,19 +50,35 @@ int main ()
      if (NXopendata (fileid, "i2_data") != NX_OK) return 1;
         if (NXputdata (fileid, i2_array) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
+     dims[0] = 1000;
+     dims[1] = 20;
+     for(i = 0; i < 1000; i++)
+         {
+         for(j = 0; j < 20; j++)
+            {
+              comp_array[i][j] = 1;
+            }
+         }
+     cdims[0] = 20;
+     cdims[1] = 20;
+     /*
+     if (NXcompmakedata (fileid, "comp_data", NX_INT32, 2, dims, NX_COMP_LZW, cdims) != NX_OK) return 1;
+     if (NXopendata (fileid, "comp_data") != NX_OK) return 1;
+        if (NXputdata (fileid, comp_array) != NX_OK) return 1;
+     if (NXclosedata (fileid) != NX_OK) return 1;
+     */
      if (NXmakedata (fileid, "i4_data", NX_INT32, 1, &array_dims[1]) != NX_OK) return 1;
      if (NXopendata (fileid, "i4_data") != NX_OK) return 1;
         if (NXputdata (fileid, i4_array) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
-     chunk_size = 2;
-     if (NXcompmakedata (fileid, "r4_data", NX_FLOAT32, 2, array_dims, NX_COMP_LZW, chunk_size) != NX_OK) return 1;
+     if (NXcompmakedata (fileid, "r4_data", NX_FLOAT32, 2, array_dims,NX_COMP_LZW,chunk_size) != NX_OK) return 1;
      if (NXopendata (fileid, "r4_data") != NX_OK) return 1;
         if (NXputdata (fileid, r4_array) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
      if (NXmakedata (fileid, "r8_data", NX_FLOAT64, 2, array_dims) != NX_OK) return 1;
      if (NXopendata (fileid, "r8_data") != NX_OK) return 1;
         slab_start[0] = 4; slab_start[1] = 0; slab_size[0] = 1; slab_size[1] = 4;
-        if (NXputslab (fileid, r8_array, slab_start, slab_size) != NX_OK) return 1;
+        if (NXputslab (fileid, *r8_array + 16, slab_start, slab_size) != NX_OK) return 1;
         slab_start[0] = 0; slab_start[1] = 0; slab_size[0] = 4; slab_size[1] = 4;
         if (NXputslab (fileid, r8_array, slab_start, slab_size) != NX_OK) return 1;
         if (NXputattr (fileid, "ch_attribute", "NeXus", strlen ("NeXus"), NX_CHAR) != NX_OK) return 1;
@@ -63,13 +86,15 @@ int main ()
         if (NXputattr (fileid, "i4_attribute", &i, 1, NX_INT32) != NX_OK) return 1;
         r = 3.14159265;
         if (NXputattr (fileid, "r4_attribute", &r, 1, NX_FLOAT64) != NX_OK) return 1;
+        if (NXputattr (fileid, "r4_attribute", &r, 1, NX_FLOAT64) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
      /* subgroup detector */
      if (NXmakegroup (fileid, "zdetector", "NXdetector") != NX_OK) return 1;
      if (NXopengroup (fileid, "zdetector", "NXdetector") != NX_OK) return 1;
      if (NXclosegroup (fileid) != NX_OK) return 1;
-
   /* close NXentry group */
+  if (NXclosegroup (fileid) != NX_OK) return 1;
+  if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclosegroup (fileid) != NX_OK) return 1;
 
   /* test data linking  */
@@ -122,13 +147,17 @@ int main ()
     }
   while (attr_status == NX_OK);
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
+  if (NXopengroup (fileid, "det", "NXdetector") != NX_OK) return 1;
+  if (NXopengroup (fileid, "da", "NXdata") != NX_OK) return 1;
   do
     {
     entry_status = NXgetnextentry (fileid, name, char_class, &NXtype);
     if (entry_status == NX_ERROR) return 1;
-    if (strlen (char_class) > 0) {
+    if (strcmp(char_class,"SDS") != 0) {
        /*subgroup */
-       entry_status = NX_OK;
+       if (entry_status != NX_EOD) { 
+          entry_status = NX_OK;
+       }
     } else {
        if (entry_status == NX_OK) {
           if (NXopendata (fileid, name) != NX_OK) return 1;
@@ -201,6 +230,8 @@ int main ()
   if (NXclosedata (fileid) != NX_OK) return 1;
   if (NXgetgroupinfo (fileid, &u, group_name, class_name) != NX_OK) return 1;
      printf ("Group:'%s' with class name: %s and %d item(s)\n", group_name, class_name, u);
+  if (NXclosegroup (fileid) != NX_OK) return 1;
+  if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclosegroup (fileid) != NX_OK) return 1;
   NXlen = sizeof (char_buffer);
   NXtype = NX_CHAR;

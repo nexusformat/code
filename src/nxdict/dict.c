@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <mfhdf.h>
 #include "dynstring.h"
-#include "napi.h"
+#include "napi45.h"
 #include "nxdict.h"
 
    int main(int argc, char *argv[])
@@ -27,7 +27,7 @@
       float fTina[3] = { 0.123, 0.234, 0.456};
       float fTest[3], fDelta;
       float fTust[20*20];
-      char pBuffer[132];
+      char pBuffer[256];
       int i;
 
       /* test nxdict */
@@ -38,7 +38,7 @@
       NXDupdate(pDict,"Bea","/entry1,NXentry/SDS");
       NXDget(pDict,"Bea",pBuffer,131);
       printf("Bea = %s\n",pBuffer);
-      NXDget(pDict,"Linda",pBuffer,131);
+      NXDget(pDict,"Linda",pBuffer,254);
       NXDopendef(hfil,pDict,pBuffer);
       NXDputalias(hfil,pDict,"Tina",fTina);
       NXDputalias(hfil,pDict,"Gina",fTina);

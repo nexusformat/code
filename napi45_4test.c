@@ -1,5 +1,5 @@
 #include <stdio.h> 
-#include "napi45.h"
+#include "napi.h"
 
 static void print_data(const char* prefix, void* data, int type, int num);
 
@@ -16,6 +16,7 @@ int main()
    double r8_array[5][4] = 
    {1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.};
    int array_dims[2] = { 5, 4 };
+   int chunk_size[3] = { 0, 0, 0 };
    int unlimited_dims[1] = {NX_UNLIMITED};
    int slab_start[2], slab_size[2];
    char name[64], char_class[64], char_buffer[128];
@@ -26,7 +27,9 @@ int main()
    if (NXopen("NXtest.hdf", NXACC_CREATE, &fileid) != NX_OK) return 1;
    if (NXmakegroup(fileid, "entry", "NXentry") != NX_OK) return 1;
    if (NXopengroup(fileid, "entry", "NXentry") != NX_OK) return 1;
-   /*NXgetgroupID(fileid,&glink); */
+   if (NXmakegroup(fileid, "detector-x", "NXdetector") != NX_OK) return 1;
+   if (NXopengroup(fileid, "detector-x", "NXdetector") != NX_OK) return 1;
+      NXgetgroupID(fileid,&glink); 
       NXlen = 10;
       if (NXmakedata (fileid, "ch_data", NX_CHAR, 1, &NXlen) != NX_OK) return 1;
       if (NXopendata (fileid, "ch_data") != NX_OK) return 1;
@@ -46,7 +49,7 @@ int main()
          if (NXcompress (fileid,NX_COMP_LZW) != NX_OK) return 1;
          if (NXputdata(fileid, i4_array) != NX_OK) return 1;
       if (NXclosedata(fileid) != NX_OK) return 1;
-      if (NXcompmakedata (fileid, "r4_data", NX_FLOAT32, 2, array_dims, NX_COMP_LZW,0) != NX_OK) return 1;
+      if (NXcompmakedata (fileid, "r4_data", NX_FLOAT32, 2, array_dims, NX_COMP_LZW, chunk_size) != NX_OK) return 1;
       if (NXopendata (fileid, "r4_data") != NX_OK) return 1;
 	 if (NXputdata(fileid, r4_array) != NX_OK) return 1;
       if (NXclosedata(fileid) != NX_OK) return 1;
@@ -63,11 +66,12 @@ int main()
          if (NXputattr(fileid, "r4_attribute", &r, 1, NX_FLOAT64) != NX_OK) return 1;
       if (NXclosedata(fileid) != NX_OK) return 1;
    if (NXclosegroup(fileid) != NX_OK) return 1;
-
+   if (NXclosegroup(fileid) != NX_OK) return 1; 
     /* test linking  */
    if (NXmakegroup(fileid, "data", "NXdata") != NX_OK) return 1;
    if (NXopengroup(fileid, "data", "NXdata") != NX_OK) return 1;
       NXmakelink(fileid, &dlink);
+      NXmakelink(fileid, &glink);
    if (NXclosegroup(fileid) != NX_OK) return 1;
 
 
@@ -88,6 +92,7 @@ int main()
 /* read data */
    if (NXopen("NXtest.hdf", NXACC_READ, &fileid) != NX_OK) return 1;
    if (NXopengroup(fileid, "entry", "NXentry") != NX_OK) return 1;
+   if (NXopengroup(fileid, "detector-x", "NXdetector" ) != NX_OK) return 1;
    do 
    {
       entry_status = NXgetnextentry(fileid, name, char_class, &NXtype);
@@ -154,6 +159,7 @@ int main()
       }
    } while (entry_status == NX_OK);
    if (NXclosegroup(fileid) != NX_OK) return 1;
+   if (NXclosegroup(fileid) != NX_OK) return 1; 
    if (NXclose(&fileid) != NX_OK) return 1;
    return 0;
 }

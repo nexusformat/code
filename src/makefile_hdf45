@@ -3,25 +3,24 @@
 # Makefile for building all NEXUS libraries
 #
 
-#NX_PARA=lib4
-
 CC=cc
 CFLAGS1=-g
 HROOT=/data/lnslib
-FROOT=/data/filges/nexus-45
+FROOT=/data/koenneck/src/NeXus
 CFLAGS=$(CFLAGS1)
-LIBNEXUS45_OBJ=napi45.o
+LIBNEXUS45_OBJ=napi45.o napif.o
 TEST4_OBJ=napi45_4test.o
 TEST5_OBJ=napi45_5test.o
 NOPT=-DHDF4 -DHDF5
+NXBROWSE_OBJ=NXbrowse.o
 
-all: libNeXus45.a test4 test5
+all: libNeXus45.a test4 test5 NXbrowse napif5_test
 
 .c.o :
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45.c -I$(HROOT)/include -c 
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45_4test.c -I$(HROOT)/include -c
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45_5test.c -I$(HROOT)/include -c
+	$(CC) $(CFLAGS) $(NOPT)  -I$(HROOT)/include -c $(FROOT)/$*.c 
 
+.f.o:
+	f77 -g -c $(FROOT)/$*.f
 
 libNeXus45.a : $(LIBNEXUS45_OBJ)
 	@echo "*** Creating NeXus interface based on HDF4/HDF5 library libNeXus45.a ***"
@@ -29,12 +28,20 @@ libNeXus45.a : $(LIBNEXUS45_OBJ)
 	ar -cr $@ $(LIBNEXUS45_OBJ)
 	ranlib $@
 
-test4: libNeXus45.a $(TEST4_OBJ)
+test4: libNeXus45.a $(TEST4_OBJ) 
 	$(CC) $(CFLAGS) -o test4 $(TEST4_OBJ) $(FROOT)/libNeXus45.a \
 	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lhdf5 -lz 
 
-test5: libNeXus45.a $(TEST5_OBJ)
+test5: libNeXus45.a $(TEST5_OBJ) 
 	$(CC) $(CFLAGS) -o test5 $(TEST5_OBJ) $(FROOT)/libNeXus45.a \
 	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lhdf5 -lz 
 	
+NXbrowse: libNeXus45.a $(NXBROWSE_OBJ) 
+	$(CC) $(CFLAGS) -o NXbrowse $(NXBROWSE_OBJ) $(FROOT)/libNeXus45.a \
+	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lhdf5 -lz 
+	
+napif5_test: libNeXus45.a napif5_test.o
+	f77 -o napif5_test napif5_test.o $(FROOT)/libNeXus45.a \
+	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lhdf5 -lz
+
 

@@ -27,6 +27,10 @@ C           Oxfordshire
 C           OX11 0QX
 C           United Kingdom
 C
+C Updated to NAPI-2.1.0 with HDF-5 support:
+C
+C Mark Koennecke, August 2001, Mark.Koennecke@psi.ch
+C
 C For further information, see <http://www.neutron.anl.gov/NeXus/>
 C
 C $Id$
@@ -34,10 +38,11 @@ C------------------------------------------------------------------------------
 
 C *** Version of NeXus interface - should be consistent with napi.h!
       CHARACTER*5 NEXUS_VERSION
-      PARAMETER(NEXUS_VERSION='1.3.3')
+      PARAMETER(NEXUS_VERSION='2.1.0')
 C *** NXaccess enum - access modes for NXopen
-      INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE
-      PARAMETER(NXACC_READ=1,NXACC_RDWR=3,NXACC_CREATE=4)
+      INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE, NXACC_CREATE5
+      PARAMETER(NXACC_READ=1,NXACC_RDWR=2,NXACC_CREATE=3,
+     +    NXACC_CREATE5=4)
 C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
 C *** large enough to hold an NXhandle structure
       INTEGER NXHANDLESIZE
@@ -45,7 +50,7 @@ C *** large enough to hold an NXhandle structure
 C *** NXLINKSIZE is (at least) the size of an INTEGER*4 array that can hold
 C *** an NXlink structure: we'll assume 64bit alignment of structure members for safety
       INTEGER NXLINKSIZE
-      PARAMETER(NXLINKSIZE=4)
+      PARAMETER(NXLINKSIZE=1028)
 C *** Possible NXstatus values - these are returned by all NX routines
       INTEGER NX_OK,NX_ERROR,NX_EOD
       PARAMETER(NX_OK=1,NX_ERROR=0,NX_EOD=-1)
@@ -67,11 +72,11 @@ C *** NeXus names for HDF parameters
      +          NX_INT32=24,NX_UINT32=25,NX_CHAR=4)
 C**** NeXus compression schemes
       INTEGER NX_COMP_NONE, NX_COMP_LZW, NX_COMP_HUF, NX_COMP_RLE
-      PARAMETER(NX_COMP_NONE=0,NX_COMP_LZW=4,NX_COMP_RLE=1,
-     +          NX_COMP_HUF=3)
+      PARAMETER(NX_COMP_NONE=100,NX_COMP_LZW=200,NX_COMP_RLE=300,
+     +          NX_COMP_HUF=400)
 C**** NeXus Unlimited Dimension
       INTEGER NX_UNLIMITED
-      PARAMETER (NX_UNLIMITED=0)
+      PARAMETER (NX_UNLIMITED=-1)
       INTEGER NXOPEN, NXCLOSE, NXMAKEGROUP, NXOPENGROUP, NXCLOSEGROUP,
      +       NXMAKEDATA, NXOPENDATA, NXCLOSEDATA, NXGETDATA, 
      +       NXGETCHARDATA, NXGETSLAB, NXGETATTR, NXGETCHARATTR, 
@@ -79,7 +84,7 @@ C**** NeXus Unlimited Dimension
      +       NXPUTATTR, NXPUTCHARATTR, NXPUTDIM, NXGETINFO, 
      +       NXGETNEXTENTRY, NXGETNEXTATTR, NXGETGROUPID, NXMAKELINK,
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
-     +       NXINITATTRDIR, NXFLUSH
+     +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA
       EXTERNAL NXOPEN, NXCLOSE, NXMAKEGROUP, NXOPENGROUP, NXCLOSEGROUP,
      +       NXMAKEDATA, NXOPENDATA, NXCLOSEDATA, NXGETDATA, 
      +       NXGETCHARDATA, NXGETSLAB, NXGETATTR, NXGETCHARATTR, 
@@ -87,7 +92,7 @@ C**** NeXus Unlimited Dimension
      +       NXPUTATTR, NXPUTCHARATTR, NXPUTDIM, NXGETINFO, 
      +       NXGETNEXTENTRY, NXGETNEXTATTR, NXGETGROUPID, NXMAKELINK,
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
-     +       NXINITATTRDIR, NXFLUSH
+     +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA
 
 
 

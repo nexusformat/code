@@ -22,27 +22,8 @@
     char iAccess[2];
   } NexusFile, *pNexusFile;
    
-   /*---------------------------------------------------------------------*/
-
-  static void NXNXNXReportError(void *pData, char *string)
-  {
-    printf("%s \n",string);
-  }
-     
-  /*---------------------------------------------------------------------*/
-
-  void *NXpData = NULL;
-  void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
-
-  /*---------------------------------------------------------------------*/
-
-  void CALLING_STYLE NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
-  {
-    NXpData = pData;
-    NXIReportError = NewError;
-  }
- 
-  /*--------------------------------------------------------------------*/
+    
+   /*--------------------------------------------------------------------*/
 
   static pNexusFile NXIassert(NXhandle fid)
   {
@@ -293,6 +274,8 @@
   {
     pNexusFile pNew = NULL;
     char pBuffer[512], time_buffer[64];
+    char HDF_VERSION[64];
+    uint32 lmajor, lminor, lrelease;
     int32 am1=0;
     int32 file_id=0, an_id=0, ann_id=0;
     time_t timer;
@@ -404,6 +387,11 @@
     if (am != NXACC_READ) {
       if (SDsetattr(pNew->iSID, "NeXus_version", DFNT_CHAR8, strlen(NEXUS_VERSION), NEXUS_VERSION) < 0) {
           NXIReportError (NXpData, "ERROR: HDF failed to store NeXus_version attribute ");
+          return NX_ERROR;
+      }
+      Hgetlibversion(&lmajor, &lminor, &lrelease, HDF_VERSION); 
+      if (SDsetattr(pNew->iSID, "HDF_version", DFNT_CHAR8, strlen(HDF_VERSION), HDF_VERSION) < 0) {
+          NXIReportError (NXpData, "ERROR: HDF failed to store HDF_version attribute ");
           return NX_ERROR;
       }
     }
@@ -728,7 +716,7 @@
   
    
   NXstatus CALLING_STYLE NX4compmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
-              int dimensions[],int compress_type, int chunk_size)
+              int dimensions[],int compress_type, int chunk_size[])
   {
     pNexusFile pFile;
     int32 iNew, iRet, type;
@@ -871,7 +859,7 @@
     }
     else if (compress_type == NX_COMP_NONE)
     {
-      NXIReportError (NXpData, "No compression method selected!"); 
+      /*      */
     }
     else 
     {
@@ -1214,16 +1202,7 @@
     if (pFile->iCurrentVG == 0) { /* root level, can not link here */
       return NX_ERROR;
     }
-    if(sLink->iTag == DFTAG_VG)
-    {
-        iVG = Vattach (pFile->iVID, sLink->iRef,pFile->iAccess);
-        iRet = Vinsert(pFile->iCurrentVG,iVG);
-        iRet = Vdetach(iVG);
-    }
-    else
-    {
-       Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
-    }    
+    Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
     return NX_OK;
   }
   
@@ -1681,7 +1660,7 @@
       return NX_ERROR;
     } else {
       sRes->iTag = DFTAG_VG;
-      sRes->iRef = pFile->iStack[pFile->iStackPtr].iVref;
+      sRes->iRef = VQueryref(pFile->iCurrentVG);
       return NX_OK;
     }
     /* not reached */

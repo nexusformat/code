@@ -8,15 +8,16 @@ CFLAGS1=-g
 HROOT=/data/lnslib
 FROOT=/data/filges/nexus-45
 CFLAGS=$(CFLAGS1)
-LIBNEXUS45_OBJ=napi45.o
+LIBNEXUS45_OBJ=napi45.o napif.o
 TEST4_OBJ=napi45_4test.o
 NOPT=-DHDF4
 
-all: libNeXus45_4.a test4o 
+all: libNeXus45_4.a test4o napif4_test
 
 .c.o :
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45.c -I$(HROOT)/include -c 
-	$(CC) $(CFLAGS) $(NOPT) $(FROOT)/napi45_4test.c -I$(HROOT)/include -c
+	$(CC) $(CFLAGS) $(NOPT) -I$(HROOT)/include -c $(FROOT)/$*.c
+.f.o:
+	f77 -g -c $(FROOT)/$*.f
 
 libNeXus45_4.a : $(LIBNEXUS45_OBJ)
 	@echo "*** Creating NeXus interface based on HDF4 library (libNeXus45_4.a) ***"
@@ -28,4 +29,7 @@ test4o: libNeXus45_4.a $(TEST4_OBJ)
 	$(CC) $(CFLAGS) -o test4o $(TEST4_OBJ) $(FROOT)/libNeXus45_4.a \
 	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lz 
 
+napif4_test: libNeXus45_4.a napif4_test.o
+	f77 -o napif4_test napif4_test.o $(FROOT)/libNeXus45_4.a \
+	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lz
 	

@@ -13,20 +13,20 @@
 #         C O N F I G U R A T I O N       S E C T I O N                   #
 ###########################################################################
 # Where to find the HDF libraries: HDF4.1r3 is REQUIRED
-HDFROOT=..\..\HDF4.1r3
+HDFROOT=K:\koennecke\HDF4.1r3
 
 #Where to find the napi C stuff
 NAPIROOT=..\
 
 # Where the Java binaries live
-JAVABIN=C:\jdk1.1.5\bin
+JAVABIN=C:\jdk1.1.8\bin
 
 # The classpath for compiling java
-JCP=C:\jdk1.1.5\lib\classes.zip;.;
+JCP=C:\jdk1.1.8\lib\classes.zip;.;
 
 # The path to the include files for the jni-headers
-JINCLUDE= -I"C:\jdk1.1.5\include" \
-      -I"C:\jdk1.1.5\include\win32"
+JINCLUDE= -I"C:\jdk1.1.8\include" \
+      -I"C:\jdk1.1.8\include\win32"
 
 # The C-compiler to use
 CC=bcc32

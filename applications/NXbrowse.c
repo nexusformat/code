@@ -27,6 +27,10 @@
 
  For further information, see <http://www.neutron.anl.gov/NeXus/>
 
+ Updated to use new NeXus PI for HDF4 and HDF5:
+  
+ Mark Koennecke, August 2001 
+
  $Id$
 !----------------------------------------------------------------------------*/
 
@@ -217,7 +221,7 @@ int NXBdir (NXhandle fileId)
             printf ("\n");
          }
       }
-   } while (status != NX_EOD);
+   } while (status == NX_OK);
    return status;
 }
 
@@ -405,7 +409,7 @@ void PrintAttributes (NXhandle fileId)
       if (status == NX_OK) {
          attrLen++; /* Add space for string termination */
          if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return;
-         if (NXgetattr (fileId, attrName, attrBuffer, &attrLen, &attrType) != NX_OK) return;
+         if (NXgetattr (fileId, attrName, attrBuffer,&attrLen , &attrType) != NX_OK) return;
          printf ("    %s = ", attrName);
          PrintData (attrBuffer, attrType, attrLen);
          printf ("\n");
@@ -473,13 +477,27 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
 {
    char *dataPtr;
    int i, dimSize, dataSize, lineSize;
+   int type_size = 0;
 
    if (rank > 1) { /* Recursively call DumpData until rank = 1 */
       for (i = 1, dimSize = 1; i < rank; i++) {
          dimSize *= dimensions[i];
       }
       for (i = 0; i < dimensions[0]; i++) {
-         dataPtr = (char *)data + i * dimSize * DFKNTsize(dataType);
+#ifdef HDF4
+         dataPtr = (char *)data + i * dimSize * DFKNTsize(dataType);        
+#else
+         if ((dataType == NX_CHAR) || (dataType == NX_INT8) || (dataType == NX_UINT8)) {
+            type_size = 1;
+         } else if ((dataType == NX_INT16) || (dataType == NX_UINT16)) {
+            type_size = 2;
+         } else if ((dataType == NX_INT32) || (dataType == NX_UINT32) || (dataType == NX_FLOAT32)) {
+            type_size = 4;
+         } else if (dataType == NX_FLOAT64) {
+            type_size = 8;
+         }
+         dataPtr = (char *)data + i * dimSize * type_size;  
+#endif         
          DumpData (fd, rank-1, &dimensions[1], dataType, dataPtr);
       }
       return;
@@ -497,7 +515,12 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
         WriteData (fd, dataPtr, dataType, lineSize);
         fprintf(fd,"\n");
         dataSize -= lineSize;
+#ifdef HDF4
         dataPtr += lineSize * DFKNTsize(dataType);
+#else
+        dataPtr += lineSize * type_size;
+#endif
+
       }
    }
 }
@@ -535,10 +558,10 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
             fprintf (fd, "%d ", ((unsigned short *)data)[i]);
             break;
          case NX_INT32:
-            fprintf (fd, "%d ", ((int32 *)data)[i]);
+            fprintf (fd, "%d ", ((int *)data)[i]);
             break;
          case NX_UINT32:
-            fprintf (fd, "%d ", ((uint32 *)data)[i]);
+            fprintf (fd, "%d ", ((uint *)data)[i]);
             break;
          case NX_FLOAT32:
             fprintf (fd, "%f ", ((float *)data)[i]);
@@ -569,7 +592,7 @@ int FindGroup (NXhandle fileId, char *groupName, char *groupClass)
       status = NXgetnextentry (fileId, name, class, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
-         if (StrEq (groupName, name)) {
+          if (StrEq (groupName, name)) {
             strcpy (groupClass, class);
             if (!strncmp(groupClass,"NX",2)) {
                return NX_OK;
