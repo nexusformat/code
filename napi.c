@@ -341,21 +341,15 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	return ret;
   }
 
-/* 
- * the following deals with how we do our timezone calculation.
- * Not all systems have a timezone field as part of "struct tm"
- * that is passed to localtime(), so we need to look elsewhere
- *
- * If you encounter problems, try defining USE_FTIME first, with
- * NEED_TZSET is your system provides the tzset() function
+/*
+ * On Open VMS prior to version 7.0 timezone support wasn't complete and gmtime() always returned NULL
  */
-
-#if defined(_WIN32)
-#   define NEED_TZSET		/* call tzset() to initialise time variables */
-#elif (defined(__VMS) && (__VMS_VER < 70000000))
+#if (defined(__VMS) && (__VMS_VER < 70000000))
 #   define USE_FTIME		/* use ftime() function */
 #   include <sys/timeb.h>
 #endif /* __VMS && __VMS_VER < 70000000 */
+
+/* #define NEED_TZSET /* probably not needed now as we do not use the "timezone" external variable */
 
   NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess am, NXhandle* pHandle)
   {
@@ -386,21 +380,26 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     tzset();
 #endif /* NEED_TZSET */
     time(&timer);
-    time_info = localtime(&timer);
-#if defined(USE_TIMEZONE)
-    gmt_offset = -timezone + ( (daylight != 0) ? 3600 : 0 );
-#elif defined(USE_FTIME)
+#ifdef USE_FTIME
     ftime(&timeb_struct);
     gmt_offset = -timeb_struct.timezone * 60;
     if (timeb_struct.dstflag != 0)
     {
 	gmt_offset += 3600;
     }
-#elif (defined(__MWERKS__) || defined(_WIN32))
-   gmt_offset = difftime (timer, mktime(gmtime(&timer)));
 #else
-   gmt_offset = time_info->tm_gmtoff;
-#endif
+    time_info = gmtime(&timer);
+    if (time_info != NULL)
+    {
+        gmt_offset = difftime(timer, mktime(time_info));
+    }
+    else
+    {
+        NXIReportError(NXpData, "Your gmtime() function does not work ... timezone information will be incorrect\n");
+        gmt_offset = 0;
+    }
+#endif /* USE_FTIME */
+    time_info = localtime(&timer);
     if (time_info != NULL)
     {
         if (gmt_offset < 0)
