@@ -27,10 +27,10 @@
 #
 #
 #====================================================================
-lib_LIBRARIES=libNeXus90.a
+lib_LTLIBRARIES = libNeXus90.la
 
-libNeXus90_a_SOURCES=NXUmodule.f90 NXmodule.f90
-libNeXus90_a_LIBADD=../../src/napi.o
+libNeXus90_la_SOURCES = NXUmodule.f90 NXmodule.f90
+libNeXus90_la_LIBADD = $(top_builddir)/src/libNeXus.la
 
 NXUmodule.o: NXUmodule.f90 NXmodule.o
 

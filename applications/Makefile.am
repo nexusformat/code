@@ -26,10 +26,10 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
-LIBNEXUS=../src/libNeXus.a
-LIBNEXUS77=../bindings/f77/libNeXus77.a
-LIBNEXUS90=../bindings/f90/libNeXus90.a
-AM_CPPFLAGS=-I. -I../include
+LIBNEXUS=$(top_builddir)/src/libNeXus.la
+LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
+LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
 if HAVE_HDF4
 HDF4_TARGETS = NXtoNX4
@@ -60,10 +60,10 @@ NXtoNX5_LDADD = $(LIBNEXUS)
 
 NXdump_SOURCES = NXdump.f90
 NXdump_LDADD = $(LIBNEXUS90)
-NXdump_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
+## NXdump_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
 
 NXbrowse90_SOURCES = NXbrowse90.f90
 NXbrowse90_LDADD = $(LIBNEXUS90)
-NXbrowse90_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
+## NXbrowse90_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
 
 include $(top_srcdir)/build_rules.am

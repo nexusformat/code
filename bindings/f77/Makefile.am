@@ -27,9 +27,11 @@
 #
 #
 #====================================================================
-lib_LIBRARIES=libNeXus77.a
+lib_LTLIBRARIES=libNeXus77.la
 
-libNeXus77_a_SOURCES=napif.f
-libNeXus77_a_LIBADD=../../src/napi.o
+libNeXus77_la_SOURCES=napif.f
+libNeXus77_la_LIBADD=$(top_builddir)/src/libNeXus.la
+
+EXTRA_DIST = napif.inc
 
 include $(top_srcdir)/build_rules.am
