@@ -1,4 +1,3 @@
-#
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
@@ -28,31 +27,49 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
-# AC_CHECK_C_OPTION tests for a given compiler option; we need to egrep
+# AC_CHECK_COMPILER_OPTION tests for a given compiler option; we need to egrep
 # the output as well as check the status as sometimes the compiler 
 # will return success for invalid options
 #
+# Argument 1 must be "Fortran 77" or "C"
+# Argument 2 must be FFLAGS or CFLAGS as appropriate
+# Argument 3 is the compiler option to check
+#
 AC_DEFUN(
- [AC_CHECK_C_OPTION],
- [AC_MSG_CHECKING([for C compiler option $1])
-  AC_LANG_PUSH(C)
-  CFLAGS_SAVE=$CFLAGS
-  ac_compile="$ac_compile 2>check_c_option.$$"
-  CFLAGS="$CFLAGS $1"
+ [AC_CHECK_COMPILER_OPTION],
+ [AC_MSG_CHECKING([for $1 compiler option $3])
+  AC_LANG_PUSH($1)
+  COMPFLAGS_SAVE=[$]$2
+  ac_compile="$ac_compile 2>check_compiler_option.$$"
+  $2="[$]$2 $3"
   AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM],
-    [C_OPTION=yes],
-    [C_OPTION=no]) 
-  if test $C_OPTION = "yes"; then
-    $EGREP "unrecognized|unrecognised|unknown|invalid" check_c_option.$$ >/dev/null 2>&1 && C_OPTION="no" 
+    [COMPILER_OPTION=yes],
+    [COMPILER_OPTION=no]) 
+  if test $COMPILER_OPTION = "yes"; then
+    $EGREP "unrecognized|unrecognised|unknown|invalid|error" check_compiler_option.$$ >/dev/null 2>&1 && COMPILER_OPTION="no" 
   fi
-  if test $C_OPTION = "yes"; then
+  if test $COMPILER_OPTION = "yes"; then
     AC_MSG_RESULT([yes])
   else
     AC_MSG_RESULT([no])
-    CFLAGS=$CFLAGS_SAVE
+    $2=$COMPFLAGS_SAVE
   fi
-  rm -f check_c_option.$$
-  AC_LANG_POP(C)]
+  rm -f check_compiler_option.$$
+  AC_LANG_POP($1)]
+)
+#
+# AC_CHECK_C_OPTION
+#
+AC_DEFUN(
+ [AC_CHECK_C_OPTION],
+ [AC_CHECK_COMPILER_OPTION(C,CFLAGS,$1)]
+)
+#
+# AC_CHECK_F77_OPTION
+#
+AC_DEFUN(
+ [AC_CHECK_F77_OPTION],
+ [AC_CHECK_COMPILER_OPTION(Fortran 77,FFLAGS,$1)]
 )
 #

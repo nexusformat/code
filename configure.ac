@@ -3,6 +3,8 @@
 #  
 #  Autoconf (configure script) generation file
 #  
+#  $Id$
+#
 #  Copyright (C) 2004 Freddie Akeroyd
 #  
 #  This library is free software; you can redistribute it and/or
@@ -28,6 +30,9 @@
 AC_PREREQ(2.57)
 AC_REVISION($Revision$)
 AC_INIT(NeXus Library, 2.0.0, nexus-developers@anl.gov, nexus)
+AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
+This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
+see file  gnu_licence.txt  for further information])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/napi.c])
 AM_CONFIG_HEADER([include/nxconfig.h])
@@ -35,15 +40,15 @@ AC_CONFIG_AUX_DIR(.)
 AC_CANONICAL_HOST
 # Checks for programs.
 AC_ARG_WITH([cc],
-	AC_HELP_STRING([--with-cc=c_compile],
+	AC_HELP_STRING([--with-cc=c_compiler],
                        [Specify name of C compiler]),
 	[if test $withval != no; then CC=$withval; fi])
 AC_ARG_WITH([f90],
-	AC_HELP_STRING([--with-f90=f90_compile],
+	AC_HELP_STRING([--with-f90=f90_compiler],
                        [Specify name of FORTRAN 90 compiler]),
 	[if test $withval != no; then F90=$withval; fi])
 AC_ARG_WITH([f77],
-	AC_HELP_STRING([--with-f77=f77_compile],
+	AC_HELP_STRING([--with-f77=f77_compiler],
                        [Specify name of FORTRAN 77 compiler]),
 	[if test $withval != no; then F77=$withval; fi])
 AC_PROG_CC
@@ -56,7 +61,12 @@ AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+# Check C compiler options
+# -no-cpp-precomp needed on MacOS-X (and others?)
 AC_CHECK_C_OPTION([-no-cpp-precomp])
+
+# Check FORTRAN compiler options
+#AC_CHECK_F77_OPTION([-Wno-globals])
 
 #
 # First any host specific bits
@@ -154,5 +164,5 @@ AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
 AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
 AC_CONFIG_FILES([Makefile src/Makefile applications/Makefile
 		test/Makefile bindings/Makefile bindings/f77/Makefile
-		bindings/f90/Makefile])
+		bindings/f90/Makefile scripts/nxbuild])
 AC_OUTPUT

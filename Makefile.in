@@ -110,22 +110,31 @@ install_sh = @install_sh@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
+EXTRA_DIST = README gnu_licence.txt
+include_HEADERS = include/napi.h
+bin_SCRIPTS = scripts/nxbuild
+#CLEANFILES=
+#DIST_SUBDIRS=
 SUBDIRS = src bindings test applications
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/nxconfig.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = scripts/nxbuild
+SCRIPTS = $(bin_SCRIPTS)
+
 DIST_SOURCES =
+HEADERS = $(include_HEADERS)
+
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
 	uninstall-info-recursive all-recursive install-data-recursive \
 	install-exec-recursive installdirs-recursive install-recursive \
 	uninstall-recursive check-recursive installcheck-recursive
-DIST_COMMON = README ./include/nxconfig.h.in AUTHORS COPYING ChangeLog \
-	INSTALL Makefile.am Makefile.in NEWS acinclude.m4 aclocal.m4 \
-	config.guess config.sub configure configure.ac depcomp \
-	install-sh missing mkinstalldirs
+DIST_COMMON = README $(include_HEADERS) ./include/nxconfig.h.in AUTHORS \
+	COPYING ChangeLog INSTALL Makefile.am Makefile.in NEWS \
+	acinclude.m4 aclocal.m4 config.guess config.sub configure \
+	configure.ac depcomp install-sh missing mkinstalldirs
 DIST_SUBDIRS = $(SUBDIRS)
 all: all-recursive
 
@@ -163,7 +172,47 @@ $(srcdir)/./include/nxconfig.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 
 distclean-hdr:
 	-rm -f include/nxconfig.h include/stamp-h1
+scripts/nxbuild: $(top_builddir)/config.status $(top_srcdir)/scripts/nxbuild.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    echo " $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f"; \
+	    $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f; \
+	  else :; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
+	done
 uninstall-info-am:
+includeHEADERS_INSTALL = $(INSTALL_HEADER)
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(includedir)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f"; \
+	  $(includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(includedir)/$$f"; \
+	  rm -f $(DESTDIR)$(includedir)/$$f; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -276,7 +325,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/./include
+	$(mkinstalldirs) $(distdir)/./include $(distdir)/include $(distdir)/scripts
 	@list='$(DISTFILES)'; for file in $$list; do \
 	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
@@ -364,9 +413,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(SCRIPTS) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
+	$(mkinstalldirs) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
 
 install: install-recursive
 install-exec: install-exec-recursive
@@ -408,9 +458,9 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
-install-exec-am:
+install-exec-am: install-binSCRIPTS
 
 install-info: install-info-recursive
 
@@ -427,7 +477,8 @@ mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-generic
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
+	uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -435,17 +486,18 @@ uninstall-info: uninstall-info-recursive
 	clean-generic clean-recursive dist dist-all dist-gzip distcheck \
 	distclean distclean-generic distclean-hdr distclean-recursive \
 	distclean-tags distcleancheck distdir dvi dvi-am dvi-recursive \
-	info info-am info-recursive install install-am install-data \
-	install-data-am install-data-recursive install-exec \
-	install-exec-am install-exec-recursive install-info \
+	info info-am info-recursive install install-am \
+	install-binSCRIPTS install-data install-data-am \
+	install-data-recursive install-exec install-exec-am \
+	install-exec-recursive install-includeHEADERS install-info \
 	install-info-am install-info-recursive install-man \
 	install-recursive install-strip installcheck installcheck-am \
 	installdirs installdirs-am installdirs-recursive \
 	maintainer-clean maintainer-clean-generic \
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
 	mostlyclean-recursive tags tags-recursive uninstall \
-	uninstall-am uninstall-info-am uninstall-info-recursive \
-	uninstall-recursive
+	uninstall-am uninstall-binSCRIPTS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-info-recursive uninstall-recursive
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

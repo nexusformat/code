@@ -26,4 +26,9 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
+EXTRA_DIST=README gnu_licence.txt
+include_HEADERS=include/napi.h
+bin_SCRIPTS=scripts/nxbuild
+#CLEANFILES=
+#DIST_SUBDIRS=
 SUBDIRS=src bindings test applications
