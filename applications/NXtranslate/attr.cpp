@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include "attr.h"
+#include "nexus_util.h"
 
 using std::runtime_error;
 using std::logic_error;
@@ -17,7 +18,8 @@ Attr::Attr(const string name, const void* val,const int len, const int type): __
 
   // copy the value
   NXmalloc(&__value,1,dims,__type);
-  memcpy(__value,val,__length);
+  size_t size=nexus_util::calc_size(1,dims,__type);
+  memcpy(__value,val,size);
 }
 
 Attr::Attr(const Attr& old): __name(old.__name), __length(old.__length), __type(old.__type){
@@ -26,7 +28,8 @@ Attr::Attr(const Attr& old): __name(old.__name), __length(old.__length), __type(
 
   // copy the value
   NXmalloc(&__value,1,dims,__type);
-  memcpy(__value,old.__value,__length);
+  size_t size=nexus_util::calc_size(1,dims,__type);
+  memcpy(__value,old.__value,size);
 }
 
 Attr::~Attr(){
@@ -50,7 +53,8 @@ Attr& Attr::operator=(const Attr& old){
 
   // copy the value
   NXmalloc(&__value,1,dims,__type);
-  memcpy(__value,old.__value,__length);
+  size_t size=nexus_util::calc_size(1,dims,__type);
+  memcpy(__value,old.__value,size);
 
   return *this;
 }
