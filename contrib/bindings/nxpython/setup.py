@@ -8,7 +8,7 @@ hdf5macros = [('HDF5','1')]
 hdf4_incdir = '/usr/include'
 hdf5_incdir = '/usr/include'
 nexus_incdir = '../../../include'
-napi_incdir = "."
+napi_incdir = '.' 
 incdir_list = [hdf4_incdir, hdf5_incdir, nexus_incdir, napi_incdir]
 
 hdf4_libdir = '/usr/lib'
@@ -18,8 +18,12 @@ libdir_list = [ hdf4_libdir, hdf5_libdir, nexus_libdir]
 
 nexus_lib = "NeXus"
 lib_list = [nexus_lib, 
-            "mfhdf","df","z","jpeg",  
-            "hdf5"]   
+            "z","jpeg",  
+            "hdf5"]   i
+
+lib_list_hdf4 = [nexus_lib,
+            "mfhdf","df","z","jpeg",
+            "hdf4"]
 
 
 if os.uname()[0] == 'Linux':

@@ -1,6 +1,7 @@
 import types
 import cPickle
 import time
+import string
 
 from nexus import *
 
@@ -39,14 +40,21 @@ def checkTypes(pytype, nxtype):
 class NXattr:
 	def __init__(self, parent=None, path=None, name="", nxtype=NX_CHAR, value=None):
 		self.parent = parent
+		
+		if path != None:
+			if type(path) == types.StringType:
+				self.path = pathStringToList(path)	
+			elif type(path)==types.ListType:
+				self.path = path
+			else:
+				self.path = None
+				
 		if path == None:
 			if parent != None:
 				if type(parent.path)==types.ListType:
 					self.path = parent.path.append((name,"NXattr"))
 			else:
 				self.path = [(name,"NXattr")]
-		else:
-			self.path=path
 		
 		self.name = name
 		self.type = nxtype
@@ -113,14 +121,20 @@ class NXelem:
 			attrs = {}
 			
 		self.parent = parent
+		if path != None:
+			if type(path) == types.StringType:
+				self.path = pathStringToList(path)	
+			elif type(path)==types.ListType:
+				self.path = path
+			else:
+				self.path = None
+
 		if path == None:
 			if parent != None:
 				if type(parent.path)==types.ListType:
 					self.path = parent.path.append((name,"SDS"))
 			else:
 				self.path = [(name,"SDS")]
-		else:
-			self.path = path
 			
 		self.nxtype = nxtype
 		self.dims = dims
@@ -207,27 +221,24 @@ class NXelem:
 
 
 class NXgroup:
-	def __init__(self):
-		self.parent = None
-		self.path = []
-		
-		self.name = ""
-		self.nxclass = ""
-		
-		self.atts   = {}
-		self.elems  = {}
-		self.groups = {}
-		
 	def __init__(self, parent=None, path=None, name="", nxclass="", attrs=None, elems=None, groups=None):
 		self.parent = parent
+		
+		if path != None:
+			if type(path) == types.StringType:
+				self.path = pathStringToList(path)	
+			elif type(path)==types.ListType:
+				self.path = path
+			else:
+				self.path = None
+				
 		if path == None:
 			if parent != None:
 				if type(parent.path)==types.ListType:
 					self.path = parent.path.append((name,nxclass))
 			else:
 				self.path = [(name,nxclass)]
-		else:
-			self.path = path
+				
 		self.name = name
 		self.nxclass = nxclass
 		
@@ -329,8 +340,10 @@ class NXaxis(NXelem):
 			return 0
 		self.data.append(value)
 		if cache == "yes":
-			self.saveAxDataToNX(value)
-			#self.saveAxData(value)
+			if self.nxdata.axcachefile != "":
+				self.saveAxData(value)
+			if self.nxdata.nxcachefile !="":
+				self.saveAxDataToNX(value)
 		return 1
 
 	def attachToNXData(self, nxdata):
@@ -394,12 +407,12 @@ class NXdataelem(NXelem):
 		self.attrs["axis"] = NXattr(name="axis", nxtype=NX_CHAR, value=axnames)
 		self.cachefile = cachefile
 		self.axcachefile = axcachefile
-		if nxcachefile!="":
-			self.nxcachefile = nxcachefile
-		else:
-			self.nxcachefile = self.newNXCacheFilename()
-			
-			
+		self.nxcachefile = nxcachefile
+		
+		#if nxcachefile!="":
+		#	self.nxcachefile = nxcachefile
+		#else:
+		#	self.nxcachefile = self.newNXCacheFilename()
 		self.nxhandle = None
 		
 		if len(dims) > 0:
@@ -534,8 +547,10 @@ class NXdataelem(NXelem):
 					coord = []
 					for i in range(len(self.dims)-1):
 						coord.append(0)
-				#self.saveData(value, coord)
-				self.saveDataToNX(value, coord)
+				if self.cachefile!="":		
+					self.saveData(value, coord)
+				if self.nxcachefile!="":	
+					self.saveDataToNX(value, coord)
 
 		else:
 			if type(coords) != types.TupleType and type(coords) != types.ListType:
@@ -566,8 +581,10 @@ class NXdataelem(NXelem):
 				return 0
 			data.append(value)
 			if cache=="yes":
-				#self.saveData(value, coords)
-				self.saveDataToNX(value, coords)
+				if self.cachefile != "":
+					self.saveData(value, coords)
+				if self.nxcachefile != "":	
+					self.saveDataToNX(value, coords)
 		return 1
 
 
@@ -999,4 +1016,14 @@ class NXdataelem(NXelem):
 		self.nxhandle = None
 		axis.trimAxDataToGridinfo()
 		return 1
-		
+
+
+def pathStringToList(pathstr):
+	pathlist = string.split(pathstr, "/")
+	for i in range(len(pathlist)):
+		pair = string.split(pathlist[i], ":", 2)
+		if len(pair)>1:
+			pathlist[i] = (pair[0], pair[1])
+		else:	
+			pathlist[i] = (pair[0], "")
+	return pathlist	

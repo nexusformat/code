@@ -435,7 +435,7 @@ class NXfile:
 		if self.handle == None:
 			print "Error: handle hasn't been initialized yet"
 			return 0
-	
+		
 		if group.path[len(group.path)-1][1][0:2] != "NX":
 			return 0
 			

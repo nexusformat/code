@@ -3,10 +3,11 @@
 import sys
 import types
 import cPickle
-from string import *
+import string
 
 import nxtemplates
 import nxfile
+
 from nxfile import *
 from nexus import *
 
@@ -22,7 +23,19 @@ class NXgroupbase:
 		self.nxclass = nxclass
 		
 		if path != None:
-			self.group.path = path
+			if type(path) == types.StringType:
+				self.path = pathStringToList(path)	
+			elif type(path)==types.ListType:
+				self.path = path
+			else:
+				self.path = None
+				
+		if path == None:
+			if parent != None:
+				if type(parent.path)==types.ListType:
+					self.path = parent.path.append((name,nxclass))
+			else:
+				self.path = [(name,nxclass)]
 
 
 	def getAttr(self, attr_name):
