@@ -31,6 +31,7 @@ LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.a
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
+DISTCLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs
 
 testdir=$(prefix)/nexus/test
 
@@ -53,10 +54,9 @@ test_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
 check_PROGRAMS = $(test_PROGRAMS)	# what to build
 TESTS = $(test_PROGRAMS)		# what to run
 
-# this is an example of setting the test running environment - in case we
-# have got built shared we should pass the location of the HDF libraries
-# down and add them here; another day ...
-TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:/usr/local/lib
+# this sets the test running environment - in case we
+# have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
+TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib
 
 napi4_test_SOURCES = napi4_test.c
 napi4_test_LDADD = $(LIBNEXUS)
