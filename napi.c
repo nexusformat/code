@@ -1196,7 +1196,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     } else {
       sRes->iTag = DFTAG_VG;
-      sRes->iRef = pFile->iCurrentVG;
+      sRes->iRef = VQueryref(pFile->iCurrentVG);
       return NX_OK;
     }
     /* not reached */
@@ -1235,11 +1235,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     if (pFile->iCurrentVG == 0) { /* root level, can not link here */
       return NX_ERROR;
     }
-    if (sLink->iTag == DFTAG_VG) {
-      Vinsert (pFile->iCurrentVG, sLink->iRef);
-    } else {
-      Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
-    }
+    Vaddtagref (pFile->iCurrentVG, sLink->iTag, sLink->iRef);
     return NX_OK;
   }
   
