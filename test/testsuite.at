@@ -94,8 +94,8 @@ AT_CLEANUP
 
 AT_BANNER([Check the FORTRAN binding.])
 
-AT_SETUP([Check the F77 binding.])
-AT_CHECK([napif_test], [], 
+AT_SETUP([Check the F77 binding using HDF4.])
+AT_CHECK([napif_test-hdf4], [], 
 [[ Number of global attributes:  4
     NeXus_version = 2.1.0
     file_name = NXtest.nxs
@@ -124,6 +124,41 @@ AT_CHECK([napif_test], [],
        i4_attribute :    42
        r4_attribute :   3.141593
     Subgroup: data(NXdata)
+    Subgroup: sample(NXsample)
+ Link Check OK
+]])
+AT_CLEANUP
+
+AT_SETUP([Check the F77 binding using HDF5.])
+AT_CHECK([napif_test-hdf5], [], 
+[[ Number of global attributes:  4
+    NeXus_version = 2.1.0
+    file_name = NXtest.nxs
+ Group: entry(NXentry) contains  8 items
+    ch_data( 4)
+    Values : NeXus data
+    Subgroup: data(NXdata)
+    i1_data(20)
+    Values :   1  2  3  4
+    i2_data(22)
+    Values :   1000  2000  3000  4000
+    i4_data(24)
+    Values :      1000000     2000000     3000000     4000000
+    r4_data( 5)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+    r8_data( 6)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+       ch_attribute : NeXus
+       i4_attribute :    42
+       r4_attribute :   3.141593
     Subgroup: sample(NXsample)
  Link Check OK
 ]])

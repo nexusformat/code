@@ -40,7 +40,7 @@ HDF4_TARGETS = napi_test-hdf4
 
 HDF5_TARGETS = napi_test-hdf5
 
-F77_TARGETS = napif_test
+F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
 F90_TARGETS = NXtest
 
@@ -72,11 +72,22 @@ napi_test_hdf5_SOURCES = napi_test.c
 napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 
-if HAVE_F77
-napif_test_SOURCES = napif_test.f
-napif_test_LDADD = $(LIBNEXUS77) # $(FLIBS)
+if HAVE_HDF4
+napif_test_hdf4_SOURCES = napif4_test.f
+napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
+napif_test_hdf4_LINK = $(F77LINK)
 else
-napif_test_SOURCES = dummy.c
+napif_test_hdf4_SOURCES = dummy.c
+napif_test_hdf4_LINK = $(LINK)
+endif
+
+if HAVE_HDF5
+napif_test_hdf5_SOURCES = napif5_test.f
+napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
+napif_test_hdf5_LINK = $(F77LINK)
+else
+napif_test_hdf5_SOURCES = dummy.c
+napif_test_hdf5_LINK = $(LINK)
 endif
 
 if HAVE_F90
