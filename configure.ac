@@ -39,6 +39,9 @@ AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
 AC_CANONICAL_TARGET
 
+dnl $EGREP is used in macros included from acinclude.m4
+AC_PROG_EGREP
+
 dnl check for correct autoconf version - the same check is done in autogen.sh
 if test ! -z "$srcdir"; then
     . $srcdir/autoversion.sh
@@ -49,7 +52,6 @@ fi
 AM_INIT_AUTOMAKE([1.6])
 
 AM_CONFIG_HEADER([include/nxconfig.h])
-AC_PROG_LIBTOOL
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[], [with_cc=yes])
@@ -86,13 +88,6 @@ else
 	F77=
 fi
 
-dnl These are used in build_rules.am to pass any approptiate 
-dnl tag to libtool for f90 building
-LTF90COMPILETAG=""
-LTF90LINKTAG=""
-AC_SUBST(LTF90COMPILETAG)
-AC_SUBST(LTF90LINKTAG)
-
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
 	[], [with_f90=yes])
 if test x"$with_f90" != x"no" ; then
@@ -105,30 +100,45 @@ if test x"$with_f90" != x"no" ; then
 	dnl ready compiled module to point the option at so for now we are just
 	dnl check that the option takes a directory and the compiler works
 	mytop=`pwd`
-	F90FLAGS="$F90FLAGS -I$mytop/bindings/f90 -qextname"
+	F90FLAGS="$F90FLAGS -I$mytop/bindings/f90"
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
+	dnl AC_CHECK_F90_OPTION([-qextname])
 	AC_SUBST(F90)
 	AC_SUBST(F90FLAGS)
 else
 	F90=
 fi
 
+java_host="linux"
+javaroot=""
+AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK]),
+	[], [with_java_home=$withval])
+if test -d "$with_java_home"; then
+	javaroot="$with_java_home"
+fi
+
+
 AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
 	[], [with_java=yes])
-if test x$"with_java" != x"no" ; then
-	if test x"$with_java" = x"yes" ; then
-		AC_CHECK_PROGS(JAVAC, javac)
-	else
-		AC_CHECK_PROGS(JAVAC, ["$with_java"])
+if test x$with_java != xno ; then
+	if test -z "$javaroot"; then
+	    javapath=`which java`
+	    if test ! -z "$javapath"; then javaroot=`dirname $javapath`/..; fi
 	fi
-	AC_CHECK_PROGS(JAVADOC,	javadoc)
-	AC_CHECK_PROGS(JAR, jar)
-	AC_CHECK_PROGS(JAVA, java)
-	AC_CHECK_PROGS(JAVAH, javah)
-dnl assume java is in the "$javaroot/bin" directory of the distribution
-	javapath=`which $JAVA`
-	javaroot=`dirname $javapath`/..
+	if test -z "$javaroot"; then 
+	    AC_MSG_ERROR([Unable to determine JAVA SDK directory - please specify this using  --with-java-home=/sdk/directory  or instead use  --without-java])
+	fi
+	AC_MSG_NOTICE([Java SDK home is $javaroot])
+	if test x"$with_java" = x"yes" ; then
+		AC_PATH_PROGS(JAVAC,javac,,[$PATH:$javaroot/bin])
+	else
+		AC_PATH_PROGS(JAVAC,["$with_java"],,[$PATH:$javaroot/bin])
+	fi
+	AC_PATH_PROGS(JAVADOC,javadoc,,[$PATH:$javaroot/bin])
+	AC_PATH_PROGS(JAR,jar,,[$PATH:$javaroot/bin])
+	AC_PATH_PROGS(JAVA,java,,[$PATH:$javaroot/bin])
+	AC_PATH_PROGS(JAVAH,javah,,[$PATH:$javaroot/bin])
 	JAVAINCLUDE="-I$javaroot/include"
 else
 	JAVAC=
@@ -137,20 +147,31 @@ fi
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
 
-AC_PROG_EGREP
+AC_PROG_LIBTOOL
+
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+dnl These are used in build_rules.am to pass any approptiate 
+dnl tag to libtool for f90 building
+if test `$EGREP "available_tags=.*F77" libtool | wc -l` -gt 0; then
+    LTF90COMPILETAG="--tag=F77"
+    LTF90LINKTAG="--tag=CC"
+else
+    LTF90COMPILETAG=""
+    LTF90LINKTAG=""
+fi
+AC_SUBST(LTF90COMPILETAG)
+AC_SUBST(LTF90LINKTAG)
 
 dnl
 dnl First any host specific bits
 dnl
 case $host in
     alpha*-dec-osf*)
-	LDFLAGS="$LDFLAGS -non_shared"
+	java_host="alpha"
 	;;
     *darwin*)
-	JAVAINCLUDE="-I/usr/local/java/include -I/usr/local/java/include/linux"
 	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
 dnl This is a hack for libtool - for some reason the F77 tag
@@ -161,6 +182,7 @@ dnl does not get set with the commands to create a shared library
 	chmod +x libtool
 	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	F90FLAGS="$F90FLAGS -qextname"
 	SHARED_LDFLAGS="-Wl,-single_module"
 	LTF90COMPILETAG="--tag=F77"
 	LTF90LINKTAG="--tag=CC"
@@ -174,6 +196,9 @@ dnl	fi
 	;;
 esac
 
+if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
+    JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
+fi
 dnl
 dnl * locate path to HDF libraries *
 dnl

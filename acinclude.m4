@@ -42,14 +42,14 @@ AC_DEFUN(
  [AC_MSG_CHECKING([for $1 compiler option $4])
   AC_LANG_PUSH($2)
   COMPFLAGS_SAVE=[$]$3
-  ac_compile="$ac_compile 2>check_compiler_option.$$"
+  ac_compile="$ac_compile >check_compiler_option.$$ 2>&1"
   $3="[$]$3 $4"
   AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM(,[$5])],
     [COMPILER_OPTION=yes],
     [COMPILER_OPTION=no]) 
   if test $COMPILER_OPTION = "yes"; then
-    $EGREP "unrecognized|unrecognised|unknown|invalid|error" check_compiler_option.$$ >/dev/null 2>&1 && COMPILER_OPTION="no" 
+    if test `$EGREP "unrecognized|unrecognised|unknown|invalid|error" check_compiler_option.$$ | wc -l` -gt 0; then COMPILER_OPTION="no"; fi
   fi
   if test $COMPILER_OPTION = "yes"; then
     AC_MSG_RESULT([yes])
