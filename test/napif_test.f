@@ -9,15 +9,9 @@ C
       INTEGER SLAB_START(2), SLAB_SIZE(2)
       BYTE I1_ARRAY(4) /1, 2, 3, 4/
       INTEGER*2 I2_ARRAY(4)
-      DATA I2_ARRAY /1000, 2000, 3000, 4000/
       INTEGER*4 I4_ARRAY(4) 
-      DATA I4_ARRAY /1000000, 2000000, 3000000, 4000000/
       REAL*4 R4_ARRAY(4,5)
-      DATA R4_ARRAY /1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,
-     +  15.,16.,17.,18.,19.,20./
       REAL*8 R8_ARRAY(4,5)
-      DATA R8_ARRAY/1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,
-     +  15.,16.,17.,18.,19.,20./
       BYTE I1_BUFFER(4)
       INTEGER*2 I2_BUFFER(4)
       INTEGER*4 I4_BUFFER(4)
@@ -27,6 +21,12 @@ C
       REAL*4 R
       CHARACTER*64 NAME, CLASS, CH_BUFFER
       INTEGER FILEID(NXHANDLESIZE)
+      DATA I2_ARRAY /1000, 2000, 3000, 4000/
+      DATA I4_ARRAY /1000000, 2000000, 3000000, 4000000/
+      DATA R4_ARRAY /1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,
+     +  15.,16.,17.,18.,19.,20./
+      DATA R8_ARRAY/1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,
+     +  15.,16.,17.,18.,19.,20./
 
       NXDIMS(1) = 2
       NXDIMS(2) = 2
@@ -91,7 +91,8 @@ C *** read data
          WRITE(*,FMT='(1X,A,I2)') NAME(1:12)//' : ', NXTYPE
          IF (NXTYPE .EQ. NX_CHAR) THEN
             IF (NXGETCHARDATA(FILEID,CH_BUFFER) .NE. NX_OK) STOP
-            WRITE(*,FMT='(1X,A)') 'Values       : '//CH_BUFFER
+            WRITE(*,FMT='(1X,A)') 
+     +         'Values       : '//CH_BUFFER(1:NXDIMS(1))
          ELSE IF (NXTYPE .EQ. NX_INT8) THEN
             IF (NXGETDATA(FILEID,I1_BUFFER) .NE. NX_OK) STOP
             WRITE(*,FMT='(1X,A,4I3)') 'Values       : ', I1_BUFFER
