@@ -28,8 +28,9 @@
 AC_PREREQ(2.57)
 AC_REVISION($Revision$)
 AC_INIT(NeXus Library, 2.0.0, nexus-developers@anl.gov, nexus)
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/napi.c])
-AC_CONFIG_HEADER([include/nxconfig.h])
+AM_CONFIG_HEADER([include/nxconfig.h])
 AC_CONFIG_AUX_DIR(.)
 AC_CANONICAL_HOST
 # Checks for programs.
@@ -54,13 +55,8 @@ AC_SUBST(F90FLAGS)
 AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_SUBST(NXTARGET)
-AC_SUBST(BINDINGS)
-NXTARGET=""
-BINDINGS=""
 
 AC_CHECK_C_OPTION([-no-cpp-precomp])
-AC_CHECK_C_OPTION([-some-invalid-option])
 
 #
 # First any host specific bits
@@ -111,7 +107,6 @@ fi
 if test ! -z "$H4ROOT"; then
     LDFLAGS="$LDFLAGS -L$H4ROOT/lib"
     CPPFLAGS="$CPPFLAGS -I$H4ROOT/include -DHDF4"
-    NXTARGET="$NXTARGET nexus4"
 fi
 # HDF5
 HDF5SEARCH="/usr/local/hdf5"
@@ -129,7 +124,6 @@ fi
 if test ! -z "$H5ROOT"; then
     LDFLAGS="$LDFLAGS -L$H5ROOT/lib"
     CPPFLAGS="$CPPFLAGS -I$H5ROOT/include -DHDF5"
-    NXTARGET="$NXTARGET nexus5"
 fi
 # finally set LIBS variable if we 
 AC_CHECK_LIB(z, gzopen)
@@ -154,17 +148,11 @@ AC_FUNC_MKTIME
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
-# compiler specific targets
-if test ! -z "$F77"; then 
-    NXTARGET="$NXTARGET nexus77"
-    BINDINGS="$BINDINGS bindings/f77"
-fi
-if test ! -z "$F90"; then 
-    NXTARGET="$NXTARGET nexus90"
-    BINDINGS="$BINDINGS bindings/f90"
-fi
-
+AM_CONDITIONAL([HAVE_F77], [test ! -z "$F77"])
+AM_CONDITIONAL([HAVE_F90], [test ! -z "$F90"])
+AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
+AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
 AC_CONFIG_FILES([Makefile src/Makefile applications/Makefile
-		test/Makefile bindings/f77/Makefile
+		test/Makefile bindings/Makefile bindings/f77/Makefile
 		bindings/f90/Makefile])
 AC_OUTPUT
