@@ -57,8 +57,8 @@ C *** Convert FORTRAN string STRING into NULL terminated C string ISTRING
       ENDDO
       ISTRING(ILEN+1) = 0
       RETURN
- 9000 FORMAT('NAPIF: String too long - buffer needs increasing from ',
-     +        i4,' to at least ',i4)
+ 9000 FORMAT('NeXus(NAPIF/EXTRACT_STRING): String too long -'
+     +       'buffer needs increasing from ', i4,' to at least ',i4)
       END
 
 C *** Convert NULL terminated C string ISTRING to FORTRAN string STRING
@@ -73,7 +73,8 @@ C *** Convert NULL terminated C string ISTRING to FORTRAN string STRING
       ENDDO
       IF (ISTRING(LEN(STRING)+1) .NE. 0) WRITE(6,9010) LEN(STRING) 
       RETURN
- 9010 FORMAT('NAPIF: String truncated - buffer needs to be > ', I4)
+ 9010 FORMAT('NeXus(NAPIF/REPLACE_STRING): String truncated - ',
+     +  'buffer needs to be > ', I4)
       END
 
 C *** Wrapper routines for NXAPI interface
@@ -158,10 +159,15 @@ C *** Wrapper routines for NXAPI interface
       INTEGER FUNCTION NXGETCHARDATA(FILEID, DATA)
       INTEGER FILEID(*), NXIGETDATA
       CHARACTER*(*) DATA
-      INTEGER NX_ERROR
-      PARAMETER(NX_ERROR=0)
-      BYTE IDATA(1024)
+      INTEGER NX_ERROR,NX_IDATLEN
+      PARAMETER(NX_ERROR=0,NX_IDATLEN=1024)
+      BYTE IDATA(NX_IDATLEN)
       EXTERNAL NXIGETDATA
+C *** We need to zero IDATA as GETDATA doesn't NULL terminate character data,
+C *** and so we would get "buffer not big enough" messages from REPLACE_STRING
+      DO I=1,NX_IDATLEN
+          IDATA(I) = 0
+      ENDDO
       NXGETCHARDATA = NXIGETDATA(FILEID, IDATA)
       IF (NXGETCHARDATA .NE. NX_ERROR) THEN
           CALL REPLACE_STRING(DATA, IDATA)
