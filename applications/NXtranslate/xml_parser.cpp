@@ -43,7 +43,8 @@ static const string DEFAULT_MIME_TYPE = "NeXus";
 static const string MIME_TYPE         = "NXS:mime_type";
 static const string SOURCE            = "NXS:source";
 static const string LOCATION          = "NXS:location";
-static const string LINK              = "NXS:make_link";
+static const string LINK              = "NAPIlink";
+static const string TARGET            = "target";
 static const string TYPE              = "type";
 static const string NAME              = "name";
 static const string NXROOT            = "NXroot";
@@ -56,7 +57,7 @@ typedef struct{
   int status;             // status of parsing
   bool is_link;           // whether the current node is a link
   map<string,string> map; // store macros for replacement
-  std::map<StrVector,string> loc_to_source; // mapping for links
+  vector<StrVector> loc_to_source; // mapping for links
   NodeVector nodes;       // vector to current node listing
   string char_data;       // character data collected for current node
   vector<int> dims;       // dimensions of the array in current node
@@ -266,8 +267,11 @@ void my_startElement(void *user_data, const xmlChar *name,
   // convert the attributes to a vector<string>
   StrVector str_attrs=xmlattr_to_strvec(attrs);
 
+  // check if it is a link
+  bool is_link=(str_name==LINK);
+
   // check for "name", "type", "source", "mime_type", "location",
-  // "link" attributes
+  // "target" attributes
   string source;
   string mime_type;
   string location;
@@ -276,7 +280,7 @@ void my_startElement(void *user_data, const xmlChar *name,
   vector<Attr> node_attrs;
   for( StrVector::iterator it=str_attrs.begin() ; it!=str_attrs.end() ; it+=2){
     if( (*it==SOURCE) || (*it==MIME_TYPE) || (*it==LOCATION) || (*it==TYPE)
-                                                || (*it==LINK) || (*it==NAME)){
+                               || ((*it==TARGET) && (is_link)) || (*it==NAME)){
       if(*it==SOURCE){
         source=*(it+1);
       }else if(*it==MIME_TYPE){
@@ -305,17 +309,16 @@ void my_startElement(void *user_data, const xmlChar *name,
           ((UserData *)user_data)->dims.clear();
           ((UserData *)user_data)->dims.push_back(1);
         }
-      }else if(*it==LINK){
-        ((UserData *)user_data)->is_link=true;
+      }else if((is_link) && (*it==TARGET)){ // working with a link
         StrVector str_vec;
         NodeVector node_vec=((UserData *)user_data)->nodes;
         for( NodeVector::const_iterator node_it=node_vec.begin() ; node_it!=node_vec.end() ; node_it++ ){
           if(node_it->name()!=NXROOT)
             str_vec.push_back(node_it->name());
         }
-        str_vec.push_back(str_name);
-        ((UserData *)user_data)->loc_to_source.insert(make_pair(str_vec,*(it+1)));
-        type="link";
+        ((UserData *)user_data)->loc_to_source.push_back(str_vec);
+        ((UserData *)user_data)->loc_to_source.push_back(string_util::string_to_path(*(it+1)));
+        type=LINK;
       }
       str_attrs.erase(it,it+2);
       it-=2;
@@ -327,7 +330,7 @@ void my_startElement(void *user_data, const xmlChar *name,
       }
     }
   }
-  bool is_link=((UserData *)user_data)->is_link;
+  ((UserData *)user_data)->is_link=is_link;
 
   // if type is not defined (and it is not root) it is a character array
   if( (type.size()<=0) && (str_name!=NXROOT) )
@@ -527,12 +530,11 @@ static bool resolve_links(UserData *user_data){
   if(user_data->loc_to_source.size()<=0) return false;
 
   // convenience for less typing
-  typedef map<StrVector,string>::const_iterator map_iter;
+  typedef vector<StrVector>::const_iterator vec_iter;
 
   // loop over links in map
-  for( map_iter it=user_data->loc_to_source.begin() ; it!=user_data->loc_to_source.end() ; it++ ){
-      nexus_util::make_link(user_data->handle,it->first,
-                                      string_util::string_to_path(it->second));
+  for( vec_iter it=user_data->loc_to_source.begin() ; it!=user_data->loc_to_source.end() ; it+=2 ){
+    nexus_util::make_link(user_data->handle,*it,*(it+1));
   }
 
 

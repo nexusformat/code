@@ -409,7 +409,6 @@ extern void nexus_util::make_link(NXhandle *handle, const vector<string> &link, 
   std::cout << std::endl;
   // ********** end debug print
 */
-
   // keep track of location in file
   NXlink *link_id=(NXlink *)malloc(sizeof(NXlink));
   int num_group=0;
@@ -433,11 +432,9 @@ extern void nexus_util::make_link(NXhandle *handle, const vector<string> &link, 
   nexus_util::close_path(handle,num_group,num_data);
 
   // open to link's parent location
-  vector<string> link_copy(link);
-  link_copy.pop_back();
-  nexus_util::open_path(handle,link_copy,num_group,num_data);
+  nexus_util::open_path(handle,link,num_group,num_data);
   if(is_group){ // create it and open it
-    Node node(*(link.rbegin()),"link");
+    Node node(*(source.rbegin()),"link");
     open(handle,node);
     num_group++;
   }

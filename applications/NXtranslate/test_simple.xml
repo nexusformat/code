@@ -39,7 +39,7 @@ units="number">
     </parabola_2D>
   </entry2>
   <copies type="NXentry">
-    <x NXS:make_link="/entry2/parabola_2D/x"/>
-    <parabola_2D NXS:make_link="/entry2/parabola_2D"/>
+    <NAPIlink target="/entry2/parabola_2D/x"/>
+    <NAPIlink target="/entry2/parabola_2D"/>
   </copies>
 </NXroot>
