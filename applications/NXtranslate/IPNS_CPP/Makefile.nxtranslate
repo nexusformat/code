@@ -1,0 +1,28 @@
+######################################################################
+# this file is to allow for configuring NXtranslate
+######################################################################
+# select input types
+IPNS_CPP_CFLAGS=-DIPNS_RETRIEVER
+IPNS_CPP_OBJS=ipns_retriever.o
+IPNS_CPP_LIBS=IPNS_CPP/libIPNSRunfile.a
+
+# source files
+IPNS_CPP_SRC=ipns_retriever.cpp ipns_retriever.h IPNS_CPP/Makefile \
+    IPNS_CPP/Makefile.nxtranslate IPNS_CPP/DetectorMap.cpp \
+    IPNS_CPP/DetectorMap.h IPNS_CPP/Header.cpp IPNS_CPP/Header.h \
+    IPNS_CPP/LpsdDetIdMap.cpp IPNS_CPP/LpsdDetIdMap.h \
+    IPNS_CPP/RandomAccessRunfile.cpp IPNS_CPP/RandomAccessRunfile.h \
+    IPNS_CPP/Runfile.cpp IPNS_CPP/Runfile.h IPNS_CPP/Segment.cpp \
+    IPNS_CPP/Segment.h IPNS_CPP/testProg2.cpp IPNS_CPP/testProg.cpp \
+    IPNS_CPP/TimeField.cpp IPNS_CPP/TimeField.h
+
+# how to build the retriever
+ipns_retriever.o: ipns_retriever.cpp ipns_retriever.h IPNS_CPP/libIPNSRunfile.a
+	$(CPP) $(INC_FLAGS) $(CFLAGS) ipns_retriever.cpp
+
+# directions for building the library
+IPNS_CPP/libIPNSRunfile.a: IPNS_CPP/Runfile.cpp
+	cd IPNS_CPP && make libIPNSRunfile.a
+
+# what are the results of the tests, test itself should be in main makefile
+IPNS_CPP_TEST=test_ipns.nxs
