@@ -1,7 +1,8 @@
 The NAPI FORTRAN interface consists of wrapper routines (napif.f) and
 an include file of definitions (napif.inc). The routines are called
 exactly like their C counterparts, but the setup for NXHandle
-and NXlink structures is done slightly differently (see napif_test.f)
+and NXlink structures is done slightly differently (see the
+example program "napif_test.f")
 
 For a NXhandle, you use:
 
@@ -14,11 +15,22 @@ And for an NXlink
 The two test programs perform exactly the same operations, but one is in
 C and the other FORTRAN
 
+--- Running the Examples ---
+
+You will need to get copies of the HDF (Hierarchical Data Format)
+libraries approriate for your operating system. These can be obtained from: 
+
+    http://hdf.ncsa.uiuc.edu/
+
+The default installation is to put the C header files into
+/usr/local/hdf/include and the libraries into /usr/local/hdf/lib
+
 *** Running C interface test ***
 
 cc -c -I/usr/local/hdf/include napi.c
 cc -c -I/usr/local/hdf/include napi_test.c
-cc -o napi_test napi_test.o napi.o -lmfhdf -ldf -lz
+cc -o napi_test napi_test.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
+
 ./napi_test
 
 *** Running FORTRAN interface test ***
@@ -26,7 +38,9 @@ cc -o napi_test napi_test.o napi.o -lmfhdf -ldf -lz
 cc -c -I/usr/local/hdf/include napi.c
 f77 -c napif.f 
 f77 -c napif_test.f
-f77 -o napif_test napif_test.o napif.o napi.o -lmfhdf -ldf -lz
+f77 -o napif_test napif_test.o napif.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
+
+./napif_test
 
 Both these test programs should print 
 
@@ -38,21 +52,6 @@ Both these test programs should print
 
 To the screen and create a file "nxtest.dat"
 (Note: FORTRAN prints 20 for length)
-
-They have only been tested on Digital UNIX, but i hope they would
-work on others.
-
-*** C Interface Notes ***
-
-I had to make the following changes to the C interface to allow FORTRAN calls:
-
-- NXopen takes a pointer to a NexusFile structure, and returns a NXstatus
-- NXgetgroupID, NXgetdataID and NXmakelink take pointers to NXlink structures and return NXstatus
-
-Also
-
-- Addition of NXmalloc and NXfree for convenience
-- Minor changes to make napi.c C++ clean (rename of use of "class" as a string, add extern "C" etc)
 
 *** FORTRAN Interface Notes ***
 
@@ -71,3 +70,5 @@ Rutherford Appleton Laboratory
 Chilton, Didcot, OX11 OQX, GB
 
 Email: Freddie.Akeroyd@rl.ac.uk
+
+$Id$

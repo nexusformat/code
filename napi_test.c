@@ -1,3 +1,8 @@
+/*
+ * $Id$
+ *
+ * Test program for NeXus C interface
+ */
 #include "napi.h"
 
 int main()
@@ -16,13 +21,13 @@ int main()
 	return 1;
     if (NXopengroup(fileid, "mygroup", "myclass") != NX_OK)
 	return 1;
-    if (NXmakedata (fileid, "mylabel", DFNT_FLOAT32, 2, array_dims) != NX_OK)
+    if (NXmakedata (fileid, "mylabel", NX_FLOAT32, 2, array_dims) != NX_OK)
 	return 1;
     if (NXopendata (fileid, "mylabel") != NX_OK)
 	return 1;
     if (NXputdata(fileid, array) != NX_OK)
 	return 1;
-    if (NXputattr(fileid, "attribute", attr, strlen(attr), DFNT_UINT8) != NX_OK)
+    if (NXputattr(fileid, "attribute", attr, strlen(attr), NX_CHAR) != NX_OK)
 	return 1;
     if (NXclosedata(fileid) != NX_OK)
 	return 1;
@@ -50,7 +55,7 @@ int main()
  * be returned in "length"
  */
     length = sizeof(buffer);
-    type = DFNT_UINT8;
+    type = NX_CHAR;
     if (NXgetattr(fileid, "attribute", buffer, &length, &type) != NX_OK)
 	return 1;
     for(i=0; i<4; i++)

@@ -1,5 +1,6 @@
 -------------------------------------------------------------------------
 NeXus - a common format for neutron and X-ray scattering data
+             http://www.neutron.anl.gov/NeXus/
 -------------------------------------------------------------------------
 
 The following files are stored.
@@ -10,7 +11,7 @@ napi_test.c    - Test code of C API
 napif.f        - Fortran 77 wrapper for NeXus API
 napif.inc      - Fortran 77 include file
 napif_test.f   - Test code of Fortran API
-README.FORTRAN - Notes on Fortran wrapper
+README.FORTRAN - Notes on FORTRAN wrapper
 
 napi.tex       - LaTeX documentation of API
 NXdict.tex     - LaTeX documentation of proposed data dictionary
@@ -22,3 +23,4 @@ the U.S. Department of Energy under contract W-31-109-ENG-38.
 -------------------------------------------------------------------------
 Comments to : ROsborn@anl.gov
 -------------------------------------------------------------------------
+$Id$

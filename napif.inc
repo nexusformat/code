@@ -6,9 +6,9 @@ C
 C $Id$
 C
 C Copyright (C) 1997, Freddie Akeroyd
-C                     ISIS Facility, Rutherford Appleton Laboratory
+C                     ISIS Facility, Rutherford Appleton Laboratory, UK
 C  
-C See NAPI.C for details
+C See NAPI.C for more details
 C
 C 97/7/30 - Initial Release
 C 97/7/31 - Correct NXPUTATTR/NXGETATTR and make 'implicit none' clean
@@ -34,7 +34,13 @@ C *** HDF datatypes used by Nexus - see hntdefs.h in HDF distribution
      +        DFNT_UINT16,DFNT_INT32,DFNT_UINT32
       PARAMETER(DFNT_FLOAT32=5,DFNT_FLOAT64=6,DFNT_INT8=20,
      +          DFNT_UINT8=21,DFNT_INT16=22,DFNT_UINT16=23,
-     +          DFNT_INT32=24,DFNT_UINT32=25)
+     +          DFNT_INT32=24,DFNT_UINT32=25,DFNT_UCHAR8=3)
+C *** NeXus names for HDF parameters
+      INTEGER NX_FLOAT32,NX_FLOAT64,NX_INT8,NX_UINT8,NX_INT16,
+     +        NX_UINT16,NX_INT32,NX_UINT32,NX_CHAR
+      PARAMETER(NX_FLOAT32=5,NX_FLOAT64=6,NX_INT8=20,
+     +          NX_UINT8=21,NX_INT16=22,NX_UINT16=23,
+     +          NX_INT32=24,NX_UINT32=25,NX_CHAR=4)
       INTEGER NXOPEN, NXCLOSE, NXMAKEGROUP, NXOPENGROUP, NXCLOSEGROUP,
      +       NXMAKEDATA, NXOPENDATA, NXCLOSEDATA, NXGETDATA, NXGETSLAB,
      +       NXGETATTR, NXGETDIM, NXPUTDATA, NXPUTSLAB, NXPUTATTR,

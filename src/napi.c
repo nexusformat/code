@@ -47,10 +47,6 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <mfhdf.h>
 #include "napi.h"
 
-/* FORTRAN helpers */
-#define NXfopen 			MANGLE(nxifopen)
-#define NXfclose			MANGLE(nxifclose)
-
 #define NXMAXSTACK 50
 #define NXSIGNATURE 959697
 
@@ -203,7 +199,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       iN = Vntagrefs (self->iCurrentVG);
       for (i = 0; i < iN; i++) {
         Vgettagref (self->iCurrentVG, i, &iTag, &iRef);
-        if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG)) {
+        if ((iTag == DFTAG_SDG) || (iTag == DFTAG_NDG) || (iTag == DFTAG_SDS)) {
           iNew = SDreftoindex (self->iSID, iRef);
           iNew = SDselect (self->iSID, iNew);
           SDgetinfo (iNew, pNam, &iA, iDim, &iD2, &iD2);
@@ -226,13 +222,17 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     int32 iTag, iRef;
     int iStackPtr, iCurDir;
   
+/* 
+ * Note: the +1 to various malloc() operations is to avoid a
+ *  malloc(0), which is an error on some operating systems 
+ */
     iStackPtr = self->iStackPtr;
     if (self->iCurrentVG == 0 &&
         self->iStack[iStackPtr].iRefDir == NULL) {        /* root level */
       /* get the number and ID's of all lone Vgroups in the file */
       self->iStack[iStackPtr].iNDir = Vlone (self->iVID, NULL, 0);
       self->iStack[iStackPtr].iRefDir = 
-          (int32 *) malloc (self->iStack[iStackPtr].iNDir * sizeof (int32));
+          (int32 *) malloc (self->iStack[iStackPtr].iNDir * sizeof (int32) + 1);
       if (!self->iStack[iStackPtr].iRefDir) {
         NXIReportError (NXpData, "ERROR: out of memory in NXIInitDir");
         return NX_EOD;
@@ -244,9 +244,9 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       /* Vgroup level */
       self->iStack[iStackPtr].iNDir = Vntagrefs (self->iCurrentVG);
       self->iStack[iStackPtr].iRefDir =
-        (int32 *) malloc (self->iStack[iStackPtr].iNDir * sizeof (int32));
+        (int32 *) malloc (self->iStack[iStackPtr].iNDir * sizeof (int32) + 1);
       self->iStack[iStackPtr].iTagDir =
-        (int32 *) malloc (self->iStack[iStackPtr].iNDir * sizeof (int32));
+        (int32 *) malloc (self->iStack[iStackPtr].iNDir * sizeof (int32) + 1);
       if ((!self->iStack[iStackPtr].iRefDir) ||
           (!self->iStack[iStackPtr].iTagDir)) {
         NXIReportError (NXpData, "ERROR: out of memory in NXIInitDir");
@@ -317,10 +317,15 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     self->iAtt.iNDir = 0;
   }
   
-  
-  NXstatus  NXfopen(char * filename, NXaccess* am, NexusFile* pHandle)
+  /*
+   * We store the whole of the NeXus file in the array - that way
+   * we can just pass the array name to C as it will be a valid
+   * NXhandle. We could store the NXhandle value in the FORTRAN array
+   * instead, but that would mean writing far more wrappers
+   */
+  NXstatus NXfopen(char * filename, NXaccess* am, NexusFile* pHandle)
   {
-	int ret;
+	NXstatus ret;
  	NXhandle fileid;
 	ret = NXopen(filename, *am, &fileid);
 	memcpy(pHandle, fileid, sizeof(NexusFile));
@@ -329,7 +334,6 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 
   NXstatus  NXopen(char * filename, NXaccess am, NXhandle* pHandle)
   {
-
     pNexusFile pNew = NULL;
     char pBuffer[512];
     int iRet;
@@ -388,12 +392,18 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
+/* 
+ * The pHandle from FORTRAN is a pointer to a static FORTRAN
+ * array holding the NexusFile structure. We need to malloc()
+ * a temporary copy as NXclose will try to free() this
+ */
   NXstatus
   NXfclose (NexusFile* pHandle)
   {
     NXhandle h;
-    int ret;
-    h = pHandle;
+    NXstatus ret;
+    h = (NXhandle)malloc(sizeof(NexusFile));
+    memcpy(h, pHandle, sizeof(NexusFile));
     ret = NXclose(&h);
     memset(pHandle, 0, sizeof(NexusFile));
     return ret;
@@ -541,8 +551,13 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   }
   
   
-  NXstatus
-  NXmakedata (NXhandle fid, char *name, int datatype, int rank,
+  NXstatus NXfmakedata(NXhandle fid, char *name, int *pDatatype,
+		int *pRank, int dimensions[])
+  {
+    return NXmakedata(fid, name, *pDatatype, *pRank, dimensions);
+  }
+
+  NXstatus NXmakedata (NXhandle fid, char *name, int datatype, int rank,
               int dimensions[])
   {
     pNexusFile pFile;
@@ -566,6 +581,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     case DFNT_FLOAT64: break;
     case DFNT_INT8:    break;
     case DFNT_UINT8:   break;
+    case DFNT_CHAR8:  break;
+    case DFNT_UCHAR8:  break;
     case DFNT_INT16:   break;
     case DFNT_UINT16:  break;
     case DFNT_INT32:   break;
@@ -772,7 +789,6 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     iLen = iLen * DFKNTsize (*iType);
-    iLen = iLen * DFKNTsize (*iType);
     pData = (void *) malloc (iLen);
     if (!pData) {
       NXIReportError (NXpData, "ERROR: allocating memory in NXgetattr");
@@ -793,7 +809,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
     /* copy data to caller */
     memset (data, 0, *datalen);
-    if ((*datalen < iLen) && (*iType == DFNT_UINT8)) {
+    if ((*datalen <= iLen) && (*iType == DFNT_UINT8 || *iType == DFNT_CHAR8 || *iType == DFNT_UCHAR8)) {
       iLen = *datalen - 1;
     }
     memcpy (data, pData, iLen);
@@ -868,7 +884,12 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }
   
-  
+  NXstatus 
+  NXfputattr(NXhandle fid, char *name, void *data, int *pDatalen, int *pIType)
+  {
+    return NXputattr(fid, name, data, *pDatalen, *pIType);
+  }
+
   NXstatus
   NXputattr (NXhandle fid, char *name, void *data, int datalen, int iType)
   {
@@ -971,7 +992,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
         Vdetach (iTemp);
         return NX_OK;
       } else if ((pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_SDG) ||
-                 (pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_NDG)) {
+                 (pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_NDG) ||
+                 (pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_SDS)) {
         iTemp = SDreftoindex (pFile->iSID,
                               pFile->iStack[iStackPtr].iRefDir[iCurDir]);
         iTemp = SDselect (pFile->iSID, iTemp);
@@ -984,6 +1006,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       } else {                    /* unidentified */
         strcpy (name, "UNKNOWN");
         strcpy (nxclass, "UNKNOWN");
+	*datatype = pFile->iStack[iStackPtr].iTagDir[iCurDir];
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         return NX_OK;
       }
@@ -1027,7 +1050,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       NXIReportError (NXpData, "ERROR: HDF cannot read attribute info");
       return NX_ERROR;
     }
-    *iLength = iCount * DFKNTsize (iPType);
+    *iLength = iCount;
     *iType = iPType;
     pFile->iAtt.iCurDir++;
     return NX_OK;
@@ -1106,6 +1129,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	{
 	    case DFNT_INT8:
 	    case DFNT_UINT8:
+	    case DFNT_CHAR8:
+	    case DFNT_UCHAR8:
 		break;		/* size is correct already */
 
 	    case DFNT_INT16:

@@ -6,10 +6,11 @@ C
 C $Id$
 C
 C Copyright (C) 1997, Freddie Akeroyd
-C                     ISIS Facility, Rutherford Appleton Laboratory
+C                     ISIS Facility, Rutherford Appleton Laboratory, UK
 C  
-C See NAPI.C for details
+C See NAPI.C for further details
 C
+C 22/2/98 - Correct an NXfclose problem (free() of FORTRAN memory)
 C 97/7/30 - Initial Release
 C 97/7/31 - Correct NXPUTATTR/NXGETATTR and make 'implicit none' clean
 C 97/8/7  - Update interface
@@ -103,13 +104,12 @@ C *** Wrapper routines for NXAPI interface
       END
 
       INTEGER FUNCTION NXMAKEDATA(FILEID, LABEL, DATATYPE, RANK, DIM)  
-      INTEGER FILEID(*), DATATYPE, RANK, DIM,NXIMAKEDATA
+      INTEGER FILEID(*), DATATYPE, RANK, DIM(*), NXIFMAKEDATA
       CHARACTER*(*) LABEL
       BYTE ILABEL(256)
-      EXTERNAL NXIMAKEDATA
+      EXTERNAL NXIFMAKEDATA
       CALL EXTRACT_STRING(ILABEL, 256, LABEL)
-      NXMAKEDATA = NXIMAKEDATA(FILEID, ILABEL, %VAL(DATATYPE), 
-     +                         %VAL(RANK), DIM)
+      NXMAKEDATA = NXIFMAKEDATA(FILEID, ILABEL, DATATYPE, RANK, DIM) 
       END
 
       INTEGER FUNCTION NXOPENDATA(FILEID, LABEL)
@@ -141,8 +141,8 @@ C *** Wrapper routines for NXAPI interface
       END
       
       INTEGER FUNCTION NXGETATTR(FILEID, NAME, DATA, DATALEN, TYPE)
-      INTEGER FILEID(*), DATALEN,MAX_DATALEN,NX_ERROR,TYPE
-      PARAMETER(MAX_DATALEN=1024,NX_ERROR=0)
+      INTEGER FILEID(*), DATALEN,MAX_DATALEN,TYPE,NX_ERROR,NX_CHAR
+      PARAMETER(MAX_DATALEN=1024,NX_ERROR=0,NX_CHAR=4)
       CHARACTER*(*) NAME, DATA     
       BYTE INAME(256), IDATA(MAX_DATALEN)
       INTEGER NXIGETATTR
@@ -154,6 +154,11 @@ C *** Wrapper routines for NXAPI interface
       ENDIF
       CALL EXTRACT_STRING(INAME, 256, NAME)
       NXGETATTR = NXIGETATTR(FILEID, INAME, IDATA, DATALEN, TYPE)
+      IF (TYPE .NE. NX_CHAR) THEN
+          WRITE(6,*) 
+     +      'NeXus FORTRAN interface can only do string attributes'
+          NXGETATTR=NX_ERROR
+      ENDIF
       CALL REPLACE_STRING(DATA, IDATA)
       RETURN
  9020 FORMAT('NXgetattr: asked for attribute size ', I4, 
@@ -174,15 +179,21 @@ C *** Wrapper routines for NXAPI interface
       END
 
       INTEGER FUNCTION NXPUTATTR(FILEID, NAME, DATA, DATALEN, TYPE)
-      INTEGER FILEID(*), DATALEN, TYPE
+      INTEGER FILEID(*), DATALEN, TYPE, NX_ERROR, NX_CHAR
+      PARAMETER(NX_ERROR=0,NX_CHAR=4)
       CHARACTER*(*) NAME, DATA
       BYTE INAME(256), IDATA(1024)
-      INTEGER NXIPUTATTR
-      EXTERNAL NXIPUTATTR
+      INTEGER NXIFPUTATTR
+      EXTERNAL NXIFPUTATTR
       CALL EXTRACT_STRING(INAME, 256, NAME)
       CALL EXTRACT_STRING(IDATA, 1024, DATA)
-      NXPUTATTR = NXIPUTATTR(FILEID, INAME, IDATA, 
-     +                       %VAL(DATALEN), %VAL(TYPE))
+      IF (TYPE .EQ. NX_CHAR) THEN
+          NXPUTATTR = NXIFPUTATTR(FILEID, INAME, IDATA, DATALEN, TYPE)
+      ELSE
+          WRITE(6,*) 
+     +      'NeXus FORTRAN interface can only do string attributes'
+          NXPUTATTR = NX_ERROR
+      ENDIF
       END
 
       INTEGER FUNCTION NXGETINFO(FILEID, RANK, DIM, DATATYPE)
