@@ -39,7 +39,7 @@ C------------------------------------------------------------------------------
       INTEGER*4 SLAB_START(2), SLAB_SIZE(2)
       CHARACTER*64 NAME, CLASS
       CHARACTER*128 CHAR_BUFFER
-	BYTE CHAR_BUFFER_B(128)
+      BYTE CHAR_BUFFER_B(128)
       CHARACTER*64 GROUP_NAME, CLASS_NAME
       INTEGER FILEID(NXHANDLESIZE)
       INTEGER GLINK(NXLINKSIZE), DLINK(NXLINKSIZE), BLINK(NXLINKSIZE)
@@ -60,7 +60,7 @@ C------------------------------------------------------------------------------
       DATA ARRAY_DIMS /4, 5/
       DATA CHUNK_SIZE /4, 5/
       DATA U_BUFFER /0,1,2,3,4,5,6/
-	EQUIVALENCE (CHAR_BUFFER, CHAR_BUFFER_B)
+      EQUIVALENCE (CHAR_BUFFER, CHAR_BUFFER_B)
 
       IF (NXOPEN('NXtest.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
       IF (NXMAKEGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
