@@ -70,15 +70,39 @@ r4_attribute : 3.141593
 
 A file called "NXtest.nxs" is also created.
 
+*** Cross-checking the interfaces ***
+
+To check that the Fortran 77 interface produces the equivalent file to the 
+C interface, use "napi_test_read.c" to read the Fortran-generated file 
+"NXtest.nxs".
+
+cc -c -I/usr/local/hdf/include napi_test_read.c
+cc -o napi_test_read napi_test_read.o napi.o -L/usr/local/hdf/lib -lmfhdf -ldf -lz
+
+./napi_test_read
+
+This produces the same output as the other test programs.
+
 *** FORTRAN Interface Notes ***
 
-- All attributes are considered to be strings at the moment
+- NAPIF.F uses the non-standard type specification BYTE to convert Fortran
+  character data to C strings.  There is no method of specifying single-byte
+  storage under the Fortran 77 standard, but if the BYTE specification is 
+  not allowed by your Fortran compiler, please try one of the other common
+  compiler extensions, e.g., INTEGER*1, LOGICAL*1.
 
-*** CHANGELOG ***
+- There are separate routines for reading and writing character data
+  and attributes (NXGETCHARDATA, NXGETCHARATTR, NXPUTCHARDATA, NXPUTCHARATTR).
+  This is necessary because character strings are passed by descriptor rather
+  than by reference.
 
-30/7/97 Initial release
-31/7/97 Correct NXPUTATTR/NXGETATTR and add in declarations for "implicit none" compiling
-7/8/97  Add in new interface definitions
+- If you don't wish to use these routines, it is possible to pass character
+  data to the C interface using the regular routines (i.e. NXGETDATA etc) 
+  by forcing the string arguments to be passed by reference.  Either 
+  equivalence the string to a BYTE array or use the %REF (or equivalent) 
+  function.  It does not appear to be necessary to null-terminate the strings
+  since the string length, passed to the HDF file, does not include the 
+  terminator.
 
 --
 Freddie Akeroyd
