@@ -73,7 +73,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
          printf("%s \n",string);
      }
   /*---------------------------------------------------------------------*/
-     static void *NXpData = NULL;
+     void *NXpData = NULL;
      void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
   /*---------------------------------------------------------------------*/
      void NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
@@ -679,6 +679,10 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     return NX_OK;
   }
   
+  NXstatus NXfcompress(NXhandle fid, int *compr_type)
+  { 
+      return NXcompress(fid,*compr_type);
+  }
   
   NXstatus NXfmakedata(NXhandle fid, char *name, int *pDatatype,
 		int *pRank, int dimensions[])
@@ -973,8 +977,9 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     pNexusFile pFile;
     int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS], iStride[MAX_VAR_DIMS];
     NXname pBuffer;
-    int32 iRank, iAtt, iType, iRet, i;
+    int32 iRank, iAtt, iType, iRet, i, e;
     char pError[512];
+    char *str;
   
     pFile = NXIassert (fid);
   
@@ -996,6 +1001,50 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iSize, data);
     if (iRet < 0) {
       sprintf (pError, "ERROR: failure to write data to %s", pBuffer);
+      NXIReportError (NXpData, pError);
+      return NX_ERROR;
+    }
+    return NX_OK;
+  }
+  
+  NXstatus
+  NXcompress (NXhandle fid, int compress_type)
+  {
+    pNexusFile pFile;
+    int32 iRank, iAtt, iType, iRet, i, e;
+    int32 iSize[MAX_VAR_DIMS];
+    NXname pBuffer;
+    char pError[512];
+    comp_info compstruct;  
+    char *str;
+
+    pFile = NXIassert (fid);
+  
+    /* check if there is an SDS open */
+    if (pFile->iCurrentSDS == 0) {
+      NXIReportError (NXpData, "ERROR: no SDS open");
+      return NX_ERROR;
+    }
+
+    /* first read dimension information */
+    SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iSize, &iType, &iAtt);
+
+    /* 
+       according to compression type initialize compression
+       information 
+    */
+    if(compress_type == NX_COMP_LZW)
+    {
+         compstruct.deflate.level = 6;
+    }
+    else if(compress_type == NX_COMP_HUF)
+    {
+        compstruct.skphuff.skp_size = DFKNTsize(iType);
+    }
+
+    iRet = SDsetcompress(pFile->iCurrentSDS, compress_type, &compstruct);
+    if (iRet < 0) {
+      sprintf (pError, "ERROR: failure to compress data to %s", pBuffer);
       NXIReportError (NXpData, pError);
       return NX_ERROR;
     }
