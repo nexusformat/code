@@ -32,13 +32,15 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
-CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs
+CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml
 
 ## testdir=$(prefix)/nexus/test
 
 HDF4_TARGETS = napi_test-hdf4
 
 HDF5_TARGETS = napi_test-hdf5
+
+XML_TARGETS = napi_test-xml
 
 F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
@@ -54,7 +56,7 @@ TESTSUITE_AT	= ## dbase.at devices.at starter.at
 
 AUTOTEST	= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
+check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
@@ -71,6 +73,10 @@ napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 napi_test_hdf5_SOURCES = napi_test.c
 napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
+
+napi_test_xml_SOURCES = napi_test.c
+napi_test_xml_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_xml_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 
 if HAVE_HDF4
 napif_test_hdf4_SOURCES = napif4_test.f

@@ -152,6 +152,7 @@ AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_CHECK_PROG(SWIG,swig)
 AC_PROG_CXX
 
 dnl These are used in build_rules.am to pass any approptiate 
@@ -208,8 +209,10 @@ dnl first see if one has been given
 dnl
 H4ROOT=""
 H5ROOT=""
+MXMLROOT=""
 AC_SUBST(H4ROOT)
 AC_SUBST(H5ROOT)
+AC_SUBST(MXMLROOT)
 AC_ARG_WITH([hdf4],
 	AC_HELP_STRING([--with-hdf4=/path/to/hdf4],
                        [Specify location of HDF4 files]),
@@ -218,6 +221,10 @@ AC_ARG_WITH([hdf5],
 	AC_HELP_STRING([--with-hdf5=/path/to/hdf5],
                        [Specify location of HDF5 files]),
 	[if test $withval != no; then H5ROOT=$withval; fi])
+AC_ARG_WITH([xml],
+	AC_HELP_STRING([--with-xml=/path/to/mxml],
+                       [Specify location of MXML library files]),
+	[if test $withval != no; then MXMLROOT=$withval; fi])
 dnl otherwise try and find HDF path, but not if
 dnl e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
 dnl first HDF4
@@ -272,6 +279,26 @@ fi
 AC_SUBST(HDF5_LDFLAGS)
 AC_SUBST(HDF5_CPPFLAGS)
 
+dnl XML
+MXMLSEARCH="/usr /usr/local"
+if test "$with_xml" != "no" -a -z "$MXMLROOT"; then
+    AC_MSG_CHECKING(for location of mxml package)
+    for i in $MXMLSEARCH; do
+	if test -z "$MXMLROOT" -a -r ${i}/include/mxml.h; then MXMLROOT=$i; fi
+    done
+    if test -z "$MXMLROOT"; then 
+	AC_MSG_RESULT(unknown)
+    else 
+	AC_MSG_RESULT($MXMLROOT)
+    fi
+fi
+if test "$MXMLROOT"; then
+    XML_LDFLAGS="-L$MXMLROOT/lib -lmxml"
+    XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
+fi
+AC_SUBST(XML_LDFLAGS)
+AC_SUBST(XML_CPPFLAGS)
+
 dnl finally set LIBS variable if we 
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
@@ -303,6 +330,7 @@ AM_CONDITIONAL([HAVE_JAVAC], [test ! -z "$JAVAC"])
 AM_CONDITIONAL([HAVE_JAVADOC], [test ! -z "$JAVADOC"])
 AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
 AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
+AM_CONDITIONAL([HAVE_XML], [test ! -z "$MXMLROOT"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
@@ -326,10 +354,12 @@ AC_CONFIG_FILES([Makefile
 		scripts/Makefile
 		scripts/nexus.pc
 		scripts/nxbuild])
+dnl src/nxdict/Makefile
 AC_OUTPUT
 
 HDF4SUPPORT=`if test -n "$H4ROOT" ; then echo yes ; else echo no ; echo "                found version $H4VERSION"; fi`
 HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "                found version $H5VERSION"; fi`
+XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$F90" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
@@ -345,6 +375,7 @@ build:
         NeXus with:
                 HDF4 support:  ${HDF4SUPPORT} 
                 HDF5 support:  ${HDF5SUPPORT}
+                XML support:   ${XMLSUPPORT}
 
         bindings:
                 F77 :          ${F77BINDING} 

@@ -56,10 +56,10 @@ int main (int argc, char *argv[])
   char nxFile[80];
   int xmlFlag = 0;
 
-  if(strstr(argv[0],"napi5_test") != NULL){
+  if(strstr(argv[0],"napi_test-hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
     strcpy(nxFile,"NXtest.h5");
-  }else if(strstr(argv[0],"napix_test") != NULL){
+  }else if(strstr(argv[0],"napi_test-xml") != NULL){
     nx_creation_code = NXACC_CREATEXML;
     strcpy(nxFile,"NXtest.xml");
     xmlFlag = 1;

@@ -92,6 +92,12 @@ NXopenpath checks OK
 ]])
 AT_CLEANUP
 
+AT_SETUP([Check the XML binding])
+AT_CHECK([napi_test-xml], [], 
+[[Number of global attributes: 4
+]])
+AT_CLEANUP
+
 AT_BANNER([Check the FORTRAN binding.])
 
 AT_SETUP([Check the F77 binding using HDF4.])

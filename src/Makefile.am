@@ -28,7 +28,7 @@
 #
 #====================================================================
 
-AM_CPPFLAGS=-I$(top_srcdir)/include @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
+AM_CPPFLAGS=-I$(top_srcdir)/include @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 
 if HAVE_HDF4
 H4SRC = napi4.c
@@ -38,13 +38,17 @@ if HAVE_HDF5
 H5SRC = napi5.c
 endif
 
+if HAVE_XML
+XMLSRC = nxxml.c nxio.c nxdataset.c
+endif
 ##  the LIBS variable should contain all needed libs for the HDF support
 ##  It will be filled during the configuration run
 
 lib_LTLIBRARIES = libNeXus.la
+#SUBDIRS=nxdict
 
-libNeXus_la_SOURCES = napi.c $(H4SRC) $(H5SRC)
-libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@
+libNeXus_la_SOURCES = napi.c $(H4SRC) $(H5SRC) $(XMLSRC)
+libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@
 
 ## The following part is the solution for automake >= 1.7
 ## 
@@ -60,8 +64,3 @@ libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@
 ## endif
 
 include $(top_srcdir)/build_rules.am
-
-
-
-
-
