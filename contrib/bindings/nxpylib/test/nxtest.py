@@ -16,7 +16,7 @@ def main(args):
 
 	f = NXfile(filename="monoxtas_template.nxs", 
 				  mode=NXACC_CREATE5, 
-				  template="/home/hgilde/nexus/nexus/contrib/bindings/nxpylib/test/monoxtas_template.xml")
+				  template="monoxtas_template.xml")
 	
 	root = f.getRoot()
 	myentry 	= f.readGroup("root:NXroot/entry:NXentry")
