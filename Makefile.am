@@ -1,4 +1,3 @@
-## Process this file with automake to produce Makefile.in
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
@@ -25,10 +24,11 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
+# $Id$
+#
+# @configure_input@
+#
 #====================================================================
-EXTRA_DIST=README gnu_licence.txt
-include_HEADERS=include/napi.h
-bin_SCRIPTS=scripts/nxbuild
-#CLEANFILES=
-#DIST_SUBDIRS=
-SUBDIRS=src bindings test applications
+SUBDIRS=include src bindings test applications scripts
+
+DISTCHECK_CONFIGURE_FLAGS=--without-hdf5
