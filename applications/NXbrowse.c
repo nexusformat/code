@@ -39,44 +39,41 @@
 int NXBdir (NXhandle fileId);
 int NXBopen (NXhandle fileId, NXname groupName);
 int NXBread (NXhandle fileId, NXname dataName, char *dimensions);
-int NXBdump (NXhandle fileId, NXname dataName, char *filename);
+int NXBdump (NXhandle fileId, NXname dataName, char *fileName);
 void PrintAttributes (NXhandle fileId);
-void PrintDimensions (int rank, int *dimensions);
+void PrintDimensions (int rank, int dimensions[]);
 void PrintType (int dataType);
 void PrintData (void* data, int dataType, int numElements);
-void DumpData(FILE *fd, int iDim[], int rank, int datatype, void *data);
+void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data);
 void WriteData (FILE *fd, char *data, int dataType, int numElements);
 int FindGroup (NXhandle fileId, char *groupName, char *groupClass);
 int FindData (NXhandle fileId, char *dataName);
 
-static int iByteAsChar = 1;
+/* if iByteAsChar, NX_INT8 and NX_UINT8 are treated as characters */
+static int iByteAsChar = 1; /* Assume global attributes are all characters */
 static char nxFile[256];
 
 int main(int argc, char *argv[])
 {
    NXhandle fileId;
-   char fileName[80], inputText[255], path[80], *command, 
-        *dimensions, *stringPtr,dumpFile[132];
+   char fileName[80], inputText[255], path[80], *command, *dimensions, *stringPtr;
    NXname groupName, dataName;
    int status, groupLevel = 0, i;
 
    printf ("NXBrowse %s Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski\n", NEXUS_VERSION);
 
-   /* if there is a filename given on the command line use that,
-      else ask for a filename
-   */
-   if(argc < 2)
-   {
+/* if there is a filename given on the command line use that,
+      else ask for a filename */
+   if (argc < 2) {
       printf ("Give name of NeXus file : ");
       fgets (fileName, sizeof(fileName), stdin);
       if ((stringPtr = strchr(fileName, '\n')) != NULL)
 	      *stringPtr = '\0';
    }
-   else
-   {
-     strcpy(fileName, argv[1]);
+   else {
+     strcpy (fileName, argv[1]);
    }
-   strcpy(nxFile,fileName);
+   strcpy (nxFile, fileName);
  
 /* Open input file and output global attributes */
    if (NXopen (fileName, NXACC_READ, &fileId) != NX_OK) {
@@ -84,6 +81,7 @@ int main(int argc, char *argv[])
       return NX_ERROR;
    }
    PrintAttributes (fileId);
+   iByteAsChar = 0; /* Display remaining NX_INT8 and NX_UINT8 variables as integers by default */
 /* Input commands until the EXIT command is given */
    strcpy (path, "NX");
    do {
@@ -117,17 +115,16 @@ int main(int argc, char *argv[])
       }
       /* Command is to  dump data values to a file */
       if (StrEq(command, "DUMP") || StrEq(command, "dump")) {
-         stringPtr = strtok (NULL, " [");
+         stringPtr = strtok (NULL, " ");
          if (stringPtr != NULL) {
             strcpy (dataName, stringPtr);
             stringPtr = strtok(NULL," ");
-            strcpy(dumpFile,stringPtr);
-            if(stringPtr != NULL)
-	    {
-              status = NXBdump (fileId, dataName,dumpFile);
+            if (stringPtr != NULL) {
+               strcpy (fileName, stringPtr);
+               status = NXBdump (fileId, dataName, fileName);
             }
             else {
-                 printf ("NX_ERROR: Specify a dump file name \n");
+               printf ("NX_ERROR: Specify a dump file name \n");
             }
          }
          else {
@@ -136,14 +133,14 @@ int main(int argc, char *argv[])
       }
       /* Command is to print the values of the data */
       if (StrEq(command, "READ") || StrEq(command, "read")) {
-         stringPtr = strtok (NULL, " ");
+         stringPtr = strtok (NULL, " [");
          if (stringPtr != NULL) {
             strcpy (dataName, stringPtr);
             dimensions = strtok(NULL, "[]");
             status = NXBread (fileId, dataName, dimensions);
             /* Check for attributes unless a single element is specified */
             if (status == NX_OK && dimensions == NULL) 
-                      PrintAttributes (fileId);
+               PrintAttributes (fileId);
          }
          else {
             printf ("NX_ERROR: Specify a data item\n");
@@ -151,12 +148,17 @@ int main(int argc, char *argv[])
       }
       /* Command is to close the current group */
       if (StrEq(command, "CLOSE") || StrEq(command, "close")) {
-         if (NXclosegroup (fileId) == NX_OK) {
-            /* Remove the group from the prompt string */
-            stringPtr = strrchr (path, '/'); /* position of last group delimiter */
-            if (stringPtr != NULL) 
-               *stringPtr = '\0';            /* terminate the string there */
-            groupLevel--;
+         if (groupLevel > 0) {
+            if (NXclosegroup (fileId) == NX_OK) {
+               /* Remove the group from the prompt string */
+               stringPtr = strrchr (path, '/'); /* position of last group delimiter */
+               if (stringPtr != NULL) 
+                  *stringPtr = '\0';            /* terminate the string there */
+               groupLevel--;
+            }
+         }
+         else {
+            printf ("NX_WARNING: Already at root level of file\n");
          }
       }
       /* Command is to print help information */
@@ -165,15 +167,15 @@ int main(int argc, char *argv[])
          printf ("                    OPEN <groupName>\n");
          printf ("                    READ <dataName>\n");
          printf ("                    READ <dataName>[<dimension indices...>]\n");
-         printf ("                    dump <dataName> <dumpFile> \n");
+         printf ("                    DUMP <dataName> <fileName> \n");
          printf ("                    CLOSE\n");
          printf ("                    BYTEASCHAR\n");
          printf ("                    HELP\n");
          printf ("                    EXIT\n");
       }
       /* Command is to print byte as char information */
-      if (StrEq(command, "byteaschar") || StrEq(command, "byteaschar")) {
-         if(iByteAsChar == 1)
+      if (StrEq(command, "BYTEASCHAR") || StrEq(command, "byteaschar")) {
+         if (iByteAsChar == 1)
             iByteAsChar = 0;
          else
             iByteAsChar = 1;
@@ -231,7 +233,7 @@ int NXBopen (NXhandle fileId, NXname groupName)
    return NX_OK;
 }
 
-/* Output requested data */
+/* Outputs requested data */
 int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
 {
    int dataRank, dataDimensions[NX_MAXRANK], dataType, start[NX_MAXRANK], size[NX_MAXRANK], i, j;
@@ -326,11 +328,11 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
    if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
    return NX_OK;
 }
-/* dump requested data */
-int NXBdump (NXhandle fileId, NXname dataName, char *filename)
+
+/* Dumps requested data */
+int NXBdump (NXhandle fileId, NXname dataName, char *fileName)
 {
-   int dataRank, dataDimensions[NX_MAXRANK], dataType, 
-       start[NX_MAXRANK], size[NX_MAXRANK], i, j;
+   int dataRank, dataDimensions[NX_MAXRANK], dataType, i;
    FILE *fd = NULL;
    void *dataBuffer;
   
@@ -340,41 +342,39 @@ int NXBdump (NXhandle fileId, NXname dataName, char *filename)
    /* Open the data and obtain its type and rank details */
    if (NXopendata (fileId, dataName) != NX_OK) return NX_ERROR;
    if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) 
-                 return NX_ERROR;
+      return NX_ERROR;
    
-   /* open the file */
-   fd = fopen(filename,"w");
-   if(!fd)
-   {
-     printf("ERROR: failed to open--> %s <-- for writing\n",
-            filename);
+   /* Open the file */
+   fd = fopen (fileName,"w");
+   if(!fd) {
+     printf ("ERROR: failed to open--> %s <-- for writing\n",
+            fileName);
      return NX_ERROR;
    }
 
-   /* allocate data space */
-   if(NXmalloc(&dataBuffer,dataRank, dataDimensions,dataType) != NX_OK)
-            return NX_ERROR;
+   /* Allocate data space */
+   if (NXmalloc(&dataBuffer,dataRank, dataDimensions,dataType) != NX_OK)
+      return NX_ERROR;
 
-   /* read the lot */
-   if(NXgetdata(fileId,dataBuffer) != NX_OK)
-            return NX_ERROR;
+   /* Read the lot */
+   if (NXgetdata(fileId,dataBuffer) != NX_OK)
+      return NX_ERROR;
 
    NXclosedata(fileId);
 
-   /* print a header */
-   fprintf(fd,"File : %s, DataSet: %s \n", nxFile,  dataName);
-   for(i= 0; i < dataRank; i++)
-   {
+   /* Print a header */
+   fprintf (fd,"File : %s, DataSet: %s \n", nxFile,  dataName);
+   for (i= 0; i < dataRank; i++) {
      fprintf(fd," %d ", dataDimensions[i]);
    }
    fprintf(fd,"\n");
 
-   /* do data */
-   DumpData(fd,dataDimensions,dataRank,dataType,dataBuffer);
+   /* Dump the data */
+   DumpData (fd, dataRank, dataDimensions, dataType, dataBuffer);
 
-   /* clean up */
-   fclose(fd);
-   NXfree(&dataBuffer);
+   /* Clean up */
+   fclose (fd);
+   NXfree (&dataBuffer);
    return NX_OK;
 }
 
@@ -453,52 +453,42 @@ void PrintType (int dataType)
         break;
    }
 }
-/* 
-  Dump data to file. The problem is that there is a an unknown number of
-  dimensions. This is solved by recursion.
-*/
-void DumpData(FILE *fd, int iDim[], int rank, int datatype, void *data)
-{
-    char *pData;
-    int i, iMult, toPrint, toWrite;
 
-    if(rank > 1)
-    {
-      for(i = 1, iMult = 1; i < rank; i++)
-      {
-        iMult *= iDim[i];
+/* Dumps data to a file. Uses recursion because of unknown number of dimensions. */
+void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
+{
+   char *dataPtr;
+   int i, dimSize, dataSize, lineSize;
+
+   if (rank > 1) { /* Recursively call DumpData until rank = 1 */
+      for (i = 1, dimSize = 1; i < rank; i++) {
+         dimSize *= dimensions[i];
       }
-      for(i = 0; i < iDim[0]; i++)
-      {
-         pData = (char *)data + i * iMult * DFKNTsize(datatype);
-         DumpData(fd,&iDim[1],rank - 1,datatype, pData);
+      for (i = 0; i < dimensions[0]; i++) {
+         dataPtr = (char *)data + i * dimSize * DFKNTsize(dataType);
+         DumpData (fd, rank-1, &dimensions[1], dataType, dataPtr);
       }
       return;
-    }
-    else
-    {
-      /* actually print the data */
-      toPrint = iDim[0];
-      pData = (char *)data;
-      while(toPrint > 0)
-      {
-        if(toPrint > 10)
-	{
-           toWrite = 10;
+   }
+   else { /* Actually print the data */
+      dataSize = dimensions[0];
+      dataPtr = (char *)data;
+      while(dataSize > 0) {
+        if (dataSize > 10) {
+           lineSize = 10;
         }
-        else
-	{
-            toWrite = toPrint;
+        else {
+           lineSize = dataSize;
         }
-        WriteData(fd,pData, datatype, toWrite);
+        WriteData (fd, dataPtr, dataType, lineSize);
         fprintf(fd,"\n");
-        toPrint -= toWrite;
-        pData += toWrite * DFKNTsize(datatype);
+        dataSize -= lineSize;
+        dataPtr += lineSize * DFKNTsize(dataType);
       }
-    }
+   }
 }
 
-/* writes data items with the requested type */
+/* Writes data items with the requested type */
 void WriteData (FILE *fd, char *data, int dataType, int numElements)
 {
    int i;
@@ -506,61 +496,54 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
    for (i=0; i<numElements; i++) {
       switch(dataType) {
          case NX_CHAR:
-            fprintf(fd,"%c", ((char *)data)[i]);
+            fprintf (fd, "%c", ((char *)data)[i]);
             break;
          case NX_INT8:
-            if(iByteAsChar)
-	    {
-               fprintf(fd,"%c", ((char *)data)[i]);
+            if(iByteAsChar) {
+               fprintf (fd, "%c", ((char *)data)[i]);
             }
-            else
-	    {
-               fprintf(fd,"%d ", ((char *)data)[i]);
+            else {
+               fprintf (fd, "%d ", ((char *)data)[i]);
             }
             break;
          case NX_UINT8:
-            if(iByteAsChar)
-	    {
-                fprintf(fd,"%c", ((unsigned char *)data)[i]);
+            if(iByteAsChar) {
+                fprintf (fd, "%c", ((unsigned char *)data)[i]);
             }
-            else
-	    {
-                fprintf(fd,"%d ", ((unsigned char *)data)[i]);
+            else {
+                fprintf (fd, "%d ", ((unsigned char *)data)[i]);
             }
             break;
          case NX_INT16:
-            fprintf(fd,"%d ", ((short *)data)[i]);
+            fprintf (fd, "%d ", ((short *)data)[i]);
             break;
          case NX_UINT16:
-            fprintf(fd,"%d ", ((unsigned short *)data)[i]);
+            fprintf (fd, "%d ", ((unsigned short *)data)[i]);
             break;
          case NX_INT32:
-            fprintf(fd,"%d ", ((int32 *)data)[i]);
+            fprintf (fd, "%d ", ((int32 *)data)[i]);
             break;
          case NX_UINT32:
-            fprintf(fd,"%d ", ((uint32 *)data)[i]);
+            fprintf (fd, "%d ", ((uint32 *)data)[i]);
             break;
          case NX_FLOAT32:
-            fprintf(fd,"%f ", ((float *)data)[i]);
+            fprintf (fd, "%f ", ((float *)data)[i]);
             break;
          case NX_FLOAT64:
-            fprintf(fd,"%f ", ((double *)data)[i]);
+            fprintf (fd, "%f ", ((double *)data)[i]);
             break;
          default:
-            printf("PrintData: invalid type");
+            printf ("WriteData: invalid type");
             break;
       }
    }
 }
 
-
 /* Outputs data items with the requested type */
 void PrintData (void *data, int dataType, int numElements)
 {
-   WriteData(stdout, data, dataType, numElements);
+   WriteData (stdout, data, dataType, numElements);
 }
-
-/* Searches group for requested group and return its class */
 int FindGroup (NXhandle fileId, char *groupName, char *groupClass)
 {
    int status, dataType;
