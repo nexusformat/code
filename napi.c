@@ -344,8 +344,21 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	return ret;
   }
 
-#if (defined(__VMS) && (__VMS_VER < 70000000)) || defined(_WIN32)
-#define NO_LOCALTIME_GMTOFF	/* prior to VMS 7.0 localtime() relative to UTC */
+/* 
+ * the following deals with how we do our timezone calculation.
+ * Not all systems have a timezone field as part of "struct tm"
+ * that is passed to localtime(), so we need to look elsewhere
+ *
+ * If you encounter problems, try defining USE_FTIME first, with
+ * NEED_TZSET is your system provides the tzset() function
+ */
+
+#if defined(_WIN32)
+#   define NEED_TZSET		/* call tzset() to initialise time variables */
+#   define USE_TIMEZONE		/* use timezone and daylight variables */
+#elif (defined(__VMS) && (__VMS_VER < 70000000))
+#   define USE_FTIME		/* use ftime() function */
+#   include <sys/timeb.h>
 #endif /* __VMS && __VMS_VER < 70000000 */
 
   NXstatus  NXopen(CONSTCHAR * filename, NXaccess am, NXhandle* pHandle)
@@ -358,6 +371,9 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     struct tm *time_info;
     const char* time_format;
     long gmt_offset;
+#ifdef USE_FTIME
+    struct timeb timeb_struct;
+#endif /* USE_FTIME */
   
     *pHandle = NULL;
     /* get memory */
@@ -370,14 +386,23 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 /* 
  * get time in ISO 8601 format 
  */
+#ifdef NEED_TZSET
     tzset();
+#endif /* NEED_TZSET */
     time(&timer);
     time_info = localtime(&timer);
-#ifdef NO_LOCALTIME_GMTOFF
+#if defined(USE_TIMEZONE)
     gmt_offset = -timezone + ( (daylight != 0) ? 3600 : 0 );
+#elif defined(USE_FTIME)
+    ftime(&timeb_struct);
+    gmt_offset = -timeb_struct.timezone * 60;
+    if (timeb_struct.dstflag != 0)
+    {
+	gmt_offset += 3600;
+    }
 #else
     gmt_offset = time_info->tm_gmtoff;
-#endif /* NO_LOCALTIME_GMTOFF */
+#endif
     if (time_info != NULL)
     {
         if (gmt_offset < 0)
