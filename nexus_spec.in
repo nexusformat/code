@@ -61,12 +61,21 @@ make install
 # some cleaning mechanism if we use alternative build roots
 ###rm -fr $RPM_BUILD_ROOT
 %post
+if [ "$RPM_INSTALL_PREFIX" != "" ]; then
+    INSTALL_PREFIX=$RPM_INSTALL_PREFIX
+else
+    INSTALL_PREFIX=/usr/local
+fi
+( cd $INSTALL_PREFIX/bin; for i in nxbuild; do \
+  sed -e "s|^prefix=.*|prefix=$INSTALL_PREFIX|" $i > /tmp/nexus.$$; \
+  mv /tmp/nexus.$$ $i; chmod 0755 $i; done )
 if test `whoami` = root; then ldconfig; fi
-# also need to sort out nxbuild if we are not installed to /usr/local
 %postun
 if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
 * Sun Feb 22 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
-- Initial version
+- Initial RPM kit version
+* Wed Mar 24 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+- Fix up prefix in nxbuild after an install so the RPM is now relocatable
