@@ -40,7 +40,7 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#define NEXUS_VERSION	"1.2.1"		/* major.minor.patch */
+#define NEXUS_VERSION	"1.3.0"		/* major.minor.patch */
 
 #ifdef GENIE_IMPLEMENTATION__		/* OpenGENIE is fussy about consts */
 #   define CONSTCHAR	const char
@@ -118,6 +118,11 @@ typedef char NXname[VGNAMELENMAX];
 #define NX_UINT32	DFNT_UINT32
 #define NX_CHAR		DFNT_CHAR8
 
+/* Map NeXus compression methods to HDF compression methods */
+#define NX_COMP_LZW COMP_CODE_DEFLATE
+#define NX_COMP_RLE COMP_CODE_RLE
+#define NX_COMP_HUF COMP_CODE_SKPHUFF          
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -149,6 +154,7 @@ extern "C" {
 #    define NXopengroup 	MANGLE(nxiopengroup)
 #    define NXclosegroup 	MANGLE(nxiclosegroup)
 #    define NXmakedata 		MANGLE(nximakedata)
+#    define NXcompress 		MANGLE(nxicompress)
 #    define NXopendata 		MANGLE(nxiopendata)
 #    define NXclosedata 	MANGLE(nxiclosedata)
 #    define NXgetdata 		MANGLE(nxigetdata)
@@ -171,6 +177,7 @@ extern "C" {
 #    define NXfopen		MANGLE(nxifopen)
 #    define NXfclose		MANGLE(nxifclose)
 #    define NXfmakedata		MANGLE(nxifmakedata)
+#    define NXfcompress		MANGLE(nxfcompress)
 #    define NXfputattr		MANGLE(nxifputattr)
 #elif defined(_WIN32)
 /* 
@@ -185,6 +192,7 @@ extern "C" {
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
 #       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
 #       define NXmakedata 		NXIMAKEDATA_
+#       define NXcompress 		MANGLE(NXICOMPRESS)
 #       define NXopendata 		MANGLE(NXIOPENDATA)
 #       define NXclosedata 		MANGLE(NXICLOSEDATA)
 #       define NXgetdata 		MANGLE(NXIGETDATA)
@@ -207,6 +215,7 @@ extern "C" {
 #	define NXfopen 			MANGLE(NXIFOPEN)
 #	define NXfclose			MANGLE(NXIFCLOSE)
 #    	define NXfmakedata		MANGLE(NXIFMAKEDATA)
+#    	define NXfcompress		MANGLE(NXIFCOMPRESS)
 #    	define NXfputattr		MANGLE(NXIFPUTATTR)
 #else
 #   error Cannot compile - unknown operating system
@@ -224,6 +233,7 @@ extern "C" {
   
   NXstatus  NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
   NXstatus  NXopendata (NXhandle handle, CONSTCHAR* label);
+  NXstatus  NXcompress (NXhandle handle, int compr_type);
   NXstatus  NXclosedata(NXhandle handle);
   
   NXstatus  NXgetdata(NXhandle handle, void* data);
