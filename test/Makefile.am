@@ -32,6 +32,8 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.a
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 
+testdir=$(prefix)/nexus/test
+
 if HAVE_HDF4
 HDF4_TARGETS = napi4_test
 endif
@@ -45,7 +47,7 @@ if HAVE_F90
 F90_TARGETS = NXtest
 endif
 
-bin_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
+test_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
 
 napi4_test_SOURCES = napi4_test.c
 napi4_test_LDADD = $(LIBNEXUS)
