@@ -1,4 +1,6 @@
 #include "RandomAccessRunfile.h"
+#include <stdexcept>
+using std::runtime_error;
 
 RandomAccessRunfile::RandomAccessRunfile(){}
 
@@ -6,7 +8,7 @@ RandomAccessRunfile::RandomAccessRunfile(){}
 RandomAccessRunfile::RandomAccessRunfile(ifstream *inFile) {
   int curPos = (*inFile).tellg();
   input = inFile;
-  (*inFile).seekg(68);
+  (*input).seekg(68);
   (*inFile).read((char *)&version, sizeof (int));
   if (version > 16777215 ) {   // Version < 4 was little endian
     int byte1 = version & 0xff;
@@ -364,6 +366,35 @@ void RandomAccessRunfile::readRunFloatVector(vector<float> *floatArray, int nel)
   for ( ii = 1; ii <= nel; ii++ ) {
     (*floatArray)[ii] = readRunFloat();
   }
+}
+
+//readRunFloatVectorFromShort  - read an array of floats from an array of 
+//shorts in the file. The argument shortArray needs to have memory allocated 
+//for nel + 1 elements since the array is assumed to start indexing at 1 
+void RandomAccessRunfile::readRunFloatVectorFromShort(vector<float> *floatArray, int nel) {
+  int ii;
+  
+  for ( ii = 1; ii <= nel; ii++ ) {
+    (*floatArray)[ii] = (float)readRunShort();
+  }
+}
+
+//readRunFloatVectorFromInt  - read an array of floats from an array of 
+//ints in the file. The argument shortArray needs to have memory allocated 
+//for nel + 1 elements since the array is assumed to start indexing at 1 
+void RandomAccessRunfile::readRunFloatVectorFromInt(vector<float> *floatArray, int nel) {
+  int ii;
+  
+  for ( ii = 1; ii <= nel; ii++ ) {
+    (*floatArray)[ii] = (float)readRunInt();
+  }
+}
+
+istream& RandomAccessRunfile::seekg( streampos pos ) {
+  if ( !input->is_open() ) {
+    throw runtime_error( "RandomAccessRunfile::seekg() input stream is closed\n");
+  }
+  return input->seekg( pos );
 }
 
 /*

@@ -24,7 +24,9 @@ class RandomAccessRunfile {
   void readRunIntVector(vector<int> * , int);
   void readRunFloatVector(vector<float> *, int);
   void readRunShortVector(vector<short> *, int);
-
+  void readRunFloatVectorFromShort(vector<float> *, int);
+  void readRunFloatVectorFromInt(vector<float> *, int);
+  istream& seekg( streampos );
  private:
   int version;
   ifstream *input;
