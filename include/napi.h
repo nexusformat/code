@@ -144,35 +144,41 @@ extern "C" {
 #    define NXfmakedata		MANGLE(nxifmakedata)
 #    define NXfputattr		MANGLE(nxifputattr)
 #elif defined(_WIN32)
+/* 
+ * Various PC calling converntions
+ */
+/* #       define MANGLE(__arg)		__stdcall CONCAT(__arg,_) */
+/* #       define MANGLE(__arg)		CONCAT(__arg,_) */
+#       define MANGLE(__arg)		__stdcall __arg
 #	define NXopen 			NXIOPEN_
 #       define NXclose 			NXICLOSE_
-#       define NXmakegroup 		NXIMAKEGROUP_
-#       define NXopengroup 		NXIOPENGROUP_
-#       define NXclosegroup 		NXICLOSEGROUP_
+#       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
+#       define NXopengroup 		MANGLE(NXIOPENGROUP)
+#       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
 #       define NXmakedata 		NXIMAKEDATA_
-#       define NXopendata 		NXIOPENDATA_
-#       define NXclosedata 		NXICLOSEDATA_
-#       define NXgetdata 		NXIGETDATA_
-#       define NXgetslab 		NXIGETSLAB_
-#       define NXgetattr 		NXIGETATTR_
-#       define NXgetdim 		NXIGETDIM_
-#       define NXputdata 		NXIPUTDATA_
-#       define NXputslab 		NXIPUTSLAB_
+#       define NXopendata 		MANGLE(NXIOPENDATA)
+#       define NXclosedata 		MANGLE(NXICLOSEDATA)
+#       define NXgetdata 		MANGLE(NXIGETDATA)
+#       define NXgetslab 		MANGLE(NXIGETSLAB)
+#       define NXgetattr 		MANGLE(NXIGETATTR)
+#       define NXgetdim 		MANGLE(NXIGETDIM)
+#       define NXputdata 		MANGLE(NXIPUTDATA)
+#       define NXputslab 		MANGLE(NXIPUTSLAB)
 #       define NXputattr 		NXIPUTATTR_
-#       define NXputdim 		NXIPUTDIM_
-#       define NXgetinfo 		NXIGETINFO_
-#       define NXgetnextentry 		NXIGETNEXTENTRY_
-#       define NXgetnextattr 		NXIGETNEXTATTR_
-#       define NXgetgroupID 		NXIGETGROUPID_
-#       define NXgetdataID 		NXIGETDATAID_
-#       define NXmakelink 		NXIMAKELINK_
-#       define NXmalloc 		NXIMALLOC_
-#       define NXfree 			NXIFREE_
+#       define NXputdim 		MANGLE(NXIPUTDIM)
+#       define NXgetinfo 		MANGLE(NXIGETINFO)
+#       define NXgetnextentry 		MANGLE(NXIGETNEXTENTRY)
+#       define NXgetnextattr 		MANGLE(NXIGETNEXTATTR)
+#       define NXgetgroupID 		MANGLE(NXIGETGROUPID)
+#       define NXgetdataID 		MANGLE(NXIGETDATAID)
+#       define NXmakelink 		MANGLE(NXIMAKELINK)
+#       define NXmalloc 		MANGLE(NXIMALLOC)
+#       define NXfree 			MANGLE(NXIFREE)
 /* FORTRAN helpers - for NeXus internal use only */
-#	define NXfopen 			NXIFOPEN_
-#	define NXfclose			NXIFCLOSE_
-#    	define NXfmakedata		NXIFMAKEDATA_
-#    	define NXfputattr		NXIFPUTATTR_
+#	define NXfopen 			MANGLE(NXIFOPEN)
+#	define NXfclose			MANGLE(NXIFCLOSE)
+#    	define NXfmakedata		MANGLE(NXIFMAKEDATA)
+#    	define NXfputattr		MANGLE(NXIFPUTATTR)
 #else
 #   error Cannot compile - unknown operating system
 #endif
