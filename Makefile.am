@@ -35,7 +35,8 @@ test: check
 
 SUBDIRS=include src bindings test applications scripts
 
-EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec autoversion.sh
+EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec autoversion.sh \
+		build_rpm.in
 
 # Add any flags here that you want passed to configure when you do 
 # a "make distcheck"

@@ -267,6 +267,7 @@ LINUX_DISTRIBUTION
 
 AC_CONFIG_FILES([Makefile
 		nexus.spec
+		build_rpm
 		include/Makefile
 		src/Makefile 
 		applications/Makefile
