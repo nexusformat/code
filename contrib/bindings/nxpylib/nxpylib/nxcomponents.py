@@ -405,6 +405,7 @@ class NXdataelem(NXelem):
 		if data == None: 	data = []
 		NXelem.__init__(self, parent=None, path=None, name=name, nxtype=nxtype, dims=dims, attrs=attrs, data=data)
 		self.attrs["axis"] = NXattr(name="axis", nxtype=NX_CHAR, value=axnames)
+		self.attrs["signal"] = NXattr(name="axis", nxtype=NX_CHAR, value="1")
 		self.cachefile = cachefile
 		self.axcachefile = axcachefile
 		self.nxcachefile = nxcachefile
