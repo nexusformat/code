@@ -1,7 +1,10 @@
 $!
 $! $Id$
 $!
-$! Build comamnd file for VMS
+$! Build command file for VMS
+$!
+$! Choose either the Fortran 77 or Fortran 90 versions 
+$! by commenting out the alternative (i.e. start the line with $!)
 $!
 $ SET VERIFY
 $ DEFINE HDF_ROOT AXPLIB$DISK:[HDF.]   ! where you installed HDF, trailing "." is needed
