@@ -43,7 +43,7 @@ dnl check for correct autoconf version - the same check is done in autogen.sh
 if test ! -z "$srcdir"; then
     . $srcdir/autoversion.sh
 else
-    . autoversion.sh
+    . ./autoversion.sh
 fi
 
 AM_INIT_AUTOMAKE([1.6])
