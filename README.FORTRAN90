@@ -36,15 +36,9 @@ provided there is no overflow.
 --- Compatibility Issues ---
 
 This version has been tested on Alpha/VMS, Windows NT, Linux, and Mac
-OS X (using Absoft Pro Fortran 90).  We are aware of a problem that
-affects Digital Unix, and other systems with 64-bit pointers.  The
-derived type NXstack defined in NXmodule.f90 should be equivalent to
-the iStack C struct defined in NAPI.C, which contains two 32-bit
-pointers, iRefDir and iTagDir.  If the local operating system uses
-64-bit pointers, add two extra 4-byte integers as padding to the
-beginning of the NXstack definition.  In the latest version of the API
-(v 1.3.1), the Fortran 90 code does not require access to the internal
-details of the NXhandle structure.
+OS X (using Absoft Pro Fortran 90).  In the latest versions of the API
+(after v 1.3.1), the Fortran 90 code does not require access to the 
+internal details of the NXhandle structure.
 
 --- Running the Examples ---
 
