@@ -621,6 +621,17 @@ short Header::NumOfY() {
   return numOfY;
 }
 
+
+// return minimum wavelength for an area detector
+int Header::MinWavelength() {
+  return minWavelength;
+}
+
+// return minimum wavelength for an area detector
+int Header::MaxWavelength() {
+  return maxWavelength;
+}
+
 // return number of wavelength channels for an area detector
 short Header::NumOfWavelengths() {
   return numOfWavelengths;
