@@ -186,18 +186,34 @@ extern "C" {
 #    define NXfputattr		MANGLE(nxifputattr)
 #elif defined(_WIN32)
 /* 
- * Various PC calling converntions
+ * START OF WINDOWS SPECIFIC CONFIGURATION
+ *
+ * Various PC calling conventions - you need only uncomment one of the following definitions of MANGLE()
+ * The choice arises because under Windows the default way FORTRAN calls FORTRAN is different
+ * from the dafault way C calls C, and so when you need to have FORTRAN calling C you must
+ * force them to use the same convention. Notice the use of "default way" above ... by choice
+ * of compiler options (or compiler vendor) you may actually have FORTRAN calling in the C way 
+ * etc., so you might need to experiment with the options below until you get no "unresolved symbols" 
+ *
+ * Choice 1: Should allow both FORTRAN and C NeXus interfaces to work in a "default" setup 
+ * Choice 2: For when choice 1: gives problems and you only require the C interface
+ * Choice 3: An alternative for choice 1:
+ * Choice 4: A variation of 2:
  */
-/* #       define MANGLE(__arg)		__stdcall CONCAT(__arg,_) */
-/* #       define MANGLE(__arg)		CONCAT(__arg,_) */
-#       define MANGLE(__arg)		__stdcall __arg
+#	define MANGLE(__arg)		__stdcall __arg			/* Choice 1 */
+/* #	define MANGLE(__arg)		CONCAT(__arg,_)			/* Choice 2 */
+/* #	define MANGLE(__arg)		__stdcall CONCAT(__arg,_)	/* Choice 3 */
+/* #	define MANGLE(__arg)		__arg				/* Choice 4 */
+/* 
+ * END OF WINDOWS SPECIFIC CONFIGURATION 
+ */
 #       define NXopen 			NXIOPEN_
 #       define NXclose 			NXICLOSE_
 #       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
 #       define NXclosegroup 		MANGLE(NXICLOSEGROUP)
 #       define NXmakedata 		NXIMAKEDATA_
-#       define NXcompress 		MANGLE(NXICOMPRESS)
+#       define NXcompress 		NXICOMPRESS_
 #       define NXopendata 		MANGLE(NXIOPENDATA)
 #       define NXclosedata 		MANGLE(NXICLOSEDATA)
 #       define NXgetdata 		MANGLE(NXIGETDATA)
