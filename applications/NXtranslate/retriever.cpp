@@ -3,7 +3,7 @@
 #include "nexus_retriever.h"
 
 #ifdef IPNS_RETRIEVER
-#include "ipns_retriever.h"
+#include "IPNS_CPP/ipns_retriever.h"
 #endif
 #ifdef TEXT_PLAIN_RETRIEVER
 #include "text_plain/retriever.h"
