@@ -395,8 +395,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 	    time_info->tm_hour,
 	    time_info->tm_min,
 	    time_info->tm_sec,
-	    gmt_offset / 3600,
-	    gmt_offset / 60  -  60 * (gmt_offset / 3600)
+	    abs(gmt_offset / 3600),
+	    abs((gmt_offset % 3600) / 60)
         );
     }
     else
@@ -750,7 +750,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
           
     /* dataset creation */
-    iNew = SDcreate (pFile->iSID, name, datatype, rank, dimensions);
+    iNew = SDcreate (pFile->iSID, name, datatype, rank, (int32*)dimensions);
     if (iNew < 0) {
       sprintf (pBuffer, "ERROR: cannot create SDS %s, check arguments",
                name);
@@ -872,7 +872,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     /* actually read */
-    SDreaddata (pFile->iCurrentSDS, iStart, NULL, iEnd, data);
+    SDreaddata (pFile->iCurrentSDS, (int32*)iStart, NULL, (int32*)iEnd, data);
     return NX_OK;
   }
   
@@ -905,9 +905,9 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
     /* get more info, allocate temporary data space */
     if (pFile->iCurrentSDS != 0) {
-      iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, iType, &iLen);
+      iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, (int32*)iType, &iLen);
     } else {
-      iRet = SDattrinfo (pFile->iSID, iNew, pNam, iType, &iLen);
+      iRet = SDattrinfo (pFile->iSID, iNew, pNam, (int32*)iType, &iLen);
     }
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: HDF could not read attribute info");
@@ -1002,7 +1002,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
     }
   
     /* actually write */
-    iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iEnd, data);
+    iRet = SDwritedata (pFile->iCurrentSDS, (int32*)iStart, 
+			(int32*)iStride, (int32*)iEnd, data);
     if (iRet < 0) {
       NXIReportError (NXpData, "ERROR: writing slab failed");
       return NX_ERROR;
@@ -1057,7 +1058,8 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
       return NX_ERROR;
     }
     /* read information */
-    SDgetinfo (pFile->iCurrentSDS, pBuffer, rank, dimension, iType, &iAtt);
+    SDgetinfo (pFile->iCurrentSDS, pBuffer, (int32*)rank, (int32*)dimension, 
+	       (int32*)iType, &iAtt);
     return NX_OK;
   }
   
