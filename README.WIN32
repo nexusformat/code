@@ -31,13 +31,14 @@ If you wish to build "nexus.dll", you need to do the following:
 
      C:\HDF4.1R3\INCLUDE
 
-5. Select "Project", "Add to project", "Files" and add the HDF DLL import libraries
+5. In "Project", "Setting", "C/C++" "code generation", select "Multithreaded DLL" for the "run-time library" to use
+6. Select "Project", "Add to project", "Files" and add the HDF DLL import libraries
    (hd413m.lib and hm413m.lib) to the project - they are in e.g. C:\HDF4.1R3\DLLLIB
-6. In "Project", "Setting", "Link" add the following to the start of the "Object/library modules" line
+7. In "Project", "Setting", "Link" add the following to the start of the "Object/library modules" line
 
         /nodefaultlib:"libcmt.lib" msvcrt.lib
 
-7. Now build the library ... it will generate a "nexus.dll" and a "nexus.lib" file in 
+8. Now build the library ... it will generate a "nexus.dll" and a "nexus.lib" file in 
    the "Release" directory. The "nexus.lib" import library contains information that is needed by
    programs that need to link against the "nexus.dll" DLL; see "building examples" below
 
@@ -45,7 +46,7 @@ If you wish to build "nexus.dll", you need to do the following:
 
 1. Create a WIN32 console project
 2. Go to "Build", "Set Active Configuration" and choose "Release" rather than "Debug"
-3. In "Project", "Setting", "C/C++" "code generation", select "multithreaded DLL"
+3. In "Project", "Setting", "C/C++" "code generation", select "Multithreaded DLL" for the "run-time library" to use
 4. Select "Project" "Add to project" "Files" and add nexus.lib, hd413m.lib and hm413m.lib to the project
 5. In "Project", "Setting", "C/C++", "Preprocessor" add the directory for napi.h and the HDF include files
 6. Build
