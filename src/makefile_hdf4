@@ -32,9 +32,10 @@ include makefile_options
 LIBNEXUS_OBJ=napi.o napif.o
 TEST4_OBJ=napi4_test.o
 NXBROWSE_OBJ=NXbrowse.o
+NXTOXML_OBJ=NXtoXML.o
 NOPT=-DHDF4
 
-all: libNeXus.a napi4_test napif_test NXbrowse 
+all: libNeXus.a napi4_test napif_test NXbrowse NXtoXML
 
 .c.o :
 	$(CC) $(CFLAGS) $(NOPT) -I$(H4ROOT)/include -c $(FROOT)/$*.c
@@ -57,5 +58,9 @@ napif_test: libNeXus.a napif_test.o
 	
 NXbrowse: libNeXus.a $(NXBROWSE_OBJ) 
 	$(CC) $(CFLAGS) -o NXbrowse $(NXBROWSE_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz 
+
+NXtoXML: libNeXus.a $(NXTOXML_OBJ) 
+	$(CC) $(CFLAGS) -o NXtoXML $(NXTOXML_OBJ) $(FROOT)/libNeXus.a \
 	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz 
 
