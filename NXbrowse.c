@@ -386,7 +386,7 @@ void ConvertUpperCase (char *string)
    int i;
    
    for (i=0; string[i]!=0; i++) {
-      if (string[i] >= 97 & string[i] <= 122) {
+      if (string[i] >= 97 && string[i] <= 122) {
          string[i] = string[i] - 32;
       }
    }
@@ -557,7 +557,7 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
             fprintf (fd, "%d ", ((int *)data)[i]);
             break;
          case NX_UINT32:
-            fprintf (fd, "%d ", ((uint *)data)[i]);
+            fprintf (fd, "%d ", ((unsigned *)data)[i]);
             break;
          case NX_FLOAT32:
             fprintf (fd, "%f ", ((float *)data)[i]);
