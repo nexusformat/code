@@ -1,35 +1,61 @@
+#====================================================================
+#  NeXus - Neutron & X-ray Common Data Format
+#  
+#  Makefile for building the NeXus library with the HDF4 libraries
+#  
+#  Copyright (C) 2002 Mark Koennecke
+#  
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free 
+#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+#  MA  02111-1307  USA
+#             
+#  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
-# $Id: Makefile,v 2.00 2001/27/07 11:00:02
-# Makefile for building all NEXUS libraries
+# $Id$
 #
+#====================================================================
 
-CC=cc
-CFLAGS1=-g
-HROOT=/data/lnslib
-FROOT=/data/filges/nexus-45
-CFLAGS=$(CFLAGS1)
-LIBNEXUS45_OBJ=napi45.o napif.o
-TEST4_OBJ=napi45_4test.o
+#Edit "makefile_options" to set compiler flags
+include makefile_options
+
+LIBNEXUS_OBJ=napi.o napif.o
+TEST4_OBJ=napi4_test.o
+NXBROWSE_OBJ=NXbrowse.o
 NOPT=-DHDF4
 
-all: libNeXus45_4.a test4o napif4_test
+all: libNeXus.a napi4_test napif_test NXbrowse 
 
 .c.o :
-	$(CC) $(CFLAGS) $(NOPT) -I$(HROOT)/include -c $(FROOT)/$*.c
+	$(CC) $(CFLAGS) $(NOPT) -I$(H4ROOT)/include -c $(FROOT)/$*.c
 .f.o:
-	f77 -g -c $(FROOT)/$*.f
+	$(FC) $(FFLAGS) -c $(FROOT)/$*.f
 
-libNeXus45_4.a : $(LIBNEXUS45_OBJ)
-	@echo "*** Creating NeXus interface based on HDF4 library (libNeXus45_4.a) ***"
+libNeXus.a : $(LIBNEXUS_OBJ)
+	@echo "*** Creating NeXus interface based on HDF4 library (libNeXus.a) ***"
 	- rm $@
-	ar -cr $@ $(LIBNEXUS45_OBJ)
+	ar -cr $@ $(LIBNEXUS_OBJ)
 	ranlib $@
-
-test4o: libNeXus45_4.a $(TEST4_OBJ)
-	$(CC) $(CFLAGS) -o test4o $(TEST4_OBJ) $(FROOT)/libNeXus45_4.a \
-	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lz 
-
-napif4_test: libNeXus45_4.a napif4_test.o
-	f77 -o napif4_test napif4_test.o $(FROOT)/libNeXus45_4.a \
-	-L$(HROOT)/lib -lmfhdf -ldf /data/lnslib/lib/libjpeg.a -lz
 	
+napi4_test: libNeXus.a $(TEST4_OBJ)
+	$(CC) $(CFLAGS) -o napi4_test $(TEST4_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz 
+
+napif_test: libNeXus.a napif_test.o
+	$(FC) $(FFLAGS) -o napif_test napif_test.o $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz
+	
+NXbrowse: libNeXus.a $(NXBROWSE_OBJ) 
+	$(CC) $(CFLAGS) -o NXbrowse $(NXBROWSE_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -lz 
+
