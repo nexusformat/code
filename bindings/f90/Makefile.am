@@ -49,3 +49,5 @@ libNeXus90.la_orig: libNeXus90.la
 
 include $(top_srcdir)/build_rules.am
 
+CLEANFILES = libNeXus90.la_orig nxmodule.mod nxumodule.mod
+
