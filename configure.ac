@@ -66,9 +66,11 @@ AC_PROG_RANLIB
 # Check C compiler options
 # -no-cpp-precomp needed on MacOS-X (and others?)
 AC_CHECK_C_OPTION([-no-cpp-precomp])
+AC_CHECK_C_OPTION([-fno-common])
 
 # Check FORTRAN compiler options
 #AC_CHECK_F77_OPTION([-Wno-globals])
+#AC_CHECK_F77_OPTION([-fno-common])  # use with caution
 
 #
 # First any host specific bits
