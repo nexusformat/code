@@ -562,7 +562,7 @@ static Tree build_tree_start(NXhandle handle, StringVector abs_path){
 /*
  * Effectively a writting of operator< for Path.
  */
-extern bool compPath(const Path path1, const Path path2){
+bool compPath(const Path path1, const Path path2){
 
   // set up for how many elements to itterate over
   int path1_len=path1.size();
