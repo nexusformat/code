@@ -36,10 +36,11 @@ static const string SOURCE            = "NXS:source";
 static const string LOCATION          = "NXS:location";
 static const string LINK              = "NXS:make_link";
 static const string TYPE              = "type";
+static const string NAME              = "name";
 static const string NXROOT            = "NXroot";
 static const string EXCEPTION         = "EXCEPTION";
 static const string INVALID_ARGUMENT  = "INVALID ARGUMENT";
-static const string RUNTIME_ERROR    = "RUNTIME ERROR";
+static const string RUNTIME_ERROR     = "RUNTIME ERROR";
 
 typedef struct{
   NXhandle *handle;       // output file handle
@@ -256,7 +257,8 @@ void my_startElement(void *user_data, const xmlChar *name,
   // convert the attributes to a vector<string>
   StrVector str_attrs=xmlattr_to_strvec(attrs);
 
-  // check for "type", "source", "mime_type", "location", "link" attributes
+  // check for "name", "type", "source", "mime_type", "location",
+  // "link" attributes
   string source;
   string mime_type;
   string location;
@@ -265,13 +267,16 @@ void my_startElement(void *user_data, const xmlChar *name,
   vector<Attr> node_attrs;
   for( StrVector::iterator it=str_attrs.begin() ; it!=str_attrs.end() ; it+=2){
     if( (*it==SOURCE) || (*it==MIME_TYPE) || (*it==LOCATION) || (*it==TYPE)
-                                                              || (*it==LINK) ){
+                                                || (*it==LINK) || (*it==NAME)){
       if(*it==SOURCE){
         source=*(it+1);
       }else if(*it==MIME_TYPE){
         mime_type=*(it+1);
       }else if(*it==LOCATION){
         location=*(it+1);
+      }else if(*it==NAME){
+        type=str_name;
+        str_name=*(it+1);
       }else if(*it==TYPE){
         type=*(it+1);
         if(string_util::starts_with(type,"NX_CHAR")){
@@ -314,6 +319,10 @@ void my_startElement(void *user_data, const xmlChar *name,
     }
   }
   bool is_link=((UserData *)user_data)->is_link;
+
+  // if type is not defined (and it is not root) it is a character array
+  if( (type.size()<=0) && (str_name!=NXROOT) )
+    type="NX_CHAR";
 
   // map everything using the macro replacement
   map_string(((UserData *)user_data)->map,source);
@@ -423,8 +432,7 @@ void my_endElement(void *user_data, const xmlChar *name){
         update_node_from_string(node,((UserData *)user_data)->char_data,
                                ((UserData *)user_data)->dims, node.int_type());
       }catch(runtime_error &e){
-        update_node_from_string(node,((UserData *)user_data)->char_data,
-                                ((UserData *)user_data)->dims, Node::CHAR);
+        print_error(((UserData *)user_data),RUNTIME_ERROR+": "+except_label+" group cannot contain data");
       }
     }catch(invalid_argument &e){
       print_error(((UserData *)user_data),
@@ -526,6 +534,9 @@ static bool resolve_links(UserData *user_data){
 extern bool xml_parser::parse_xml_file(const std::map<string,string> &map,
                                        const string &filename,
                                        NXhandle *handle){
+#ifdef DEBUG3_XML_PARSER
+  std::cout << "xml_parser::parse_xml_file" << std::endl;
+#endif
   // set up the user data for use in the parser
   UserData user_data;
   user_data.handle=handle;
