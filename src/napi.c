@@ -70,13 +70,13 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 /*------------------------------------------------------------------------
   HDF-5 cache size special stuff
   -------------------------------------------------------------------------*/
-static long cacheSize =  1024000; /* 1MB, HDF-5 default */
+long nx_cacheSize =  1024000; /* 1MB, HDF-5 default */
 
 NXstatus CALLING_STYLE NXsetcache(long newVal)
 {
   if(newVal > 0)
   {
-    cacheSize = newVal;
+    nx_cacheSize = newVal;
     return NX_OK;
   }
   return NX_ERROR;

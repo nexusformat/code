@@ -199,7 +199,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     if (am == NXACC_CREATE5) {  
        fapl = H5Pcreate(H5P_FILE_ACCESS);
        iRet=H5Pget_cache(fapl,&mdc_nelmts,&rdcc_nelmts,&rdcc_nbytes,&rdcc_w0);
-       rdcc_nbytes=(size_t)cacheSize;
+       rdcc_nbytes=(size_t)nx_cacheSize;
        iRet = H5Pset_cache(fapl,mdc_nelmts,rdcc_nelmts,rdcc_nbytes,rdcc_w0);
        /*
 	 setting the close degree is absolutely necessary in HDF5 

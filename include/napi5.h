@@ -74,3 +74,5 @@ herr_t nxgroup_info(hid_t loc_id, const char *name, void *op_data);
 herr_t attr_info(hid_t loc_id, const char *name, void *opdata);
 herr_t group_info(hid_t loc_id, const char *name, void *opdata);
 
+extern long nx_cacheSize;
+
