@@ -68,10 +68,10 @@ napif_test : $(NAPIFTEST_OBJ)
 
 NXtest : $(NXTEST_OBJ)
 	$(F90) -o $@ $(NXTEST_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
-	
+
 NXbrowse : $(NXBROWSE_OBJ)
 	$(CC) -o $@ $(NXBROWSE_OBJ) -L$(HDFROOT)/lib -lmfhdf -ldf -lz -ljpeg
-	
+
 NXtest.o : NXtest.f90 NXmodule.o
 	$(F90) $(F90FLAGS) -c $?
 
