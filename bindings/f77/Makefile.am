@@ -30,7 +30,8 @@
 lib_LTLIBRARIES=libNeXus77.la
 
 libNeXus77_la_SOURCES=napif.f
-libNeXus77_la_LIBADD=$(top_builddir)/src/libNeXus.la
+libNeXus77_la_LIBADD=$(top_builddir)/src/libNeXus.la @FLIBS@
+libNeXus77_la_LDFLAGS=@SHARED_LDFLAGS@
 
 EXTRA_DIST = napif.inc
 

@@ -33,3 +33,6 @@ SUFFIXES = .f90 .o .java
 
 .java.class:
 	$(JAVAC) $<
+
+.f90.lo:
+	$(LTF90COMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<

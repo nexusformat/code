@@ -43,8 +43,8 @@ endif
 
 lib_LTLIBRARIES = libNeXus.la
 
-libNeXus_la_LIBADD = @HDF4_LDFLAGS@ @HDF5_LDFLAGS@
 libNeXus_la_SOURCES = napi.c $(H4SRC) $(H5SRC)
+libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@
 
 ## The following part is the solution for automake >= 1.7
 ## 

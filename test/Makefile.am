@@ -28,7 +28,7 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
-LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.a
+LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
@@ -73,7 +73,7 @@ napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 
 if HAVE_F77
 napif_test_SOURCES = napif_test.f
-napif_test_LDADD = $(LIBNEXUS77)
+napif_test_LDADD = $(LIBNEXUS77) $(FLIBS)
 else
 napif_test_SOURCES = dummy.c
 endif

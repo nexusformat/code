@@ -27,12 +27,16 @@
 #                       -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 #
+
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
 AC_INIT([NeXus Library], [2.1.0], [nexus-developers@anl.gov], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
+
+# check for correct autoconf version - the same check is done in autogen.sh
+. autoversion.sh
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
@@ -64,6 +68,7 @@ AC_CHECK_PROGS(JAVA,java)
 AC_CHECK_PROGS(JAVAH,javah)
 AC_SUBST(F90)
 AC_SUBST(F90FLAGS)
+AC_SUBST(SHARED_LDFLAGS)
 #
 AC_PROG_EGREP
 AC_PROG_MAKE_SET
@@ -83,9 +88,11 @@ AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
 # f90 has a "module path" option - hard to get as you really need a
 # ready compiled module to point the option at so for now we are just
 # check that the option takes a directory and the compiler works
-AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
+F90FLAGS="$F90FLAGS -I$mytop/bindings/f90"
+#AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 #AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 
+AC_F77_LIBRARY_LDFLAGS
 #
 # First any host specific bits
 #
@@ -96,14 +103,15 @@ case $host in
     *darwin*)
 	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
-	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
-	LDFLAGS="$LDFLAGS -flat_namespace"
-        if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
-           lt_int_apple_cc_single_mod=yes
-        fi
-        if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
-           archive_cmds='$CC -dynamiclib -single_module'
-	fi
+#	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	SHARED_LDFLAGS="-Wl,-single_module"
+#	LDFLAGS="$LDFLAGS -flat_namespace"
+#        if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
+#           lt_int_apple_cc_single_mod=yes
+#        fi
+#        if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
+#           archive_cmds='$CC -dynamiclib -single_module'
+#	fi
 	;;
 esac
 
