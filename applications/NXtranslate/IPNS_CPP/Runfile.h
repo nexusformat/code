@@ -10,7 +10,9 @@
 #include "DetectorMap.h"
 #include "TimeField.h"
 #include "Segment.h"
-using namespace std;
+
+using std::ifstream;
+//ing namespace std;
 
 struct DiscLevel{
   int lowerLevel;
@@ -76,10 +78,13 @@ class Runfile {
   Runfile();
   Runfile( char * );
   Header getHeader();
-   
+  vector<float> Get1DSpectrum(Segment seg, int hist);
+  vector<Segment *> GetSegments();
+
  private:
   int leaveOpen;
   char *runfileName;
+  ifstream *inFile;
   RandomAccessRunfile *runFile;
   Header *header;
   vector<DetectorMap *> detectorMap;

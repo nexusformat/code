@@ -16,12 +16,12 @@ Runfile::Runfile( char *fileName ){
   int ii;
   strcpy( runfileName, fileName);
 
-  ifstream inFile(runfileName, ios::in);
+  inFile = new ifstream(runfileName, ios::in);
 
   if (!inFile ) {
     throw std::runtime_error("File could not be opened: "+string(fileName));
   }
-  runFile = new RandomAccessRunfile(&inFile); 
+  runFile = new RandomAccessRunfile(inFile); 
 
   char *tokenPtr;
   char *fileName2;
@@ -47,14 +47,14 @@ Runfile::Runfile( char *fileName ){
   //  cout << "Final iName: "<< fileName << endl;
   
 
-  header = new Header(&inFile, iName);
+  header = new Header(inFile, iName);
   versionNumber = header->VersionNumber();
   TableType detMapTab = header->GetDetMapTable();
   detectorMap.resize(detMapTab.size/GetDetectorMapTableSize(versionNumber) + 1);
-  inFile.seekg(detMapTab.location);
+  runFile->seekg(detMapTab.location);
   for ( ii = 1; ii <= detMapTab.size/GetDetectorMapTableSize(versionNumber); 
 	ii++ ) {
-    detectorMap[ii]=new DetectorMap( &inFile, ii, *header );
+    detectorMap[ii]=new DetectorMap( inFile, ii, *header );
 #ifdef IPNS_RUNFILE_DEBUG
     cout << "DetMap (address, tfType, moreHistBit) [" << ii << "]: (" <<
       (*detectorMap[ii]).GetAddress() << ", " << (*detectorMap[ii]).GetTFType() << ", " << (*detectorMap[ii]).GetMHBit() << ")\n";
@@ -62,13 +62,13 @@ Runfile::Runfile( char *fileName ){
   }
   TableType tfMapTab = header->GetTimeFieldTable();  
   timeField = new TimeField*[tfMapTab.size/16 + 1];
-  inFile.seekg(tfMapTab.location);
+  runFile->seekg(tfMapTab.location);
 #ifdef IPNS_RUNFILE_DEBUG
   cout << "TimeField Map\n";
   cout << "tfNum    tMin     tMax     tStep   tDouble  NumChn   tf em del En wv ph log\n";
 #endif
   for ( ii = 1; ii <= tfMapTab.size/16; ii++ ) {
-    timeField[ii]=new TimeField( &inFile, ii, *header );
+    timeField[ii]=new TimeField( inFile, ii, *header );
 #ifdef IPNS_RUNFILE_DEBUG
     cout << " " << ii << "   " <<
       setw(9) << setprecision(2)<<
@@ -110,7 +110,7 @@ Runfile::Runfile( char *fileName ){
     " words starting at byte offset " << daTable.location << "\n";
 #endif
   detectorAngle.resize(daTable.size/4 +1);
-  inFile.seekg(daTable.location);
+  runFile->seekg(daTable.location);
   runFile->readRunFloatVector( &detectorAngle, daTable.size/4);
   
   TableType fpTable = header->GetFlightPathTable();
@@ -119,7 +119,7 @@ Runfile::Runfile( char *fileName ){
     " words starting at byte offset " << fpTable.location << "\n";
 #endif
   flightPath.resize(fpTable.size/4 +1);
-  inFile.seekg(fpTable.location);
+  runFile->seekg(fpTable.location);
   runFile->readRunFloatVector( &flightPath, fpTable.size/4);
   
   TableType dhTable = header->GetDetectorHeightTable();
@@ -128,7 +128,7 @@ Runfile::Runfile( char *fileName ){
     " words starting at byte offset " << dhTable.location << "\n";
 #endif
   detectorHeight.resize(dhTable.size/4 +1);
-  inFile.seekg(dhTable.location);
+  runFile->seekg(dhTable.location);
   runFile->readRunFloatVector( &detectorHeight, dhTable.size/4);
   
   TableType dtTable = header->GetDetectorTypeTable();
@@ -137,7 +137,7 @@ Runfile::Runfile( char *fileName ){
     " words starting at byte offset " << dtTable.location << "\n";
 #endif
   detectorType.resize(dtTable.size/2 +1);
-  inFile.seekg(dtTable.location);
+  runFile->seekg(dtTable.location);
   runFile->readRunShortVector( &detectorType, dtTable.size/2);
     
 #ifdef IPNS_RUNFILE_DEBUG
@@ -160,10 +160,10 @@ Runfile::Runfile( char *fileName ){
   }
 #endif  
   if ( header->VersionNumber() > 4 ) {
-    LoadV5(&inFile);
+    LoadV5(inFile);
   }
   else {
-    LoadV4(&inFile);
+    LoadV4(inFile);
   }
 #ifdef IPNS_RUNFILE_DEBUG
   cout<< detectorMap.size() << "  " << sizeof (DetectorMap)<<"\n";
@@ -1224,4 +1224,142 @@ void Runfile::setMinID() {
   }
 }
     
+/**
+   Retrieves the spectrum of a detector segment.  This method opens and 
+   closes the file on each call.
+   @param seg Segment to be retrieved.
+   @param hist Histogram number for data to retrieved.
+   @return The retrieved spectrum.
+*/
+vector<float> Runfile::Get1DSpectrum(Segment seg, int hist) {
+  int numOfTimeChannels;
+  int i;
+  vector<float> data;
+  char *bdata;
+  int tfType;
+  int index, offset;
+  int wordLength;
+  
+  /*  if ( leaveOpen == false){
+    cout << "GetSpectrum1D opening file\n";
+    runfile = new RandomAccessRunfile(runfileName, "r");
+    }*/
+  cout << "Get1DSpectrum: detID, SegID: " << seg.DetID() << ", " << 
+    seg.SegID() << "\n";
+  int detID = seg.DetID();
+  if ( !((psdOrder[detID] == 2) && (header->VersionNumber() < 5 )) ) {
+    index = seg.SegID() + (hist-1) * header->NDet();
+    if (detectorMap[index]->GetTFType() == 0 ) {
+      cout << "invalid id in Get1DSpectrum(id,hist), " <<
+			  "returning null\n";
+      //      return NULL;
+      throw  invalid_argument("invalid id in get1DSpectrum(id, hist)");
 
+    }
+    tfType = detectorMap[index]->GetTFType();
+    cout << "tfType" << tfType << "\n";
+    numOfTimeChannels = timeField[tfType]->GetNumOfChannels();
+    cout << "Get1DSpectrum: numOfTimeChannels " << numOfTimeChannels << "\n";;
+    //add one element since start readRunFloatVectorFromXXXX has empty first
+    //element
+    data.resize(numOfTimeChannels + 1);
+    // calculate start of data.
+    if (header->NumOfWavelengths() > 0) {
+      offset = detectorMap[index]->GetAddress() 
+	+ header->TotalChannels() * 2 
+	+ header->HistStartAddress() + 4;
+    }
+    else {
+      offset = detectorMap[index]->GetAddress() + 
+	header->HistStartAddress() + 4;
+    }
+    
+    cout << "here\n";
+    runFile->seekg(offset);
+    cout << "here\n";
+    if (numOfTimeChannels !=0){
+      
+      if (header->VersionNumber() < 4){
+	runFile->readRunFloatVectorFromShort( &data, numOfTimeChannels);
+      }
+      else{
+	runFile->readRunFloatVectorFromInt( &data, numOfTimeChannels);
+      }
+      // clear out empty first element
+      vector<float>::iterator dataStart = data.begin();
+      data.erase(dataStart);
+    }
+    /*    if (!leaveOpen ){
+      runfile.close();
+      }*/
+    return data; 
+  }
+  else {                        // Area detector data
+    float minWave = header->MinWavelength();
+    float maxWave = header->MaxWavelength();
+    int numWaves = header->NumOfWavelengths();
+    float stepWave = (maxWave - minWave)/numWaves;
+    int areaStartAddress;
+    int sliceInterval;
+    int aindex;
+    
+    areaStartAddress = header->HistStartAddress();
+    sliceInterval = (header->TotalChannels()*2)/(numWaves);
+    aindex = seg.Column()  + (seg.Row() -1) * header->NumOfX();
+    
+    int ioffset = areaStartAddress  + 2 + aindex*2;
+    data.resize(numWaves);
+    bdata = new char[2];
+    int nbytes;
+    int xx;
+    int minSearchChan=1;
+    int maxSearchChan=header->NumOfOverflows();
+    for ( int ii = 0; ii < numWaves; ii++ ) {
+      runFile->seekg( ioffset + ii * sliceInterval );
+      int ovOffset = ioffset + ii * sliceInterval - header->HistStartAddress();
+      data[ii] = (float)runFile->readRunShort();
+      /*      nbytes = runfile.read ( bdata, 0, 2 );
+      if (bdata[0] < 0 ) {
+	data[ii] += 
+	  (bdata[0] + 256);
+	
+      }
+      else {
+	data[ii] += bdata[0];
+      }
+      if (bdata[1] < 0 ) {
+	data[ii] += 
+	  (bdata[1] + 256) * 256;
+	
+      }
+      else {
+	data[ii] += bdata[1] * 256;
+      }
+      */
+      
+      if (header->NumOfOverflows() > 0) {
+	char sdone = false;
+	for(int jj = minSearchChan; jj<=maxSearchChan&&!sdone; jj++) {
+	  if ( ovOffset == overflows[jj] ) {
+	    
+	    data[ii] = data[ii] + 65536;
+	  }
+	  else if( ovOffset < overflows[jj] ) {
+	    sdone = true;
+	    minSearchChan = jj;
+	  }
+	}
+      }
+    }
+    /*    if (!leaveOpen ){
+      runfile.close();
+      }*/
+    return data;
+  }
+}
+
+//
+//
+vector<Segment *>  Runfile::GetSegments() {
+  return segments;
+}
