@@ -153,31 +153,69 @@ static void print_retrievervec(const vector<RetrieverPtr> &vec){
   cout << "]" << endl;
 }
 #endif
+
 static Attr make_attr(const string &name, const string &value){
   // if value is empty return empty attribute (delete it from node)
   if(value.size()<=0)
     return Attr(name,NULL,0,NX_CHAR);
 
-  // try to create an integer attribute
-  try{
-    long number=string_util::str_to_int(value);
-    int inner_val[1]={number};
-    return Attr(name,inner_val,1,NX_INT32);
-  }catch(std::invalid_argument &e){
-    // let it drop on the floor
-  }
+  // if the attribute does not start with "NX_" it is a character
+  if(value.substr(0,3)!="NX_")
+    return Attr(name,value.c_str(),value.size(),NX_CHAR);
+  //else                                                          // REMOVE
+  //std::cout << "FOUND:" << name << "|" << value << std::endl; // REMOVE
 
-  // try to create a float attribute
-  try{
-    double number=string_util::str_to_float(value);
-    double inner_val[1]={number};
-    return Attr(name,inner_val,1,NX_FLOAT64);
-  }catch(std::invalid_argument &e){
-    // let it drop on the floor
-  }
+  // split the string for type and value
+  static const char COLON=':';
+  string::size_type loc=1;
+  for( ; loc<value.size() ; loc++ )
+    if(COLON==value[loc]) break;
+  string my_type=value.substr(0,loc);
+  string my_val=value.substr(loc+1,value.size());
 
-  // give up, it is a string attribute
-  return Attr(name,value.c_str(),value.size(),NX_CHAR);
+  //std::cout << "TYPE=" << my_type << " VALUE=" << my_val << std::endl; //REMOVE
+
+  // convert the string type to an integer type
+  Node::NXtype int_type;
+  if(my_type=="NX_CHAR")
+    int_type=Node::CHAR;
+  else if(my_type=="NX_FLOAT32")
+    int_type=Node::FLOAT32;
+  else if(my_type=="NX_FLOAT64")
+    int_type=Node::FLOAT64;
+  else if(my_type=="NX_INT8")
+    int_type=Node::INT8;
+  else if(my_type=="NX_INT16")
+    int_type=Node::INT16;
+  else if(my_type=="NX_INT32")
+    int_type=Node::INT32;
+  else if(my_type=="NX_UINT8")
+    int_type=Node::UINT8;
+  else if(my_type=="NX_UINT16")
+    int_type=Node::UINT16;
+  else if(my_type=="NX_UINT32")
+    int_type=Node::UINT32;
+  else
+    return Attr(name,NULL,0,NX_CHAR);
+  
+  int rank=1;
+  int dims[rank];
+  if(int_type==Node::CHAR)
+    dims[0]=my_val.size();
+  else
+    dims[0]=1;
+
+  void *data;
+  NXmalloc(&data,rank,dims,int_type);
+  try{
+    void_ptr_from_string(data,my_val,rank,dims,int_type);
+  }catch(std::invalid_argument &e){
+    NXfree(&data);
+    throw e;
+  }
+  Attr attr(name,data,dims[0],int_type);
+  NXfree(&data);
+  return attr;
 }
 
 static void my_startDocument(void *user_data){
@@ -268,7 +306,11 @@ void my_startElement(void *user_data, const xmlChar *name,
       str_attrs.erase(it,it+2);
       it-=2;
     }else{ // everything else is an attribute
-      node_attrs.push_back(make_attr(*it,*(it+1)));
+      try{
+        node_attrs.push_back(make_attr(*it,*(it+1)));
+      }catch(std::invalid_argument &e){
+        print_error(((UserData *)user_data),INVALID_ARGUMENT+except_label+e.what());
+      }
     }
   }
   bool is_link=((UserData *)user_data)->is_link;
