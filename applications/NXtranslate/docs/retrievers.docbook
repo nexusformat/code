@@ -1,0 +1,306 @@
+<!-- ******************** RETRIEVERS ******************** -->
+<chapter id="retrievers">
+<title>Retriever Details</title>
+
+<example id="retriever.h"><title>listing of <filename>retriever.h</filename></title>
+  <programlisting role="C++">
+<![CDATA[class Retriever{
+  typedef Ptr<Retriever> RetrieverPtr;
+
+ public:
+  /**
+   * The factory will call the constructor with a string. The string
+   * specifies where to locate the data (e.g. a filename), but
+   * interpreting the string is left up to the implementing code.
+   */
+  //Retriever(const std::string &);
+
+  /**
+   * The destructor must be virtual to make sure the right one is
+   * called in the end.
+   */
+  virtual ~Retriever()=0;
+
+  /**
+   * This is provide a method for creating copies that is used in the
+   * copy constructor.
+   */
+  //virtual Retriever* clone() const=0;
+
+  /**
+   * This is the method for retrieving data from a file. The whole
+   * tree will be written to the new file immediately after being
+   * called. Interpreting the string is left up to the implementing
+   * code.
+   */
+  virtual void getData(const std::string &, tree<Node> &)=0;
+
+  /**
+   * This method is to be used for debugging purposes only. While the
+   * string can be anything, most useful is "[mime_type] source".
+   */
+  virtual std::string toString() const=0;
+
+  /**
+   * Factory method to create new retrievers.
+   */
+  static RetrieverPtr getInstance(const std::string &, const std::string &);
+};]]>
+  </programlisting>
+</example>
+
+<para><xref linkend="retriever.h"> is the listing of the Retriever
+abstract base class. In addition to these methods there are a couple
+of assumptions made about classes that implement this interface
+
+<orderedlist><title>Other constraints</title>
+ <listitem id="no_copy_or_assign"><para>The copy constructor and
+ assignment operator will not be used. It is suggested that they are
+ made private methods.</para></listitem>
+ <listitem id="mime_type"><para>There is a static const string called
+ MIME_TYPE which will be used to determine if that particular
+ Retriever should be created by the factory. Care must be made to
+ select a unique MIME_TYPE to prevent name clashing.</para></listitem>
+ <listitem id="destructor"><para>The destructor will properly
+ deallocate all resources allocated in the construtor. Specifically,
+ if a file is opened in the constructor, it should be closed in the
+ destructor.</para></listitem>
+ <listitem id="exception"><para>If anything goes wrong during the
+ course of the Retriever's operation, an std::exception will be
+ thrown.</para></listitem>
+</orderedlist> </para>
+
+<para> The rest of this chapter describes how to create the body of
+code, and header, for an example implementation.</para>
+
+<sect1><title>The NeXusRetriever as an Example</title>
+
+<para>To ease the job of debugging problems in &nxtranslate the
+NeXusRetriever is a plugin using the same architecture as everything
+else. Because of this it makes a good example of how to create your
+own retriever. </para>
+
+<example id="nexus_retriever.h"><title>listing of <filename>nexus_retriever.h</filename></title>
+  <programlisting role="C++">
+<![CDATA[#include "retriever.h"
+
+// this is not intended to be inherited from
+class NexusRetriever: public Retriever{
+ public:
+  NexusRetriever(const std::string &);
+  ~NexusRetriever();
+  void getData(const std::string &, tree<Node> &);
+  std::string toString() const;
+  static const std::string MIME_TYPE;
+ private:
+  NexusRetriever(const NexusRetriever&);
+  NexusRetriever& operator=(const NexusRetriever&);
+  NXhandle *handle;
+  std::string source;
+};]]>
+  </programlisting>
+</example>
+
+<para>Note that none of the methods are virtual, so this is not
+intended to be derived from directly. That being said, you may want to
+copy the header and code for your own retriever as a basis of what
+works. In this example the copy constructor and assignment operator
+are made private as specified in Other constraints <xref
+linkend="no_copy_or_assign">. The private data is a filehandle and the
+name of the file that is open for reading. The file name and
+<parameter>MIME_TYPE</parameter> are used in the
+<function>toString</function> to identify it uniquely for
+debugging as seen in <xref linkend="nexus_toString">.</para>
+
+<example id="nexus_toString"><title>Listing of NeXus <function>toString</function></title>
+  <programlisting role="C++">
+<![CDATA[string NexusRetriever::toString() const{
+  return "["+MIME_TYPE+"] "+source;
+}]]>
+  </programlisting>
+</example>
+
+<para>The first non-trivial function to write is the constructor. The
+constructor is not very complicated or insightful. Lines 2-15 are just
+error checking the parameters being passed to the function. First is
+checking that a non-empty string was passed, then that the file is
+readable. In both cases an exception is thrown if there is a
+problem to follows Other constraints <xref linkend="exception">. Finally, at line 15 is the actual file being opened. Again notice the exception being thrown if something goes wrong.</para>
+
+<example id="nexus_constructor"><title>Listing of the NeXus constructor</title>
+  <programlisting role="C++" linenumbering="numbered">
+<![CDATA[NexusRetriever::NexusRetriever(const string &str): source(str){
+  // check if the filename is nonzero
+  if(str.size()<=0)
+    throw invalid_argument("Cannot initialize from an empty string");
+
+  // check if the file is readable
+  { // have the variable quickly go out of scope to enable cleanup
+    std::ifstream checkFile(source.c_str());
+    bool is_readable(checkFile);
+    checkFile.close();
+    if(!is_readable)
+      throw runtime_error(source+" is not readable");
+  }
+
+  // open the file using NAPI
+  char filename[50];
+  strcpy(filename,str.c_str());
+  if(NXopen(filename,NXACC_READ,handle)!=NX_OK){
+    handle=NULL;
+    throw runtime_error("NXopen failed");
+  }
+}]]>
+  </programlisting>
+</example>
+
+<para>The destructor for the Retriever in <xref
+linkend="nexus_destructor">is far simpler since all it has to do is
+release the handle. There were no calls in the constructor (or
+anywhere else) to <function>new</function> or
+<function>malloc</function> so the constructor does not need to call
+<function>delete</function> or <function>free</function>.</para>
+
+<example id="nexus_destructor"><title>Listing of the NeXus destructor</title>
+  <programlisting role="C++">
+<![CDATA[NexusRetriever::~NexusRetriever(){
+  if(handle!=NULL){
+    if(NXclose(handle)!=NX_OK)
+      throw runtime_error("NXclose failed");
+    handle=NULL;
+  }
+}]]>
+  </programlisting>
+</example>
+
+<para>While the actual <function>getData</function> is much more
+complicated, it is easier to understand what is going on if we look at
+a simplified version instead.<footnote><para>The full version exists
+in the source code of &nxtranslate in the file
+<filename>nexus_retriever.cpp</filename>.</para></footnote> Lines 2-3
+are the normal error checking followed by some accounting to get to
+the correct place in the source file with lines 5-17. Line 20 creates
+a node object to be passed and filled out in
+<function>getDataNode</function> which is called in line 22 and shown
+in <xref linkend="nexus_getDataNode">. Line 30 adds the node to the
+head of the tree that was passed into the function, and lines 33-34
+returns the file to its initial state. The basic format of create a
+<parameter>Node</parameter> and add it to the tree is the only purpose
+of <function>getData</function>. <footnote><para>NXtranslate assumes that
+the retriever will not return an empty tree, an empty tree will crash
+the program. Instead throw an exception.</para></footnote> </para>
+
+<example id="nexus_getData"><title>Listing of a simplified NeXus <function>getData</function></title>
+  <programlisting role="C++" linenumbering="numbered">
+<![CDATA[void NexusRetriever::getData(const string &location, NodeTree &tree){
+  if(location.size()<=0)
+    throw invalid_argument("cannot parse empty string");
+
+  // get the name
+  vector<string> path=string_util::string_to_path(location);
+  string name=*(path.rbegin());
+  // remove the last bit from the path
+  path.pop_back();
+
+  // open the path to the node
+  int num_group=0;
+  int num_data=0;
+  nexus_util::open_path(handle,path,num_group,num_data);
+  
+  // get the type
+  string type=nexus_util::open(handle,name);
+
+  // get the node
+  Node node(name,type);
+  try{
+    getDataNode(handle,name,node);
+  }catch(runtime_error &e){
+    nexus_util::close(handle,node);
+    nexus_util::close_path(handle,num_group,num_data);
+    throw;
+  }
+
+  // add the node to the tree
+  tree.insert(tree.begin(),node);
+
+  // close the path to the node
+  nexus_util::close_path(handle,node);
+  nexus_util::close_path(handle,num_group,num_data);
+}]]>
+  </programlisting>
+</example>
+
+<para>The heart of <function>getData</function> was not in the
+function itself, but inside of the <function>getDataNode</function>
+shown in <xref linkend="nexus_getDataNode">. Because this is a private
+function there is no error checking as the other functions
+had. Instead lines 2-7 are dedicated to determine details about what
+is going to be read from the source file followed by (lines 10-12)
+allocating space for the information. Lines 15-16 actually copy the
+data from the file into the memory just allocated in line 11. Lines
+19-39 just read teh attributes from the file and put them in a
+<parameter><![CDATA[vector<Node>]]></parameter> to add to the
+<parameter>Node</parameter>. Lines 42-43 create the node and add the
+attributes. And finally, line 46 frees the memory that was allocated
+in line 11. Things worth special mention is that the
+<parameter>Node</parameter> and <parameter>Attr</parameter> objects
+both make copies of the data they are given. While this does increase
+the memory requirements to run &nxtranslate it does greatly reduce the
+chance for a memory leak.</para>
+
+<example id="nexus_getDataNode"><title>Listing of a NeXus <function>getDataNode</function></title>
+  <programlisting role="C++" linenumbering="numbered">
+<![CDATA[static void getDataNode(NXhandle *handle, string &name, Node &node){
+  // get the node and all of its attributes
+  int rank=0;
+  int type=0;
+  int dims[NX_MAXRANK];
+  if(NXgetinfo(*handle,&rank,dims,&type)!=NX_OK)
+    throw runtime_error("NXgetinfo failed");
+
+  // allocate space for the data
+  void *data;
+  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
+    throw runtime_error("NXmalloc failed");
+
+  // retrieve data from the file
+  if(NXgetdata(*handle,data)!=NX_OK)
+    throw runtime_error("NXgetdata failed");
+
+  // retrieve attributes from the file
+  if(NXinitattrdir(*handle)!=NX_OK)
+    throw runtime_error("NXinitattrdir failed");
+  char attr_name[GROUP_STRING_LEN];
+  int attr_type;
+  int num_attr;
+  int attr_len;
+  if(NXgetattrinfo(*handle,&num_attr)!=NX_OK)
+    throw runtime_error("NXgetattrinfo failed");
+  vector<Attr> attrs;
+  for( int i=0 ; i<num_attr ; i++ ){
+    if(NXgetnextattr(*handle,attr_name,&attr_len,&attr_type)!=NX_OK)
+      throw runtime_error("NXgetnextattr failed");
+    int attr_dims[1]={attr_len+1};
+    void *attr_value;
+    if(NXmalloc(&attr_value,1,attr_dims,attr_type)!=NX_OK)
+      throw runtime_error("NXmalloc failed");
+    if(NXgetattr(*handle,attr_name,attr_value,attr_dims,&attr_type)!=NX_OK)
+      throw runtime_error("NXgetattr failed");
+    Attr my_attr(attr_name,attr_value,attr_len,attr_type);
+    attrs.push_back(my_attr);
+  }
+
+  // create the data
+  node=Node(name,data,rank,dims,type);
+  node.set_attrs(attrs);
+
+  // free the temporary data
+  if(NXfree(&data)!=NX_OK)
+    throw runtime_error("NXfree failed");
+}]]>
+  </programlisting>
+</example>
+
+</sect1>
+
+</chapter>

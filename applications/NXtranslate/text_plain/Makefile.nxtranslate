@@ -1,0 +1,18 @@
+######################################################################
+# this file is to allow for configuring NXtranslate
+######################################################################
+# select input types
+TEXT_PLAIN_CFLAGS=-DTEXT_PLAIN_RETRIEVER
+TEXT_PLAIN_OBJS=text_plain/retriever.o
+#TEXT_PLAIN_LIBS=
+
+# source files
+TEXT_PLAIN_SRC=text_plain/retriever.cpp text_plain/retriever.h \
+     text_plain/Makefile text_plain/Makefile.nxtranslate
+
+# how to build the retriever
+text_plain/retriever.o: text_plain/retriever.cpp text_plain/retriever.h
+	cd text_plain && make retriever.o
+
+# what are the results of the tests, test itself should be in main makefile
+TEXT_PLAIN_TEST=test_text_plain.nxs

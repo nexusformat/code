@@ -1,0 +1,14 @@
+<NXroot>
+<entry1 type="NXentry" NXS:source="fileName" NXS:mime_type="application/x-IPNS">
+<title  NXS:location="header.runTitle" />
+<start_date NXS:location="header.startDateTime" />
+<end_date NXS:location="header.endDateTime" />
+<userInfo type="NXuser">
+<user  NXS:location="header.userName" />
+</userInfo>
+<data1 type="NX_DATA">
+</data1>
+
+
+</entry1>
+</NXroot>

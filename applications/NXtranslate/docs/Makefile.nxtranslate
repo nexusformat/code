@@ -1,0 +1,9 @@
+######################################################################
+# this file is to allow for configuring NXtranslate
+######################################################################
+DOC_SRC=docs/Makefile docs/Makefile.nxtranslate docs/NXtranslate.docbook \
+    docs/overview.docbook docs/retrievers.docbook docs/translation.docbook
+
+NXtranslate.pdf: docs/NXtranslate.docbook
+	cd docs && make NXtranslate.pdf
+	cp docs/NXtranslate.pdf .
