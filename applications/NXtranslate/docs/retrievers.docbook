@@ -22,12 +22,6 @@
   virtual ~Retriever()=0;
 
   /**
-   * This is provide a method for creating copies that is used in the
-   * copy constructor.
-   */
-  //virtual Retriever* clone() const=0;
-
-  /**
    * This is the method for retrieving data from a file. The whole
    * tree will be written to the new file immediately after being
    * called. Interpreting the string is left up to the implementing
@@ -73,30 +67,34 @@ of assumptions made about classes that implement this interface
 <para> The rest of this chapter describes how to create the body of
 code, and header, for an example implementation.</para>
 
-<sect1><title>The NeXusRetriever as an Example</title>
+<sect1><title>The Simple ASCII Retriever as an Example</title>
 
-<para>To ease the job of debugging problems in &nxtranslate the
-NeXusRetriever is a plugin using the same architecture as everything
-else. Because of this it makes a good example of how to create your
-own retriever. </para>
+<para>The simplest retriever is the the one for the &mime_type
+<parameter>text/plain</parameter>. Because of this it makes a good
+example of how to create your own retriever. The files are located in
+the <filename>text_plain</filename> subdirectory as
+<filename>retriever.h</filename> and
+<filename>retriever.cpp</filename>.</para>
 
-<example id="nexus_retriever.h"><title>listing of <filename>nexus_retriever.h</filename></title>
+<example id="text_plain_retriever.h"><title>listing of <filename>text_plain/retriever.h</filename></title>
   <programlisting role="C++">
-<![CDATA[#include "retriever.h"
+<![CDATA[#include "../retriever.h"
+#include <fstream>
 
 // this is not intended to be inherited from
-class NexusRetriever: public Retriever{
+class TextPlainRetriever: public Retriever{
  public:
-  NexusRetriever(const std::string &);
-  ~NexusRetriever();
+  TextPlainRetriever(const std::string &);
+  ~TextPlainRetriever();
   void getData(const std::string &, tree<Node> &);
   std::string toString() const;
   static const std::string MIME_TYPE;
  private:
-  NexusRetriever(const NexusRetriever&);
-  NexusRetriever& operator=(const NexusRetriever&);
-  NXhandle *handle;
+  TextPlainRetriever(const TextPlainRetriever&);
+  TextPlainRetriever& operator=(const TextPlainRetriever&);
   std::string source;
+  int current_line;
+  std::ifstream infile;
 };]]>
   </programlisting>
 </example>
@@ -108,198 +106,114 @@ works. In this example the copy constructor and assignment operator
 are made private as specified in Other constraints <xref
 linkend="no_copy_or_assign">. The private data is a filehandle and the
 name of the file that is open for reading. The file name and
-<parameter>MIME_TYPE</parameter> are used in the
-<function>toString</function> to identify it uniquely for
-debugging as seen in <xref linkend="nexus_toString">.</para>
+&mime_type are used in the <function>toString</function> to identify
+it uniquely for debugging as seen in <xref
+linkend="text_plain_toString">.</para>
 
-<example id="nexus_toString"><title>Listing of NeXus <function>toString</function></title>
+<example id="text_plain_toString"><title>Listing of simple ascii <function>toString</function></title>
   <programlisting role="C++">
-<![CDATA[string NexusRetriever::toString() const{
+<![CDATA[string TextPlainRetriever::toString() const{
   return "["+MIME_TYPE+"] "+source;
 }]]>
   </programlisting>
 </example>
 
 <para>The first non-trivial function to write is the constructor. The
-constructor is not very complicated or insightful. Lines 2-15 are just
-error checking the parameters being passed to the function. First is
-checking that a non-empty string was passed, then that the file is
-readable. In both cases an exception is thrown if there is a
-problem to follows Other constraints <xref linkend="exception">. Finally, at line 15 is the actual file being opened. Again notice the exception being thrown if something goes wrong.</para>
+constructor is not very complicated or insightful. The
+<parameter>source</parameter> and accounting for where in the file the
+reading is (<parameter>current_line</parameter>) are initialized in
+line 1. Line 3 opens the file, and line 6 confirms that it was opened
+without error. An exception is thrown if there is a problem to follows
+Other constraints <xref linkend="exception">. The constructor is very
+brief because C++ <parameter>fstream</parameter> library provides the
+<parameter>ifstream</parameter> object that does most of the
+work.</para>
 
-<example id="nexus_constructor"><title>Listing of the NeXus constructor</title>
+<example id="simple_ascii_constructor"><title>Listing of the simple ascii constructor</title>
   <programlisting role="C++" linenumbering="numbered">
-<![CDATA[NexusRetriever::NexusRetriever(const string &str): source(str){
-  // check if the filename is nonzero
-  if(str.size()<=0)
-    throw invalid_argument("Cannot initialize from an empty string");
+<![CDATA[TextPlainRetriever::TextPlainRetriever(const string &str): source(str),current_line(0){
+  // open the file
+  infile.open(source.c_str());
 
-  // check if the file is readable
-  { // have the variable quickly go out of scope to enable cleanup
-    std::ifstream checkFile(source.c_str());
-    bool is_readable(checkFile);
-    checkFile.close();
-    if(!is_readable)
-      throw runtime_error(source+" is not readable");
-  }
-
-  // open the file using NAPI
-  char filename[50];
-  strcpy(filename,str.c_str());
-  if(NXopen(filename,NXACC_READ,handle)!=NX_OK){
-    handle=NULL;
-    throw runtime_error("NXopen failed");
-  }
+  // check that open was successful
+  if(!infile.is_open())
+    throw invalid_argument("Could not open file: "+source);
 }]]>
   </programlisting>
 </example>
 
 <para>The destructor for the Retriever in <xref
-linkend="nexus_destructor">is far simpler since all it has to do is
-release the handle. There were no calls in the constructor (or
-anywhere else) to <function>new</function> or
+linkend="simple_ascii_destructor"> is just as simple simpler since all
+it has to do is close the file. There were no calls in the constructor
+(or anywhere else) to <function>new</function> or
 <function>malloc</function> so the constructor does not need to call
 <function>delete</function> or <function>free</function>.</para>
 
-<example id="nexus_destructor"><title>Listing of the NeXus destructor</title>
+<example id="simple_ascii_destructor"><title>Listing of the simple ascii destructor</title>
   <programlisting role="C++">
-<![CDATA[NexusRetriever::~NexusRetriever(){
-  if(handle!=NULL){
-    if(NXclose(handle)!=NX_OK)
-      throw runtime_error("NXclose failed");
-    handle=NULL;
-  }
+<![CDATA[TextPlainRetriever::~TextPlainRetriever(){
+  // close the file
+  if(infile)
+    infile.close();
 }]]>
   </programlisting>
 </example>
 
-<para>While the actual <function>getData</function> is much more
-complicated, it is easier to understand what is going on if we look at
-a simplified version instead.<footnote><para>The full version exists
-in the source code of &nxtranslate in the file
-<filename>nexus_retriever.cpp</filename>.</para></footnote> Lines 2-3
-are the normal error checking followed by some accounting to get to
-the correct place in the source file with lines 5-17. Line 20 creates
-a node object to be passed and filled out in
-<function>getDataNode</function> which is called in line 22 and shown
-in <xref linkend="nexus_getDataNode">. Line 30 adds the node to the
-head of the tree that was passed into the function, and lines 33-34
-returns the file to its initial state. The basic format of create a
-<parameter>Node</parameter> and add it to the tree is the only purpose
-of <function>getData</function>. <footnote><para>NXtranslate assumes that
-the retriever will not return an empty tree, an empty tree will crash
-the program. Instead throw an exception.</para></footnote> </para>
+<para>Next is the <function>getData</function> function which is
+simple as well. All that <function>getData</function> does is grab a
+line of text from the file and create a node. Lines 3-4 are error
+checking, and line 7 converts the <parameter>location</parameter>
+string into an integer. Line 10 moves to the appropriate place in the
+file while line 12 gets the string on that line. Since every
+<function>getData</function> must put a <parameter>node</parameter>
+into the provided <parameter>tree</parameter>, line 15 creates a
+<parameter>node</parameter> to be filled with data. Lines 18-20 update
+the generic <parameter>node</parameter> with the string read in from
+the source file. Finally line 21 adds the single node to the supplied
+tree.</para>
 
-<example id="nexus_getData"><title>Listing of a simplified NeXus <function>getData</function></title>
+<example id="simple_ascii_getData"><title>Listing of the simple ascii <function>getData</function></title>
   <programlisting role="C++" linenumbering="numbered">
-<![CDATA[void NexusRetriever::getData(const string &location, NodeTree &tree){
+<![CDATA[void TextPlainRetriever::getData(const string &location, tree<Node> &tr){
+  // check that the argument is not an empty string
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
 
-  // get the name
-  vector<string> path=string_util::string_to_path(location);
-  string name=*(path.rbegin());
-  // remove the last bit from the path
-  path.pop_back();
+  // check that the argument is an integer
+  int line_num=string_util::str_to_int(location);
 
-  // open the path to the node
-  int num_group=0;
-  int num_data=0;
-  nexus_util::open_path(handle,path,num_group,num_data);
-  
-  // get the type
-  string type=nexus_util::open(handle,name);
+  // set stream to the line before
+  skip_to_line(infile,current_line,line_num);
+  // read the line and print it to the console
+  string text=read_line(infile);
 
-  // get the node
-  Node node(name,type);
-  try{
-    getDataNode(handle,name,node);
-  }catch(runtime_error &e){
-    nexus_util::close(handle,node);
-    nexus_util::close_path(handle,num_group,num_data);
-    throw;
-  }
+  // create an empty node
+  Node node("empty","empty");
 
-  // add the node to the tree
-  tree.insert(tree.begin(),node);
-
-  // close the path to the node
-  nexus_util::close_path(handle,node);
-  nexus_util::close_path(handle,num_group,num_data);
+  // put the data in the node
+  vector<int> dims;
+  dims.push_back(text.size());
+  update_node_from_string(node,text,dims,Node::CHAR);
+  tr.insert(tr.begin(),node);
 }]]>
   </programlisting>
 </example>
 
-<para>The heart of <function>getData</function> was not in the
-function itself, but inside of the <function>getDataNode</function>
-shown in <xref linkend="nexus_getDataNode">. Because this is a private
-function there is no error checking as the other functions
-had. Instead lines 2-7 are dedicated to determine details about what
-is going to be read from the source file followed by (lines 10-12)
-allocating space for the information. Lines 15-16 actually copy the
-data from the file into the memory just allocated in line 11. Lines
-19-39 just read teh attributes from the file and put them in a
-<parameter><![CDATA[vector<Node>]]></parameter> to add to the
-<parameter>Node</parameter>. Lines 42-43 create the node and add the
-attributes. And finally, line 46 frees the memory that was allocated
-in line 11. Things worth special mention is that the
-<parameter>Node</parameter> and <parameter>Attr</parameter> objects
-both make copies of the data they are given. While this does increase
-the memory requirements to run &nxtranslate it does greatly reduce the
-chance for a memory leak.</para>
+<para><xref linkend="simple_ascii_getData"> is brief because it
+leverages existing functionality. The <parameter>ifstream</parameter>
+objects does all of the work of getting information out of a
+file. <function>skip_to_line</function> and
+<function>read_line</function> are very short functions that scan to a
+point in an ascii file and read from a point to the next end-of-line
+character, respectively. Finally, the function
+<function>update_node_from_string</function> existed in &nxtranslate
+already to assist <parameter>node</parameter> creation while reading
+the translation file. The interested reader can look at the source of
+<filename>node_util.cpp</filename> and
+<filename>text_plain/retriever.cpp</filename> to see the body of the
+functions.
 
-<example id="nexus_getDataNode"><title>Listing of a NeXus <function>getDataNode</function></title>
-  <programlisting role="C++" linenumbering="numbered">
-<![CDATA[static void getDataNode(NXhandle *handle, string &name, Node &node){
-  // get the node and all of its attributes
-  int rank=0;
-  int type=0;
-  int dims[NX_MAXRANK];
-  if(NXgetinfo(*handle,&rank,dims,&type)!=NX_OK)
-    throw runtime_error("NXgetinfo failed");
-
-  // allocate space for the data
-  void *data;
-  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
-    throw runtime_error("NXmalloc failed");
-
-  // retrieve data from the file
-  if(NXgetdata(*handle,data)!=NX_OK)
-    throw runtime_error("NXgetdata failed");
-
-  // retrieve attributes from the file
-  if(NXinitattrdir(*handle)!=NX_OK)
-    throw runtime_error("NXinitattrdir failed");
-  char attr_name[GROUP_STRING_LEN];
-  int attr_type;
-  int num_attr;
-  int attr_len;
-  if(NXgetattrinfo(*handle,&num_attr)!=NX_OK)
-    throw runtime_error("NXgetattrinfo failed");
-  vector<Attr> attrs;
-  for( int i=0 ; i<num_attr ; i++ ){
-    if(NXgetnextattr(*handle,attr_name,&attr_len,&attr_type)!=NX_OK)
-      throw runtime_error("NXgetnextattr failed");
-    int attr_dims[1]={attr_len+1};
-    void *attr_value;
-    if(NXmalloc(&attr_value,1,attr_dims,attr_type)!=NX_OK)
-      throw runtime_error("NXmalloc failed");
-    if(NXgetattr(*handle,attr_name,attr_value,attr_dims,&attr_type)!=NX_OK)
-      throw runtime_error("NXgetattr failed");
-    Attr my_attr(attr_name,attr_value,attr_len,attr_type);
-    attrs.push_back(my_attr);
-  }
-
-  // create the data
-  node=Node(name,data,rank,dims,type);
-  node.set_attrs(attrs);
-
-  // free the temporary data
-  if(NXfree(&data)!=NX_OK)
-    throw runtime_error("NXfree failed");
-}]]>
-  </programlisting>
-</example>
+</para>
 
 </sect1>
 
