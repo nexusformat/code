@@ -1060,7 +1060,7 @@ CONTAINS
       CHARACTER(len=len(data_name)) :: name
       CHARACTER(len=NX_MAXNAMELEN) :: class, attr_name
       CHARACTER(len=255) :: axis_list
-      INTEGER :: status, signal, value, data_rank, i, j, k
+      INTEGER :: status, signal=1, value, data_rank, i, j, k
 
       !First find data with "signal" attribute to check for "axes" attribute
       status = NXUfindsignal (file_id, signal, data_name, data_rank, &
@@ -1101,7 +1101,7 @@ CONTAINS
             j = j + k + 1
          END DO
          !Open data to retrieve information about the dimension scale
-         status = NXopendata (file_id, data_name)
+         status = NXopendata (file_id, name)
          IF (status /= NX_OK) RETURN
          status = NXgetinfo (file_id, NXrank, NXdims, NXtype)
          IF (status == NX_OK) THEN
