@@ -38,6 +38,7 @@ translation file is <filename>test.xml</filename>.</para>
   </group>
   <arg>-D <replaceable>macro</replaceable></arg>
   <arg choice="req"><replaceable>translationfile</replaceable></arg>
+  <arg>--append <replaceable>outputfile</replaceable></arg>
 </cmdsynopsis>
 
 <para>First to get the easy arguments out of the way. Typing just
@@ -99,19 +100,20 @@ better understanding of what this means see Chapter 2. For now it is enough to s
 </programlisting></informalexample>
 
 This example assumes that there is a macro
-<parameter>FILE1</parameter> in the translation file. &nxtranslate
-will convert <parameter>FILE1</parameter> into
+<parameter>FILE1</parameter> in the translation file. &nxtranslate will
+convert the string <parameter>FILE1</parameter> into
 <filename>old_nexus.nxs</filename> before creating the resulting NeXus
-file. This allows for a script to convert an entire directory of files to look like (using python)
+file. This allows for a script to convert an entire directory of files
+to look like (using python)
 
 <informalexample><programlisting>
 listing=glob.glob("*.nxs")
-for dir in listing:
-    os.system("<command>nxtranslate</command> <filename>converter.xml</filename> -DFILE1=%s" % dir)
+for file in listing:
+    os.system("<command>nxtranslate</command> <filename>converter.xml</filename> -DFILE1=%s -o new_%s" % (file,file))
 </programlisting></informalexample>
 
 This bit of code (plus the proper import statements) would use the
-file <filename>converter.xml</filename> to translate all
+translation file <filename>converter.xml</filename> to translate all
 <filename>*.nxs</filename> in the current working directory.
 
 </para>
