@@ -568,7 +568,6 @@ class NXfile:
 		if self.handle == None:
 			print "Error: handle hasn't been initialized yet"
 			return 0
-		print "elem path:", elem.path	
 		if elem.path[len(elem.path)-1][1] != "SDS":
 			elem.path.append((elem.getName(), "SDS"))	
 			
