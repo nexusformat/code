@@ -41,7 +41,7 @@
        extern void *NXpData;
        extern void (*NXIReportError)(void *pData, char *pBuffer);  
 /*--------------------------------------------------------------------------*/
-#define DEFDEBUG 1
+/*#define DEFDEBUG 1*/
 /* define DEFDEBUG when you wish to print your definition strings before
    action. This can help a lot to resolve mysteries when working with
    dictionaries.
@@ -665,10 +665,13 @@
 #define DCLOSE 11
 #define DATTR  12
 #define DEND   13
+#define DLZW   14
+#define DHUF   15
+#define DRLE   16
 
 /*----------------- Keywords ----------------------------------------*/
 
-  static TokDat TokenList[8] = { 
+  static TokDat TokenList[11] = { 
                                 {"SDS",DSDS},
                                 {"NXLINK",DLINK},
                                 {"NXVGROUP",DGROUP},
@@ -676,6 +679,9 @@
                                 {"-type",DTYPE},
                                 {"-rank",DRANK},
                                 {"-attr",DATTR},
+                                {"-LZW",DLZW},
+                                {"-HUF",DHUF},
+                                {"-RLE",DRLE},
                                 {NULL,0} };
 
 /*-----------------------------------------------------------------------*/
@@ -744,7 +750,7 @@
          sStat->pToken[i] = '\0';
 
          /*--------- try to find word in Tokenlist */
-         for(i = 0; i < 7; i++)
+         for(i = 0; i < 10; i++)
          {
            if(strcmp(sStat->pToken,TokenList[i].pText) == 0)
            {
@@ -988,6 +994,7 @@
                       {"DFNT_UINT16",DFNT_UINT16},
                       {"DFNT_INT32",DFNT_INT32},
                       {"DFNT_UINT32",DFNT_UINT32},
+                      {"DFNT_CHAR",DFNT_CHAR},
                       {NULL,-122} };
 
 
@@ -1033,6 +1040,7 @@
    {
       int iType = DFNT_FLOAT32;
       int iRank = 1;
+      int iCompress = 0;
       int32 iDim[MAX_VAR_DIMS];
       int iList;
       int iRet, iStat;
@@ -1103,6 +1111,15 @@
                         return iRet;
                      } 
                      break;
+	    case DLZW:
+                     iCompress = NX_COMP_LZW;
+                     break;
+	    case DRLE:
+                     iCompress = NX_COMP_RLE;
+                     break;
+	    case DHUF:
+                     iCompress = NX_COMP_HUF;
+                     break;
             case DEND:
                      break;
             default:
@@ -1149,6 +1166,15 @@
                  /* a comment on this one has already been written! */
                  LLDdelete(iList);
                  return iRet;
+            }
+            /* deal with compression, if appropriate */
+            if(iCompress != 0)
+	    {
+                iRet = NXcompress(hfil,iCompress);
+                if(!iRet)
+		{
+                    NXIReportError(NXpData,"Failed to compress data set");
+                }
             }
             /* put attributes in */
             iRet = LLDnodePtr2First(iList);
@@ -1221,7 +1247,7 @@
 
 #line 1034 "nxdict.w"
 
-    static int NXDIDefParse(NXhandle hFil, NXdict pDict, ParDat *pParse)
+    int NXDIDefParse(NXhandle hFil, NXdict pDict, ParDat *pParse)
     {
        int iRet;
        char pError[256];
@@ -1278,7 +1304,7 @@
 
 #line 1576 "nxdict.w"
 
-  static NXstatus NXDIUnwind(NXhandle hFil, int iDepth)
+  NXstatus NXDIUnwind(NXhandle hFil, int iDepth)
   {
      int i, iRet;
       
@@ -1514,6 +1540,9 @@
      return iStat;
    }
 
+
+
+
 #line 2416 "nxdict.w"
 
 /*------------------------------------------------------------------------*/
@@ -1553,7 +1582,94 @@
 
 #line 2418 "nxdict.w"
 
+
 /*------------------------------------------------------------------------*/
+
+   NXstatus NXDinfodef(NXhandle hFil, NXdict dict, char *pDef, int *rank,
+   			int dimension[], int *iType)
+   {
+     NXdict pDict;
+     ParDat pParse;
+     int iRet, i, iStat;
+
+     pDict = NXDIAssert(dict);
+     
+     /* parse and act on definition string */
+     pParse.iMayCreate = 0;
+     pParse.pPtr = pDef;
+     pParse.iDepth = 0;
+#ifdef DEFDEBUG
+     printf("Getting: %s\n",pDef);
+#endif
+     iRet = NXDIDefParse(hFil,pDict,&pParse);
+     if(iRet == NX_ERROR)
+     {
+         /* unwind and throw up */
+          NXDIUnwind(hFil,pParse.iDepth);
+          return NX_ERROR;
+     }
+
+
+     /* only SDS can be written */
+     if(pParse.iTerminal != TERMSDS)
+     {
+        NXIReportError(NXpData,
+                     "ERROR: can only write to an SDS!");
+        iStat = NX_ERROR;
+     } 
+     else 
+     {
+       /* the SDS should be open by now, read it */
+       iStat = NXgetinfo(hFil, rank,dimension, iType);
+       iRet = NXclosedata(hFil);
+     }   
+
+
+     /* rewind the hierarchy */
+     iRet = NXDIUnwind(hFil,pParse.iDepth);
+     if(iRet != NX_OK)
+     {
+        return NX_ERROR;
+     }
+     return iStat;
+   }
+
+/*------------------------------------------------------------------------*/
+
+  NXstatus NXDinfoalias(NXhandle hFil, NXdict dict, char *pAlias, int *rank,
+   			int dimension[], int *iType)
+  {
+     NXdict pDict;
+     int iRet;
+     char pDefinition[1024];
+     pDynString pReplaced = NULL;
+
+     pDict = NXDIAssert(dict);
+     
+     /* get Definition String  */
+     iRet = NXDget(pDict,pAlias,pDefinition,1023);
+     if(iRet != NX_OK)
+     {
+        sprintf(pDefinition,"ERROR: alias %s not recognized",pAlias);
+        NXIReportError(NXpData,pDefinition);
+        return NX_ERROR;
+     }
+ 
+     /* do text replacement */
+     pReplaced = NXDItextreplace(dict,pDefinition);
+     if(!pReplaced)
+     {
+       return NX_ERROR;
+     }
+     
+     /* call NXDgetdef */
+     iRet = NXDinfodef(hFil,dict,GetCharArray(pReplaced),rank,dimension,iType);
+     DeleteDynString(pReplaced);
+     return iRet;
+  }
+
+/*------------------------------------------------------------------------*/
+
 
 #line 1849 "nxdict.w"
 
@@ -1706,7 +1822,7 @@
      iDate = time(NULL);
      psTime = localtime(&iDate);
      memset(pBuffer,0,iBufLen);         
-     strftime(pBuffer,iBufLen,"%Y-%d-%m %H:%M:%S",psTime);
+     strftime(pBuffer,iBufLen,"%Y-%m-%d %H:%M:%S",psTime);
   }  
 /*--------------------------------------------------------------------------*/
    NXstatus NXUwriteglobals(NXhandle pFile, 
@@ -1913,6 +2029,8 @@
              lLength *= sizeof(float64);
              break;
         case DFNT_INT8:
+        case DFNT_CHAR:
+        case DFNT_UCHAR8:
              lLength *= sizeof(int8);
              break;
         case DFNT_UINT8:
@@ -1943,6 +2061,7 @@
         NXIReportError(NXpData,"ERROR: memory exhausted in NXUallocSDS");
         return NX_ERROR;
       }
+      memset(*pData,0,lLength);
       return NX_OK;
    }
 
