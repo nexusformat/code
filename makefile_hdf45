@@ -29,16 +29,17 @@
 #Edit "makefile_options" to set compiler flags
 include makefile_options
 
-
 LIBNEXUS_OBJ=napi.o napif.o
 TEST4_OBJ=napi4_test.o
 TEST5_OBJ=napi5_test.o
 NXBROWSE_OBJ=NXbrowse.o
 NXTOXML_OBJ=NXtoXML.o
 NXTODTD_OBJ=NXtoDTD.o
+NXTONX4_OBJ=NXtoNX4.o
+NXTONX5_OBJ=NXtoNX5.o
 NOPT=-DHDF4 -DHDF5
 
-all: libNeXus.a napi4_test napi5_test napif_test NXbrowse NXtoXML NXtoDTD
+all: libNeXus.a napi4_test napi5_test napif_test NXbrowse NXtoXML NXtoDTD NXtoNX4 NXtoNX5
 
 .c.o :
 	$(CC) $(CFLAGS) $(NOPT) -I$(H4ROOT)/include -I$(H5ROOT)/include -c $(FROOT)/$*.c 
@@ -74,5 +75,13 @@ NXtoXML: libNeXus.a $(NXTOXML_OBJ)
 	
 NXtoDTD: libNeXus.a $(NXTODTD_OBJ) 
 	$(CC) $(CFLAGS) -o NXtoDTD $(NXTODTD_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -L$(H5ROOT)/lib -lhdf5 -lz 
+
+NXtoNX4: libNeXus.a $(NXTONX4_OBJ) 
+	$(CC) $(CFLAGS) -o NXtoNX4 $(NXTONX4_OBJ) $(FROOT)/libNeXus.a \
+	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -L$(H5ROOT)/lib -lhdf5 -lz 
+
+NXtoNX5: libNeXus.a $(NXTONX5_OBJ) 
+	$(CC) $(CFLAGS) -o NXtoNX5 $(NXTONX5_OBJ) $(FROOT)/libNeXus.a \
 	-L$(H4ROOT)/lib -lmfhdf -ldf -ljpeg -L$(H5ROOT)/lib -lhdf5 -lz 
 
