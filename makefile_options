@@ -26,30 +26,30 @@
 #
 #====================================================================
 #Edit the compiler flags as necessary
+CC=cc
+FC=g77
+CFLAGS=-g 
+FFLAGS=-g
+F90=f90
+F90FLAGS=
+LDFLAGS=-g
+#====================================================================
+#Compiler flags on DEC TRU64 UNIX
 #CC=cc
 #FC=f77
 #CFLAGS=-g -non_shared
 #FFLAGS=-g
 #F90=f90
 #F90FLAGS=
-#LDFLAGS=-g
+#LDFLAGS=
 #====================================================================
-#Compiler flags on DEC TRU64 UNIX
-CC=cc
-FC=f77
-CFLAGS=-g  -non_shared
-FFLAGS=-g
-F90=f90
-F90FLAGS=
-LDFLAGS=
-#====================================================================
-#Compiler flags for g77 and Absoft Pro Fortran 90 on Mac OS X
+#Compiler flags for Absoft Pro Fortran 77 and 90 on Mac OS X
 #CC=cc
 #FC=g77
 #CFLAGS=-g -no-cpp-precomp -D__unix
 #FFLAGS=-g -Wno-globals
 #F90=f95
-#F90FLAGS=-YEXT_NAMES=LCS -YEXT_SFX=_
+#F90FLAGS=-g -cons -YEXT_NAMES=LCS -YEXT_SFX=_
 #LDFLAGS=-flat_namespace
 #====================================================================
 #Compiler flags for Absoft Pro Fortran 90 on Linux
@@ -62,6 +62,6 @@ LDFLAGS=
 #LDFLAGS=
 #====================================================================
 #Specify locations of the NeXus source files and HDF libraries
-FROOT=/data/koenneck/src/NeXus
-H4ROOT=/data/lnslib
-H5ROOT=/data/lnslib
+FROOT=/usr/local/NeXus
+H4ROOT=/usr/local/hdf4
+H5ROOT=/usr/local/hdf5
