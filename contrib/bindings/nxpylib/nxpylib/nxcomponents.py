@@ -5,7 +5,7 @@ import string
 
 from nexus import *
 #from nxplot import *
-
+import nxtemplates
 
 
 def checkTypes(pytype, nxtype):
@@ -190,8 +190,9 @@ class NXelem:
 			if groupclass[0:2] != "NX":
 				groupclass = self.path[len(self.path)-2][1]
 				if groupclass[0:2] != "NX":
-					print "Error in elem path"
-					return 0
+					print "elem %s doesn't belong to a group. no validation possible \n-> validate when appending to group!!!!"%(self.name)
+					#print "Error in elem path"
+					#return 0
 			if not attname in nxtemplates.group_types[groupclass].elems[self.name].attrs.keys():
 				print "attr not valid !!" 
 				return 0
@@ -207,13 +208,14 @@ class NXelem:
 			if groupclass[0:2] != "NX":
 				groupclass = self.path[len(self.path)-2][1]
 				if groupclass[0:2] != "NX":
-					print "Error in elem path"
+					print "elem %s doesn't belong to a group. no validation possible \n-> validate when appending to group!!!!"%(self.name)
+					#return 0
+		
+			
+			if groupclass[0:2] == "NX":
+				if not attname in nxtemplates.group_types[groupclass].elems[self.name].attrs.keys():
+					print "attr not valid !!" 
 					return 0
-		
-		
-			if not attname in nxtemplates.group_types[groupclass].elems[self.name].attrs.keys():
-				print "attr not valid !!" 
-				return 0
 			attpath = self.path
 			
 		#atttype = guessNXType(attvalue)	
@@ -404,11 +406,11 @@ class NXaxis(NXelem):
 
 
 class NXdataelem(NXelem):
-	def __init__(self, name="", nxtype=NX_FLOAT32, dims=None, axnames="", attrs=None, data=None, cachefile="", nxcachefile="", axcachefile=""):
+	def __init__(self, path=None, name="", nxtype=NX_FLOAT32, dims=None, axnames="", attrs=None, data=None, cachefile="", nxcachefile="", axcachefile=""):
 		if dims == None: 	dims = []
 		if attrs == None:	attrs = {}	
 		if data == None: 	data = []
-		NXelem.__init__(self, parent=None, path=None, name=name, nxtype=nxtype, dims=dims, attrs=attrs, data=data)
+		NXelem.__init__(self, parent=None, path=path, name=name, nxtype=nxtype, dims=dims, attrs=attrs, data=data)
 		self.attrs["axis"] = NXattr(name="axis", nxtype=NX_CHAR, value=axnames)
 		self.attrs["signal"] = NXattr(name="axis", nxtype=NX_CHAR, value="1")
 		self.cachefile = cachefile
@@ -424,7 +426,7 @@ class NXdataelem(NXelem):
 		
 		if len(dims) > 0:
 			self.gridinfo = self.initGridInfo(0)
-			print self.gridinfo
+			#print "self.gridinfo:", self.gridinfo
 			
 		
 	def initGridInfo(self, level):
@@ -584,7 +586,7 @@ class NXdataelem(NXelem):
 					data.append([])
 				data = data[0]
 			if len(data) >= self.dims[len(self.dims)-1]:	
-				print "oh:", len(data), self.dims[len(self.dims)-1]
+				#print "oh:", len(data), self.dims[len(self.dims)-1]
 				print "warning: data exceeds dimension boundary"
 				return 0
 			data.append(value)
@@ -647,17 +649,26 @@ class NXdataelem(NXelem):
 
 	def saveDataToNX(self, value, coords):
 		if not self.nxcachefileExists():
-			print "opening file"
+			#print "opening file"
 			status, self.nxhandle = NXopen(self.nxcachefile, NXACC_CREATE5)
-			print "ok, everythings fine"
 			status = NXmakegroup(self.nxhandle, "entry", "NXentry")
 			status = NXopengroup(self.nxhandle, "entry", "NXentry")
 			status = NXmakegroup(self.nxhandle, "data", "NXdata")
 			status = NXopengroup(self.nxhandle, "data", "NXdata")
-			status = NXmakedata(self.nxhandle, self.name+"_gridinfo", NX_INT32, len(self.dims)-1, self.dims[0:len(self.dims)-1])
+			
+			if len(self.dims) > 1:
+				gridinfo_rank = len(self.dims)-1
+				gridinfo_dims = self.dims[0:len(self.dims)-1]
+			else:	
+				#in case of one-dim data we need only a single field to store gridinfo
+				gridinfo_rank=1
+				gridinfo_dims=[1]
+				
+			status = NXmakedata(self.nxhandle, self.name+"_gridinfo", NX_INT32, gridinfo_rank, gridinfo_dims)
 			status = NXmakedata(self.nxhandle, self.name, self.nxtype, len(self.dims), self.dims)
 			status = NXopendata(self.nxhandle, self.name)
-			
+			#print "DEBUG coords:", coords
+
 			#write some header info here
 		else:
 			if self.nxhandle != None:
@@ -697,7 +708,7 @@ class NXdataelem(NXelem):
 						status = NXopendata(self.nxhandle, self.name)
 						found = 1
 				if found == 0:
-					print "creating:", self.name, self.nxtype, len(self.dims), self.dims
+					#print "DEBUG creating:", self.name, self.nxtype, len(self.dims), self.dims
 					status = NXmakedata(self.nxhandle, self.name, self.nxtype, len(self.dims), self.dims)
 					status = NXopendata(self.nxhandle, self.name)
 
@@ -773,14 +784,28 @@ class NXdataelem(NXelem):
 				status = NXopendata(self.nxhandle, gridinfoname)
 				found = 1
 		if found == 0:
-			status = NXmakedata(self.nxhandle, gridinfoname, NX_INT32, len(self.dims)-1, self.dims[0:len(self.dims)-1])
+			if len(self.dims) > 1:
+				gridinfo_rank = len(self.dims)-1
+				gridinfo_dims = self.dims[0:len(self.dims)-1]
+			else:	
+				#in case of one-dim data we need only a single field to store gridinfo
+				gridinfo_rank=1
+				gridinfo_dims=[1]
+			status = NXmakedata(self.nxhandle, gridinfoname, NX_INT32, gridinfo_rank, gridinfo_dims)
 			status = NXopendata(self.nxhandle, gridinfoname)
 		startslab = []
 		sizeslab=[]
-		for i in range(len(coords)):
-			startslab.append(coords[i])
-			sizeslab.append(1)
-		status = NXputslab(self.nxhandle, info[coords[len(coords)-1]], startslab, sizeslab)	
+		if coords != None:
+			for i in range(len(coords)):
+				startslab.append(coords[i])
+				sizeslab.append(1)
+				info_value = info[coords[len(coords)-1]]
+		else:
+			startslab = [0]
+			sizeslab = [1]
+			info_value = self.gridinfo
+		#print "DEBUG gridinfo:", info_value
+		status = NXputslab(self.nxhandle, info_value, startslab, sizeslab)	
 		status = NXclosedata(self.nxhandle)
 		status = NXflush(self.nxhandle)
 		return 1

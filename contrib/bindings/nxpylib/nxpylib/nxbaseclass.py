@@ -197,7 +197,10 @@ class NXdata(NXdatabase):
 		
 	def setData(self, data):
 		return self.setElem(data)
-	
+
+	def getData(self, data_name):
+		return self.getElem(data_name)
+		
 	def setAxes(self, axlist):
 		if axlist != None:
 			if type(axlist) != types.ListType and type(axlist) != types.TupleType:

@@ -109,7 +109,7 @@ class NXfactory:
 					NXclosegroup(nxhandle)
 
 				else:  #SDS
-					print "name", item.name
+					#print "name", item.name
 					elemcontent = item.children.listGetString(item.doc, 1)
 					attrs = None
 					elemtype = NX_CHAR

@@ -11,7 +11,49 @@ def main(args):
 	""" the entry point for testing purposes """
 	
 
+	print "EXAMPLE 0:  LOAD TEMPLATE META-DTD AND GENERATE SKELETON MONOXTAS NXFILE"
+	print "========================================================================"
+
+	f = NXfile(filename="monoxtas_template.nxs", 
+				  mode=NXACC_CREATE5, 
+				  template="monoxtas_template.xml")
 	
+	root = f.getRoot()
+	myentry 	= f.readGroup("root:NXroot/template_entry:NXentry")
+	mydata = myentry.getGroup("on-on", "NXdata") 
+   
+	h_vector = NXelem(name="h", nxtype=NX_FLOAT32, dims=[5], data=[0.0,0.0,0.0,0.0,0.0])
+	h_vector.setAttrValue("info", "{H reciprocal space vector}?", NX_CHAR)
+	mydata.setElem(h_vector)
+	
+	k_vector = NXelem(name="k", nxtype=NX_FLOAT32, dims=[5], data=[0.0,0.0,0.0,0.0,0.0])
+	k_vector.setAttrValue("info", "{K reciprocal space vector}?", NX_CHAR)
+	mydata.setElem(k_vector)
+	
+	l_vector = NXelem(name="l", nxtype=NX_FLOAT32, dims=[5], data=[0.0,0.0,0.0,0.0,0.0])
+	l_vector.setAttrValue("info", "{L reciprocal space vector}?", NX_CHAR)
+	mydata.setElem(l_vector)
+	
+
+	mycounts = NXdataelem(	name="counts", 
+									dims=[5], 
+									nxtype=NX_INT32, 
+									nxcachefile="monoxtas_template.nxc")
+	
+	for i in range(mycounts.dims[0]):
+		print "writing ", i , " to position: ",i
+		mycounts.appendData(i)
+	
+	mydata.setData(mycounts)
+	root.setGroup(myentry)
+	
+	f.save()  #equivalent to  f.writeGroup(root)
+	f.close()
+	
+	print "========================================================================"
+	return
+
+
 	#----------------------------------------------------------
 	# EXAMPLE 1:  BUILD GROUP TREE FROM SCRATCH AND FILL NXDATA
 	print "EXAMPLE 1:  BUILD GROUP TREE FROM SCRATCH AND FILL NXDATA"

@@ -81,7 +81,7 @@ class NXfile:
 
 
 	def readSingleGroup(self, groupname, groupclass, mode, pathlist):
-		print "pathlist init: ", pathlist
+		#print "pathlist init: ", pathlist
 		group = None
 		groups = {}
 		elems  = {}
@@ -195,10 +195,24 @@ class NXfile:
 					if elemtype not in nxtemplates.group_types[groupclass].elems[ename].types:
 						print "type of elem %s in group %s doesn't match DTD"%(ename, groupclass)
 						continue
+						
 				# build path	
 				nlist=pathlist[:]
 				nlist.append((ename,"SDS"))
-				elems[ename] = NXelem(path=nlist, name=ename, nxtype=elemtype, dims=dims, attrs=elemattrs)
+				
+				if groupclass == "NXdata" and elemattrs.has_key("signal"):
+					elems[ename] = NXdataelem(	path=nlist, 
+														name=ename, 
+														nxtype=elemtype, 
+														dims=dims, 
+														attrs=elemattrs)
+				else:
+					elems[ename] = NXelem(	path=nlist, 
+													name=ename, 
+													nxtype=elemtype, 
+													dims=dims, 
+													attrs=elemattrs)
+					
 				#get data of data set
 				status, data = NXgetdata(self.handle)
 				if status != 1:
