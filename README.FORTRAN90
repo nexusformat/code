@@ -42,8 +42,9 @@ defined in NXmodule.f90 should be equivalent to the iStack C struct
 defined in NAPI.C, which contains two 32-bit pointers, iRefDir and
 iTagDir.  If the local operating system uses 64-bit pointers, add two
 extra 4-byte integers as padding to the beginning of the NXstack
-definition.  Currently, the Fortran 90 version only needs access to the
-final two integers in NXstack, iNdir and iCurDir.
+definition.  In the latest version of the API (v 1.3.1), the Fortran 90 
+code does not require access to the internal details of the NXhandle
+structure.
 
 --- Running the Examples ---
 
