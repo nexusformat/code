@@ -125,6 +125,7 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
     NXhandle hdf5_handle;
     NXhandle hdf4_handle;
     pNexusFunction fHandle;
+    NXstatus retstat;
         
     /* configure fortify 
     iFortifyScope = Fortify_EnterScope();
@@ -164,7 +165,7 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
     if (hdf_type==1) {
       /* HDF4 type */
 #ifdef HDF4
-      NX4open((const char *)filename,am,&hdf4_handle);
+      retstat = NX4open((const char *)filename,am,&hdf4_handle);
       fHandle->pNexusData=hdf4_handle;
       fHandle->nxclose=NX4close;
       fHandle->nxflush=NX4flush;
@@ -193,13 +194,17 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
       fHandle->nxsameID=NX4sameID;
       fHandle->nxinitgroupdir=NX4initgroupdir;
       fHandle->nxinitattrdir=NX4initattrdir;
-#endif
       *gHandle = fHandle;
-      return NX_OK; 
+#else
+      NXIReportError (NXpData,"ERROR: Attempt to create HDF4 file when not linked with HDF4");
+      *gHandle = NULL;
+      retstat = NX_ERROR;
+#endif /* HDF4 */
+      return retstat; 
     } else if (hdf_type==2) {
       /* HDF5 type */
 #ifdef HDF5
-      NX5open(filename,am,&hdf5_handle);
+      retstat = NX5open(filename,am,&hdf5_handle);
       fHandle->pNexusData=hdf5_handle;
       fHandle->nxclose=NX5close;
       fHandle->nxflush=NX5flush;
@@ -228,9 +233,13 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
       fHandle->nxsameID=NX5sameID;
       fHandle->nxinitgroupdir=NX5initgroupdir;
       fHandle->nxinitattrdir=NX5initattrdir;
-#endif      
       *gHandle = fHandle;
-      return NX_OK;
+#else
+      NXIReportError (NXpData,"ERROR: Attempt to create HDF5 file when not linked with HDF5");
+      *gHandle = NULL;
+      retstat = NX_ERROR;
+#endif /* HDF5 */
+      return retstat;
     } else {
       NXIReportError (NXpData,
           "ERROR: Format not readable by this NeXus library");
