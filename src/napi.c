@@ -554,7 +554,26 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXstatus NXfmakedata(NXhandle fid, char *name, int *pDatatype,
 		int *pRank, int dimensions[])
   {
-    return NXmakedata(fid, name, *pDatatype, *pRank, dimensions);
+    NXstatus ret;
+    static char buffer[256];
+    int i, *reversed_dimensions;
+    reversed_dimensions = (int*)malloc(*pRank * sizeof(int));
+    if (reversed_dimensions == NULL)
+    {
+        sprintf (buffer, "ERROR: Cannot allocate space for array rank of %d in NXfmakedata", *pRank);
+        NXIReportError (NXpData, buffer);
+	return NX_ERROR;
+    }
+/*
+ * Reverse dimensions array as FORTRAN is column major, C row major
+ */
+    for(i=0; i < *pRank; i++)
+    {
+	reversed_dimensions[i] = dimensions[*pRank - i - 1];
+    }
+    ret = NXmakedata(fid, name, *pDatatype, *pRank, reversed_dimensions);
+    free(reversed_dimensions);
+    return ret;
   }
 
   NXstatus NXmakedata (NXhandle fid, char *name, int datatype, int rank,

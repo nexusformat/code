@@ -198,9 +198,15 @@ C *** Wrapper routines for NXAPI interface
 
       INTEGER FUNCTION NXGETINFO(FILEID, RANK, DIM, DATATYPE)
       INTEGER FILEID(*), RANK, DIM(*), DATATYPE
-      INTEGER NXIGETINFO
+      INTEGER I, J, NXIGETINFO
       EXTERNAL NXIGETINFO
       NXGETINFO = NXIGETINFO(FILEID, RANK, DIM, DATATYPE)
+C *** Reverse dimension array as C is ROW major, FORTRAN column major
+      DO I = 1, RANK/2
+          J = DIM(I)
+          DIM(I) = DIM(RANK-I+1)
+          DIM(RANK-I+1) = J
+      ENDDO
       END
 
       INTEGER FUNCTION NXGETNEXTENTRY(FILEID, NAME, CLASS, DATATYPE)
