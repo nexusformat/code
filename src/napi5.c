@@ -1213,7 +1213,8 @@
       {
         if (op_data.iname != NULL) {
            free(op_data.iname);
-        }   
+        }
+        pFile->iStack5[pFile->iStackPtr].iCurrentIDX = 0;   
         return NX_EOD;
       }
       else
@@ -1233,18 +1234,69 @@
   {
     pNexusFile5 pFile;
     int iStart[H5S_MAX_RANK];
-    
+    hid_t data_id, memtype_id, size_id, sign_id;    
+    int dims;    
+
     pFile = NXI5assert (fid);
     /* check if there is an Dataset open */
     if (pFile->iCurrentD == 0) 
-      {
-        NXIReportError (NXpData, "ERROR: no Dataset open");
-        return NX_ERROR;
-      }
+    {
+       NXIReportError (NXpData, "ERROR: no Dataset open");
+       return NX_ERROR;
+    }
     memset (iStart, 0, H5S_MAX_RANK * sizeof(int));
-    /* actually read */
-    
-    H5Dread (pFile->iCurrentD, pFile->iCurrentT, H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
+    /* map datatypes of other plateforms */
+    data_id = H5Tget_class(pFile->iCurrentT);
+    if (data_id==H5T_STRING)
+    {
+       dims = H5Tget_size(pFile->iCurrentT);
+       memtype_id = H5Tcopy(H5T_C_S1);
+       H5Tset_size(memtype_id, dims);
+    }
+    if (data_id==H5T_INTEGER)
+    {
+       size_id=H5Tget_size(pFile->iCurrentT);
+       sign_id=H5Tget_sign(pFile->iCurrentT);
+       if (size_id==1)
+       {
+           if (sign_id==H5T_SGN_2)
+           {
+              memtype_id = H5T_NATIVE_INT8;
+           } else {
+              memtype_id = H5T_NATIVE_UINT8;
+           }
+       } 
+       else if (size_id==2) 
+       {
+          if (sign_id==H5T_SGN_2)
+          {
+             memtype_id = H5T_NATIVE_INT16;
+          } else {
+	     memtype_id = H5T_NATIVE_UINT16; 
+          }
+       }
+       else if (size_id==4) 
+       {
+         if (sign_id==H5T_SGN_2)
+         {
+	    memtype_id = H5T_NATIVE_INT32;
+         } else {
+            memtype_id = H5T_NATIVE_UINT32; 
+         }
+       }
+     } else if (data_id==H5T_FLOAT)     
+       {
+         size_id=H5Tget_size(pFile->iCurrentT);
+         if (size_id==4)
+         {
+	    memtype_id = H5T_NATIVE_FLOAT; 
+         } else if (size_id==8) {
+            memtype_id = H5T_NATIVE_DOUBLE;
+         }
+     }           
+
+    /* actually read */    
+    H5Dread (pFile->iCurrentD, memtype_id, H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
     return NX_OK;
   }
     
@@ -1340,9 +1392,10 @@
     hsize_t mySize[H5S_MAX_RANK];
     hssize_t mStart[H5S_MAX_RANK];
     hid_t   memspace, iRet, data_id;
+    hid_t   memtype_id, size_id, sign_id;
     char *tmp_data;
     char *data1;
-    int i, iRank, mtype = 0;
+    int i, dims, iRank, mtype = 0;
       
     pFile = NXI5assert (fid);
     /* check if there is an Dataset open */
@@ -1388,16 +1441,64 @@
          NXIReportError (NXpData, "ERROR: Select memspace failed");
          return NX_ERROR;
        }
-       
+      /* map datatypes of other plateforms */
+      if (data_id==H5T_STRING)
+      {
+        dims = H5Tget_size(pFile->iCurrentT);
+        memtype_id = H5Tcopy(H5T_C_S1);
+        H5Tset_size(memtype_id, dims);  
+      }
+      if (data_id==H5T_INTEGER)
+      {
+        size_id=H5Tget_size(pFile->iCurrentT);
+        sign_id=H5Tget_sign(pFile->iCurrentT);
+        if (size_id==1)
+        {
+           if (sign_id==H5T_SGN_2)
+           {
+              memtype_id = H5T_NATIVE_INT8;
+           } else {
+              memtype_id = H5T_NATIVE_UINT8;
+           }
+        } 
+        else if (size_id==2) 
+        {
+           if (sign_id==H5T_SGN_2)
+           {
+              memtype_id = H5T_NATIVE_INT16;
+           } else {
+	      memtype_id = H5T_NATIVE_UINT16; 
+           }
+        }
+        else if (size_id==4) 
+        {
+          if (sign_id==H5T_SGN_2)
+          {
+	     memtype_id = H5T_NATIVE_INT32;
+          } else {
+             memtype_id = H5T_NATIVE_UINT32; 
+          }
+        }
+      } else if (data_id==H5T_FLOAT)     
+        {
+          size_id=H5Tget_size(pFile->iCurrentT);
+          if (size_id==4)
+          {
+	     memtype_id = H5T_NATIVE_FLOAT; 
+          } else if (size_id==8) {
+             memtype_id = H5T_NATIVE_DOUBLE;
+          }
+      }       
+  
      /* read slab */ 
      if (mtype == NX_CHAR) {
-        iRet = H5Dread(pFile->iCurrentD, pFile->iCurrentT, H5S_ALL, 
+        iRet = H5Dread(pFile->iCurrentD, memtype_id, H5S_ALL, 
                     H5S_ALL, H5P_DEFAULT,tmp_data);
          data1 = tmp_data + myStart[0];
          strncpy(data,data1,(hsize_t)iSize[0]);
          free(tmp_data);           
      } else {    
-        iRet = H5Dread(pFile->iCurrentD, pFile->iCurrentT, memspace, 
+        iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, 
                     pFile->iCurrentS, H5P_DEFAULT,data);
      }    
     
@@ -1525,9 +1626,10 @@
         } 
         if (idx == 0)
         {
+	   pFile->iAtt5.iCurrentIDX = 0;
            return NX_EOD;
         }
-        
+        pFile->iAtt5.iCurrentIDX = 0;        
         return NX_EOD;
       }
       else
@@ -1806,8 +1908,8 @@
        return NX_ERROR;
     }
   }
-
-  /*-------------------------------------------------------------------------*/
+ 
+ /*-------------------------------------------------------------------------*/
  
   NXstatus CALLING_STYLE NX5initattrdir (NXhandle fid)
   {
@@ -1817,7 +1919,7 @@
     NXI5KillAttDir (fid);
     return NX_OK;
   }
- 
+
   /*-------------------------------------------------------------------------*/
  
   NXstatus CALLING_STYLE NX5initgroupdir (NXhandle fid)

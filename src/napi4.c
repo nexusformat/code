@@ -450,7 +450,7 @@
   
     /* start Vgroup API */
     
-    pNew->iVID = Hopen (filename, am1, 100);
+    pNew->iVID = Hopen(filename, am1, 100);
     if (pNew->iVID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file_c: %s", filename);
       NXIReportError (NXpData, pBuffer);

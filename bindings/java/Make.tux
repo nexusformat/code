@@ -13,26 +13,25 @@
 #         C O N F I G U R A T I O N       S E C T I O N                   #
 ###########################################################################
 # Where to find the HDF libraries: HDF4.1r3 is REQUIRED
-HDFROOT=/usr/local
+HDFROOT=$(SINQDIR)/linux
 
 #Where to find the napi C stuff
-NAPIROOT=../
+NAPIROOT=$(SINQDIR)/linux
 
 # Where the Java binaries live
-JAVABIN=/usr/local/jdk118_v1/bin
+JAVABIN=/usr/lib/IBMJava2-131/bin
 
 # The classpath for compiling java
-JCP=/usr/local/jdk118_v1/lib/classes.zip:.:
+JCP=.:
 
 # The path to the include files for the jni-headers
-JINCLUDE= -I/usr/local/jdk118_v1/include \
-      -I/usr/local/jdk118_v1/include/linux
+JINCLUDE= -I/usr/lib/IBMJava2-131/include 
 
 # The C-compiler to use
 CC=gcc
 
 # Compiler flags to use for compiling
-CFLAGS= -g -c $(JINCLUDE) -I$(HDFROOT)/include -I$(NAPIROOT) \
+CFLAGS= -g -c $(JINCLUDE) -DHDF4 -DHDF5 -I$(HDFROOT)/include -I$(NAPIROOT) \
        -Inative
 
 #Compiler flags used for linking
@@ -82,9 +81,9 @@ jnexus.jar: $(JOBJ)
 	  ncsa/hdf/hdflib/ArrayDescriptor.class
 
 libjnexus.so: $(COBJ)
-	$(CC) $(LFLAGS) -o $(SHLIB) $(COBJ) -lNeXus \
+	$(CC) $(LFLAGS) -o $(SHLIB) $(COBJ) -lnexus \
 	  -lmfhdf -ldf \
-	  $(HDFROOT)/lib/libjpeg.a -lz -lm 
+	  $(HDFROOT)/lib/libjpeg.a $(HDFROOT)/lib/libhdf5.a -lz -lm 
 
 
 header: neutron/nexus/NexusFile.class
@@ -96,4 +95,5 @@ clean:
 	- rm neutron/nexus/*.class
 	- rm ncsa/hdf/hdflib/*.class
 	- rm native/*.o
+
 

@@ -26,22 +26,22 @@
 #
 #====================================================================
 #Edit the compiler flags as necessary
+#CC=cc
+#FC=f77
+#CFLAGS=-g -non_shared
+#FFLAGS=-g
+#F90=f90
+#F90FLAGS=
+#LDFLAGS=-g
+#====================================================================
+#Compiler flags on DEC TRU64 UNIX
 CC=cc
-FC=g77
-CFLAGS=-g 
+FC=f77
+CFLAGS=-g  -non_shared
 FFLAGS=-g
 F90=f90
 F90FLAGS=
 LDFLAGS=
-#====================================================================
-#Compiler flags on DEC TRU64 UNIX
-#CC=cc
-#FC=f77
-#CFLAGS=-g 
-#FFLAGS=-g
-#F90=f90
-#F90FLAGS=
-#LDFLAGS=
 #====================================================================
 #Compiler flags for g77 and Absoft Pro Fortran 90 on Mac OS X
 #CC=cc
@@ -62,6 +62,6 @@ LDFLAGS=
 #LDFLAGS=
 #====================================================================
 #Specify locations of the NeXus source files and HDF libraries
-FROOT=/usr/local/NeXus
-H4ROOT=/usr/local/hdf4
-H5ROOT=/usr/local/hdf5
+FROOT=/data/koenneck/src/NeXus
+H4ROOT=/data/lnslib
+H5ROOT=/data/lnslib

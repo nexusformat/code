@@ -66,8 +66,10 @@ NexusFile.NXACC_CREATE);</center>
 The first parameter to the constructor is of course the name. The
 second parameter is the access code valid for the file: Three access
 codes are supported:<dl>
-<dt>NXACC_CREATE
-<dd>For creating a new NeXus file.
+<dt>NXACC_CREATE, NXACC_CREATE4
+<dd>For creating a new NeXus file as HDF-4 file.
+<dt>NXACC_CREATE%
+<dd>For creating a new NeXus file as HDF-5 file.
 <dt>NXACC_RDWR
 <dd>For opening an existing NeXus file for modification or for
 appending.
@@ -243,11 +245,17 @@ looks like this:
       iDim[0] = 100;
       iDim[1] = 1000;
 
-       nf.makedata("fData",2,NexusFile.NX_FLOAT32,iDim);
+       nf.compmakedata("fData",2,NexusFile.NX_FLOAT32,iDim,
+               NexusFile.COMP_CODE_LZW,iDim);
        nf.opendata("fData");
-       nf.compress(NexusFile.COMP_CODE_LZW);
        nf.putdata(fData);
 </pre> 
+The additional parameters to NXcompmakedata are the compression type
+and a buffer  size for use used during compression. This is an integer
+array of the same rank as the data.  If the data set is written
+in one go this should be the dimensions of the dataset,
+when writing in slabs, the slab size. This is a performance feauture.
+
 Please note the sequence of calls. The parameter to compress is the
 compression algorithm to use. Permitted values are:
 <dl>
@@ -262,7 +270,7 @@ compression algorithm to use. Permitted values are:
 </dl> 
 Please note that transfers to compressed datasets have to be done
 through the putdata, getdata routines, subset operations are not
-supported with compression.
+supported with compression. When using HDF-5 as underlying file format, only LZW compression is available.  
 <p>
 When dealing with an unknown NeXus file we might need to find out
 about the characteristics of a SDS. This can be done with:

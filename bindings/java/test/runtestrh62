@@ -7,5 +7,5 @@
 # Mark Koennecke, October 2000
 #------------------------------------------------------------------------
 java -classpath /usr/local/jdk118_v1/lib/classes.zip:../jnexus.jar:. \
- -Dneutron.nexus.JNEXUSLIB=../bin/rh62/libjnexus.so TestJapi
+ -Dneutron.nexus.JNEXUSLIB=$HOME/nt/k/src/NeXus/jnexus/bin/rh62/libjnexus.so TestJapi
  

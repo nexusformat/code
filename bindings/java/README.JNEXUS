@@ -1,7 +1,8 @@
 
 	JNEXUS
 
-	This is the README file for the NeXus API for Java, Version 1.0.
+	This is the README file for the NeXus API for Java, Version 2.0.
+        This version supports both HDF-4 and HDF-5.
 
         The NeXus API for Java (JAPI) is implemented by a class NexusFile
         which calls the C-language NeXus-API through the Java Native
@@ -22,8 +23,6 @@
 	library. Please see the file COPYING.NCSA for more details. See
 	JHI version from which the code was extracted was JHI-2.5 as 
 	downloaded in October 2000. 
-
-
 
 	USAGE
 	

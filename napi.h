@@ -29,7 +29,7 @@
 /* NeXus HDF45 */
 #define NEXUS_VERSION   "2.0.0."                /* major.minor.patch */
 
-#define CONSTCHAR       char
+#define CONSTCHAR       const char
 
 #if defined(_WIN32) && defined(_DLL)
 #	ifdef NX45DLL_EXPORTS

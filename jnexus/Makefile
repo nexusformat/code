@@ -92,7 +92,7 @@ jnexus.zip: $(JOBJ)
 
 
 libjnexus.so: $(COBJ)
-	$(CC) $(LFLAGS) -o $(SHLIB) $(COBJ)   $(NAPIROOT)libNeXus45.a \
+	$(CC) $(LFLAGS) -o $(SHLIB) $(COBJ) $(HDFROOT)/lib/libNeXus.a \
 	$(HDFROOT)/lib/libhdf5.a \
 	   $(HDFROOT)/lib/libmfhdf.a $(HDFROOT)/lib/libdf.a \
 	   $(HDFROOT)/lib/libjpeg.a $(HDFROOT)/lib/libz.a  -lm 
@@ -108,6 +108,8 @@ clean:
 	- rm ncsa/hdf/hdflib/*.class
 	- rm native/*.o
 
+apidoc: $(JOBJ)
+	javadoc -d apidoc neutron.nexus ncsa.hdf.hdflib
 
 # Make distributions
 ALLDIS=apidoc test jnexus.jar *.html neutron/nexus/*.java \
@@ -133,7 +135,6 @@ ZIP=/data/koenneck/bin/zip
 disw32: $(ALLDIS)
 	- rm jnexusw32.zip
 	$(ZIP) -r jnexusw32.zip $(ALLDIS)
-	cp jnexus/bin/win32/*.dll .
 	cp bin/win32/*.dll .
 	$(ZIP) -g jnexusw32.zip *.dll
 	- rm *.dll

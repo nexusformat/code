@@ -118,7 +118,7 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
    ---------------------------------------------------------------------*/
 
 
-  NXstatus CALLING_STYLE NXopen(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
+  NXstatus CALLING_STYLE  NXopen(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
   {
     int hdf_type=0;
     int iRet=0;
@@ -154,7 +154,7 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
         hdf_type=2; 
       } else {
 #ifdef HDF4
-        iRet=Hishdf(filename);
+        iRet=Hishdf((const char*)filename);
 #endif
         if (iRet>0) {
           hdf_type=1; 
@@ -164,7 +164,7 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
     if (hdf_type==1) {
       /* HDF4 type */
 #ifdef HDF4
-      NX4open(filename,am,&hdf4_handle);
+      NX4open((const char *)filename,am,&hdf4_handle);
       fHandle->pNexusData=hdf4_handle;
       fHandle->nxclose=NX4close;
       fHandle->nxflush=NX4flush;

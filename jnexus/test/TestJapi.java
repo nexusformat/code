@@ -132,7 +132,6 @@ public class TestJapi {
          nf.opengroup("data","NXdata");
          nf.makelink(did);
 	 // nf.debugstop();  
-         nf.makelink(gid);
          nf.closegroup();
 
          // close a file explicitly (recommended!)
