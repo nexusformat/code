@@ -11,14 +11,46 @@ def copy_dictionary(orig):
         copy[key]=orig[key]
     return copy
 
+def get_path(file):
+    """Determine the directory name that a file exists in (if specified)"""
+
+    # default value for end
+    end=0
+    
+    # try linux path separator
+    try:
+        end=file.rindex("/")
+    except ValueError:
+        pass # let it drop on the floor
+    if(end): return file[:end]+"/"
+
+    # try windows path separator
+    try:
+        end=file.rindex("\\")
+    except ValueError:
+        pass # let it drop on the floor
+    if(end): return file[:end]+"\\"
+
+    # the path must not have been specified
+    return ""
+
 def get_root_name(file):
     """Determine the root of the filename assuming that it either ends
     with '.xml' or is already a root"""
+
+    # determine the path and strip it off
+    begin=get_path(file).__len__()
+
+    # determine where the result ends
     ext=".xml"
-    if file.endswith(ext):
-        return file[:-1*ext.__len__()]
-    else:
-        return file
+    end=file.__len__()
+    try:
+        end=file.rindex(ext)
+    except ValueError:
+        pass # let it drop on the floor
+
+    # return the result
+    return file[begin:end]
 
 def print_usage(command,level=0):
     print "USAGE:",command,"[options] <definition file>"
@@ -55,6 +87,9 @@ def process_file(infile, outfile, options, DEBUG=1):
     doc=parse(infile)
     if DEBUG: print "          ... done"
 
+    # determine the path
+    path=get_path(infile)
+
     # determine the input name
     try:
         root_name=options.pop("--root")
@@ -75,7 +110,7 @@ def process_file(infile, outfile, options, DEBUG=1):
             ext=format_xml.get_def_ext()
         elif(format_option=="DOCBOOK"):
             ext=format_docbook.get_def_ext()
-        outfile="%s.%s" % (root_name,ext)
+        outfile="%s%s.%s" % (path,root_name,ext)
 
     # open the output file or create the buffer to write to
     if DEBUG: print "Writing result to \"%s\"" % outfile
