@@ -32,4 +32,7 @@ endif
 if HAVE_F90
 F90SUB = f90
 endif
-SUBDIRS = $(F77SUB) $(F90SUB)
+if HAVE_JAVAC
+JAVASUB = java
+endif
+SUBDIRS = $(F77SUB) $(F90SUB) $(JAVASUB)
