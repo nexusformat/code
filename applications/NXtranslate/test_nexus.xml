@@ -6,8 +6,8 @@
              </description>
     </note>
     <parabola_2D type="NXdata">
-      <x axis="2" NXS:location="/entry2/parabola_2D/x"/>
-      <y axis="1" NXS:location="/entry2/parabola_2D/y"/>
+      <x axis="NX_INT16:2" NXS:location="/entry2/parabola_2D/x"/>
+      <y axis="NX_INT16:1" NXS:location="/entry2/parabola_2D/y"/>
       <f_x_y type="NX_FLOAT64[3,4]" axes=""
             NXS:location="/entry2/parabola_2D/f_x_y"/>
     </parabola_2D>
