@@ -1,3 +1,19 @@
+If you wish to build using Microsoft Visual studio, there are workspace and
+project files in the WIN32_VS directory - just open "nexus.dsw"
+
+For more information see the README.TXT file in the WIN32_VS directory
+
+
+--------------------------------------------------------------------------
+
+
+**************************************************************************
+*** below are my old notes for WIN32 compilation. These have hopefully ***
+*** been superceded by the ones in WIN32_VS, but are left here in case ***
+*** they are useful                                                    ***
+**************************************************************************
+
+
 *** Notes Specific for Compilation on PC/Windows ***
 
 Due to the availability of different calling conventions 
