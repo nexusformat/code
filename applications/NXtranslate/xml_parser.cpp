@@ -45,6 +45,7 @@ static const string DEFAULT_MIME_TYPE = "NeXus";
 static const string MIME_TYPE         = "NXS:mime_type";
 static const string SOURCE            = "NXS:source";
 static const string LOCATION          = "NXS:location";
+static const string EXPAND            = "NXS:expand_list";
 static const string LINK              = "NAPIlink";
 static const string TARGET            = "target";
 static const string TYPE              = "type";
@@ -58,6 +59,7 @@ typedef struct{
   NXhandle *handle;       // output file handle
   int status;             // status of parsing
   bool is_link;           // whether the current node is a link
+  bool expand;            // whether the string should have special parsing
   map<string,string> map; // store macros for replacement
   vector<StrVector> loc_to_source; // mapping for links
   NodeVector nodes;       // vector to current node listing
@@ -115,6 +117,38 @@ static string trim(const string &s){
     return s;
   else
     return s.substr(start,end+1);
+}
+
+static bool is_left(char c){
+  static const string LEFT="[";
+  return find(LEFT.begin(),LEFT.end(),c)!=LEFT.end();
+}
+
+static bool is_right(char c){
+  static const string RIGHT="]";
+  return find(RIGHT.begin(),RIGHT.end(),c)!=RIGHT.end();
+}
+
+static StrVector split_on_bracket(const string str){
+  typedef string::size_type string_size;
+
+  string_size i=0;
+  string_size j=0;
+
+  // find LEFT
+  while(i<str.size() && !is_left(str[i]))
+    i++;
+
+  j=i;
+  // find right
+  while(j<str.size() && !is_right(str[j]))
+    j++;
+
+  // create the result
+  StrVector result;
+  result.push_back(str.substr(0,i));
+  result.push_back(str.substr(i+1,j-i-1));
+  return result;
 }
 
 /*
@@ -246,6 +280,9 @@ static void my_characters(void *user_data, const xmlChar *ch, int len){
 #ifdef DEBUG3_XML_PARSER
   std::cout << "characters" << std::endl;
 #endif
+  // ignore all characters if in an EXPAND field
+  if(((UserData *)user_data)->expand) return;
+
   // convert to a string
   string str=xmlChar_to_str(ch,len);
   // if it is empty just return
@@ -285,7 +322,7 @@ void my_startElement(void *user_data, const xmlChar *name,
   vector<Attr> node_attrs;
   for( StrVector::iterator it=str_attrs.begin() ; it!=str_attrs.end() ; it+=2){
     if( (*it==SOURCE) || (*it==MIME_TYPE) || (*it==LOCATION) || (*it==TYPE)
-                               || ((*it==TARGET) && (is_link)) || (*it==NAME)){
+             || ((*it==TARGET) && (is_link)) || (*it==NAME) || (*it==EXPAND) ){
       if(*it==SOURCE){
         source=*(it+1);
       }else if(*it==MIME_TYPE){
@@ -324,6 +361,16 @@ void my_startElement(void *user_data, const xmlChar *name,
         ((UserData *)user_data)->loc_to_source.push_back(str_vec);
         ((UserData *)user_data)->loc_to_source.push_back(string_util::string_to_path(*(it+1)));
         type=LINK;
+      }else if(*it==EXPAND){
+        cout << "FOUND " << EXPAND << "=" << *(it+1) << endl; // REMOVE
+        ((UserData *)user_data)->expand=true;
+        StrVector vec=split_on_bracket(*(it+1));
+        cout << " ***"; // REMOVE
+        for( StrVector::const_iterator inner=vec.begin() ; inner!=vec.end() ; inner++ ) // REMOVE
+          cout << "{" << *inner << "}"; // REMOVE
+        cout << endl; // REMOVE
+        type=vec[0];
+        ((UserData *)user_data)->char_data=vec[1];
       }
       str_attrs.erase(it,it+2);
       it-=2;
@@ -446,14 +493,71 @@ void my_endElement(void *user_data, const xmlChar *name){
     // update the node with the character value
     try{
       try{
-        update_node_from_string(node,((UserData *)user_data)->char_data,
+        if(((UserData *)user_data)->expand){
+          using string_util::intListStr_to_intVec;
+          int rank=1;
+          int dims[rank];
+          void *value;
+          Node::NXtype type=node.int_type();
+          if(type==NX_INT8){
+            vector<unsigned char> vec;
+            intListStr_to_intVec(((UserData *)user_data)->char_data,vec);
+            dims[0]=vec.size();
+            NXmalloc(&value,rank,dims,type);
+            for( int i=0 ; i<dims[0] ; i++ )
+              ((unsigned char *)value)[i]=vec[i];
+          }else if(type==NX_INT16){
+            vector<short int> vec;
+            intListStr_to_intVec(((UserData *)user_data)->char_data,vec);
+            dims[0]=vec.size();
+            NXmalloc(&value,rank,dims,type);
+            for( int i=0 ; i<dims[0] ; i++ )
+              ((short int *)value)[i]=vec[i];
+          }else if(type==NX_INT32){
+            vector<int> vec;
+            intListStr_to_intVec(((UserData *)user_data)->char_data,vec);
+            dims[0]=vec.size();
+            NXmalloc(&value,rank,dims,type);
+            for( int i=0 ; i<dims[0] ; i++ )
+              ((int *)value)[i]=vec[i];
+          }else if(type==NX_UINT8){
+            vector<unsigned char> vec;
+            intListStr_to_intVec(((UserData *)user_data)->char_data,vec);
+            dims[0]=vec.size();
+            NXmalloc(&value,rank,dims,type);
+            for( int i=0 ; i<dims[0] ; i++ )
+              ((unsigned char *)value)[i]=vec[i];
+          }else if(type==NX_UINT16){
+            vector<unsigned short> vec;
+            intListStr_to_intVec(((UserData *)user_data)->char_data,vec);
+            dims[0]=vec.size();
+            NXmalloc(&value,rank,dims,type);
+            for( int i=0 ; i<dims[0] ; i++ )
+              ((unsigned short *)value)[i]=vec[i];
+          }else if(type==NX_UINT32){
+            vector<unsigned int> vec;
+            intListStr_to_intVec(((UserData *)user_data)->char_data,vec);
+            dims[0]=vec.size();
+            NXmalloc(&value,rank,dims,type);
+            for( int i=0 ; i<dims[0] ; i++ )
+              ((unsigned int *)value)[i]=vec[i];
+          }else{
+            print_error(((UserData *)user_data),
+                    INVALID_ARGUMENT+":"+except_label+" type must be integer");
+          }
+          node.set_data(value,rank,dims,type);
+          NXfree(&value);
+        }else{
+          update_node_from_string(node,((UserData *)user_data)->char_data,
                                ((UserData *)user_data)->dims, node.int_type());
+        }
       }catch(runtime_error &e){
-        print_error(((UserData *)user_data),RUNTIME_ERROR+": "+except_label+" group cannot contain data");
+        print_error(((UserData *)user_data),RUNTIME_ERROR+": "+except_label
+                                                +" group cannot contain data");
       }
     }catch(invalid_argument &e){
       print_error(((UserData *)user_data),
-                                       INVALID_ARGUMENT+except_label+e.what());
+                                   INVALID_ARGUMENT+":"+except_label+e.what());
       return;
     }
 
@@ -594,6 +698,7 @@ extern bool xml_parser::parse_xml_file(const std::map<string,string> &map,
   user_data.handle=handle;
   user_data.status=0;
   user_data.is_link=false;
+  user_data.expand=false;
   user_data.map=map;
   user_data.mime_types.reserve(MAX_NODE_DEPTH);
   user_data.dims.reserve(25);
