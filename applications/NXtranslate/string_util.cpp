@@ -170,10 +170,42 @@ static StrVec shrink_and_split(string &str){
       *ch=*COMMA;
   }
 
+  // replace the first space with a comma
+  bool space=false;
+  for( string::iterator ch=str.begin() ; ch!=str.end() ; ch++ ){
+    if(isspace(*ch)){
+      if(!space){
+        space=true;
+        *ch=*COMMA;
+      }
+    }else{
+      space=false;
+    }
+  }
+
   // remove spaces
-  for( int i=1 ; i<str.size() ; i++ ){
-    if(isspace(str[i-1]))
-      str.erase(i-1,i);
+  {
+    typedef string::size_type string_size;
+
+    string new_str="";
+    string_size i=0;
+    while(i<str.size()){
+      // skip initial whitespace
+      while(i<str.size() && isspace(str[i]))
+        i++;
+
+      // find the end of the non-whitespace section
+      string_size j=i;
+      while(j<str.size() && !isspace(str[j]))
+        j++;
+
+      // copy the non-whitespace into the new string
+      if(i!=j){
+        new_str+=str.substr(i,j-i);
+        i=j;
+      }
+    }
+    str=new_str;
   }
 
   // trim extra commas off of the beginning
