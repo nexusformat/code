@@ -29,24 +29,21 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.a
+
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
-DISTCLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs
+CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs
 
 ## testdir=$(prefix)/nexus/test
 
-if HAVE_HDF4
-HDF4_TARGETS = napi4_test
-endif
-if HAVE_HDF5
-HDF5_TARGETS = napi5_test
-endif
-if HAVE_F77
+HDF4_TARGETS = napi_test-hdf4
+
+HDF5_TARGETS = napi_test-hdf5
+
 F77_TARGETS = napif_test
-endif
-if HAVE_F90
+
 F90_TARGETS = NXtest
-endif
+
 
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4
 
@@ -66,19 +63,27 @@ check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS)
 # have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
 TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib
 
-napi4_test_SOURCES = napi4_test.c
-napi4_test_LDADD = $(LIBNEXUS)
+napi_test_hdf4_SOURCES = napi_test.c
+napi_test_hdf4_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 
-napi5_test_SOURCES = napi5_test.c
-napi5_test_LDADD = $(LIBNEXUS)
+napi_test_hdf5_SOURCES = napi_test.c
+napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 
+if HAVE_F77
 napif_test_SOURCES = napif_test.f
 napif_test_LDADD = $(LIBNEXUS77)
-## napif_test_LINK = $(F77) $(F77FLAGS) $(LDFLAGS) -o $@
+else
+napif_test_SOURCES = dummy.c
+endif
 
+if HAVE_F90
 NXtest_SOURCES = NXtest.f90
 NXtest_LDADD = $(LIBNEXUS90)
-## NXtest_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
+else
+NXtest_SOURCES = dummy.c
+endif
 
 include $(top_srcdir)/build_rules.am
 
@@ -105,6 +110,4 @@ atconfig:	$(top_builddir)/config.status
 clean-local:
 	$(SHELL) $(TESTSUITE) --clean
 
-CLEANFILES = NXtest.nx4 NXtest.nxs
-
-DISTCLEANFILES += atconfig
+DISTCLEANFILES = atconfig
