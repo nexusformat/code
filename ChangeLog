@@ -1,3 +1,30 @@
+2004-02-20 10:00  jk
+	* autogen.sh: autogen.sh contains all calls to autotools necessary
+	  to create the complete infrastructure to use the configure
+	  script.
+	* AUTHORS: contains the names of the developers and contributors
+	  of the NeXus library
+	* COPYING: contains the Lesser General Public Licence. This more
+	  compliant to the GNU style than the gnu_license.txt
+	* NEWS: This file should contain the NEWS for the release.
+	* configure.ac: add the use of libtool in this project and add a
+	  summary report at the end of the configure run
+	* include/Makefile.am, scripts/Makefile.am: add this file due to a
+	  better control of distribution files.
+	* Makefile.am: remove the files from directories include and scripts
+	* test/Makefile, bindings/f77/Makefile.am: substitute the relative
+	  by absolute pathes beginning at the top (build or src)
+	* bindings/f90/Makefile.am, applications/Makefile.am: substitute
+	  the relative pathes by pathes beginning from the top (either
+	  build or src) 
+	* include/napi4.h, include/napi5.h: remove the include of the
+	  sources
+	* src/napi4.c, src/napi5.c: Include the different header files for
+	  the different HDF versions. Add the external reference to the
+	  NXpData.
+	* src/Makefile.am: Add the conditional build of the HDF4 and HDF5
+	  support of NeXus
+ 
 2004-02-18 19:23  faa
 
 	* scripts/nxbuild.in: nxbuild is a command that will take a list of
