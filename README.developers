@@ -1,18 +1,39 @@
-You need to type:
+Initial Setup
+-------------
+
+You first need to type:
 
     sh autogen.sh
 
-to generate the initial configure and *.in files. After doing this use:
+to generate the initial configure and *.in files. You only need to 
+type this again if you upgrade you system's versions of 
+libtool/automake/autoconf and wish to use these newer version for the build
+
+After doing this type:
 
     ./configure
+
+General Building
+----------------
+
+Just typing
+
     make
 
-to build the NeXus sources. The programs can then be installed 
-on the local system with:
+should be enough to build the NeXus libraries and executables from source. 
+Make will automatically re-run configure if it needs to.
+The test programs can then be run with
+
+    make check
+
+and everything installed onto the local system with
 
     make install
 
-To generate a *.tar.gz distribution kit use:
+Making a distribution kit
+-------------------------
+
+To generate a *.tar.gz distribution kit just type:
 
     make distcheck
 
