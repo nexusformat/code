@@ -111,6 +111,6 @@ atconfig:	$(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 clean-local:
-	$(SHELL) $(TESTSUITE) --clean
+	-$(SHELL) $(TESTSUITE) --clean
 
 DISTCLEANFILES = atconfig
