@@ -48,4 +48,17 @@ ftp://ftp.gnu.org/gnu/autoconf
 ftp://ftp.gnu.org/gnu/automake
 ftp://ftp.gnu.org/gnu/libtool
 
+NeXus Developer Mailing Lists
+-----------------------------
+
+CVS commit/log messages are automatically sent to the nexus-cvs@anl.gov 
+mailing list - if you wish to receive these, subscribe to the list via the link
+
+  http://www.neutron.anl.gov/mailman/listinfo/nexus-cvs
+
+Any general developer questions should be directed to nexus-developers@anl.gov 
+list - you can subscribe to this via the link
+
+  http://www.neutron.anl.gov/mailman/listinfo/nexus-developers
+
 $Id$
