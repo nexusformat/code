@@ -13,6 +13,13 @@ After doing this type:
 
     ./configure
 
+For a full list of options that can be passed to configure type:
+
+    ./configure --help
+
+(typical configure options include the choice of compiler, enabling or
+ disabling creation of bindings and the location of HDF libraries)
+
 General Building
 ----------------
 
@@ -36,6 +43,11 @@ Making a distribution kit
 To generate a *.tar.gz distribution kit just type:
 
     make distcheck
+
+If you need to pass arguments to "configure" during the distcheck process,
+you must add these to the DISTCHECK_CONFIGURE_FLAGS variable in Makefile.am
+
+To generate an RPM install kit see README.rpm
 
 If you have problems
 --------------------
