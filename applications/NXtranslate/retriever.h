@@ -31,12 +31,6 @@ class Retriever{
   virtual ~Retriever()=0;
 
   /**
-   * This is provide a method for creating copies that is used in the
-   * copy constructor.
-   */
-  //virtual Retriever* clone() const=0;
-
-  /**
    * This is the method for retrieving data from a file. The whole
    * tree will be written to the new file immediately after being
    * called. Interpreting the string is left up to the implementing
