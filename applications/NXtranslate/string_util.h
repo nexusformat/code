@@ -7,6 +7,9 @@
 namespace string_util{
   extern bool string_util::is_comma(char);
   extern std::vector<std::string> string_util::split(const std::string &);
+  /**
+   * Returns true if the first argument starts with the second.
+   */
   extern bool   starts_with(const std::string &, const std::string &);
   extern std::string trim(const std::string &);
   extern long   str_to_int(const std::string &);
