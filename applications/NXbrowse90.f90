@@ -49,11 +49,34 @@ program NXbrowse
 
    write (unit=*, fmt="(a)", advance="no") " Give name of NeXus file : "
    read *, file_name
-!Open input file
+!Open input file and output global attributes
    if (NXopen (trim(file_name), NXACC_READ, file_id) /= NX_OK) then
       call NXerror ("Can't open "//trim(file_name))
       stop
    end if
+   do
+      status = NXgetnextattr (file_id, attr_name, n, NXtype)
+      if (status /= NX_OK) exit
+      !Output attribute information according to type
+      select case (NXtype)
+         case (NX_CHAR)
+            if (NXgetattr (file_id, attr_name, char_value) /= NX_OK) cycle
+               print *, "    "//trim(attr_name)//" = "//trim(char_value)
+               char_value = " "
+         case (NX_INT8,NX_UINT8,NX_INT16,NX_UINT16,NX_INT32,NX_UINT32)
+            if (NXgetattr (file_id, attr_name, int_value) == NX_OK) then
+               print *, "    "//trim(attr_name)//" = ",int_value
+            end if
+         case (NX_FLOAT32)
+            if (NXgetattr (file_id, attr_name, real_value) == NX_OK) then
+               print *, "    "//trim(attr_name)//" = ",real_value
+            end if
+         case (NX_FLOAT64)
+            if (NXgetattr (file_id, attr_name, dble_value) == NX_OK) then
+               print *, "    "//trim(attr_name)//" = ",dble_value
+            end if
+      end select
+   end do
 !Input commands until the EXIT command is given
    path = "NX"
    do
