@@ -3,7 +3,7 @@
   
   NeXus API header file
   
-  Copyright (C) 1997, 1998, 1999 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2000 Mark Koennecke, Przemek Klosowski
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -167,7 +167,11 @@ extern "C" {
 #    define NXputattr 		MANGLE(nxiputattr)
 #    define NXputdim 		MANGLE(nxiputdim)
 #    define NXgetinfo 		MANGLE(nxigetinfo)
+#    define NXgetgroupinfo 	MANGLE(nxigetgroupinfo)
+#    define NXinitgroupdir 	MANGLE(nxiinitgroupdir)
 #    define NXgetnextentry 	MANGLE(nxigetnextentry)
+#    define NXgetattrinfo 	MANGLE(nxigetattrinfo)
+#    define NXinitattrdir 	MANGLE(nxiinitattrdir)
 #    define NXgetnextattr 	MANGLE(nxigetnextattr)
 #    define NXgetgroupID 	MANGLE(nxigetgroupid)
 #    define NXgetdataID 	MANGLE(nxigetdataid)
@@ -187,7 +191,7 @@ extern "C" {
 /* #       define MANGLE(__arg)		__stdcall CONCAT(__arg,_) */
 /* #       define MANGLE(__arg)		CONCAT(__arg,_) */
 #       define MANGLE(__arg)		__stdcall __arg
-#	define NXopen 			NXIOPEN_
+#       define NXopen 			NXIOPEN_
 #       define NXclose 			NXICLOSE_
 #       define NXmakegroup 		MANGLE(NXIMAKEGROUP)
 #       define NXopengroup 		MANGLE(NXIOPENGROUP)
@@ -205,7 +209,11 @@ extern "C" {
 #       define NXputattr 		NXIPUTATTR_
 #       define NXputdim 		MANGLE(NXIPUTDIM)
 #       define NXgetinfo 		MANGLE(NXIGETINFO)
+#       define NXgetgroupinfo 		MANGLE(NXIGETGROUPINFO)
+#       define NXinitgroupdir 		MANGLE(NXIINITGROUPDIR)
 #       define NXgetnextentry 		MANGLE(NXIGETNEXTENTRY)
+#       define NXgetattrinfo 		MANGLE(NXIGETATTRINFO)
+#       define NXinitattrdir 		MANGLE(NXIINITATTRDIR)
 #       define NXgetnextattr 		MANGLE(NXIGETNEXTATTR)
 #       define NXgetgroupID 		MANGLE(NXIGETGROUPID)
 #       define NXgetdataID 		MANGLE(NXIGETDATAID)
@@ -215,9 +223,9 @@ extern "C" {
 /* FORTRAN helpers - for NeXus internal use only */
 #	define NXfopen 			MANGLE(NXIFOPEN)
 #	define NXfclose			MANGLE(NXIFCLOSE)
-#    	define NXfmakedata		MANGLE(NXIFMAKEDATA)
-#    	define NXfcompress		MANGLE(NXIFCOMPRESS)
-#    	define NXfputattr		MANGLE(NXIFPUTATTR)
+#	define NXfmakedata		MANGLE(NXIFMAKEDATA)
+#	define NXfcompress		MANGLE(NXIFCOMPRESS)
+#	define NXfputattr		MANGLE(NXIFPUTATTR)
 #else
 #   error Cannot compile - unknown operating system
 #endif
@@ -246,7 +254,11 @@ extern "C" {
   NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
   
   NXstatus  NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
+  NXstatus  NXgetgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
+  NXstatus  NXinitgroupdir(NXhandle handle);
   NXstatus  NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
+  NXstatus  NXgetattrinfo(NXhandle handle, int* no_items);
+  NXstatus  NXinitattrdir(NXhandle handle);
   NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
   
   NXstatus  NXgetgroupID(NXhandle handle, NXlink* pLink);
