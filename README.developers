@@ -1,0 +1,30 @@
+You need to type:
+
+    sh autogen.sh
+
+to generate the initial configure and *.in files. After doing this use:
+
+    ./configure
+    make
+
+to build the NeXus sources. The programs can then be installed 
+on the local system with:
+
+    make install
+
+To generate a *.tar.gz distribution kit use:
+
+    make distcheck
+
+If you have problems
+--------------------
+
+If  autogen.sh  reports errors, it may be that you need
+to install/upgrade your versions of autoconf, automake and libtool.
+Source for these can be obtained from:
+
+ftp://ftp.gnu.org/gnu/autoconf
+ftp://ftp.gnu.org/gnu/automake
+ftp://ftp.gnu.org/gnu/libtool
+
+$Id$
