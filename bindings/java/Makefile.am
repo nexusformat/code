@@ -29,6 +29,16 @@
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include
 
+# define which libraries to use
+if HAVE_HDF4
+LIB4_FLAG = -DHDF4
+endif
+
+if HAVE_HDF5
+LIB5_FLAG = -DHDF5
+endif
+
+
 ## List of all classes needed for the jar file. The order matters
 ## since ArrayDescripter is defined inside HDFArray
 jnexus_CLASS = ncsa/hdf/hdflib/HDFArray.class \
@@ -44,20 +54,22 @@ jnexus_CLASS = ncsa/hdf/hdflib/HDFArray.class \
                neutron/nexus/NexusFile.class \
                neutron/nexus/NXlink.class
 
-jnexus_COBJ = native/hdfnativeImp.o \
-              native/hdfexceptionImp.o \
-              native/handle.o \
-              native/NexusFile.o
+lib_LIBRARIES = libjnexus.so
 
-include $(top_srcdir)/build_rules.am
+libjnexus_so_SOURCES = native/neutron_nexus_NexusFile.h \
+                       native/hdfnativeImp.c \
+                       native/hdfexceptionImp.c \
+                       native/handle.c \
+                       native/NexusFile.c
+
+native/NexusFile.o: native/NexusFile.c native/neutron_nexus_NexusFile.h
 
 JAVAROOT = /usr/local/java
 JINCLUDE = -I$(JAVAROOT)/include -I$(JAVAROOT)/include/linux
 
-LIB_FLAGS=-DHDF4 -DHDF5
 
-CFLAGS = -g -c $(JINCLUDE) $(LIB_FLAGS) -I../../include -Inative
-LFLAGS = -g -shared -L../../src -lNeXus $(LIB_FLAGS)
+CFLAGS = -g -c $(AM_CPPFLAGS) $(JINCLUDE) -I../../include -Inative
+LFLAGS = -g -shared -L../../src -lNeXus $(LIB4_FLAG) $(LIB5_FLAG)
 
 .c.o:
 	$(CC) $(CFLAGS) -o $*.o $*.c
@@ -68,16 +80,18 @@ native/neutron_nexus_NexusFile.h: neutron/nexus/NexusFile.class
 jnexus.jar: $(jnexus_CLASS)
 	$(JAR) cvf jnexus.jar $(jnexus_CLASS)
 
-libjnexus.so: native/neutron_nexus_NexusFile.h $(jnexus_COBJ)
-	$(CC) -o libjnexus.so $(jnexus_COBJ) $(LFLAGS) -lz -lm
+#libjnexus.so: native/neutron_nexus_NexusFile.h $(jnexus_COBJ)
+#	$(CC) -o libjnexus.so $(jnexus_COBJ) $(LFLAGS) -lz -lm
 
 test: test/TestJapi.class
 
 javadoc:
 	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus neutron.nexus ncsa.hdf.hdflib
 
-all: jnexus.jar libjnexus.so javadoc
+all: jnexus.jar native/neutron_nexus_NexusFile.h libjnexus.so javadoc
 
 clean:
-	rm -f $(jnexus_CLASS) $(jnexus_COBJ) native/neutron_nexus_NexusFile.h
+	rm -f $(jnexus_CLASS) native/neutron_nexus_NexusFile.h
 	rm -rf apidoc/*
+
+include $(top_srcdir)/build_rules.am
