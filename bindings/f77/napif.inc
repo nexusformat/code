@@ -34,7 +34,7 @@ C------------------------------------------------------------------------------
 
 C *** Version of NeXus interface - should be consistent with napi.h!
       CHARACTER*5 NEXUS_VERSION
-      PARAMETER(NEXUS_VERSION='1.3.1')
+      PARAMETER(NEXUS_VERSION='1.3.2')
 C *** NXaccess enum - access modes for NXopen
       INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE
       PARAMETER(NXACC_READ=1,NXACC_RDWR=3,NXACC_CREATE=4)

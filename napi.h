@@ -40,7 +40,7 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#define NEXUS_VERSION	"1.3.1"		/* major.minor.patch */
+#define NEXUS_VERSION	"1.3.2"		/* major.minor.patch */
 
 #ifdef GENIE_IMPLEMENTATION__		/* OpenGENIE is fussy about consts */
 #   define CONSTCHAR	const char
