@@ -11,10 +11,8 @@ program NXtest
    integer(kind=NXi1), dimension(4) :: i1_array = (/1, 2, 3, 4/)
    integer(kind=NXi2), dimension(4) :: i2_array = (/1000, 2000, 3000, 4000/)
    integer(kind=NXi4), dimension(4) :: i4_array = (/1000000, 2000000, 3000000, 4000000/)
-   real(kind=NXr4), dimension(4,5) :: r4_array = &
-     (/1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20./)
-   real(kind=NXr8), dimension(4,5) :: r8_array = &
-     (/1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20./)
+   real(kind=NXr4), dimension(4,5) :: r4_array
+   real(kind=NXr8), dimension(4,5) :: r8_array
    integer(kind=NXi4), dimension(4) :: i4_buffer
    real(kind=NXr4), dimension(4) :: r4_buffer
    real(kind=NXr8), dimension(16) :: r8_buffer
@@ -24,6 +22,8 @@ program NXtest
    character(len=NX_maxnamelen) :: name, class
    type(NXhandle) :: fileid
 
+   r4_array = reshape ((/(i*1.0_NXr4,i=1,20)/),(/4,5/))
+   r8_array = reshape ((/(i*1.0_NXr8,i=1,20)/),(/4,5/))
 ! *** create file
    if (NXopen("NXtest.nxs", NXACC_CREATE, fileid) /= NX_OK) stop
    if (NXmakegroup(fileid, "entry", "NXentry") /= NX_OK) stop
