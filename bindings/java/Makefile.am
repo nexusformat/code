@@ -59,9 +59,6 @@ LIB_FLAGS=-DHDF4 -DHDF5
 CFLAGS = -g -c $(JINCLUDE) $(LIB_FLAGS) -I../../include -Inative
 LFLAGS = -g -shared -L../../src -lNeXus $(LIB_FLAGS)
 
-.java.class:
-	$(JAVAC) -g -target 1.1 $*.java
-
 .c.o:
 	$(CC) $(CFLAGS) -o $*.o $*.c
 
@@ -80,3 +77,7 @@ javadoc:
 	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus neutron.nexus ncsa.hdf.hdflib
 
 all: jnexus.jar libjnexus.so javadoc
+
+clean:
+	rm -f $(jnexus_CLASS) $(jnexus_COBJ) native/neutron_nexus_NexusFile.h
+	rm -rf apidoc/*
