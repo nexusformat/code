@@ -145,10 +145,10 @@ C------------------------------------------------------------------------------
          IF (NXCLOSEGROUP(FILEID) .NE. NX_OK) STOP
          IF (NXMAKEGROUP(FILEID, 'sample', 'NXsample') .NE. NX_OK) STOP
          IF (NXOPENGROUP(FILEID, 'sample', 'NXsample') .NE. NX_OK) STOP
-            IF (NXMAKEDATA(FILEID, "ch_data", NX_CHAR, 1, 12) .NE. 
+            IF (NXMAKEDATA(FILEID, 'ch_data', NX_CHAR, 1, 12) .NE. 
      +        NX_OK) STOP
-            IF (NXOPENDATA(FILEID, "ch_data") .NE. NX_OK) STOP
-               IF (NXPUTDATA(FILEID, "NeXus sample") .NE. NX_OK) STOP
+            IF (NXOPENDATA(FILEID, 'ch_data') .NE. NX_OK) STOP
+            IF (NXPUTCHARDATA(FILEID, 'NeXus sample') .NE. NX_OK) STOP
             IF (NXCLOSEDATA(FILEID) .NE. NX_OK) STOP
             IF (NXGETGROUPID (FILEID, GLINK) .NE. NX_OK) STOP
          IF (NXCLOSEGROUP (FILEID) .NE. NX_OK) STOP
