@@ -36,12 +36,15 @@ MODULE NXUmodule
    PUBLIC
 ! *** NeXus utility functions ***
    PUBLIC :: NXUwriteglobals, NXUwritegroup, NXUwritedata, NXUreaddata
+   PUBLIC :: NXUsetcompress
    PUBLIC :: NXUfindgroup, NXUfindclass, NXUfinddata, NXUfindattr
    PUBLIC :: NXUfindsignal, NXUfindaxis
    PUBLIC :: NXUfindlink, NXUresumelink
 ! *** NeXus utility internal functions
    PRIVATE :: NXUpreparedata, NXUconfirmdata, NXUsearchgroup
 ! *** NeXus utility global variables
+   INTEGER, PRIVATE :: NXcompress_type = NX_COMP_NONE
+   INTEGER, PRIVATE :: NXcompress_size = 100
    INTEGER, PRIVATE :: group_level
    INTEGER, PRIVATE :: NXrank, NXdims(NX_MAXRANK), NXtype, NXsize
 ! *** NeXus generic interfaces ***
@@ -844,6 +847,27 @@ CONTAINS
    END FUNCTION NXUread3Dr8array
 !------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
+!NXUsetcompress sets the default compression type and minimum size
+   FUNCTION NXUsetcompress (file_id, compress_type, compress_size) &
+                        RESULT (status)
+
+      TYPE(NXhandle), INTENT(inout) :: file_id
+      INTEGER,        INTENT(in)    :: compress_type
+      INTEGER,        INTENT(in), OPTIONAL :: compress_size
+      INTEGER :: status
+
+      IF (compress_type == NX_COMP_LZW .OR. compress_type == NX_COMP_HUF .OR. &
+          compress_type == NX_COMP_RLE .OR. compress_type == NX_COMP_NONE) THEN
+         NXcompress_type = compress_type
+         IF (PRESENT(compress_size)) NXcompress_size = compress_size
+         status = NX_OK
+      ELSE
+         call NXerror ("Invalid compression option")
+         status = NX_ERROR
+      END IF
+
+   END FUNCTION NXUsetcompress
+!------------------------------------------------------------------------------
 !NXUfindgroup finds if a NeXus group of the specified name exists
    FUNCTION NXUfindgroup (file_id, group_name, group_class) RESULT (status)
 
@@ -1251,6 +1275,10 @@ CONTAINS
                END IF
             END DO
          END IF
+      END IF
+      IF (status == NX_OK .AND. NXcompress_type /= NX_COMP_NONE .AND. &
+          PRODUCT(data_dimensions(1:data_rank)) > NXcompress_size) THEN
+         status = NXcompress (file_id, NXcompress_type)
       END IF
       
    END FUNCTION NXUpreparedata
