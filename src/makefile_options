@@ -1,0 +1,58 @@
+#====================================================================
+#  NeXus - Neutron & X-ray Common Data Format
+#  
+#  Makefile compiler and directory options
+#  
+#  Copyright (C) 2002 Ray Osborn
+#  
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free 
+#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+#  MA  02111-1307  USA
+#             
+#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#
+# $Id$
+#
+#====================================================================
+#Edit the compiler flags as necessary
+CC=cc
+FC=g77
+CFLAGS=-g 
+FFLAGS=-g
+F90=f90
+F90FLAGS=
+LDFLAGS=
+#====================================================================
+#Compiler flags for g77 and Absoft Pro Fortran 90 on Mac OS X
+#CC=cc
+#FC=g77
+#CFLAGS=-g -no-cpp-precomp 
+#FFLAGS=-g -Wno-globals
+#F90=f95
+#F90FLAGS=-YEXT_NAMES=LCS -YEXT_SFX=_
+#LDFLAGS=-flat_namespace
+#====================================================================
+#Compiler flags for Absoft Pro Fortran 90 on Linux
+#CC=cc
+#FC=g77
+#CFLAGS=-gdwarf -D__ABSOFT
+#FFLAGS=-f
+#F90=f90
+#F90FLAGS=-YEXT_NAMES=LCS
+#LDFLAGS=
+#====================================================================
+#Specify locations of the NeXus source files and HDF libraries
+FROOT=/usr/local/NeXus
+H4ROOT=/usr/local/hdf4
+H5ROOT=/usr/local/hdf5
