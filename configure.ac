@@ -86,11 +86,18 @@ else
 	F77=
 fi
 
+dnl These are used in build_rules.am to pass any approptiate 
+dnl tag to libtool for f90 building
+LTF90COMPILETAG=""
+LTF90LINKTAG=""
+AC_SUBST(LTF90COMPILETAG)
+AC_SUBST(LTF90LINKTAG)
+
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
 	[], [with_f90=yes])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(F90, [f90 f95])
+		AC_CHECK_PROGS(F90, [f90 f95 ifort])
 	else
 		AC_CHECK_PROGS(F90, ["$with_f90"])
 	fi
@@ -134,6 +141,7 @@ AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+
 dnl
 dnl First any host specific bits
 dnl
@@ -154,6 +162,8 @@ dnl does not get set with the commands to create a shared library
 	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	SHARED_LDFLAGS="-Wl,-single_module"
+	LTF90COMPILETAG="--tag=F77"
+	LTF90LINKTAG="--tag=CC"
 dnl	LDFLAGS="$LDFLAGS -flat_namespace"
 dnl     if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
 dnl           lt_int_apple_cc_single_mod=yes

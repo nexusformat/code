@@ -44,7 +44,7 @@ all: all-am libNeXus90.la_orig
 
 libNeXus90.la_orig: libNeXus90.la
 	mv libNeXus90.la $@
-	sed -e 's/--mode=relink/--mode=relink --tag=CC/' < $@ > libNeXus90.la
+	sed -e 's/--mode=relink/--mode=relink @LTF90LINKTAG@/' < $@ > libNeXus90.la
 	touch $@
 
 include $(top_srcdir)/build_rules.am
