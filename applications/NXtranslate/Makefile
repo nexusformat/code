@@ -51,7 +51,6 @@ SRC=$(CPP_SRC) $(H_SRC) $(TEST_SRC) $(DOC_SRC) $(IPNS_CPP_SRC) Makefile \
 VERS=0.2.0-rc4
 ######################################################################
 nxtranslate: $(OBJS) $(INPUT_LIBS)
-	cd IPNS_CPP && $(MAKE)
 	$(CPP) $(OBJS) $(LIBS) -o nxtranslate
 
 attr.o: attr.cpp attr.h
