@@ -43,24 +43,29 @@ MODULE NXmodule
    INTEGER, PARAMETER, PUBLIC :: NX_MAXSTACK = 50
 ! *** NeXus type definitions
    TYPE, PUBLIC :: NXstack
-      SEQUENCE
-      INTEGER :: iVref
+! WARNING: 32bit pointer assumption; on e.g. Digital UNIX iRefDir
+!          and iTagDir need to be 64bit
+      INTEGER(kind=selected_int_kind(8)) :: iRefDir
+      INTEGER(kind=selected_int_kind(8)) :: iTagDir
+      INTEGER(kind=selected_int_kind(8)) :: iVref
+      INTEGER(kind=selected_int_kind(8)) :: pad
       INTEGER :: iNDir
       INTEGER :: iCurDir
-      INTEGER :: iRefDir
-      INTEGER :: iTagDir
    END TYPE NXstack
    TYPE, PUBLIC :: NXhandle
-      SEQUENCE
-      INTEGER :: iNXID
-      CHARACTER(len=2) :: iAccess
-      INTEGER :: iVID
-      INTEGER :: iSID
-      INTEGER :: iCurrentVG
-      INTEGER :: iCurrentSDS
       TYPE(NXstack) :: iStack(NX_MAXSTACK)
-      INTEGER :: iStackPtr
       TYPE(NXstack) :: iAtt
+      INTEGER(kind=selected_int_kind(8)) :: iVID
+      INTEGER(kind=selected_int_kind(8)) :: iSID
+      INTEGER(kind=selected_int_kind(8)) :: iCurrentVG
+      INTEGER(kind=selected_int_kind(8)) :: iCurrentSDS
+      INTEGER :: iNXID
+      INTEGER :: iStackPtr
+      CHARACTER(len=2) :: iAccess
+! If we are on Digital UNIX and haven't changed the type of iTagDir
+! and iRefDir, this will at least stop a memory overwrite by padding
+! out the structure to the same length as in C
+      INTEGER(kind=selected_int_kind(8)) :: morepad(2+2*NX_MAXSTACK)
    END TYPE
    TYPE, PUBLIC :: NXlink
       INTEGER(kind=selected_int_kind(8)) :: tag
