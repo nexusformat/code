@@ -11,7 +11,7 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#define NEXUS_VERSION	"1.0.0"		/* major.minor.patch */
+#define NEXUS_VERSION	"1.1.0"		/* major.minor.patch */
 
 #include <mfhdf.h>
 
