@@ -37,5 +37,5 @@ SUBDIRS=include src bindings test applications scripts
 
 # We seem to fail a dependency check later with the install
 # kit if this line is missing
-EXTRA_DIST=build_rules.am
+EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec
 
