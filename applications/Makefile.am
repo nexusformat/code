@@ -38,7 +38,8 @@ if HAVE_HDF5
 HDF5_TARGETS = NXtoNX5
 endif
 if HAVE_F90
-F90_TARGETS = NXdump NXbrowse90
+## F90_TARGETS = NXdump NXbrowse90
+F90_TARGETS =
 endif
 
 bin_PROGRAMS = NXbrowse NXtoXML NXtoDTD $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_TARGETS)
@@ -58,12 +59,12 @@ NXtoNX4_LDADD = $(LIBNEXUS)
 NXtoNX5_SOURCES = NXtoNX5.c 
 NXtoNX5_LDADD = $(LIBNEXUS)
 
-NXdump_SOURCES = NXdump.f90
-NXdump_LDADD = $(LIBNEXUS90)
+## NXdump_SOURCES = NXdump.f90
+## NXdump_LDADD = $(LIBNEXUS90)
 ## NXdump_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
 
-NXbrowse90_SOURCES = NXbrowse90.f90
-NXbrowse90_LDADD = $(LIBNEXUS90)
+## NXbrowse90_SOURCES = NXbrowse90.f90
+## NXbrowse90_LDADD = $(LIBNEXUS90)
 ## NXbrowse90_LINK = $(F90) $(F90FLAGS) $(LDFLAGS) -o $@
 
 include $(top_srcdir)/build_rules.am
