@@ -7,6 +7,15 @@
 #include "string_util.h"
 #include "nxtranslate_debug.h"
 
+// ----- start of declaring debug levels
+#ifdef DEBUG3_NEXUS_UTIL
+#define DEBUG2_NEXUS_UTIL
+#endif
+#ifdef DEBUG2_NEXUS_UTIL
+#define DEBUG1_NEXUS_UTIL
+#endif
+// ----- end of declaring debug levels
+
 using std::invalid_argument;
 using std::runtime_error;
 using std::string;

@@ -13,6 +13,15 @@
 #include "tree.hh"
 #include "nxtranslate_debug.h"
 
+// ----- start of declaring debug levels
+#ifdef DEBUG3_XML_PARSER
+#define DEBUG2_XML_PARSER
+#endif
+#ifdef DEBUG2_XML_PARSER
+#define DEBUG1_XML_PARSER
+#endif
+// ----- end of declaring debug levels
+
 using std::cerr;
 using std::cout;
 using std::endl;
