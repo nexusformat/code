@@ -13,14 +13,10 @@ class TextPlainRetriever: public Retriever{
   std::string toString() const;
   static const std::string MIME_TYPE;
  private:
-  //void IpnsRetriever::getData(Node &, const std::string &);
-  //IpnsRetriever(const IpnsRetriever&);
-  //IpnsRetriever& operator=(const IpnsRetriever&);
-  //  NXhandle *handle;
+  TextPlainRetriever(const TextPlainRetriever&);
+  TextPlainRetriever& operator=(const TextPlainRetriever&);
   std::string source;
   int current_line;
   std::ifstream infile;
-  //std::vector<int> *lines;
-  //Runfile *runFile;
 };
 #endif
