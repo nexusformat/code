@@ -70,7 +70,18 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   /*---------------------------------------------------------------------*/
      static void NXNXNXReportError(void *pData, char *string)
      {
-         printf("%s \n",string);
+#if defined(_WIN32) && ( defined(_DLL) || defined(_HDFDLL_) ) && !defined(_CONSOLE)
+/*
+ * printf() output may get lost in Windows applications without a console ... this code
+ * makes them appear in Dialog boxes. To use printf(), you would probably have to create
+ * a console window with AllocConsole(), or get hold of "stdout" from the main program
+ * and then use fprintf(main_program_stdout, ... ) rather then printf(...)
+ */
+        MessageBeep(MB_ICONEXCLAMATION);
+        MessageBox(NULL, string, "NeXus Error", MB_ICONSTOP | MB_OK | MB_TASKMODAL | MB_SETFOREGROUND);
+#else
+        printf("%s \n",string);
+#endif /* _WIN32 */
      }
   /*---------------------------------------------------------------------*/
      void *NXpData = NULL;
