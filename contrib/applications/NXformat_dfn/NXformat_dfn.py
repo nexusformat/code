@@ -81,7 +81,7 @@ def print_usage(command,level=0):
           % format_docbook.get_def_ext()
     print format_docbook.get_command_line_doc()
 
-def process_file(infile, outfile, options, DEBUG=1):
+def process_file(infile, outfile, options, DEBUG=1, append=False):
     # parse the xml file
     if DEBUG: print "Processing \"%s\"" % infile
     doc=parse(infile)
@@ -115,9 +115,15 @@ def process_file(infile, outfile, options, DEBUG=1):
     # open the output file or create the buffer to write to
     if DEBUG: print "Writing result to \"%s\"" % outfile
     if DEBUG<=0:
-        buffer=open(outfile,"w")
+        if(append):
+            buffer=open(outfile,"a")
+        else:
+            buffer=open(outfile,"w")
     else:
         buffer=StringIO.StringIO()
+
+    # if appending then add a newline to the end of the file
+    if(append): buffer.write("\n")
 
     # get the appropriate formatter
     if DEBUG: print "Creating %s formatter" % format_option
@@ -149,14 +155,22 @@ def main(infile, outfile, options, DEBUG=1):
         return
 
     # confirm that we are working without an output file name
+    append=False
+    first=True
     if outfile:
-        print "Cannot specify output filename in multiple file processing mode"
-        sys.exit(-1)
+        append=True
+    else:
+        outfile=""
 
     # deal with no output file specified
     for file in infile:
         options_copy=copy_dictionary(options)
-        process_file(file,"",options_copy,DEBUG)
+        if first:
+            process_file(file,outfile,options_copy,DEBUG)
+            first=False
+        else:
+            process_file(file,outfile,options_copy,DEBUG,append)
+            
 
 if __name__ == "__main__":
     # sys module only needed for command line operation
@@ -191,11 +205,11 @@ if __name__ == "__main__":
                 options["--format"]="xml"
             else:
                 # get key and value
-                index=key.index("=")
-                if(index>=0):
+                try:
+                    index=key.index("=")
                     value=key[index+1:]
                     key=key[:index]
-                elif(sys.argv.__len__()>0):
+                except ValueError:
                     value=sys.argv[0]
                     sys.argv=sys.argv[1:]
                 # check for special keys
