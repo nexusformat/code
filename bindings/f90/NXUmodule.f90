@@ -3,7 +3,7 @@
 !  
 ! Fortran 90 Utilities
 !
-! Copyright (C) 1999, Ray Osborn
+! Copyright (C) 1999-2002, Ray Osborn
 !
 ! This library is free software; you can redistribute it and/or
 ! modify it under the terms of the GNU Lesser General Public
@@ -18,12 +18,6 @@
 ! You should have received a copy of the GNU Lesser General Public
 ! License along with this library; if not, write to the Free Software
 ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-!
-! Contact : R. Osborn <ROsborn@anl.gov>
-!           Materials Science Division
-!           Argonne National Laboratory
-!           Argonne, IL 60439-4845
-!           USA
 !
 ! For further information, see <http://www.neutron.anl.gov/NeXus/>
 !
@@ -44,7 +38,7 @@ MODULE NXUmodule
    PRIVATE :: NXUpreparedata, NXUconfirmdata, NXUsearchgroup
 ! *** NeXus utility global variables
    INTEGER, PRIVATE :: NXcompress_type = NX_COMP_NONE
-   INTEGER, PRIVATE :: NXcompress_size = 100
+   INTEGER, PRIVATE :: NXcompress_size = 1000
    INTEGER, PRIVATE :: group_level
    INTEGER, PRIVATE :: NXrank, NXdims(NX_MAXRANK), NXtype, NXsize
 ! *** NeXus generic interfaces ***
@@ -1165,7 +1159,7 @@ CONTAINS
                IF (status /= NX_OK) EXIT
                status = NXgetgroupID (file_id, new_id)
                IF (status /= NX_OK) EXIT
-               IF (NXsameID (new_id, group_id)) EXIT !Original group found
+               IF (NXsameID (file_id, new_id, group_id)) EXIT !Original group found
                status = NXclosegroup (file_id)
                IF (status /= NX_OK) EXIT
             END IF       
@@ -1211,7 +1205,7 @@ CONTAINS
                IF (status /= NX_OK) EXIT       
                status = NXgetdataID (file_id, new_id)
                IF (status /= NX_OK) EXIT
-               IF (NXsameID (new_id, data_id)) THEN !Linked item found
+               IF (NXsameID (file_id, new_id, data_id)) THEN !Linked item found
                   status = NX_OK
                   EXIT
                END IF
@@ -1221,7 +1215,7 @@ CONTAINS
                status = NXgetgroupID (file_id, new_id)
                IF (status /= NX_OK) EXIT
                !Skip this group if it's where we started
-               IF (NXsameID (new_id, group_id)) THEN
+               IF (NXsameID (file_id, new_id, group_id)) THEN
                   status = NXclosegroup (file_id)
                   IF (status /= NX_OK) EXIT
                   CYCLE
@@ -1253,8 +1247,14 @@ CONTAINS
 
       status = NXUfinddata (file_id, data_name)
       IF (status == NX_EOD) THEN       !Data item needs to be created
-         status = NXmakedata (file_id, data_name, data_type, data_rank, &
+         IF (NXcompress_type /= NX_COMP_NONE .AND. &
+             PRODUCT(data_dimensions(1:data_rank)) > NXcompress_size) THEN
+            status = NXmakedata (file_id, data_name, data_type, data_rank, &
+                        data_dimensions, NXcompress_type)
+         ELSE
+            status = NXmakedata (file_id, data_name, data_type, data_rank, &
                         data_dimensions)
+         END IF
          IF (status == NX_OK) status = NXopendata (file_id, data_name)
       ELSE if (status == NX_OK) THEN   !Data item already exists
          status = NXopendata (file_id, data_name)
@@ -1275,10 +1275,6 @@ CONTAINS
                END IF
             END DO
          END IF
-      END IF
-      IF (status == NX_OK .AND. NXcompress_type /= NX_COMP_NONE .AND. &
-          PRODUCT(data_dimensions(1:data_rank)) > NXcompress_size) THEN
-         status = NXcompress (file_id, NXcompress_type)
       END IF
       
    END FUNCTION NXUpreparedata
