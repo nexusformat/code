@@ -1140,22 +1140,20 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile pFile;
-    int iRet;
   
     pFile = NXIassert (fid);
     /* check if there is a group open */
     if (pFile->iCurrentVG == 0) {
-      pName = "root";
-      pClass = "NXroot";
+      *iN = Vlone (pFile->iVID, NULL, 0);
+      strcpy (pName, "root");
+      strcpy (pClass, "NXroot");
     }
     else {
+      *iN = Vntagrefs (pFile->iCurrentVG);
       Vgetname (pFile->iCurrentVG, pName);
       Vgetclass (pFile->iCurrentVG, pClass);
     }
-    iRet = NXinitgroupdir (fid);
-    if (iRet == NX_OK)
-      *iN = pFile->iStack[pFile->iStackPtr].iNDir;
-    return iRet;
+    return NX_OK;
   }
   
   /*-------------------------------------------------------------------------*/
@@ -1164,11 +1162,23 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
   {
     pNexusFile pFile;
     int iRet;
+    int32 iData, iAtt, iRank, iType;
+    int32 iDim[MAX_VAR_DIMS];
+    NXname pNam;
   
     pFile = NXIassert (fid);
-    iRet = NXinitattrdir (fid);
-    if (iRet == NX_OK)
-      *iN = pFile->iAtt.iNDir;
+    if (pFile->iCurrentSDS != 0) {        /* SDS level */
+      iRet = SDgetinfo (pFile->iCurrentSDS, pNam, &iRank, iDim, &iType,
+                        &iAtt);
+    } else {                      /* global level */
+      iRet = SDfileinfo (pFile->iSID, &iData, &iAtt);
+    }
+    if (iRet < 0) {
+      NXIReportError (NXpData, "NX_ERROR: HDF cannot read attribute numbers");
+      *iN = 0;
+      return NX_ERROR;
+    }
+    *iN = iAtt;
     return iRet;
   }
 
