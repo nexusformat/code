@@ -33,5 +33,6 @@ $ LINK NAPIF_TEST,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB
 $!=======================================================================
 $! Create Fortran 90 test program
 $!
-$! F90 NXtest
+$! F90 NXtest, NXbrowse
 $! LINK NXtest,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB
+$! LINK NXbrowse,NEXUS/LIB,HDF_ROOT:[LIB]MFHDF/LIB,DF/LIB,LIBZ/LIB,LIBJPEG/LIB

@@ -21,7 +21,8 @@
 HDFROOT=/usr/local/hdf
 FILES=napi.c napi.h napi_test.c napif.f napif_test.f napif.inc \
 	napi_test_read.c NXmodule.f90 NXUmodule.f90 NXtest.f90 \
-	NXbrowse.f90 README README.FORTRAN README.FORTRAN90
+	NXbrowse.f90 README README.FORTRAN README.FORTRAN90 \
+	make_vms.com
 NAPITEST_OBJ=napi_test.o napi.o
 NAPITESTREAD_OBJ=napi_test_read.o napi.o
 NAPIFTEST_OBJ=napif_test.o napif.o napi.o
