@@ -6032,3 +6032,19 @@ SED=$lt_cv_path_SED
 ])
 AC_MSG_RESULT([$SED])
 ])
+
+AC_DEFUN([LINUX_DISTRIBUTION],
+[
+	AC_REQUIRE([AC_CANONICAL_TARGET])
+	case "$target" in
+		i[[3456]]86-*-linux-* | i[[3456]]86-*-linux)
+			if test -f /etc/lsb-release ; then
+				DISTRIBUTION=`(. /etc/lsb-release; echo $DISTRIB_DESCRIPTION)`
+			else
+				DISTRIBUTION=`cat /etc/*-release | head -1`
+			fi
+			;;
+	esac
+	AC_SUBST([DISTRIBUTION])
+])
+
