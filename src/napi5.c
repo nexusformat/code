@@ -33,6 +33,7 @@
           int *iTagDir;
           char irefn[1024];
           int iVref;
+          int iCurrentIDX;
         } iStack5[NXMAXSTACK];
         struct iStack5 iAtt5;
         int iVID;
@@ -41,8 +42,6 @@
         int iCurrentD;
         int iCurrentS;
         int iCurrentT;
-        int iCurrentIDX;
-        unsigned int iCurrentA_IDX;
         int iCurrentA;
         int iNX;
         int iNXID;
@@ -79,6 +78,7 @@
       free (self->iStack5[self->iStackPtr].iTagDir);
       self->iStack5[self->iStackPtr].iTagDir = NULL;
     }
+    self->iStack5[self->iStackPtr].iCurrentIDX = 0;
   }
   
   /*--------------------------------------------------------------------*/
@@ -93,6 +93,7 @@
       free (self->iAtt5.iTagDir);
       self->iAtt5.iTagDir = NULL;
     }
+    self->iAtt5.iCurrentIDX = 0;
   }
 
   /* ---------------------------------------------------------------------- 
@@ -404,7 +405,7 @@
        /* check group attribute */
        iRet = H5Aiterate(pFile->iCurrentG,NULL,attr_check,NULL);
        if (iRet < 0) {
-          NXIReportError (NXpData, "ERROR iterating thourgh group!");
+          NXIReportError (NXpData, "ERROR iterating through group!");
           return NX_ERROR;  
        } else if (iRet == 1) {
          /* group attribute was found */
@@ -413,7 +414,7 @@
          NXIReportError (NXpData, "No group attribute available");
          return NX_ERROR;
        }
-       /* check contains of group attribute */
+       /* check contents of group attribute */
        attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
        atype=H5Tcopy(H5T_C_S1);
        H5Tset_size(atype,128);  
@@ -446,7 +447,7 @@
        /* check group attribute */
        iRet=H5Aiterate(pFile->iCurrentG,NULL,attr_check,NULL);
        if (iRet < 0) {
-          NXIReportError (NXpData, "ERROR iterating thourgh group!");
+          NXIReportError (NXpData, "ERROR iterating through group!");
           return NX_ERROR;  
        } else if (iRet == 1) {
          /* group attribute was found */
@@ -474,8 +475,7 @@
     pFile->iStackPtr++;
     pFile->iStack5[pFile->iStackPtr].iVref=pFile->iCurrentG;
     strcpy(pFile->iStack5[pFile->iStackPtr].irefn,name);
-    pFile->iCurrentIDX=0;
-    pFile->iCurrentA_IDX=0;
+    pFile->iAtt5.iCurrentIDX=0;
     pFile->iCurrentLGG = strdup(name);
     NXI5KillDir (pFile);
     return NX_OK;
@@ -527,16 +527,14 @@
         strcpy(pFile->name_ref,"");
         strcpy(pFile->name_tmp,"");
       }
+      NXI5KillDir (pFile);
       pFile->iStackPtr--;
       if (pFile->iStackPtr>0) {
          pFile->iCurrentG=pFile->iStack5[pFile->iStackPtr].iVref;
       } else {
          pFile->iCurrentG=0;
       }
-      NXI5KillDir (pFile);
     }
-    pFile->iCurrentIDX=0;
-    pFile->iCurrentA_IDX=0;
     return NX_OK;
   }
   
@@ -726,8 +724,8 @@
 
   NXstatus CALLING_STYLE NX5compress (NXhandle fid, int compress_type)
   {
-    printf(" NXcompress ERROR: NeXus API  based  on  HDF5  don't supports\n");
-    printf("                   NXcompress  function!  Using  HDF5 library\n");
+    printf(" NXcompress ERROR: NeXus API  based  on  HDF5  doesn't support\n");
+    printf("                   NXcompress  function!  Using  HDF5 library,\n");
     printf("                   the NXcompmakedata function can be applied\n"); 
     printf("                   for compression of data!\n");
     return NX_ERROR;
@@ -1117,7 +1115,7 @@
      
     pFile = NXI5assert (fid);
     op_data.iname = NULL;
-    idx=pFile->iCurrentIDX;
+    idx=pFile->iStack5[pFile->iStackPtr].iCurrentIDX;
     if (strlen(pFile->name_ref) == 0) {
        /* root group */
        strcpy(pFile->name_ref,"/");
@@ -1126,7 +1124,7 @@
     strcpy(nxclass,"");
     if (iRet > 0)
       {
-        pFile->iCurrentIDX++;
+        pFile->iStack5[pFile->iStackPtr].iCurrentIDX++;
         strcpy(name,op_data.iname);
         if (op_data.iname != NULL) {
            free(op_data.iname);
@@ -1430,7 +1428,7 @@
     unsigned int idx;
       
     pFile = NXI5assert (fileid);
-    idx=pFile->iCurrentA_IDX;
+    idx=pFile->iAtt5.iCurrentIDX;
     if ((pFile->iCurrentD == 0) && (pFile->iCurrentG==0)) 
     {
     /* global attribute */
@@ -1441,7 +1439,7 @@
     }
     if (iRet>0)
       {
-        pFile->iCurrentA_IDX++;
+        pFile->iAtt5.iCurrentIDX++;
         strcpy(pName, iname);
         if (iname != NULL) {
            free(iname);
@@ -1815,7 +1813,6 @@
         
     pFile = NXI5assert (fid);
     NXI5KillAttDir (fid);
-    pFile->iCurrentA_IDX=0;
     return NX_OK;
   }
  
@@ -1827,6 +1824,5 @@
         
     pFile = NXI5assert (fid);
     NXI5KillDir (fid);
-    pFile->iCurrentIDX=0;
     return NX_OK;
   }
