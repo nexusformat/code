@@ -35,12 +35,17 @@ AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
-dnl check for correct autoconf version - the same check is done in autogen.sh
-. autoversion.sh
-
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
 AC_CANONICAL_TARGET
+
+dnl check for correct autoconf version - the same check is done in autogen.sh
+if test ! -z "$srcdir"; then
+    . $srcdir/autoversion.sh
+else
+    . autoversion.sh
+fi
+
 AM_INIT_AUTOMAKE([1.6])
 
 AM_CONFIG_HEADER([include/nxconfig.h])
@@ -93,7 +98,7 @@ if test x"$with_f90" != x"no" ; then
 	dnl ready compiled module to point the option at so for now we are just
 	dnl check that the option takes a directory and the compiler works
 	mytop=`pwd`
-	F90FLAGS="$F90FLAGS -I$mytop/bindings/f90"
+	F90FLAGS="$F90FLAGS -I$mytop/bindings/f90 -qextname"
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	AC_SUBST(F90)
@@ -133,6 +138,12 @@ case $host in
     *darwin*)
 	CFLAGS="$CFLAGS -g -D__unix"
 	FFLAGS="$FFLAGS -g -Wno-globals"
+dnl This is a hack for libtool - for some reason the F77 tag
+dnl does not get set with the commands to create a shared library
+	AC_MSG_NOTICE([Patching libtool for F77 shared linking])
+	sed -e "s/^archive_cmds=\"\"//" < libtool > libtool.$$
+	mv -f libtool.$$ libtool
+	chmod +x libtool
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	SHARED_LDFLAGS="-Wl,-single_module"
 dnl	LDFLAGS="$LDFLAGS -flat_namespace"
