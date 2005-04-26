@@ -33,6 +33,7 @@ libNeXus77_la_SOURCES=napif.f
 libNeXus77_la_LIBADD=$(top_builddir)/src/libNeXus.la # @FLIBS@
 libNeXus77_la_LDFLAGS=@SHARED_LDFLAGS@
 
-EXTRA_DIST = napif.inc
+include_HEADERS = napif.inc
+#EXTRA_DIST = napif.inc
 
 include $(top_srcdir)/build_rules.am

@@ -47,7 +47,7 @@ endif
 lib_LTLIBRARIES = libNeXus.la
 #SUBDIRS=nxdict
 
-libNeXus_la_SOURCES = napi.c $(H4SRC) $(H5SRC) $(XMLSRC)
+libNeXus_la_SOURCES = napi.c napiu.c $(H4SRC) $(H5SRC) $(XMLSRC)
 libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@
 
 ## The following part is the solution for automake >= 1.7
