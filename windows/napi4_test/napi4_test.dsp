@@ -93,13 +93,6 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\..\napi4_test.c
-
-!IF  "$(CFG)" == "napi4_test - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "napi4_test - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -107,7 +100,7 @@ SOURCE=..\..\napi4_test.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=..\..\napi.h
+SOURCE=..\..\include\napi.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

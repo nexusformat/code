@@ -44,7 +44,7 @@ RSC=rc.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "$(HDF4ROOT)\lib" /I "$(HDF5ROOT)\c\release\lib" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "HDF4" /D "HDF5" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\..\include" /I "$(HDF5ROOT)\release\include" /I "$(HDF4ROOT)\release\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "HDF4" /D "HDF5" /YX /FD /c
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
 # ADD RSC /l 0x809 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -69,7 +69,7 @@ LIB32=link.exe -lib
 # ADD BASE F90 /check:bounds /compile_only /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "$(HDF4ROOT)\include" /I "$(HDF5ROOT)\c\debug\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HDF4" /D "HDF5" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\..\include" /I "$(HDF4ROOT)\debug\include" /I "$(HDF5ROOT)\debug\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HDF4" /D "HDF5" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x809 /d "_DEBUG"
 # ADD RSC /l 0x809 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -90,21 +90,33 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=..\..\napi.c
+SOURCE=..\..\src\napi.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\napif.f
+SOURCE=..\..\src\napi4.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\NXmodule.f90
+SOURCE=..\..\src\napi5.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\NXUmodule.f90
+SOURCE=..\..\bindings\f77\napif.f
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\napiu.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\bindings\f90\NXmodule.f90
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\bindings\f90\NXUmodule.f90
 DEP_F90_NXUMO=\
-	"..\..\nxmodule.mod"\
+	".\Debug\NXmodule.mod"\
 	
 # End Source File
 # End Group
@@ -113,15 +125,19 @@ DEP_F90_NXUMO=\
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=..\..\napi.h
+SOURCE=..\..\include\napi.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\napi4.h
+SOURCE=..\..\include\napi4.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\napi5.h
+SOURCE=..\..\include\napi5.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\napiu.h
 # End Source File
 # End Group
 # End Target

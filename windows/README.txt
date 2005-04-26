@@ -4,18 +4,29 @@ Building NeXus with Visual Studio
 Setup
 -----
 
-You need to define two Windows environment variables
+You need to define several Windows environment variables
 HDF4ROOT and HDF5ROOT to point to top of unpacked HDF distributions
 e.g. 
 
-    HDF4ROOT=c:\program files\hdf41r5 
-    HDF5ROOT=C:\Program Files\HDF5-144
+    HDF4ROOT=c:\program files\hdf42r1 
+    HDF5ROOT=C:\program Files\HDF5-164
 
-the HDF4 includes will then be in %HDFROOT%\include and
-the HDF5 includes in %HDF5ROOT%\c\debug\include and %HDF5ROOT%\c\release\include 
+Note that you do not need the HDF5 version with F90 support even to build the nexus F90 API
+The above the the latest version of HDF as available from the NCSA site and
+reaquire several external libraries: zlin 1.2.2, jpeg-6b and szip-2.0 (encoder enabled)
+The location of these external libraries is isdicated by the following variables e.g.
+
+    JPEGROOT=c:\program files\jpeg-6b
+    ZLIBROOT=c:\program fiules\zlib122
+    SZIPROOT=c:\program files\szip20
+
+the HDF4 includes will be in %HDFROOT%\debug\include and %HDF5ROOT%\release\include and
+similarly HDF5 includes in %HDF5ROOT%\debug\include and %HDF5ROOT%\release\include 
 
 All the visual studio project files make use of these variables and so should not
 depend on the location HDF files are installed in.
+
+Currently ZLIB only works as a DLL so your programs will require zlib1.dll
 
 Building
 --------
@@ -38,14 +49,14 @@ program using the NeXus library you will need to do the following to the
 project settings:
 
 * Add  HDF4  and/or  HDF5  to the C "preprocessor definitions"
-* Add either  $(HDF4ROOT)\include,$(HDF5ROOT)\c\debug\include  or   
-     $(HDF4ROOT)\include,$(HDF5ROOT)\c\release\include   to the C "additional include directories"
+* Add either  $(HDF4ROOT)\debug\include,$(HDF5ROOT)\debug\include  or   
+     $(HDF4ROOT)\debug\include,$(HDF5ROOT)\release\include   to the C "additional include directories"
      depending on whether you are building a debug or release project
-* For a C project add either   $(HDF4ROOT)\libdbg,$(HDF5ROOT)\c\debug\lib   or
-                      $(HDF4ROOT)\lib,$(HDF5ROOT)\c\release\lib
+* For a C project add either   $(HDF4ROOT)\debug\lib,$(HDF5ROOT)\debug\lib   or
+                      $(HDF4ROOT)\release\lib,$(HDF5ROOT)\release\lib
      to the "additional library path" in the "input" section of the "link" settings
-* For a FORTRAN project add either  $(HDF4ROOT)\libdbg,$(HDF5ROOT)\f90\debug\lib   or
-                      $(HDF4ROOT)\lib,$(HDF5ROOT)\f90\release\lib
+* For a FORTRAN project add either  $(HDF4ROOT)\debug\lib,$(HDF5ROOT)\debug\lib   or
+                      $(HDF4ROOT)\debug\lib,$(HDF5ROOT)\release\lib
      to the "additional library path" in the "input" section of the "link" settings
 * Add "wsock32.lib" (for the _htons@4 symbols etc.) and "hdf5.lib"  to the list of
   library modules to load.
