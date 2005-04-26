@@ -389,7 +389,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
  /*-----------------------------------------------------------------------*/   
 
-  NXstatus CALLING_STYLE NX5makegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) 
+  NXstatus CALLING_STYLE NX5makegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
     pNexusFile5 pFile;
     hid_t iRet;
@@ -445,7 +445,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     return strstr(member_name, attr_name) ? 1 : 0;
   }
 
-  NXstatus CALLING_STYLE NX5opengroup (NXhandle fid, CONSTCHAR *name, char *nxclass)
+  NXstatus CALLING_STYLE NX5opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
 
     pNexusFile5 pFile;

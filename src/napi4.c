@@ -67,7 +67,7 @@ extern	void *NXpData;
   
   /* --------------------------------------------------------------------- */
 
-  static int32 NXIFindVgroup (pNexusFile pFile, char *name, char *nxclass)
+  static int32 NXIFindVgroup (pNexusFile pFile, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     int32 iNew, iRef, iTag;
     int iN, i;
@@ -531,7 +531,7 @@ extern	void *NXpData;
 /*-----------------------------------------------------------------------*/   
 
   
-  NXstatus CALLING_STYLE NX4makegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) 
+  NXstatus CALLING_STYLE NX4makegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
     pNexusFile pFile;
     int32 iNew, iRet;
@@ -575,7 +575,7 @@ extern	void *NXpData;
   /*------------------------------------------------------------------------*/
 
   
-  NXstatus CALLING_STYLE NX4opengroup (NXhandle fid, CONSTCHAR *name, char *nxclass)
+  NXstatus CALLING_STYLE NX4opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     pNexusFile pFile;
     int32 iRef;

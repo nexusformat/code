@@ -43,6 +43,13 @@
 #	define NX_EXTERNAL
 #endif
 
+#ifdef _WIN32
+#define snprintf nxisnprintf
+
+extern int nxisnprintf(char* buffer, int len, const char* format, ... );
+
+#endif
+
 typedef void* NXhandle;         /* really a pointer to a NexusFile structure */
 typedef int NXstatus;
 typedef char NXname[128];
@@ -275,8 +282,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXopen(CONSTCHAR * filename, NXaccess access
 NX_EXTERNAL  NXstatus CALLING_STYLE NXclose(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXflush(NXhandle* pHandle);
   
-NX_EXTERNAL  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXmakegroup (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXopengroup (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopenpath (NXhandle handle, CONSTCHAR *path);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXopengrouppath (NXhandle handle, CONSTCHAR *path);
 
@@ -322,6 +329,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXfree(void** data);
 ------------------------------------------------------------------------*/
 NX_EXTERNAL  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
 extern void (*NXIReportError)(void *pData,char *text);
+extern void *NXpData;
+
 
 /*
   another special function for setting the default cache size for HDF-5
@@ -336,8 +345,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXsetcache(long newVal);
         NXhandle *pNexusData;   
         NXstatus (CALLING_STYLE *nxclose)(NXhandle* pHandle);
         NXstatus (CALLING_STYLE *nxflush)(NXhandle* pHandle);
-        NXstatus (CALLING_STYLE *nxmakegroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
-        NXstatus (CALLING_STYLE *nxopengroup) (NXhandle handle, CONSTCHAR *name, char* NXclass);
+        NXstatus (CALLING_STYLE *nxmakegroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
+        NXstatus (CALLING_STYLE *nxopengroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
         NXstatus (CALLING_STYLE *nxclosegroup)(NXhandle handle);
         NXstatus (CALLING_STYLE *nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
         NXstatus (CALLING_STYLE *nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);

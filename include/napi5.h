@@ -8,8 +8,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NX5open(CONSTCHAR *filename, NXaccess access
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5close(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5flush(NXhandle* pHandle);
   
-NX_EXTERNAL  NXstatus CALLING_STYLE NX5makegroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
-NX_EXTERNAL  NXstatus CALLING_STYLE NX5opengroup (NXhandle handle, CONSTCHAR *name, char* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NX5makegroup (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NX5opengroup (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5closegroup(NXhandle handle);
   
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5makedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
@@ -39,6 +39,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NX5getgroupinfo(NXhandle handle, int* no_ite
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5initgroupdir(NXhandle handle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX5initattrdir(NXhandle handle);
 
+void NX5assignFunctions(pNexusFunction fHandle);
 
 herr_t nxgroup_info(hid_t loc_id, const char *name, void *op_data);
 herr_t attr_info(hid_t loc_id, const char *name, void *opdata);

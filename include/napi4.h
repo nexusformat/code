@@ -11,8 +11,8 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NX4open(CONSTCHAR *filename, NXaccess access
 NX_EXTERNAL  NXstatus CALLING_STYLE NX4close(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX4flush(NXhandle* pHandle);
   
-NX_EXTERNAL  NXstatus CALLING_STYLE NX4makegroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
-NX_EXTERNAL  NXstatus CALLING_STYLE NX4opengroup (NXhandle handle, CONSTCHAR* Vgroup, char* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NX4makegroup (NXhandle handle, CONSTCHAR* Vgroup, CONSTCHAR* NXclass);
+NX_EXTERNAL  NXstatus CALLING_STYLE NX4opengroup (NXhandle handle, CONSTCHAR* Vgroup, CONSTCHAR* NXclass);
 NX_EXTERNAL  NXstatus CALLING_STYLE NX4closegroup(NXhandle handle);
   
 NX_EXTERNAL  NXstatus CALLING_STYLE NX4makedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);

@@ -154,12 +154,13 @@ static int determineFileType(CONSTCHAR *filename)
     iFortifyScope = Fortify_EnterScope();
     Fortify_CheckAllMemory();
     */
-
+	*gHandle = NULL;
     fHandle = (pNexusFunction)malloc(sizeof(NexusFunction));
     if (fHandle == NULL) {
       NXIReportError (NXpData,"ERROR: no memory to create Function structure");
       return NX_ERROR;
     }
+	memset(fHandle, 0, sizeof(NexusFunction)); /* so any functions we miss are NULL */
     if (am==NXACC_CREATE) {
       /* HDF4 will be used ! */
       hdf_type=1;
@@ -274,7 +275,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /*-----------------------------------------------------------------------*/   
 
-  NXstatus CALLING_STYLE NXmakegroup (NXhandle fid, CONSTCHAR *name, char *nxclass) 
+  NXstatus CALLING_STYLE NXmakegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
      pNexusFunction pFunc = (pNexusFunction)fid;
      return pFunc->nxmakegroup(pFunc->pNexusData, name, nxclass);   
@@ -282,7 +283,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /*------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXopengroup (NXhandle fid, CONSTCHAR *name, char *nxclass)
+  NXstatus CALLING_STYLE NXopengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxopengroup(pFunc->pNexusData, name, nxclass);  
@@ -584,6 +585,7 @@ static int determineFileType(CONSTCHAR *filename)
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxinitgroupdir(pFunc->pNexusData);
   }
+
 /*------------------------------------------------------------------------
   Implementation of NXopenpath. 
   --------------------------------------------------------------------------*/
@@ -1079,4 +1081,18 @@ char *NXIformatNeXusTime(){
                                    int *pDatalen, int *pIType)
   {
     return NXputattr(fid, name, data, *pDatalen, *pIType);
+  }
+
+
+  /*
+   * implement snprintf when it is not available 
+   */
+  int nxisnprintf(char* buffer, int len, const char* format, ... )
+  {
+	  int ret;
+	  va_list valist;
+	  va_start(valist,format);
+	  ret = vsprintf(buffer, format, valist);
+	  va_end(valist);
+	  return ret;
   }
