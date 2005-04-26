@@ -70,7 +70,7 @@ int main (int argc, char *argv[])
 
 /* create file */
   if (NXopen (nxFile, nx_creation_code, &fileid) != NX_OK) return 1;
-  NXsetnumberformat(nxFile,NX_FLOAT32,"%9.3f");
+  NXsetnumberformat(fileid,NX_FLOAT32,"%9.3f");
   if (NXmakegroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
      NXlen = 10;
