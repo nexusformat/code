@@ -175,6 +175,11 @@ NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am,
     return NX_ERROR;
   }
   mxmlSetErrorCallback(errorCallbackForMxml);
+  if(xmlHandle->stack[0].current == NULL){
+      NXIReportError(NXpData,
+		     "No NXroot element in XML-file, no NeXus-XML file");
+      return NX_ERROR;
+  }
 
   *pHandle = xmlHandle;
   return NX_OK;
@@ -1004,6 +1009,7 @@ NXstatus CALLING_STYLE NXXgetnextentry (NXhandle fid,NXname name,
   int stackPtr;
   const char *target = NULL, *attname = NULL;
   pNXDS dataset;
+  char pBueffel[256];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1049,7 +1055,9 @@ NXstatus CALLING_STYLE NXXgetnextentry (NXhandle fid,NXname name,
     strcpy(nxclass,"SDS");
     userData = findData(next);
     if(userData == NULL){
-      NXIReportError(NXpData,"Corrupted file, userData not found");
+	snprintf(pBueffel,255,"Corrupted file, userData for %s not found",
+		 name);
+      NXIReportError(NXpData,pBueffel);
       return NX_ERROR;
     }
     if(userData->type == MXML_OPAQUE){

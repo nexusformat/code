@@ -17,6 +17,8 @@ extern "C" {
 #define neutron_nexus_NexusFile_NXACC_CREATE4 4L
 #undef neutron_nexus_NexusFile_NXACC_CREATE5
 #define neutron_nexus_NexusFile_NXACC_CREATE5 5L
+#undef neutron_nexus_NexusFile_NXACC_CREATEXML
+#define neutron_nexus_NexusFile_NXACC_CREATEXML 6L
 #undef neutron_nexus_NexusFile_NX_UNLIMITED
 #define neutron_nexus_NexusFile_NX_UNLIMITED 0L
 #undef neutron_nexus_NexusFile_NX_FLOAT32
@@ -25,8 +27,12 @@ extern "C" {
 #define neutron_nexus_NexusFile_NX_FLOAT64 6L
 #undef neutron_nexus_NexusFile_NX_INT8
 #define neutron_nexus_NexusFile_NX_INT8 20L
+#undef neutron_nexus_NexusFile_NX_BINARY
+#define neutron_nexus_NexusFile_NX_BINARY 20L
 #undef neutron_nexus_NexusFile_NX_UINT8
 #define neutron_nexus_NexusFile_NX_UINT8 21L
+#undef neutron_nexus_NexusFile_NX_BOOLEAN
+#define neutron_nexus_NexusFile_NX_BOOLEAN 21L
 #undef neutron_nexus_NexusFile_NX_INT16
 #define neutron_nexus_NexusFile_NX_INT16 22L
 #undef neutron_nexus_NexusFile_NX_UINT16
@@ -94,6 +100,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengroup
  */
 JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopenpath
   (JNIEnv *, jobject, jint, jstring);
+
 /*
  * Class:     neutron_nexus_NexusFile
  * Method:    nxopengrouppath
@@ -205,10 +212,11 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputattr
  */
 JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetinfo
   (JNIEnv *, jobject, jint, jintArray, jintArray);
+
 /*
  * Class:     neutron_nexus_NexusFile
  * Method:    nxsetnumberformat
- * Signature: (I[I[I)V
+ * Signature: (IILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxsetnumberformat
   (JNIEnv *, jobject, jint, jint, jstring);
