@@ -171,8 +171,10 @@ int main (int argc, char *argv[])
               NXlen = sizeof (char_buffer);
               if (NXgetattr (fileid, name, char_buffer, &NXlen, &NXtype) 
 		  != NX_OK) return 1;
-		/* ignore file_time as it will always change and cause the test to fail */
-		if (strcmp(name, "file_time"))
+		/* ignore these as they will always change and cause the test to fail */
+		if ( strcmp(name, "file_time") &&
+		     strcmp(name, "HDF_version") &&
+		     strcmp(name, "XML_version") )
 		{
                  printf ("   %s = %s\n", name, char_buffer);
 		}

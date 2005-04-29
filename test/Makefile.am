@@ -46,7 +46,6 @@ F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
 F90_TARGETS = NXtest
 
-
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
 			NXtest.f90 napif_test.f
 
@@ -66,19 +65,19 @@ check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $
 # have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
 TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib
 
-napi_test_hdf4_SOURCES = napi_test.c
-napi_test_hdf4_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
-napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
-
-napi_test_hdf5_SOURCES = napi_test.c
-napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
-napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
-
+if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
 napi_test_xml_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_xml_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
+else
+napi_test_xml_SOURCES = dummy.c
+endif
 
 if HAVE_HDF4
+napi_test_hdf4_SOURCES = napi_test.c
+napi_test_hdf4_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
+if HAVE_F77
 napif_test_hdf4_SOURCES = napif4_test.f
 napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
 napif_test_hdf4_LINK = $(F77LINK)
@@ -86,12 +85,26 @@ else
 napif_test_hdf4_SOURCES = dummy.c
 napif_test_hdf4_LINK = $(LINK)
 endif
+else
+napi_test_hdf4_SOURCES = dummy.c
+napif_test_hdf4_SOURCES = dummy.c
+napif_test_hdf4_LINK = $(LINK)
+endif
 
 if HAVE_HDF5
+napi_test_hdf5_SOURCES = napi_test.c
+napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
+if HAVE_F77
 napif_test_hdf5_SOURCES = napif5_test.f
 napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
 napif_test_hdf5_LINK = $(F77LINK)
 else
+napif_test_hdf5_SOURCES = dummy.c
+napif_test_hdf5_LINK = $(LINK)
+endif
+else
+napi_test_hdf5_SOURCES = dummy.c
 napif_test_hdf5_SOURCES = dummy.c
 napif_test_hdf5_LINK = $(LINK)
 endif

@@ -30,7 +30,6 @@ AT_SETUP([Check the HDF4 binding])
 AT_CHECK([napi_test-hdf4], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
-   HDF_version = NCSA HDF Version 4.1 Release 5, November 5, 2001
    file_name = NXtest.hdf
 Group: entry(NXentry) contains 8 items
    ch_data(4) = NeXus data
@@ -98,7 +97,6 @@ AT_SETUP([Check the XML binding])
 AT_CHECK([napi_test-xml], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
-   XML_version = mxml-2.0
    file_name = NXtest.xml
 Group: entry(NXentry) contains 8 items
    ch_data(4) = NeXus data
