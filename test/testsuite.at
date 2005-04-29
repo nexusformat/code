@@ -22,36 +22,38 @@
 m4_version_prereq([2.57])
 
 AT_INIT
-AT_TESTED(NXtest.f90)
+dnl AT_TESTED(NXtest.f90)
 
 AT_BANNER([[Testing the NeXus C library.]])
 
 AT_SETUP([Check the HDF4 binding])
 AT_CHECK([napi_test-hdf4], [], 
 [[Number of global attributes: 4
-   NeXus_version = 2.1.0
-   file_name = NXtest.nx4
+   NeXus_version = 3.0.0
+   HDF_version = NCSA HDF Version 4.1 Release 5, November 5, 2001
+   file_name = NXtest.hdf
 Group: entry(NXentry) contains 8 items
    ch_data(4) = NeXus data
-   i1_data(20) = 1 2 3 4 
-   i2_data(22) = 1000 2000 3000 4000 
-   i4_data(24) = 1000000 2000000 3000000 4000000 
+   i1_data(20) =  1 2 3 4
+   i2_data(22) =  1000 2000 3000 4000
+   i4_data(24) =  1000000 2000000 3000000 4000000
    r4_data(5)
-       1.000000 2.000000 3.000000 4.000000 
-       5.000000 6.000000 7.000000 8.000000 
-       9.000000 10.000000 11.000000 12.000000 
-       13.000000 14.000000 15.000000 16.000000 
-       17.000000 18.000000 19.000000 20.000000 
+       1.000000 2.000000 3.000000 4.000000
+       5.000000 6.000000 7.000000 8.000000
+       9.000000 10.000000 11.000000 12.000000
+       13.000000 14.000000 15.000000 16.000000
+       17.000000 18.000000 19.000000 20.000000
    r8_data(6)
-       1.000000 2.000000 3.000000 4.000000 
-       5.000000 6.000000 7.000000 8.000000 
-       9.000000 10.000000 11.000000 12.000000 
-       13.000000 14.000000 15.000000 16.000000 
-       17.000000 18.000000 19.000000 20.000000 
-      Number of attributes : 3
+       1.000000 2.000000 3.000000 4.000000
+       5.000000 6.000000 7.000000 8.000000
+       9.000000 10.000000 11.000000 12.000000
+       13.000000 14.000000 15.000000 16.000000
+       17.000000 18.000000 19.000000 20.000000
+      Number of attributes : 4
          ch_attribute : NeXus
          i4_attribute : 42
          r4_attribute : 3.141593
+         target : /entry/r8_data
    Subgroup: data(NXdata)
    Subgroup: sample(NXsample)
 Link check OK
@@ -95,6 +97,38 @@ AT_CLEANUP
 AT_SETUP([Check the XML binding])
 AT_CHECK([napi_test-xml], [], 
 [[Number of global attributes: 4
+   NeXus_version = 3.0.0
+   XML_version = mxml-2.0
+   file_name = NXtest.xml
+Group: entry(NXentry) contains 8 items
+   ch_data(4) = NeXus data
+   i1_data(20) =  210 0 0 0
+   i2_data(22) =  -32768 0 0 0
+   i4_data(24) =  -2147483648 0 0 0
+   r4_data(5)
+       1.000200 16.000170 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+      Number of attributes : 1
+         type : NX_FLOAT32[5,4]
+   r8_data(6)
+       1.000002 12.000001 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+       0.000000 0.000000 0.000000 0.000000
+      Number of attributes : 5
+         type : NX_FLOAT64[5,4]
+         ch_attribute : NeXus
+         i4_attribute : 42
+         r4_attribute : 3.141593
+         target : /entry/r8_data
+   Subgroup: data(NXdata)
+   Subgroup: sample(NXsample)
+Link check OK
+NXopenpath checks OK
 ]])
 AT_CLEANUP
 
@@ -103,7 +137,7 @@ AT_BANNER([Check the FORTRAN binding.])
 AT_SETUP([Check the F77 binding using HDF4.])
 AT_CHECK([napif_test-hdf4], [], 
 [[ Number of global attributes:  4
-    NeXus_version = 2.1.0
+    NeXus_version = 3.0.0
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
     ch_data( 4)
@@ -129,6 +163,7 @@ AT_CHECK([napif_test-hdf4], [],
        ch_attribute : NeXus
        i4_attribute :    42
        r4_attribute :   3.141593
+       target : /entry/r8_data
     Subgroup: data(NXdata)
     Subgroup: sample(NXsample)
  Link Check OK
@@ -137,13 +172,12 @@ AT_CLEANUP
 
 AT_SETUP([Check the F77 binding using HDF5.])
 AT_CHECK([napif_test-hdf5], [], 
-[[ Number of global attributes:  4
-    NeXus_version = 2.1.0
+[[Number of global attributes:  4
+    NeXus_version = 3.0.0
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
     ch_data( 4)
     Values : NeXus data
-    Subgroup: data(NXdata)
     i1_data(20)
     Values :   1  2  3  4
     i2_data(22)
@@ -165,6 +199,8 @@ AT_CHECK([napif_test-hdf5], [],
        ch_attribute : NeXus
        i4_attribute :    42
        r4_attribute :   3.141593
+       target : /entry/r8_data
+    Subgroup: data(NXdata)
     Subgroup: sample(NXsample)
  Link Check OK
 ]])
