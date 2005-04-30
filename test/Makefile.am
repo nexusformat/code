@@ -36,11 +36,11 @@ CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml
 
 ## testdir=$(prefix)/nexus/test
 
-HDF4_TARGETS = napi_test-hdf4
+HDF4_TARGETS = napi_test-hdf4 napi_test-hdf4-static
 
-HDF5_TARGETS = napi_test-hdf5
+HDF5_TARGETS = napi_test-hdf5 napi_test-hdf5-static
 
-XML_TARGETS = napi_test-xml
+XML_TARGETS = napi_test-xml napi_test-xml-static
 
 F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
@@ -69,14 +69,24 @@ if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
 napi_test_xml_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_xml_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
+napi_test_xml_static_SOURCES = napi_test.c
+napi_test_xml_static_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_xml_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
+napi_test_xml_static_LDFLAGS = -all-static $(LDFLAGS)
 else
 napi_test_xml_SOURCES = dummy.c
+napi_test_xml_static_SOURCES = dummy.c
+napi_test_xml_static_LDFLAGS = $(LDFLAGS)
 endif
 
 if HAVE_HDF4
 napi_test_hdf4_SOURCES = napi_test.c
 napi_test_hdf4_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
+napi_test_hdf4_static_SOURCES = napi_test.c
+napi_test_hdf4_static_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf4_static_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
+napi_test_hdf4_static_LDFLAGS = -all-static $(LDFLAGS)
 if HAVE_F77
 napif_test_hdf4_SOURCES = napif4_test.f
 napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
@@ -87,6 +97,8 @@ napif_test_hdf4_LINK = $(LINK)
 endif
 else
 napi_test_hdf4_SOURCES = dummy.c
+napi_test_hdf4_static_SOURCES = dummy.c
+napi_test_hdf4_static_LDFLAGS = $(LDFLAGS)
 napif_test_hdf4_SOURCES = dummy.c
 napif_test_hdf4_LINK = $(LINK)
 endif
@@ -95,6 +107,10 @@ if HAVE_HDF5
 napi_test_hdf5_SOURCES = napi_test.c
 napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
+napi_test_hdf5_static_SOURCES = napi_test.c
+napi_test_hdf5_static_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf5_static_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
+napi_test_hdf5_static_LDFLAGS = -all-static $(LDFLAGS)
 if HAVE_F77
 napif_test_hdf5_SOURCES = napif5_test.f
 napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
@@ -105,6 +121,8 @@ napif_test_hdf5_LINK = $(LINK)
 endif
 else
 napi_test_hdf5_SOURCES = dummy.c
+napi_test_hdf5_static_SOURCES = dummy.c
+napi_test_hdf5_static_LDFLAGS = $(LDFLAGS)
 napif_test_hdf5_SOURCES = dummy.c
 napif_test_hdf5_LINK = $(LINK)
 endif
