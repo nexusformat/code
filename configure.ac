@@ -67,6 +67,17 @@ else
 	AC_MSG_ERROR([You need a C compiler to compile this package])
 fi
 
+AC_ARG_WITH([cxx], AC_HELP_STRING([--with-cxx=c++ compiler], [Specify name of C++ compiler]), [], [with_cxx=yes])
+if test x"$with_cxx" != x"no" ; then
+	if test x"$with_cxx" = x"yes" ; then
+		AC_PROG_CXX
+	else
+		AC_CHECK_PROGS(CXX, ["$with_cxx"])
+	fi
+else
+	AC_PROG_CXX
+fi
+
 AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
 	[], [with_f77=yes])
 if test x"$with_f77" != x"no" ; then
@@ -151,7 +162,6 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 AC_CHECK_PROG(SWIG,swig)
-AC_PROG_CXX
 
 dnl These are used in build_rules.am to pass any approptiate 
 dnl tag to libtool for f90 building
