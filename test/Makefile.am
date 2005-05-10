@@ -26,6 +26,10 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
+
+# so   "make test"   is the same as   "make check"
+test: check
+
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
@@ -72,7 +76,7 @@ napi_test_xml_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_static_SOURCES = napi_test.c
 napi_test_xml_static_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_xml_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
-napi_test_xml_static_LDFLAGS = -all-static $(LDFLAGS)
+napi_test_xml_static_LDFLAGS = -static $(LDFLAGS)
 else
 napi_test_xml_SOURCES = dummy.c
 napi_test_xml_static_SOURCES = dummy.c
@@ -86,7 +90,7 @@ napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 napi_test_hdf4_static_SOURCES = napi_test.c
 napi_test_hdf4_static_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_hdf4_static_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
-napi_test_hdf4_static_LDFLAGS = -all-static $(LDFLAGS)
+napi_test_hdf4_static_LDFLAGS = -static $(LDFLAGS)
 if HAVE_F77
 napif_test_hdf4_SOURCES = napif4_test.f
 napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
@@ -110,7 +114,7 @@ napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 napi_test_hdf5_static_SOURCES = napi_test.c
 napi_test_hdf5_static_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
 napi_test_hdf5_static_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
-napi_test_hdf5_static_LDFLAGS = -all-static $(LDFLAGS)
+napi_test_hdf5_static_LDFLAGS = -static $(LDFLAGS)
 if HAVE_F77
 napif_test_hdf5_SOURCES = napif5_test.f
 napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
