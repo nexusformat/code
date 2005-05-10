@@ -276,12 +276,13 @@ AT_CLEANUP
 
 AT_SETUP([Check the F77 binding using HDF5.])
 AT_CHECK([napif_test-hdf5], [], 
-[[Number of global attributes:  4
+[[ Number of global attributes:  4
     NeXus_version = 3.0.0
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
     ch_data( 4)
     Values : NeXus data
+    Subgroup: data(NXdata)
     i1_data(20)
     Values :   1  2  3  4
     i2_data(22)
@@ -304,7 +305,6 @@ AT_CHECK([napif_test-hdf5], [],
        i4_attribute :    42
        r4_attribute :   3.141593
        target : /entry/r8_data
-    Subgroup: data(NXdata)
     Subgroup: sample(NXsample)
  Link Check OK
 ]])
