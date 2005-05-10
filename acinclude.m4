@@ -49,7 +49,7 @@ AC_DEFUN(
     [COMPILER_OPTION=yes],
     [COMPILER_OPTION=no]) 
   if test $COMPILER_OPTION = "yes"; then
-    if test `$EGREP "unrecognized|unrecognised|unknown|invalid|error" check_compiler_option.$$ | wc -l` -gt 0; then COMPILER_OPTION="no"; fi
+    if test `$EGREP "[Uu]nrecogni[sz]ed|[Uu]nknown|[Ii]nvalid|[Ee]rror" check_compiler_option.$$ | wc -l` -gt 0; then COMPILER_OPTION="no"; fi
   fi
   if test $COMPILER_OPTION = "yes"; then
     AC_MSG_RESULT([yes])
@@ -66,6 +66,13 @@ AC_DEFUN(
 AC_DEFUN(
  [AC_CHECK_C_OPTION],
  [AC_CHECK_COMPILER_OPTION(C,C,CFLAGS,[$1],[$2])]
+)
+#
+# AC_CHECK_CPP_OPTION
+#
+AC_DEFUN(
+ [AC_CHECK_CPP_OPTION],
+ [AC_CHECK_COMPILER_OPTION(C,C,CPPFLAGS,[$1],[$2])]
 )
 #
 # AC_CHECK_F77_OPTION
