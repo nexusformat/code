@@ -174,6 +174,7 @@ int main (int argc, char *argv[])
 		/* ignore these as they will always change and cause the test to fail */
 		if ( strcmp(name, "file_time") &&
 		     strcmp(name, "HDF_version") &&
+		     strcmp(name, "HDF5_Version") &&
 		     strcmp(name, "XML_version") )
 		{
                  printf ("   %s = %s\n", name, char_buffer);
@@ -265,6 +266,10 @@ int main (int argc, char *argv[])
      if (NXgetgroupID (fileid, &blink) != NX_OK) return 1;
      if (NXsameID(fileid, &glink, &blink) == NX_OK) {
          printf ("Link check OK\n");
+     }
+     else
+     {
+         printf ("Link check FAILED\n");
      }
   if (NXclosegroup (fileid) != NX_OK) return 1;  
 

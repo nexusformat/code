@@ -63,14 +63,14 @@ AT_CLEANUP
 AT_SETUP([Check the HDF5 binding])
 AT_CHECK([napi_test-hdf5], [], 
 [[Number of global attributes: 4
-   NeXus_version = 2.1.0
-   file_name = NXtest.nx5
+   NeXus_version = 3.0.0
+   file_name = NXtest.h5
 Group: entry(NXentry) contains 8 items
    ch_data(4) = NeXus data
    Subgroup: data(NXdata)
-   i1_data(20) = 1 2 3 4 
-   i2_data(22) = 1000 2000 3000 4000 
-   i4_data(24) = 1000000 2000000 3000000 4000000 
+   i1_data(20) =  1 2 3 4 
+   i2_data(22) =  1000 2000 3000 4000 
+   i4_data(24) =  1000000 2000000 3000000 4000000 
    r4_data(5)
        1.000000 2.000000 3.000000 4.000000 
        5.000000 6.000000 7.000000 8.000000 
@@ -83,10 +83,11 @@ Group: entry(NXentry) contains 8 items
        9.000000 10.000000 11.000000 12.000000 
        13.000000 14.000000 15.000000 16.000000 
        17.000000 18.000000 19.000000 20.000000 
-      Number of attributes : 3
+      Number of attributes : 4
          ch_attribute : NeXus
          i4_attribute : 42
          r4_attribute : 3.141593
+         target : /entry/r8_data
    Subgroup: sample(NXsample)
 Link check OK
 NXopenpath checks OK
@@ -100,9 +101,9 @@ AT_CHECK([napi_test-hdf4-static], [],
    file_name = NXtest.hdf
 Group: entry(NXentry) contains 8 items
    ch_data(4) = NeXus data
-   i1_data(20) =  1 2 3 4
-   i2_data(22) =  1000 2000 3000 4000
-   i4_data(24) =  1000000 2000000 3000000 4000000
+   i1_data(20) =  1 2 3 4 
+   i2_data(22) =  1000 2000 3000 4000 
+   i4_data(24) =  1000000 2000000 3000000 4000000 
    r4_data(5)
        1.000000 2.000000 3.000000 4.000000
        5.000000 6.000000 7.000000 8.000000
@@ -130,14 +131,14 @@ AT_CLEANUP
 AT_SETUP([Check the HDF5 binding (static library)])
 AT_CHECK([napi_test-hdf5-static], [], 
 [[Number of global attributes: 4
-   NeXus_version = 2.1.0
-   file_name = NXtest.nx5
+   NeXus_version = 3.0.0
+   file_name = NXtest.h5
 Group: entry(NXentry) contains 8 items
    ch_data(4) = NeXus data
    Subgroup: data(NXdata)
-   i1_data(20) = 1 2 3 4 
-   i2_data(22) = 1000 2000 3000 4000 
-   i4_data(24) = 1000000 2000000 3000000 4000000 
+   i1_data(20) =  1 2 3 4 
+   i2_data(22) =  1000 2000 3000 4000 
+   i4_data(24) =  1000000 2000000 3000000 4000000 
    r4_data(5)
        1.000000 2.000000 3.000000 4.000000 
        5.000000 6.000000 7.000000 8.000000 
@@ -150,10 +151,11 @@ Group: entry(NXentry) contains 8 items
        9.000000 10.000000 11.000000 12.000000 
        13.000000 14.000000 15.000000 16.000000 
        17.000000 18.000000 19.000000 20.000000 
-      Number of attributes : 3
+      Number of attributes : 4
          ch_attribute : NeXus
          i4_attribute : 42
          r4_attribute : 3.141593
+         target : /entry/r8_data
    Subgroup: sample(NXsample)
 Link check OK
 NXopenpath checks OK
@@ -312,7 +314,7 @@ AT_SETUP([Check the F90 binding.])
 AT_CHECK([NXtest], [], 
 [[ Writing character data
  Number of global attributes:  4
-    NeXus_version = 2.1.0
+    NeXus_version = 3.0.0
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
     ch_data : NX_CHAR 
@@ -339,6 +341,7 @@ AT_CHECK([NXtest], [],
     ch_attribute : NeXus 
     i4_attribute :  42
     r4_attribute :  3.141592741
+    target : /entry/r8_data
     Subgroup: sample(NXsample)
  Link Check OK
 ]])
