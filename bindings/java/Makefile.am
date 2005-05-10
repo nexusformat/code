@@ -93,6 +93,7 @@ jnexus.jar: $(jnexus_CLASS)
 all: $(jnexus_ARCHIVE) $(lib_LTLIBRARIES) javadoc
 
 javadoc:	$(noinst_JAVA)
+	test -d apidoc || mkdir apidoc
 	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath $(srcdir) \
                       neutron.nexus ncsa.hdf.hdflib
 
