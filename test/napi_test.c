@@ -97,7 +97,7 @@ int main (int argc, char *argv[])
      if (NXmakedata (fileid, "r8_data", NX_FLOAT64, 2, array_dims) != NX_OK) return 1;
      if (NXopendata (fileid, "r8_data") != NX_OK) return 1;
         slab_start[0] = 4; slab_start[1] = 0; slab_size[0] = 1; slab_size[1] = 4;
-        if (NXputslab (fileid, *r8_array + 16, slab_start, slab_size) != NX_OK) return 1;
+        if (NXputslab (fileid, (double*)r8_array + 16, slab_start, slab_size) != NX_OK) return 1;
         slab_start[0] = 0; slab_start[1] = 0; slab_size[0] = 4; slab_size[1] = 4;
         if (NXputslab (fileid, r8_array, slab_start, slab_size) != NX_OK) return 1;
         if (NXputattr (fileid, "ch_attribute", "NeXus", strlen ("NeXus"), NX_CHAR) != NX_OK) return 1;
