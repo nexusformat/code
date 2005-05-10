@@ -56,36 +56,27 @@ dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[], [with_cc=yes])
 if test x"$with_cc" != x"no" ; then
-	if test x"$with_cc" = x"yes" ; then
-		AC_PROG_CC
-	else
-		AC_CHECK_PROGS(CC, ["$with_cc"])
-	fi
+	if test x"$with_cc" != x"yes" ; then CC="$with_cc"; fi
+	AC_PROG_CC
 	dnl Check C compiler options
-	AC_CHECK_C_OPTION([-fno-common])
+	AC_CHECK_CPP_OPTION([-fno-common])
 else
 	AC_MSG_ERROR([You need a C compiler to compile this package])
 fi
 
 AC_ARG_WITH([cxx], AC_HELP_STRING([--with-cxx=c++ compiler], [Specify name of C++ compiler]), [], [with_cxx=yes])
 if test x"$with_cxx" != x"no" ; then
-	if test x"$with_cxx" = x"yes" ; then
-		AC_PROG_CXX
-	else
-		AC_CHECK_PROGS(CXX, ["$with_cxx"])
-	fi
-else
+	if test x"$with_cxx" != x"yes" ; then CXX="$with_cxx"; fi
 	AC_PROG_CXX
+else
+	CXX=
 fi
 
 AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
 	[], [with_f77=yes])
 if test x"$with_f77" != x"no" ; then
-	if test x"$with_f77" = x"yes" ; then
-		AC_PROG_F77
-	else
-		AC_CHECK_PROGS(F77, ["$with_f77"])
-	fi
+	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
+	AC_PROG_F77
 	dnl Check FORTRAN compiler options
 	dnl 	AC_CHECK_F77_OPTION([-Wno-globals])
 	dnl 	AC_CHECK_F77_OPTION([-fno-common])  # use with caution
@@ -126,7 +117,6 @@ AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Speci
 if test -d "$with_java_home"; then
 	javaroot="$with_java_home"
 fi
-
 
 AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
 	[], [with_java=yes])
@@ -182,17 +172,19 @@ case $host in
     alpha*-dec-osf*)
 	java_host="alpha"
 	if test "$CC" = "cc" -o "$CC" = "c89"; then
-	    CFLAGS="$CFLAGS -pthread"
+	    CPPFLAGS="$CPPFLAGS -pthread"
 	fi
 	if test "$CXX" = "cxx"; then
-	    CXXFLAGS="$CXXFLAGS -pthread -std gnu -D__USE_STD_IOSTREAM"
+	    CPPFLAGS="$CPPFLAGS -pthread -D__USE_STD_IOSTREAM"
+	    CXXFLAGS="$CXXFLAGS -std gnu"
 	fi
 	;;
 
     *darwin*)
 	dnl -no-cpp-precomp needed on MacOS-X (and others?)
 	AC_CHECK_C_OPTION([-no-cpp-precomp])
-	CFLAGS="$CFLAGS -g -D__unix"
+	CPPFLAGS="$CPPFLAGS -D__unix"
+	CFLAGS="$CFLAGS -g"
 	FFLAGS="$FFLAGS -g -Wno-globals"
 dnl This is a hack for libtool - for some reason the F77 tag
 dnl does not get set with the commands to create a shared library
