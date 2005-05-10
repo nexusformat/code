@@ -30,7 +30,7 @@ dnl
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT([NeXus Library], [2.1.0], [nexus-developers@anl.gov], [nexus])
+AC_INIT([NeXus Library], [3.0.0], [nexus-developers@anl.gov], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
