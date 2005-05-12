@@ -84,7 +84,11 @@ def print_usage(command,level=0):
 def process_file(infile, outfile, options, DEBUG=1, append=False):
     # parse the xml file
     if DEBUG: print "Processing \"%s\"" % infile
-    doc=parse(infile)
+    try:
+        doc=parse(infile)
+    except Exception, error:
+        print "ERROR:",error.__str__()
+        raise error
     if DEBUG: print "          ... done"
 
     # determine the path
@@ -224,4 +228,7 @@ if __name__ == "__main__":
         infile=infile[0]
 
     # pass the command line options to main
-    main(infile,outfile,options,debug)
+    try:
+        main(infile,outfile,options,debug)
+    except Exception:
+        sys.exit(-1)
