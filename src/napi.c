@@ -25,6 +25,7 @@
 
 static const char* rscid = "$Id$";	/* Revision interted by CVS */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
