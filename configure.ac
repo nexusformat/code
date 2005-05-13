@@ -51,7 +51,7 @@ fi
 
 AM_INIT_AUTOMAKE([1.6])
 
-AM_CONFIG_HEADER([include/nxconfig.h])
+AM_CONFIG_HEADER(include/nxconfig.h)
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[], [with_cc=yes])
@@ -309,6 +309,7 @@ AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
 
 dnl finally set LIBS variable if we 
+AC_CHECK_LIB(rpc, xdr_float)
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
 AC_CHECK_LIB(sz, SZ_Compress)
@@ -332,14 +333,14 @@ AC_FUNC_MKTIME
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
-AM_CONDITIONAL([HAVE_F77], [test ! -z "$F77"])
-AM_CONDITIONAL([HAVE_F90], [test ! -z "$F90"])
-AM_CONDITIONAL([HAVE_JAVA], [test ! -z "$JAVA"])
-AM_CONDITIONAL([HAVE_JAVAC], [test ! -z "$JAVAC"])
-AM_CONDITIONAL([HAVE_JAVADOC], [test ! -z "$JAVADOC"])
-AM_CONDITIONAL([HAVE_HDF4], [test ! -z "$H4ROOT"])
-AM_CONDITIONAL([HAVE_HDF5], [test ! -z "$H5ROOT"])
-AM_CONDITIONAL([HAVE_XML], [test ! -z "$MXMLROOT"])
+AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
+AM_CONDITIONAL(HAVE_F90, [test ! -z "$F90"])
+AM_CONDITIONAL(HAVE_JAVA, [test ! -z "$JAVA"])
+AM_CONDITIONAL(HAVE_JAVAC, [test ! -z "$JAVAC"])
+AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC"])
+AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
+AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
+AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
