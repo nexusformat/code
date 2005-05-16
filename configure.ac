@@ -307,6 +307,7 @@ if test "$MXMLROOT"; then
 fi
 AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
+LDFLAGS="$LDFLAGS -L/usr/local/lib"
 
 dnl finally set LIBS variable if we 
 AC_CHECK_LIB(rpc, xdr_float)
