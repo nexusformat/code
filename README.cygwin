@@ -1,0 +1,14 @@
+Set you PATH with
+
+export PATH=/usr/autotools/devel/bin:$PATH
+
+the default "stable" autotools provided are not recent enough
+and you will get problems if you have to run autoconf/autoheader/automake
+or "autogen.sh"
+
+You need to install the hdf libraries - you can download a pre-compiled
+version from:
+
+http://nexus.isis.rl.ac.uk/kits/cygwin
+
+

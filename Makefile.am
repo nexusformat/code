@@ -34,7 +34,7 @@ test: check
 SUBDIRS=include src bindings test applications scripts contrib
 
 EXTRA_DIST=build_rules.am nexus.spec.in nexus.spec autoversion.sh \
-		build_rpm.in
+		build_rpm.in README.cygwin README.WIN32
 
 # Add any flags here that you want passed to configure when you do 
 # a "make distcheck"
