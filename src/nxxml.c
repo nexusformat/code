@@ -252,7 +252,7 @@ NXstatus CALLING_STYLE NXXmakegroup (NXhandle fid, CONSTCHAR *name,
 } 
 /*----------------------------------------------------------------------*/
 static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name, 
-				char *nxclass){
+				CONSTCHAR *nxclass){
   mxml_node_t *linkNode = NULL;
   mxml_node_t *current;
   mxml_node_t *test = NULL;
