@@ -107,7 +107,8 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 static int determineFileType(CONSTCHAR *filename)
 {
   FILE *fd = NULL;
-  int iRet;
+  int iRet, fapl;
+  NXhandle handle;
   
   /*
     this is for reading, check for existence first

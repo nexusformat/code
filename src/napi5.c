@@ -112,7 +112,8 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    ---------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX5open(CONSTCHAR *filename, NXaccess am, NXhandle* pHandle)
+  NXstatus CALLING_STYLE NX5open(CONSTCHAR *filename, NXaccess am, 
+				 NXhandle* pHandle)
   {
   hid_t attr1,aid1, aid2;
   pNexusFile5 pNew = NULL;

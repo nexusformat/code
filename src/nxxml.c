@@ -128,6 +128,7 @@ NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am,
   */
   mxmlSetCustomHandlers(nexusLoadCallback, nexusWriteCallback);
   initializeNumberFormats();
+  mxmlSetErrorCallback(errorCallbackForMxml);
 
   /*
     open file
@@ -155,8 +156,8 @@ NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am,
     fclose(fp);
     break;
   case NXACC_CREATEXML:
-    xmlHandle->root = mxmlNewElement(NULL,"?xml");
-    mxmlElementSetAttr(xmlHandle->root,"version","1.0");
+    xmlHandle->root = mxmlNewElement(NULL,
+		   "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     current = mxmlNewElement(xmlHandle->root,"NXroot");
     mxmlElementSetAttr(current,"NeXus_version",NEXUS_VERSION);
     mxmlElementSetAttr(current,"XML_version","mxml-2.0");
@@ -174,7 +175,6 @@ NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am,
     NXIReportError(NXpData,"Bad access parameter specified in NXXopen");
     return NX_ERROR;
   }
-  mxmlSetErrorCallback(errorCallbackForMxml);
   if(xmlHandle->stack[0].current == NULL){
       NXIReportError(NXpData,
 		     "No NXroot element in XML-file, no NeXus-XML file");
@@ -229,7 +229,7 @@ NXstatus CALLING_STYLE NXXflush(NXhandle *fid){
                    Group functions
 =========================================================================*/
 NXstatus CALLING_STYLE NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
-				     char *nxclass){
+				     CONSTCHAR *nxclass){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
 
@@ -276,7 +276,7 @@ static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name,
 }
 /*------------------------------------------------------------------------*/
 NXstatus CALLING_STYLE NXXopengroup (NXhandle fid, CONSTCHAR *name, 
-				     char *nxclass){
+				     CONSTCHAR *nxclass){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
   char error[1024];

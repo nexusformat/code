@@ -503,7 +503,7 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
   char *indent;
   int len;  
 
-  if(strcmp(node->value.element.name,"?xml") == 0){
+  if(strstr(node->value.element.name,"?xml") != NULL){
     return NULL;
   }
 

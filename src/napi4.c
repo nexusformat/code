@@ -31,7 +31,7 @@
 
 #include "napi.h"
 #include "napi4.h"
- 
+
 extern	void *NXpData;
 
   typedef struct __NexusFile {
@@ -320,7 +320,8 @@ extern	void *NXpData;
    ---------------------------------------------------------------------*/
 
 
-   NXstatus CALLING_STYLE NX4open(CONSTCHAR *filename, NXaccess am, NXhandle* pHandle)
+   NXstatus CALLING_STYLE NX4open(CONSTCHAR *filename, NXaccess am, 
+				  NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
     char pBuffer[512], time_buffer[64];
@@ -357,9 +358,11 @@ extern	void *NXpData;
 /* 
  * get time in ISO 8601 format 
  */
+
+/*
 #ifdef NEED_TZSET
     tzset();
-#endif /* NEED_TZSET */
+#endif 
     time(&timer);
 #ifdef USE_FTIME
     ftime(&timeb_struct);
@@ -375,8 +378,10 @@ extern	void *NXpData;
       NXIReportError(NXpData, "Your gmtime() function does not work ... timezone information will be incorrect\n");
       gmt_offset = 0;
     }
-#endif /* USE_FTIME */
+#endif 
     time_info = localtime(&timer);
+*/
+    time_info = NULL;
     if (time_info != NULL) {
       if (gmt_offset < 0) {
         time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
