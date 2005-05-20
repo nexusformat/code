@@ -27,9 +27,9 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXXclose(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXXflush(NXhandle* pHandle);
 
 NXstatus CALLING_STYLE NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
-				     char *nxclass);
+				     CONSTCHAR *nxclass);
 NXstatus CALLING_STYLE NXXopengroup (NXhandle fid, CONSTCHAR *name, 
-				     char *nxclass);
+				     CONSTCHAR *nxclass);
 NXstatus CALLING_STYLE NXXclosegroup (NXhandle fid);
 
 NXstatus CALLING_STYLE NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
