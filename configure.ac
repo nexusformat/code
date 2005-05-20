@@ -253,7 +253,8 @@ if test "$H4ROOT"; then
     H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
     case $H4VERSION in
 	4.[[12]]*) 
-    		HDF4_LDFLAGS="-L$H4ROOT/lib -lmfhdf -ldf -ljpeg";
+    		HDF4_LDFLAGS="-lmfhdf -ldf -ljpeg";
+		LDFLAGS="-L$H4ROOT/lib $LDFLAGS"
     		HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4" ;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
 		H4ROOT="";;
@@ -279,7 +280,8 @@ if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
 	1.[[6]]*)
-    		HDF5_LDFLAGS="-L$H5ROOT/lib -lhdf5 -lz -lm"
+    		HDF5_LDFLAGS="-lhdf5 -lz -lm"
+		LDFLAGS="-L$H5ROOT/lib $LDFLAGS"
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
 		H5ROOT="";;
@@ -302,7 +304,8 @@ if test "$with_xml" != "no" -a -z "$MXMLROOT"; then
     fi
 fi
 if test "$MXMLROOT"; then
-    XML_LDFLAGS="-L$MXMLROOT/lib -lmxml"
+    XML_LDFLAGS="-lmxml"
+    LDFLAGS="-L$XMLROOT/lib $LDFLAGS"
     XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
 fi
 AC_SUBST(XML_LDFLAGS)
