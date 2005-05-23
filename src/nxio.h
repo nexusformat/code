@@ -27,6 +27,8 @@
 #define __NXIO
 #include <mxml.h>
 
+#define TYPENAME "NAPItype"
+
 mxml_type_t nexusTypeCallback(mxml_node_t *parent);
 const char *NXwhitespaceCallback(mxml_node_t *node, int where);
 int nexusLoadCallback(mxml_node_t *node, const char *buffer);

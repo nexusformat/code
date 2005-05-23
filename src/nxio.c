@@ -280,7 +280,7 @@ static void analyzeDataType(mxml_node_t *parent, int *rank, int *type,
   /*
     get the type attribute. No attribute means: plain text
   */ 
-  typeString = mxmlElementGetAttr(parent,"type");
+  typeString = mxmlElementGetAttr(parent,TYPENAME);
   if(typeString == NULL){
     return;
   }
@@ -338,7 +338,7 @@ mxml_type_t nexusTypeCallback(mxml_node_t *parent){
      strstr(parent->value.element.name,"NX") != NULL){
     return MXML_ELEMENT;
   } else {
-    typeString = mxmlElementGetAttr(parent,"type");
+    typeString = mxmlElementGetAttr(parent,TYPENAME);
     if(typeString == NULL){
       /*
 	MXML_TEXT seems more appropriate here. But mxml hacks text into

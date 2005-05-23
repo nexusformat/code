@@ -404,7 +404,7 @@ NXstatus CALLING_STYLE NXXmakedata (NXhandle fid,
   } else {
     typestring = buildTypeString(datatype,rank,dimensions);
     if(typestring != NULL){
-      mxmlElementSetAttr(dataNode,"type",typestring);
+      mxmlElementSetAttr(dataNode,TYPENAME,typestring);
       free(typestring);
     } else {
       NXIReportError(NXpData,"Failed to allocate typestring");
@@ -888,7 +888,7 @@ NXstatus CALLING_STYLE NXXputattr (NXhandle fid, CONSTCHAR *name, void *data,
       dataset attribute
     */
     current = xmlHandle->stack[xmlHandle->stackPointer].current;
-    if(strcmp(name,"type") == 0){
+    if(strcmp(name,TYPENAME) == 0){
       NXIReportError(NXpData,"type is a reserved attribute name, rejected");
       return  NX_ERROR;
     }
@@ -947,7 +947,7 @@ NXstatus CALLING_STYLE NXXgetattr (NXhandle fid, char *name,
       We need to find the number after the type code. However, there is
       the complication of the datatype type attribute ...
     */
-    if(strcmp(name,"type") == 0){
+    if(strcmp(name,TYPENAME) == 0){
       nx_type = NX_CHAR;
     } else {
       attData = strchr(attribute,(int)':');
@@ -1122,10 +1122,18 @@ NXstatus CALLING_STYLE NXXgetnextattr (NXhandle fid, NXname pName,
     return NX_EOD;
   }
 
+  /*
+    hide type attribute
+  */
+  if(strcmp(current->value.element.attrs[currentAtt].name,TYPENAME) == 0){
+    xmlHandle->stack[stackPtr].currentAttribute++;
+    return NXXgetnextattr(fid,pName,iLength,iType);
+  }
+
   strcpy(pName,current->value.element.attrs[currentAtt].name);
   attVal = current->value.element.attrs[currentAtt].value;
   nx_type = translateTypeCode((char *)attVal);
-  if(nx_type < 0 || strcmp(pName,"type") == 0){
+  if(nx_type < 0 || strcmp(pName,TYPENAME) == 0){
     /*
       no type == NX_CHAR
     */
@@ -1217,7 +1225,14 @@ NXstatus CALLING_STYLE NXXgetattrinfo (NXhandle fid, int *iN){
   }
 
   current = xmlHandle->stack[stackPtr].current;
-  *iN = current->value.element.num_attrs;
+  /*
+    hide type attribute
+  */
+  if(mxmlElementGetAttr(current,TYPENAME) != NULL){
+    *iN = current->value.element.num_attrs -1;
+  } else {
+    *iN = current->value.element.num_attrs;
+  }
   return NX_OK;
 }
 /*================= Linking functions =================================*/

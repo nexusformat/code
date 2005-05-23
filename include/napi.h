@@ -120,12 +120,13 @@ typedef struct {
 #include <hdf5.h>
 #endif                
 
-typedef struct {
-#ifdef HDF4
-                int32 iTag;          /* HDF4 variable */
-                int32 iRef;          /* HDF4 variable */
+#ifndef HDF4
+typedef int int32;
 #endif
 
+typedef struct {
+                int32 iTag;          /* HDF4 variable */
+                int32 iRef;          /* HDF4 variable */
 #ifdef HDF5
                 char iTag5[1024];     /* HDF5 variable */ 
                 char iRef5[1024];     /* HDF5 variable */
