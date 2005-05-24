@@ -127,11 +127,9 @@ typedef int int32;
 typedef struct {
                 int32 iTag;          /* HDF4 variable */
                 int32 iRef;          /* HDF4 variable */
-#ifdef HDF5
                 char iTag5[1024];     /* HDF5 variable */ 
                 char iRef5[1024];     /* HDF5 variable */
                 char iRefd[1024];     /* HDF5 variable */
-#endif  
                 char targetPath[1024]; /* XML path */
                } NXlink;
 

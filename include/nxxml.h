@@ -65,9 +65,9 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXXgetattrinfo (NXhandle fid, int *iN);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXXgetgroupinfo (NXhandle fid, int *iN, 
 					NXname pName, NXname pClass);
 
-NXstatus CALLING_STYLE NXXgetdataID (NXhandle fid, NXlink* sRes);
-NXstatus CALLING_STYLE NXXgetgroupID (NXhandle fid, NXlink* sRes);
-NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink);
-NXstatus CALLING_STYLE NXXsameID (NXhandle fileid, NXlink* pFirstID, 
-				  NXlink* pSecondID);
+NX_EXTERNAL NXstatus CALLING_STYLE NXXgetdataID (NXhandle fid, NXlink* sRes);
+NX_EXTERNAL NXstatus CALLING_STYLE NXXgetgroupID (NXhandle fid, NXlink* sRes);
+NX_EXTERNAL NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink);
+NX_EXTERNAL NXstatus CALLING_STYLE NXXsameID (NXhandle fileid, 
+					      NXlink* pFirstID, NXlink* pSecondID);
 #endif
