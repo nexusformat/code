@@ -126,7 +126,8 @@ if test x$with_java != xno ; then
 	    if test ! -z "$javapath"; then javaroot=`dirname $javapath`/..; fi
 	fi
 	if test -z "$javaroot"; then 
-	    AC_MSG_ERROR([Unable to determine JAVA SDK directory - please specify this using  --with-java-home=/sdk/directory  or instead use  --without-java])
+	    with_java=no
+#	    AC_MSG_ERROR([Unable to determine JAVA SDK directory - please specify this using  --with-java-home=/sdk/directory  or instead use  --without-java])
 	fi
 	AC_MSG_NOTICE([Java SDK home is $javaroot])
 	if test x"$with_java" = x"yes" ; then
