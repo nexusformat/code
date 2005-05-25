@@ -127,7 +127,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   unsigned int vers_major, vers_minor, vers_release, am1 ;
   hid_t fapl;     
   int mdc_nelmts;
-  unsigned long rdcc_nelmts;
+  int rdcc_nelmts;
   size_t rdcc_nbytes;
   double rdcc_w0;
 
