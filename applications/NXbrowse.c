@@ -210,7 +210,10 @@ int NXBdir (NXhandle fileId)
          if (!strncmp(class,"SDS",3)) {
             printf ("  NX Data  : %s", name);
             if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
-            if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
+            if (NXgetinfo (fileId, &dataRank, 
+			   dataDimensions, &dataType) 
+		!= NX_OK) return NX_ERROR;
+	    NXclosedata(fileId);
             PrintDimensions (dataRank, dataDimensions);
             printf (" ");
             PrintType (dataType);
