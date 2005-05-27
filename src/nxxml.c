@@ -160,7 +160,7 @@ NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am,
 		   "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     current = mxmlNewElement(xmlHandle->root,"NXroot");
     mxmlElementSetAttr(current,"NeXus_version",NEXUS_VERSION);
-    mxmlElementSetAttr(current,"XML_version","mxml-2.0");
+    mxmlElementSetAttr(current,"XML_version","mxml");
     mxmlElementSetAttr(current,"file_name",filename);
     time_buffer = NXIformatNeXusTime();
     if(time_buffer != NULL){
@@ -1015,8 +1015,13 @@ NXstatus CALLING_STYLE NXXgetnextentry (NXhandle fid,NXname name,
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"Cannot search datasets");
-    return NX_ERROR;
+    /*
+      be nice to users: close the open dataset even as this is
+      a usage error
+    */
+    NXIReportError(NXpData,
+		   "WARNING: fixing bad NAPI usage: dataset still open");
+    NXXclosedata(fid);
   }
 
   stackPtr = xmlHandle->stackPointer;
@@ -1284,11 +1289,18 @@ static char *buildPathString(mxml_node_t *path[], int stackPtr){
 }
 /*--------------------------------------------------------------------*/
 static char *findLinkPath(mxml_node_t *node){
-  mxml_node_t *path[NXMAXSTACK];
+  mxml_node_t **path = NULL;
   int stackPtr;
   mxml_node_t *current = NULL;
-  char *pathString = NULL;
+  char *pathString = NULL, *result = NULL;
   int count;
+
+  path = (mxml_node_t **)malloc(NXMAXSTACK*sizeof(mxml_node_t *));
+  if(path == NULL){
+    NXIReportError(NXpData,"ERROR: out of memory follwoing link path");
+    return NULL;
+  }
+  memset(path,0,NXMAXSTACK*sizeof(mxml_node_t *));
 
   /*
     first path:  walk up the tree untill NXroot is found
@@ -1307,7 +1319,9 @@ static char *findLinkPath(mxml_node_t *node){
     path now contains the nodes to the root node in reverse order.
     From this build the path string
   */
-  return buildPathString(path,stackPtr);
+  result = buildPathString(path,stackPtr);
+  free(path);
+  return result;
 }
 /*--------------------------------------------------------------------*/
 NXstatus CALLING_STYLE NXXgetdataID (NXhandle fid, NXlink* sRes){
