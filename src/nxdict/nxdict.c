@@ -593,9 +593,10 @@
 /*------------------- The Defintion String Parser -----------------------*/
 /*------- Data structures */
   typedef struct {
-                  char pText[20];
+                  char *pText;
                   int iCode;
                  }  TokDat;
+
 #define TERMSDS 100
 #define TERMVG  200
 #define TERMLINK 300
@@ -719,7 +720,7 @@
          sStat->pToken[i] = '\0';
 
          /*--------- try to find word in Tokenlist */
-         for(i = 0; i < 10; i++)
+         for(i = 0; i < 11; i++)
          {
            if(strcmp(sStat->pToken,TokenList[i].pText) == 0)
            {
@@ -727,6 +728,67 @@
              break;
            }
          }
+         return;
+       }
+      /* not reached */
+      return;
+   }
+/*-----------------------------------------------------------------------*/
+   static void NXDIAttValue(ParDat *sStat)
+   {
+       int i;
+       
+
+       sStat->pToken[0] = '\0';
+
+       /* skip whitespace */
+       while( (*(sStat->pPtr) == ' ') || (*(sStat->pPtr) == '\t') )
+       {
+         sStat->pPtr++;
+       } 
+
+       if(*(sStat->pPtr) == ',')
+       {
+         sStat->iToken = DKOMMA;
+         sStat->pToken[0] = *(sStat->pPtr);
+         sStat->pPtr++;
+         return;
+       }
+       else if(*(sStat->pPtr) == '\0')
+       {
+         sStat->iToken = DEND;
+         sStat->pToken[0] = *(sStat->pPtr);
+         sStat->pPtr++;
+         return;
+       }
+       else if(*(sStat->pPtr) == '{')
+       {
+         sStat->iToken = DOPEN;
+         sStat->pToken[0] = *(sStat->pPtr);
+         sStat->pPtr++;
+         return;
+       }
+       else if(*(sStat->pPtr) == '}')
+       {
+         sStat->iToken = DCLOSE;
+         sStat->pToken[0] = *(sStat->pPtr);
+         sStat->pPtr++;
+         return;
+       }
+       else 
+       {
+         sStat->iToken = DWORD;
+         /* copy word to pToken */
+         i = 0;
+         while( (*(sStat->pPtr) != ' ') && (*(sStat->pPtr) != '\t') && 
+                 (*(sStat->pPtr) != '\0') &&
+                (*(sStat->pPtr) != ',') && (*(sStat->pPtr) != '}') )
+         {
+           sStat->pToken[i] = *(sStat->pPtr);
+           sStat->pPtr++;
+           i++;
+         } 
+         sStat->pToken[i] = '\0';
          return;
        }
       /* not reached */
@@ -863,7 +925,7 @@
      }
 
      /* a word is expected */
-     NXDIDefToken(pParse);
+     NXDIAttValue(pParse);
      if(pParse->iToken != DWORD)
      {
         sprintf(pError,"ERROR: expected attribute value, got %s",pParse->pToken);
