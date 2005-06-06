@@ -45,10 +45,8 @@
 
 #ifdef _WIN32
 #define snprintf nxisnprintf
-
 extern int nxisnprintf(char* buffer, int len, const char* format, ... );
-
-#endif
+#endif /* _WIN32 */
 
 typedef void* NXhandle;         /* really a pointer to a NexusFile structure */
 typedef int NXstatus;
@@ -70,10 +68,6 @@ typedef struct {
 #define NX_MAXRANK 32
 #define NX_MAXNAMELEN 64
 
-
-
-
-
 /*-------------------------------------------------------------------------
                 HDF Datatype values for datatype parameters 
                        in the Nexus API
@@ -91,7 +85,6 @@ typedef struct {
 
 --------------------------------------------------------------------------*/ 
 
-  
 /* Map NeXus to HDF types */
 #define NX_FLOAT32   5
 #define NX_FLOAT64   6
@@ -111,29 +104,14 @@ typedef struct {
 #define NX_COMP_RLE 300
 #define NX_COMP_HUF 400  
 
-
-#ifdef HDF4
-#include <mfhdf.h>
-#endif 
-
-#ifdef HDF5
-#include <hdf5.h>
-#endif                
-
-#ifndef HDF4
-typedef int int32;
-#endif
-
 typedef struct {
-                int32 iTag;          /* HDF4 variable */
-                int32 iRef;          /* HDF4 variable */
+                long iTag;          /* HDF4 variable */
+                long iRef;          /* HDF4 variable */
                 char iTag5[1024];     /* HDF5 variable */ 
                 char iRef5[1024];     /* HDF5 variable */
                 char iRefd[1024];     /* HDF5 variable */
                 char targetPath[1024]; /* XML path */
                } NXlink;
-
-  
 
 #define NXMAXSTACK 50
 

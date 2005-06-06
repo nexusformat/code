@@ -1,6 +1,6 @@
 #define NXSIGNATURE 959697
 
-#include "napi.h"
+#include "mfhdf.h"
 /* #include "napi4.c" */
 
 /* 
