@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
    if (argc < 2) {
       printf ("Give name of NeXus file : ");
       fgets (fileName, sizeof(fileName), stdin);
-      if ((stringPtr = strchr(fileName, '\n')) != NULL)
-	      *stringPtr = '\0';
+      if ((stringPtr = strchr(fileName, '\n')) != NULL) 
+         *stringPtr = '\0';
    }
    else {
      strcpy (fileName, argv[1]);
@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
    do {
       printf ("%s> ", path);
       fgets (inputText, sizeof(inputText), stdin);
-      if ((stringPtr = strchr(inputText, '\n')) != NULL)
-	     *stringPtr = '\0';
+      if ((stringPtr = strchr(inputText, '\n')) != NULL) 
+         *stringPtr = '\0';
       command = strtok(inputText," ");
       /* Check if a command has been given */
       if (command == NULL) command = " ";
@@ -141,9 +141,6 @@ int main(int argc, char *argv[])
             strcpy (dataName, stringPtr);
             dimensions = strtok(NULL, "[]");
             status = NXBread (fileId, dataName, dimensions);
-            /* Check for attributes unless a single element is specified */
-            if (status == NX_OK && dimensions == NULL) 
-               PrintAttributes (fileId);
          }
          else {
             printf ("NX_ERROR: Specify a data item\n");
@@ -210,10 +207,8 @@ int NXBdir (NXhandle fileId)
          if (!strncmp(class,"SDS",3)) {
             printf ("  NX Data  : %s", name);
             if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
-            if (NXgetinfo (fileId, &dataRank, 
-			   dataDimensions, &dataType) 
-		!= NX_OK) return NX_ERROR;
-	    NXclosedata(fileId);
+            if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
+            if (NXclosedata(fileId) != NX_OK) return NX_ERROR;
             PrintDimensions (dataRank, dataDimensions);
             printf (" ");
             PrintType (dataType);
@@ -289,7 +284,12 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
    }
    if (NXmalloc((void**)&dataBuffer, dataRank, size, dataType) != NX_OK) return NX_ERROR;
    /* Read in the data with NXgetslab */
-   if (NXgetslab (fileId, dataBuffer, start, size) != NX_OK) return NX_ERROR;
+   if (dataType == NX_CHAR) {
+      if (NXgetdata(fileId, dataBuffer) != NX_OK) return NX_ERROR;
+   }
+   else {
+      if (NXgetslab (fileId, dataBuffer, start, size) != NX_OK) return NX_ERROR;
+   }
    /* Output data name, dimensions and type */
    printf ("  %s", dataName);
    if (dimensions == NULL)
@@ -331,6 +331,14 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
    }
    printf ("\n");
    if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
+
+   /* Check for attributes unless a single element is specified */
+   if (dimensions == NULL) 
+      PrintAttributes (fileId);
+
+   /* Close data set */
+   if (NXclosedata(fileId) != NX_OK) return NX_ERROR;
+
    return NX_OK;
 }
 
@@ -358,14 +366,14 @@ int NXBdump (NXhandle fileId, NXname dataName, char *fileName)
    }
 
    /* Allocate data space */
-   if (NXmalloc(&dataBuffer,dataRank, dataDimensions,dataType) != NX_OK)
+   if (NXmalloc(&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK)
       return NX_ERROR;
 
    /* Read the lot */
-   if (NXgetdata(fileId,dataBuffer) != NX_OK)
+   if (NXgetdata(fileId, dataBuffer) != NX_OK)
       return NX_ERROR;
 
-   NXclosedata(fileId);
+   if (NXclosedata(fileId) != NX_OK) return NX_ERROR;
 
    /* Print a header */
    fprintf (fd,"File : %s, DataSet: %s \n", nxFile,  dataName);
