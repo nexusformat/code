@@ -52,6 +52,10 @@ typedef void* NXhandle;         /* really a pointer to a NexusFile structure */
 typedef int NXstatus;
 typedef char NXname[128];
 
+/* 
+ * Any new NXaccess options should be numbered in 2^n format 
+ * (8, 16, 32, etc) so that they can be bit masked and tested easily 
+ */
 typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, NXACC_CREATE5=5, NXACC_CREATEXML=6} NXaccess;
 
 typedef struct {
