@@ -51,11 +51,12 @@ make
 # as automake supports it; configure --prefix is OK for now though
 make install
 %files
-%doc README NEWS ChangeLog AUTHORS COPYING INSTALL
+%doc README NEWS ChangeLog AUTHORS COPYING INSTALL ReleaseNotes
 # %docdir /usr/local/doc
 /usr/local/lib
 /usr/local/bin
 /usr/local/include
+/usr/local/nexus
 
 %clean
 # the rm line can be dangerous - build_root might be / !
@@ -77,6 +78,8 @@ if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
+* Mon Jun  6 2005 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+- Add extra documentation and example files to distribution
 * Wed May 12 2004 Jens Krüger <jens.krueger@frm2.tum.de>
 - Change the License entry to LGPL
 - remove /usr/local/nexus /usr/local/doc from the file list

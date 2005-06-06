@@ -61,6 +61,13 @@ AUTOTEST	= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
+nxtestdir=${prefix}/nexus/tests
+nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
+
+nxexampledir=${prefix}/nexus/examples
+nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
+
+
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
 ## TESTS = $(test_PROGRAMS)		# what to run
