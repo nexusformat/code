@@ -1,0 +1,10 @@
+Various bits of NeXus documentation
+
+api: 		NeXus API documentation
+definitions:	NeXus definitions documentation
+howto:		NeXus howto and FAQs
+nxdict:		NXdict (NXD) API reference
+tutorial:	NeXus tutorial
+
+--
+$Id$
