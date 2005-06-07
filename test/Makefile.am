@@ -51,7 +51,7 @@ F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 F90_TARGETS = NXtest
 
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
-			NXtest.f90 napif_test.f
+			NXtest.f90 napif_test.f README.tests
 
 TESTSUITE	= $(srcdir)/testsuite
 
@@ -61,10 +61,11 @@ AUTOTEST	= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
-nxtestdir=${prefix}/nexus/tests
+nxtestdir=$(NXTESTDIR)
 nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
+nxtest_DATA = README.tests
 
-nxexampledir=${prefix}/nexus/examples
+nxexampledir=$(NXEXAMPLEDIR)
 nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
 
 

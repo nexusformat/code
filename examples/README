@@ -1,3 +1,8 @@
 NeXus example programs and files
+--------------------------------
+These are installed to the location specified by the
+NXEXAMPLEDIR variable in configure.ac, whihc is usually
+/usr/local/nexus/examples
+
 --
 $Id$

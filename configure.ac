@@ -147,6 +147,13 @@ fi
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
 
+NXDOCDIR='${prefix}/nexus/doc'
+NXEXAMPLEDIR='${prefix}/nexus/examples'
+NXTESTDIR='${prefix}/nexus/tests'
+AC_SUBST(NXDOCDIR)
+AC_SUBST(NXEXAMPLEDIR)
+AC_SUBST(NXTESTDIR)
+
 AC_PROG_LIBTOOL
 
 AC_PROG_MAKE_SET
@@ -359,6 +366,10 @@ AC_CONFIG_FILES([Makefile
 		include/Makefile
 		src/Makefile 
 		applications/Makefile
+		examples/Makefile
+		doc/Makefile
+		doc/api/Makefile
+		doc/nxdict/Makefile
 		bindings/Makefile 
 		bindings/f77/Makefile
 		bindings/f90/Makefile

@@ -1,10 +1,9 @@
-Various bits of NeXus documentation
-
-api: 		NeXus API documentation
-definitions:	NeXus definitions documentation
-howto:		NeXus howto and FAQs
-nxdict:		NXdict (NXD) API reference
-tutorial:	NeXus tutorial
+*
+* This file is part of CVS only and not part of the install
+* kit. Put comments for the install kit into README.doc
+*
+Documentation is installed into $(NXDOCDIR) which is specified
+in configure.ac - usually /usr/local/nexus/doc/{api,tutorial,...}
 
 --
 $Id$

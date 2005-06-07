@@ -1,3 +1,6 @@
+*
+* This file is CVS only - README.tests is installed in /usr/local/nexus/tests
+*
 Both dynamic library versions (e.g. napi_test-hdf4) and 
 static library versions (e.g. napi_test-hdf4-static) of the test
 programs are now build. 
