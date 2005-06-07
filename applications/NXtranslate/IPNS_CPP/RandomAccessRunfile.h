@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <math.h>
 
 using std::vector;
 using namespace std;
