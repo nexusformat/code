@@ -373,10 +373,13 @@ AC_CONFIG_FILES([Makefile
 		bindings/Makefile 
 		bindings/f77/Makefile
 		bindings/f90/Makefile
-                bindings/java/Makefile
+		bindings/java/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
 		contrib/applications/NXdir/Makefile
+		contrib/applications/NXtranslate/Makefile
+		contrib/applications/NXtranslate/text_plain/Makefile
+		contrib/applications/NXtranslate/IPNS_CPP/Makefile
 		scripts/Makefile
 		scripts/nexus.pc
 		scripts/nxbuild])
