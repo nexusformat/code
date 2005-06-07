@@ -36,7 +36,10 @@ bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
-	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp
+	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp \
+	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
+	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
+	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh
 
 nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2
 
