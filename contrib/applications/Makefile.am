@@ -6,4 +6,4 @@
 # @configure_input@
 #
 #====================================================================
-SUBDIRS = NXdir
+SUBDIRS = NXdir NXtranslate

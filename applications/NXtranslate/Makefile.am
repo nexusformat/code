@@ -1,0 +1,63 @@
+## Process this file with automake to produce Makefile.in
+#====================================================================
+# $Id$
+#
+# Copyright (c) 2004, P.F.Peterson <petersonpf@ornl.gov>
+#               Spallation Neutron Source at Oak Ridge National Laboratory
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use, copy,
+# modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# @configure_input@
+#
+#====================================================================
+LIBNEXUS=$(top_builddir)/src/libNeXus.la
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_PLAIN_RETRIEVER `xml2-config --cflags` -DHDF4 -DHDF5
+SUBDIRS=IPNS_CPP
+
+bin_PROGRAMS = nxtranslate
+nxtranslate_SOURCES = \
+	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
+	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
+	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp
+
+nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2
+
+#EXTRA_DIST = CHANGES LICENSE README TODO
+
+include $(top_srcdir)/build_rules.am
+
+test_simple.nxs: nxtranslate test_simple.xml
+	./nxtranslate test_simple.xml
+
+test_nexus.nxs: nxtranslate test_nexus.xml
+	./nxtranslate test_nexus.xml
+
+test_nexus_macro.nxs: nxtranslate test_nexus_macro.xml
+	./nxtranslate test_nexus_macro.xml -DFILE=test_simple.nxs
+
+test_ipns.nxs: nxtranslate test_ipns.xml hrcs1797.run
+	./nxtranslate test_ipns.xml -DfileName=hrcs1797.run
+
+test_text_plain.nxs: nxtranslate test_text_plain.xml test_simple.xml
+	./nxtranslate test_text_plain.xml
+
+test-clean:
+	rm -f $(TEST_RESULT)
