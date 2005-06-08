@@ -6,4 +6,7 @@
 # @configure_input@
 #
 #====================================================================
-SUBDIRS = NXdir NXtranslate
+if HAVE_LIBXML2
+NXTRANSLATE=NXtranslate
+endif
+SUBDIRS = NXdir $(NXTRANSLATE)

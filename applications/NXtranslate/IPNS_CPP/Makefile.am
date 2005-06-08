@@ -31,13 +31,13 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_LITTLE_ENDIAN
 
-bin_PROGRAMS = testProg testProg2
+noinst_PROGRAMS = testProg testProg2
 lib_LTLIBRARIES = libIPNSRunfile.la
 
 libIPNSRunfile_la_SOURCES = \
  Header.cpp RandomAccessRunfile.cpp LpsdDetIdMap.cpp DetectorMap.cpp \
  Segment.cpp Runfile.cpp TimeField.cpp DetectorMap.h Header.h \
-LpsdDetIdMap.h RandomAccessRunfile.h Runfile.h Segment.h TimeField.h
+ LpsdDetIdMap.h RandomAccessRunfile.h Runfile.h Segment.h TimeField.h
 
 testProg_SOURCES = testProg.cpp 
 testProg_LDADD = libIPNSRunfile.la $(LIBNEXUS)

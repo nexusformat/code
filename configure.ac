@@ -328,6 +328,7 @@ AC_CHECK_LIB(sz, SZ_Compress)
 AC_CHECK_LIB(df, Hopen)
 AC_CHECK_LIB(mfhdf, ncopen)
 AC_CHECK_LIB(hdf5, H5open)
+AC_CHECK_LIB(xml2, xmlParseDocument)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -353,6 +354,7 @@ AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC"])
 AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
 AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
+AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
@@ -379,6 +381,7 @@ AC_CONFIG_FILES([Makefile
 		contrib/applications/NXdir/Makefile
 		contrib/applications/NXtranslate/Makefile
 		contrib/applications/NXtranslate/IPNS_CPP/Makefile
+		contrib/applications/NXtranslate/docs/Makefile
 		scripts/Makefile
 		scripts/nexus.pc
 		scripts/nxbuild])
