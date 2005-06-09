@@ -46,19 +46,19 @@ bin_PROGRAMS = nxbrowse nx2dtd nxconvert $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_T
 
 nxconvert_SOURCES = nxconvert.c
 nxconvert_LDADD = $(LIBNEXUS)
-nxconvert_LDFLAGS = -static
+nxconvert_LDFLAGS = -static $(LDFLAGS)
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
-nxbrowse_LDFLAGS = -static
+nxbrowse_LDFLAGS = -static $(LDFLAGS)
 
 #NXtoXML_SOURCES = NXtoXML.c 
 #NXtoXML_LDADD = $(LIBNEXUS)
-#NXtoXML_LDFLAGS = -static
+#NXtoXML_LDFLAGS = -static $(LDFLAGS)
 
 nx2dtd_SOURCES = NXtoDTD.c 
 nx2dtd_LDADD = $(LIBNEXUS)
-nx2dtd_LDFLAGS = -static
+nx2dtd_LDFLAGS = -static $(LDFLAGS)
 
 #NXtoNX4_SOURCES = NXtoNX4.c 
 #NXtoNX4_LDADD = $(LIBNEXUS)
