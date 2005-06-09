@@ -29,43 +29,58 @@
 #include <unistd.h>
 #include "napi.h"
 
-int WriteGroup ();
-int WriteAttributes ();
+static int WriteGroup (int write_data);
+static int WriteAttributes (int write_data);
 
 static NXhandle inId, outId;
 
 #define NX_XML	0
 #define NX_HDF4	1
 #define NX_HDF5	2
+#define NX_DTD	3
 
 static void print_usage()
 {
-    printf("Usage: nxconvert [ -x | -h4 | -h5 ] [ infile ] [ outfile ]\n");
+    printf("Usage: nxconvert [ -x | -d | -h4 | -h5 ] [ infile ] [ outfile ]\n");
 }
 
-static const char* nx_formats[] = { "XML", "HDF4", "HDF5", NULL };
+static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DTD", NULL };
 
 int main(int argc, char *argv[])
 {
    char inFile[256], outFile[256], *stringPtr;
    int opt, nx_format = NX_HDF4, nx_access = NXACC_CREATE4;
+   int nx_write_data = 1;
 
-   while( (opt = getopt(argc, argv, "h:x")) != -1 )
+   while( (opt = getopt(argc, argv, "h:xd")) != -1 )
    {
+/* use with "-:" in getopt	
+	if (opt == '-')
+	{
+	    opt = optarg[0];
+	    optarg++;
+	} 
+*/
 	switch(opt)
 	{
 	  case 'x':
-	    nx_format =NX_XML;
+	    nx_format = NX_XML;
 	    nx_access = NXACC_CREATEXML;
 	    break;
 
+	  case 'd':
+	    nx_format = NX_DTD;
+	    nx_access = NXACC_CREATEXML;
+	    nx_write_data = 0; 
+	    break;
+
 	  case 'h':
-	    if (!strcmp(optarg, "4"))
+	    if (!strcmp(optarg, "4") || !strcmp(optarg, "df4"))
 	    {
 		nx_format = NX_HDF4;
 	        nx_access = NXACC_CREATE4;
 	    } 
-	    else if (!strcmp(optarg, "5"))
+	    else if (!strcmp(optarg, "5") || !strcmp(optarg, "df5"))
 	    {
 		nx_format = NX_HDF5;
 	        nx_access = NXACC_CREATE5;
@@ -120,9 +135,9 @@ int main(int argc, char *argv[])
    }
    
 /* Output global attributes */
-   if (WriteAttributes () != NX_OK) return NX_ERROR;
+   if (WriteAttributes (nx_write_data) != NX_OK) return NX_ERROR;
 /* Recursively cycle through the groups printing the contents */
-   if (WriteGroup () != NX_OK) return NX_ERROR;
+   if (WriteGroup (nx_write_data) != NX_OK) return NX_ERROR;
 /* Close the input and output files */
    NXclose (&outId);
    NXclose (&inId);
@@ -130,7 +145,7 @@ int main(int argc, char *argv[])
 }
 
 /* Prints the contents of each group as XML tags and values */
-int WriteGroup ()
+int WriteGroup (int write_data)
 { 
    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], dataLen;     
    NXname name, class;
@@ -144,17 +159,21 @@ int WriteGroup ()
             if (NXopengroup (inId, name, class) != NX_OK) return NX_ERROR;
             if (NXmakegroup (outId, name, class) != NX_OK) return NX_ERROR;
             if (NXopengroup (outId, name, class) != NX_OK) return NX_ERROR;
-            if (WriteGroup () != NX_OK) return NX_ERROR;
+            if (WriteGroup (write_data) != NX_OK) return NX_ERROR;
          }
          else if (!strncmp(class,"SDS",3)) {
             if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
             if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
             if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
             if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
-            if (WriteAttributes () != NX_OK) return NX_ERROR;
-            if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
-            if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
-            if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
+            if (WriteAttributes (write_data) != NX_OK) return NX_ERROR;
+	    if (write_data == 1)
+	    {
+                if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
+                if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
+                if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
+                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
+	    }
             if (NXclosedata (inId) != NX_OK) return NX_ERROR;
             if (NXclosedata (outId) != NX_OK) return NX_ERROR;
          }
@@ -168,7 +187,7 @@ int WriteGroup ()
    return NX_OK;
 }
 
-int WriteAttributes ()
+int WriteAttributes (int write_data)
 {
    int status, i, attrLen, attrType;
    NXname attrName;
@@ -185,7 +204,14 @@ int WriteAttributes ()
             attrLen++; /* Add space for string termination */
             if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return NX_ERROR;
             if (NXgetattr (inId, attrName, attrBuffer, &attrLen , &attrType) != NX_OK) return NX_ERROR;
-            if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
+	    if (write_data == 1)
+	    {
+                if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
+	    }
+	    else
+   	    {
+                if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
+	    }
             if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
          }
          i++;
