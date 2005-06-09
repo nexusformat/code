@@ -31,18 +31,18 @@ LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
-if HAVE_HDF4
-HDF4_TARGETS = NXtoNX4
-endif
-if HAVE_HDF5
-HDF5_TARGETS = NXtoNX5
-endif
+#if HAVE_HDF4
+#HDF4_TARGETS = NXtoNX4
+#endif
+#if HAVE_HDF5
+#HDF5_TARGETS = NXtoNX5
+#endif
 if HAVE_F90
 F90_TARGETS = NXdump NXbrowse90
 ## F90_TARGETS =
 endif
 
-bin_PROGRAMS = nxbrowse NXtoXML nx2dtd nxconvert $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_TARGETS)
+bin_PROGRAMS = nxbrowse nx2dtd nxconvert $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_TARGETS)
 
 nxconvert_SOURCES = nxconvert.c
 nxconvert_LDADD = $(LIBNEXUS)
@@ -52,19 +52,19 @@ nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
 nxbrowse_LDFLAGS = -static
 
-NXtoXML_SOURCES = NXtoXML.c 
-NXtoXML_LDADD = $(LIBNEXUS)
-NXtoXML_LDFLAGS = -static
+#NXtoXML_SOURCES = NXtoXML.c 
+#NXtoXML_LDADD = $(LIBNEXUS)
+#NXtoXML_LDFLAGS = -static
 
 nx2dtd_SOURCES = NXtoDTD.c 
 nx2dtd_LDADD = $(LIBNEXUS)
 nx2dtd_LDFLAGS = -static
 
-NXtoNX4_SOURCES = NXtoNX4.c 
-NXtoNX4_LDADD = $(LIBNEXUS)
+#NXtoNX4_SOURCES = NXtoNX4.c 
+#NXtoNX4_LDADD = $(LIBNEXUS)
 
-NXtoNX5_SOURCES = NXtoNX5.c 
-NXtoNX5_LDADD = $(LIBNEXUS)
+#NXtoNX5_SOURCES = NXtoNX5.c 
+#NXtoNX5_LDADD = $(LIBNEXUS)
 
 NXdump_SOURCES = NXdump.f90
 NXdump_LDADD = $(LIBNEXUS90)
