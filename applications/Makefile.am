@@ -42,16 +42,23 @@ F90_TARGETS = NXdump NXbrowse90
 ## F90_TARGETS =
 endif
 
-bin_PROGRAMS = NXbrowse NXtoXML NXtoDTD $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_TARGETS)
+bin_PROGRAMS = nxbrowse NXtoXML nx2dtd nxconvert $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_TARGETS)
 
-NXbrowse_SOURCES = NXbrowse.c
-NXbrowse_LDADD = $(LIBNEXUS)
+nxconvert_SOURCES = nxconvert.c
+nxconvert_LDADD = $(LIBNEXUS)
+nxconvert_LDFLAGS = -static
+
+nxbrowse_SOURCES = NXbrowse.c
+nxbrowse_LDADD = $(LIBNEXUS)
+nxbrowse_LDFLAGS = -static
 
 NXtoXML_SOURCES = NXtoXML.c 
 NXtoXML_LDADD = $(LIBNEXUS)
+NXtoXML_LDFLAGS = -static
 
-NXtoDTD_SOURCES = NXtoDTD.c 
-NXtoDTD_LDADD = $(LIBNEXUS)
+nx2dtd_SOURCES = NXtoDTD.c 
+nx2dtd_LDADD = $(LIBNEXUS)
+nx2dtd_LDFLAGS = -static
 
 NXtoNX4_SOURCES = NXtoNX4.c 
 NXtoNX4_LDADD = $(LIBNEXUS)
