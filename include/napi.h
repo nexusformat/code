@@ -121,7 +121,7 @@ typedef struct {
 
 #define CONCAT(__a,__b) __a##__b        /* token concatenation */
 
-#if defined(__unix) || defined(__unix__) || defined (__VMS)
+#if defined(__unix) || defined(__unix__) || defined (__VMS) || defined(__APPLE__)
 
 #    ifdef __VMS
 #        define MANGLE(__arg)	__arg 
