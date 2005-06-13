@@ -96,7 +96,7 @@ extern long string_util::str_to_int(const string &str){
   return atol(str.c_str());
 }
 
-extern ulong string_util::str_to_uint(const string &str){
+extern unsigned long string_util::str_to_uint(const string &str){
   long num=str_to_int(str);
   if(num<0)
     throw invalid_argument("str_to_uint(string) argument is not an integer");
@@ -326,7 +326,7 @@ extern void string_util::str_to_uintArray(std::string & str,uint *array, const u
     *(array+i)=(uint)str_to_uint(*(strIt+i));
 }
 
-extern void string_util::str_to_ulongArray(std::string & str,ulong *array, const uint len){
+extern void string_util::str_to_ulongArray(std::string & str,unsigned long *array, const uint len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -336,7 +336,7 @@ extern void string_util::str_to_ulongArray(std::string & str,ulong *array, const
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
   for( uint i=0 ; i<len ; i++ )
-    *(array+i)=(ulong)str_to_uint(*(strIt+i));
+    *(array+i)=(unsigned long)str_to_uint(*(strIt+i));
 }
 
 extern void string_util::str_to_floatArray(std::string & str,float *array, const uint len){
