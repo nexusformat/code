@@ -342,7 +342,7 @@ mxml_type_t nexusTypeCallback(mxml_node_t *parent){
     if(typeString == NULL){
       /*
 	MXML_TEXT seems more appropriate here. But mxml hacks text into
-	single words which is not what NeXus want.
+	single words which is not what NeXus wants.
       */
       return MXML_OPAQUE;
     } else{
@@ -498,12 +498,48 @@ char *nexusWriteCallback(mxml_node_t *node){
   myxml_add_char('\0',&bufPtr,&buffer,&bufsize);
   return (char *)buffer;
 }
+/*--------------------------------------------------------------------*/
+static int isTextData(mxml_node_t *node){
+  const char *attr = NULL;
+  int rank, type, iDim[NX_MAXRANK];
+
+  if(!isDataNode(node)){
+    return 0;
+  }
+  /*
+    test datasets
+  */
+  attr = mxmlElementGetAttr(node,TYPENAME);
+  if(attr == NULL){
+    return 1;
+  }
+  analyzeDim(attr,&rank,iDim,&type);
+  if(type == NX_CHAR){
+    return 1;
+  } else {
+    return 0;
+  }
+}
 /*---------------------------------------------------------------------*/
 const char *NXwhitespaceCallback(mxml_node_t *node, int where){
   char *indent;
   int len;  
 
   if(strstr(node->value.element.name,"?xml") != NULL){
+    return NULL;
+  }
+
+  if(isTextData(node)){
+    if(where == MXML_WS_BEFORE_OPEN){
+      len = countDepth(node)*2 + 2;
+      indent = (char *)malloc(len*sizeof(char));
+      if(indent != NULL){
+	memset(indent,' ',len);
+	indent[0]= '\n';
+	indent[len-1] = '\0';
+	return  (const char*)indent;
+      }
+    }
     return NULL;
   }
 
@@ -518,6 +554,19 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
     }
   }
   return NULL;
+}
+  /*------------------------------------------------------------------*/
+int isDataNode(mxml_node_t *node){
+  if(mxmlElementGetAttr(node,"name") != NULL){
+    return 0;
+  }
+  if(strcmp(node->value.element.name,"NXroot") == 0){
+    return 0;
+  }
+  if(strcmp(node->value.element.name,"NAPIlink") == 0){
+    return 0;
+  }
+  return 1;
 }
 /*-----------------------------------------------------------------------*/
 #ifdef TESTMAIN

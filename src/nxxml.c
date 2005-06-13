@@ -59,18 +59,6 @@ typedef struct {
   xmlStack stack[NXMAXSTACK];  /* stack */
 }XMLNexus, *pXMLNexus;
 /*===================== support functions ===============================*/
-static int isDataNode(mxml_node_t *node){
-  if(mxmlElementGetAttr(node,"name") != NULL){
-    return 0;
-  }
-  if(strcmp(node->value.element.name,"NXroot") == 0){
-    return 0;
-  }
-  if(strcmp(node->value.element.name,"NAPIlink") == 0){
-    return 0;
-  }
-  return 1;
-}
 /*----------------------------------------------------------------------*/
 extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
 
@@ -447,6 +435,24 @@ static mxml_node_t *searchSDSLinks(pXMLNexus xmlHandle, CONSTCHAR *name){
     }
   }
   return NULL;
+}
+/*-------------------------------------------------------------------*/
+static int strtrimcr(char *szStr, char *szSet)
+{
+      int   i, j;                                     /* Locale counters */
+
+      /*-------------------------------------------------*/
+
+      j = i = strlen(szStr) - 1;                /* Find length of string */
+
+      while (strrchr(szSet, szStr[ i ])
+                  && (0 <= i))
+      {
+            /* While string is terminated by one of the specified characters */
+            szStr[ i-- ] = '\0';          /*- Replace character with '\0' */
+      }
+
+      return(j - i);    /* Return the difference between old and new length */
 }
 /*-----------------------------------------------------------------------*/
 NXstatus CALLING_STYLE NXXopendata (NXhandle fid, CONSTCHAR *name){
