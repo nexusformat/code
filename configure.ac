@@ -159,7 +159,9 @@ AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-AC_CHECK_PROG(SWIG,swig)
+AC_CHECK_PROGS(SWIG,[swig])
+AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
+AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 
 dnl These are used in build_rules.am to pass any approptiate 
 dnl tag to libtool for f90 building
@@ -355,6 +357,7 @@ AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
 AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
 AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
+AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
