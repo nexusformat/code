@@ -198,7 +198,7 @@ int WriteAttributes (int write_data)
       status = NXgetnextattr (inId, attrName, &attrLen, &attrType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
-         if (strcmp(attrName, "NeXus_version") && 
+         if (strcmp(attrName, "NeXus_version") && strcmp(attrName, "XML_version") &&
              strcmp(attrName, "HDF_version") && strcmp(attrName, "HDF5_Version") && 
              strcmp(attrName, "file_name") && strcmp(attrName, "file_time")) {
             attrLen++; /* Add space for string termination */
