@@ -426,19 +426,21 @@ void my_startElement(void *user_data, const xmlChar *name,
   Node node(str_name,type);  // default
   tree<Node> tree;
   if(location.size()>0 && retriever){ // if there is a location and a retriever
-    try{
-      retriever->getData(location,tree);
-      tree.begin()->set_name(str_name);
-      if( (tree.begin()->is_data()) && update_dims )
-        tree.begin()->update_dims(((UserData *)user_data)->dims);
-      node=*(tree.begin());
-      node_from_retriever=true;
-    }catch(invalid_argument &e){
-      print_error(((UserData *)user_data),INVALID_ARGUMENT+except_label+e.what());
-    }catch(runtime_error &e){
-      print_error(((UserData *)user_data),RUNTIME_ERROR+except_label+e.what());
-    }catch(exception &e){
-      print_error(((UserData *)user_data),EXCEPTION+except_label+e.what());
+    if(!(((UserData *)user_data)->status)){
+      try{
+        retriever->getData(location,tree);
+        tree.begin()->set_name(str_name);
+        if( (tree.begin()->is_data()) && update_dims )
+          tree.begin()->update_dims(((UserData *)user_data)->dims);
+        node=*(tree.begin());
+        node_from_retriever=true;
+      }catch(invalid_argument &e){
+        print_error(((UserData *)user_data),INVALID_ARGUMENT+except_label+e.what());
+      }catch(runtime_error &e){
+        print_error(((UserData *)user_data),RUNTIME_ERROR+except_label+e.what());
+      }catch(exception &e){
+        print_error(((UserData *)user_data),EXCEPTION+except_label+e.what());
+      }
     }
   }
 
