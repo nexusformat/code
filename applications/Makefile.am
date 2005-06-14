@@ -42,7 +42,7 @@ F90_TARGETS = NXdump NXbrowse90
 ## F90_TARGETS =
 endif
 
-bin_PROGRAMS = nxbrowse nx2dtd nxconvert $(HDF4_TARGETS) $(HDF5_TARGETS) $(F90_TARGETS)
+bin_PROGRAMS = nxbrowse nx2dtd nxconvert $(F90_TARGETS)
 
 nxconvert_SOURCES = nxconvert.c
 nxconvert_LDADD = $(LIBNEXUS)
