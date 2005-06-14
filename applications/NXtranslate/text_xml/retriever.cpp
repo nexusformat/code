@@ -1,0 +1,205 @@
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <libxml/xmlmemory.h>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#include "retriever.h"
+#include "../node.h"
+#include "../node_util.h"
+#include "../string_util.h"
+#include "../tree.hh"
+
+using std::ifstream;
+using std::invalid_argument;
+using std::runtime_error;
+using std::string;
+using std::cout;
+using std::endl;
+using std::vector;
+using string_util::starts_with;
+
+static string get_type(const string &location){
+  static const string CHAR("CHAR");
+  if(starts_with(location,CHAR))
+    return "NX_CHAR";
+
+  static const string INT8("INT8");
+  if(starts_with(location,INT8))
+    return "NX_INT8";
+
+  static const string INT16("INT16");
+  if(starts_with(location,INT16))
+    return "NX_INT16";
+
+  static const string INT32("INT32");
+  if(starts_with(location,INT32))
+    return "NX_INT32";
+
+  static const string UINT8("UINT8");
+  if(starts_with(location,UINT8))
+    return "NX_UINT8";
+
+  static const string UINT16("UINT16");
+  if(starts_with(location,UINT16))
+    return "NX_UINT16";
+
+  static const string UINT32("UINT32");
+  if(starts_with(location,UINT32))
+    return "NX_UINT32";
+
+  static const string FLOAT32("FLOAT32");
+  if(starts_with(location,FLOAT32))
+    return "NX_FLOAT32";
+
+  static const string FLOAT64("FLOAT64");
+  if(starts_with(location,FLOAT64))
+    return "NX_FLOAT64";
+
+  throw invalid_argument("Cannot determine type in location: "+location);
+}
+
+static bool is_right_square_bracket(const char c){
+  static const string RIGHT="]";
+  return find(RIGHT.begin(),RIGHT.end(),c)!=RIGHT.end();
+}
+
+static string get_dims(const string &location){
+  using std::find;
+  static const string LEFT("[");
+
+  if(!starts_with(location,LEFT))
+    return "";
+
+  string result="";
+  for(string::const_iterator it=location.begin() ; it!=location.end() ; it++ ){
+    result+=(*it);
+    if(is_right_square_bracket(*it))
+      break;
+  }
+
+  if(result.size()==location.size())
+    return "";
+  else
+    return result;
+}
+
+static void print_element_names(xmlNode * a_node){
+    xmlNode *cur_node = NULL;
+
+    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            printf("node type: Element, name: %s\n", cur_node->name);
+        }
+        
+        //print_element_names(cur_node->children);
+    }
+}
+
+/**
+ * The factory will call the constructor with a string. The string
+ * specifies where to locate the data (e.g. a filename), but
+ * interpreting the string is left up to the implementing code.
+ */
+TextXmlRetriever::TextXmlRetriever(const string &str): source(str) /*,current_line(0)*/{
+  cout << "****************************************" 
+       << "****************************************" << endl; // REMOVE
+  cout << "TextXmlRetriever(" << source << ")" << endl; // REMOVE
+
+  // open the file
+  doc=xmlParseFile(source.c_str());
+
+  // check that open was successful
+  if(doc==NULL){
+    xmlFreeDoc(doc);
+    xmlCleanupParser();
+    throw runtime_error("Parsing "+source+" was not successful");
+  }
+}
+
+TextXmlRetriever::~TextXmlRetriever(){
+  //cout << "~TextXmlRetriever()" << endl;
+
+  if(doc==NULL) return;
+
+  // close the file
+  xmlFreeDoc(doc);
+  xmlCleanupParser();
+}
+
+/**
+ * This is the method for retrieving data from a file. The whole
+ * tree will be written to the new file immediately after being
+ * called. Interpreting the string is left up to the implementing
+ * code.
+ */
+void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
+  cout << "TextXmlRetriever::getData(" << location << ",tree)" << endl; // REMOVE
+  // check that the argument is not an empty string
+  if(location.size()<=0)
+    throw invalid_argument("cannot parse empty string");
+
+  // variables for the divided string version of the location
+  string str_path;
+  string type;
+  string str_dims;
+
+  // convert the location to a type and (string) path
+  if(starts_with(location,"/")){
+    str_path=location;
+    type="NX_CHAR";
+    str_dims="";
+  }else{
+    // get the type and remove it from the location
+    type=get_type(location);
+    str_path=location.substr(type.size()-3,location.size());
+    // get the dimensions and remove it from the location
+    str_dims=get_dims(str_path);
+    str_path=str_path.substr(str_dims.size(),str_path.size());
+    // remove the separating colon
+    str_path=str_path.substr(1,str_path.size());
+  }
+  std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
+
+  // get the root
+  xmlNode *root_element = NULL;
+  root_element = xmlDocGetRootElement(doc);
+
+  // print out contents at current location
+  print_element_names(root_element);
+
+/*
+  // check that the argument is an integer
+  int line_num=string_util::str_to_int(location);
+
+  // set stream to the line before
+  skip_to_line(infile,current_line,line_num);
+  // read the line and print it to the console
+  string text=read_line(infile);
+*/
+  // create an empty node
+  Node node("empty","empty");
+
+  // put the data in the node
+/*
+  vector<int> dims;
+  dims.push_back(text.size());
+  update_node_from_string(node,text,dims,Node::CHAR);
+*/
+  tr.insert(tr.begin(),node);
+}
+
+static void openPath(  xmlNode *root_element, const std::vector<std::string> &path, int &num_group, int &num_data){
+
+}
+
+static void closePath(  xmlNode *root_element, int &num_group, int &num_data){
+
+}
+
+const string TextXmlRetriever::MIME_TYPE("text/xml");
+
+string TextXmlRetriever::toString() const{
+  return "["+MIME_TYPE+"] "+source;
+}

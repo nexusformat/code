@@ -3,9 +3,9 @@ ALL=nxtranslate NXtranslate.pdf # do not edit
 all:$(ALL) # do not edit
 
 # search for include
-INC_FLAGS=-IIPNS_CPP
+INC_FLAGS=
 #search for libraries
-LIB_FLAGS=-LIPNS_CPP
+LIB_FLAGS=
 
 # NeXus specific stuff
 NEXUS_LIBS=-lNeXus -lmfhdf -ldf -ljpeg -lhdf5
@@ -21,15 +21,16 @@ OUTPUT_CFLAGS=-DHDF4 -DHDF5
 # select input types
 include IPNS_CPP/Makefile.nxtranslate # IPNS runfile support
 include text_plain/Makefile.nxtranslate # text/plain support
+include text_xml/Makefile.nxtranslate # text/xml support
 
 # installation directory
 INSTALL_DIR=/usr/local/bin
 ######################################################################
 # DO NOT EDIT BELOW THIS POINT
 ######################################################################
-INPUT_CFLAGS=$(IPNS_CPP_CFLAGS) $(TEXT_PLAIN_CFLAGS)
-INPUT_OBJS=$(IPNS_CPP_OBJS) $(TEXT_PLAIN_OBJS)
-INPUT_LIBS=$(IPNS_CPP_LIBS) $(TEXT_PLAIN_LIBS)
+INPUT_CFLAGS=$(IPNS_CPP_CFLAGS) $(TEXT_PLAIN_CFLAGS) $(TEXT_XML_CFLAGS)
+INPUT_OBJS=$(IPNS_CPP_OBJS) $(TEXT_PLAIN_OBJS) $(TEXT_XML_OBJS)
+INPUT_LIBS=$(IPNS_CPP_LIBS) $(TEXT_PLAIN_LIBS) $(TEXT_XML_LIBS)
 CFLAGS=-c -g -fPIC
 LIBS=$(LIB_FLAGS) $(XML_LIBS) $(NEXUS_LIBS) $(INPUT_LIBS)
 
@@ -43,14 +44,14 @@ CPP_SRC=attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 H_SRC=attr.h nexus_retriever.h nexus_util.h node.h node_util.h Ptr.h \
     retriever.h string_util.h xml_parser.h tree.hh nxtranslate_debug.h
 TEST_SRC=test_simple.xml test_nexus.xml test_nexus_macro.xml test_ipns.xml \
-    hrcs1797.run test_text_plain.xml
+    hrcs1797.run test_text_plain.xml test_text_xml.xml
 TEST_RESULT=test_simple.nxs test_nexus.nxs test_nexus_macro.nxs \
-    $(IPNS_CPP_TEST) $(TEXT_PLAIN_TEST)
+    $(IPNS_CPP_TEST) $(TEXT_PLAIN_TEST) $(TEXT_XML_TEST)
 SRC=$(CPP_SRC) $(H_SRC) $(TEST_SRC) $(DOC_SRC) $(IPNS_CPP_SRC) Makefile \
     NXtranslate.pdf README LICENSE BUGS CHANGES $(TEXT_PLAIN_SRC)
 VERS=0.2.0-rc4
 ######################################################################
-nxtranslate: $(OBJS) $(INPUT_LIBS)
+nxtranslate: $(OBJS) $(INPUT_LIBS) $(INPUT_OBJS)
 	$(CPP) $(OBJS) $(LIBS) -o nxtranslate
 
 attr.o: attr.cpp attr.h
@@ -95,11 +96,14 @@ test_nexus.nxs: nxtranslate test_nexus.xml
 test_nexus_macro.nxs: nxtranslate test_nexus_macro.xml
 	./nxtranslate test_nexus_macro.xml -DFILE=test_simple.nxs
 
-test_ipns.nxs: nxtranslate test_ipns.xml hrcs1797.run
-	./nxtranslate test_ipns.xml -DfileName=hrcs1797.run
+$(IPNS_CPP_TEST): nxtranslate test_ipns.xml hrcs1797.run
+	./nxtranslate test_ipns.xml -DfileName=hrcs1797.run -o $(IPNS_CPP_TEST)
 
-test_text_plain.nxs: nxtranslate test_text_plain.xml test_simple.xml
-	./nxtranslate test_text_plain.xml
+$(TEXT_PLAIN_TEST): nxtranslate test_text_plain.xml test_simple.xml
+	./nxtranslate test_text_plain.xml -o $(TEXT_PLAIN_TEST)
+
+$(TEXT_XML_TEST): nxtranslate test_text_xml.xml test_simple.xml
+	./nxtranslate test_text_xml.xml -o $(TEXT_XML_TEST)
 
 test-clean:
 	rm -f $(TEST_RESULT)
@@ -123,6 +127,8 @@ dist-test: test
 clean: test-clean
 	rm -f $(OBJS)
 	cd IPNS_CPP && make clean
+	cd text_plain && make clean
+	cd text_xml && make clean
 
 dist-clean: clean
 

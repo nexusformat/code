@@ -8,6 +8,9 @@
 #ifdef TEXT_PLAIN_RETRIEVER
 #include "text_plain/retriever.h"
 #endif
+#ifdef TEXT_XML_RETRIEVER
+#include "text_xml/retriever.h"
+#endif
 
 using std::string;
 using std::invalid_argument;
@@ -29,6 +32,11 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #ifdef TEXT_PLAIN_RETRIEVER
   }else if(type==TextPlainRetriever::MIME_TYPE){
     RetrieverPtr ptr(new TextPlainRetriever(source));
+    return ptr;
+#endif
+#ifdef TEXT_XML_RETRIEVER
+  }else if(type==TextXmlRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new TextXmlRetriever(source));
     return ptr;
 #endif
   }

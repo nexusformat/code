@@ -1,0 +1,18 @@
+######################################################################
+# this file is to allow for configuring NXtranslate
+######################################################################
+# select input types
+TEXT_XML_CFLAGS=`xml2-config --cflags` -DTEXT_XML_RETRIEVER
+TEXT_XML_OBJS=text_xml/retriever.o
+#TEXT_XML_LIBS=
+
+# source files
+TEXT_XML_SRC=text_xml/retriever.cpp text_xml/retriever.h \
+     text_xml/Makefile text_xml/Makefile.nxtranslate
+
+# how to build the retriever
+text_xml/retriever.o: $(TEXT_XML_SOURCE)
+	cd text_xml && make all
+
+# what are the results of the tests, test itself should be in main makefile
+TEXT_XML_TEST=test_text_xml.nxs
