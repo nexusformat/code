@@ -1,0 +1,530 @@
+<sect1><title>Monochromatic Reflectometry</title>
+
+<!--
+<mediaobject>
+<imageobject><imagedata fileref="tofnpd.gif" format="gif"></imageobject>
+<imageobject><imagedata fileref="tofnpd.jpg" format="jpg"></imageobject>
+<caption> <para>Schematic diagram of the generic time of flight
+neutron powder diffractometer.  </para> </caption>
+</mediaobject>
+
+<para>The time of flight powder diffractometer (TOFNPD) is an
+instrument used with a couple of different types of analysis. For that
+reason the composite TOFNPD definition is made up of three separate
+definitions.</para>
+
+<sect2><title>TOFNPD:Time Focus</title>
+
+<para>To time focus data there is little information required. The parameters needed in the file are
+
+<orderedlist>
+
+<listitem><para>unique detector pixel identifier</para></listitem>
+
+<listitem><para>primary flight path</para></listitem>
+
+<listitem><para>detector pixel position</para></listitem>
+
+<listitem><para>detector pixel solid angle covered</para></listitem>
+
+</orderedlist>
+
+In addition, the software needs to have some additional information
+that is specified by the user.
+
+<orderedlist>
+
+<listitem><para>mapping of detector pixel identifiers to focused
+detector pixel identifier</para></listitem>
+
+<listitem><para>focused detector position</para></listitem>
+
+<listitem><para>unique focused detector identifier</para></listitem>
+
+</orderedlist>
+
+</para>
+-->
+
+<example id="monoref.xml"><title><filename>monoref.xml</filename></title>
+<programlisting role="XML">
+<![CDATA[<!--
+Instrument Definition for Monochromatic Source Reflectometers.
+
+Editor: Paul Kienzle <pkienzle@nist.gov>
+Mangled_by: Nick Maliszewskyj <nickm@nist.gov>
+$Id$
+
+See http://www.neutron.anl.gov:8080/NeXus/5 for component definitions.-->
+<NXentry>
+  <definition URL="http://www.nexus.anl.gov/instruments/xml/monoref.xml" 
+      version="1.0">
+    MONOREF
+  </definition>
+  <start_time type="ISO8601">
+  </start_time>
+  <tag polarization="++|+-|-+|--|+|-?" magnetic_field="NX_FLOAT?" 
+      userfield="..." scan="slit|background+|background-|specular|rock|...">
+    {Empty.}
+    <!--
+    *** HDF may not allow empty blocks, so maybe a single integer
+    *** to distinguish the various conditions.
+    -->
+  </tag>
+  <NXsample>
+    <rotation_angle units="degrees" type="NX_FLOAT[i]">
+    </rotation_angle>
+  </NXsample>
+  <!--
+  *** link to spectrum measurement for intensity vs. wavelength
+  *** for a given slit setting 
+
+  *** warning: beam profile is not regular, but this effect is
+  *** accomodated in the spectrum measurement
+  -->
+  <NXinstrument>
+    <!-- wavelength selection -->
+    <NXcrystal name="monochromator">
+      <wavelength units="Angstroms" type="NX_FLOAT">
+        { Wavelength of beam exiting component - take this as wavelength of 
+        beam incident on samples }
+      </wavelength>
+      <wavelength_spread type="NX_FLOAT">
+        {% deviation FWHM /Wavelength - need this to compute resolution}
+      </wavelength_spread>
+    </NXcrystal>
+    <!-- collimation -->
+    <NXaperture name="pre[sample|detector]_slit[|y]#">
+      <opening units="mm" filter="Qx|Qy" type="NX_FLOAT">
+        <!-- *** This is not part of standard NXaperture -->
+        { Slit opening; this is a scan parameter, so cannot be recorded as part 
+        of the aperture size. }
+      </opening>
+      <NXgeometry name="geometry">
+        <NXtranslation name="translation">
+          <distances units="mm" type="NX_FLOAT">
+            { Location of slit along beamline (midway between slits if slits 
+            are not coplanar). This is required to compute instrument 
+            resolution. }
+          </distances>
+          <angles>
+            { Only need angles if slits are not centered on beam wrt sample. }?
+          </angles>
+        </NXtranslation>
+        <NXshape name="shape">
+          <type type="NX_CHAR">
+            nxslit
+          </type>
+          <size units="mm" type="NX_FLOAT[2]">
+            { size[1] is thickness of material (actual slits can be more 
+            complicated in practice, being composed of different materials that 
+            are not aligned, but these can be simulated with sets of slits). 
+            size[2] is zero if slits are coplanar, otherwise it is the distance 
+            between slits. each half of the slit is considered to be a 
+            semi-infinite plane cutting neutrons in Qx if they are in the 
+            scattering plane, or Qy if they are normal to the scattering plane 
+            as defined by
+            <opening filter="...">
+            </opening>
+            above. }
+          </size>
+        </NXshape>
+      </NXgeometry>
+    </NXaperture>
+    <!--
+    The polarizer-flipper-guidefield combination selects polarization vectors 
+    in and out of the sample. A number of scans are required to tune the 
+    instrument so that polarization is either 'up' or 'down' on the sample. On 
+    correctly tuned instruments the polarization angle selected should be 
+    recorded by the flipper using polar_angle relative to the surface (0/180 
+    for +/-, or with out of plane polarization, 90/270 for +/-). The 
+    polarization efficiency must be determined from a spectrum scan and the 
+    appropriate correction applied to the data. Raw values from the instrument, 
+    such as time dependent field applied to flipper coils or current on the 
+    current sheet can be recorded for specialized reduction programs which know 
+    how to handle them.
+    -->
+    <NXpolarizer name="presample_polarizer">
+    </NXpolarizer>
+    <NXflipper name="presample_flipper">
+      <polar_angle units="degree" type="NX_FLOAT">
+      </polar_angle>
+    </NXflipper>
+    <NXpolarizer name="predetector_polarizer">
+    </NXpolarizer>
+    <NXflipper name="predetector_flipper">
+      <polar_angle units="degree" type="NX_FLOAT">
+      </polar_angle>
+    </NXflipper>
+    <!-- detector may be protected by an attenuator and/or a beam stop -->
+    <NXattenuator>
+      <attenuator_transmission type="NX_FLOAT">
+        { The nominal amount of the beam that gets through (transmitted 
+        intensity)/(incident intensity) }
+      </attenuator_transmission>
+    </NXattenuator>
+    <NXbeam_stop name="stop">
+      ? { Need all fields so that we can calculate shadow of beam stop on 
+      detector. }
+    </NXbeam_stop>
+    <NXdetector name="detector">
+      <!-- 
+      polar_angle and azimuthal_angle define the location of the detector 
+      relative to the beamzero
+      -->
+      <distance units="mm" type="NX_FLOAT">
+        { distance from sample }
+      </distance>
+      <translation units="centimeter" type="NX_FLOAT[2]">
+        { translation normal to direct beam }?
+      </translation>
+      <polar_angle units="degrees" type="NX_FLOAT[i]">
+        { angular position of detector relative to beamzero through sample -- 
+        known to practitioners as "A4" or "two theta" }
+      </polar_angle>
+      <azimuthal_angle units="degrees" type="NX_FLOAT">
+        { Indicate sense of scattering: 0 is front surface of sample, 180 is 
+        back surface of sample. If 180, change the sign of the reflected angle 
+        in the data. It is also possible for the beam to enter the substrate 
+        from the side and reflect off the back surface of a film, in which case 
+        negative angles can be interpreted as inverting the scattering length 
+        density profile of the film (after accounting for absorption in the 
+        substrate. }
+      </azimuthal_angle>
+      <x_offset units="mm" type="NX_FLOAT[j]">
+        {pixel edges in x}?
+      </x_offset>
+      <y_offset units="mm" type="NX_FLOAT[k]">
+        {pixel edges in x}?
+      </y_offset>
+      <counts signal="1" axes="x_offset?,y_offset?,polar_angle" 
+          type="NX_INT[k,? j,? i]">
+        { raw detector counts }
+      </counts>
+      <!--
+      *** Raw counts are meaningless to the user if they are counting
+      *** against detector since all values will be the same. The data
+      *** only become meaningful when divided by counting time or monitor
+      *** as specified by the ratio field. The generic plotting program
+      *** will need to sort this out.
+
+      *** In general, n-D data should contain k-D summary statistics
+      *** for all 0&lt;=k&lt;n. That way a really dumb plotting program can
+      *** still display info from a 3-D result as a line.
+
+      *** Some control systems have data windows. Windows may be
+      *** defined in terms of pixel ranges or in terms of
+      *** theta_in-theta_out relationships (i.e., Qx). Each scan
+      *** point should have start/end positions and summary
+      *** statistics for every window defined. Window size may be
+      *** dynamic. Store windows in separate data blocks.
+      -->
+    </NXdetector>
+  </NXinstrument>
+  <NXmonitor name="monitor">
+    <mode type="NX_CHAR">
+      monitor
+    </mode>
+    <preset type="NX_FLOAT">
+      { preset value for monitor }?
+    </preset>
+    <data units="counts" type="NX_INT[i]">
+      { record of monitor counts }?
+    </data>
+    <efficiency type="Nxdata">
+      { Monitor efficiency as a function of wavelength }?
+    </efficiency>
+    <sampled_fraction units="dimensionless" type="NX_FLOAT">
+      { Proportion of incident beam sampled by the monitor }
+    </sampled_fraction>
+  </NXmonitor>
+  <NXmonitor name="timer">
+    <mode type="NX_CHAR">
+      timer
+    </mode>
+    <preset type="NX_FLOAT">
+      { preset value for timer }?
+    </preset>
+    <data units="seconds" type="NX_INT[i]">
+      { record of times for individual points }?
+    </data>
+  </NXmonitor>
+  <NXdata>
+    <attenuator_transmission NAPIlink="NXentry/NXinstrument/NXattenuator">
+    </attenuator_transmission>
+    <theta NAPIlink="NXentry/NXsample/rotation_angle">
+    </theta>
+    <twotheta NAPIlink="NXentry/detector/polar_angle">
+    </twotheta>
+    <presample_slit1 NAPIlink="NXentry/presample_slit1/opening">
+    </presample_slit1>
+    <presample_slit2 NAPIlink="NXentry/presample_slit2/opening">
+    </presample_slit2>
+    <predetector_slit1 NAPIlink="NXentry/predetector_slit1/opening">
+    </predetector_slit1>
+    <predetector_slit2 NAPIlink="NXentry/predetector_slit2/opening">
+    </predetector_slit2>
+    <counts NAPIlink="NXentry/detector/counts">
+    </counts>
+    <count_start units="second" type="NX_FLOAT[i]">
+      <!-- probably shouldn't store any real data here, but where else? -->
+      { start time of each measurement point relative to start time of entry. }
+    </count_start>
+    <timer NAPIlink="NXentry/timer/data">
+    </timer>
+    <monitor NAPIlink="NXentry/monitor/data">
+    </monitor>
+  </NXdata>
+  <NXlog name="??">
+    { Various logs for temperature, field, etc. which are assumed to be 
+    constant over the duration of the run. The reduction program should be able 
+    to display their values on a parallel graph. Note that logs are not 
+    necessarily sampled synchronously with the data points. }*
+  </NXlog>
+</NXentry>
+<!--
+Reflectometry requires several different data scans.  After reduction
+it will all be reduced to normalized reflected intensity as a function
+of Q but how it gets there depends on the nature of the instrument and
+how the data are taken.
+
+A reflectometry data point is parameterized by theta_in (the angle of
+incidence relative to the sample surface) and theta_out (the angle of
+the detector relative to the beam).  The reflectivity is is a count of the
+neutrons reflected in the specular condition (theta_out = theta_in)
+minus the background measured in an off-specular condition and
+divided by the number of neutrons incident on the sample.
+
+You also need to know the wavelength of the source in order to convert 
+from real space to reciprocal space and to calculate absorption in models
+of the reflected signal.
+
+The common scan types are alignment scans, intensity scans,
+specular scans, and +/- offset background scans. With polarized beam
+these scan types are repeated for each polarization cross-section.
+
+Even though scans may be interleaved and the points may not be taken
+in order, each logical scan will be stored in a separate entry in the
+file with 
+
+Alignment scans
+===============
+
+The sample goniometer has six degrees of freedom: rotation about x,y,z
+and translation along x,y and z.  Alignment consists of centering the
+sample in the beam and adjusting the x,y,z angles until the reflected
+signal is maximized.  At this point theta_in is defined to be theta_out.
+
+The incident angle theta_in is undefined until the sample is aligned. 
+Once the sample is aligned, all subsequent theta_in values are 
+measured relative to those values on the goniometer.
+
+Data in the NeXus file should record theta_in relative to the aligned
+sample rather than recording raw goniometer positions.  Alignment scans
+can record raw goniometer rotations.  
+
+Slit scans
+==========
+
+As the sample is rotated the portion of the beam that it intercepts
+changes, with shallower angles having fewer neutrons per unit time.
+A reflectometer will have slits that can be adjusted to eliminate
+any beam that does not fall on the sample.  This reduces background
+which is important when measuring small signals, and provides a means
+for counting the neutrons hitting the sample: Simply remove the sample
+from the beam and count the neutrons that come through the slits.
+
+Some instruments have a monitor between the slits and the sample, with
+a fixed ratio between detector counts and monitor counts.  For those
+instruments a single point slit scan is adequate for determining the
+detector to monitor ratio.
+
+With small samples and at low angles, the slits are usually fixed, and
+the beam spills over the edges of the sample.  In this case a
+footprint correction is required to correct for the changing ratio
+of neutrons on the sample to neutrons missing the sample.
+
+*** Link to or include the intensity scan within every file that needs it?
+
+
+Point detectors
+===============
+
+Each theta_in-theta_out pair has a single data value associated with
+it.  If theta_in is equal to theta_out, then it is a specular
+scan.  If it is a little bit off, it is a background scan (either
+plus or minus).  There are various reasons for offsetting theta_in
+vs. theta_out.  If the detector is fixed and the sample is rocked,
+then it is a rocking curve, from which you might recover the structure
+of the beam, or study off specular details of the reflection. It would
+even be possible to do a complete Qx-Qz scan if the beam rates are
+high enough, such as from an X-ray machine.
+
+There are a variety of ways to perform background scans depending
+on the source of the background.  The most common ways are to offset
+from theta_in and offset from theta_out.  This is a property of the
+experiment rather than the particular instrument configuration, and
+so it is the responsibility of the control program to record the
+correct type.  The reduction program should have the flexibility to
+interpret data in either way.
+
+Linear detectors
+================
+
+A linear detector simultaneously samples multiple theta_out values
+for a given theta_in-theta_out setting of the instrument. The data
+will therefore be two dimensional, with (theta_in,theta_out) on the
+primary axis, and theta distances (dtheta) on the second axis.
+
+The detector entry in the instrument definition should indicate the
+location of the edges of each pixel on the detector and the detector
+position.  Using this information the NeXus file writer can easily
+translate this to dtheta values for the detector ( for a detector 
+at distance D from the sample, dtheta=atan(d/D)*180/pi ).
+
+Specular reflection need not be centered on the linear detector.  As
+a result of the alignment process, the appropriate pixel to theta 
+mapping must be stored in the NXdetector entry and copied to/linked
+from the dtheta vector in the data block.  This will also require
+details of the electronics controlling e.g., bin widths.
+
+Area detectors
+==============
+
+Area detectors are like linear detectors except that they can also
+measure angle zeta normal to the scattering plane.  This yields 
+3-D data, with (theta_in,theta_out) on the primary axis, dtheta on 
+the second axis, and zeta on the third axis.  Normally the zeta data 
+is vertically integrated, possibly by the DAQ software.  The reduction
+software may need to compensate for rotations of the detector as
+measured from a narrow beam scan.
+
+Polarized neutrons
+==================
+
+Some instruments have neutron spin polarizers.  This is not a separate
+data dimension, however, since each polarization cross section is a
+separate measurement with different flipper states.  Instead each
+point is characterized by the triple (theta_in,theta_out,polarization)
+where polarization is ++, +-, -+, - -.  If only one polarizer is present 
+the polarization would be + or - depending on which is present (look
+for flipper_in or flipper_out in the data block).
+
++ for the incident neutron is that state which comes from the polarizer
+in the absence of a front flipper.  + for the reflected neutron is the
+state detected in the absence of a rear flipper.
+
+Polarization itself can, depending on instrument, be in an arbitrary
+direction relative to the sample.  This direction is defined relative
+to the absolute coordinate system given by NXgeometry.  NXpolarizer
+class needs to be extended with this field.
+
+It may be possible to scan polarization angle, but the current 
+definition doesn't support this.
+
+Attenuators
+===========
+
+Some instruments may have well calibrated attenuators under instrument
+control.  Others will have poorly calibrated attenuators, and
+attenuators not under instrument control.  Values taken with different
+attenuators need to be sorted into different scans so that the
+reduction program can set the attenuation independent of the nominal
+value.
+
+Scans
+=====
+
+Reflectometers are scan based instrument.  Rather than measuring a set
+of detectors for a time in an entry, they measure one point, move to
+another configuration, measure, and so on.  The configuration space
+need not be measured on a mesh. For example, the specular scan may be
+sampled more densely than the background scans.  Because of this we
+can't use a dense array to represent our data.
+
+With good control software, the sequence of measurements need not
+correspond to logical scans being constructed.  For example, it is
+very sensible to measure all four polarization cross sections at
+several different fields for a particular geometry before moving to
+the next geometry.  It is also sensible to measure specular and +/-
+background interleaved rather than measuring them in different scans.
+
+With adaptive scanning the control software may decide to fill in
+parts of the scan where the values are changing most rapidly meaning
+that the sequence of measurements is not increasing along the primary
+axis.  Data should probably be recorded in the order it is taken 
+otherwise we are constrained to only ever write NeXus files after the 
+fact rather than point by point as the data arrives.  Reduction and 
+viewing software should sort the data before plotting.
+
+The NeXus format could be organized by the physical scan.  That is, an
+NXdata element is just a set of tuples representing the machine
+configuration for those tuples and the counts at those configurations.
+However, an automatic NeXus file plotter would not be able to make
+sense of the data and automatically plot something reasonable.
+
+Instead we chose to organize by the logical scan.  An NXdata element is
+still a set of tuples representing the machine configuration and
+counts, but tuples from different scans are stored in a separate NXdata
+blocks within an NXentry.
+
+One consequence of this organization is that each NXdata block needs
+its own NXmonitor for the source monitor and NXlog to record the
+start time and duration of the measurement at each point relative to
+the NXentry.
+
+Regardless of the file layout, each separate scan must be tagged so
+the user can organize their data.  The tag is a set of field, value
+pairs which together make up the condition.  When viewing their data,
+the user should be able to organize it by various fields.  For
+example, by scan type, by polarization cross section, or by magnetic
+field if the data was taken under different field conditions.  This is
+done with a condition block within NXdata.  E.g.,
+
+    <tag
+     scan="align|slit|back+|back-|specular|rock|..."
+     polarization="++|+-|-+|- -|+|-?"
+     magnetic_field="NX_FLOAT32?"
+     ...
+    ></tag>
+
+An individual NXentry does not exist in isolation, but is instead part of
+a larger dataset.  This may include more conditions such as solvent
+concentration or temperature which is not varied within the course of
+a run.  Users must be free to add field,value pairs to the condition
+as they see fit since many of the variables important to them when
+organizing their data are set when they are building the sample and are
+not part of the instrument configuration.  This is true not only for 
+reflectivity, so this should be a generic mechanism which is part of 
+the NXdata class, and can be used by all viewing and reduction software 
+as part of the data selection mechanism.
+
+Each data element has a primary axis for the data and covers a range
+of values along that axis.  For scan instruments the primary axis
+is the axis being scanned.  As a convenience to the data selection
+software, the range of values along the primary axis should be
+available as an attribute of the NXdata element rather than having
+to first determine the primary axis then query it for the data range.
+
+Motors
+======
+
+Record raw motor values as well.  These will be instrument
+specific.  Where standard dimensions do not correspond to
+raw motors, the standard dimension will have a 
+derivation="expression"  attribute with expression defined 
+in terms of the field names of the raw motors.  dtheta should also
+have an expression based on pixel number, the bin widths stored
+in entry/instrument/detector, and the total distance to the
+detector.  Store the zero of the raw motor as well as the
+motor value.
+
+-->]]>
+</programlisting>
+</example>
+
+
+<!--
+</sect2>
+-->
+</sect1>

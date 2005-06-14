@@ -1,0 +1,240 @@
+<sect1><title>Monochromatic Triple Axis Spectrometer</title>
+
+<!--
+<mediaobject>
+<imageobject><imagedata fileref="tofnpd.gif" format="gif"></imageobject>
+<imageobject><imagedata fileref="tofnpd.jpg" format="jpg"></imageobject>
+<caption> <para>Schematic diagram of the generic time of flight
+neutron powder diffractometer.  </para> </caption>
+</mediaobject>
+
+<para>The time of flight powder diffractometer (TOFNPD) is an
+instrument used with a couple of different types of analysis. For that
+reason the composite TOFNPD definition is made up of three separate
+definitions.</para>
+
+<sect2><title>TOFNPD:Time Focus</title>
+
+<para>To time focus data there is little information required. The parameters needed in the file are
+
+<orderedlist>
+
+<listitem><para>unique detector pixel identifier</para></listitem>
+
+<listitem><para>primary flight path</para></listitem>
+
+<listitem><para>detector pixel position</para></listitem>
+
+<listitem><para>detector pixel solid angle covered</para></listitem>
+
+</orderedlist>
+
+In addition, the software needs to have some additional information
+that is specified by the user.
+
+<orderedlist>
+
+<listitem><para>mapping of detector pixel identifiers to focused
+detector pixel identifier</para></listitem>
+
+<listitem><para>focused detector position</para></listitem>
+
+<listitem><para>unique focused detector identifier</para></listitem>
+
+</orderedlist>
+
+</para>
+-->
+
+<example id="NXmonotas.xml"><title><filename>NXmonotas.xml</filename></title>
+<programlisting role="XML">
+<![CDATA[<!--
+URL:     http://www.nexus.anl.gov/classes/xml/NXmonotas.xml
+Editor:  NIAC
+NIAC Version: 0.1
+$Id$
+
+Template of a generic NeXus file containing neutron or x-ray triple-axis data.-->
+<NXentry name="{Name of entry}">
+  <title>
+    {Extended title for entry}
+  </title>
+  <definition URL="http://www.nexus.anl.gov/instruments/xml/NXmonotas.xml" 
+      version="1.0">
+    NXmonotas
+  </definition>
+  <start_time type="ISO8601">
+    {Starting time of measurement}
+  </start_time>
+  <NXsample name="sample">
+    <name type="NX_CHAR">
+      {Descriptive name of sample}?
+    </name>
+    <unit_cell type="NX_FLOAT32[1,6])">
+      {Unit cell parameters (lengths and angles)}?
+    </unit_cell>
+    <plane_vector_0 type="NX_FLOAT32[3]">
+      {Reciprocal space vector of primary reflection in the scattering plane}
+    </plane_vector_0>
+    <plane_vector_1 type="NX_FLOAT32[3]">
+      {Reciprocal space vector of secondary reflection in the scattering plane}
+    </plane_vector_1>
+    <polar_angle units="degree" type="NX_FLOAT32[:]">
+      {Polar angle of the sample with respect to the beam incident on the 
+      monochromator}
+    </polar_angle>
+    <azimuthal_angle units="degree" type="NX_FLOAT32">
+      {Azimuthal angle of the sample with respect to the beam incident on the 
+      monochromator}
+    </azimuthal_angle>
+    <rotation_angle units="degree" type="NX_FLOAT32[:]">
+      {Rotation angle of the sample}
+    </rotation_angle>
+    <Qh type="NX_FLOAT32[:]">
+      {Reciprocal space component of scan}
+    </Qh>
+    <Qk type="NX_FLOAT32[:]">
+      {Reciprocal space component of scan}
+    </Qk>
+    <Ql type="NX_FLOAT32[:]">
+      {Reciprocal space component of scan}
+    </Ql>
+    <energy_transfer units="meV" type="NX_FLOAT32[:]">
+      {Energy transfer of scan}
+    </energy_transfer>
+  </NXsample>
+  <NXinstrument name="{Name of instrument}">
+    <NXcollimator name="premonochromator_collimator">
+      <type type="NX_CHAR">
+        "Soller"|"radial"
+      </type>
+      <soller_angle units="minute" type="NX_FLOAT32">
+        {Angular divergence of Soller collimator}
+      </soller_angle>
+    </NXcollimator>
+    <NXfilter name="premonochromator_filter">
+      <description type="NX_CHAR">
+        {"Beryllium" | "Pyrolytic Graphite" | "Graphite"}
+      </description>
+    </NXfilter>
+    <NXcrystal name="monochromator">
+      <type type="NX_CHAR">
+        {"PG (Highly Oriented Pyrolytic Graphite)" | "Ge" | "Si" | "Cu" | 
+        "Fe3Si" | "CoFe" | "Cu2MnAl (Heusler)" | "Multilayer"}
+      </type>
+      <energy units="meV" type="NX_FLOAT32[:]">
+        {Optimum diffracted energy}
+      </energy>
+      <d_spacing units="Angstrom" type="NX_FLOAT32">
+        {The planar spacing of the nominal reflection}
+      </d_spacing>
+      <rotation_angle units="degree" type="NX_FLOAT32[:]">
+        {Rotation angle of the monochromator}
+      </rotation_angle>
+    </NXcrystal>
+    <NXcollimator name="presample_collimator">
+      <type type="NX_CHAR">
+        "Soller"|"radial"
+      </type>
+      <soller_angle units="minute" type="NX_FLOAT32">
+        {Angular divergence of Soller collimator}
+      </soller_angle>
+    </NXcollimator>
+    <NXfilter name="presample_filter">
+      <description type="NX_CHAR">
+        {"Beryllium" | "Pyrolytic Graphite" | "Graphite"}
+      </description>
+    </NXfilter>
+    <NXcollimator name="preanalyzer_collimator">
+      <type type="NX_CHAR">
+        "Soller"|"radial"
+      </type>
+      <soller_angle units="minute" type="NX_FLOAT32">
+        {Angular divergence of Soller collimator}
+      </soller_angle>
+    </NXcollimator>
+    <NXfilter name="preanalyzer_filter">
+      <description type="NX_CHAR">
+        {"Beryllium" | "Pyrolytic Graphite" | "Graphite"}
+      </description>
+    </NXfilter>
+    <NXcrystal name="analyzer">
+      <type type="NX_CHAR">
+        {"PG (Highly Oriented Pyrolytic Graphite)" | "Ge" | "Si" | "Cu" | 
+        "Fe3Si" | "CoFe" | "Cu2MnAl (Heusler)" | "Multilayer"}
+      </type>
+      <energy units="meV" type="NX_FLOAT32[:]">
+        {Optimum diffracted energy}
+      </energy>
+      <d_spacing units="Angstrom" type="NX_FLOAT32">
+        {The planar spacing of the nominal reflection}
+      </d_spacing>
+      <polar_angle units="degree" type="NX_FLOAT32[:]">
+        {Polar angle of the analyzer with respect to the beam incident on the 
+        monochromator}
+      </polar_angle>
+      <azimuthal_angle units="degree" type="NX_FLOAT32">
+        {Azimuthal angle of the analyzer with respect to the beam incident on 
+        the monochromator}
+      </azimuthal_angle>
+      <rotation_angle units="degree" type="NX_FLOAT32[:]">
+        {Rotation angle of the monochromator}
+      </rotation_angle>
+    </NXcrystal>
+    <NXcollimator name="predetector_collimator">
+      <type type="NX_CHAR">
+        "Soller"|"radial"
+      </type>
+      <soller_angle units="minute" type="NX_FLOAT32">
+        {Angular divergence of Soller collimator}
+      </soller_angle>
+    </NXcollimator>
+    <NXdetector name="detector">
+      <counts signal="1" axes="energy_transfer|Qh|Qk|Ql" type="NX_INT32[:]">
+        {Integer counts}
+      </counts>
+      <polar_angle units="degree" type="NX_FLOAT32[:]">
+        {Polar angle of the detector with respect to the beam incident on the 
+        monochromator}
+      </polar_angle>
+      <azimuthal_angle units="degree" type="NX_FLOAT32">
+        {Azimuthal angle of the detector with respect to the beam incident on 
+        the analyzer}
+      </azimuthal_angle>
+    </NXdetector>
+  </NXinstrument>
+  <NXmonitor name="monitor">
+    <mode type="NX_CHAR">
+      "monitor"|"timer"
+    </mode>
+    <preset type="NX_FLOAT32[1]">
+      {preset value for time or monitor}
+    </preset>
+    <data type="NX_INT[:]">
+      {Monitor data}?
+    </data>
+  </NXmonitor>
+  <NXdata name="data">
+    <Qh NAPIlink="NXentry/NXsample/Qh">
+    </Qh>
+    <Qk NAPIlink="NXentry/NXsample/Qk">
+    </Qk>
+    <Ql NAPIlink="NXentry/NXsample/Ql">
+    </Ql>
+    <energy_transfer NAPIlink="NXentry/NXsample/energy_transfer">
+    </energy_transfer>
+    <counts NAPIlink="NXentry/NXinstrument/detector/counts">
+    </counts>
+    <energy NAPIlink="NXentry/NXinstrument/analyzer/energy">
+    </energy>
+  </NXdata>
+</NXentry>
+]]>
+</programlisting>
+</example>
+
+
+<!--
+</sect2>
+-->
+</sect1>

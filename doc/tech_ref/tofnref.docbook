@@ -1,0 +1,356 @@
+<sect1><title>Time of Flight Neutron  Reflectometer</title>
+
+<!--
+<mediaobject>
+<imageobject><imagedata fileref="tofnpd.gif" format="gif"></imageobject>
+<imageobject><imagedata fileref="tofnpd.jpg" format="jpg"></imageobject>
+<caption> <para>Schematic diagram of the generic time of flight
+neutron powder diffractometer.  </para> </caption>
+</mediaobject>
+
+<para>The time of flight powder diffractometer (TOFNPD) is an
+instrument used with a couple of different types of analysis. For that
+reason the composite TOFNPD definition is made up of three separate
+definitions.</para>
+
+<sect2><title>TOFNPD:Time Focus</title>
+
+<para>To time focus data there is little information required. The parameters needed in the file are
+
+<orderedlist>
+
+<listitem><para>unique detector pixel identifier</para></listitem>
+
+<listitem><para>primary flight path</para></listitem>
+
+<listitem><para>detector pixel position</para></listitem>
+
+<listitem><para>detector pixel solid angle covered</para></listitem>
+
+</orderedlist>
+
+In addition, the software needs to have some additional information
+that is specified by the user.
+
+<orderedlist>
+
+<listitem><para>mapping of detector pixel identifiers to focused
+detector pixel identifier</para></listitem>
+
+<listitem><para>focused detector position</para></listitem>
+
+<listitem><para>unique focused detector identifier</para></listitem>
+
+</orderedlist>
+
+</para>
+-->
+
+<example id="tofnref.xml"><title><filename>tofnref.xml</filename></title>
+<programlisting role="XML">
+<![CDATA[<!--
+Instrument Definition for a Time of Flight Neutron Reflectometer
+
+Editor: Robert Dalgliesh <r.m.dalgliesh@rl.ac.uk>
+Initial version: October 2004
+$Id$
+
+See http://www.neutron.anl.gov:8080/NeXus/5 for component definitions.  
+2005-04-28 Paul Kienzle <pkienzle@nist.gov> * Only include information that may 
+be used for reduction/analysis * Make consistent with monoref and monotas
+-->
+<NXentry>
+  <definition URL="http://www.nexus.anl.gov/instruments/xml/tofnref.xml" 
+      version="1.0">
+    TOFNREF
+  </definition>
+  <start_time type="ISO8601">
+  </start_time>
+  <tag polarization="++|+-|-+|--|+|-?" magnetic_field="NX_FLOAT?" 
+      userfield="..." scan="spectrum|background+|background-|specular|rock|...">
+    {Empty.}
+    <!--
+    *** HDF may not allow empty blocks, so maybe a single integer
+    *** to distinguish the various conditions.
+    -->
+  </tag>
+  <NXsample>
+    <rotation_angle units="degrees" type="NX_FLOAT[i]">
+    </rotation_angle>
+  </NXsample>
+  <!--
+  *** link to spectrum measurement for intensity vs. wavelength
+  *** for a given slit setting
+
+  *** warning: beam profile is not regular, but this effect is
+  *** accomodated in the spectrum measurement
+  -->
+  <NXinstrument>
+    <NXmoderator name="{Name of moderator}">
+      <distance units="metre" type="NX_FLOAT">
+        { Distance from T_o to sample along beam-path. To calculate wavelength: 
+        L[i] = wavelength at time T[i] T[i] = time of flight for point i. d1 = 
+        distance from moderator to sample along beam path d2 = distance from 
+        detector to sample along beam path h = Planck's constant m_n = mass of 
+        the neutron L[i] = h/m_n * T[i]/(d1+d2) }
+      </distance>
+      <pulse_shape type="NXdata">
+        { Find the center of mass of the pulse shape and use that as the T0 
+        offset with respect to the protons hitting the target. The TOF from 
+        target (which is the real T0) to the moderator is insignficant compared 
+        to the uncertainty from the pulse shape and so can be ignored. }
+      </pulse_shape>
+    </NXmoderator>
+    <NXguide name="{Name of guide section}">
+      { Guides in total or in segments thgrough to sample position; may be 
+      interspersed between other components - Check component index. Can be 
+      nested for guides with multiple straight segments. Affects wavelength 
+      spectrum, both in divergence and intensity. The spectrum scan will 
+      automatically compensate for intensity effects. To compute divergence 
+      effects, detailed information about the guide geometry will be required. 
+      
+    </NXguide>
+    <!--
+    Some instruments will require gravitational corrections. Neutrons travel on 
+    a parabolic trajectory. For long wavelength neutrons this changes incident 
+    and reflected angle and results in the neutron appearing on a lower 
+    detector pixel than expected. The information required for these 
+    corrections comes from the instrument geometry.
+    -->
+    <NXchopper name="[T0_chopper|frame_overlap_chopper]">
+      <wavelength_range units="Angstrom" type="NX_FLOAT[2]">
+        { Reduction software needs to ignore Q values outside the range defined 
+        by the choppers. The T0 chopper is phased to the source to block fast 
+        neutron and gamma flash. The frame overlap chopper is set to select low 
+        wavelength neutrons (those from the current pulse) or high wavelength 
+        neutrons (those from the previous pulse. On a properly tuned 
+        instrument, the time bins recorded in the detector will reflect the 
+        actions of the choppers and these fields can be ignored. }
+      </wavelength_range>
+    </NXchopper>
+    <NXmirror name="frame_overlap_mirror">
+      <cutoff_wavelength mode="above|below">
+        <!-- *** This is not part of standard NXmirror -->
+        { The frame overlap mirror is used to eliminate very long wavelength 
+        neutrons from previous pulses. Together with the choppers, this helps 
+        to choose which pulse to use in the TOF calculations. On a properly 
+        tuned instrument the time bins recorded in the detector will account 
+        for the actions of the mirror. There will be some attenuation but this 
+        will be compensated for when correcting for the spectrum scan. For an 
+        ab initio calculation, you would need to store the angle wrt the beam 
+        to compute the cutoff angle but often this will not be explicit since 
+        the instrument is simply tuned to have the correct cutoff. } }
+      </cutoff_wavelength>
+    </NXmirror>
+    <!-- collimation -->
+    <NXaperture name="pre[sample|detector]_slit[|y]#">
+      <opening units="mm" filter="Qx|Qy" type="NX_FLOAT">
+        <!-- *** This is not part of standard NXaperture -->
+        { Slit opening; this is a scan parameter, so cannot be recorded as part 
+        of the aperture size. }
+      </opening>
+      <NXgeometry name="geometry">
+        <NXtranslation name="translation">
+          <distances units="mm" type="NX_FLOAT">
+            { Location of slit along beamline (midway between slits if slits 
+            are not coplanar). This is required to compute instrument 
+            resolution. }
+          </distances>
+          <angles>
+            { Only need angles if slits are not centered on beam wrt sample. }?
+          </angles>
+        </NXtranslation>
+        <NXshape name="shape">
+          <type type="NX_CHAR">
+            nxslit
+          </type>
+          <size units="mm" type="NX_FLOAT[2]">
+            { size[1] is thickness of material (actual slits can be more 
+            complicated in practice, being composed of different materials that 
+            are not aligned, but these can be simulated with sets of slits). 
+            size[2] is zero if slits are coplanar, otherwise it is the distance 
+            between slits. each half of the slit is considered to be a 
+            semi-infinite plane cutting neutrons in Qx if they are in the 
+            scattering plane, or Qy if they are normal to the scattering plane 
+            as defined by
+            <opening filter="...">
+            </opening>
+            above. }
+          </size>
+        </NXshape>
+      </NXgeometry>
+    </NXaperture>
+    <!--
+    The polarizer-flipper-guidefield combination selects polarization vectors 
+    in and out of the sample. A number of scans are required to tune the 
+    instrument so that polarization is either 'up' or 'down' on the sample. On 
+    correctly tuned instruments the polarization angle selected should be 
+    recorded by the flipper using polar_angle relative to the surface (0/180 
+    for +/-, or with out of plane polarization, 90/270 for +/-). The 
+    polarization efficiency must be determined from a spectrum scan and the 
+    appropriate correction applied to the data. Raw values from the instrument, 
+    such as time dependent field applied to flipper coils or current on the 
+    current sheet can be recorded for specialized reduction programs which know 
+    how to handle them.
+    -->
+    <NXpolarizer name="presample_polarizer">
+    </NXpolarizer>
+    <NXflipper name="presample_flipper">
+      <polar_angle units="degree" type="NX_FLOAT">
+      </polar_angle>
+    </NXflipper>
+    <NXpolarizer name="predetector_polarizer">
+    </NXpolarizer>
+    <NXflipper name="predetector_flipper">
+      <polar_angle units="degree" type="NX_FLOAT">
+      </polar_angle>
+    </NXflipper>
+    <!-- detector may be protected by an attenuator and/or a beam stop -->
+    <NXattenuator>
+      <attenuator_transmission type="NX_FLOAT">
+        { The nominal amount of the beam that gets through (transmitted 
+        intensity)/(incident intensity) }
+      </attenuator_transmission>
+    </NXattenuator>
+    <NXbeam_stop name="stop">
+      ? { Need all fields so that we can calculate shadow of beam stop on 
+      detector. }
+    </NXbeam_stop>
+    <NXdetector name="detector">
+      <!--
+      polar_angle and azimuthal_angle define the location of the detector 
+      relative to the beamzero
+      -->
+      <distance units="mm" type="NX_FLOAT">
+        { distance from sample }
+      </distance>
+      <translation units="centimeter" type="NX_FLOAT[2]">
+        { translation normal to direct beam }?
+      </translation>
+      <time_of_flight units="10^-6 second|10^-7 second" type="NX_FLOAT[l+1]">
+        { Total time of flight }
+      </time_of_flight>
+      <polar_angle units="degrees" type="NX_FLOAT[i]">
+        { angular position of detector relative to beamzero through sample -- 
+        known to practitioners as "A4" or "two theta" }
+      </polar_angle>
+      <azimuthal_angle units="degrees" type="NX_FLOAT">
+        { Indicate sense of scattering: 0 is front surface of sample, 180 is 
+        back surface of sample. If 180, change the sign of the reflected angle 
+        in the data. It is also possible for the beam to enter the substrate 
+        from the side and reflect off the back surface of a film, in which case 
+        negative angles can be interpreted as inverting the scattering length 
+        density profile of the film (after accounting for absorption in the 
+        substrate. }
+      </azimuthal_angle>
+      <x_offset units="mm" type="NX_FLOAT[j]">
+        {pixel edges in x}?
+      </x_offset>
+      <y_offset units="mm" type="NX_FLOAT[k]">
+        {pixel edges in x}?
+      </y_offset>
+      <counts signal="1" axes="time_of_flight,x_offset?,y_offset?,polar_angle?" 
+          type="NX_INT[l,k,? j,? i]">
+        { raw detector counts }
+      </counts>
+      <!-- 
+      Time bins are logarithmic, but identical for each pixel on the detector 
+      this keeps constant resolution in Q. If not, then save things in 
+      different bins. Time bins are set for the lowest angle and with 
+      resolution improving at higher angles. Since dtheta/theta dominates, 
+      there's little benefit to changing time bins at higher angles. 
+      Regardless, lots of rebinning is required because the Q steps are too 
+      fine.
+
+      *** Raw counts are meaningless to the user if they are counting
+      *** against detector since all values will be the same. The data
+      *** only become meaningful when divided by counting time or monitor
+      *** as specified by the ratio field. The generic plotting program
+      *** will need to sort this out.
+
+      *** In general, n-D data should contain k-D summary statistics
+      *** for all 0&lt;=k&lt;n. That way a really dumb plotting program can
+      *** still display info from a 3-D result as a line.
+
+      *** Some control systems have data windows. Windows may be
+      *** defined in terms of pixel ranges or in terms of
+      *** theta_in-theta_out relationships (i.e., Qx). Each scan
+      *** point should have start/end positions and summary
+      *** statistics for every window defined. Window size may be
+      *** dynamic. Store windows in separate data blocks.
+      -->
+    </NXdetector>
+  </NXinstrument>
+  <NXmonitor name="monitor">
+    <mode type="NX_CHAR">
+      monitor
+    </mode>
+    <preset type="NX_FLOAT">
+      { preset value for monitor }?
+    </preset>
+    <data units="counts" type="NX_INT[i]">
+      { record of monitor counts }?
+    </data>
+    <efficiency type="Nxdata">
+      { Monitor efficiency as a function of wavelength }?
+    </efficiency>
+    <sampled_fraction units="dimensionless" type="NX_FLOAT">
+      { Proportion of incident beam sampled by the monitor }
+    </sampled_fraction>
+  </NXmonitor>
+  <NXmonitor name="timer">
+    <mode type="NX_CHAR">
+      timer
+    </mode>
+    <preset type="NX_FLOAT">
+      { preset value for timer }?
+    </preset>
+    <data units="seconds" type="NX_INT[i]">
+      { record of times for individual points }?
+    </data>
+  </NXmonitor>
+  <NXdata>
+    <time_of_flight units="second" 
+        NAPIlink="entry/instrument/detector/time_of_flight" type="NX_FLOAT[k]">
+    </time_of_flight>
+    <attenuator_transmission NAPIlink="NXentry/NXinstrument/NXattenuator">
+    </attenuator_transmission>
+    <theta NAPIlink="NXentry/NXsample/rotation_angle">
+    </theta>
+    <twotheta NAPIlink="NXentry/detector/polar_angle">
+    </twotheta>
+    <presample_slit1 NAPIlink="NXentry/presample_slit1/opening">
+    </presample_slit1>
+    <presample_slit2 NAPIlink="NXentry/presample_slit2/opening">
+    </presample_slit2>
+    <predetector_slit1 NAPIlink="NXentry/predetector_slit1/opening">
+    </predetector_slit1>
+    <predetector_slit2 NAPIlink="NXentry/predetector_slit2/opening">
+    </predetector_slit2>
+    <counts NAPIlink="NXentry/detector/counts">
+    </counts>
+    <count_start units="second" type="NX_FLOAT[i]">
+      <!-- probably shouldn't store any real data here, but where else? -->
+      { start time of each measurement point relative to start time of entry. }
+    </count_start>
+    <timer NAPIlink="NXentry/timer/data">
+    </timer>
+    <monitor NAPIlink="NXentry/monitor/data">
+    </monitor>
+  </NXdata>
+  <NXlog name="??">
+    { Various logs for temperature, field, etc. which are assumed to be 
+    constant over the duration of the run. The reduction program should be able 
+    to display their values on a parallel graph. Note that logs are not 
+    necessarily sampled synchronously with the data points. }*
+  </NXlog>
+</NXentry>
+]]>
+</programlisting>
+</example>
+
+
+<!--
+</sect2>
+-->
+</sect1>
