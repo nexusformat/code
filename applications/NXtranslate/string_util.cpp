@@ -25,6 +25,13 @@ static bool my_isnotdigit(char c){
   return !isdigit(c);
 }
 
+static bool my_isnotfloatdigit(char c){
+  if(c=='.')
+    return false;
+  else
+    return my_isnotdigit(c);
+}
+
 static bool has_non_zero(const string &str){
   string::size_type size=str.size();
 
@@ -109,7 +116,7 @@ extern double string_util::str_to_float(const string &str){
   // check if the return is bad
   if((num==0.0) || (!num)){
     string::const_iterator it=str.begin();
-    it=find_if(it,str.end(),my_isnotdigit);
+    it=find_if(it,str.end(),my_isnotfloatdigit);
     if(it!=str.end() || has_non_zero(str)){
       throw invalid_argument("str_to_float(string) argument is not a float");
     }
