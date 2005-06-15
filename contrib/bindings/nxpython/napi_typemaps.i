@@ -399,6 +399,11 @@ void buildList(PyObject** baselist, int depth, int rank, int dims[], int type, c
 		return NULL;
 	}
 	
+	/* for NX_CHAR increase buffer to store '\0' character */
+	if (type == NX_CHAR && rank==1) {
+		dims[0]++;		
+	}
+	
 	t_result =(NXstatus)NXmalloc(&data, rank, dimsp, type);	
 	
 	if (t_result != NX_OK) {

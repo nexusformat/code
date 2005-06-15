@@ -19,7 +19,7 @@ libdir_list = [ hdf4_libdir, hdf5_libdir, nexus_libdir]
 nexus_lib = "NeXus"
 lib_list = [nexus_lib, 
             "z","jpeg",  
-            "hdf5"]   i
+            "hdf5"]   
 
 lib_list_hdf4 = [nexus_lib,
             "mfhdf","df","z","jpeg",
