@@ -3,7 +3,7 @@
   
   Application Program Interface Header File
   
-  Copyright (C) 2000-2003 Mark Koennecke, Uwe Filges
+  Copyright (C) 2000-2005 Mark Koennecke, Uwe Filges
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,8 @@ typedef char NXname[128];
  * Any new NXaccess options should be numbered in 2^n format 
  * (8, 16, 32, etc) so that they can be bit masked and tested easily 
  */
-typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, NXACC_CREATE5=5, NXACC_CREATEXML=6} NXaccess;
+typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, 
+	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_STRIP=128} NXaccess;
 
 typedef struct {
                 char *iname;
@@ -324,6 +325,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXsetcache(long newVal);
  */
   typedef struct {
         NXhandle *pNexusData;   
+        int stripFlag;
         NXstatus (CALLING_STYLE *nxclose)(NXhandle* pHandle);
         NXstatus (CALLING_STYLE *nxflush)(NXhandle* pHandle);
         NXstatus (CALLING_STYLE *nxmakegroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
