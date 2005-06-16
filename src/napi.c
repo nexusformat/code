@@ -157,13 +157,26 @@ static int determineFileType(CONSTCHAR *filename)
     iFortifyScope = Fortify_EnterScope();
     Fortify_CheckAllMemory();
     */
-	*gHandle = NULL;
+    
+    /*
+      allocate data
+    */
+    *gHandle = NULL;
     fHandle = (pNexusFunction)malloc(sizeof(NexusFunction));
     if (fHandle == NULL) {
       NXIReportError (NXpData,"ERROR: no memory to create Function structure");
       return NX_ERROR;
     }
 	memset(fHandle, 0, sizeof(NexusFunction)); /* so any functions we miss are NULL */
+
+    /*
+      test the strip flag. Elimnate it for the rest of the tests to work
+    */
+    if(am & NXACC_STRIP){
+      fHandle->stripFlag = 1;
+      am -= NXACC_STRIP;
+    }
+
     if (am==NXACC_CREATE) {
       /* HDF4 will be used ! */
       hdf_type=1;
@@ -472,20 +485,92 @@ static int determineFileType(CONSTCHAR *filename)
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetnextentry(pFunc->pNexusData, name, nxclass, datatype);  
   }
+/*----------------------------------------------------------------------*/
+/*
+**  TRIM.C - Remove leading, trailing, & excess embedded spaces
+**
+**  public domain by Bob Stout
+*/
+#define NUL '\0'
 
+static char *nxtrim(char *str)
+{
+      char *ibuf = str, *obuf = str;
+      int i = 0, cnt = 0;
 
+      /*
+      **  Trap NULL
+      */
+
+      if (str)
+      {
+            /*
+            **  Remove leading spaces (from RMLEAD.C)
+            */
+
+            for (ibuf = str; *ibuf && isspace(*ibuf); ++ibuf)
+                  ;
+            if (str != ibuf)
+                  memmove(str, ibuf, ibuf - str);
+
+            /*
+            **  Collapse embedded spaces (from LV1WS.C)
+            */
+
+            while (*ibuf)
+            {
+                  if (isspace(*ibuf) && cnt)
+                        ibuf++;
+                  else
+                  {
+                        if (!isspace(*ibuf))
+                              cnt = 0;
+                        else
+                        {
+                              *ibuf = ' ';
+                              cnt = 1;
+                        }
+                        obuf[i++] = *ibuf++;
+                  }
+            }
+            obuf[i] = NUL;
+
+            /*
+            **  Remove trailing spaces (from RMTRAIL.C)
+            */
+
+            while (--i >= 0)
+            {
+                  if (!isspace(obuf[i]))
+                        break;
+            }
+            obuf[++i] = NUL;
+      }
+      return str;
+}
   /*-------------------------------------------------------------------------*/
 
   NXstatus CALLING_STYLE NXgetdata (NXhandle fid, void *data)
   {
+    int status, type, rank, iDim[NX_MAXRANK];
+    char *pPtr;
+
     pNexusFunction pFunc = (pNexusFunction)fid;
-    return pFunc->nxgetdata(pFunc->pNexusData, data); 
+    status = pFunc->nxgetdata(pFunc->pNexusData, data); 
+    if(status != NX_ERROR && pFunc->stripFlag == 1){
+      NXgetinfo(fid,&rank,iDim,&type);
+      if(type == NX_CHAR){
+	pPtr = (char *)data;
+	data = (void *)nxtrim(pPtr);
+      }
+    }
+    return status;
   }
-  
     
   /*-------------------------------------------------------------------------*/
  
-  NXstatus CALLING_STYLE NXgetinfo (NXhandle fid, int *rank, int dimension[], int *iType)
+  NXstatus CALLING_STYLE NXgetinfo (NXhandle fid, int *rank, 
+				    int dimension[], int *iType)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
