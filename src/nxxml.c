@@ -30,7 +30,6 @@
 
 
 extern  void *NXpData;
-extern char *NXIformatNeXusTime();
 
 
 /*----------------------- our data structures --------------------------

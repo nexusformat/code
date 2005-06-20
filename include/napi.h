@@ -312,6 +312,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXfree(void** data);
 NX_EXTERNAL  void CALLING_STYLE NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
 extern void (*NXIReportError)(void *pData,char *text);
 extern void *NXpData;
+extern char *NXIformatNeXusTime();
 
 
 /*
