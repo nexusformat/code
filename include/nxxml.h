@@ -22,7 +22,9 @@
 #ifndef NEXUSXML
 #define NEXUSXML
 
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess access_method, NXhandle* pHandle);
+NX_EXTERNAL  NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, 
+					    NXaccess access_method, 
+					    NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXXclose(NXhandle* pHandle);
 NX_EXTERNAL  NXstatus CALLING_STYLE NXXflush(NXhandle* pHandle);
 
@@ -70,4 +72,5 @@ NX_EXTERNAL NXstatus CALLING_STYLE NXXgetgroupID (NXhandle fid, NXlink* sRes);
 NX_EXTERNAL NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink);
 NX_EXTERNAL NXstatus CALLING_STYLE NXXsameID (NXhandle fileid, 
 					      NXlink* pFirstID, NXlink* pSecondID);
+
 #endif
