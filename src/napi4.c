@@ -324,18 +324,12 @@ extern	void *NXpData;
 				  NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
-    char pBuffer[512], time_buffer[64];
+    char pBuffer[512];
+    char *time_puffer;
     char HDF_VERSION[64];
     uint32 lmajor, lminor, lrelease;
     int32 am1=0;
     int32 file_id=0, an_id=0, ann_id=0;
-    time_t timer;
-    struct tm *time_info;
-    const char* time_format;
-    long gmt_offset;
-#ifdef USE_FTIME
-    struct timeb timeb_struct;
-#endif /* USE_FTIME */
   
     *pHandle = NULL;
     /* map Nexus NXaccess types to HDF4 types */
@@ -355,53 +349,9 @@ extern	void *NXpData;
       return NX_ERROR;
     }
     memset (pNew, 0, sizeof (NexusFile));
-/* 
- * get time in ISO 8601 format 
- */
 
-/*
-#ifdef NEED_TZSET
-    tzset();
-#endif 
-    time(&timer);
-#ifdef USE_FTIME
-    ftime(&timeb_struct);
-    gmt_offset = -timeb_struct.timezone * 60;
-    if (timeb_struct.dstflag != 0) {
-        gmt_offset += 3600;
-    }
-#else
-    time_info = gmtime(&timer);
-    if (time_info != NULL) {
-      gmt_offset = (long)difftime(timer, mktime(time_info));
-    } else {
-      NXIReportError(NXpData, "Your gmtime() function does not work ... timezone information will be incorrect\n");
-      gmt_offset = 0;
-    }
-#endif 
-    time_info = localtime(&timer);
-*/
-    time_info = NULL;
-    if (time_info != NULL) {
-      if (gmt_offset < 0) {
-        time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
-      } else {
-        time_format = "%04d-%02d-%02d %02d:%02d:%02d+%02d%02d";
-      }
-      sprintf(time_buffer, time_format,
-            1900 + time_info->tm_year,
-            1 + time_info->tm_mon,
-            time_info->tm_mday,
-            time_info->tm_hour,
-            time_info->tm_min,
-            time_info->tm_sec,
-            abs(gmt_offset / 3600),
-            abs((gmt_offset % 3600) / 60)
-      );
-    } else {
-      strcpy(time_buffer, "1970-01-01 00:00:00+0000");
-    }
-  
+    time_puffer = NXIformatNeXusTime();
+
 #if WRITE_OLD_IDENT     /* not used at moment */
 /*
  * write something that can be used by OLE
@@ -457,9 +407,15 @@ extern	void *NXpData;
         NXIReportError (NXpData, "ERROR: HDF failed to store file_name attribute ");
         return NX_ERROR;
       }
-      if (SDsetattr(pNew->iSID, "file_time", DFNT_CHAR8, strlen(time_buffer), time_buffer) < 0) {
-        NXIReportError (NXpData, "ERROR: HDF failed to store file_time attribute ");
-        return NX_ERROR;
+      if(time_puffer != NULL){
+	if (SDsetattr(pNew->iSID, "file_time", DFNT_CHAR8, 
+		      strlen(time_puffer), time_puffer) < 0) {
+	  NXIReportError (NXpData, 
+			  "ERROR: HDF failed to store file_time attribute ");
+	  free(time_puffer);
+	  return NX_ERROR;
+	}
+	free(time_puffer);
       }
     }
 

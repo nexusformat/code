@@ -117,13 +117,10 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   {
   hid_t attr1,aid1, aid2;
   pNexusFile5 pNew = NULL;
-  char pBuffer[512], time_buffer[64];
+  char pBuffer[512];
+  char *time_buffer;
   char version_nr[10];
   int iRet;
-  time_t timer;
-  struct tm *time_info;
-  const char* time_format;
-  long gmt_offset;
   unsigned int vers_major, vers_minor, vers_release, am1 ;
   hid_t fapl;     
   int mdc_nelmts;
@@ -146,56 +143,8 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     }
     memset (pNew, 0, sizeof (NexusFile5));
 
-#ifdef NEED_TZSET
-    tzset();
-#endif 
-    time(&timer);
-#ifdef USE_FTIME
-    ftime(&timeb_struct);
-    gmt_offset = -timeb_struct.timezone * 60;
-    if (timeb_struct.dstflag != 0)
-    {
-        gmt_offset += 3600;
-    }
-#else
-    time_info = gmtime(&timer);
-    if (time_info != NULL)
-    {
-        gmt_offset = (long)difftime(timer, mktime(time_info));
-    }
-    else
-    {
-        NXIReportError (NXpData, 
-        "Your gmtime() function does not work ... timezone information will be incorrect\n");
-        gmt_offset = 0;
-    }
-#endif 
-    time_info = localtime(&timer);
-    if (time_info != NULL)
-    {
-        if (gmt_offset < 0)
-        {
-            time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
-        }
-        else
-        {
-            time_format = "%04d-%02d-%02d %02d:%02d:%02d+%02d%02d";
-        }
-        sprintf(time_buffer, time_format,
-            1900 + time_info->tm_year,
-            1 + time_info->tm_mon,
-            time_info->tm_mday,
-            time_info->tm_hour,
-            time_info->tm_min,
-            time_info->tm_sec,
-            abs(gmt_offset / 3600),
-            abs((gmt_offset % 3600) / 60)
-        );
-    }
-    else
-    {
-        strcpy(time_buffer, "1970-01-01 00:00:00+0000");
-    }
+    time_buffer = NXIformatNeXusTime();
+
     /* start HDF5 interface */
     if (am == NXACC_CREATE5) {  
        fapl = H5Pcreate(H5P_FILE_ACCESS);
@@ -306,28 +255,33 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 	iRet = H5Sclose(aid2); 
         iRet = H5Aclose(attr1);
 	/*----------- file time */
-        aid2=H5Screate(H5S_SCALAR);
-        aid1 = H5Tcopy(H5T_C_S1);
-        H5Tset_size(aid1, strlen(time_buffer));
-        attr1=H5Acreate(pNew->iVID, "file_time", aid1, aid2, H5P_DEFAULT);
-        if (attr1 < 0)
-        {
-          NXIReportError (NXpData, 
+	if(time_buffer != NULL){
+	  aid2=H5Screate(H5S_SCALAR);
+	  aid1 = H5Tcopy(H5T_C_S1);
+	  H5Tset_size(aid1, strlen(time_buffer));
+	  attr1=H5Acreate(pNew->iVID, "file_time", aid1, aid2, H5P_DEFAULT);
+	  if (attr1 < 0)
+	  {
+	      NXIReportError (NXpData, 
 			  "ERROR: HDF failed to store file_time attribute ");
-          return NX_ERROR;
-        }
-        if (H5Awrite(attr1, aid1, time_buffer) < 0)
-        {
-          NXIReportError (NXpData, 
+	      free(time_buffer);
+	      return NX_ERROR;
+	  }
+	  if (H5Awrite(attr1, aid1, time_buffer) < 0)
+	  {
+	      NXIReportError (NXpData, 
 			  "ERROR: HDF failed to store file_time attribute ");
-          return NX_ERROR;
-        }
-        /* Close attribute dataspace */
-       iRet = H5Tclose(aid1);
-       iRet = H5Sclose(aid2); 
-       /* Close attribute */
-       iRet = H5Aclose(attr1); 
-       H5Gclose(pNew->iVID); 
+	      free(time_buffer);
+	      return NX_ERROR;
+	  }
+	  /* Close attribute dataspace */
+	  iRet = H5Tclose(aid1);
+	  iRet = H5Sclose(aid2); 
+	  /* Close attribute */
+	  iRet = H5Aclose(attr1); 
+	  free(time_buffer);
+	}
+	H5Gclose(pNew->iVID); 
     }
     /* Set HDFgroup access mode */
     if (am1 == H5F_ACC_RDONLY) {

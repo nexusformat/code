@@ -59,9 +59,8 @@ typedef struct {
   xmlStack stack[NXMAXSTACK];  /* stack */
 }XMLNexus, *pXMLNexus;
 /*===================== support functions ===============================*/
-/*----------------------------------------------------------------------*/
 extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
-
+/*----------------------------------------------------------------------*/
 static mxml_node_t *getLinkTarget(pXMLNexus xmlHandle, const char *target){
   mxml_node_t *node = NULL;
   mxml_node_t *testNode = NULL;
@@ -609,7 +608,7 @@ NXstatus CALLING_STYLE NXXgetinfo (NXhandle fid, int *rank,
     */
     *rank = 1;
     *iType = NX_CHAR;
-    dimension[0]= strlen(userData->value.opaque) +1;
+    dimension[0]= strlen(userData->value.opaque);
   } else { 
     dataset = (pNXDS)userData->value.custom.data;
     assert(dataset);

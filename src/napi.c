@@ -168,13 +168,14 @@ static int determineFileType(CONSTCHAR *filename)
       return NX_ERROR;
     }
 	memset(fHandle, 0, sizeof(NexusFunction)); /* so any functions we miss are NULL */
-
+       
     /*
       test the strip flag. Elimnate it for the rest of the tests to work
     */
-    if(am & NXACC_STRIP){
-      fHandle->stripFlag = 1;
-      am -= NXACC_STRIP;
+    fHandle->stripFlag = 1;
+    if(am & NXACC_NOSTRIP){
+      fHandle->stripFlag = 0;
+      am -= NXACC_NOSTRIP;
     }
 
     if (am==NXACC_CREATE) {
@@ -493,7 +494,7 @@ static int determineFileType(CONSTCHAR *filename)
 */
 #define NUL '\0'
 
-static char *nxtrim(char *str)
+static char *nxitrim(char *str)
 {
       char *ibuf = str, *obuf = str;
       int i = 0, cnt = 0;
@@ -561,7 +562,7 @@ static char *nxtrim(char *str)
       NXgetinfo(fid,&rank,iDim,&type);
       if(type == NX_CHAR){
 	pPtr = (char *)data;
-	data = (void *)nxtrim(pPtr);
+	data = (void *)nxitrim(pPtr);
       }
     }
     return status;
@@ -572,8 +573,20 @@ static char *nxtrim(char *str)
   NXstatus CALLING_STYLE NXgetinfo (NXhandle fid, int *rank, 
 				    int dimension[], int *iType)
   {
+    int status;
+    char *pPtr = NULL;
+
     pNexusFunction pFunc = (pNexusFunction)fid;
-    return pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
+    status = pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
+    if(*iType == NX_CHAR && pFunc->stripFlag == 1){
+      pPtr = (char *)malloc(dimension[0]*sizeof(char));
+      if(pPtr != NULL){
+	pFunc->nxgetdata(pFunc->pNexusData, pPtr);
+	dimension[0] = strlen(nxitrim(pPtr));
+	free(pPtr);
+      }
+    } 
+    return status;
   }
   
   /*-------------------------------------------------------------------------*/
