@@ -51,7 +51,7 @@ fi
 
 AM_INIT_AUTOMAKE([1.6])
 
-AM_CONFIG_HEADER(include/nxconfig.h)
+AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[], [with_cc=yes])
@@ -366,11 +366,15 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 LINUX_DISTRIBUTION
 
 AC_CONFIG_FILES([Makefile
-		nexus.spec
+		nexus.spec:nexus_spec.in
 		build_rpm
 		include/Makefile
 		src/Makefile 
 		applications/Makefile
+		applications/NXdir/Makefile
+		applications/NXtranslate/Makefile
+		applications/NXtranslate/IPNS_CPP/Makefile
+		applications/NXtranslate/docs/Makefile
 		examples/Makefile
 		doc/Makefile
 		doc/api/Makefile
@@ -381,12 +385,8 @@ AC_CONFIG_FILES([Makefile
 		bindings/java/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
-		contrib/applications/NXdir/Makefile
-		contrib/applications/NXtranslate/Makefile
-		contrib/applications/NXtranslate/IPNS_CPP/Makefile
-		contrib/applications/NXtranslate/docs/Makefile
 		scripts/Makefile
-		scripts/nexus.pc
+		scripts/nexus.pc:scripts/nexus_pc.in
 		scripts/nxbuild])
 dnl src/nxdict/Makefile
 AC_OUTPUT
