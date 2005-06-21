@@ -559,8 +559,10 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
  /* --------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5compmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
-                           int rank, int dimensions[],int compress_type, int chunk_size[])
+  NXstatus CALLING_STYLE NX5compmakedata (NXhandle fid, CONSTCHAR *name, 
+					  int datatype, 
+					  int rank, int dimensions[],
+					  int compress_type, int chunk_size[])
   {
     hid_t datatype1, dataspace, iNew, iRet;
     hid_t type,cparms;
@@ -641,6 +643,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
          {
          mydim1[i] = dimensions[i];
          }
+      dimensions[0] = byte_zahl;
          dataspace=H5Screate_simple(rank,mydim1,NULL);
     } else {
       if (dimensions[0] == NX_UNLIMITED)

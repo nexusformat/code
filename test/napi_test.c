@@ -157,7 +157,7 @@ int main (int argc, char *argv[])
   /*
     read test
   */
-  if (NXopen (nxFile, NXACC_RDWR, &fileid) != NX_OK) return 1;
+  if (NXopen (nxFile, NXACC_RDWR,&fileid) != NX_OK) return 1;
   NXgetattrinfo (fileid, &i);
   if (i > 0) {
      printf ("Number of global attributes: %d\n", i);

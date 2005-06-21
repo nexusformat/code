@@ -24,11 +24,12 @@ C
 C $Id$
 C------------------------------------------------------------------------------
 
-C *** Return length of a string, ignoring training blanks
+C *** Return length of a string, ignoring trailing blanks
       INTEGER FUNCTION TRUELEN(STRING)
       CHARACTER*(*) STRING
       DO TRUELEN=LEN(STRING),1,-1
-          IF (STRING(TRUELEN:TRUELEN) .NE. ' ') RETURN
+          IF (STRING(TRUELEN:TRUELEN) .NE. ' ' .AND. 
+     &        STRING(TRUELEN:TRUELEN) .NE. CHAR(0) ) RETURN
       ENDDO
       TRUELEN = 0
       END
@@ -321,7 +322,7 @@ C *** and so we would get "buffer not big enough" messages from REPLACE_STRING
 
       INTEGER FUNCTION NXGETINFO(FILEID, RANK, DIM, DATATYPE)
       INTEGER FILEID(*), RANK, DIM(*), DATATYPE
-      INTEGER I, J, NXIGETINFO
+      INTEGER I, J, NXIGETINFO, NX_CHAR
       EXTERNAL NXIGETINFO
       NXGETINFO = NXIGETINFO(FILEID, RANK, DIM, DATATYPE)
 C *** Reverse dimension array as C is ROW major, FORTRAN column major
@@ -330,6 +331,11 @@ C *** Reverse dimension array as C is ROW major, FORTRAN column major
           DIM(I) = DIM(RANK-I+1)
           DIM(RANK-I+1) = J
       ENDDO
+C *** subtract space for terminating \0 needed by C
+      NX_CHAR = 4
+      IF(DATATYPE .EQ. NX_CHAR)THEN
+         DIM(1) = DIM(1) - 1
+      END IF
       END
 
       INTEGER FUNCTION NXGETNEXTENTRY(FILEID, NAME, CLASS, DATATYPE)

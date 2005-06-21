@@ -1421,7 +1421,8 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
   NXstatus
-  CALLING_STYLE NX4getinfo (NXhandle fid, int *rank, int dimension[], int *iType)
+  CALLING_STYLE NX4getinfo (NXhandle fid, int *rank, int dimension[], 
+			    int *iType)
   {
     pNexusFile pFile;
     NXname pBuffer;

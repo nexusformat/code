@@ -433,27 +433,31 @@ static int determineFileType(CONSTCHAR *filename)
 
   /*-------------------------------------------------------------------------*/
   
-  NXstatus CALLING_STYLE NXmalloc (void** data, int rank, int dimensions[], int datatype)
+  NXstatus CALLING_STYLE NXmalloc (void** data, int rank, 
+				   int dimensions[], int datatype)
   {
     int i;
     size_t size = 1;
     *data = NULL;
     for(i=0; i<rank; i++)
     size *= dimensions[i];
-    if ((datatype == NX_CHAR) || (datatype == NX_INT8) || (datatype == NX_UINT8)) {
+    if ((datatype == NX_CHAR) || (datatype == NX_INT8) 
+	|| (datatype == NX_UINT8)) {
         /* size is correct already */
       }
       else if ((datatype == NX_INT16) || (datatype == NX_UINT16)) {
       size *= 2;
       }    
-      else if ((datatype == NX_INT32) || (datatype == NX_UINT32) || (datatype == NX_FLOAT32)) {
+      else if ((datatype == NX_INT32) || (datatype == NX_UINT32) 
+	       || (datatype == NX_FLOAT32)) {
         size *= 4;
       }    
       else if (datatype == NX_FLOAT64) {
         size *= 8;
       }
       else {
-        NXIReportError (NXpData, "ERROR: NXmalloc - unknown data type in array");
+        NXIReportError (NXpData,
+			"ERROR: NXmalloc - unknown data type in array");
         return NX_ERROR;
     }
     *data = (void*)malloc(size);
@@ -578,11 +582,21 @@ static char *nxitrim(char *str)
 
     pNexusFunction pFunc = (pNexusFunction)fid;
     status = pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
+    /*
+      allow for a \0 at the end of the data
+    */
+    if(*iType == NX_CHAR){
+      dimension[0] += 1;
+    }
+    /*
+      the length of a string may be trimmed....
+    */
     if(*iType == NX_CHAR && pFunc->stripFlag == 1){
       pPtr = (char *)malloc(dimension[0]*sizeof(char));
       if(pPtr != NULL){
+	memset(pPtr,0,dimension[0]*sizeof(char));
 	pFunc->nxgetdata(pFunc->pNexusData, pPtr);
-	dimension[0] = strlen(nxitrim(pPtr));
+	dimension[0] = strlen(nxitrim(pPtr)) + 1;
 	free(pPtr);
       }
     } 
