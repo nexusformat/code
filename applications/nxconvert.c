@@ -41,7 +41,7 @@ static NXhandle inId, outId;
 
 static void print_usage()
 {
-    printf("Usage: nxconvert [ -x | -d | -h4 | -h5 ] [ infile ] [ outfile ]\n");
+    printf("Usage: nxconvert [ -x | -d | -h4 | -h5 | -o keepws ] [ infile ] [ outfile ]\n");
 }
 
 static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DTD", NULL };
@@ -49,10 +49,10 @@ static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DTD", NULL };
 int main(int argc, char *argv[])
 {
    char inFile[256], outFile[256], *stringPtr;
-   int opt, nx_format = NX_HDF4, nx_access = NXACC_CREATE4;
+   int opt, nx_format = -1, nx_access = 0;
    int nx_write_data = 1;
 
-   while( (opt = getopt(argc, argv, "h:xd")) != -1 )
+   while( (opt = getopt(argc, argv, "h:xdo:")) != -1 )
    {
 /* use with "-:" in getopt	
 	if (opt == '-')
@@ -65,12 +65,12 @@ int main(int argc, char *argv[])
 	{
 	  case 'x':
 	    nx_format = NX_XML;
-	    nx_access = NXACC_CREATEXML;
+	    nx_access |= NXACC_CREATEXML;
 	    break;
 
 	  case 'd':
 	    nx_format = NX_DTD;
-	    nx_access = NXACC_CREATEXML;
+	    nx_access |= NXACC_CREATEXML;
 	    nx_write_data = 0; 
 	    break;
 
@@ -78,16 +78,29 @@ int main(int argc, char *argv[])
 	    if (!strcmp(optarg, "4") || !strcmp(optarg, "df4"))
 	    {
 		nx_format = NX_HDF4;
-	        nx_access = NXACC_CREATE4;
+	        nx_access |= NXACC_CREATE4;
 	    } 
 	    else if (!strcmp(optarg, "5") || !strcmp(optarg, "df5"))
 	    {
 		nx_format = NX_HDF5;
-	        nx_access = NXACC_CREATE5;
+	        nx_access |= NXACC_CREATE5;
 	    }
 	    else
 	    {
 	        printf("Invalid option -h%s\n", optarg);
+	        print_usage();
+		exit(1);
+	    }
+	    break;
+
+	  case 'o':
+	    if (!strcmp(optarg, "keepws"))
+	    {
+	        nx_access |= NXACC_NOSTRIP;
+	    }
+	    else
+	    {
+	        printf("Invalid option -o%s\n", optarg);
 	        print_usage();
 		exit(1);
 	    }
@@ -99,6 +112,11 @@ int main(int argc, char *argv[])
 	    exit(1);
 	    break;
 	}
+   }
+   if (nx_format == -1)
+   {
+	nx_format = NX_HDF4;
+	nx_access |= NXACC_CREATE4;
    }
    if ((argc - optind) <  1)
    {
