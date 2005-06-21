@@ -49,8 +49,9 @@ static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DTD", NULL };
 int main(int argc, char *argv[])
 {
    char inFile[256], outFile[256], *stringPtr;
-   int opt, nx_format = -1, nx_access = 0;
+   int opt, nx_format = -1, nx_write_access = 0;
    int nx_write_data = 1;
+   int nx_read_access = NXACC_READ;
 
    while( (opt = getopt(argc, argv, "h:xdo:")) != -1 )
    {
@@ -65,12 +66,12 @@ int main(int argc, char *argv[])
 	{
 	  case 'x':
 	    nx_format = NX_XML;
-	    nx_access |= NXACC_CREATEXML;
+	    nx_write_access |= NXACC_CREATEXML;
 	    break;
 
 	  case 'd':
 	    nx_format = NX_DTD;
-	    nx_access |= NXACC_CREATEXML;
+	    nx_write_access |= NXACC_CREATEXML;
 	    nx_write_data = 0; 
 	    break;
 
@@ -78,12 +79,12 @@ int main(int argc, char *argv[])
 	    if (!strcmp(optarg, "4") || !strcmp(optarg, "df4"))
 	    {
 		nx_format = NX_HDF4;
-	        nx_access |= NXACC_CREATE4;
+	        nx_write_access |= NXACC_CREATE4;
 	    } 
 	    else if (!strcmp(optarg, "5") || !strcmp(optarg, "df5"))
 	    {
 		nx_format = NX_HDF5;
-	        nx_access |= NXACC_CREATE5;
+	        nx_write_access |= NXACC_CREATE5;
 	    }
 	    else
 	    {
@@ -96,7 +97,8 @@ int main(int argc, char *argv[])
 	  case 'o':
 	    if (!strcmp(optarg, "keepws"))
 	    {
-	        nx_access |= NXACC_NOSTRIP;
+	        nx_write_access |= NXACC_NOSTRIP;
+	        nx_read_access |= NXACC_NOSTRIP;
 	    }
 	    else
 	    {
@@ -116,7 +118,7 @@ int main(int argc, char *argv[])
    if (nx_format == -1)
    {
 	nx_format = NX_HDF4;
-	nx_access |= NXACC_CREATE4;
+	nx_write_access |= NXACC_CREATE4;
    }
    if ((argc - optind) <  1)
    {
@@ -142,12 +144,12 @@ int main(int argc, char *argv[])
    printf("Converting %s to %s NeXus file %s\n", inFile, nx_formats[nx_format], outFile);
 
 /* Open NeXus input file and NeXus output file */
-   if (NXopen (inFile, NXACC_READ, &inId) != NX_OK) {
+   if (NXopen (inFile, nx_read_access, &inId) != NX_OK) {
       printf ("NX_ERROR: Can't open %s\n", inFile);
       return NX_ERROR;
    }
 
-   if (NXopen (outFile, nx_access, &outId) != NX_OK) {
+   if (NXopen (outFile, nx_write_access, &outId) != NX_OK) {
       printf ("NX_ERROR: Can't open %s\n", outFile);
       return NX_ERROR;
    }
