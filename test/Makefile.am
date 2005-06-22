@@ -59,7 +59,7 @@ TESTSUITE_AT	= ## dbase.at devices.at starter.at
 
 AUTOTEST	= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
+check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) nxconvert
 
 nxtestdir=$(NXTESTDIR)
 nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
@@ -68,6 +68,9 @@ nxtest_DATA = README.tests
 nxexampledir=$(NXEXAMPLEDIR)
 nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
 
+nxconvert:
+	rm -f $@
+	ln -s ../applications/$@ .
 
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
@@ -172,5 +175,6 @@ atconfig:	$(top_builddir)/config.status
 
 clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
+
 
 DISTCLEANFILES = atconfig

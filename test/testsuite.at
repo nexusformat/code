@@ -340,3 +340,59 @@ AT_CHECK([NXtest], [],
  Link Check OK
 ]])
 AT_CLEANUP
+
+AT_BANNER([[Testing the NeXus File Converter.]])
+AT_SETUP([Checking HDF4 -> HDF4 ])
+AT_CHECK([napi_test-hdf4-static >/dev/null && nxconvert -h4 NXtest.hdf a.a],[], 
+[[Converting NXtest.hdf to HDF4 NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF4 -> HDF5 ])
+AT_CHECK([napi_test-hdf4-static >/dev/null && nxconvert -h5 NXtest.hdf a.a],[], 
+[[Converting NXtest.hdf to HDF5 NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF4 -> XML ])
+AT_CHECK([napi_test-hdf4-static >/dev/null && nxconvert -x NXtest.hdf a.a],[], 
+[[Converting NXtest.hdf to XML NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF5 -> HDF4 ])
+AT_CHECK([napi_test-hdf5-static >/dev/null && nxconvert -h4 NXtest.h5 a.a],[], 
+[[Converting NXtest.h5 to HDF4 NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF5 -> HDF5 ])
+AT_CHECK([napi_test-hdf5-static >/dev/null && nxconvert -h5 NXtest.h5 a.a],[], 
+[[Converting NXtest.h5 to HDF5 NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF5 -> XML ])
+AT_CHECK([napi_test-hdf5-static >/dev/null && nxconvert -x NXtest.h5 a.a],[], 
+[[Converting NXtest.h5 to XML NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking XML -> HDF4 ])
+AT_CHECK([napi_test-xml-static >/dev/null && nxconvert -h4 NXtest.xml a.a],[], 
+[[Converting NXtest.xml to HDF4 NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking XML -> HDF5 ])
+AT_CHECK([napi_test-xml-static >/dev/null && nxconvert -h5 NXtest.xml a.a],[], 
+[[Converting NXtest.xml to HDF5 NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
+AT_SETUP([Checking XML -> XML ])
+AT_CHECK([napi_test-xml-static >/dev/null && nxconvert -x NXtest.xml a.a],[], 
+[[Converting NXtest.xml to XML NeXus file a.a
+Convertion successful.
+]])
+AT_CLEANUP
