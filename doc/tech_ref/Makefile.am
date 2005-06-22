@@ -8,7 +8,7 @@ DOC_SRC=NeXus_definitions.docbook terminology.docbook methods.docbook base_class
 
 nxtechrefdocdir		= $(NXDOCDIR)/tech_ref
 nxtechrefdoc_DATA		= $(DOC_OUTPUT)
-EXTRA_DIST 			= $(DOC_OUTPUT) $(DOC_SRC)
+EXTRA_DIST 			= $(DOC_OUTPUT) $(DOC_SRC) $(IMAGES)
 
 if HAVE_DOCBOOK
 DOC_OUTPUT=NeXus_definitions.pdf NeXus_definitions.txt
