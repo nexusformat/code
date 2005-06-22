@@ -379,6 +379,7 @@ AC_CONFIG_FILES([Makefile
 		doc/Makefile
 		doc/api/Makefile
 		doc/nxdict/Makefile
+		doc/tech_ref/Makefile
 		bindings/Makefile 
 		bindings/f77/Makefile
 		bindings/f90/Makefile

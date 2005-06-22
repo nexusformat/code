@@ -5,7 +5,7 @@
 #
 
 # documenttion subdirectories
-SUBDIRS=api nxdict
+SUBDIRS=api nxdict tech_ref
 nxdocdir		= $(NXDOCDIR)
 
 # add files and example code here from this directory
