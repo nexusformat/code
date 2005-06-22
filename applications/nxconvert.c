@@ -44,6 +44,8 @@ static void print_usage()
     printf("Usage: nxconvert [ -x | -d | -h4 | -h5 | -o keepws ] [ infile ] [ outfile ]\n");
 }
 
+#define NXCONVERT_EXIT_ERROR	exit(1)
+
 static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DTD", NULL };
 
 int main(int argc, char *argv[])
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
 	    {
 	        printf("Invalid option -h%s\n", optarg);
 	        print_usage();
-		exit(1);
+		NXCONVERT_EXIT_ERROR;
 	    }
 	    break;
 
@@ -104,14 +106,14 @@ int main(int argc, char *argv[])
 	    {
 	        printf("Invalid option -o%s\n", optarg);
 	        print_usage();
-		exit(1);
+		NXCONVERT_EXIT_ERROR;
 	    }
 	    break;
 
 	  default:
 /*	    printf("Invalid option -%c\n", opt); */
 	    print_usage();
-	    exit(1);
+	    NXCONVERT_EXIT_ERROR;
 	    break;
 	}
    }
@@ -146,22 +148,35 @@ int main(int argc, char *argv[])
 /* Open NeXus input file and NeXus output file */
    if (NXopen (inFile, nx_read_access, &inId) != NX_OK) {
       printf ("NX_ERROR: Can't open %s\n", inFile);
-      return NX_ERROR;
+      NXCONVERT_EXIT_ERROR;
    }
 
    if (NXopen (outFile, nx_write_access, &outId) != NX_OK) {
       printf ("NX_ERROR: Can't open %s\n", outFile);
-      return NX_ERROR;
+      NXCONVERT_EXIT_ERROR;
    }
    
 /* Output global attributes */
-   if (WriteAttributes (nx_write_data) != NX_OK) return NX_ERROR;
+   if (WriteAttributes (nx_write_data) != NX_OK)
+   {
+	NXCONVERT_EXIT_ERROR;
+   }
 /* Recursively cycle through the groups printing the contents */
-   if (WriteGroup (nx_write_data) != NX_OK) return NX_ERROR;
+   if (WriteGroup (nx_write_data) != NX_OK)
+   {
+	NXCONVERT_EXIT_ERROR;
+   }
 /* Close the input and output files */
-   NXclose (&outId);
-   NXclose (&inId);
-   return NX_OK;
+   if (NXclose (&outId) != NX_OK)
+   {
+	NXCONVERT_EXIT_ERROR;
+   }
+   if (NXclose (&inId) != NX_OK)
+   {
+	NXCONVERT_EXIT_ERROR;
+   }
+   printf("Convertion successful.\n");
+   return 0;
 }
 
 /* Prints the contents of each group as XML tags and values */
