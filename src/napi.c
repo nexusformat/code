@@ -29,6 +29,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <ctype.h>
 #include <time.h>
 #include <stdarg.h>
 #include "napi.h"
