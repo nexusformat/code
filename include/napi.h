@@ -54,8 +54,19 @@ typedef char NXname[128];
 
 /* 
  * Any new NXaccess options should be numbered in 2^n format 
- * (8, 16, 32, etc) so that they can be bit masked and tested easily 
+ * (8, 16, 32, etc) so that they can be bit masked and tested easily.
+ *
+ * To test older non bit masked options (values below 8) use e.g.
+ *
+ *       if ( (mode & NXACCMASK_REMOVEFLAGS) == NXACC_CREATE )
+ *
+ * To test new (>=8) options just use normal bit masking e.g.
+ * 
+ *       if ( mode & NXACC_NOSTRIP )
+ *
  */
+#define NXACCMASK_REMOVEFLAGS (0x7) /* bit mask to remove higher flag options */
+
 typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, 
 	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_NOSTRIP=128} NXaccess;
 
