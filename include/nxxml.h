@@ -73,4 +73,5 @@ NX_EXTERNAL NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink);
 NX_EXTERNAL NXstatus CALLING_STYLE NXXsameID (NXhandle fileid, 
 					      NXlink* pFirstID, NXlink* pSecondID);
 
+void NXXassignFunctions(pNexusFunction fHandle);
 #endif
