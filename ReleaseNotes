@@ -1,3 +1,14 @@
+Changes in Version 3.0.0
+========================
+
+- GNU Autotools are now used for building the API and programs
+
+- XML files can be written by the NeXus API by specifying NXACC_XML to NXopen
+
+- The NXtoXML, NXtoNX4 and NXtoNX5 utilities have been combined into a single utility nxconvert
+
+- New utilities nxdir and nxtranslate
+
 Changes in Version 2.0.0
 ========================
 
