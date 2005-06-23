@@ -59,7 +59,7 @@ TESTSUITE_AT	= ## dbase.at devices.at starter.at
 
 AUTOTEST	= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) nxconvert
+check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
 nxtestdir=$(NXTESTDIR)
 nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
@@ -164,6 +164,8 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 	} > $(srcdir)/package.m4
 
 check-local:	atconfig atlocal $(TESTSUITE) 
+	rm -f nxconvert
+	ln -s ../applications/nxconvert .
 	$(SHELL) $(TESTSUITE)
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
