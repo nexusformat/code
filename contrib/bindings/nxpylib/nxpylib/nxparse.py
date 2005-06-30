@@ -47,16 +47,132 @@ class NXfactory:
 		nxhandle = self.parseTemplateRootAttrs(root, nxhandle)
 		nxhandle = self.parseTemplateNode(root.children, nxhandle)
 		
+		links = []
+		links = self.getLinks(root.children, links)
+		print "links: ", links
+		if len(links) > 0: 
+			self.makeLinks(links, nxhandle)
+		
 		doc.freeDoc()
 	
-		status = NXflush(nxhandle)
-		if status != 1:
-			print "warning: flushing NeXus file failed"
-		status = NXclose(nxhandle)
-		if status != 1:
+		try:
+			status = NXflush(nxhandle)
+			if status != 1:
+				print "warning: flushing NeXus file failed"
+			status = NXclose(nxhandle)
+			if status != 1:
+				print "warning: closing Nexus file failed" 
+		except:
 			print "warning: closing Nexus file failed" 
 	
 	
+	def getLinks(self, item, links):
+		""" running through the xml tree using libxml2"""
+		while item != None:
+			if item.type == "element":
+				if item.name[0:2] == "NX":
+					# Group
+					links = self.getLinks(item.children, links)
+				else:
+					# SDS
+					if item.properties != None:
+						for att in item.properties:
+							if att.type == "attribute":
+								if att.name == "NAPIlink":
+									path = ""
+									parent = item.parent
+									while parent != None:
+										if parent.name == "NXroot":
+											break
+										if path == "":
+											path = parent.name
+										else:	
+											path = parent.name + "/"+path 
+										parent = parent.parent
+									links.append([path, att.content])
+					
+			item=item.next 
+		return links
+		
+		
+	def makeLinks(self, links, nxhandle):
+		for a in links:
+			nxhandle = self.resetHandle(nxhandle)
+			src_items = a[0].split("/")
+			tgt_items = a[1].split("/") 
+			nxID = self.getID(tgt_items, nxhandle)
+			nxhandle = self.resetHandle(nxhandle)
+			if nxID != None:
+				nx_handle = self.getHandle(src_items, nxhandle)
+				if nx_handle != None:
+					status = NXmakelink(nx_handle, nxID)
+					print "makelink status: ", status 
+		
+		
+	def resetHandle(self, nxhandle):
+		status, nitems, path, nxclass =	NXgetgroupinfo(nxhandle)
+		while nxclass != "NXroot":
+			status = NXclosegroup(nxhandle)
+			status, nitems, path, nxclass =	NXgetgroupinfo(nxhandle)
+		status = NXinitgroupdir(nxhandle)	
+		return nxhandle
+
+	
+	def getHandle(self, items, nxhandle):
+		nx_handle=None
+		status, nitems, path, nxclass =	NXgetgroupinfo(nxhandle)
+		status = NXinitgroupdir(nxhandle)
+		
+		for a in range(nitems):
+			status, name, nxclass, type =	NXgetnextentry(nxhandle)
+			if nxclass[0:2] == "NX":
+				# Group
+				if name == items[0] or nxclass == items[0]:
+					status =	NXopengroup(nxhandle, name, nxclass)
+					if len(items)==1:
+						return nxhandle
+					else:	
+						nx_handle = self.getHandle(items[1:], nxhandle)
+						return nx_handle
+			else:
+				# SDS
+				if name == items[0]:
+					if len(items)==1:
+						status = NXopendata(nxhandle, name)
+						return nxhandle
+					else:
+						return None
+		return nx_handle
+		
+		
+	def getID(self, items, nxhandle):
+		link = None
+		status, nitems, path, nxclass =	NXgetgroupinfo(nxhandle)
+		status = NXinitgroupdir(nxhandle)
+		
+		for a in range(nitems):
+			status, name, nxclass, type =	NXgetnextentry(nxhandle)
+			if nxclass[0:2] == "NX":
+				# Group
+				if name == items[0] or nxclass == items[0]:
+					if len(items)==1:
+						return None
+					else:	
+						status =	NXopengroup(nxhandle, name, nxclass)
+						link = self.getID(items[1:], nxhandle)
+						return link
+			else:
+				# SDS
+				if name == items[0]:
+					if len(items) ==1:
+						status = NXopendata(nxhandle, name)
+						status, link =	NXgetdataID(nxhandle)
+						return link
+					else:
+						return None
+		return link
+		
+
 	def parseTemplateRootAttrs(self, item, nxhandle):
 		if item.properties != None:
 			for att in item.properties:
@@ -84,10 +200,11 @@ class NXfactory:
 								
 				if item.name[0:2] == "NX": #NXgroup
 					groupname = item.name
-					for att in item.properties:
-						if att.type == "attribute":
-							if att.name == "name":
-								groupname = att.content
+					if item.properties != None:
+						for att in item.properties:
+							if att.type == "attribute":
+								if att.name == "name":
+									groupname = att.content
 					#make group
 					#print "making group", groupname, item.name
 					status = NXmakegroup(nxhandle, groupname, item.name)
@@ -118,9 +235,15 @@ class NXfactory:
 					attrs = None
 					elemtype = NX_CHAR
 					elemdims = []
+					
+					napilink = False
+					
 					if item.properties != None:
 						for att in item.properties:
 							if att.type == "attribute":
+								if att.name == "NAPIlink":
+									napilink = True
+									break
 								attcontent = att.content
 								if att.name == "type":
 									dimstring = att.content
@@ -155,6 +278,11 @@ class NXfactory:
 											elemdims = [1]
 										
 									break	
+						if	napilink == True:
+							napilink = False
+							item = item.next			
+							continue
+							
 					if elemtype == NX_CHAR and elemdims==[]:
 						elemdims = [len(elemcontent)]
 						
@@ -396,6 +524,7 @@ class NXfactory:
 								occSpec = string.replace(occSpec, info, "")
 							if desc != "":	
 								occSpec = string.replace(occSpec, desc, "")
+							occSpec = occSpec.strip()	
 						if itemname != self.metagroup.nxclass:	
 							if self.metagroup.groups == None:
 								self.metagroup.groups = {}
