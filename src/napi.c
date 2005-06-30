@@ -321,7 +321,16 @@ static int determineFileType(CONSTCHAR *filename)
                                   int rank, int dimensions[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
-    return pFunc->nxmakedata(pFunc->pNexusData, name, datatype, rank, dimensions); 
+    if ( (datatype == NX_CHAR) && (rank > 1) )
+    {
+        NXIReportError (fid,
+          "ERROR: multi-dimensional NX_CHAR arrays are not supported by the NeXus library");
+	return NX_ERROR;
+    }
+    else
+    {
+        return pFunc->nxmakedata(pFunc->pNexusData, name, datatype, rank, dimensions); 
+    }
   }
 
 
@@ -331,7 +340,16 @@ static int determineFileType(CONSTCHAR *filename)
                            int rank, int dimensions[],int compress_type, int chunk_size[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid; 
-    return pFunc->nxcompmakedata (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size); 
+    if ( (datatype == NX_CHAR) && (rank > 1) )
+    {
+        NXIReportError (fid,
+          "ERROR: multi-dimensional NX_CHAR arrays are not supported by the NeXus library");
+	return NX_ERROR;
+    }
+    else
+    {
+        return pFunc->nxcompmakedata (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size); 
+    }
   } 
   
  
@@ -601,6 +619,10 @@ static char *nxitrim(char *str)
 	free(pPtr);
       }
     } 
+    if ( (*iType == NX_CHAR) && (*rank > 1) )
+    {
+	NXIReportError(fid,"WARNING: multi-dimensional character arrays are not really supported");
+    }
     return status;
   }
   
