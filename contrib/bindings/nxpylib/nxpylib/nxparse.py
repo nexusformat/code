@@ -50,7 +50,7 @@ class NXfactory:
 		links = []
 		links = self.getLinks(root.children, links)
 		print "links: ", links
-		if len(links) > 0: 
+		if len(links) > 0 and nxhandle != None and nxhandle != 0: 
 			self.makeLinks(links, nxhandle)
 		
 		doc.freeDoc()
@@ -101,12 +101,13 @@ class NXfactory:
 			src_items = a[0].split("/")
 			tgt_items = a[1].split("/") 
 			nxID = self.getID(tgt_items, nxhandle)
-			nxhandle = self.resetHandle(nxhandle)
-			if nxID != None:
-				nx_handle = self.getHandle(src_items, nxhandle)
-				if nx_handle != None:
-					status = NXmakelink(nx_handle, nxID)
-					print "makelink status: ", status 
+			if nxhandle != None and nxhandle != 0:
+				nxhandle = self.resetHandle(nxhandle)
+				if nxID != None:
+					nx_handle = self.getHandle(src_items, nxhandle)
+					if nx_handle != None:
+						status = NXmakelink(nx_handle, nxID)
+						print "makelink status: ", status 
 		
 		
 	def resetHandle(self, nxhandle):
@@ -253,12 +254,20 @@ class NXfactory:
 											tdims = map(string.strip, string.split(dimstring, ","))
 											for i in range(len(tdims)):
 												if tdims[i] != "":
-													if tdims[i][0] >= "0" and tdims[i][0] <="9":
+													try:
 														elemdims.append(string.atoi(tdims[i]))
-													else:
-														elemdims.append(tdims[i])	
+													except:
+														elemdims.append(1)
+
+													#if tdims[i][0] >= "0" and tdims[i][0] <="9":
+													#	elemdims.append(string.atoi(tdims[i]))
+													#else:
+													#	elemdims.append(tdims[i])	
 										else:
-											elemdims = [int(dimstring)] 
+											try: 
+												elemdims = [int(dimstring)] 
+											except:
+												elemdims = None
 									else:
 										elemdims = None
 											
@@ -298,12 +307,18 @@ class NXfactory:
 						return 0
 					#put data
 					if elemcontent != None:
-						#print "putting data:", elemcontent
-						status = NXputdata(nxhandle, self.convertXMLToNXData(elemcontent, elemdims, elemtype))
+						print "putting data:", elemcontent
+						sds_data = self.convertXMLToNXData(elemcontent, elemdims, elemtype)
+						status = NXputdata(nxhandle, sds_data)
 						if status != 1:
 							print "putting data to dataset %s failed. aborting"%(item.name)
 							return 0
 						#print "data put into ", item.name, self.convertXMLToNXData(elemcontent, elemdims, elemtype)
+						#in case of numeric type and string content save content as description attribute ... 
+						if len(elemcontent)!=0 and len(sds_data)==0:
+							if elemtype != NX_CHAR:
+								NXputattr(nxhandle, "description", elemcontent, NX_CHAR)
+							
 					else:
 						print "elemcontent of ", item.name, " was None"
 					
@@ -336,23 +351,29 @@ class NXfactory:
 		if type in int_types:
 			ints = []
 			int_toks = string.split(xmldata)
-			for i in range(len(int_toks)):
-				ints.append(int(int_toks[i]))
+			try:
+				for i in range(len(int_toks)):
+					ints.append(int(int_toks[i]))
 				
-			if totaldimcounts != len(ints):
-				print "warning: count of int data elems does not match dimensions", totaldimcounts, len(ints), xmldata
-				
+				if totaldimcounts != len(ints):
+					print "warning: count of int data elems does not match dimensions", totaldimcounts, len(ints), xmldata
+			except:
+				#no integer data -> treat as comment string
+				pass
 			return ints
 			
 		elif type in float_types:	
 			floats = []
 			float_toks = string.split(xmldata)
-			for i in range(len(float_toks)):
-				floats.append(float(float_toks[i]))
+			try:
+				for i in range(len(float_toks)):
+					floats.append(float(float_toks[i]))
 			
-			if totaldimcounts != len(floats):
-				print "warning: count of float data elems does not match dimensions", totaldimcounts, len(floats), xmldata
-
+				if totaldimcounts != len(floats):
+					print "warning: count of float data elems does not match dimensions", totaldimcounts, len(floats), xmldata
+			except:
+				# no float data -> treat as comment string
+				pass
 			return floats	
 			
 		elif type in str_types:
