@@ -1012,7 +1012,7 @@ CONTAINS
 
       TYPE(NXhandle),   INTENT(inout) :: file_id
       INTEGER,          INTENT(in)    :: signal
-      CHARACTER(len=*), INTENT(out)   :: data_name
+      CHARACTER(len=*)                :: data_name
       INTEGER,          INTENT(out)   :: data_rank, data_type, data_dimensions(:)
       CHARACTER(len=len(data_name)) :: name
       CHARACTER(len=NX_MAXNAMELEN) :: class, attr_name
@@ -1061,7 +1061,7 @@ CONTAINS
 
       TYPE(NXhandle),   INTENT(inout) :: file_id
       INTEGER,          INTENT(in)    :: axis, primary
-      CHARACTER(len=*), INTENT(out)   :: data_name
+      CHARACTER(len=*)                :: data_name
       INTEGER,          INTENT(out)   :: data_type, data_dimensions(NX_MAXRANK)
       CHARACTER(len=len(data_name)) :: name
       CHARACTER(len=NX_MAXNAMELEN) :: class, attr_name

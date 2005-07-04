@@ -1223,7 +1223,7 @@ CONTAINS
 
       TYPE(NXhandle),   INTENT(inout)  :: file_id
       INTEGER,          INTENT(out)    :: item_number
-      CHARACTER(len=*), INTENT(out)    :: item_name(:), item_class(:)
+      CHARACTER(len=*)                 :: item_name(:), item_class(:)
       CHARACTER(len=len(item_name)) :: name
       CHARACTER(len=len(item_class)) :: class
       INTEGER :: status
@@ -1281,7 +1281,7 @@ CONTAINS
 
       TYPE(NXhandle),   INTENT(inout)  :: file_id
       INTEGER,          INTENT(out)    :: attr_number
-      CHARACTER(len=*), INTENT(out)    :: attr_name(:)
+      CHARACTER(len=*)    :: attr_name(:)
       CHARACTER(len=len(attr_name))    :: name
       INTEGER :: status
 
