@@ -1,57 +1,1682 @@
-2004-10-21 15:00  jk
-	* autogen.sh autoversion.h: Enable the automake versions 1.9.X
-	* binding/f77/napif.inc: Set the NeXus version number 2.1.0
-	* test/: Improve the testing for F77 binding depending on F77,
-	  HDF4, and HDF5 using
+2005-07-04 14:54  faa59
 
-2004-05-05 17:00  jk
-	* bindings/java/Makefile.am: Improve the build of the JAVA
-	  interface to NeXus
-	* Makefile.am, configure.ac, test/Makefile.am, test/atlocal.in,
-	  test/testsuite.at, test/test?_test.[cf]: Add a new testsuite to 
-	  the distribution.
-		
-2004-05-03 17:00  jk
-	* autogen.sh: Improve the search for the newest autotools on the
-	  developer machine.
-	* configure.ac: Reduce the required autoconf version 
-	
-2004-03-01 17:00  jk
-	* configure.ac: Improve the check for the HDF libraries. If the
-	  HDF libraries found, check the versions. For HDF4 we need at least
-	  4.1 and for HDF 1.6
-	* configure.ac, test/Makefile.am, test/testsuite.at,
-	  test/atlocal.in: Add the automatic generated testsuite. 
-	* test/napi[45f]_test.c: Remove the output of the HDF_version and
-	  file_time because the are not fixed.
-	
-2004-02-20 10:00  jk
-	* autogen.sh: autogen.sh contains all calls to autotools necessary
-	  to create the complete infrastructure to use the configure
-	  script.
-	* AUTHORS: contains the names of the developers and contributors
-	  of the NeXus library
-	* COPYING: contains the Lesser General Public Licence. This more
-	  compliant to the GNU style than the gnu_license.txt
-	* NEWS: This file should contain the NEWS for the release.
-	* configure.ac: add the use of libtool in this project and add a
-	  summary report at the end of the configure run
-	* include/Makefile.am, scripts/Makefile.am: add this file due to a
-	  better control of distribution files.
-	* Makefile.am: remove the files from directories include and scripts
-	* test/Makefile, bindings/f77/Makefile.am: substitute the relative
-	  by absolute pathes beginning at the top (build or src)
-	* bindings/f90/Makefile.am, applications/Makefile.am: substitute
-	  the relative pathes by pathes beginning from the top (either
-	  build or src) 
-	* include/napi4.h, include/napi5.h: remove the include of the
-	  sources
-	* src/napi4.c, src/napi5.c: Include the different header files for
-	  the different HDF versions. Add the external reference to the
-	  NXpData.
-	* src/Makefile.am: Add the conditional build of the HDF4 and HDF5
-	  support of NeXus
- 
+	* Makefile.am: Build "applications" before "test"
+
+2005-07-04 12:41  faa59
+
+	* applications/nxconvert.c: Remove -d (make DTD) option - you need
+	  to use nx2dtd for the moment
+
+2005-07-01 13:55  hg
+
+	* contrib/bindings/nxpylib/nxpylib/nxparse.py: improved template
+	  parser to be more tolerant towards incomplete class definitions
+
+2005-06-30 17:26  hg
+
+	* contrib/bindings/nxpylib/nxpylib/: nxclasses.py, nxobjects.py,
+	  nxparse.py, nxtemplates.py: updated the base class definitions,
+	  extended the template parser to be able to recognize and create
+	  NAPIlinks
+
+2005-06-30 17:07  faa59
+
+	* src/napi.c: Flag an error when multi-dimensional character arrays
+	  are used
+
+2005-06-23 14:53  faa59
+
+	* test/Makefile.am: Correct a build order dependency problem with
+	  nxconvert
+
+2005-06-23 14:47  faa59
+
+	* ReleaseNotes: Add some new bits about the 3.0.0 release
+
+2005-06-23 12:24  faa59
+
+	* include/nxxml.h: Add prototype for NXXassignFunctions
+
+2005-06-23 12:23  faa59
+
+	* include/napi.h: Add NXACCMASK_REMOVEFLAGS bitmask
+
+2005-06-23 12:20  faa59
+
+	* src/napi.c: Add <ctype.h> header (needed on VMS)
+
+2005-06-22 12:55  faa59
+
+	* test/: Makefile.am, testsuite.at: Run tests on nxconvert
+
+2005-06-22 12:55  faa59
+
+	* applications/nxconvert.c: Improve exit status returned to shell
+
+2005-06-22 10:04  faa59
+
+	* doc/tech_ref/Makefile.am: Add images to distribution
+
+2005-06-22 09:33  faa59
+
+	* configure.ac, doc/Makefile.am, doc/tech_ref/Makefile,
+	  doc/tech_ref/Makefile.am: Add tech_ref to documentation
+
+2005-06-21 18:19  faa59
+
+	* applications/nxconvert.c: Specify NOSTRIP on both read and write
+	  NXopens if it is requested
+
+2005-06-21 15:10  faa59
+
+	* Makefile.am, configure.ac, applications/Makefile.am,
+	  contrib/applications/Makefile.am, scripts/Makefile.am: Change ".
+	  ." to "_ ." in config file names - VMS doesn't allow two "."
+	  characters in a file name
+
+2005-06-21 14:46  faa59
+
+	* applications/NXtranslate/: Makefile, IPNS_CPP/Makefile,
+	  docs/Makefile: No longer needed in CVS - now provided by automake
+
+2005-06-21 14:41  faa59
+
+	* applications/nxconvert.c: Add   -o keepws    to allow preserving
+	  of white space to be specified
+
+2005-06-21 10:30  mk
+
+	* applications/NXtranslate/Makefile, bindings/f77/napif.f,
+	  applications/NXtranslate/IPNS_CPP/Makefile,
+	  applications/NXtranslate/docs/Makefile, src/napi.c, src/napi4.c,
+	  src/napi5.c, test/napi_test.c: - Another attempt at fixing the
+	  whitespace issue...
+
+2005-06-20 15:56  faa59
+
+	* include/napi.h, src/nxxml.c: Move declaration of
+	  NXIFormatNeXusTime() into napi.h so that all uses see the correct
+	  prototype and to avoid a "casting pointer to integer" warning
+
+2005-06-20 09:44  mk
+
+	* include/: napi.h, nxxml.h: - Made strip whitespace the default,
+	  rename NXACC_STRIP to NXACC_NOSTRIP
+
+2005-06-20 09:43  mk
+
+	* src/: napi.c, napi4.c, napi5.c, nxxml.c: - Made strip whitespace
+	  the default - Refactored time code
+
+2005-06-16 08:45  mk
+
+	* src/napi.c: - Added feauture to strip whitespace from char data
+	  on reads
+
+2005-06-16 08:44  mk
+
+	* include/napi.h: - Added NXACC_STRIP to strip whitespace from
+	  NX_CHAR data
+
+2005-06-15 17:40  hg
+
+	* contrib/bindings/nxpython/: napi_typemaps.i, setup.py: removed
+	  little bug with NX_CHARs
+
+2005-06-14 23:19  rio
+
+	* applications/nxconvert.c: Added XML_version to the list of global
+	  attributes that are -not- written to the converted file (along
+	  with HDF_version and HDF5_Version).
+
+2005-06-14 18:24  pfp
+
+	* applications/NXtranslate/string_util.cpp: Fixed problem with
+	  str_to_float throwing an exception with "0.0".
+
+2005-06-14 18:19  faa59
+
+	* configure.ac, applications/NXtranslate/docs/Makefile.am: Check
+	  for docbook and only rebuild documentation if this is present
+
+2005-06-14 17:54  pfp
+
+	* doc/definitions/base_classes/: NXaperture.xml, NXattenuator.xml,
+	  NXbeam.xml, NXbeam_stop.xml, NXcharacterizations.xml,
+	  NXcollimator.xml, NXcrystal.xml, NXdata.xml, NXdetector.xml,
+	  NXdisk_chopper.xml, NXentry.xml, NXenvironment.xml,
+	  NXevent_data.xml, NXfermi_chopper.xml, NXfilter.xml,
+	  NXflipper.xml, NXgeometry.xml, NXguide.xml, NXinstrument.xml,
+	  NXlog.xml, NXmirror.xml, NXmoderator.xml, NXmonitor.xml,
+	  NXnote.xml, NXorientation.xml, NXprocess.xml, NXroot.xml,
+	  NXsample.xml, NXsensor.xml, NXshape.xml, NXsource.xml,
+	  NXtranslation.xml, NXuser.xml, NXvelocity_selector.xml: Added to
+	  CVS. These are the definitions approved by NIAC.
+
+2005-06-14 17:50  pfp
+
+	* doc/tech_ref/: Makefile, NeXus_definitions.docbook,
+	  base_classes.docbook, methods.docbook, monoref.docbook,
+	  monotas.docbook, terminology.docbook, tofdgs.docbook,
+	  tofnpd.docbook, tofnpd.gif, tofnpd.jpg, tofnref.docbook: Added to
+	  CVS. The definitions included are matched in the definitions
+	  directory.
+
+2005-06-14 16:57  pfp
+
+	* applications/NXtranslate/text_xml/: Makefile,
+	  Makefile.nxtranslate, retriever.cpp, retriever.h: Added
+	  preliminary version of XML retriever.
+
+2005-06-14 16:53  pfp
+
+	* applications/NXtranslate/: Makefile, retriever.cpp: Added
+	  preliminary version of XML retriever.
+
+2005-06-14 16:51  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: Added check for parser
+	  status for better exception handling.
+
+2005-06-14 16:24  pfp
+
+	* applications/Makefile.am: Removed NXtoNX4 and NXtoNX5 from list
+	  of binary targets. They are no longer necessary due to NXconvert.
+
+2005-06-13 17:05  faa59
+
+	* applications/NXtranslate/: string_util.cpp, string_util.h: Change
+	  ulong to unsigned long
+
+2005-06-13 15:27  mk
+
+	* src/: nxio.c, nxio.h, nxxml.c: - Fixed XML whitespace problem
+
+2005-06-10 22:45  rio
+
+	* include/napi.h: Added check for '__APPLE__', since Mac OS X does
+	  not automatically define '__unix__'.	This is no longer needed
+	  for autoconf, but other applications that use napi.h need to know
+	  that Mac OS X is a unix system.
+
+2005-06-09 14:06  faa59
+
+	* applications/nxconvert.c: Add -d option for DTD - doesn't quite
+	  work though (see bug report)
+
+2005-06-09 11:43  faa59
+
+	* scripts/nxbuild.in: Correct library path
+
+2005-06-09 11:24  faa59
+
+	* applications/: Makefile.am, NXdir/Makefile.am,
+	  NXtranslate/Makefile.am: Build applications static to allow
+	  command line option parsing
+
+2005-06-09 10:48  faa59
+
+	* applications/Makefile.am: Remove NXtoNX4, NXtoNX5 and NXtoXML
+	  from kit; replaced by nxconvert
+
+2005-06-09 10:36  faa59
+
+	* applications/: Makefile.am, nxconvert.c: Add nxconvert (NeXus to
+	  NX4/NX5/NXXML)
+
+	  Usage: nxconvert [ -x | -h4 | -h5 ] [ infile ] [ outfile ]
+
+2005-06-08 11:58  faa59
+
+	* applications/NXtranslate/docs/Makefile.am: Makefile to build
+	  documentation
+
+2005-06-08 11:55  faa59
+
+	* configure.ac, applications/NXtranslate/Makefile.am,
+	  applications/NXtranslate/IPNS_CPP/Makefile.am,
+	  contrib/applications/Makefile.am: Add NXtranslate documentation
+	  to kit
+
+2005-06-07 20:01  faa59
+
+	* applications/NXtranslate/: Makefile.am, IPNS_CPP/Makefile.am: Add
+	  missing kit files
+
+2005-06-07 19:40  faa59
+
+	* configure.ac: Remove text_plain Makefile
+
+2005-06-07 19:31  faa59
+
+	* configure.ac: Add NXtranslate
+
+2005-06-07 19:25  faa59
+
+	* applications/NXtranslate/Makefile.am,
+	  applications/NXtranslate/IPNS_CPP/Makefile.am,
+	  applications/NXtranslate/text_plain/text_retriever.cpp,
+	  contrib/applications/Makefile.am: Add NXtranslate to autotools
+
+2005-06-07 19:21  faa59
+
+	* applications/NXtranslate/IPNS_CPP/RandomAccessRunfile.h: Add
+	  math.h
+
+2005-06-07 17:54  faa59
+
+	* doc/Makefile.am, doc/api/Makefile.am, doc/nxdict/Makefile.am,
+	  examples/Makefile.am: Add missing automake files
+
+2005-06-07 13:52  faa59
+
+	* Makefile.am, configure.ac, doc/README, doc/README.doc,
+	  examples/README, examples/README.examples, test/Makefile.am,
+	  test/README, test/README.tests: Add doc and examples directories
+	  to install kit
+
+2005-06-07 12:11  faa59
+
+	* examples/README: Add README placeholder
+
+2005-06-07 12:11  faa59
+
+	* doc/: README, definitions/README, howto/README, tutorial/README:
+	  Add some README placeholders
+
+2005-06-06 19:52  faa59
+
+	* Makefile.am, nexus_spec.in, test/Makefile.am: Add test programs
+	  and ReleaseNotes to distribution kit
+
+2005-06-06 17:39  faa59
+
+	* include/napi.h: Add in comment about bit masking NXaccess
+
+2005-06-06 14:10  rio
+
+	* applications/NXbrowse.c: Moved PrintAttributes into NXBread so
+	  that the data set can be closed properly afterwards.	Also,
+	  NX_CHAR data is now read with NXgetdata rather than NXgetslab,
+	  which doesn't work with the XML API.
+
+2005-06-06 10:36  faa59
+
+	* install_nexus_dep_rpm: Script to download and install HDF rpms
+
+2005-06-06 10:07  faa59
+
+	* include/: napi.h, napi4.h: Change headers slightly so that napi.h
+	  no longer depends on HDF includes; this should make it easier for
+	  people to build applications as they only then need the HDF
+	  libraries and not the HDF includes. Only code change was to make
+	  iTag and iRef in the NXlink strcuture long rather than int32 - as
+	  far as I can tell a reference to these is never passed to a
+	  function and so there should be no conflict with the sizeof(long)
+	  varying on platforms
+
+2005-05-27 13:07  mk
+
+	* src/nxdict/nxdict.c: - Fixed a bug in nxdict which prevented it
+	  from handling http://www   attributes properly
+
+2005-05-27 08:53  mk
+
+	* applications/NXbrowse.c: - Fixed NXbrowse
+
+2005-05-27 08:53  mk
+
+	* src/nxxml.c: - Fixed issue 822, NXbrowse, and 823, mxml version
+	  numbers
+
+2005-05-25 18:30  faa59
+
+	* build_rpm.in: Default to /usr/src/redhat if not rpm build area
+	  found
+
+2005-05-25 18:29  faa59
+
+	* configure.ac: You do not now need to give --without-java if you
+	  do not have java
+
+2005-05-25 17:54  faa59
+
+	* test/testsuite.at: Update output for XML test; all tests should
+	  now pass
+
+2005-05-25 17:43  faa59
+
+	* src/napi5.c: In HDF5 1.6.4 rdcc_nelmts is "int" rather than
+	  "unsigned long" in the call to H5Pget_cache
+
+2005-05-24 15:57  mk
+
+	* include/: napi.h, nxxml.h: - Removed ifdef HDf5 in NXlink
+
+2005-05-23 10:47  mk
+
+	* src/nxio.c, src/nxio.h, src/nxxml.c, include/napi.h: - changed
+	  type to NAPItype, suppressed type in NAPI
+
+2005-05-20 12:43  faa59
+
+	* configure.ac: Improve searching for libsz.a
+
+2005-05-20 11:31  faa59
+
+	* src/nxxml.c: Fix compiler const warning
+
+2005-05-20 11:20  faa59
+
+	* include/nxxml.h: Correct "constness" on makegroup/opengroup
+
+2005-05-20 09:57  mk
+
+	* src/: napi.c, napi4.c, napi5.c, nxio.c, nxxml.c: - Fixed a
+	  problem with MXML
+
+2005-05-16 14:47  faa59
+
+	* Makefile.am, README.cygwin: Cygwin instructions
+
+2005-05-16 13:52  faa59
+
+	* configure.ac: Add /usr/local/lib to default search path
+
+2005-05-13 21:02  faa59
+
+	* configure.ac: Tidy ups for cygwin: napi HDF4 now builds OK, but
+	  HDF4 does not build "out of the box" on cygwin - i'll post
+	  necessary fixes on monday.
+
+2005-05-13 20:59  faa59
+
+	* autogen.sh: Allow automake 1.4 (cygwin)
+
+2005-05-13 20:58  faa59
+
+	* src/napi.c: Add <stdio.h> for cygwin
+
+2005-05-12 15:30  pfp
+
+	* contrib/applications/NXformat_dfn/NXformat_dfn.py: Added
+	  *slightly* better error reporting when input file is not
+	  well-formed XML document.
+
+2005-05-10 19:36  faa59
+
+	* test/testsuite.at: Fix fortran/hdf5 test
+
+2005-05-10 15:20  faa59
+
+	* test/: napi_test.c, testsuite.at: Update hdf5 tests
+
+2005-05-10 15:19  faa59
+
+	* configure.ac: Update to 3.0.0
+
+2005-05-10 13:55  faa59
+
+	* test/napi_test.c: Correct cast on r8_array
+
+2005-05-10 12:30  faa59
+
+	* test/Makefile.am: Change -all-static to -static
+
+2005-05-10 12:11  faa59
+
+	* applications/NXdir/data.cpp: ulong not known on Darwin - using
+	  "unsigned long" instead
+
+2005-05-10 11:51  faa59
+
+	* bindings/java/Makefile.am: Create apidoc directory
+
+2005-05-10 11:50  faa59
+
+	* configure.ac: Better check of compiler type
+
+2005-05-10 11:50  faa59
+
+	* acinclude.m4: Add CPP option test
+
+2005-05-09 20:14  faa59
+
+	* configure.ac: Add --with-cxx option to specify a C++ compiler
+
+2005-05-09 19:44  faa59
+
+	* configure.ac: (1) search $javaroot/bin before $PATH (2) Added
+	  osf1/cxx specific compiler options (3) moved -no-cpp-precomp
+	  option check to MacOS as confused osf1
+
+2005-05-09 19:18  faa59
+
+	* test/README: Add notes about how to run test programs in a
+	  debugger and to check on which shared libraries are being loaded
+
+2005-05-09 19:17  faa59
+
+	* configure.ac: Move check for szip library earlier - hdf4 now
+	  depends on it as well as hdf5
+
+2005-04-30 03:26  faa59
+
+	* test/: Makefile.am, testsuite.at: Also build static library
+	  versions of the tests (napi_test-hdf4-static)
+
+2005-04-29 07:04  faa59
+
+	* test/: Makefile.am, napi_test.c, testsuite.at: Better check of
+	  presence of packages
+
+2005-04-29 01:39  faa59
+
+	* test/: napi_test.c, testsuite.at: Fix test suite
+
+2005-04-27 20:48  mk
+
+	* bindings/java/native/neutron_nexus_NexusFile.h, src/nxxml.c:	-
+	  Fixed a bug with the XML-API failing when a XML file does
+	     not have a NXroot. Now this case is properly treated as an
+	     error.
+
+2005-04-26 14:22  faa59
+
+	* src/napi.c: Add stdarg.h
+
+2005-04-26 14:21  faa59
+
+	* bindings/f77/Makefile.am, include/Makefile.am, src/Makefile.am:
+	  Add napiu.c
+
+2005-04-26 14:06  faa59
+
+	* windows/: README.txt, nexus.dsw, napi4_test/napi4_test.dsp,
+	  napi5_test/napi5_test.dsp, napif_test/napif_test.dsp,
+	  nexus45/nexus45.dsp, nexus4/nexus4.dsp, nexus5/nexus5.dsp,
+	  nexusf90/nexusf90.dsp, nx45dll/nx45dll.dsp,
+	  nxbrowse/nxbrowse.dsp, nxbrowse_dll/nxbrowse_dll.dsp,
+	  nxtest90/nxtest90.dsp, nxtodtd/nxtodtd.dsp, nxtoxml/nxtoxml.dsp:
+	  Add Windows build with new directory structure
+
+2005-04-26 13:51  faa59
+
+	* include/napi.h, include/napi4.h, include/napi5.h, src/napi.c,
+	  src/napi4.c, src/napi5.c, src/napiu.c: * Add NXU source file
+	  (napiu.c) * Add nxisnprintf() and use on Windows VC6 which lacks
+	  snprintf() * Add const to NXmakegroup and NXopengroup * Zero
+	  NexusFunction structure on NXopen creation so any missing
+	  pointers are trapped/ignored
+
+2005-04-26 06:08  faa59
+
+	* test/napi_test.c: Correct error in call to NXsetnumberformat
+
+2005-04-26 06:04  faa59
+
+	* bindings/f77/napif.f: Update NXSETNUMBERFORMAT declaration
+
+2005-04-04 15:53  pfp
+
+	* contrib/applications/NXformat_dfn/NXformat_dfn.py: Added support
+	  to process a list of files into a single output file (implicit
+	  append mode).
+
+2005-04-04 14:48  pfp
+
+	* contrib/applications/NXformat_dfn/format_xml.py: Adds word
+	  wrapping to the description portion of the initial comments of
+	  the input file.
+
+2005-04-01 17:20  pfp
+
+	* contrib/applications/NXformat_dfn/format_xml.py: Added wrapping
+	  of long opening tags.
+
+2005-04-01 15:54  pfp
+
+	* contrib/applications/NXformat_dfn/NXformat_dfn.py: Fixed bug to
+	  support working on files whose name includes a full path.
+
+2005-04-01 15:08  pfp
+
+	* contrib/applications/NXformat_dfn/NXformat_dfn.py: Several
+	  changes including removing dead code, a docbook formatter, and
+	  specifying multiple files on the command line.
+
+2005-04-01 15:04  pfp
+
+	* contrib/applications/NXformat_dfn/format_docbook.py: New
+	  formatter. This inherits from format_xml.
+
+2005-04-01 15:02  pfp
+
+	* contrib/applications/NXformat_dfn/format_xml.py: Added a function
+	  to return a default extension for the output file.
+
+2005-03-29 19:54  pfp
+
+	* contrib/applications/NXformat_dfn/: NXformat_dfn.py,
+	  format_xml.py: First version of plugin method for formatting
+	  definitions files.
+
+2005-03-18 21:10  pfp
+
+	* contrib/applications/NXformat_dfn/: NXconvert.py,
+	  NXprettyprint.py: Added to CVS. Originally by Ray Osborn.
+
+2005-03-10 15:21  faa59
+
+	* include/napiu.h: Add in declarations for C version of NXU
+	  routines
+
+2005-01-04 16:28  pfp
+
+	* applications/NXtranslate/string_util.h: Added some documentation.
+
+2005-01-04 14:22  pfp
+
+	* applications/NXtranslate/text_plain/Makefile: Removed unused
+	  targets and variables.
+
+2005-01-04 14:20  pfp
+
+	* applications/NXtranslate/text_plain/Makefile.nxtranslate: Changed
+	  so that all of the source in the directory is required to make
+	  the object file.
+
+2004-12-22 21:02  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: Added "NXS:expand"
+	  macro.
+
+2004-12-22 21:02  pfp
+
+	* applications/NXtranslate/nexus_util.cpp: Removed debug prints.
+
+2004-12-22 20:52  pfp
+
+	* applications/NXtranslate/: string_util.cpp, string_util.h: Made
+	  some methods public to work with templates.
+
+2004-12-22 20:51  pfp
+
+	* applications/NXtranslate/node_util.h: Removed unnecessary
+	  include.
+
+2004-12-22 20:47  pfp
+
+	* applications/NXtranslate/nexus_util.cpp: Throw exception when the
+	  rank passed to calc_size<=0.
+
+2004-12-21 21:52  pfp
+
+	* applications/NXtranslate/: string_util.cpp, string_util.h: Added
+	  new template for converting an intList (see docs) into a vector
+	  of integers. Bit size of integers determined by caller.
+
+2004-12-21 21:09  pfp
+
+	* applications/NXtranslate/string_util.cpp: Converted
+	  int_list_str_to_int_Vect to use itterators.
+
+2004-12-13 17:42  jph
+
+	* applications/NXtranslate/test_ipns.xml: change time-of-flight to
+	  time_of_flight.
+
+	  Add an NXmonitor.
+
+2004-12-10 19:45  jph
+
+	* applications/NXtranslate/test_ipns.xml: Add a few comments, fix
+	  problems with axis= and signal=, add detector_numbers to get
+	  second axis.
+
+2004-12-09 21:56  jph
+
+	* applications/NXtranslate/IPNS_CPP/Makefile.nxtranslate: Make
+	  libRunfile depend on all of the source files.
+
+2004-12-09 21:55  jph
+
+	* applications/NXtranslate/Makefile: Remove line to cd & make
+	  IPNS_CPP
+
+2004-12-09 20:51  jph
+
+	* applications/NXtranslate/test_ipns.xml: Add times & Errors to
+	  files and make a few changes to make NXvalid happier.
+
+2004-12-09 20:50  jph
+
+	* applications/NXtranslate/IPNS_CPP/Header.cpp: Modify method to
+	  get Pseudo time unit.
+
+2004-12-09 20:49  jph
+
+	* applications/NXtranslate/IPNS_CPP/ipns_retriever.cpp: Add in
+	  stuff to get TOFs & Errors from file
+
+2004-12-09 20:49  jph
+
+	* applications/NXtranslate/IPNS_CPP/: Runfile.cpp, Runfile.h: Add
+	  in stuff to get TOFs from file
+
+2004-12-07 20:54  jph
+
+	* applications/NXtranslate/IPNS_CPP/: Runfile.cpp,
+	  ipns_retriever.cpp: Remove extra cout's
+
+2004-12-07 20:53  jph
+
+	* applications/NXtranslate/Makefile: Add a line that runs the
+	  Makefile in IPNS_CPP to update those files as nxtranslate builds.
+
+2004-12-07 17:58  jph
+
+	* applications/NXtranslate/test_ipns.xml: Add retrieved data into
+	  the test_ipns.xml
+
+2004-12-07 17:57  jph
+
+	* applications/NXtranslate/IPNS_CPP/: ipns_retriever.cpp,
+	  ipns_retriever.h: Add in code to retrieve data from a runfile.
+
+2004-12-07 17:53  jph
+
+	* applications/NXtranslate/IPNS_CPP/: Runfile.cpp, Runfile.h: Add
+	  in new methods to Get 1D spectra out of a runfile Get a vector of
+	  Segment objects.  This may be used by other function.
+
+	  Also make the input stream a private member of the class.  This
+	  helps keep this class alive during runtime.  This may later be
+	  made part of RandomAccessRunfile for robustness.
+
+2004-12-07 17:51  jph
+
+	* applications/NXtranslate/IPNS_CPP/: RandomAccessRunfile.cpp,
+	  RandomAccessRunfile.h: Add in new methods to seek to a new
+	  position in file.  Read data stored as shorts or ints in the file
+	  into a vector of floats.
+
+	  Also make the input stream a private member of the class.  This
+	  helps keep this class alive during runtime.  This may later be
+	  made part of RandomAccessRunfile for robustness.
+
+2004-12-07 17:47  jph
+
+	* applications/NXtranslate/IPNS_CPP/Header.cpp: Add in some missing
+	  functions
+
+2004-12-07 08:51  mk
+
+	* bindings/f77/napif.f, bindings/f77/napif.inc,
+	  bindings/java/native/NexusFile.c,
+	  bindings/java/native/neutron_nexus_NexusFile.h,
+	  bindings/java/neutron/nexus/NeXusFileInterface.java,
+	  bindings/java/neutron/nexus/NexusFile.java,
+	  bindings/swig/Makefile, bindings/swig/nxinter.i,
+	  bindings/swig/nxinterhelper.c, bindings/swig/nxinterhelper.h,
+	  include/napi.h, src/napi.c: - Added NXopengrouppath which opens
+	  the group below a path denoting   a dataset. If the terminal
+	  symbol of the path is a group,   NXopengrouppath ends in that
+	  group.  - Added NXopensourcepath which opens the group from which
+	  a dataset was   linked. Pleae note that this only works with
+	  files which were written with   the NeXus 3.0 API. Only those
+	  contain the necessary target attribute to   linked datasets.	-
+	  Added NX_BINARY and NX_BOOLEAN
+
+2004-12-06 09:05  faa59
+
+	* src/: Makefile.am, stptok.c: Add stptok code
+
+2004-12-05 18:06  faa59
+
+	* include/Makefile.am, src/Makefile.am: Add XML headers to
+	  distribution kit
+
+2004-12-05 17:51  faa59
+
+	* configure.ac, src/Makefile.am, test/Makefile.am,
+	  test/napi_test.c, test/testsuite.at: Add XML interface into
+	  autotools and test suite.
+
+	  The build works OK except for a missing stptok() function - I
+	  found a free implementation on the internet but haven't included
+	  it in case Mark has a better version which he can add to CVS.
+
+	  The testsuite builds, but the tests currently fail.
+
+2004-12-05 15:59  faa59
+
+	* include/napi.h: Mark NXIReportError as external to avoid multiple
+	  defined symbol problem
+
+2004-12-02 23:07  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: Added line and column
+	  number printing when a parsing error occurs.
+
+2004-12-02 22:32  jph
+
+	* applications/NXtranslate/: string_util.cpp, string_util.h: Add
+	  method trim to take out leading and trailing whitespace.  Add in
+	  int_list_str_to_intVect to make a list of integers out of a list
+	  like 1,2,5:9 This will become 1,2,5,6,7,8,9
+
+2004-12-02 17:00  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: Formats the SAX_ERROR
+	  statements so you can see which open and close tag names don't
+	  match.
+
+2004-12-02 15:52  pfp
+
+	* applications/NXtranslate/docs/: NXtranslate.docbook,
+	  translation.docbook: Updated to reflect the new format of the
+	  translation file.
+
+2004-12-01 21:52  pfp
+
+	* applications/NXtranslate/nexus_util.cpp: Fixed bug where links to
+	  groups created an extra level.
+
+2004-12-01 21:44  pfp
+
+	* applications/NXtranslate/: nexus_util.cpp, test_simple.xml,
+	  xml_parser.cpp: Changed the linking mechanism to be in line with
+	  what is done with the XML NeXus base.
+
+2004-12-01 16:57  pfp
+
+	* applications/NXtranslate/: nexus_util.cpp, nxtranslate_debug.h,
+	  xml_parser.cpp: Upgraded debuging system. The three levels of
+	  debugging are better defined.
+
+2004-12-01 16:51  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: Changed program logic to
+	  reflect practices in xml based NeXus files. If there is a name
+	  attribute the type is the tag, if there is a type attribute the
+	  name is the tag, if neither are defined it has the type NX_CHAR.
+
+2004-12-01 16:49  pfp
+
+	* applications/NXtranslate/nexus_util.cpp: Reorganized get_groups
+	  to check for the number of groups first. Added several debug
+	  statements.
+
+2004-11-30 10:28  mk
+
+	* bindings/java/native/neutron_nexus_NexusFile.h: -Readded
+	  neutron_nexus_NexusFile.h
+
+2004-11-30 10:28  mk
+
+	* applications/NXtoXML.c, bindings/f77/napif.f,
+	  bindings/f77/napif.inc, bindings/f77/napif_test.f,
+	  bindings/java/Make.alpha, bindings/java/native/NexusFile.c,
+	  bindings/java/neutron/nexus/NXlink.java,
+	  bindings/java/neutron/nexus/NeXusFileInterface.java,
+	  bindings/java/neutron/nexus/NexusFile.java,
+	  bindings/java/test/TestJapi.java, bindings/java/test/runtestdu40,
+	  bindings/swig/Makefile, bindings/swig/makefile, include/napi.h,
+	  include/napi4.h, include/napi5.h, include/nxxml.h,
+	  src/Makefile.am, src/napi.c, src/napi4.c, src/napi5.c,
+	  src/nxdataset.c, src/nxdataset.h, src/nxio.c, src/nxio.h,
+	  src/nxxml.c, src/nxdict/Makefile.nxdict, src/nxdict/dict.c,
+	  test/napi_test.c: -XML support for NeXus
+
+2004-11-22 10:24  hg
+
+	* contrib/bindings/nxpylib/: nxpylib/nxbaseclass.py,
+	  nxpylib/nxcomponents.py, nxpylib/nxfile.py, nxpylib/nxparse.py,
+	  test/monoxtas_template.xml, test/nxtest.py: slight modifications
+
+2004-11-19 15:59  pfp
+
+	* applications/NXtranslate/IPNS_CPP/: DetectorMap.cpp,
+	  DetectorMap.h, Header.cpp, Header.h, LpsdDetIdMap.cpp,
+	  LpsdDetIdMap.h, Makefile, RandomAccessRunfile.cpp,
+	  RandomAccessRunfile.h, Runfile.cpp, Runfile.h, Segment.cpp,
+	  Segment.h, TimeField.cpp, TimeField.h, ipns_retriever.cpp,
+	  ipns_retriever.h, testProg.cpp, testProg2.cpp: Mirror of the
+	  IPNS_CPP code in the CVS repository on gandalf.pns.anl.gov.
+
+2004-11-19 15:56  pfp
+
+	* applications/NXtranslate/IPNS_CPP/Makefile.nxtranslate: Changed
+	  to reflect the new location of "ipns_retriever.*".
+
+2004-11-19 15:52  pfp
+
+	* applications/NXtranslate/retriever.cpp: Changed include to
+	  reflect that the IPNS retriever was moved into the same directory
+	  as its library.
+
+2004-11-19 15:52  pfp
+
+	* applications/NXtranslate/: ipns_retriever.cpp, ipns_retriever.h:
+	  Moved into the IPNS_CPP subdirectory.
+
+2004-11-17 21:38  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: If the type of a data
+	  node is not given it is assumed to be a character array.
+
+2004-11-17 21:16  pfp
+
+	* applications/NXtranslate/: test_nexus.xml, test_nexus_macro.xml,
+	  test_simple.xml: Updated tests to reflect the new formatting of
+	  the translation files.
+
+2004-11-17 21:01  pfp
+
+	* applications/NXtranslate/xml_parser.cpp: Changed to work with
+	  attributes specified the same way that they are in XML based
+	  NeXus files. Also properly deals with exceptions generated by
+	  creating attributes with numeric values.
+
+2004-11-17 20:58  pfp
+
+	* applications/NXtranslate/attr.cpp: Fixed a bug arrising from
+	  incorrect "size" parameter passed to stdlib function "memcpy".
+
+2004-11-17 20:45  pfp
+
+	* applications/NXtranslate/: node_util.cpp, node_util.h: Split out
+	  the code to create a void* from a string into a separate
+	  function.
+
+2004-11-16 20:22  pfp
+
+	* applications/NXtranslate/string_util.cpp: Fixed bug in converting
+	  strings of numbers that were space separated.
+
+2004-10-29 22:19  pfp
+
+	* applications/NXtranslate/text_plain/retriever.cpp: code cleanup
+
+2004-10-29 22:18  pfp
+
+	* applications/NXtranslate/docs/retrievers.docbook: Changed the
+	  example to be the simple ascii retriever.
+
+2004-10-29 22:18  pfp
+
+	* applications/NXtranslate/docs/translation.docbook: Added
+	  information on the simple ascii retriever
+
+2004-10-29 22:17  pfp
+
+	* applications/NXtranslate/docs/overview.docbook: Minor editing.
+
+2004-10-29 22:16  pfp
+
+	* applications/NXtranslate/docs/NXtranslate.docbook: Changed some
+	  "entity" definitions to reflect new special attribute names.
+
+2004-10-29 19:24  pfp
+
+	* applications/NXtranslate/text_plain/retriever.h: Removed
+	  commented out private variables. Made the copy constructor and
+	  assignment operator private.
+
+2004-10-29 16:37  pfp
+
+	* applications/NXtranslate/retriever.h: Removed the commented out
+	  clone method.
+
+2004-10-29 16:18  jk
+
+	* applications/NXdir/nxdir.h: Remove ostream include
+
+2004-10-29 14:37  pfp
+
+	* applications/NXtranslate/IPNS_CPP/Makefile.nxtranslate: Added to
+	  CVS
+
+2004-10-29 14:12  jk
+
+	* applications/NXdir/tree.cpp: Remove extern from implementation of
+	  function compPath
+
+2004-10-29 14:11  jk
+
+	* applications/NXdir/nxdir.h: Add a define to avoid multiple
+	  includes
+
+2004-10-29 13:55  pfp
+
+	* applications/NXtranslate/: docs/Makefile,
+	  docs/Makefile.nxtranslate, docs/NXtranslate.docbook,
+	  docs/overview.docbook, docs/retrievers.docbook,
+	  docs/translation.docbook, text_plain/Makefile,
+	  text_plain/Makefile.nxtranslate, text_plain/retriever.cpp,
+	  text_plain/retriever.h: Added to CVS
+
+2004-10-29 13:51  pfp
+
+	* applications/NXtranslate/: BUGS, CHANGES, LICENSE, Makefile,
+	  Ptr.h, README, attr.cpp, attr.h, hrcs1797.run,
+	  ipns_retriever.cpp, ipns_retriever.h, main.cpp,
+	  nexus_retriever.cpp, nexus_retriever.h, nexus_util.cpp,
+	  nexus_util.h, node.cpp, node.h, node_util.cpp, node_util.h,
+	  nxtranslate_debug.h, retriever.cpp, retriever.h, string_util.cpp,
+	  string_util.h, test_ipns.xml, test_nexus.xml,
+	  test_nexus_macro.xml, test_simple.xml, test_text_plain.xml,
+	  tree.hh, xml_parser.cpp, xml_parser.h: Added to CVS
+
+2004-10-29 08:48  jk
+
+	* applications/NXdir/: main.cpp, string_util.cpp: add some include
+	  files to make it ready to compile on RH 7.3 systems (PSI)
+
+2004-10-22 08:37  jk
+
+	* ChangeLog: comment the changes
+
+2004-10-21 13:08  jk
+
+	* test/: Makefile.am, napif4_test.f, napif5_test.f, testsuite.at:
+	  Improve the testsuite. Add the F77 check depending on HDF4 and
+	  HDF5
+
+2004-10-21 13:07  jk
+
+	* applications/NXdir/.cvsignore, contrib/.cvsignore,
+	  contrib/applications/.cvsignore: [no log message]
+
+2004-10-21 13:06  jk
+
+	* bindings/f77/napif.inc: Fixed the version number
+
+2004-10-21 13:05  jk
+
+	* autogen.sh, autoversion.sh: Enable automake versions 1.9.X too
+
+2004-10-05 23:55  rio
+
+	* README: First attempt at revising README for the new autoconf
+	  builds - needs work.
+
+	  Ray
+
+2004-07-23 09:22  faa59
+
+	* Makefile.am, configure.ac, contrib/Makefile.am,
+	  applications/NXdir/Makefile, applications/NXdir/Makefile.am,
+	  contrib/applications/Makefile.am: Add in automake support for
+	  building NXdir
+
+2004-07-14 22:05  pfp
+
+	* applications/NXdir/: CHANGES, LICENSE, Makefile, README, TODO,
+	  data.cpp, data_writer.cpp, main.cpp, nxdir.h, nxdir_help.h,
+	  string_util.cpp, tree.cpp: Added to CVS.
+
+2004-07-13 14:40  hg
+
+	* contrib/bindings/nxpylib/test/nxtest.py: minor changes to avoid
+	  debug printout
+
+2004-07-13 14:36  hg
+
+	* contrib/bindings/nxpylib/: nxpylib/nxcomponents.py,
+	  nxpylib/nxfile.py, test/monoxtas_template.xml, test/nxtest.py:
+	  minor changes to avoid debug printout
+
+2004-07-12 16:18  hg
+
+	* contrib/bindings/nxpylib/test/monoxtas_template.xml: added
+	  template metaDTD to test dir for testing generation of skeleton
+	  nexus files
+
+2004-07-12 16:15  hg
+
+	* contrib/bindings/nxpylib/: nxpylib/nxbaseclass.py,
+	  nxpylib/nxcomponents.py, nxpylib/nxfile.py, nxpylib/nxparse.py,
+	  test/nxtest.py: removed some bugs; improved data caching to
+	  nxdata
+
+2004-07-12 12:26  hg
+
+	* contrib/bindings/nxpylib/nxpylib/nxcomponents.py: plotting code
+	  deactivated (commented out) (avoid python to ask for grace_np
+	  package)
+
+2004-07-12 11:45  hg
+
+	* contrib/bindings/nxpylib/nxpylib/nxplot.py: added nxplot for
+	  on-the-fly plotting using external plotting packages(XMgrace)
+
+2004-07-12 11:10  hg
+
+	* contrib/bindings/nxpylib/: nxpylib/nxcomponents.py,
+	  nxpylib/nxfile.py, nxpylib/nxparse.py, test/nxtest.py: nxparse
+	  from nxpylib improved: now processes template metaDTDs and
+	  generates skeleton NX files
+
+2004-06-16 11:44  faa59
+
+	* make_general, make_general_alpha, make_redhat: Remove old
+	  pre-autotools files
+
+2004-06-16 11:30  faa59
+
+	* acinclude.m4, configure.ac: Add --with-java-home option and
+	  various other corrections for Digital UNIX
+
+2004-06-15 18:39  faa59
+
+	* test/Makefile.am: Ignore any error when attempting to run
+	  $(TESTSUIT) --clean Otherwise this can stop a recursive make
+	  clean from the top working properly
+
+2004-06-15 17:40  jk
+
+	* bindings/f90/Makefile.am: Add rule for cleaning generated files.
+
+2004-06-15 15:11  rio
+
+	* test/NXtest.f90: Removed output of volatile global attributes and
+	  trailing spaces that were causing test suite failures.
+
+2004-06-15 15:09  rio
+
+	* test/testsuite.at: Removed unwanted space from the F90 output
+	  test.
+
+2004-06-15 11:59  faa59
+
+	* build_rules.am, configure.ac, bindings/f90/Makefile.am: Separate
+	  out Darwin specific libtool --tag options for F90
+
+2004-06-15 07:55  jk
+
+	* test/testsuite.at: Change the check for the F90 version according
+	  to the tested program.
+
+2004-06-14 14:42  faa59
+
+	* configure.ac: Try to guess the java include path via the java
+	  program path
+
+2004-06-14 13:57  faa59
+
+	* configure.ac, bindings/java/Makefile.am: Add JAVAINCLUDES
+	  variable
+
+2004-06-03 19:28  faa
+
+	* build_rpm: Now generated from build_rpm.in
+
+2004-06-03 19:27  faa
+
+	* Makefile.am, build_rpm.in, configure.ac: Now generate build_rpm
+	  from configure so it gets the correct NeXus version number
+
+2004-06-03 19:26  faa
+
+	* acinclude.m4: Update test for linux distribution - RH9 seems to
+	  have a different /etc/lsb-release
+
+2004-06-03 10:20  faa
+
+	* bindings/f90/Makefile.am: Fix make install problem for F90 shared
+	  libraries on Darwin. During the install the libraries need to be
+	  relinked, but the relink command written to libNeXus90.la by
+	  libtool does not have the correct "tag".  I've added a new target
+	  to "all" that does a quick edit of libNeXus90.la after the build
+	  to fix the relink
+
+2004-06-02 17:12  faa
+
+	* configure.ac: Add ./ to autoversion.sh
+
+2004-06-02 17:07  faa
+
+	* autogen.sh: Tidy up shell syntax
+
+2004-06-02 16:07  faa
+
+	* README.developers: Update for DISTCHECK flags
+
+2004-06-02 15:47  faa
+
+	* test/Makefile.am: Add FORTRAN files to EXTRA_DIST; probably a
+	  better way, but it gets round the dependancy problem for now
+
+2004-06-02 15:32  faa
+
+	* test/Makefile.am: Add dummy link line for F90 when it is not
+	  present
+
+2004-06-02 15:16  faa
+
+	* applications/Makefile.am, bindings/f77/Makefile.am,
+	  bindings/f90/Makefile.am, test/Makefile.am: Update for building
+	  F77/F90 on Darwin
+
+2004-06-02 15:09  faa
+
+	* configure.ac: - Add in -qext to F90 on Darwin; needed to add _ to
+	  external names - Patch libtool on Darwin so that it can build
+	  FORTRAN shared libraries
+
+2004-06-02 15:07  faa
+
+	* build_rules.am: Add in FORTRAN90 libtool linking lines
+
+2004-06-02 15:07  faa
+
+	* Makefile.am: Add in DISTCHECK_CONFIGURE_FLAGS - this is used	to
+	  pass flags through when you do a make distcheck to e.g. to
+	  specify --without-java  should be used when performing the
+	  configure as part of the check
+
+2004-05-28 15:46  jk
+
+	* configure.ac: Add the --without-f77 --without-f90 feature
+	  according to --without-java
+
+2004-05-28 15:07  jk
+
+	* configure.ac: Disable the Java binding with '--without-java'
+	  during the configure run.
+
+2004-05-28 13:52  rio
+
+	* bindings/f90/NXUmodule.f90: Added new constant-size arrays
+	  (data_shape) to contain the SHAPE of the read data.  The XLF
+	  compiler will not allow assumed-size arrays as the SHAPE argument
+	  in the RESHAPE intrinsic.
+
+2004-05-28 11:24  faa
+
+	* build_rules.am, configure.ac, bindings/f77/Makefile.am,
+	  bindings/f90/Makefile.am, src/Makefile.am, test/Makefile.am: F90
+	  builds static on Darwin now, but there is still a libtool problem
+	  as it doesn't make a shared version of the library. More work
+	  needed ...
+
+2004-05-28 10:55  faa
+
+	* autogen.sh, autoversion.sh: Move check for configure version to a
+	  separate file so that it can also be run from configure to ensure
+	  version consistancy
+
+2004-05-28 10:44  faa
+
+	* acinclude.m4: Remove some ltmain macros that seem to have got
+	  included in here
+
+2004-05-25 13:42  hg
+
+	* contrib/bindings/nxpylib/: nxpylib/nxbaseclass.py,
+	  nxpylib/nxcomponents.py, nxpylib/nxfile.py, test/nxtest.py:
+	  changed syntax of reading a subgroup
+
+2004-05-25 12:06  hg
+
+	* contrib/bindings/nxpylib/nxpylib/: nxcomponents.py, nxfile.py:
+	  automatically add signal attribute to plottable data
+
+2004-05-25 11:06  hg
+
+	* contrib/bindings/: nxpylib/nxtest.py,
+	  nxpylib/nxpylib/nxbaseclass.py, nxpylib/nxpylib/nxcomponents.py,
+	  nxpylib/nxpylib/nxfile.py, nxpylib/test/nxtest.py,
+	  nxpython/setup.py: removed some bugs, completed test file and
+	  moved it to test folder
+
+2004-05-19 17:57  hg
+
+	* contrib/bindings/nxpylib/README: made some fine changes in README
+
+2004-05-19 17:49  hg
+
+	* contrib/bindings/nxpylib/: README, nxtest.py, setup.py,
+	  nxpylib/__init__.py, nxpylib/nxbaseclass.py,
+	  nxpylib/nxclasses.py, nxpylib/nxcomponents.py, nxpylib/nxfile.py,
+	  nxpylib/nxobjects.py, nxpylib/nxparse.py,
+	  nxpylib/nxtemplatecomponents.py, nxpylib/nxtemplates.py,
+	  nxpylib/metaDTD/NXaperture.xml, nxpylib/metaDTD/NXattenuator.xml,
+	  nxpylib/metaDTD/NXbeam.xml, nxpylib/metaDTD/NXbeam_stop.xml,
+	  nxpylib/metaDTD/NXcrystal.xml, nxpylib/metaDTD/NXdata.xml,
+	  nxpylib/metaDTD/NXdetector.xml,
+	  nxpylib/metaDTD/NXdisk_chopper.xml, nxpylib/metaDTD/NXentry.xml,
+	  nxpylib/metaDTD/NXenvironment.xml,
+	  nxpylib/metaDTD/NXevent_data.xml,
+	  nxpylib/metaDTD/NXfermi_chopper.xml,
+	  nxpylib/metaDTD/NXfilter.xml, nxpylib/metaDTD/NXflipper.xml,
+	  nxpylib/metaDTD/NXgeometry.xml, nxpylib/metaDTD/NXguide.xml,
+	  nxpylib/metaDTD/NXinstrument.xml, nxpylib/metaDTD/NXlog.xml,
+	  nxpylib/metaDTD/NXmirror.xml, nxpylib/metaDTD/NXmoderator.xml,
+	  nxpylib/metaDTD/NXmonitor.xml, nxpylib/metaDTD/NXnote.xml,
+	  nxpylib/metaDTD/NXorientation.xml,
+	  nxpylib/metaDTD/NXpolarizer.xml, nxpylib/metaDTD/NXroot.xml,
+	  nxpylib/metaDTD/NXsample.xml, nxpylib/metaDTD/NXsensor.xml,
+	  nxpylib/metaDTD/NXshape.xml, nxpylib/metaDTD/NXsource.xml,
+	  nxpylib/metaDTD/NXtranslation.xml, nxpylib/metaDTD/NXuser.xml,
+	  nxpylib/metaDTD/NXvelocity_selector.xml,
+	  nxpylib/metaDTD/instruments/NXmononxtas.xml,
+	  nxpylib/metaDTD/instruments/NXsimulation.xml,
+	  nxpylib/metaDTD/instruments/NXtofnpd.xml: Added the files for
+	  building nxpylib
+
+2004-05-19 15:43  hg
+
+	* contrib/bindings/nxpython/README: Inserted slight corrections to
+	  the README file
+
+2004-05-19 15:40  hg
+
+	* contrib/bindings/nxpython/: napi.i, napi_swig.i: napi.i replaced
+	  by napi_wrap.i because the automatically generated file by swig
+	  was named napi.c which coud have lead to confusing it with napi.c
+	  in the /src dir. now the generated file is names napi_swig.c and
+	  everything should be pretty clear...
+
+2004-05-19 15:37  hg
+
+	* contrib/bindings/nxpython/: napi.h, setup.py: Remove napi.h
+	  because the version in /include dir should be used instead
+
+2004-05-19 10:25  hg
+
+	* contrib/bindings/nxpython/: README, napi.h, napi.i,
+	  napi_typemaps.i, setup.py: Added files needed to build  python
+	  swig interface
+
+2004-05-19 07:11  jk
+
+	* scripts/nexus_pc.in: Typos
+
+2004-05-18 11:28  faa
+
+	* contrib/bindings/README: Add summary file
+
+2004-05-18 10:15  faa
+
+	* contrib/README: Add initial "description of use" file
+
+2004-05-12 12:25  faa
+
+	* scripts/nxbuild.in: Add ${prefix}/include to CPP list
+
+2004-05-12 08:47  jk
+
+	* configure.ac, bindings/java/Makefile.am, src/Makefile.am: Split
+	  the HDF4 and HDF5 'include' and 'lib' dependencies. Create own
+	  variables for these dependencies.
+
+2004-05-12 08:45  jk
+
+	* test/: Makefile.am, dummy.c, napi4_test.c, napi5_test.c,
+	  testsuite.at: Improve the tests
+
+2004-05-12 08:42  jk
+
+	* scripts/Makefile.am: Add a nexus description for the pkgconfig
+	  system
+
+2004-05-12 08:41  jk
+
+	* applications/napi_test.c, test/napi_test.c: Move to the test dir
+
+2004-05-12 08:39  jk
+
+	* acinclude.m4: Add a macro the determine the Linux distribution on
+	  Intel based linux systems
+
+2004-05-12 08:38  jk
+
+	* scripts/nexus_pc.in: Add a nexus description for the pkgconfig
+	  system
+
+2004-05-12 08:37  jk
+
+	* nexus_spec.in: Change the changelog order to benefit the
+	  requirements of the RPM. Remove some dirs (not needed).
+
+2004-05-12 08:12  jk
+
+	* Makefile.am: Add the RPM spec files to the distribution. Needed
+	  by 'rpm -ta source.tar.gz' command.
+
+2004-05-11 09:15  faa
+
+	* README.developers: Add note about mailing lists
+
+2004-05-11 07:21  mk
+
+	* applications/napi_test.c: -Adding the combined napi4, napi5 test
+	  file
+
+2004-05-09 16:22  faa
+
+	* AUTHORS: Add CVS usernames
+
+2004-05-05 16:48  jk
+
+	* ChangeLog: Document the changes.
+
+2004-05-05 16:42  jk
+
+	* test/: napi4_test.c, napi5_test.c, napif_test.f: Remove the file
+	  time from output.
+
+2004-05-05 16:41  jk
+
+	* test/Makefile.am, test/atlocal.in, test/testsuite.at,
+	  Makefile.am, configure.ac: Generate a new test suite.
+
+2004-05-05 16:12  jk
+
+	* bindings/java/Makefile.am: Complete the distribution.
+
+2004-05-05 16:12  jk
+
+	* bindings/java/: Makefile, native/neutron_nexus_NexusFile.h:
+	  Remove generated files.
+
+2004-05-03 12:50  jk
+
+	* autogen.sh: Fix Mac OS X which: mysterious output if command not
+	  found.
+
+2004-05-03 12:29  jk
+
+	* autogen.sh: Add the search of autoconf-2.52
+
+2004-05-03 12:27  jk
+
+	* configure.ac: Reduce the minimum version of autoconf to 2.52.
+
+2004-05-03 12:26  jk
+
+	* autogen.sh: Improve the build of the configur script. It tries to
+	  find the newest version of autoconf, automake, and libtool. At
+	  least it needs the following versions:
+
+		  autoconf	  2.52
+		  automake	  1.5.X
+		  libtool	  1.4.2
+
+	  It was tested on a clean RedHat system 7.3 without any additional
+	  installed software.
+
+2004-04-30 13:47  mk
+
+	* acinclude.m4, configure.ac, make_general, bindings/f77/napif.f,
+	  bindings/f77/napif.inc, bindings/f77/napif_test.f,
+	  bindings/java/Makefile, bindings/java/native/NexusFile.c,
+	  bindings/java/native/neutron_nexus_NexusFile.h,
+	  bindings/java/neutron/nexus/NeXusFileInterface.java,
+	  bindings/java/neutron/nexus/NexusFile.java,
+	  bindings/java/test/TestJapi.java, bindings/swig/makefile,
+	  bindings/swig/nxinter.i, bindings/swig/nxinterhelper.c,
+	  include/napi.h, include/napi5.h, src/napi.c, src/napi5.c,
+	  src/nxdict/nxdict.c: [no log message]
+
+2004-04-01 00:09  pfp
+
+	* bindings/java/Makefile.am: Code cleanup.
+
+2004-03-31 23:23  pfp
+
+	* bindings/java/Makefile.am: Migrated building shared library
+	  entirely to automake.
+
+2004-03-30 18:48  pfp
+
+	* bindings/java/Makefile.am: Leave most of building of shared
+	  object to AutoMake.
+
+2004-03-26 21:26  pfp
+
+	* bindings/java/Makefile.am: Added "clean" target and removed
+	  package specific suffix rule for java code.
+
+2004-03-26 16:12  faa
+
+	* configure.ac: Add missing quote to test for -p with f90
+
+2004-03-25 23:11  pfp
+
+	* bindings/java/Makefile.am: Added "all" and "javadoc" targets.
+
+2004-03-25 22:22  pfp
+
+	* configure.ac: Resolving conflict in file to deal with adding java
+	  support.
+
+2004-03-25 22:19  pfp
+
+	* bindings/java/Makefile.am: First pass at having automake build
+	  java binding.
+
+2004-03-25 22:18  pfp
+
+	* bindings/Makefile.am: Added java subdirectory to be recursed into
+	  if java is found in configure.
+
+2004-03-25 14:50  pfp
+
+	* build_rules.am: Added rules for building class files from java
+	  source.
+
+2004-03-25 12:21  faa
+
+	* configure.ac: Add in check for f90 modules directory and set the
+	  compiler flag
+
+2004-03-25 12:19  faa
+
+	* acinclude.m4: Add in function for checking F90 compiler options
+
+2004-03-24 19:03  faa
+
+	* README.developers: Add note that "make check" can now be used to
+	  run test programs
+
+2004-03-24 18:34  faa
+
+	* nexus_spec.in: Add prefix fixup loop for nxbuild so the RPM can
+	  be relocated with  rpm --prefix
+
+2004-03-24 18:12  faa
+
+	* applications/Makefile.am: Remove NXdump and NXbrowse90 from
+	  standard build
+
+2004-03-24 18:02  faa
+
+	* src/napi.c: * Pass back the return status from NX4open/NX5open to
+	  NXopen * Trap open/create of e.g HDF5 files when only HDF4 has
+	  been linked
+
+2004-03-24 13:30  faa
+
+	* test/Makefile.am: Add HDF library directories to LD_LIBRARY_PATH
+	  for running tests; also clean up output files created by running
+	  the tests
+
+2004-03-24 13:29  faa
+
+	* configure.ac: Add in check for "sz" library - this is needed by
+	  HDF5 and now seems to be shipped separately to libhdf5
+
+2004-03-24 12:38  faa
+
+	* test/Makefile.am: Set up check and TESTS targets to run test
+	  programs
+
+2004-03-24 12:38  faa
+
+	* Makefile.am: Add a "test" target so "make test" will be the same
+	  as "make check" (which is the actual automake target for running
+	  tests)
+
+2004-03-24 12:36  faa
+
+	* configure.ac: Add /usr/local to search path for HDF libraries
+
+2004-02-23 20:28  faa
+
+	* configure.ac: Add in -single_module command for darwin linking
+
+2004-02-23 19:45  faa
+
+	* release/: nexus-2.0.0-1.i386.rpm, nexus-2.0.0-1.src.rpm: Add in
+	  test NeXus RPMs - they are currently HDF4 / F77 only
+
+2004-02-23 19:35  faa
+
+	* nexus_spec.in: Correct date format on line
+
+2004-02-23 19:23  faa
+
+	* AUTHORS: Update email addresses
+
+2004-02-23 19:11  faa
+
+	* configure.ac: Add test for -fno-common for C compiler flags (i
+	  don't think this is a problem on architecture other than MAC);
+	  also added a commented out line for the same option for F77. The
+	  man page for g77 does not recommend using -fno-common, but i
+	  don't believe you will be able to build a shared library on MAC
+	  without it. I think it may be used to implement common blocks,
+	  which as we don't use we may be able to specify it.
+
+2004-02-23 10:46  faa
+
+	* include/napi5.h, src/napi.c, src/napi5.c: Mangle cacheSize to
+	  nx_cacheSize and add extern declaration to the header; I think
+	  this should fix it, but I don't actually have an hdf5
+	  distribution to test it on
+
+2004-02-22 18:20  faa
+
+	* nexus_spec.in: Update comments and add %changelog
+
+2004-02-22 17:44  faa
+
+	* README.rpm: Add note about rebuilding and installing
+
+2004-02-22 16:52  faa
+
+	* README.rpm, build_rpm, configure.ac, nexus_spec.in: First go at
+	  building RPM files - you need to set up your build root (see
+	  README.rpm) and then run  build_rpm  after a	 make distcheck
+
+2004-02-22 16:27  faa
+
+	* Makefile.am: Add build_rules.am to DIST - we get some funny
+	  dependency errors if it is not there
+
+2004-02-22 16:26  faa
+
+	* test/Makefile.am: Install test programs to /usr/local/nexus/test
+
+2004-02-20 23:28  jk
+
+	* autogen.sh: Add the look for libtoolize on the Mac OS X systems
+
+2004-02-20 16:51  faa
+
+	* configure.ac: Move AC_CONFIG_AUX_DIR to before AC_CONFIG_AUTOMAKE
+	  - otherwise configure looks for install-sh before it knows where
+	  the config directory is
+
+2004-02-20 16:43  faa
+
+	* configure.ac: Add /sw to the search path for hdf libraries (to
+	  automatically pick these up on OS X/fink)
+
+2004-02-20 16:33  faa
+
+	* README.developers: Brief instructions for developers on using
+	  autotools
+
+2004-02-20 13:06  faa
+
+	* Makefile.in, aclocal.m4, config.guess, config.sub, configure,
+	  depcomp, install-sh, missing, mkinstalldirs,
+	  applications/Makefile, applications/Makefile.in,
+	  bindings/Makefile.in, bindings/f77/Makefile,
+	  bindings/f77/Makefile.in, bindings/f90/Makefile.in,
+	  include/nxconfig.h.in, src/Makefile, src/Makefile.in,
+	  test/Makefile.in: Remove files which are now generated
+	  automatically by autotools via autogen.sh
+
+2004-02-20 08:35  jk
+
+	* ChangeLog: Document the changes
+
+2004-02-20 08:35  jk
+
+	* configure.ac: Add the use of libtool and give a summary at the
+	  end of the configure run
+
+2004-02-20 08:34  jk
+
+	* Makefile.am: Move the napi and nxbuild dependencies in the
+	  corresponding subdirs
+
+2004-02-20 08:32  jk
+
+	* applications/Makefile.am: Substitute the relative pathes by
+	  absolute pathes.
+
+2004-02-20 08:28  jk
+
+	* bindings/f90/Makefile.am: Substitute the relative pathes by
+	  absolute pathes.
+
+2004-02-20 08:24  jk
+
+	* bindings/f77/Makefile.am: Substitute the relative pathes by
+	  absolute pathes.
+
+2004-02-20 08:20  jk
+
+	* include/: napi4.h, napi5.h: remove the include of the source code
+	  into the header files
+
+2004-02-20 08:18  jk
+
+	* src/: napi4.c, napi5.c: Add the header files and the external
+	  reference to the NXpData
+
+2004-02-20 08:17  jk
+
+	* src/Makefile.am: Substitute the relative pathes by absolute
+	  pathes. Put the dependencies of the sources into this file.
+
+2004-02-20 08:07  jk
+
+	* test/Makefile.am: Substitute the relative pathes by absolute
+	  pathes
+
+2004-02-20 08:04  jk
+
+	* include/Makefile.am, scripts/Makefile.am: Add these files for
+	  better distribution control
+
+2004-02-20 08:00  jk
+
+	* AUTHORS, COPYING, NEWS, autogen.sh: Add this file
+
+2004-02-18 19:25  faa
+
+	* ChangeLog, Makefile.am, Makefile.in, acinclude.m4, aclocal.m4,
+	  configure, configure.ac: Update to cover generation of
+	  scripts/nxbuild
+
 2004-02-18 19:23  faa
 
 	* scripts/nxbuild.in: nxbuild is a command that will take a list of
@@ -123,15 +1748,6 @@
 	  applications/Makefile, bindings/f77/Makefile,
 	  bindings/java/Make.alpha, bindings/java/Make.linux,
 	  bindings/java/Make.mingw, bindings/java/Makefile,
-	  bindings/java/apidoc/AllNames.html,
-	  bindings/java/apidoc/Package-neutron.nexus.html,
-	  bindings/java/apidoc/neutron.nexus.AttributeEntry.html,
-	  bindings/java/apidoc/neutron.nexus.NXlink.html,
-	  bindings/java/apidoc/neutron.nexus.NeXusFileInterface.html,
-	  bindings/java/apidoc/neutron.nexus.NexusException.html,
-	  bindings/java/apidoc/neutron.nexus.NexusFile.html,
-	  bindings/java/apidoc/packages.html,
-	  bindings/java/apidoc/tree.html,
 	  bindings/java/bin/win32/hd415m.dll,
 	  bindings/java/bin/win32/hdf5dll.dll,
 	  bindings/java/bin/win32/hm415m.dll,
@@ -194,15 +1810,7 @@
 	  src/napi5.c, bindings/java/Make.tux, bindings/java/Make.win32,
 	  bindings/java/Makefile, bindings/java/README.JNEXUS,
 	  bindings/java/index.html, bindings/java/japinotes.html,
-	  bindings/java/jnexustut.html, bindings/java/apidoc/AllNames.html,
-	  bindings/java/apidoc/Package-neutron.nexus.html,
-	  bindings/java/apidoc/neutron.nexus.AttributeEntry.html,
-	  bindings/java/apidoc/neutron.nexus.NXlink.html,
-	  bindings/java/apidoc/neutron.nexus.NeXusFileInterface.html,
-	  bindings/java/apidoc/neutron.nexus.NexusException.html,
-	  bindings/java/apidoc/neutron.nexus.NexusFile.html,
-	  bindings/java/apidoc/packages.html,
-	  bindings/java/apidoc/tree.html,
+	  bindings/java/jnexustut.html,
 	  bindings/java/neutron/nexus/NexusFile.java,
 	  bindings/java/test/TestJapi.java, bindings/java/test/runtestrh62,
 	  bindings/java/test/runtestw32.bat, bindings/swig/Makefile,
@@ -712,15 +2320,7 @@ Ray
 2001-08-17 09:49  nexus
 
 	* Makefile, src/Makefile, bindings/java/Makefile,
-	  bindings/java/README.JNEXUS, bindings/java/apidoc/AllNames.html,
-	  bindings/java/apidoc/Package-neutron.nexus.html,
-	  bindings/java/apidoc/neutron.nexus.AttributeEntry.html,
-	  bindings/java/apidoc/neutron.nexus.NXlink.html,
-	  bindings/java/apidoc/neutron.nexus.NeXusFileInterface.html,
-	  bindings/java/apidoc/neutron.nexus.NexusException.html,
-	  bindings/java/apidoc/neutron.nexus.NexusFile.html,
-	  bindings/java/apidoc/packages.html,
-	  bindings/java/apidoc/tree.html, bindings/java/native/NexusFile.c,
+	  bindings/java/README.JNEXUS, bindings/java/native/NexusFile.c,
 	  bindings/java/neutron/nexus/NeXusFileInterface.java,
 	  bindings/java/neutron/nexus/NexusFile.java,
 	  bindings/java/test/TestJapi.java, bindings/java/test/runtestdu40:
@@ -752,16 +2352,7 @@ Ray
 	  bindings/java/NeXus.gif, bindings/java/README.JNEXUS,
 	  bindings/java/compilejava.bat, bindings/java/index.html,
 	  bindings/java/japinotes.html, bindings/java/jnexustut.html,
-	  bindings/java/apidoc/AllNames.html,
-	  bindings/java/apidoc/Package-neutron.nexus.html,
-	  bindings/java/apidoc/neutron.nexus.AttributeEntry.html,
-	  bindings/java/apidoc/neutron.nexus.NXlink.html,
-	  bindings/java/apidoc/neutron.nexus.NeXusFileInterface.html,
-	  bindings/java/apidoc/neutron.nexus.NexusException.html,
-	  bindings/java/apidoc/neutron.nexus.NexusFile.html,
-	  bindings/java/apidoc/packages.html,
-	  bindings/java/apidoc/tree.html, bindings/java/bin/README,
-	  bindings/java/bin/win32/hd413m.def,
+	  bindings/java/bin/README, bindings/java/bin/win32/hd413m.def,
 	  bindings/java/bin/win32/hd413m.dll,
 	  bindings/java/bin/win32/hd413m.lib,
 	  bindings/java/bin/win32/hm413m.def,
@@ -885,10 +2476,13 @@ Ray
 
 2000-02-29 21:08  nexus
 
-	* napi.h, include/napi.h, napif.inc, bindings/f77/napif.inc,
-	  NXmodule.f90, bindings/f90/NXmodule.f90: - Updated version number
-	  to 1.3.2
+	* napi.h, napif.inc, bindings/f77/napif.inc, NXmodule.f90,
+	  bindings/f90/NXmodule.f90: - Updated version number to 1.3.2
 Ray
+
+2000-02-29 21:08  nexus
+
+	* include/napi.h: - Updated version number to 1.3.2Ray
 
 2000-02-29 21:06  nexus
 
@@ -909,9 +2503,15 @@ Ray
 
 2000-02-29 20:43  nexus
 
-	* napi.c, src/napi.c: - Added int32* typecast to iStart and iSize
-	  in NXputslab to eliminate 
-	some unnecessary compiler warning
+	* napi.c: - Added int32* typecast to iStart and iSize in NXputslab
+	  to eliminate 
+   some unnecessary compiler warning messages
+Ray
+
+2000-02-29 20:43  nexus
+
+	* src/napi.c: - Added int32* typecast to iStart and iSize in
+	  NXputslab to eliminate    some unnecessary compiler warning
 	  messages
 Ray
 
@@ -994,10 +2594,14 @@ Ray
 
 2000-01-21 23:43  nexus
 
-	* napi.h, include/napi.h, napif.inc, bindings/f77/napif.inc,
-	  NXmodule.f90, bindings/f90/NXmodule.f90: - Changed NeXus version
-	  number to 1.3.1
+	* napi.h, napif.inc, bindings/f77/napif.inc, NXmodule.f90,
+	  bindings/f90/NXmodule.f90: - Changed NeXus version number to
+	  1.3.1
 Ray
+
+2000-01-21 23:43  nexus
+
+	* include/napi.h: - Changed NeXus version number to 1.3.1Ray
 
 2000-01-11 16:15  nexus
 
@@ -1008,10 +2612,18 @@ Ray
 
 2000-01-04 18:09  nexus
 
-	* napi.c, src/napi.c: - Changed NXgetgroupinfo (NXgetattrinfo) to
-	  return information
-  without affecting the status of
-	  NXgetnextentry (NXgetnextattr)
+	* napi.c: - Changed NXgetgroupinfo (NXgetattrinfo) to return
+	  information
+	without affecting the status of NXgetnextentry
+	  (NXgetnextattr)
+  searches
+Ray
+
+2000-01-04 18:09  nexus
+
+	* src/napi.c: - Changed NXgetgroupinfo (NXgetattrinfo) to return
+	  information  without affecting the status of NXgetnextentry
+	  (NXgetnextattr)
   searches
 Ray
 
@@ -1031,18 +2643,44 @@ Ray
 
 2000-01-04 16:47  nexus
 
-	* napi.h, include/napi.h: - Added function prototypes and name
-	  mangling for NXgetgroupinfo,
+	* napi.h: - Added function prototypes and name mangling for
+	  NXgetgroupinfo,
    NXgetattrinfo, NXinitgroupdir and
 	  NXinitattrdir
 Ray
 
+2000-01-04 16:47  nexus
+
+	* include/napi.h: - Added function prototypes and name mangling for
+	  NXgetgroupinfo,   NXgetattrinfo, NXinitgroupdir and NXinitattrdir
+	  Ray
+
 2000-01-04 16:45  nexus
 
-	* napi.c, src/napi.c: - Added NXgetgroupinfo to return the number
-	  of entries and the 
-	name and class of the currently open group
-	  - Added NXgetattrinfo to return the number of attributes in the 
+	* napi.c: - Added NXgetgroupinfo to return the number of entries
+	  and the 
+  name and class of the currently open group
+- Added
+	  NXgetattrinfo to return the number of attributes in the 
+	  currently open data set
+- Added NXinitgroupdir to re-initialize
+	  searches using 
+  NXgetnextentry
+- Added NXinitattrdir to
+	  re-initialize searches using 
+  NXgetnextattr
+- Fixed calculation
+	  of the time zone difference when using 
+  Metrowerks Code Warrior
+	  on the Mac
+Ray
+
+2000-01-04 16:45  nexus
+
+	* src/napi.c: - Added NXgetgroupinfo to return the number of
+	  entries and the   name and class of the currently open group
+-
+	  Added NXgetattrinfo to return the number of attributes in the 
 	  currently open data set
 - Added NXinitgroupdir to re-initialize
 	  searches using 
@@ -1094,15 +2732,29 @@ Ray
 
 1999-12-02 02:27  nexus
 
-	* napi.c, src/napi.c: - Moved NXfcompress and NXcompress functions
-	  together
+	* napi.c: - Moved NXfcompress and NXcompress functions together
+Ray
+
+1999-12-02 02:27  nexus
+
+	* src/napi.c: - Moved NXfcompress and NXcompress functions
+	  togetherRay
+
+1999-12-02 02:26  nexus
+
+	* napi.h: - Added definition of NX_COMP_NONE (= COMP_CODE_NONE
+	  defined
+  by HDF)
+- Changed name mangling of NXfcompress from
+	  nxfcompress to 
+  nxifcompress for greater consistency with other
+	  routines
 Ray
 
 1999-12-02 02:26  nexus
 
-	* napi.h, include/napi.h: - Added definition of NX_COMP_NONE (=
-	  COMP_CODE_NONE defined
-  by HDF)
+	* include/napi.h: - Added definition of NX_COMP_NONE (=
+	  COMP_CODE_NONE defined  by HDF)
 - Changed name mangling of
 	  NXfcompress from nxfcompress to 
   nxifcompress for greater
@@ -1194,17 +2846,25 @@ Ray
 
 1999-11-05 16:15  nexus
 
-	* napi.c, src/napi.c, napi.h, include/napi.h, napi_test.c,
-	  napi_test_read.c, napif.f, bindings/f77/napif.f, napif.inc,
-	  bindings/f77/napif.inc, napif_test.f, test/napif_test.f,
-	  NXbrowse.f90, applications/NXbrowse90.f90, NXdump.f90,
-	  applications/NXdump.f90, NXmodule.f90, bindings/f90/NXmodule.f90,
-	  NXtest.f90, test/NXtest.f90, NXUmodule.f90,
-	  bindings/f90/NXUmodule.f90, README, ReleaseNotes: - NeXus API now
-	  released underthe terms of the
-  GNU Lesser General Public
-	  License
-- Updated version number to 1.2.1 for this release
+	* napi.c, napi.h, napi_test.c, napi_test_read.c, napif.f,
+	  bindings/f77/napif.f, napif.inc, bindings/f77/napif.inc,
+	  napif_test.f, test/napif_test.f, NXbrowse.f90,
+	  applications/NXbrowse90.f90, NXdump.f90, applications/NXdump.f90,
+	  NXmodule.f90, bindings/f90/NXmodule.f90, NXtest.f90,
+	  test/NXtest.f90, NXUmodule.f90, bindings/f90/NXUmodule.f90,
+	  README, ReleaseNotes: - NeXus API now released underthe terms of
+	  the
+	GNU Lesser General Public License
+- Updated version number
+	  to 1.2.1 for this release
+Ray
+
+1999-11-05 16:15  nexus
+
+	* src/napi.c, include/napi.h: - NeXus API now released underthe
+	  terms of the	GNU Lesser General Public License
+- Updated version
+	  number to 1.2.1 for this release
 Ray
 
 1999-11-05 16:11  nexus
@@ -1335,9 +2995,15 @@ Ray
 
 1999-10-04 23:18  nexus
 
-	* napi.h, include/napi.h: - added macro for Absoft compiler running
-	  on Linux
-- incremented NeXus version number to 1.2.0
+	* napi.h: - added macro for Absoft compiler running on Linux
+-
+	  incremented NeXus version number to 1.2.0
+Ray
+
+1999-10-04 23:18  nexus
+
+	* include/napi.h: - added macro for Absoft compiler running on
+	  Linux- incremented NeXus version number to 1.2.0
 Ray
 
 1999-10-04 23:15  nexus
@@ -1385,9 +3051,14 @@ Ray
 
 1999-09-24 21:42  nexus
 
-	* napi.c, src/napi.c: Changed name of variable iEnd to iSize in
-	  NXgetdata, 
-NXgetslab, NXputdata and NXputslab
+	* napi.c: Changed name of variable iEnd to iSize in NXgetdata,
+	  NXgetslab, NXputdata and NXputslab
+Ray
+
+1999-09-24 21:42  nexus
+
+	* src/napi.c: Changed name of variable iEnd to iSize in NXgetdata,
+	  NXgetslab, NXputdata and NXputslab
 Ray
 
 1999-09-24 18:21  nexus
@@ -1451,9 +3122,13 @@ Ray
 
 1999-09-24 15:45  nexus
 
-	* napi.h, include/napi.h: Add definitions of NX_MAXRANK and
-	  NX_MAXNAMELEN
+	* napi.h: Add definitions of NX_MAXRANK and NX_MAXNAMELEN
 Ray
+
+1999-09-24 15:45  nexus
+
+	* include/napi.h: Add definitions of NX_MAXRANK and
+	  NX_MAXNAMELENRay
 
 1999-09-24 09:34  nexus
 
@@ -1502,9 +3177,14 @@ Ray Osborn
 
 1999-08-05 14:29  nexus
 
-	* napi.c, src/napi.c: Changed NXgetgroupID and NXmakelink so that
-	  the tag/ref pair is used to identify linked Vgroups.
+	* napi.c: Changed NXgetgroupID and NXmakelink so that the tag/ref
+	  pair is used to identify linked Vgroups.
 R. Osborn
+
+1999-08-05 14:29  nexus
+
+	* src/napi.c: Changed NXgetgroupID and NXmakelink so that the
+	  tag/ref pair is used to identify linked Vgroups.R. Osborn
 
 1999-06-14 15:30  faa
 
