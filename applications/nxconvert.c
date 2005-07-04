@@ -41,7 +41,7 @@ static NXhandle inId, outId;
 
 static void print_usage()
 {
-    printf("Usage: nxconvert [ -x | -d | -h4 | -h5 | -o keepws ] [ infile ] [ outfile ]\n");
+    printf("Usage: nxconvert [ -x | -h4 | -h5 | -o keepws ] [ infile ] [ outfile ]\n");
 }
 
 #define NXCONVERT_EXIT_ERROR	exit(1)
@@ -71,11 +71,13 @@ int main(int argc, char *argv[])
 	    nx_write_access |= NXACC_CREATEXML;
 	    break;
 
+/*
 	  case 'd':
 	    nx_format = NX_DTD;
 	    nx_write_access |= NXACC_CREATEXML;
 	    nx_write_data = 0; 
 	    break;
+*/
 
 	  case 'h':
 	    if (!strcmp(optarg, "4") || !strcmp(optarg, "df4"))
