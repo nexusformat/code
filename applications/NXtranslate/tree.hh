@@ -69,7 +69,7 @@ inline void constructor(T1* p)
    }
 
 template <class T1>
-inline void kp::destructor(T1* p)
+inline void destructor(T1* p)
    {
    p->~T1();
    }

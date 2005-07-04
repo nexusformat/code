@@ -5,8 +5,8 @@
 #include <stdexcept>
 
 namespace string_util{
-  extern bool string_util::is_comma(char);
-  extern std::vector<std::string> string_util::split(const std::string &);
+  extern bool is_comma(char);
+  extern std::vector<std::string> split(const std::string &);
   /**
    * Returns true if the first argument starts with the second.
    */
@@ -15,7 +15,7 @@ namespace string_util{
   extern long   str_to_int(const std::string &);
   extern unsigned long  str_to_uint(const std::string &);
   extern double str_to_float(const std::string &);
-  extern std::vector<std::string> string_util::string_to_path(const std::string &);
+  extern std::vector<std::string> string_to_path(const std::string &);
   extern std::string int_to_str(const int);
   extern std::vector<int> str_to_intVec(std::string &);
   extern void str_to_ucharArray(std::string &,unsigned char *, const uint);

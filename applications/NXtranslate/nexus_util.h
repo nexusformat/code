@@ -26,7 +26,7 @@ namespace nexus_util{
   // create a listing of the currently open level. In pairs of (name,type).
   extern std::vector<std::string> get_list(NXhandle *handle);
   // creates a link from link to source
-  extern void nexus_util::make_link(NXhandle *handle, const std::vector<std::string> &link, const std::vector<std::string> &source);
+  extern void make_link(NXhandle *handle, const std::vector<std::string> &link, const std::vector<std::string> &source);
 }
 #endif
 
