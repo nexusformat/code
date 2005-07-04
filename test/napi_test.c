@@ -25,6 +25,8 @@
 
 ----------------------------------------------------------------------------*/
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "napi.h"
 
 static void print_data (const char *prefix, void *data, int type, int num);
@@ -154,6 +156,10 @@ int main (int argc, char *argv[])
   if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclose (&fileid) != NX_OK) return 1;
 
+  if ( (argc >= 2) && !strcmp(argv[1], "-q") )
+  {
+     return 0;	/* create only */
+  }
   /*
     read test
   */

@@ -1,0 +1,21 @@
+#!/bin/sh
+if test ! -z "@H4ROOT@"; then
+    HAVE_HDF4="napi_test-hdf4-static -q"
+else
+    HAVE_HDF4=skip_test
+fi
+export HAVE_HDF4
+#
+if test ! -z "@H5ROOT@"; then
+    HAVE_HDF5="napi_test-hdf5-static -q"
+else
+    HAVE_HDF5=skip_test
+fi
+export HAVE_HDF5
+#
+if test ! -z "@MXMLROOT@"; then
+    HAVE_XML="napi_test-xml-static -q"
+else
+    HAVE_XML=skip_test
+fi
+export HAVE_XML

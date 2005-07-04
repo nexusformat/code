@@ -59,7 +59,7 @@ TESTSUITE_AT	= ## dbase.at devices.at starter.at
 
 AUTOTEST	= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
+check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
 nxtestdir=$(NXTESTDIR)
 nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
@@ -79,6 +79,12 @@ nxconvert:
 # this sets the test running environment - in case we
 # have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
 TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib
+
+run_test_SOURCES=run_test.c
+run_test_LDFLAGS=-static $(LDFLAGS)
+
+skip_test_SOURCES=skip_test.c
+skip_test_LDFLAGS=-static $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
