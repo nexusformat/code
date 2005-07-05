@@ -5,9 +5,12 @@ Changes in Version 3.0.0
 
 - XML files can be written by the NeXus API by specifying NXACC_XML to NXopen
 
-- The NXtoXML, NXtoNX4 and NXtoNX5 utilities have been combined into a single utility nxconvert
+- The NXtoXML, NXtoNX4 and NXtoNX5 utilities have been combined into a single utility nxconvert. To make a DTD definition file use nxtodtd
 
 - New utilities nxdir and nxtranslate
+
+- g95 compiler supported by FORTRAN90 bindings. To specify another
+  compiler use the  --with-f90   option of configure
 
 Changes in Version 2.0.0
 ========================
