@@ -156,15 +156,15 @@ program NXtest
                print *, "   Values : ", i4_buffer
             else if (NXtype == NX_FLOAT32 .or. NXtype == NX_FLOAT64) then
                if (NXgetslab(fileid, r4_buffer, (/1,1/), (/4,1/)) /= NX_OK) stop
-               print *, "   Values : ", r4_buffer
+               print 100, "   Values : ", r4_buffer
                if (NXgetslab(fileid, r4_buffer, (/1,2/), (/4,1/)) /= NX_OK) stop
-               print *, "          : ", r4_buffer
+               print 100, "          : ", r4_buffer
                if (NXgetslab(fileid, r4_buffer, (/1,3/), (/4,1/)) /= NX_OK) stop
-               print *, "          : ", r4_buffer
+               print 100, "          : ", r4_buffer
                if (NXgetslab(fileid, r4_buffer, (/1,4/), (/4,1/)) /= NX_OK) stop
-               print *, "          : ", r4_buffer
+               print 100, "          : ", r4_buffer
                if (NXgetslab(fileid, r4_buffer, (/1,5/), (/4,1/)) /= NX_OK) stop
-               print *, "          : ", r4_buffer
+               print 100, "          : ", r4_buffer
             end if
             do
                attr_status = NXgetnextattr(fileid, name, NXdims(1), NXtype) 
@@ -181,7 +181,7 @@ program NXtest
                      print *, "   "//trim(name)//" : ", i
                   else if (NXtype == NX_FLOAT32) then
                      if (NXgetattr(fileid, name, r) /= NX_OK) stop
-                     print *, "   "//trim(name)//" : ", r
+                     print 100, "   "//trim(name)//" : ", r
                   end if
                end if
             end do
@@ -201,5 +201,7 @@ program NXtest
       end if
    if (NXclosegroup(fileid) /= NX_OK) stop
    if (NXclose(fileid) /= NX_OK) stop
+
+ 100 format(A,4f12.7)
 
 end program NXtest
