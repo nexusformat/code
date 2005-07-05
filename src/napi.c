@@ -580,13 +580,21 @@ static char *nxitrim(char *str)
     char *pPtr;
 
     pNexusFunction pFunc = (pNexusFunction)fid;
-    status = pFunc->nxgetdata(pFunc->pNexusData, data); 
-    if(status != NX_ERROR && pFunc->stripFlag == 1){
-      NXgetinfo(fid,&rank,iDim,&type);
-      if(type == NX_CHAR){
-	pPtr = (char *)data;
-	data = (void *)nxitrim(pPtr);
-      }
+/*
+ * We cannot use NXgetinfo as that returns stripped string length 
+ */
+    status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type);
+    if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) )
+    {
+	pPtr = (char*)malloc(iDim[0]+1);
+        memset(pPtr, 0, iDim[0]+1);
+        status = pFunc->nxgetdata(pFunc->pNexusData, pPtr); 
+	strcpy((char*)data, nxitrim(pPtr));
+	free(pPtr);
+    }
+    else
+    {
+        status = pFunc->nxgetdata(pFunc->pNexusData, data); 
     }
     return status;
   }
