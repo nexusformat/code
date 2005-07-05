@@ -92,7 +92,7 @@ AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FO
 	[], [with_f90=yes])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(F90, [f90 f95 ifort])
+		AC_CHECK_PROGS(F90, [g95 f90 f95 ifort])
 	else
 		AC_CHECK_PROGS(F90, ["$with_f90"])
 	fi
