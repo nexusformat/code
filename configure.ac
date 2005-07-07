@@ -92,7 +92,7 @@ AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FO
 	[], [with_f90=yes])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(F90, [g95 f90 f95 ifort])
+		AC_CHECK_PROGS(F90, [f90 f95 ifort])
 	else
 		AC_CHECK_PROGS(F90, ["$with_f90"])
 	fi
@@ -324,7 +324,7 @@ LDFLAGS="$LDFLAGS -L/usr/local/lib"
 AC_SUBST(LIBG2C)
 
 dnl finally set LIBS variable if we 
-AC_CHECK_LIB(g2c,c_sqrt,LIBG2C="-lg2c",LIBG2C="")
+#AC_CHECK_LIB(g2c,c_sqrt,LIBG2C="-lg2c",LIBG2C="")
 AC_CHECK_LIB(rpc, xdr_float)
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
