@@ -558,13 +558,14 @@ static char *nxitrim(char *str)
     char *pPtr;
 
     pNexusFunction pFunc = (pNexusFunction)fid;
-    status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type);
+    status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type); /* unstripped size if string */
     if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) )
     {
 	pPtr = (char*)malloc(iDim[0]+1);
         memset(pPtr, 0, iDim[0]+1);
         status = pFunc->nxgetdata(pFunc->pNexusData, pPtr); 
-	strcpy((char*)data, nxitrim(pPtr));
+	nxitrim(pPtr);
+	strncpy((char*)data, pPtr, strlen(pPtr)); /* not NULL terminated by default */
 	free(pPtr);
     }
     else
