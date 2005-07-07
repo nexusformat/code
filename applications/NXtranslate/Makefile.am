@@ -29,19 +29,21 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_PLAIN_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
-SUBDIRS=IPNS_CPP docs
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
+SUBDIRS=IPNS_CPP text_collist text_plain docs
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
 	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp \
+	text_collist/collist_retriever.cpp text_collist/string_util_ext.cpp \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
-	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh
+	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh \
+	text_collist/collist_retriever.h text_collist/string_util_ext.h
 
-nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2
+nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2 
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
@@ -62,6 +64,9 @@ test_ipns.nxs: nxtranslate test_ipns.xml hrcs1797.run
 
 test_text_plain.nxs: nxtranslate test_text_plain.xml test_simple.xml
 	./nxtranslate test_text_plain.xml
+
+test_text_collist.nxs: nxtranslate test_text_collist.xml
+	./nxtranslate test_text_collist.xml
 
 test-clean:
 	rm -f $(TEST_RESULT)

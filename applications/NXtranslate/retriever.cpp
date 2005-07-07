@@ -11,6 +11,9 @@
 #ifdef TEXT_XML_RETRIEVER
 #include "text_xml/retriever.h"
 #endif
+#ifdef TEXT_COLLIST_RETRIEVER
+#include "text_collist/collist_retriever.h"
+#endif
 
 using std::string;
 using std::invalid_argument;
@@ -20,6 +23,9 @@ Retriever::~Retriever(){}
 
 // factory method
 Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string &source){
+#ifdef TEXT_COLLIST_RETRIEVER
+printf("collist retriever defined\n");
+#endif 
   // return appropriate retriever based on type
   if(type==NexusRetriever::MIME_TYPE){
     RetrieverPtr ptr(new NexusRetriever(source));
@@ -32,6 +38,11 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #ifdef TEXT_PLAIN_RETRIEVER
   }else if(type==TextPlainRetriever::MIME_TYPE){
     RetrieverPtr ptr(new TextPlainRetriever(source));
+    return ptr;
+#endif
+#ifdef TEXT_COLLIST_RETRIEVER
+  }else if(type==TextCollistRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new TextCollistRetriever(source));
     return ptr;
 #endif
 #ifdef TEXT_XML_RETRIEVER

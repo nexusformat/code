@@ -1,0 +1,18 @@
+######################################################################
+# this file is to allow for configuring NXtranslate
+######################################################################
+# select input types
+TEXT_COLLIST_CFLAGS=-DTEXT_COLLIST_RETRIEVER
+TEXT_COLLIST_OBJS=text_collist/collist_retriever.o
+#TEXT_COLLIST_LIBS=
+
+# source files
+TEXT_COLLIST_SRC=text_collist/collist_retriever.cpp text_collist/collist_retriever.h \
+     text_collist/Makefile text_collist/Makefile.nxtranslate
+
+# how to build the retriever
+text_collist/retriever.o: $(TEXT_COLLIST_SRC)
+	cd text_collist && make all
+
+# what are the results of the tests, test itself should be in main makefile
+TEXT_COLLIST_TEST=test_text_collist.nxs
