@@ -323,7 +323,7 @@ static int determineFileType(CONSTCHAR *filename)
     pNexusFunction pFunc = (pNexusFunction)fid;
     if ( (datatype == NX_CHAR) && (rank > 1) )
     {
-        NXIReportError (fid,
+        NXIReportError (NXpData,
           "ERROR: multi-dimensional NX_CHAR arrays are not supported by the NeXus library");
 	return NX_ERROR;
     }
@@ -342,7 +342,7 @@ static int determineFileType(CONSTCHAR *filename)
     pNexusFunction pFunc = (pNexusFunction)fid; 
     if ( (datatype == NX_CHAR) && (rank > 1) )
     {
-        NXIReportError (fid,
+        NXIReportError (NXpData,
           "ERROR: multi-dimensional NX_CHAR arrays are not supported by the NeXus library");
 	return NX_ERROR;
     }
@@ -462,7 +462,8 @@ static int determineFileType(CONSTCHAR *filename)
     size *= dimensions[i];
     if ((datatype == NX_CHAR) || (datatype == NX_INT8) 
 	|| (datatype == NX_UINT8)) {
-        /* size is correct already */
+        /* allow for terminating \0 */
+      size += 1;
       }
       else if ((datatype == NX_INT16) || (datatype == NX_UINT16)) {
       size *= 2;
@@ -534,41 +535,18 @@ static char *nxitrim(char *str)
 
             for (ibuf = str; *ibuf && isspace(*ibuf); ++ibuf)
                   ;
-            if (str != ibuf)
-                  memmove(str, ibuf, ibuf - str);
-
-            /*
-            **  Collapse embedded spaces (from LV1WS.C)
-            */
-
-            while (*ibuf)
-            {
-                  if (isspace(*ibuf) && cnt)
-                        ibuf++;
-                  else
-                  {
-                        if (!isspace(*ibuf))
-                              cnt = 0;
-                        else
-                        {
-                              *ibuf = ' ';
-                              cnt = 1;
-                        }
-                        obuf[i++] = *ibuf++;
-                  }
-            }
-            obuf[i] = NUL;
+	    str = ibuf;
 
             /*
             **  Remove trailing spaces (from RMTRAIL.C)
             */
-
+	    i = strlen(str);
             while (--i >= 0)
             {
-                  if (!isspace(obuf[i]))
+                  if (!isspace(str[i]))
                         break;
             }
-            obuf[++i] = NUL;
+            str[++i] = NUL;
       }
       return str;
 }
@@ -580,9 +558,6 @@ static char *nxitrim(char *str)
     char *pPtr;
 
     pNexusFunction pFunc = (pNexusFunction)fid;
-/*
- * We cannot use NXgetinfo as that returns stripped string length 
- */
     status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type);
     if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) )
     {
@@ -610,33 +585,29 @@ static char *nxitrim(char *str)
     pNexusFunction pFunc = (pNexusFunction)fid;
     status = pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
     /*
-      allow for a \0 at the end of the data
-    */
-    if(*iType == NX_CHAR){
-      dimension[0] += 1;
-    }
-    /*
       the length of a string may be trimmed....
     */
     if(*iType == NX_CHAR && pFunc->stripFlag == 1){
-      pPtr = (char *)malloc(dimension[0]*sizeof(char));
+      pPtr = (char *)malloc((dimension[0]+1)*sizeof(char));
       if(pPtr != NULL){
-	memset(pPtr,0,dimension[0]*sizeof(char));
+	memset(pPtr,0,(dimension[0]+1)*sizeof(char));
 	pFunc->nxgetdata(pFunc->pNexusData, pPtr);
-	dimension[0] = strlen(nxitrim(pPtr)) + 1;
+	dimension[0] = strlen(nxitrim(pPtr));
 	free(pPtr);
       }
     } 
     if ( (*iType == NX_CHAR) && (*rank > 1) )
     {
-	NXIReportError(fid,"WARNING: multi-dimensional character arrays are not really supported");
+	NXIReportError(NXpData,
+      "WARNING: multi-dimensional character arrays are not really supported");
     }
     return status;
   }
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus CALLING_STYLE NXgetslab (NXhandle fid, void *data, 
+				    int iStart[], int iSize[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetslab(pFunc->pNexusData, data, iStart, iSize);

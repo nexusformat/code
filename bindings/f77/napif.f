@@ -331,11 +331,6 @@ C *** Reverse dimension array as C is ROW major, FORTRAN column major
           DIM(I) = DIM(RANK-I+1)
           DIM(RANK-I+1) = J
       ENDDO
-C *** subtract space for terminating \0 needed by C
-      NX_CHAR = 4
-      IF(DATATYPE .EQ. NX_CHAR)THEN
-         DIM(1) = DIM(1) - 1
-      END IF
       END
 
       INTEGER FUNCTION NXGETNEXTENTRY(FILEID, NAME, CLASS, DATATYPE)
