@@ -321,8 +321,10 @@ fi
 AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
 LDFLAGS="$LDFLAGS -L/usr/local/lib"
+AC_SUBST(LIBG2C)
 
 dnl finally set LIBS variable if we 
+AC_CHECK_LIB(g2c,c_sqrt,LIBG2C="-lg2c",LIBG2C="")
 AC_CHECK_LIB(rpc, xdr_float)
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
