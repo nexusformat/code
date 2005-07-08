@@ -555,7 +555,7 @@ static char *nxitrim(char *str)
   NXstatus CALLING_STYLE NXgetdata (NXhandle fid, void *data)
   {
     int status, type, rank, iDim[NX_MAXRANK];
-    char *pPtr;
+    char *pPtr, *pPtr2;
 
     pNexusFunction pFunc = (pNexusFunction)fid;
     status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type); /* unstripped size if string */
@@ -564,8 +564,8 @@ static char *nxitrim(char *str)
 	pPtr = (char*)malloc(iDim[0]+1);
         memset(pPtr, 0, iDim[0]+1);
         status = pFunc->nxgetdata(pFunc->pNexusData, pPtr); 
-	nxitrim(pPtr);
-	strncpy((char*)data, pPtr, strlen(pPtr)); /* not NULL terminated by default */
+	pPtr2 = nxitrim(pPtr);
+	strncpy((char*)data, pPtr2, strlen(pPtr2)); /* not NULL terminated by default */
 	free(pPtr);
     }
     else
