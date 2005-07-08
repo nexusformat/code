@@ -5,8 +5,8 @@
 #include <stdexcept>
 
 namespace string_util{
-	extern std::vector<std::string> string_util::split_values(const std::string &str);
-	extern std::vector<std::string> string_util::split_whitespace(const std::string &);
-	extern std::vector<std::string> string_util::strip_punct(std::vector<std::string> &strvec);
+	extern std::vector<std::string> split_values(const std::string &str);
+	extern std::vector<std::string> split_whitespace(const std::string &);
+	extern std::vector<std::string> strip_punct(std::vector<std::string> &strvec);
 }
 #endif

@@ -575,10 +575,10 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
 			switch (convert_type(nxtype)) {
 				case NX_CHAR:
 					if (nxtype == "ISO8601") {
-						((char*)data) = mira_datetime_2_iso(entry).c_str();
+						data = (char*)mira_datetime_2_iso(entry).c_str();
 					}
 					else {
-						((char*)data) = entry.c_str();
+						data = (char*)entry.c_str();
 					}
 					nxdims[0] = entry.size();
 					break;
