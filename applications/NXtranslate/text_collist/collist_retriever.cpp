@@ -383,7 +383,7 @@ int TextCollistRetriever::number_of_columns(std::string header_line) {
  * interpreting the string is left up to the implementing code.
  */
 TextCollistRetriever::TextCollistRetriever(const string &str): source(str),current_line(0){
-  cout << "TextCollistRetriever(" << source << ")" << endl; // REMOVE
+  //cout << "TextCollistRetriever(" << source << ")" << endl; // REMOVE
 
   // open the file
   infile.open(source.c_str());
@@ -474,7 +474,7 @@ TextCollistRetriever::~TextCollistRetriever(){
  * code.
  */
 void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
-	cout << "TextCollistRetriever::getData(" << location << ",tree)" << endl; // REMOVE
+	//cout << "TextCollistRetriever::getData(" << location << ",tree)" << endl; // REMOVE
 	// check that the argument is not an empty string
 	//printf("extracting...%s", location.c_str()); 
 	if(location.size()<=0) {
@@ -494,7 +494,7 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
 	int from, to;
 	parse_range(location, from, to); 
 	
-	cout << "location: " << method << "(\'" << arg << "\')" << "[" << from << "," << to << "]{" << nxtype <<"}" << endl << endl;	
+	//cout << "location: " << method << "(\'" << arg << "\')" << "[" << from << "," << to << "]{" << nxtype <<"}" << endl << endl;	
  
 	if (method == TextCollistRetriever::COLUMN_TAG) { 
 		std::vector<double> values = extract_column(infile, arg, from, to);
@@ -543,7 +543,7 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
 		std::string entry="";
 		std::string units="";
 		std::string raw_string = extract_dictentry(infile, arg, convert_type(nxtype));
- 		cout << "dict value: '" << raw_string << "'"<<std::endl;  
+ 		//cout << "dict value: '" << raw_string << "'"<<std::endl;  
 		
 		unsigned int pos = raw_string.find("value:");
 		if (pos != std::string::npos) {

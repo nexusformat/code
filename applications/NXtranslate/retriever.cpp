@@ -23,9 +23,6 @@ Retriever::~Retriever(){}
 
 // factory method
 Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string &source){
-#ifdef TEXT_COLLIST_RETRIEVER
-printf("collist retriever defined\n");
-#endif 
   // return appropriate retriever based on type
   if(type==NexusRetriever::MIME_TYPE){
     RetrieverPtr ptr(new NexusRetriever(source));
