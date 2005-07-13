@@ -238,11 +238,11 @@ bool TextCollistRetriever::isdata(std::string line) {
 		}
 		i++;
 	}
-	// if alpha count is greater than 85 percent -> assume its a data row
+	// if alpha count is greater than 75 percent -> assume its a data row
 
-//cout << "percent: " << line.size() << " " << digit_count <<" " <<digit_count*100/(line.size()-space_count)<<endl;
+//cout << "percent: " << line.size()-space_count << " " << digit_count <<" " <<digit_count*100/(line.size()-space_count)<<endl;
 
-	if (digit_count*100/(line.size()-space_count) > 85) {
+	if (digit_count*100/(line.size()-space_count) > 75) {
 		return true;
 	}
 	return false;
@@ -263,6 +263,7 @@ bool TextCollistRetriever::isunit(std::string line) {
 			}
 		}
 	}
+	//std::cout << " unit_count: " << unit_count << std::endl;
 	if (unit_count > 1) {
 		return true;
 	}
@@ -352,18 +353,41 @@ std::vector<double> TextCollistRetriever::extract_column(ifstream &file, std::st
 //cout << endl << "counting headers: " << *(headers.begin()) << endl;	
 
 	std::vector<std::string>::iterator it = headers.begin();
-	while (*it != col_name) {
+	while (*it != col_name && it != headers.end()) {
 		it++;
 		index++;
 	}
-	
-//cout << endl << "pushing data: " << to << " "<< count<<" "<< infile.good()<< endl;	
+
 	std::string line = read_line(infile);
-	while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {
-		std::vector<std::string> string_values = string_util::split_values(line);
-	//cout << endl << "pushing data: " << (string_util::str_to_float(string_values.at(index))) << endl;
+
+	if (it== headers.end()) {
+		std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
+		while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
+			if (!isdata(line)) {
+				break;
+			}
+			values.push_back(0);
+			count++;
+			line = read_line(infile);
+		}
+		return values;
+	}
+
+//cout << endl << "pushing data: " << to << " "<< count<<" "<< infile.good()<< endl;	
+	while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
+		if (!isdata(line)) {
+			break;
+		}
+		try {
+			std::vector<std::string> string_values = string_util::split_values(line);
 	//cout << endl << "pushing data: " << (string_util::str_to_float(string_values.at(index))) << endl;	
-		values.push_back((string_util::str_to_float(string_values.at(index))));
+			double dbl_val = string_util::str_to_float(string_values.at(index));
+			values.push_back(dbl_val);
+		}
+		catch(...) {
+			cout << "exception in transforming column values " << endl;	
+					
+		}
 		count++;
 		line = read_line(infile);
 	}
@@ -415,18 +439,23 @@ TextCollistRetriever::TextCollistRetriever(const string &str): source(str),curre
 	std::string line = read_line(infile);
 	std::string prev_line="";
 	std::string prev_prev_line="";
-
-	while (!isdata(line)) {
+	
+ 	//std::cout << "current line: " << line << std::endl;
+	while (infile.good() && !isdata(line)) {
 		prev_prev_line = prev_line;
 		prev_line=line;
 		line = read_line(infile);
+		//std::cout << "current line: " << line << std::endl;
 		cur_line++;
 	}
+	//std::cout << "data line: " << line << std::endl;
 	header_section = cur_line-1;
 	// this is dangerous as it assumes the unit line to be present and always under the header line
 	// alternative: check if in header line is some occurence of unit string -> treat is as unit line
 	if (isunit(prev_line)) {
+//std::cout << "extracting units from: " << prev_line << std::endl;
 		extract_units(prev_line);
+//std::cout << "extracting headers from: " << prev_prev_line << std::endl;
 		extract_headers(prev_prev_line);
 	}
 	else {
@@ -435,14 +464,16 @@ TextCollistRetriever::TextCollistRetriever(const string &str): source(str),curre
 	
 	data_section = cur_line;
 	
-	int num_of_cols, num_of_cols2, num_of_cols3;
-	
+	/*int num_of_cols, num_of_cols2, num_of_cols3;
+	//std::cout << "compare data line 1: " << line << std::endl;
 	num_of_cols = number_of_columns(line);
 	if (isdata(line)) {
 		line = read_line(infile);
+	//std::cout << "compare data line 2: " << line << std::endl;
 		num_of_cols2 = number_of_columns(line);
 		if (isdata(line)) {
 			line = read_line(infile);
+	//std::cout << "compare data line 3: " << line << std::endl;
 			num_of_cols3 = number_of_columns(line);
 		}
 	}
@@ -454,7 +485,7 @@ TextCollistRetriever::TextCollistRetriever(const string &str): source(str),curre
 	else {
   		//cout << "numbers of cols: " << num_of_cols <<" "<< num_of_cols2 <<" "<< num_of_cols3 << endl; 
 		printf("ERROR: number of columns must remain constant. check your ASCII file\n");
-	}
+	}*/
 
 }
 
@@ -498,7 +529,24 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
  
 	if (method == TextCollistRetriever::COLUMN_TAG) { 
 		std::vector<double> values = extract_column(infile, arg, from, to);
-  
+  		if (values.size() <= 0) {
+			// if we get no values, just dont create a node
+			std::cout << "creating an empty node, as we got no values" << std::endl;
+			// create an empty data node
+			int* empty_dims = new int[1];
+			empty_dims[0] = 1;
+			void *data;
+			if(NXmalloc(&data, 1, empty_dims, NX_INT32)!=NX_OK) {
+				throw runtime_error("NXmalloc failed");
+			}
+			*((int*)data)=0;
+			Node node(arg, data, 1, empty_dims, NX_INT32);
+			// put the node into the tree 
+			tr.insert(tr.begin(),node);
+			return;
+		}
+
+	
 		int nxrank = 1;
 		int* nxdims = new int[1];
 		nxdims[0] = values.size();
@@ -544,6 +592,23 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
 		std::string units="";
 		std::string raw_string = extract_dictentry(infile, arg, convert_type(nxtype));
  		//cout << "dict value: '" << raw_string << "'"<<std::endl;  
+  		if (raw_string.size() <= 0) {
+			// if we get no values, just dont create a node
+			std::cout << "creating an empty node, as we got no values" << std::endl;
+			// create an empty data node
+			int* empty_dims = new int[1];
+			empty_dims[0] = 1;
+			void *data;
+			if(NXmalloc(&data, 1, empty_dims, NX_CHAR)!=NX_OK) {
+				throw runtime_error("NXmalloc failed");
+			}
+			((char*)data)="";
+			Node node(arg, data, 1, empty_dims, NX_CHAR);
+			// put the node into the tree 
+			tr.insert(tr.begin(),node);
+			return;
+		}
+		
 		
 		unsigned int pos = raw_string.find("value:");
 		if (pos != std::string::npos) {
