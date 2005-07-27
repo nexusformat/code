@@ -10,7 +10,7 @@ Version: @PACKAGE_VERSION@
 # built into an RPM file; it should be incremented each RPM build and
 # then reset to 1 when a new version of the software is released
 Release: @PACKAGE_RELEASE@
-Copyright: LGPL
+License: LGPL
 # Group: there is more than one choice for this - maybe we need to split
 # nexus into separate packages (libraries + apps)
 Group: Development/Libraries
@@ -78,6 +78,8 @@ if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
+* Wed Jul 27 2005 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+- Change Copyright: to License: and add PACKAGE_RELEASE
 * Mon Jun  6 2005 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
 - Add extra documentation and example files to distribution
 * Wed May 12 2004 Jens Krüger <jens.krueger@frm2.tum.de>
