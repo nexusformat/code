@@ -602,7 +602,7 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
 			if(NXmalloc(&data, 1, empty_dims, NX_CHAR)!=NX_OK) {
 				throw runtime_error("NXmalloc failed");
 			}
-			((char*)data)="";
+			data=(void*)"";
 			Node node(arg, data, 1, empty_dims, NX_CHAR);
 			// put the node into the tree 
 			tr.insert(tr.begin(),node);
