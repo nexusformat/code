@@ -9,7 +9,7 @@ Version: @PACKAGE_VERSION@
 # Release is the number of times this version of the software was 
 # built into an RPM file; it should be incremented each RPM build and
 # then reset to 1 when a new version of the software is released
-Release: 1
+Release: @PACKAGE_RELEASE@
 Copyright: LGPL
 # Group: there is more than one choice for this - maybe we need to split
 # nexus into separate packages (libraries + apps)

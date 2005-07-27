@@ -51,6 +51,7 @@ fi
 
 AM_INIT_AUTOMAKE([1.6])
 
+
 AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
@@ -146,6 +147,8 @@ else
 fi
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
+AC_SUBST(PACKAGE_RELEASE)
+test -z "$PACKAGE_RELEASE" && PACKAGE_RELEASE=1
 
 NXDOCDIR='${prefix}/nexus/doc'
 NXEXAMPLEDIR='${prefix}/nexus/examples'
