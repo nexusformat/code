@@ -221,9 +221,12 @@ dnl	fi
 	;;
 esac
 
-if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
-    JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
-fi
+dnl comment out for now; having -I/usr/include/linux causes problems
+dnl on RHEL4 and FC4
+dnl if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
+dnl     JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
+dnl fi
+
 dnl
 dnl * locate path to HDF libraries *
 dnl
