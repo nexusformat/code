@@ -113,38 +113,46 @@ fi
 
 java_host="linux"
 javaroot=""
+with_java=no
 AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK]),
 	[], [with_java_home=$withval])
 if test -d "$with_java_home"; then
 	javaroot="$with_java_home"
-fi
-
-AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
-	[], [with_java=yes])
-if test x$with_java != xno ; then
-	if test -z "$javaroot"; then
-	    javapath=`which java`
-	    if test ! -z "$javapath"; then javaroot=`dirname $javapath`/..; fi
-	fi
-	if test -z "$javaroot"; then 
-	    with_java=no
-#	    AC_MSG_ERROR([Unable to determine JAVA SDK directory - please specify this using  --with-java-home=/sdk/directory  or instead use  --without-java])
-	fi
 	AC_MSG_NOTICE([Java SDK home is $javaroot])
-	if test x"$with_java" = x"yes" ; then
-		AC_PATH_PROGS(JAVAC,javac,,[$javaroot/bin:$PATH])
-	else
-		AC_PATH_PROGS(JAVAC,["$with_java"],,[$javaroot/bin:$PATH])
-	fi
+	JAVAINCLUDE="-I$javaroot/include"
+	AC_PATH_PROGS(JAVAC,javac,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAVA,java,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAVAH,javah,,[$javaroot/bin:$PATH])
-	JAVAINCLUDE="-I$javaroot/include"
-else
-	JAVAC=
-	JAVAINCLUDE=
 fi
+
+#AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
+#	[], [with_java=yes])
+#if test x$with_java != xno ; then
+#	if test -z "$javaroot"; then
+#	    javapath=`which java`
+#	    if test ! -z "$javapath"; then javaroot=`dirname $javapath`/..; fi
+#	fi
+#	if test -z "$javaroot"; then 
+#	    with_java=no
+#	    AC_MSG_ERROR([Unable to determine JAVA SDK directory - please specify this using  --with-java-home=/sdk/directory  or instead use  --without-java])
+#	fi
+#	AC_MSG_NOTICE([Java SDK home is $javaroot])
+#	if test x"$with_java" = x"yes" ; then
+#		AC_PATH_PROGS(JAVAC,javac,,[$javaroot/bin:$PATH])
+#	else
+#		AC_PATH_PROGS(JAVAC,["$with_java"],,[$javaroot/bin:$PATH])
+#	fi
+#	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
+#	AC_PATH_PROGS(JAR,jar,,[$javaroot/bin:$PATH])
+#	AC_PATH_PROGS(JAVA,java,,[$javaroot/bin:$PATH])
+#	AC_PATH_PROGS(JAVAH,javah,,[$javaroot/bin:$PATH])
+#	JAVAINCLUDE="-I$javaroot/include"
+#else
+#	JAVAC=
+#	JAVAINCLUDE=
+#fi
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
 AC_SUBST(PACKAGE_RELEASE)
@@ -157,6 +165,7 @@ AC_SUBST(NXDOCDIR)
 AC_SUBST(NXEXAMPLEDIR)
 AC_SUBST(NXTESTDIR)
 
+AM_PROG_GCJ
 AC_PROG_LIBTOOL
 
 AC_PROG_MAKE_SET
@@ -221,11 +230,9 @@ dnl	fi
 	;;
 esac
 
-dnl comment out for now; having -I/usr/include/linux causes problems
-dnl on RHEL4 and FC4
-dnl if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
-dnl     JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
-dnl fi
+if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
+    JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
+fi
 
 dnl
 dnl * locate path to HDF libraries *
