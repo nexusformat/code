@@ -431,7 +431,7 @@ build:
         bindings:
                 F77 :          ${F77BINDING} 
                 F90 :          ${F90BINDING} 
-                JAVA:          ${JAVABINDING}
+                JAVA:          ${JAVABINDING} (ROOT=${javaroot})
 
 Please check whether the configuration I detected matches what you
 would like to have.
