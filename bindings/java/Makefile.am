@@ -85,6 +85,7 @@ EXTRA_DIST	= $(noinst_JAVA)
 neutron/nexus/NexusFile.class:	neutron/nexus/NexusFile.java
 
 native/neutron_nexus_NexusFile.h: neutron/nexus/NexusFile.class
+	test -d native || mkdir native
 	$(JAVAH) -jni -d native neutron.nexus.NexusFile
 
 jnexus.jar: $(jnexus_CLASS)
@@ -94,8 +95,8 @@ all: $(jnexus_ARCHIVE) $(lib_LTLIBRARIES) javadoc
 
 javadoc:	$(noinst_JAVA)
 	test -d apidoc || mkdir apidoc
-	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath $(srcdir) \
-                      neutron.nexus ncsa.hdf.hdflib
+	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath . \
+                      -sourcepath $(srcdir) neutron.nexus ncsa.hdf.hdflib
 
 SUFFIXES = .java .class
 
