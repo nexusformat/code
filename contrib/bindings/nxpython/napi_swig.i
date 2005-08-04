@@ -71,12 +71,16 @@ extern pNexusFunction;*/
 
 
 
-#define NEXUS_VERSION   "2.0.0."               
+/* NeXus HDF45 */
+#define NEXUS_VERSION   "3.0.0"                /* major.minor.patch */
+#define CONSTCHAR       const char
+
 typedef void* NXhandle;         
 typedef int NXstatus;
 typedef char NXname[128];
 
-typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, NXACC_CREATE5=5} NXaccess;
+typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, 
+	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_NOSTRIP=128} NXaccess;
 
 typedef struct {
 	char *iname;
