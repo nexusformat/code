@@ -114,7 +114,7 @@ fi
 java_host="linux"
 javaroot=""
 with_java=no
-AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK]),
+AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK i.e. where the bin, lib and include directories live]),
 	[], [with_java_home=$withval])
 if test -d "$with_java_home"; then
 	javaroot="$with_java_home"
@@ -414,6 +414,9 @@ XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$F90" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
+if test -z "$javaroot"; then
+    javaroot="not specified"
+fi
 AC_MSG_RESULT([
 
 Configuration (NeXus):
@@ -431,7 +434,7 @@ build:
         bindings:
                 F77 :          ${F77BINDING} 
                 F90 :          ${F90BINDING} 
-                JAVA:          ${JAVABINDING} (ROOT=${javaroot})
+                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot})
 
 Please check whether the configuration I detected matches what you
 would like to have.
