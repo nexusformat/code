@@ -7,12 +7,11 @@
 .SUFFIXES:
 .SUFFIXES: .i .c .o
 
-HROOT=/afs/psi.ch/project/sinq/tru64
+HROOT=/afs/psi.ch/project/sinq/sl-linux
 CC=cc
-CFLAGS=-c -I$(HROOT)/include -DHDF4 -DHDF5 -DNXXML
-LDFLAGS=-L/afs/psi.ch/project/sinq/tru64/lib -lNeXus \
-	$(HROOT)/lib/libmfhdf.a $(HROOT)/lib/libdf.a -ljpeg \
-	-lhdf5 -lmxml -lz -lm
+CFLAGS=-c -I$(HROOT)/include -I../../includye -DHDF4 -DHDF5 -DNXXML
+LDFLAGS=-L$(HROOT)/lib -lNeXus -lmfhdf -ldf -lhdf5 -ljpeg \
+	-lmxml -lz -lsz -lm
 
 #---------------------------------------------------------------------------
 # If this is compiled with XML support, then nxdataset.o is already included
@@ -23,9 +22,9 @@ LDFLAGS=-L/afs/psi.ch/project/sinq/tru64/lib -lNeXus \
 OBJ=nxinterhelper.o
 
 #----------- change this for other script languages
-SCRIPTFLAG=-tcl8 -ltclsh.i
+SCRIPTFLAG=-tcl8 -ltclsh.i 
 SCRIPTFLAG2=-tcl8 
-SCRIPTLIB=-L/usr/local/lib -ltcl8.0
+SCRIPTLIB= -ltcl
 TCLOBJ=nxinter_wrap.o
 
 #---------- these define for mzscheme
@@ -58,7 +57,7 @@ clean:
 
 nxinter: $(OBJ) $(TCLOBJ)
 	$(CC) -o nxinter  $(TCLOBJ) $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
-	$(CC) -shared -o nxinter.so  $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
+	$(CC) -shared -o nxinter.so  $(TCLOBJ) $(OBJ) $(SCRIPTLIB) $(LDFLAGS)
 
 nxscheme: $(OBJ) $(MZOBJ)
 	$(CC) -shared -o nxscheme.so $(MZOBJ) $(OBJ) $(MZLIB) $(LDFLAGS) 
@@ -67,7 +66,7 @@ nxguile: $(OBJ) $(GGOBJ)
 	$(CC) -non_shared -o nxguile $(GGOBJ) $(OBJ) $(GGLIB) $(LDFLAGS) 
 
 nxinter_wrap.o: nxinter.i nxdataset.i
-	/data/lnslib/bin/swig $(SCRIPTFLAG) nxinter.i 
+	swig $(SCRIPTFLAG) nxinter.i 
 	$(CC) $(CFLAGS) nxinter_wrap.c
 
 nxscheme_wrap.o: nxinter.i nxdataset.i

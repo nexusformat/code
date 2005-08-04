@@ -599,10 +599,13 @@ void TextCollistRetriever::getData(const string &location, tree<Node> &tr){
 			int* empty_dims = new int[1];
 			empty_dims[0] = 1;
 			void *data;
+                        char *pPtr;
+
 			if(NXmalloc(&data, 1, empty_dims, NX_CHAR)!=NX_OK) {
 				throw runtime_error("NXmalloc failed");
 			}
-			data=(void*)"";
+			pPtr = (char *)data;
+			strcpy(pPtr,"");
 			Node node(arg, data, 1, empty_dims, NX_CHAR);
 			// put the node into the tree 
 			tr.insert(tr.begin(),node);

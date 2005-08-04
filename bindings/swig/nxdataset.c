@@ -52,6 +52,7 @@ pNXDS createNXDataset(int rank, int typecode, int dim[]){
   }
   pNew->rank = rank;
   pNew->type = typecode;
+  pNew->format = NULL;
   for(i = 0; i < rank; i++){
     pNew->dim[i] = dim[i];
   }
@@ -93,6 +94,9 @@ void  dropNXDataset(pNXDS dataset){
   if(dataset->u.ptr != NULL){
     free(dataset->u.ptr);
   }
+  if(dataset->format != NULL){
+    free(dataset->format);
+  }
   free(dataset);
 }
 /*-----------------------------------------------------------------------*/
@@ -128,6 +132,26 @@ int   getNXDatasetType(pNXDS dataset){
   }
   return dataset->type;
 }
+/*--------------------------------------------------------------------*/
+int getNXDatasetLength(pNXDS dataset){
+  int length, i;
+
+  if(dataset == NULL){
+    return 0;
+  }
+  if(dataset->magic != MAGIC){
+    return 0;
+  }
+  length = dataset->dim[0];
+  for(i = 1; i < dataset->rank; i++){
+    length *= dataset->dim[i];
+  }
+  return length;
+}
+/*---------------------------------------------------------------------*/
+int getNXDatasetByteLength(pNXDS dataset){
+  return getNXDatasetLength(dataset)*getTypeSize(dataset->type);
+}
 /*----------------------------------------------------------------------
   This calculates an arbitray address in C storage order
   -----------------------------------------------------------------------*/
@@ -160,6 +184,18 @@ double getNXDatasetValue(pNXDS dataset, int pos[]){
   }
 
   address = calculateAddress(dataset,pos);
+  return getNXDatasetValueAt(dataset, address);
+}
+/*----------------------------------------------------------------------*/
+double getNXDatasetValueAt(pNXDS dataset, int address){
+  double value;
+
+  if(dataset == NULL){
+    return 0;
+  }
+  if(dataset->magic != MAGIC){
+    return 0;
+  }
 
   switch(dataset->type){
   case NX_FLOAT64:
@@ -229,7 +265,10 @@ int   putNXDatasetValue(pNXDS dataset, int pos[], double value){
   }
 
   address = calculateAddress(dataset,pos);
-
+  return putNXDatasetValueAt(dataset,address,value);
+}
+  /*---------------------------------------------------------------------*/
+int putNXDatasetValueAt(pNXDS dataset, int address, double value){
   /*
     this code is dangerous, it casts without checking the data range.
     This may cause trouble in some cases

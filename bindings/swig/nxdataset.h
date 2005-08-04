@@ -17,6 +17,7 @@ typedef struct {
                    int rank;
                    int type;
                    int *dim;
+                   char *format;
                    union {
 		     void *ptr;
 		     float *fPtr;
@@ -42,6 +43,8 @@ typedef struct {
 #define NX_UINT32   25
 #define NX_CHAR      4
 
+#define NX_MAXRANK 32
+
 #endif
 
 
@@ -53,10 +56,14 @@ void  dropNXDataset(pNXDS dataset);
 int   getNXDatasetRank(pNXDS dataset);
 int   getNXDatasetDim(pNXDS dataset, int which);
 int   getNXDatasetType(pNXDS dataset);
+int   getNXDatasetLength(pNXDS dataset);
+int   getNXDatasetByteLength(pNXDS dataset);
 
 double getNXDatasetValue(pNXDS dataset, int pos[]);
+double getNXDatasetValueAt(pNXDS dataset, int address);
 char  *getNXDatasetText(pNXDS dataset);
 
 int   putNXDatasetValue(pNXDS dataset, int pos[], double value);
+int   putNXDatasetValueAt(pNXDS dataset, int address, double value);
 
 #endif
