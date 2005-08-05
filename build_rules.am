@@ -27,15 +27,15 @@
 ##  For further information, see <http://www.neutron.anl.gov/NeXus/>
 ##
 ##====================================================================
-SUFFIXES = .f90 .o .java # .i
+SUFFIXES = .f90 .o .java .i
 .f90.o:
 	$(F90) $(F90FLAGS) -c $<
 
 .java.class:
 	$(JAVAC) $<
 
-#.i.c:
-#	$(SWIG) $(SWIGFLAGS) -o $@ $<
+.i.c:
+	$(SWIG) $(SWIGFLAGS) -o $@ $<
 
 .f90.lo:
 	$(LTF90COMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<

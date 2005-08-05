@@ -111,6 +111,7 @@ else
 	F90=
 fi
 
+
 java_host="linux"
 javaroot=""
 with_java=no
@@ -174,6 +175,9 @@ AC_PROG_RANLIB
 AC_CHECK_PROGS(SWIG,[swig])
 AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
 AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
+AC_CHECK_PROGS(PYTHON,[python])
+AC_CHECK_PROGS(TCLSH,[tclsh])
+AC_CHECK_PROGS(GUILE,[guile])
 
 dnl These are used in build_rules.am to pass any approptiate 
 dnl tag to libtool for f90 building
@@ -366,6 +370,10 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
 AM_CONDITIONAL(HAVE_F90, [test ! -z "$F90"])
+AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHON"])
+AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLSH"])
+AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILE"])
+AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
 AM_CONDITIONAL(HAVE_JAVA, [test ! -z "$JAVA"])
 AM_CONDITIONAL(HAVE_JAVAC, [test ! -z "$JAVAC"])
 AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC"])
@@ -400,6 +408,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/f77/Makefile
 		bindings/f90/Makefile
 		bindings/java/Makefile
+		bindings/swig/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
 		scripts/Makefile
