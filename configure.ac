@@ -178,6 +178,7 @@ AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(PYTHON,[python])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
+AC_CHECK_PROGS(LATEX,[latex])
 
 dnl These are used in build_rules.am to pass any approptiate 
 dnl tag to libtool for f90 building
@@ -382,6 +383,7 @@ AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
 AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
 AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT"])
+AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
