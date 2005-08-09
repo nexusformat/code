@@ -29,23 +29,36 @@
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include
 if HAVE_PYTHON
-LIBNXPYTHON=libnxpython.la
-PYTHONWRAP=nxpython_wrap.c
+#LIBNXPYTHON=libnxpython.la
+#PYTHONWRAP=nxpython_wrap.c
 endif
 if HAVE_TCL
-LIBNXTCL=libnxtcl.la
-NXINTER=nxinter
-TCLWRAP=nxinter_wrap.c
+#LIBNXTCL=libnxtcl.la
+#NXINTER=nxinter
+#TCLWRAP=nxinter_wrap.c
 endif
 if HAVE_GUILE
-LIBNXGUILE=libnxguile.la
-NXGUILE=nxguile
-GUILEWRAP=nxguile_wrap.c
+#LIBNXGUILE=libnxguile.la
+#NXGUILE=nxguile
+#GUILEWRAP=nxguile_wrap.c
 endif
+
 #LIBNXSCHEME=libnxscheme.la
 
 lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXPYTHON) $(LIBNXSCHEME) $(LIBNXGUILE)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
+
+DOC_SRC		= nxinter.tex
+swigdocdir 	= $(NXDOCDIR)
+swigdoc_DATA	= $(DOC_OUTPUT)
+if HAVE_LATEX
+DOC_OUTPUT=nxinter.ps nxinter.pdf
+nxinter.ps: $(DOC_SRC)
+	latex nxinter.tex
+	latex nxinter.tex
+	dvips -f nxinter.dvi > nxinter.ps
+	ps2pdf12 nxinter.ps nxinter.pdf
+endif
 
 include $(top_srcdir)/build_rules.am
 
@@ -58,7 +71,8 @@ endif
 COMMON_SRC=nxinterhelper.c $(NXDATASET)
 
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
-		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP)
+		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) \
+		$(DOC_OUTPUT) $(DOC_SRC)
 
 # python wrapper
 libnxpython_la_SOURCES=nxpython_wrap.c $(COMMON_SRC)

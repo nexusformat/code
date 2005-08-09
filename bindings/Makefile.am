@@ -36,6 +36,6 @@ if HAVE_JAVAC
 JAVASUB = java
 endif
 #if HAVE_SWIG
-#SWIGSUB = swig
+SWIGSUB = swig
 #endif
 SUBDIRS = $(F77SUB) $(F90SUB) $(JAVASUB) $(SWIGSUB)
