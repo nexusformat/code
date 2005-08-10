@@ -1,4 +1,9 @@
 #!/bin/sh
+#
+# $Id$
+#
+# @configure_input@
+#
 if test ! -z "@H4ROOT@"; then
     HAVE_HDF4="napi_test-hdf4-static -q"
 else
