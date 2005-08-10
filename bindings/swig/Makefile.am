@@ -28,28 +28,64 @@
 #
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include
+lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXPYTHON) $(LIBNXSCHEME) $(LIBNXGUILE)
+bin_PROGRAMS=$(NXINTER) $(NXGUILE)
+
+# python wrapper
+PYTHONWRAP=nxpython_wrap.c
+nxpython_wrap.c: nxinter.i nxdataset.i
+	$(SWIG) -o $@ -python nxinter.i 
 if HAVE_PYTHON
 LIBNXPYTHON=libnxpython.la
-PYTHONWRAP=nxpython_wrap.c
+libnxpython_la_SOURCES=nxpython_wrap.c $(COMMON_SRC)
+libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) $(CFLAGS)
+libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
 endif
+
+# tcl wrapper
+TCLWRAP=nxinter_wrap.c
+nxinter_wrap.c: nxinter.i nxdataset.i
+	$(SWIG) -o $@ -tcl8 -ltclsh.i nxinter.i 
 if HAVE_TCL
 LIBNXTCL=libnxtcl.la
 NXINTER=nxinter
-TCLWRAP=nxinter_wrap.c
+TCLLIB=-L$(TCLROOT)/lib -ltcl
+libnxtcl_la_SOURCES=nxinter_wrap.c $(COMMON_SRC)
+libnxtcl_la_CFLAGS=-I$(TCLROOT)/include
+libnxtcl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
+
+nxinter_SOURCES=libnxtcl.la
+nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 endif
+
+GUILEWRAP=nxguile_wrap.c
+nxguile_wrap.c: nxinter.i nxdataset.i
+	$(SWIG) -o $@ -guile -lguilemain.i -Linkage ltdlmod nxinter.i
 if HAVE_GUILE
 LIBNXGUILE=libnxguile.la
 NXGUILE=nxguile
-GUILEWRAP=nxguile_wrap.c
+GGLIB=-L$(GUILEROOT)/lib -lguile
+libnxguile_la_SOURCES=nxguile_wrap.c $(COMMON_SRC)
+libnxguile_la_CFLAGS=-I$(GUILEROOT)/include/guile \
+  -DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();"\
+  $(CFLAGS)
+libnxguile_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
+
+nxguile_SOURCES=libnxguile.la
+nxguile_LDFLAGS=-static libnxguile.la $(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
 endif
 
+SCHEMEWRAP=nxscheme_wrap.c
+nxscheme_wrap.c: nxinter.i nxdataset.i
+	$(SWIG) -o $@ -mzscheme nxinter.i 
 if HAVE_MZSCHEME
 LIBNXSCHEME=libnxscheme.la
-SCHEMEWRAP=nxscheme_wrap.c
+MZINC=/data/koenneck/opt/plt
+MZLIB=-L$(MZINC)/lib -lmzscheme -lmzgc $(MZINC)/lib/mzdyn.o
+libnxscheme_la_SOURCES=nxscheme_wrap.c $(COMMON_SRC)
+libnxscheme_la_CFLAGS=-I$(MZINC)/include $(CFLAGS)
+libnxscheme_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(MZLIB) $(LDFLAGS)
 endif
-
-lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXPYTHON) $(LIBNXSCHEME) $(LIBNXGUILE)
-bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 
 DOC_SRC		= nxinter.tex
 swigdocdir 	= $(NXDOCDIR)
@@ -76,46 +112,4 @@ COMMON_SRC=nxinterhelper.c $(NXDATASET)
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
 		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) \
 		$(DOC_OUTPUT) $(DOC_SRC)
-
-# python wrapper
-libnxpython_la_SOURCES=nxpython_wrap.c $(COMMON_SRC)
-libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) $(CFLAGS)
-libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
-nxpython_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -python nxinter.i 
-
-# tcl wrapper
-TCLLIB=-L$(TCLROOT)/lib -ltcl
-libnxtcl_la_SOURCES=nxinter_wrap.c $(COMMON_SRC)
-libnxtcl_la_CFLAGS=-I$(TCLROOT)/include
-libnxtcl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
-nxinter_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -tcl8 -ltclsh.i nxinter.i 
-
-# tcl test program
-nxinter_SOURCES=libnxtcl.la
-nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
-
-# guile wrapper
-GGLIB=-L$(GUILEROOT)/lib -lguile
-libnxguile_la_SOURCES=nxguile_wrap.c $(COMMON_SRC)
-libnxguile_la_CFLAGS=-I$(GUILEROOT)/include/guile \
-  -DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();"\
-  $(CFLAGS)
-libnxguile_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
-nxguile_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -guile -lguilemain.i -Linkage ltdlmod nxinter.i
-
-# guile program
-nxguile_SOURCES=libnxguile.la
-nxguile_LDFLAGS=-static libnxguile.la $(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
-
-# mzscheme wrapper
-MZINC=/data/koenneck/opt/plt
-MZLIB=-L$(MZINC)/lib -lmzscheme -lmzgc $(MZINC)/lib/mzdyn.o
-libnxscheme_la_SOURCES=nxscheme_wrap.c $(COMMON_SRC)
-libnxscheme_la_CFLAGS=-I$(MZINC)/include $(CFLAGS)
-libnxscheme_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(MZLIB) $(LDFLAGS)
-nxscheme_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -mzscheme nxinter.i 
 
