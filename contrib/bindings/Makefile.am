@@ -4,5 +4,13 @@
 # $Id$
 #
 # @configure_input@
+#
 #====================================================================
-SUBDIRS = bindings applications
+#if HAVE_LIBXML2
+#NXTRANSLATE=NXtranslate
+#endif
+#if INSTALL_NXPYTHON
+#NXPYTHON=nxpython
+#endif
+#SUBDIRS = NXdir $(NXTRANSLATE)
+SUBDIRS = $(NXPYTHON)

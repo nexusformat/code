@@ -29,21 +29,24 @@
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include
 if HAVE_PYTHON
-#LIBNXPYTHON=libnxpython.la
-#PYTHONWRAP=nxpython_wrap.c
+LIBNXPYTHON=libnxpython.la
+PYTHONWRAP=nxpython_wrap.c
 endif
 if HAVE_TCL
-#LIBNXTCL=libnxtcl.la
-#NXINTER=nxinter
-#TCLWRAP=nxinter_wrap.c
+LIBNXTCL=libnxtcl.la
+NXINTER=nxinter
+TCLWRAP=nxinter_wrap.c
 endif
 if HAVE_GUILE
-#LIBNXGUILE=libnxguile.la
-#NXGUILE=nxguile
-#GUILEWRAP=nxguile_wrap.c
+LIBNXGUILE=libnxguile.la
+NXGUILE=nxguile
+GUILEWRAP=nxguile_wrap.c
 endif
 
-#LIBNXSCHEME=libnxscheme.la
+if HAVE_MZSCHEME
+LIBNXSCHEME=libnxscheme.la
+SCHEMEWRAP=nxscheme_wrap.c
+endif
 
 lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXPYTHON) $(LIBNXSCHEME) $(LIBNXGUILE)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
@@ -71,31 +74,32 @@ endif
 COMMON_SRC=nxinterhelper.c $(NXDATASET)
 
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
-		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) \
+		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) \
 		$(DOC_OUTPUT) $(DOC_SRC)
 
 # python wrapper
 libnxpython_la_SOURCES=nxpython_wrap.c $(COMMON_SRC)
-libnxpython_la_CFLAGS=-I/usr/include/python2.4 $(CFLAGS)
+libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) $(CFLAGS)
 libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
 nxpython_wrap.c: nxinter.i nxdataset.i
 	$(SWIG) -o $@ -python nxinter.i 
 
 # tcl wrapper
+TCLLIB=-L$(TCLROOT)/lib -ltcl
 libnxtcl_la_SOURCES=nxinter_wrap.c $(COMMON_SRC)
-libnxtcl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la -ltcl $(LDFLAGS)
+libnxtcl_la_CFLAGS=-I$(TCLROOT)/include
+libnxtcl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 nxinter_wrap.c: nxinter.i nxdataset.i
 	$(SWIG) -o $@ -tcl8 -ltclsh.i nxinter.i 
 
 # tcl test program
 nxinter_SOURCES=libnxtcl.la
-nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la -ltcl $(LDFLAGS)
+nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 
 # guile wrapper
-GGINC=/usr# /data/lnslib
-GGLIB=-L/data/lnslib/lib -lguile
+GGLIB=-L$(GUILEROOT)/lib -lguile
 libnxguile_la_SOURCES=nxguile_wrap.c $(COMMON_SRC)
-libnxguile_la_CFLAGS=-I$(GGINC)/include/guile \
+libnxguile_la_CFLAGS=-I$(GUILEROOT)/include/guile \
   -DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();"\
   $(CFLAGS)
 libnxguile_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)

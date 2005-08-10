@@ -167,6 +167,12 @@ AC_SUBST(NXEXAMPLEDIR)
 AC_SUBST(NXTESTDIR)
 
 AM_PROG_GCJ
+AM_PATH_PYTHON(,, :)
+
+AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
+AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
+AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[include/python$PYTHON_VERSION/Python.h])
+
 AC_PROG_LIBTOOL
 
 AC_PROG_MAKE_SET
@@ -175,7 +181,6 @@ AC_PROG_RANLIB
 AC_CHECK_PROGS(SWIG,[swig])
 AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
 AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
-AC_CHECK_PROGS(PYTHON,[python])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
@@ -371,7 +376,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
 AM_CONDITIONAL(HAVE_F90, [test ! -z "$F90"])
-AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHON"])
+AM_CONDITIONAL(HAVE_PYTHON, [test "$PYTHON" != :])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLSH"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILE"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
@@ -384,6 +389,8 @@ AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
 AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
 AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT"])
 AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
+#AM_CONDITIONAL(INSTALL_NXPYTHON, [test ! -z "$INSTALL_NXPYTHON"])
+AM_CONDITIONAL(HAVE_MZSCHEME, [test ! -z "$INSTALL_NXPYTHON"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
@@ -413,6 +420,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/swig/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
+		contrib/bindings/Makefile
 		scripts/Makefile
 		scripts/nexus.pc:scripts/nexus_pc.in
 		scripts/nxbuild])
