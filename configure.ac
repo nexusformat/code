@@ -178,7 +178,26 @@ AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-AC_CHECK_PROGS(SWIG,[swig])
+##########
+AC_PATH_PROG(SWIG, swig)
+if test -n "$SWIG"; then
+    AC_MSG_CHECKING([for SWIG >= 1.3])
+    vers=`swig -version 2>&1 | sed -n 's/SWIG Version //p' | awk 'BEGIN { FS = "."; } { printf "%d", ($1 * 1000 + $2) * 10 ;}'`
+    if test -n "$vers" && test "$vers" -ge 10030
+    then
+        HAVE_SWIG="yes"
+        AC_MSG_RESULT([yes])
+    else
+        HAVE_SWIG="no (version < 1.3)"
+        AC_MSG_RESULT([no])
+        AC_MSG_WARN([SWIG version 1.3 or later required to build swig files])
+    fi
+else
+    AC_MSG_WARN([SWIG not found, pre-built interface files will be used])
+    HAVE_SWIG="no"
+fi
+
+#AC_CHECK_PROGS(SWIG,[swig])
 AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
 AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(TCLSH,[tclsh])
@@ -379,7 +398,8 @@ AM_CONDITIONAL(HAVE_F90, [test ! -z "$F90"])
 AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
-AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
+AM_CONDITIONAL(HAVE_SWIG, test "x$HAVE_SWIG" = "xyes")
+#AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
 AM_CONDITIONAL(HAVE_JAVA, [test ! -z "$JAVA"])
 AM_CONDITIONAL(HAVE_JAVAC, [test ! -z "$JAVAC"])
 AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC"])
@@ -433,6 +453,7 @@ XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$F90" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
+#SWIGBINDING=`if test -n "$SWIG" ; then echo yes ; else echo no ; fi`
 if test -z "$javaroot"; then
     javaroot="not specified"
 fi
@@ -454,6 +475,8 @@ build:
                 F77 :          ${F77BINDING} 
                 F90 :          ${F90BINDING} 
                 JAVA:          ${JAVABINDING} (--with-java-home=${javaroot})
+#                SWIG:          ${SWIGBINDING}
+                SWIG:          ${HAVE_SWIG}
 
 Please check whether the configuration I detected matches what you
 would like to have.
