@@ -80,6 +80,9 @@ static void print_help(const string &progname, int level){
 #ifdef HDF5
   cout << " --hdf5        Write file using the hdf5 base." << endl;
 #endif
+#ifdef NXXML
+  cout << " --xml         Write file using the xml base." << endl;
+#endif
   cout << "  -D <macro>   Specify a macro. The macro should be in the form of\n"
        << "               \"FILE=old_nexus.nxs\". The \"=\" is required." << endl;
 }
@@ -138,6 +141,10 @@ int main(int argc, char *argv[]){
 #ifdef HDF5
     }else if(starts_with(arg1,"--hdf5")){
       options.base=NXACC_CREATE5;
+#endif
+#ifdef NXXML
+    }else if(starts_with(arg1,"--xml")){
+      options.base=NXACC_CREATEXML;
 #endif
     }else{
       options.infile=arg1;
