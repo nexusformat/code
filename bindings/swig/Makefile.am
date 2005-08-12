@@ -32,9 +32,11 @@ lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXPYTHON) $(LIBNXSCHEME) $(LIBNXGUILE)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 
 # python wrapper
+if HAVE_SWIG
 PYTHONWRAP=nxpython_wrap.c
 nxpython_wrap.c: nxinter.i nxdataset.i
 	$(SWIG) -o $@ -python nxinter.i 
+endif
 if HAVE_PYTHON
 LIBNXPYTHON=libnxpython.la
 libnxpython_la_SOURCES=nxpython_wrap.c $(COMMON_SRC)
@@ -43,9 +45,11 @@ libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
 endif
 
 # tcl wrapper
+if HAVE_SWIG
 TCLWRAP=nxinter_wrap.c
 nxinter_wrap.c: nxinter.i nxdataset.i
 	$(SWIG) -o $@ -tcl8 -ltclsh.i nxinter.i 
+endif
 if HAVE_TCL
 LIBNXTCL=libnxtcl.la
 NXINTER=nxinter
@@ -58,9 +62,12 @@ nxinter_SOURCES=libnxtcl.la
 nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 endif
 
+# guile wrapper
+if HAVE_SWIG
 GUILEWRAP=nxguile_wrap.c
 nxguile_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -guile -lguilemain.i -Linkage ltdlmod nxinter.i
+	$(SWIG) -o $@ -guile -lguilemain.i $(SWGUILEFLAGS) nxinter.i
+endif
 if HAVE_GUILE
 LIBNXGUILE=libnxguile.la
 NXGUILE=nxguile
@@ -75,9 +82,12 @@ nxguile_SOURCES=libnxguile.la
 nxguile_LDFLAGS=-static libnxguile.la $(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
 endif
 
+# mzscheme wrapper
+if HAVE_SWIG
 SCHEMEWRAP=nxscheme_wrap.c
 nxscheme_wrap.c: nxinter.i nxdataset.i
 	$(SWIG) -o $@ -mzscheme nxinter.i 
+endif
 if HAVE_MZSCHEME
 LIBNXSCHEME=libnxscheme.la
 MZINC=/data/koenneck/opt/plt
