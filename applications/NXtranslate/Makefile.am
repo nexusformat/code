@@ -29,7 +29,7 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 SUBDIRS=IPNS_CPP docs
 
 bin_PROGRAMS = nxtranslate
