@@ -29,7 +29,7 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 SUBDIRS=IPNS_CPP docs
 
 bin_PROGRAMS = nxtranslate
@@ -41,7 +41,8 @@ nxtranslate_SOURCES = \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
 	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh \
-	text_collist/collist_retriever.h text_collist/string_util_ext.h
+	text_collist/collist_retriever.h text_collist/string_util_ext.h \
+	text_xml/retriever.h text_xml/xml_retriever.cpp
 
 nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2 
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
