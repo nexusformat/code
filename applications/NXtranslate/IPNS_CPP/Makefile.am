@@ -29,21 +29,22 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_LITTLE_ENDIAN
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -DIPNS_LITTLE_ENDIAN
 
 noinst_PROGRAMS = testProg testProg2
-lib_LTLIBRARIES = libIPNSRunfile.la
+noinst_LIBRARIES = libIPNSRunfile.a
 
-libIPNSRunfile_la_SOURCES = \
+libIPNSRunfile_a_SOURCES = \
  Header.cpp RandomAccessRunfile.cpp LpsdDetIdMap.cpp DetectorMap.cpp \
  Segment.cpp Runfile.cpp TimeField.cpp DetectorMap.h Header.h \
- LpsdDetIdMap.h RandomAccessRunfile.h Runfile.h Segment.h TimeField.h
+ LpsdDetIdMap.h RandomAccessRunfile.h Runfile.h Segment.h TimeField.h \
+ ipns_retriever.cpp
 
 testProg_SOURCES = testProg.cpp 
-testProg_LDADD = libIPNSRunfile.la $(LIBNEXUS)
+testProg_LDADD = libIPNSRunfile.a $(LIBNEXUS)
 
 testProg2_SOURCES = testProg2.cpp
-testProg2_LDADD = libIPNSRunfile.la $(LIBNEXUS)
+testProg2_LDADD = libIPNSRunfile.a $(LIBNEXUS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 
