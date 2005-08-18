@@ -80,7 +80,7 @@ int RandomAccessRunfile::readRunInt() {
   }
   else { 
     int length = 4;
-    uint zero = 0;
+    unsigned int zero = 0;
     unsigned char b[4] = {0, 0, 0, 0};
     unsigned int c[4] = {0, 0, 0, 0};
 
@@ -145,7 +145,7 @@ int RandomAccessRunfile::readRunUnsignedInt() {
   }
   else { 
     int length = 4;
-    uint zero = 0;
+    unsigned int zero = 0;
     unsigned char b[4] = {0, 0, 0, 0};
     unsigned int c[4] = {0, 0, 0, 0};
 

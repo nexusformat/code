@@ -18,15 +18,15 @@ namespace string_util{
   extern std::vector<std::string> string_to_path(const std::string &);
   extern std::string int_to_str(const int);
   extern std::vector<int> str_to_intVec(std::string &);
-  extern void str_to_ucharArray(std::string &,unsigned char *, const uint);
-  extern void str_to_shortArray(std::string &,short *, const uint);
-  extern void str_to_intArray(std::string &,int *, const uint);
-  extern void str_to_longArray(std::string &,long *, const uint);
-  extern void str_to_ushortArray(std::string &,ushort *, const uint);
-  extern void str_to_uintArray(std::string &,uint *, const uint);
-  extern void str_to_ulongArray(std::string &,unsigned long *, const uint);
-  extern void str_to_floatArray(std::string &,float *, const uint);
-  extern void str_to_doubleArray(std::string &,double *, const uint);
+  extern void str_to_ucharArray(std::string &,unsigned char *, const unsigned int);
+  extern void str_to_shortArray(std::string &,short *, const unsigned int);
+  extern void str_to_intArray(std::string &,int *, const unsigned int);
+  extern void str_to_longArray(std::string &,long *, const unsigned int);
+  extern void str_to_ushortArray(std::string &,unsigned short *, const unsigned int);
+  extern void str_to_uintArray(std::string &,unsigned int *, const unsigned int);
+  extern void str_to_ulongArray(std::string &,unsigned long *, const unsigned int);
+  extern void str_to_floatArray(std::string &,float *, const unsigned int);
+  extern void str_to_doubleArray(std::string &,double *, const unsigned int);
   extern std::vector<int> int_list_str_to_intVect(std::string &);
   extern std::string intVec_to_str(const std::vector<int> &);
 /*

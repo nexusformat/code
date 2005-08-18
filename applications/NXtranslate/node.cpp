@@ -297,10 +297,10 @@ const void Node::update_dims(std::vector<int> &dims){
 
   // compare sizes
   int old_total_size=1;
-  for( uint i=0 ; i<__dims.size() ; i++ )
+  for( unsigned int i=0 ; i<__dims.size() ; i++ )
     old_total_size*=__dims[i];
   int new_total_size=1;
-  for( uint i=0 ; i<dims.size() ; i++ )
+  for( unsigned int i=0 ; i<dims.size() ; i++ )
     new_total_size*=dims[i];
 
   // throw an exception if the total number of elements is not conserved

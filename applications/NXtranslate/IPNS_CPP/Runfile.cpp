@@ -663,7 +663,7 @@ void Runfile::LoadV4(ifstream *inFile) {
     for ( int jj = 0; jj < lpsdIDMap->NumOfBanks(); jj++ ) {
       lpsdIDMap->DetsInBank(jj, dets);
       int tminID, tcrate, tslot, tinput;
-      for ( uint kk = 0; kk < sizeof(dets)/4;
+      for ( unsigned int kk = 0; kk < sizeof(dets)/4;
 	    kk++ ) {
 	detNum++;
 	tminID = lpsdIDMap->MinIdForDet(jj,dets[kk]);
@@ -747,7 +747,7 @@ void Runfile::LoadV4(ifstream *inFile) {
   subgroupMap[0].resize(1);
   segmentMap.resize(1);
   segmentMap[0].resize(1);
-  for (i=0; (static_cast<uint>(i)) < subgroupIDList.size(); i++ )
+  for (i=0; (static_cast<unsigned int>(i)) < subgroupIDList.size(); i++ )
     subgroupIDList[i] = -1;
   int group = 0;
   maxSubgroupID.resize( header->NumOfHistograms() + 1 );
@@ -1154,7 +1154,7 @@ void Runfile::LoadV5(ifstream *inFile) {
   segmentMap.resize(maxSubgroupID[header->NumOfHistograms()]+ 1);
   vector<int> id_count(maxSubgroupID[header->NumOfHistograms()]+1);
   
-  for ( uint id = 0; id < id_count.size(); id++ )
+  for ( unsigned int id = 0; id < id_count.size(); id++ )
     id_count[id] = 0;                   // zero out all of the counters
   
   // step across the IDMap once
@@ -1175,7 +1175,7 @@ void Runfile::LoadV5(ifstream *inFile) {
   // set up a list of next free index
   // for each id and start index at 0
   vector<int> next_index( id_count.size() );
-  for ( uint id = 0; id < next_index.size(); id++ )
+  for ( unsigned int id = 0; id < next_index.size(); id++ )
     next_index[id] = 0;
   // step across the array once more
   // adding the group_id and segment

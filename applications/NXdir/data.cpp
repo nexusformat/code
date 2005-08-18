@@ -186,9 +186,9 @@ extern long read_int_attr(NXhandle handle, const Path &path){
   else if(attr_type==NX_INT32)
     result=((long *)data)[0];
   else if(attr_type==NX_UINT8)
-    result=((ushort *)data)[0];
+    result=((unsigned short *)data)[0];
   else if(attr_type==NX_UINT16)
-    result=((uint *)data)[0];
+    result=((unsigned int *)data)[0];
   else if(attr_type==NX_UINT32)
     result=((unsigned long *)data)[0];
 

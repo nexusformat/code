@@ -255,7 +255,7 @@ static StrVec shrink_and_split(string &str){
   return string_util::split(str);
 }
 
-extern void string_util::str_to_shortArray(std::string & str,short *array, const uint len){
+extern void string_util::str_to_shortArray(std::string & str,short *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -264,11 +264,11 @@ extern void string_util::str_to_shortArray(std::string & str,short *array, const
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(short)str_to_int(*(strIt+i));
 }
 
-extern void string_util::str_to_intArray(std::string & str,int *array, const uint len){
+extern void string_util::str_to_intArray(std::string & str,int *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -277,7 +277,7 @@ extern void string_util::str_to_intArray(std::string & str,int *array, const uin
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(int)str_to_int(*(strIt+i));
 }
 
@@ -294,7 +294,7 @@ extern vector<int> string_util::str_to_intVec(string &str){
   return result;
 }
 
-extern void string_util::str_to_longArray(std::string & str,long *array, const uint len){
+extern void string_util::str_to_longArray(std::string & str,long *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -303,11 +303,11 @@ extern void string_util::str_to_longArray(std::string & str,long *array, const u
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(long)str_to_int(*(strIt+i));
 }
 
-extern void string_util::str_to_ushortArray(std::string & str,ushort *array, const uint len){
+extern void string_util::str_to_ushortArray(std::string & str,unsigned short *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -316,11 +316,11 @@ extern void string_util::str_to_ushortArray(std::string & str,ushort *array, con
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
-    *(array+i)=(ushort)str_to_uint(*(strIt+i));
+  for( unsigned int i=0 ; i<len ; i++ )
+    *(array+i)=(unsigned short)str_to_uint(*(strIt+i));
 }
 
-extern void string_util::str_to_uintArray(std::string & str,uint *array, const uint len){
+extern void string_util::str_to_uintArray(std::string & str,unsigned int *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -329,11 +329,11 @@ extern void string_util::str_to_uintArray(std::string & str,uint *array, const u
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
-    *(array+i)=(uint)str_to_uint(*(strIt+i));
+  for( unsigned int i=0 ; i<len ; i++ )
+    *(array+i)=(unsigned int)str_to_uint(*(strIt+i));
 }
 
-extern void string_util::str_to_ulongArray(std::string & str,unsigned long *array, const uint len){
+extern void string_util::str_to_ulongArray(std::string & str,unsigned long *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -342,11 +342,11 @@ extern void string_util::str_to_ulongArray(std::string & str,unsigned long *arra
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(unsigned long)str_to_uint(*(strIt+i));
 }
 
-extern void string_util::str_to_floatArray(std::string & str,float *array, const uint len){
+extern void string_util::str_to_floatArray(std::string & str,float *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -355,11 +355,11 @@ extern void string_util::str_to_floatArray(std::string & str,float *array, const
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(float)str_to_float(*(strIt+i));
 }
 
-extern void string_util::str_to_doubleArray(std::string & str,double *array, const uint len){
+extern void string_util::str_to_doubleArray(std::string & str,double *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -368,11 +368,11 @@ extern void string_util::str_to_doubleArray(std::string & str,double *array, con
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(double)str_to_float(*(strIt+i));
 }
 
-extern void string_util::str_to_ucharArray(std::string &str,unsigned char *array, const uint len){
+extern void string_util::str_to_ucharArray(std::string &str,unsigned char *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
 
@@ -381,7 +381,7 @@ extern void string_util::str_to_ucharArray(std::string &str,unsigned char *array
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
-  for( uint i=0 ; i<len ; i++ )
+  for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(unsigned char)str_to_int(*(strIt+i));
 }
 

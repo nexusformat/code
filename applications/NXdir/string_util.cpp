@@ -329,9 +329,9 @@ extern string voidptr_to_str(const void *data, int pos,int type){
   else if(type==NX_UINT8)
     return int_to_str(((unsigned char *)data)[pos]);
   else if(type==NX_UINT16)
-    return int_to_str(    ((ushort *)data)[pos]);
+    return int_to_str(    ((unsigned short *)data)[pos]);
   else if(type==NX_UINT32)
-    return int_to_str(   ((uint *)data)[pos]);
+    return int_to_str(   ((unsigned int *)data)[pos]);
   else
     throw "Do not understand type in voidptr_to_str";
 }
@@ -405,9 +405,9 @@ static string twoD_to_string(const void *data, const int dims[], int type, Print
     else if(type==NX_UINT8)
       result+=oneD_to_string((unsigned char *)data+offset,row_len,type,config);
     else if(type==NX_UINT16)
-      result+=oneD_to_string((ushort *)data+offset,row_len,type,config);
+      result+=oneD_to_string((unsigned short *)data+offset,row_len,type,config);
     else if(type==NX_UINT32)
-      result+=oneD_to_string((uint *)data+offset,row_len,type,config);
+      result+=oneD_to_string((unsigned int *)data+offset,row_len,type,config);
     else
       throw "Do not understand type in twoD_to_string";
     if(i+1<col_len)
@@ -436,9 +436,9 @@ static string twoD_to_string(const void *data, const int dims[], int type, Print
     else if(type==NX_UINT8)
       result+=oneD_to_string((unsigned char *)data+offset,row_len,type,config);
     else if(type==NX_UINT16)
-      result+=oneD_to_string((ushort *)data+offset,row_len,type,config);
+      result+=oneD_to_string((unsigned short *)data+offset,row_len,type,config);
     else if(type==NX_UINT32)
-      result+=oneD_to_string((uint *)data+offset,row_len,type,config);
+      result+=oneD_to_string((unsigned int *)data+offset,row_len,type,config);
     else
       throw "Do not understand type in twoD_to_string";
   }

@@ -40,7 +40,7 @@ typedef NodeVector* NodeVectorP;
 typedef Ptr<Retriever> RetrieverPtr;
 
 static const int    GROUP_STRING_LEN  = 128;
-static const uint   MAX_NODE_DEPTH    = 20;
+static const unsigned int   MAX_NODE_DEPTH    = 20;
 static const string DEFAULT_MIME_TYPE = "NeXus";
 static const string MIME_TYPE         = "NXS:mime_type";
 static const string SOURCE            = "NXS:source";
@@ -160,7 +160,7 @@ static string xmlChar_to_str(const xmlChar *ch, int len){
 #endif
 
   string result((char *)ch);
-  if( (len>0) && ((uint)len<result.size()) )
+  if( (len>0) && ((unsigned int)len<result.size()) )
     result.erase(result.begin()+len,result.end());
 
   return trim(result);
