@@ -417,6 +417,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXdir/Makefile
 		applications/NXtranslate/Makefile
 		applications/NXtranslate/IPNS_CPP/Makefile
+		applications/NXtranslate/text_plain/Makefile
 		applications/NXtranslate/docs/Makefile
 		examples/Makefile
 		doc/Makefile
