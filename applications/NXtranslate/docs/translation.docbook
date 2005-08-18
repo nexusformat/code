@@ -444,12 +444,137 @@ mention, the path separator is a forward slash, "/".
 
 <sect2 id="text_plain"><title>Simple ASCII</title>
 
-<para>The &mime_type for the simple ASCII retirever is
+<para>The &mime_type for the simple ASCII retriever is
 <parameter>text/plain</parameter>. The functionality of the simple
 ASCII retriever is limited. This is to emphasize the methodology for
 building retrievers, rather than build a general purpose one. All of
 the location strings are integers defining the line number to use. The
 first line of the file is zero.</para>
+
+</sect2>
+
+<sect2 id="text_xml"><title>XML retriever</title>
+
+<para>The &mime_type for the XML retriever is
+<parameter>text/xml</parameter>. The XML retriever is built on top of
+libxml2's document object model (DOM) parser. Because of this the
+entire file for information to be retrived from is loaded into memory
+as a character arrays. The DOM API was chosen to allow for jumping
+around the source file without needed to parse its contents multiple
+times. The location string will be formatted according to the
+following rules:
+
+<itemizedlist>
+
+<listitem><para>The location string for a field will look like a
+(unix) path. Each level of the hierarchy is separated by a forward
+slash, "/".</para></listitem>
+
+<listitem><para>To specify the type the value is preceeded using a
+name separated using a colon, ":". The allowed names are
+"INT8,INT16,INT32,UINT8,UINT16,UINT32,FLOAT32,FLOAT64". If no name is
+specified it is (implicitly) a string. Therefore to get "the_answer"
+as a double precision float the location is
+"FLOAT64:/numbers/the_answer".</para></listitem>
+
+<listitem><para>In the case where the field has a "type" attribute
+with the value being one of the types above that will be used rather
+than as a character array. Specifying the type in the location will
+override what is in the source file.</para></listitem>
+
+<listitem><para>Arrays can be specified as part of the type as either
+an attribute in the XML file or in the location string. To get a six
+element integer array use the location "/numbers/array" which points to a whitespace delimited list. Multiple dimensions are specified by using a comma
+delimited list in the square brackets
+(i.e. "INT16[3,2]:/numbers/array")</para></listitem>
+
+<listitem><para>To get an attribute specify it at the end of a path
+separated by a hash symbol, "#". Therefore to get attr2 as a single
+precision float the location is
+"FLOAT32:/numbers#attr2".</para></listitem>
+
+</itemizedlist>
+
+This methodolgy does not allow for automatically detecting the type of
+an imported attribute (it will be read as a string), or
+differentiating two fields at the same level with the same tag
+name.</para>
+
+<!--
+<example><title>announcement email</title>
+<programlisting role="XML">
+<![CDATA[Everybody,
+
+Rob and I talked some more about this via phone and made some
+decisions. Please object as necessary so the correct thing is
+implemented. Since it was deciding what "special features" the xml
+file could have I will just relist the entire feature set of the
+retriever (now with numbers).
+
+First a new example file:
+
+<numbers attr1="hi">
+  <the_answer attr3="hello" type="INT16">42</the_answer>
+  <the_better_answer attr3="hello">43</the_better_answer>
+  <gravity>9.81</gravity>
+  <gravity>32</gravity>
+  <array type="INT16[5]">0,1,2,3,4</array>
+</numbers>
+<best_units attr2="3.14">
+  furlongs/fortnight
+</best_units>
+
+The (revised methodology)
+
+  (1) XML files will be read using the Document Object Model (DOM)
+  parser provided by libxml2 (libxml2's SAX parser is used by
+  NXtranslate for the translation file). The DOM parser is preferred
+  since the user will (in principle) jump around the file at random to
+  get different bits of information.
+
+  (2) The location string for a field will look like a (unix) path. To
+  get the string "43" with the string attribute "hello" the location
+  is "/numbers/the_better_answer".
+
+  (3) To specify the type the value is preceeded using a name
+  separated using a colon, ":". The allowed names are
+  "INT8,INT16,INT32,UINT8,UINT16,UINT32,FLOAT32,FLOAT64". If no name
+  is specified it is (implicitly) a character array. Therefore to get
+  "the_answer" as a double precision float the location is
+  "FLOAT64:/numbers/the_answer".
+
+  (4) In the case where the field has a "type" attribute with the
+  value being one of the types in (3) that will be used rather than as
+  a character array. Specifying the type in the location will override
+  this.
+
+  (5) Arrays can be specified as part of the type as either an
+  attribute in the XML file or in the location string. To get a five
+  element integer array from the example use the location
+  "/numbers/array". Multiple dimensions are specified by using a comma
+  delimited list in the square brackets (i.e. "INT16[3,2]")
+
+  (6) To get an attribute specify it at the end of a path separated by
+  a hash symbol, "#". Therefore to get "3.14" as a single precision
+  float the location is "FLOAT32:/best_units#attr2".
+
+Problems with this:
+
+  (1) I have no way of figuring out how to get "9.81" rather than
+  "32". The problem is that with a DOM parser the order is not
+  guaranteed to be preserved. Does anyone have a good suggestion of
+  how to do this? Or are we all comfortable saying that the retriever
+  only deals with unique paths? This means that the rest of the
+  information is available, but "number/gravity" will give an
+  undertermined result.
+
+  (2) I don't have a way to define the type for attributes that come
+  automatically (hello in the first example).
+
+P^2]]>
+</programlisting>
+</example>
+-->
 
 </sect2>
 
