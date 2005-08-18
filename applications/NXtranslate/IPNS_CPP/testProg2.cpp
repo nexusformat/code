@@ -3,6 +3,10 @@
 #include <string.h>
 
 main(int argc, char *argv[]) {
+  if(argc<=1){
+    cout << "Usage: testProg <runfile>\n";
+    return 0;
+  }
   cout << "Input file is " << argv[1] << "\n";
   Runfile runFile(argv[1]);
 
