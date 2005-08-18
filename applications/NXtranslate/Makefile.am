@@ -30,23 +30,23 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
-SUBDIRS=IPNS_CPP docs
+SUBDIRS=IPNS_CPP text_collist text_plain text_xml docs
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
-	text_collist/collist_retriever.cpp text_collist/string_util_ext.cpp \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
-	tree.hh \
-	text_collist/collist_retriever.h text_collist/string_util_ext.h \
-	text_xml/retriever.h text_xml/xml_retriever.cpp
+	tree.hh 
 EXTRA_nxtranslate_SOURCES=IPNS_CPP/retriever.h \
-	text_plain/retriever.h
+	text_collist/collist_retriever.h \
+	text_plain/retriever.h \
+	text_xml/retriever.h
 
 nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
-	IPNS_CPP/libIPNSRunfile.la text_plain/libTextPlain.la
+	IPNS_CPP/libIPNSRunfile.la text_collist/libTextCollist.la \
+	text_plain/libTextPlain.la text_xml/libTextXML.la
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
