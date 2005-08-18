@@ -94,31 +94,6 @@ static void map_string(map<string,string> &map,string &key){
     key=it->second;
 }
 
-/*
- * Remove leading and trailing whitespace from a string
- */
-static string trim(const string &s){
-  typedef string::size_type string_size;
-  string_size start=0;
-  string_size end=s.size();
-
-  for( ; start<end ; start++ ){
-    if(!isspace(s[start])) break;
-  }
-
-  end--;
-  for( ; start<=end ; end-- ){
-    if(!isspace(s[end])) break;
-  }
-
-  if(end<start)
-    return "";
-  else if(start==0 && end+1==s.size())
-    return s;
-  else
-    return s.substr(start,end+1);
-}
-
 static bool is_left(char c){
   static const string LEFT="[";
   return find(LEFT.begin(),LEFT.end(),c)!=LEFT.end();
@@ -163,7 +138,7 @@ static string xmlChar_to_str(const xmlChar *ch, int len){
   if( (len>0) && ((unsigned int)len<result.size()) )
     result.erase(result.begin()+len,result.end());
 
-  return trim(result);
+  return string_util::trim(result);
 }
 
 static vector<string> xmlattr_to_strvec(const xmlChar* char_array[]){
