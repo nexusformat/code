@@ -45,8 +45,8 @@ nxtranslate_SOURCES = \
 	text_xml/retriever.h text_xml/xml_retriever.cpp
 EXTRA_nxtranslate_SOURCES=IPNS_CPP/retriever.h
 
-nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.a $(LIBNEXUS) -lxml2 
-nxtranslate_LDFLAGS = -static $(LDFLAGS) -LIPNS_CPP 
+nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2 
+nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 
