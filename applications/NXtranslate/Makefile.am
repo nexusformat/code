@@ -36,16 +36,17 @@ bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
-	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp \
+	text_plain/text_retriever.cpp \
 	text_collist/collist_retriever.cpp text_collist/string_util_ext.cpp \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
-	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh \
+	text_plain/retriever.h tree.hh \
 	text_collist/collist_retriever.h text_collist/string_util_ext.h \
 	text_xml/retriever.h text_xml/xml_retriever.cpp
+EXTRA_nxtranslate_SOURCES=IPNS_CPP/retriever.h
 
-nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2 
-nxtranslate_LDFLAGS = -static $(LDFLAGS)
+nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.a $(LIBNEXUS) -lxml2 
+nxtranslate_LDFLAGS = -static $(LDFLAGS) -LIPNS_CPP 
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 
