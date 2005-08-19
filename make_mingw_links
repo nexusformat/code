@@ -5,7 +5,7 @@
 # Create links needed by MinGW to various libraries that exist on
 # the windows file system
 #
-for i in /usr/local /usr/local/bin /usr/local/lib \
+for i in /usr/local /usr/local/include /usr/local/bin /usr/local/lib \
          /usr/local/hdf4 /usr/local/hdf4/lib \
          /usr/local/hdf5 /usr/local/hdf5/lib ; do
     [ -d $i ] || mkdir $i
