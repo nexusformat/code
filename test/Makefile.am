@@ -51,7 +51,8 @@ F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 F90_TARGETS = NXtest
 
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
-			NXtest.f90 napif_test.f README.tests
+			NXtest.f90 napif_test.f README.tests \
+			napi_test.c napif4_test.f napif5_test.f
 
 TESTSUITE	= $(srcdir)/testsuite
 
@@ -70,7 +71,7 @@ nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
 
 nxconvert:
 	rm -f $@
-	ln -s ../applications/$@ .
+	ln -s ../applications/$@$(EXEEXT) $@
 
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
@@ -171,7 +172,7 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 
 check-local:	atconfig atlocal $(TESTSUITE) 
 	rm -f nxconvert
-	ln -s ../applications/nxconvert .
+	ln -s ../applications/nxconvert$(EXEEXT) nxconvert
 	$(SHELL) $(TESTSUITE)
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
@@ -185,4 +186,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig
+DISTCLEANFILES = atconfig nxconvert

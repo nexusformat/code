@@ -27,7 +27,7 @@ dnl AT_TESTED(NXtest.f90)
 AT_BANNER([[Testing the NeXus C library.]])
 
 AT_SETUP([Check the HDF4 binding])
-AT_CHECK([napi_test-hdf4], [], 
+AT_CHECK([ $HAVE_HDF4 && napi_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
    file_name = NXtest.hdf
@@ -61,7 +61,7 @@ NXopenpath checks OK
 AT_CLEANUP
 
 AT_SETUP([Check the HDF5 binding])
-AT_CHECK([napi_test-hdf5], [], 
+AT_CHECK([ $HAVE_HDF5 && napi_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
    file_name = NXtest.h5
@@ -95,7 +95,7 @@ NXopenpath checks OK
 AT_CLEANUP
 
 AT_SETUP([Check the HDF4 binding (static library)])
-AT_CHECK([napi_test-hdf4-static], [], 
+AT_CHECK([ $HAVE_HDF4 && napi_test-hdf4-static | sed -e 's/\r$//' ], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
    file_name = NXtest.hdf
@@ -129,7 +129,7 @@ NXopenpath checks OK
 AT_CLEANUP
 
 AT_SETUP([Check the HDF5 binding (static library)])
-AT_CHECK([napi_test-hdf5-static], [], 
+AT_CHECK([ $HAVE_HDF5 && napi_test-hdf5-static | sed -e 's/\r$//' ], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
    file_name = NXtest.h5
@@ -163,7 +163,7 @@ NXopenpath checks OK
 AT_CLEANUP
 
 AT_SETUP([Check the XML binding])
-AT_CHECK([napi_test-xml], [], 
+AT_CHECK([ $HAVE_XML && napi_test-xml | sed -e 's/\r$//' ], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
    file_name = NXtest.xml
@@ -197,7 +197,7 @@ NXopenpath checks OK
 AT_CLEANUP
 
 AT_SETUP([Check the XML binding (static library)])
-AT_CHECK([napi_test-xml-static], [], 
+AT_CHECK([ $HAVE_XML && napi_test-xml-static | sed -e 's/\r$//' ], [], 
 [[Number of global attributes: 4
    NeXus_version = 3.0.0
    file_name = NXtest.xml
@@ -230,10 +230,10 @@ NXopenpath checks OK
 ]])
 AT_CLEANUP
 
-AT_BANNER([Check the FORTRAN binding.])
+AT_BANNER([Check the FORTRAN 77 binding.])
 
 AT_SETUP([Check the F77 binding using HDF4.])
-AT_CHECK([napif_test-hdf4], [], 
+AT_CHECK([ $HAVE_F77 && $HAVE_HDF4 && napif_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[ Number of global attributes:  4
     NeXus_version = 3.0.0
     file_name = NXtest.nxs
@@ -269,7 +269,7 @@ AT_CHECK([napif_test-hdf4], [],
 AT_CLEANUP
 
 AT_SETUP([Check the F77 binding using HDF5.])
-AT_CHECK([napif_test-hdf5], [], 
+AT_CHECK([ $HAVE_F77 && $HAVE_HDF5 && napif_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[ Number of global attributes:  4
     NeXus_version = 3.0.0
     file_name = NXtest.nxs
@@ -304,8 +304,8 @@ AT_CHECK([napif_test-hdf5], [],
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the F90 binding.])
-AT_CHECK([NXtest], [], 
+AT_SETUP([Check the F90 binding using HDF5 .])
+AT_CHECK([ $HAVE_F90 && $HAVE_HDF5 && NXtest | sed -e 's/\r$//' ], [], 
 [[ Writing character data
  Number of global attributes:  4
     NeXus_version = 3.0.0
@@ -343,55 +343,55 @@ AT_CLEANUP
 
 AT_BANNER([[Testing the NeXus File Converter.]])
 AT_SETUP([Checking HDF4 -> HDF4 ])
-AT_CHECK([$HAVE_HDF4 && nxconvert -h4 NXtest.hdf a.a],[], 
+AT_CHECK([$HAVE_HDF4 && nxconvert -h4 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to HDF4 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF4 -> HDF5 ])
-AT_CHECK([$HAVE_HDF4 && $HAVE_HDF5 && nxconvert -h5 NXtest.hdf a.a],[], 
+AT_CHECK([$HAVE_HDF4 && $HAVE_HDF5 && nxconvert -h5 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to HDF5 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF4 -> XML ])
-AT_CHECK([$HAVE_HDF4 && $HAVE_XML && nxconvert -x NXtest.hdf a.a],[], 
+AT_CHECK([$HAVE_HDF4 && $HAVE_XML && nxconvert -x NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to XML NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 -> HDF4 ])
-AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert -h4 NXtest.h5 a.a],[], 
+AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert -h4 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to HDF4 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 -> HDF5 ])
-AT_CHECK([$HAVE_HDF5 && nxconvert -h5 NXtest.h5 a.a],[], 
+AT_CHECK([$HAVE_HDF5 && nxconvert -h5 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to HDF5 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 -> XML ])
-AT_CHECK([$HAVE_HDF5 && $HAVE_XML && nxconvert -x NXtest.h5 a.a],[], 
+AT_CHECK([$HAVE_HDF5 && $HAVE_XML && nxconvert -x NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to XML NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML -> HDF4 ])
-AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert -h4 NXtest.xml a.a],[], 
+AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert -h4 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to HDF4 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML -> HDF5 ])
-AT_CHECK([$HAVE_XML && $HAVE_HDF5 && nxconvert -h5 NXtest.xml a.a],[], 
+AT_CHECK([$HAVE_XML && $HAVE_HDF5 && nxconvert -h5 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to HDF5 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML -> XML ])
-AT_CHECK([$HAVE_XML && nxconvert -x NXtest.xml a.a],[], 
+AT_CHECK([$HAVE_XML && nxconvert -x NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to XML NeXus file a.a
 Convertion successful.
 ]])
