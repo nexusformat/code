@@ -39,7 +39,7 @@ nxtranslate_SOURCES = \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
 	tree.hh 
-EXTRA_nxtranslate_SOURCES=IPNS_CPP/retriever.h \
+EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
 	text_collist/collist_retriever.h \
 	text_plain/retriever.h \
 	text_xml/retriever.h
