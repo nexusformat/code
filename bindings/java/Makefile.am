@@ -34,6 +34,7 @@ libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
                        native/handle.c \
                        native/NexusFile.c
 libjnexus_la_LIBADD 	= $(top_builddir)/src/libNeXus.la
+libjnexus_la_LDFLAGS 	= @SHARED_LDFLAGS@ $(LDFLAGS)
 libjnexus_la_CFLAGS 	= -I$(top_srcdir)/include -Inative @JAVAINCLUDE@ \
      			@HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
 
