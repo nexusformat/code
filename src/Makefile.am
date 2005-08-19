@@ -45,10 +45,23 @@ endif
 ##  It will be filled during the configuration run
 
 lib_LTLIBRARIES = libNeXus.la
+
+# Windows import library for DLL
+
+if MINGW_MSYS
+msimplibdir = ${libdir}
+msimplib_DATA = libNeXus.dll.lib libNeXus.dll.exp libNeXus.def
+libNeXus.def: libNeXus.la
+	pexports .libs/libNeXus-0.dll > libNeXus.def
+libNeXus.dll.exp: libNeXus.dll.lib
+libNeXus.dll.lib: libNeXus.def
+	LIB /MACHINE:I386 /DEF:libNeXus.def /OUT:libNeXus.dll.lib
+endif
+
 #SUBDIRS=nxdict
 
 libNeXus_la_SOURCES = napi.c napiu.c $(H4SRC) $(H5SRC) $(XMLSRC)
-libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@
+libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 ## The following part is the solution for automake >= 1.7
 ## 
@@ -64,5 +77,6 @@ libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAG
 ## endif
 
 EXTRA_DIST=nxio.h nxdataset.h
+CLEANFILES=libNeXus.def libNeXus.dll.lib libNeXus.dll.exp
 
 include $(top_srcdir)/build_rules.am

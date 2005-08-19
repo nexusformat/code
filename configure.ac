@@ -210,6 +210,7 @@ AC_SUBST(LTF90LINKTAG)
 dnl
 dnl First any host specific bits
 dnl
+MINGW_MSYS=no
 case $host in
     alpha*-dec-osf*)
 	java_host="alpha"
@@ -220,6 +221,11 @@ case $host in
 	    CPPFLAGS="$CPPFLAGS -pthread -D__USE_STD_IOSTREAM"
 	    CXXFLAGS="$CXXFLAGS -std gnu"
 	fi
+	;;
+
+    *mingw*)
+	SHARED_LDFLAGS="-no-undefined"
+	MINGW_MSYS=yes
 	;;
 
     *darwin*)
@@ -284,7 +290,7 @@ HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
     for i in $HDF4SEARCH; do
-	if test -z "$H4ROOT" -a -r ${i}/lib/libdf.a; then H4ROOT=$i; fi
+	if test -z "$H4ROOT" -a -r ${i}/lib/libdf.*; then H4ROOT=$i; fi
     done
     if test -z "$H4ROOT"; then 
 	AC_MSG_RESULT(unknown)
@@ -296,7 +302,7 @@ if test "$H4ROOT"; then
     H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
     case $H4VERSION in
 	4.[[12]]*) 
-    		HDF4_LDFLAGS="-lmfhdf -ldf -ljpeg";
+    		HDF4_LDFLAGS="-lmfhdf -ldf";
 		LDFLAGS="-L$H4ROOT/lib $LDFLAGS"
     		HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4" ;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
@@ -311,7 +317,7 @@ HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
     for i in $HDF5SEARCH; do
-	if test -z "$H5ROOT" -a -r ${i}/lib/libhdf5.a; then H5ROOT=$i; fi
+	if test -z "$H5ROOT" -a -r ${i}/lib/libhdf5.*; then H5ROOT=$i; fi
     done
     if test -z "$H5ROOT"; then 
 	AC_MSG_RESULT(unknown)
@@ -323,7 +329,7 @@ if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
 	1.[[6]]*)
-    		HDF5_LDFLAGS="-lhdf5 -lz -lm"
+    		HDF5_LDFLAGS="-lhdf5 -lz"
 		LDFLAGS="-L$H5ROOT/lib $LDFLAGS"
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
@@ -359,6 +365,12 @@ AC_SUBST(LIBG2C)
 dnl finally set LIBS variable if we 
 #AC_CHECK_LIB(g2c,c_sqrt,LIBG2C="-lg2c",LIBG2C="")
 AC_CHECK_LIB(SystemStubs, fprintf$LDBLStub)
+case $host in
+    *mingw*)
+	;;
+    *)
+	AC_CHECK_LIB(m, log)
+esac
 AC_CHECK_LIB(rpc, xdr_float)
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
@@ -401,6 +413,7 @@ AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT"])
 AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
 #AM_CONDITIONAL(INSTALL_NXPYTHON, [test ! -z "$INSTALL_NXPYTHON"])
 AM_CONDITIONAL(HAVE_MZSCHEME, [test ! -z "$INSTALL_NXPYTHON"])
+AM_CONDITIONAL(MINGW_MSYS, [test x$MINGW_MSYS = xyes])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
