@@ -211,6 +211,7 @@ dnl
 dnl First any host specific bits
 dnl
 MINGW_MSYS=no
+HDF_EXT=a # library file extent to look for with HDF libraries
 case $host in
     alpha*-dec-osf*)
 	java_host="alpha"
@@ -226,6 +227,7 @@ case $host in
     *mingw*)
 	SHARED_LDFLAGS="-no-undefined"
 	MINGW_MSYS=yes
+	HDF_EXT=dll
 	;;
 
     *darwin*)
@@ -290,7 +292,7 @@ HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
     for i in $HDF4SEARCH; do
-	if test -z "$H4ROOT" -a -r ${i}/lib/libdf.*; then H4ROOT=$i; fi
+	if test -z "$H4ROOT" -a -r ${i}/lib/libdf.$HDF_EXT; then H4ROOT=$i; fi
     done
     if test -z "$H4ROOT"; then 
 	AC_MSG_RESULT(unknown)
@@ -317,7 +319,7 @@ HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
     for i in $HDF5SEARCH; do
-	if test -z "$H5ROOT" -a -r ${i}/lib/libhdf5.*; then H5ROOT=$i; fi
+	if test -z "$H5ROOT" -a -r ${i}/lib/libhdf5.$HDF_EXT; then H5ROOT=$i; fi
     done
     if test -z "$H5ROOT"; then 
 	AC_MSG_RESULT(unknown)
