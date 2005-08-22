@@ -20,6 +20,8 @@ using std::endl;
 using std::vector;
 using string_util::starts_with;
 
+typedef vector<string> StringVec;
+
 static string get_type(const string &location){
   static const string CHAR("CHAR");
   if(starts_with(location,CHAR))
@@ -60,6 +62,14 @@ static string get_type(const string &location){
   throw invalid_argument("Cannot determine type in location: "+location);
 }
 
+static string xmlChar_to_str(const xmlChar *ch, int len){
+  string result((char *)ch);
+  if( (len>0) && ((unsigned int)len<result.size()) )
+    result.erase(result.begin()+len,result.end());
+
+  return string_util::trim(result);
+}
+
 static bool is_right_square_bracket(const char c){
   static const string RIGHT="]";
   return find(RIGHT.begin(),RIGHT.end(),c)!=RIGHT.end();
@@ -85,16 +95,49 @@ static string get_dims(const string &location){
     return result;
 }
 
+static xmlNode* find_element(xmlNode *a_node, const string &name){
+  xmlNode *cur_node=NULL;
+
+  string nodeName;
+  for( cur_node=a_node ; cur_node!=NULL ; cur_node=cur_node->next ){
+    nodeName=xmlChar_to_str(cur_node->name,-1);
+    if(nodeName==name)
+      return cur_node->xmlChildrenNode;
+  }
+  return NULL;
+}
+
 static void print_element_names(xmlNode * a_node){
     xmlNode *cur_node = NULL;
 
-    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
-        if (cur_node->type == XML_ELEMENT_NODE) {
-            printf("node type: Element, name: %s\n", cur_node->name);
+    for( cur_node=a_node ; cur_node!=NULL ; cur_node=cur_node->next ){
+        if(cur_node->type == XML_ELEMENT_NODE){
+          cout << "node type: Element, name: " << cur_node->name << endl;
         }
         
         //print_element_names(cur_node->children);
     }
+}
+
+static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::iterator end){
+  // error check input
+  if(begin==end)
+    return NULL;
+  
+  // locate the next part of the path
+  node=find_element(node,*begin);
+
+  // if it returned poorly then get out now
+  if(node==NULL)
+    return NULL;
+
+  // go to next step
+  begin++;
+  if(begin==end)
+    return node;
+
+  // recursively call self
+  return open_path(node,begin,end);
 }
 
 /**
@@ -161,13 +204,20 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
     str_path=str_path.substr(1,str_path.size());
   }
   std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
+  StringVec path=string_util::string_to_path(str_path);
 
   // get the root
-  xmlNode *root_element = NULL;
-  root_element = xmlDocGetRootElement(doc);
+  xmlNode *xml_node = NULL;
+  xml_node = xmlDocGetRootElement(doc);
+
+  // open the path
+  xml_node=open_path(xml_node,path.begin(),path.end());
+  if(xml_node==NULL)
+    throw invalid_argument("path ["+location+"] does not exist in file");
 
   // print out contents at current location
-  print_element_names(root_element);
+  cout << "NAMES:" << endl;
+  print_element_names(xml_node);
 
 /*
   // check that the argument is an integer
