@@ -10,11 +10,20 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <nxconfig.h>
 #include "node.h"
 #include "node_util.h"
 #include "string_util.h"
 #include "tree.hh"
 #include "dynamic_retriever.h"
+#if HAVE_DLFCN_H
+#include <dlfcn.h>
+#else
+#define dlopen(a,b)	NULL
+#define dlsym(a,b)	NULL
+#define dlclose(a)	NULL
+#define RTLD_NOW	2
+#endif /* HAVE_DLFCN_H */
 
 using std::ifstream;
 using std::invalid_argument;

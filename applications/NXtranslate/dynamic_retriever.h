@@ -29,7 +29,6 @@
 
 #include "retriever.h"
 //#include <ltdl.h>
-#include <dlfcn.h>
 
 typedef void* (*getData_func_t)(void* ref, const char* arg, int* data_type, int* dims_array, int* ndims, int* free_data);
 typedef int (*free_func_t)(void* ref, void* arg);
