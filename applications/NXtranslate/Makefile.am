@@ -29,7 +29,7 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 SUBDIRS=IPNS_CPP text_collist text_plain text_xml docs
 
 bin_PROGRAMS = nxtranslate
@@ -38,7 +38,7 @@ nxtranslate_SOURCES = \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
-	tree.hh 
+	tree.hh dynamic_retriever.cpp dynamic_retriever.h
 EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
 	text_collist/collist_retriever.h \
 	text_plain/retriever.h \
@@ -52,6 +52,12 @@ nxtranslate_LDFLAGS = -static $(LDFLAGS)
 #EXTRA_DIST = CHANGES LICENSE README TODO
 
 include $(top_srcdir)/build_rules.am
+
+test_dynamic.nxs: nxtranslate test_dynamic.xml test_dynamic.so
+	env LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:. ./nxtranslate test_dynamic.xml
+
+test_dynamic.so : test_dynamic.c
+	gcc -I$(top_srcdir)/include -shared -o $@ test_dynamic.c
 
 test_simple.nxs: nxtranslate test_simple.xml
 	./nxtranslate test_simple.xml
