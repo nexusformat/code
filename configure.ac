@@ -374,6 +374,7 @@ case $host in
 	AC_CHECK_LIB(m, log)
 esac
 AC_CHECK_LIB(rpc, xdr_float)
+AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
 AC_CHECK_LIB(sz, SZ_Compress)
