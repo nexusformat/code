@@ -20,7 +20,7 @@
 #include "napi.h"
 
 // this is called when a DynamicRetriever instance is created
-void* initialize(const char* source)
+void* nxtinit(const char* source)
 {
     return strdup(source); // this will be passed back as "ref" argument to 
                            // other functions. It can be anything e.g. a 
@@ -28,14 +28,14 @@ void* initialize(const char* source)
 }
 
 // this is called when a DynamicRetriever instance is destroyed
-int cleanup(void* ref)
+int nxtcleanup(void* ref)
 {
     free(ref);
     return 0;
 }
 
 // retrieves data from location specified in arg
-void* getdata(void* ref, const char* arg, int* data_type, int* dims_array, 
+void* nxtgetdata(void* ref, const char* arg, int* data_type, int* dims_array, 
               int* ndims, int* free_data)
 {
     char* result;
@@ -49,7 +49,7 @@ void* getdata(void* ref, const char* arg, int* data_type, int* dims_array,
 
 // free up any memory returned by a previous "getdata" when we have
 // specified the "free_data" option
-int freedata(void* ref, void* arg)
+int nxtfreedata(void* ref, void* arg)
 {
     free(arg);
     return 0;

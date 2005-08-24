@@ -12,14 +12,14 @@
 //
 // required:
 //
-//    void* initialize(const char* source) 
-//    void* getdata(void* ref, const char* arg, int* data_type, 
-//                  int* dims_array, int* ndims, int* free_data);
+//    void* nxtinit(const char* source) 
+//    void* nxtgetdata(void* ref, const char* arg, int* data_type, 
+//                     int* dims_array, int* ndims, int* free_data);
 //
 // optional:
 //
-//    void freedata(void* ref, void* arg)
-//    void cleanup(void* ref)
+//    void nxtfreedata(void* ref, void* arg)
+//    void nxtcleanup(void* ref)
 //
 //  see "test_dynamic.c" for an example of implementing this
 //
