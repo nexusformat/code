@@ -140,6 +140,15 @@ static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::it
   return open_path(node,begin,end);
 }
 
+static string getStrValue(const xmlDocPtr &doc, const xmlNodePtr &node){
+  xmlChar *char_value=xmlNodeListGetString(doc,node,1);
+  if(char_value==NULL)
+    throw runtime_error("blah");
+  string value=xmlChar_to_str(char_value,-1);
+  xmlFree(char_value);
+  return value;
+}
+
 /**
  * The factory will call the constructor with a string. The string
  * specifies where to locate the data (e.g. a filename), but
@@ -159,6 +168,12 @@ TextXmlRetriever::TextXmlRetriever(const string &str): source(str) /*,current_li
     xmlCleanupParser();
     throw runtime_error("Parsing "+source+" was not successful");
   }
+
+  // check that the document is not empty
+  xmlNode *xml_node = NULL;
+  xml_node = xmlDocGetRootElement(doc);
+  if(xml_node==NULL)
+    throw runtime_error("Empty document ["+source+"]");
 }
 
 TextXmlRetriever::~TextXmlRetriever(){
@@ -215,28 +230,19 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
   if(xml_node==NULL)
     throw invalid_argument("path ["+location+"] does not exist in file");
 
-  // print out contents at current location
-  cout << "NAMES:" << endl;
-  print_element_names(xml_node);
+  // get the value
+  string value=getStrValue(doc, xml_node);
+  if(value.size()<=0)
+    throw runtime_error("Encountered empty value ["+source+","+location+"]");
 
-/*
-  // check that the argument is an integer
-  int line_num=string_util::str_to_int(location);
-
-  // set stream to the line before
-  skip_to_line(infile,current_line,line_num);
-  // read the line and print it to the console
-  string text=read_line(infile);
-*/
   // create an empty node
-  Node node("empty","empty");
+  Node node(*(path.rbegin()),"empty");
 
   // put the data in the node
-/*
   vector<int> dims;
-  dims.push_back(text.size());
-  update_node_from_string(node,text,dims,Node::CHAR);
-*/
+  dims.push_back(value.size());
+  update_node_from_string(node,value,dims,Node::CHAR);
+
   tr.insert(tr.begin(),node);
 }
 
