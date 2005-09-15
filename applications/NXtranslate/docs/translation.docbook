@@ -453,6 +453,162 @@ first line of the file is zero.</para>
 
 </sect2>
 
+<sect2 id="SNS_histogram"><title>SNS Histogram</title>
+
+<para>The &mime_type for the SNS histogram retriever is
+<parameter>application/x-SNS-histogram</parameter>.</para>
+
+<para>The &location is of the general form
+
+<informalexample><programlisting>[dim1,dim2,...]D{tag_name_1|operator_1}keyword_1{tag_name_2|operator2}keyword_2...</programlisting></informalexample>
+
+Notice that the &location is divided into two parts, declaration and
+definition, separated by <parameter>D</parameter>. The declaration
+describes the dimension of the retrieved data. The definition
+describes which information the data consists of. Both of these will
+be described in greated detail below.</para>
+
+<para>The declaration part, <parameter>[dim1,dim2,...]</parameter>
+surrounded by square brackets, contains the size of each dimension of
+the array to be returned, separated by commas. The values are
+specified as positive integers.</para>
+
+<para>The definition part,
+<parameter>{tag_name_1|operator_1}keyword_1{tag_name_2|operator2}...</parameter>,
+is where selecting the data to be transfered from the SNS histogram
+file is described. Each part of the definition consists of a
+<parameter>tag_name</parameter> and
+<parameter>operator</parameter>. Multiple definitions can exist in a
+single &location separated by <parameter>keyword</parameter>s. If the
+definition is missing, then all of the available data will be
+retrieved.</para>
+
+<para>The possible values for the <parameter>tag_name</parameter> are
+
+<variablelist>
+
+<varlistentry><term><parameter>pixelID</parameter></term>
+<listitem><para>Select using unique pixel identifiers. Applicable for all
+detectors.</para></listitem>
+</varlistentry>
+
+<varlistentry><term><parameter>pixelX</parameter></term>
+<listitem><para>Select using column numbers. Applicable for all area
+detectors</para></listitem>
+</varlistentry>
+
+<varlistentry><term><parameter>pixelY</parameter></term>
+<listitem><para>Select using row numbers. Applicable for all area
+detectors</para></listitem>
+</varlistentry>
+
+<varlistentry><term><parameter>Tbin</parameter></term>
+<listitem><para>Select using time channels. Applicable for all
+detectors</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+</para>
+
+<para>The <parameter>operator</parameter> can be of one of two forms
+
+<itemizedlist>
+
+<listitem><para><function>loop(start,end,increment)</function> is used
+to specify a series of identifiers that runs inclusively from
+<parameter>start</parameter> to <parameter>end</parameter> in steps of
+<parameter>increment</parameter>.</para></listitem>
+
+<listitem><para>List of identifiers. The identifiers specify which
+data to include.</para></listitem>
+
+</itemizedlist>
+
+</para>
+
+<para>The <parameter>keyword</parameter> is used to link various
+declarations together into unions and intersections. Keywords are
+entirely optional. Keywords that work on two definitions are left
+associative.
+
+<variablelist>
+
+<varlistentry><term><parameter>!</parameter></term>
+<listitem><para>The logical "not" operator. This negates the definition
+following it.</para></listitem></varlistentry>
+
+<varlistentry><term><parameter>()</parameter></term>
+<listitem><para>Grouping operation. This can be used to clarify what
+order multiple keywords are applied.</para></listitem></varlistentry>
+
+<varlistentry><term><parameter>AND</parameter></term>
+<listitem><para>The logical "and" operator. This generates the
+intersection of two definitions.</para></listitem></varlistentry>
+
+<varlistentry><term><parameter>OR</parameter></term>
+<listitem><para>The logical "or" operator. This generates the union of
+two definitions.</para></listitem></varlistentry>
+
+</variablelist>
+</para>
+
+<variablelist><title>Examples</title>
+
+<varlistentry><term><parameter>[167,256,150]D{pixelID|loop(1,38400,1)}</parameter></term>
+<listitem><para>This retrieves the first 38400 pixel identifiers and
+put the data into a 167x256x150 array where the 167 dimension is
+changing the fastest. In these examples, there are 167 time channels,
+256 columns, and 150 rows.</para></listitem></varlistentry>
+
+<varlistentry><term><parameter>[100,256,50]D{pixelID|loop(1,12800,1)}AND{Tbin|loop(1,100,1)}</parameter></term>
+<listitem><para>This retrieves the union of the first 12800 pixel
+identifiers with the first 100 time channels then places the data into
+a 167x256x304 array. One must keep in mind that if the array declared
+is of a different size than the data defined, an error will be
+generated.</para></listitem></varlistentry>
+
+<varlistentry><term><parameter>[167,1050]D{pixelX|45,53,60,61,62,34500,34501}</parameter></term>
+<listitem><para>This retrieves a series of
+columns.</para></listitem></varlistentry>
+
+</variablelist>
+
+
+<para>By default, the definition part, {tag name}|operator|, is
+left-associative, but parentheses () can be added to force
+association. Moreover, each definition part must be separated by one
+of the two keywords, <parameter>AND</parameter> or
+<parameter>OR</parameter>, in all uppercase
+letters. <parameter>definition1ANDdefinition2</parameter> will produce
+and intersection of the two
+definitions. <parameter>definition1ORdefinition2</parameter> will
+produce the union of the two definitions.</para>
+
+<para>Here are a few examples to illustrate the location string for the SNS
+histogram files:
+</para>
+
+<para>
+<informalexample><programlisting><command>{167,256,150}D{pixelID}|loop(1,38400,1)</command></programlisting></informalexample>
+
+will copy the first 384000 <parameter>pixelID</parameter>s and put the
+data into a [167x256x150] array where first dimension, 167, is the
+fastest changing parameter.</para>
+
+<para>
+<informalexample><programlisting><command>{167,256,304}D{pixelID}|loop(1,35000,1)|OR{pixelID}|loop(40000,45000,1)|</command></programlisting></informalexample>
+
+will copy the union of hte first 35000 <parameter>pixelIDs</parameter> and the 5000 <parameter>pixelID</parameter>s between 40000 and 45000, putting them into a [167,256,304] array. One must keep in mind that if the array definied is smaller than the data read, the data "outside" the definition is lost.</para>
+
+<para>
+<informalexample><programlisting><command>{167,7,1}D{pixelX}|(45,53,60,61,62,34500,34501)|</command></programlisting></informalexample>
+
+Will store the <parameter>pixelID</parameter> 45, 53, .... in a
+[167,7,1] array.</para>
+
+</sect2>
+
 <sect2 id="text_xml"><title>XML retriever</title>
 
 <para>The &mime_type for the XML retriever is
