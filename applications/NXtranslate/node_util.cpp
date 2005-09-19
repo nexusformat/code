@@ -100,3 +100,26 @@ extern void update_node_from_string(Node &node, string &char_data,
   // free up created value
   NXfree(&value);
 }
+
+extern Node::NXtype node_type(const std::string &str){
+  if(str=="NX_CHAR")
+    return Node::CHAR;
+  else if(str=="NX_FLOAT32")
+    return Node::FLOAT32;
+  else if(str=="NX_FLOAT64")
+    return Node::FLOAT64;
+  else if(str=="NX_INT8")
+    return Node::INT8;
+  else if(str=="NX_INT16")
+    return Node::INT16;
+  else if(str=="NX_INT32")
+    return Node::INT32;
+  else if(str=="NX_UINT8")
+    return Node::UINT8;
+  else if(str=="NX_UINT16")
+    return Node::UINT16;
+  else if(str=="NX_UINT32")
+    return Node::UINT32;
+  else
+    throw runtime_error("Could not understand type in node_type("+str+")");
+}

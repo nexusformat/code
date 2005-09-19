@@ -18,5 +18,6 @@ extern void void_ptr_from_string(void *&value, std::string &char_data,
                                  int rank, int *dims, Node::NXtype type);
 extern void update_node_from_string(Node &node, std::string &char_data,
                                   std::vector<int> &v_dims, Node::NXtype type);
+extern Node::NXtype node_type(const std::string &str);
 #endif
 
