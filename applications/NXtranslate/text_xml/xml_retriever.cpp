@@ -220,6 +220,7 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
   }
   std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
   StringVec path=string_util::string_to_path(str_path);
+  Node::NXtype int_type=node_type(type);
 
   // get the root
   xmlNode *xml_node = NULL;
@@ -240,8 +241,13 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
 
   // put the data in the node
   vector<int> dims;
-  dims.push_back(value.size());
-  update_node_from_string(node,value,dims,Node::CHAR);
+  if(int_type==Node::CHAR){
+    dims.push_back(value.size());
+  }else{
+    dims=string_util::str_to_intVec(str_dims);
+  }
+
+  update_node_from_string(node,value,dims,int_type);
 
   tr.insert(tr.begin(),node);
 }
