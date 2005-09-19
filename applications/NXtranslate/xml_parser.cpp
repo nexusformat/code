@@ -202,26 +202,11 @@ static Attr make_attr(const string &name, const string &value){
 
   // convert the string type to an integer type
   Node::NXtype int_type;
-  if(my_type=="NX_CHAR")
-    int_type=Node::CHAR;
-  else if(my_type=="NX_FLOAT32")
-    int_type=Node::FLOAT32;
-  else if(my_type=="NX_FLOAT64")
-    int_type=Node::FLOAT64;
-  else if(my_type=="NX_INT8")
-    int_type=Node::INT8;
-  else if(my_type=="NX_INT16")
-    int_type=Node::INT16;
-  else if(my_type=="NX_INT32")
-    int_type=Node::INT32;
-  else if(my_type=="NX_UINT8")
-    int_type=Node::UINT8;
-  else if(my_type=="NX_UINT16")
-    int_type=Node::UINT16;
-  else if(my_type=="NX_UINT32")
-    int_type=Node::UINT32;
-  else
+  try{
+    int_type=node_type(my_type);
+  }catch(runtime_error &e){
     return Attr(name,NULL,0,NX_CHAR);
+  }
   
   int rank=1;
   int dims[rank];
