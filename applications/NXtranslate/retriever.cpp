@@ -17,6 +17,9 @@
 #ifdef DYNAMIC_RETRIEVER
 #include "dynamic_retriever.h"
 #endif
+#ifdef SNS_HISTOGRAM_RETRIEVER
+#include "sns_histogram/retriever.h"
+#endif
 
 using std::string;
 using std::invalid_argument;
@@ -53,6 +56,11 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #ifdef DYNAMIC_RETRIEVER
   }else if(type.substr(0,8) == "dynamic/") {
     RetrieverPtr ptr(new DynamicRetriever(source, type));
+    return ptr;
+#endif
+#ifdef SNS_HISTOGRAM_RETRIEVER
+  }else if(type==SnsHistogramRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new SnsHistogramRetriever(source);
     return ptr;
 #endif
   }
