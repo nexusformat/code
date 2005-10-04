@@ -29,8 +29,8 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
-SUBDIRS=IPNS_CPP text_collist text_plain text_xml docs
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
@@ -42,11 +42,13 @@ nxtranslate_SOURCES = \
 EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
 	text_collist/collist_retriever.h \
 	text_plain/retriever.h \
-	text_xml/retriever.h
+	text_xml/retriever.h \
+        sns_histogram/retriever.h
 
 nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	IPNS_CPP/libIPNSRunfile.la text_collist/libTextCollist.la \
-	text_plain/libTextPlain.la text_xml/libTextXML.la
+	text_plain/libTextPlain.la text_xml/libTextXML.la \
+        sns_histogram/libSNShistogram.la
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
