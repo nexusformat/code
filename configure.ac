@@ -436,6 +436,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXtranslate/text_collist/Makefile
 		applications/NXtranslate/text_plain/Makefile
 		applications/NXtranslate/text_xml/Makefile
+		applications/NXtranslate/sns_histogram/Makefile
 		applications/NXtranslate/docs/Makefile
 		examples/Makefile
 		doc/Makefile
