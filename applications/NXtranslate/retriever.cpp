@@ -60,7 +60,7 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #endif
 #ifdef SNS_HISTOGRAM_RETRIEVER
   }else if(type==SnsHistogramRetriever::MIME_TYPE){
-    RetrieverPtr ptr(new SnsHistogramRetriever(source);
+    RetrieverPtr ptr(new SnsHistogramRetriever(source));
     return ptr;
 #endif
   }
