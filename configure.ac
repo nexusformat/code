@@ -433,6 +433,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXdir/Makefile
 		applications/NXtranslate/Makefile
 		applications/NXtranslate/IPNS_CPP/Makefile
+		applications/NXtranslate/FRM2/Makefile
 		applications/NXtranslate/text_collist/Makefile
 		applications/NXtranslate/text_plain/Makefile
 		applications/NXtranslate/text_xml/Makefile
