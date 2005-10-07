@@ -542,7 +542,7 @@ associated with.</para></listitem></varlistentry>
 
 <varlistentry><term><parameter>()</parameter></term>
 <listitem><para>Grouping operation. This can be used to clarify what
-order multiple keywords are applied. No parentheses are allowed within
+order multiple keywords are applied. No associative parentheses are allowed within
 the curly braces.</para></listitem></varlistentry>
 
 <varlistentry><term><parameter>AND</parameter></term>
