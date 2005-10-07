@@ -537,11 +537,13 @@ associative.
 
 <varlistentry><term><parameter>!</parameter></term>
 <listitem><para>The logical "not" operator. This negates the definition
-following it.</para></listitem></varlistentry>
+following it. Must be placed just in front of the curly braces it is
+associated with.</para></listitem></varlistentry>
 
 <varlistentry><term><parameter>()</parameter></term>
 <listitem><para>Grouping operation. This can be used to clarify what
-order multiple keywords are applied.</para></listitem></varlistentry>
+order multiple keywords are applied. No parentheses are allowed within
+the curly braces.</para></listitem></varlistentry>
 
 <varlistentry><term><parameter>AND</parameter></term>
 <listitem><para>The logical "and" operator. This generates the
@@ -550,7 +552,6 @@ intersection of two definitions. This parameter is case sensitive.</para></listi
 <varlistentry><term><parameter>OR</parameter></term>
 <listitem><para>The logical "or" operator. This generates the union of
 two definitions. This parameter is case sensitive.</para></listitem></varlistentry>
-
 </variablelist>
 </para>
 
