@@ -13,10 +13,10 @@ class SnsHistogramRetriever: public Retriever{
   std::string toString() const;
   static const std::string MIME_TYPE;
  private:
-  SnsHistogramRetriever(const SnsHistogramRetriever&);
-  SnsHistogramRetriever& operator=(const SnsHistogramRetriever&);
+  SnsHistogramRetriever(const SnsHistogramRetriever&); //copy constructor
+  SnsHistogramRetriever& operator=(const SnsHistogramRetriever&); //operator "=" overloading
   std::string source;
-  int current_line;
+  std::string location;
   std::ifstream infile;
 };
 
