@@ -21,14 +21,17 @@ using std::vector;
 
 //Global variable
 vector<string> Tag, Def;
-
+vector<string> VecStr;
+ 
 //Declaration of functions
 string format_string_location(string& s);    //format the string 
 string without_white_spaces(string& s);      //remove spaces from string 
-vector<string> DeclaDef_separator(string& s);//separate Declaration from Definition
-vector<string> Declaration_separator(string& s); //Separate local array from global rarray
+void DeclaDef_separator(string& s,vector<string>& DeclaDef);//separate Declaration from Definition
+vector<string> Declaration_separator(string s); //Separate local array from global rarray
 string TagDef_separator(string& s, vector<string>& Tag, vector<string>& Def);  //separate Tag from Definition part and return the Grp version of the string_location
 string ReplaceTagDef_by_Grp(string& s, int a); //Tag/Def is replaced by Grp to determine the priorities of the associations
+vector<string> StoreOperators(string& s, int& HowMany);  //isolate the operators of the definition part of the string location
+vector<string::iterator> PositionSeparator(string s, int TagName_Number);  //Find the position of each separator "|"
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -55,7 +58,7 @@ SnsHistogramRetriever::~SnsHistogramRetriever()
     infile.close();
 }
 
-/********************************
+/*********.***********************
 /* This is the method for retrieving data from a file. 
 /* Interpreting the string is left up to the implementing code.
 /********************************/
@@ -66,7 +69,10 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   string DefinitionGrpVersion;    //use to determine priorities
   vector<string> DeclaDef;        //declaration and definition parts
   vector<string> LocGlobArray;    //local and global array (declaration part)
-  
+  vector<string> Ope;             //Operators of the defintion part
+  int OperatorNumber; 
+  string DefinitionPart;          //use to determine the operators
+
   new_location = location;
 
   // check that the argument is not an empty string
@@ -79,13 +85,18 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   
   //location decided to separate its declaration part (left side of the "D")
   //from its definition part --> DeclaDef vector
-  DeclaDef = DeclaDef_separator(new_location);
+  DeclaDef_separator(new_location,DeclaDef);
+
   //Separate declaration arrays (local and global)
   LocGlobArray = Declaration_separator(DeclaDef[0]);
 
+  DefinitionPart = DeclaDef[1];
   //Work on definition part
   DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
-  cout << "DefinitionGrpVersion= " << DefinitionGrpVersion << endl;
+ 
+  //Store operators
+  OperatorNumber = Tag.size();
+  Ope = StoreOperators(DefinitionPart,OperatorNumber);
 
 }
 
@@ -137,9 +148,8 @@ std::string without_white_spaces(string& location)
 /*********************************
 /Separate Decla from Definition
 /*********************************/
-vector<string> DeclaDef_separator(string& new_location)
+void DeclaDef_separator(string& new_location,vector<string>& VecStr)
 {
-  vector<string> VecStr;
   typedef std::string::size_type string_size;
   int Dposition = new_location.find("D");
 
@@ -148,13 +158,13 @@ vector<string> DeclaDef_separator(string& new_location)
   VecStr.push_back(new_location.substr(0,Dposition));
   VecStr.push_back(new_location.substr(Dposition+1, taille-VecStr[0].size()-1));
 
-  return VecStr;
+  return;
 }
 
 /*********************************
 /Separate local from global array
 /*********************************/
-vector<string> Declaration_separator(string& DeclarationStr)
+vector<string> Declaration_separator(string DeclarationStr)
 {
   std::vector<string> LocalArray_GlobalArray;
   std::string str;
@@ -183,9 +193,6 @@ string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<stri
   static const string CloseBracket = "}";
   int HowManyTimes = 0, i = 0, length =  DefinitionPart.size();
 
-  //cout << "StringLocationGroup (before adding group)= " << StringLocationGroup << std::endl;
-
- //find how many time we have "|" in the string
   while (b!=e)
     { 
        if (find(b,  DefinitionPart.end(), separator[0]) !=  DefinitionPart.end())
@@ -214,8 +221,6 @@ string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<stri
       ++i;
     }
 
-  //std::cout << "StringLocationGroup (after adding group)= " << StringLocationGroup << std::endl;
-     
    return ReplaceTagDef_by_Grp(StringLocationGroup,HowManyTimes);
 
 }
@@ -253,5 +258,58 @@ string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
 
   return StringLocationGroup;
 
+
+}
+
+
+/*********************************
+/Store operators
+/*********************************/
+vector<string> StoreOperators(string& StrS, int& HowMany)
+{
+ typedef string::iterator iter;
+  std::vector<iter> VecIter;             //vector of iterators
+  std::string::iterator a;
+  string operatorAND = "AND";
+  string operatorOR = "OR";
+  vector<string> Ope;
+
+ //Store each position of "|" into VecIter
+ VecIter = PositionSeparator(StrS,HowMany);
+  
+  for (int i=0; i<HowMany-1; i++)
+    {
+      if (find(VecIter[i],VecIter[i+1],operatorAND[0])!=VecIter[i+1])
+      { 
+	Ope.push_back("AND");
+      }
+      else
+	{
+	  Ope.push_back("OR");
+	}
+      //cout << "Ope[" << i << "]= " << Ope[i]<< std::endl;   
+    }	  
+  
+  return Ope;
+
+}
+
+/*********************************
+/Find iterator for each separator
+/*********************************/
+vector<string::iterator> PositionSeparator(string s, int TagName_Number)
+{ std::vector<string::iterator> VecIter;
+  int i = 0;
+  typedef string::iterator iter;
+  iter b = s.begin();  
+  string separator = "|";
+
+  while (i < TagName_Number)
+    {
+      VecIter.push_back(find(b, s.end(), separator[0]));
+      b = find(b,s.end(),separator[0])+1;
+      ++i;
+    }
+  return VecIter;
 
 }
