@@ -522,7 +522,7 @@ to specify a series of identifiers that runs inclusively from
 <parameter>increment</parameter>.</para></listitem>
 
 <listitem><para>List of identifiers. The identifiers specify which
-data to include.</para></listitem>
+data to include. The identifiers must be separated by commas.</para></listitem>
 
 </itemizedlist>
 
