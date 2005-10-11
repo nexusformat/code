@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <stdlib.h>
 #include "retriever.h"
 #include "../node.h"
 #include "../node_util.h"
@@ -22,7 +23,16 @@ using std::vector;
 //Global variable
 vector<string> Tag, Def;
 vector<string> VecStr;
- 
+
+struct Grp_parameters   //parameters of the different definitions
+{
+  int init, last, increment;  //with loop(init,end,increment)
+  vector<int> value;          //(value[0],value[1],....)
+  char c;                     //c=l for loop and c=p for (x,y,z,...)
+};
+
+vector<Grp_parameters> GrpPara;
+
 //Declaration of functions
 string format_string_location(string& s);    //format the string 
 string without_white_spaces(string& s);      //remove spaces from string 
@@ -32,6 +42,9 @@ string TagDef_separator(string& s, vector<string>& Tag, vector<string>& Def);  /
 string ReplaceTagDef_by_Grp(string& s, int a); //Tag/Def is replaced by Grp to determine the priorities of the associations
 vector<string> StoreOperators(string& s, int& HowMany);  //isolate the operators of the definition part of the string location
 vector<string::iterator> PositionSeparator(string s, int TagName_Number);  //Find the position of each separator "|"
+void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority, vector<int> InverseDef);  //Give priority to each grp of the definition part
+void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
+void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -72,7 +85,9 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   vector<string> Ope;             //Operators of the defintion part
   int OperatorNumber; 
   string DefinitionPart;          //use to determine the operators
-
+  vector<int> GrpPriority;        //Vector of priority of each group
+  vector<int> InverseDef;        //True=Inverse definition, False=keep it like it is
+  
   new_location = location;
 
   // check that the argument is not an empty string
@@ -90,13 +105,19 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //Separate declaration arrays (local and global)
   LocGlobArray = Declaration_separator(DeclaDef[0]);
 
-  DefinitionPart = DeclaDef[1];
   //Work on definition part
+  DefinitionPart = DeclaDef[1];
   DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
- 
+  cout << "DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   //REMOVE
   //Store operators
   OperatorNumber = Tag.size();
   Ope = StoreOperators(DefinitionPart,OperatorNumber);
+
+  //Give to each grp its priority
+  GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef);   
+  //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
+  DefinitionParametersFunction(Def,OperatorNumber);
+
 
 }
 
@@ -250,15 +271,11 @@ string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
       part2 = StringLocationGroup.substr(OpenBraPosition, StringLocationGroup.size());
      
       Grp << "grp" << j ;  
-      //cout << "grp = " << Grp.str() << std::endl;
-       StringLocationGroup = part1 + Grp.str() + part2;
-      //cout << "(after adding grp) s= " << s << std::endl;
-     
-          }
+      StringLocationGroup = part1 + Grp.str() + part2;
+      //cout << "(after adding grp) s= " << StringLocationGroup << std::endl;   //REMOVE
+      }
 
   return StringLocationGroup;
-
-
 }
 
 
@@ -313,3 +330,128 @@ vector<string::iterator> PositionSeparator(string s, int TagName_Number)
   return VecIter;
 
 }
+
+/*********************************
+/Give priority for each group
+/*********************************/
+void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority, vector<int> InverseDef)
+{
+  int DefinitionString_size = s.size();
+  int GrpNumberLive = 0;
+  int Priority = 0;
+    
+  //Initialization of vector<int> and vector<bool>
+  for (int i=0; i<OperatorNumber; i++)
+    {
+      GrpPriority.push_back(0);
+      InverseDef.push_back(0);
+    }
+  
+  //move along the definition part and look for g,A,O,!,(,and ).
+  for (int j=0; j<DefinitionString_size; j++)
+    {
+      switch (s[j])
+	{
+	case 'g':
+          j=j+3;   //move to end of grp#
+	  GrpPriority[GrpNumberLive]=Priority;
+   	  ++GrpNumberLive;
+     	  break;
+	case '!':
+	  InverseDef[GrpNumberLive]=1;
+          break;
+	case '(':
+	  ++Priority;
+          break;
+	case ')':
+	  --Priority;
+          break;
+	default:
+       	  //nothing
+	  break;
+	}
+    }
+
+  /*  //for debugging only     //REMOVE
+  for (int j=0; j<OperatorNumber; j++)
+    {
+      cout<<"GrpPriority[" << j << "]= " << GrpPriority[j];
+      cout<<"          ";
+      cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
+      }*/
+  return;
+}
+
+/*********************************
+/Store values of the definition
+/*********************************/
+void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
+{
+  Grp_parameters record;
+  string NewString;
+
+  //for debugging only     //REMOVE
+  for (int i =0; i<HowManyDef;i++)
+    {
+      cout << "Def["<<i<<"]= " << Def[i]<<endl;
+    }
+
+  //find out first if it's a loop or a (....)
+  for (int i =0; i<HowManyDef;i++)
+    {
+      if (Def[i].find("loop") < Def[i].size()) 
+	{
+        record.c = 'l';
+        }
+      else
+	{
+        record.c = 'p';
+        }
+      GrpPara.push_back(record);
+    }
+ 
+  //isolate the variable
+  for (int i=0; i<HowManyDef;i++)
+    {
+      if (GrpPara[i].c == 'l')      //loop
+	{
+	  InitLastIncre(Def[i],i);
+	  /* cout << "GrpPara["<<i<<"].init="<<GrpPara[i].init<<endl;  //REMOVE
+	  cout << "GrpPara["<<i<<"].last="<<GrpPara[i].last<<endl;
+	  cout << "GrpPara["<<i<<"].increment="<<GrpPara[i].increment<<endl;
+	  cout << "          "<<endl;*/
+	}
+      else                          //(....)
+	{
+
+	}
+    }
+ return;
+}
+
+/*********************************
+/Store Initial, last and increment
+/*********************************/
+void InitLastIncre (string& def, int i)
+{
+  static const string sep=",";
+  int pos1, pos2;
+  string new_def;
+
+  //Remove "loop(" and ")"
+  def=def.substr(5,def.size()-6);
+
+  //store the info into GrpPara[i].init, end and increment
+  pos1 = def.find(sep);
+  new_def = def.substr(pos1+1,def.size()-pos1);
+  pos2 = new_def.find(sep);
+ 
+  GrpPara[i].init =atoi((def.substr(0,pos1)).c_str());
+  GrpPara[i].last =atoi((def.substr(pos1+1,pos2).c_str()));
+  GrpPara[i].increment = atoi((new_def.substr(pos2+1, new_def.size()-1).c_str()));
+
+  cout <<"def= " << def<<endl;    //REMOVE
+
+ return;
+}
+
