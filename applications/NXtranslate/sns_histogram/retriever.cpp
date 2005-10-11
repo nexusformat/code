@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -45,6 +46,8 @@ vector<string::iterator> PositionSeparator(string s, int TagName_Number);  //Fin
 void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority, vector<int> InverseDef);  //Give priority to each grp of the definition part
 void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
 void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
+void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
+
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -260,7 +263,7 @@ string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
   for (int j=0 ; j<HowManyTimes ; j++)
   
     {
-      //cout << std::endl << std::endl << "j= " << j << std::endl << std::endl;
+      //cout << std::endl << std::endl << "j= " << j << std::endl << std::endl;//REMOVE
       std::ostringstream Grp;
       OpenBraPosition =  StringLocationGroup.find(OpenBracket);
       CloseBraPosition =  StringLocationGroup.find(CloseBracket);
@@ -304,7 +307,7 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
 	{
 	  Ope.push_back("OR");
 	}
-      //cout << "Ope[" << i << "]= " << Ope[i]<< std::endl;   
+      //cout << "Ope[" << i << "]= " << Ope[i]<< std::endl;   //REMOVE
     }	  
   
   return Ope;
@@ -416,14 +419,10 @@ void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
       if (GrpPara[i].c == 'l')      //loop
 	{
 	  InitLastIncre(Def[i],i);
-	  /* cout << "GrpPara["<<i<<"].init="<<GrpPara[i].init<<endl;  //REMOVE
-	  cout << "GrpPara["<<i<<"].last="<<GrpPara[i].last<<endl;
-	  cout << "GrpPara["<<i<<"].increment="<<GrpPara[i].increment<<endl;
-	  cout << "          "<<endl;*/
 	}
       else                          //(....)
 	{
-
+	  ParseGrp_Value(Def[i],i);
 	}
     }
  return;
@@ -450,8 +449,39 @@ void InitLastIncre (string& def, int i)
   GrpPara[i].last =atoi((def.substr(pos1+1,pos2).c_str()));
   GrpPara[i].increment = atoi((new_def.substr(pos2+1, new_def.size()-1).c_str()));
 
-  cout <<"def= " << def<<endl;    //REMOVE
+  return;
+}
 
- return;
+/*********************************
+/Store values of (......) 
+/*********************************/
+void ParseGrp_Value(string& def, int i)
+{
+  vector<int> PositionSep;
+  int b=0, a=0;
+
+  def=def.substr(1,def.size()-2);  //remove parentheses
+  cout << "def.size()= " << def.size()<<endl;
+  while (b <= def.size())
+    {
+      if (def[b]==',')
+	{
+	  GrpPara[i].value.push_back(atoi((def.substr(a,b-a)).c_str()));
+	  a=b+1;
+	}
+      if (b==def.size())
+	{
+	  GrpPara[i].value.push_back(atoi((def.substr(a,b-a)).c_str()));
+	}
+      ++b;
+    }
+
+  //for debugging     //REMOVE
+ for (int j=0; j<GrpPara[i].value.size(); j++)
+    {
+      cout << "GrpPara.value["<<i<<"]= " << GrpPara[i].value[j]<<endl;
+    }
+
+  return;
 }
 
