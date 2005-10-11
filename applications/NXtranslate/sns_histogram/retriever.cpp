@@ -13,6 +13,8 @@
 #include "../string_util.h"
 #include "../tree.hh"
 
+#define RETRIEVER_TEST      //For debugging only, REMOVE
+
 using std::ifstream;
 using std::invalid_argument;
 using std::runtime_error;
@@ -24,6 +26,7 @@ using std::vector;
 //Global variable
 vector<string> Tag, Def;
 vector<string> VecStr;
+vector<int> LocalArray, GlobalArray;  //parameters of the declaration part
 
 struct Grp_parameters   //parameters of the different definitions
 {
@@ -47,7 +50,7 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority,
 void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
 void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
 void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
-
+void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -67,7 +70,7 @@ SnsHistogramRetriever::SnsHistogramRetriever(const string &str): source(str)
 /*********************************/
 SnsHistogramRetriever::~SnsHistogramRetriever()
 {
-  cout << "~TextPlainRetriever()" << endl;
+  // cout << "~TextPlainRetriever()" << endl;
 
   // close the file
   if(infile)
@@ -90,16 +93,23 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   string DefinitionPart;          //use to determine the operators
   vector<int> GrpPriority;        //Vector of priority of each group
   vector<int> InverseDef;        //True=Inverse definition, False=keep it like it is
-  
+
+
   new_location = location;
 
   // check that the argument is not an empty string
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
+#ifdef RETRIEVER_TEST
+  cout << "Initial string location= " << endl << "  " << new_location << endl;
+#endif
 
   //Once upon a time, there was a string location named "location"
   //"location" became new_location after loosing its white spaces
   new_location = format_string_location(new_location);
+#ifdef RETRIEVER_TEST
+  cout << endl << "String location without white spaces: " << endl << "  " << new_location <<endl;
+#endif
   
   //location decided to separate its declaration part (left side of the "D")
   //from its definition part --> DeclaDef vector
@@ -111,7 +121,11 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //Work on definition part
   DefinitionPart = DeclaDef[1];
   DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
-  cout << "DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   //REMOVE
+  
+#ifdef RETRIEVER_TEST
+  cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   //REMOVE
+#endif
+ 
   //Store operators
   OperatorNumber = Tag.size();
   Ope = StoreOperators(DefinitionPart,OperatorNumber);
@@ -121,6 +135,11 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
   DefinitionParametersFunction(Def,OperatorNumber);
 
+  //parse Local and Global Array from Declaration part
+  ParseDeclarationArray(LocGlobArray);
+  
+  //Read the binary file and store the data into an array defined
+  //by the GlobalArray part of the declaration
 
 }
 
@@ -297,6 +316,10 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
  //Store each position of "|" into VecIter
  VecIter = PositionSeparator(StrS,HowMany);
   
+#ifdef RETRIEVER_TEST
+ cout << endl << "List of operators:" << endl;
+#endif
+
   for (int i=0; i<HowMany-1; i++)
     {
       if (find(VecIter[i],VecIter[i+1],operatorAND[0])!=VecIter[i+1])
@@ -307,7 +330,10 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
 	{
 	  Ope.push_back("OR");
 	}
-      //cout << "Ope[" << i << "]= " << Ope[i]<< std::endl;   //REMOVE
+#ifdef RETRIEVER_TEST
+      cout << "   Ope[" << i << "]= " << Ope[i]<< std::endl;   //REMOVE
+#endif
+
     }	  
   
   return Ope;
@@ -375,13 +401,17 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority,
 	}
     }
 
-  /*  //for debugging only     //REMOVE
+#ifdef RETRIEVER_TEST
+  cout << endl << "List of Priority and Inverse functions" << endl;
+   //for debugging only     //REMOVE
   for (int j=0; j<OperatorNumber; j++)
     {
-      cout<<"GrpPriority[" << j << "]= " << GrpPriority[j];
+      cout<<"   GrpPriority[" << j << "]= " << GrpPriority[j];
       cout<<"          ";
       cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
-      }*/
+      }
+#endif
+
   return;
 }
 
@@ -393,11 +423,14 @@ void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
   Grp_parameters record;
   string NewString;
 
-  //for debugging only     //REMOVE
+#ifdef RETRIEVER_TEST
+  cout << endl << "List of Definition: " << endl; 
+ //for debugging only     //REMOVE
   for (int i =0; i<HowManyDef;i++)
     {
-      cout << "Def["<<i<<"]= " << Def[i]<<endl;
+      cout << "   Def["<<i<<"]= " << Def[i]<<endl;
     }
+#endif  
 
   //find out first if it's a loop or a (....)
   for (int i =0; i<HowManyDef;i++)
@@ -457,11 +490,8 @@ void InitLastIncre (string& def, int i)
 /*********************************/
 void ParseGrp_Value(string& def, int i)
 {
-  vector<int> PositionSep;
   int b=0, a=0;
 
-  def=def.substr(1,def.size()-2);  //remove parentheses
-  cout << "def.size()= " << def.size()<<endl;
   while (b <= def.size())
     {
       if (def[b]==',')
@@ -476,12 +506,99 @@ void ParseGrp_Value(string& def, int i)
       ++b;
     }
 
+#ifdef RETRIEVER_TEST
+  cout << endl << "List of values from list of identifiers: " << endl;
   //for debugging     //REMOVE
- for (int j=0; j<GrpPara[i].value.size(); j++)
+   for (int j=0; j<GrpPara[i].value.size(); j++)
     {
-      cout << "GrpPara.value["<<i<<"]= " << GrpPara[i].value[j]<<endl;
+      cout << "   GrpPara.value["<<i<<"]= " << GrpPara[i].value[j]<<endl;
     }
+#endif
 
   return;
 }
+
+/*********************************
+/Parse Local and Globa array
+/*********************************/
+
+
+void ParseDeclarationArray(vector<string>& LocGlobArray)
+{
+  int a=0, b=0;
+  
+
+  //Parse Local array
+  int i=0;
+
+      //remove square braces
+  LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
+
+#ifdef RETRIEVER_TEST
+  cout << endl << "Local and Global Array: " << endl;
+    cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
+#endif
+
+  while (b <= LocGlobArray[i].size())
+    {
+      if (LocGlobArray[i][b]==',')
+	{
+	  LocalArray.push_back(atoi((LocGlobArray[i].substr(a,b-a)).c_str()));
+          a=b+1;}
+	
+      if (b==LocGlobArray[i].size())
+	{
+	  LocalArray.push_back(atoi((LocGlobArray[i].substr(a,b-a)).c_str()));
+        }
+	
+      ++b;
+    }
+
+  i=1,a=0,b=0;
+  
+//Parse Global Array
+
+ //remove square braces
+  LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
+  
+#ifdef RETRIEVER_TEST
+     cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
+#endif
+
+  while (b <= LocGlobArray[i].size())
+    {
+      if (LocGlobArray[i][b]==',')
+	{
+	  GlobalArray.push_back(atoi((LocGlobArray[i].substr(a,b-a)).c_str()));
+          a=b+1;}
+	
+      if (b==LocGlobArray[i].size())
+	{
+	  GlobalArray.push_back(atoi((LocGlobArray[i].substr(a,b-a)).c_str()));
+        }
+	
+      ++b;
+    }
+#ifdef RETRIEVER_TEST
+  cout << endl << "Parsing of values: " << endl;
+  cout << "   Local array" << endl;
+
+  //for debugging only      //REMOVE
+  for (int j=0; j<LocalArray.size();j++)
+    {
+      cout << "      LocalArray["<<j<<"]= "<<LocalArray[j]<<endl;
+    }
+  //for debugging only      //REMOVE
+  cout << "   Global array" << endl;
+  for (int j=0; j<GlobalArray.size();j++)
+    {
+      cout << "      GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
+    }
+#endif
+
+
+  return;
+}
+
+
 
