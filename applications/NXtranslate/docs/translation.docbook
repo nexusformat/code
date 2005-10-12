@@ -460,11 +460,11 @@ first line of the file is zero.</para>
 
 <para>The &location is of the general form
 
-<informalexample><programlisting>[dim1,dim2,...][dimX,dimY,...]D{tag_name_1|operator_1}keyword_1{tag_name_2|
+<informalexample><programlisting>[dim1,dim2,...][dimX,dimY,...]#{tag_name_1|operator_1}keyword_1{tag_name_2|
 operator2}keyword_2...</programlisting></informalexample>
 
 Notice that the &location is divided into two parts, declaration and
-definition, separated by <parameter>D</parameter>. The declaration
+definition, separated by <parameter>#</parameter>. The declaration
 describes the dimension of the retrieved data. The definition
 describes which information the data consists of. Both of these will
 be described in greated detail below.</para>
@@ -557,7 +557,7 @@ two definitions. This parameter is case sensitive.</para></listitem></varlistent
 
 <variablelist><title>Examples</title>
 
-<varlistentry><term><parameter>[167,256,150][167,256,304]D{pixelID|loop(1,38400,1)}</parameter></term>
+<varlistentry><term><parameter>[167,256,150][167,256,304]#{pixelID|loop(1,38400,1)}</parameter></term>
 <listitem>
 
 <para>This retrieves the first 38400 pixel identifiers and
@@ -566,7 +566,7 @@ changes the fastest. In this example, there are 167 time channels,
 256 columns, and 150 rows. The data are coming from a binary file where the data
 are stored as a 167x256x304 flat array </para></listitem></varlistentry>
 
-<varlistentry><term><parameter>[100,256,50][167,256,304]D{pixelID|loop(1,12800,1)}AND{Tbin|loop(1,100,1)}</parameter></term>
+<varlistentry><term><parameter>[100,256,50][167,256,304]#{pixelID|loop(1,12800,1)}AND{Tbin|loop(1,100,1)}</parameter></term>
 <listitem>
 
 <para>This retrieves the union of the first 12800 pixel
@@ -575,7 +575,7 @@ a 100x256x50 array. One must keep in mind that if the array declared
 is of a different size than the data defined, an error will be
 generated.</para></listitem></varlistentry>
 
-<varlistentry><term><parameter>[167,7][167,256,304]D{pixelX|45,53,60,61,62,34500,34501}</parameter></term>
+<varlistentry><term><parameter>[167,7][167,256,304]#{pixelX|45,53,60,61,62,34500,34501}</parameter></term>
 <listitem><para>This retrieves a series of
 columns.</para></listitem></varlistentry>
 
