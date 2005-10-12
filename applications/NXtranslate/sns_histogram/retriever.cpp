@@ -13,7 +13,9 @@
 #include "../string_util.h"
 #include "../tree.hh"
 
-#define RETRIEVER_TEST      //For debugging only, REMOVE
+//#define RETRIEVER_TEST      //to test main part     //REMOVE
+//#define RETRIEVER_DECLARATION_TEST   //to test declaration part
+//#define RETRIEVER_DEFINITION_TEST    //to test definition part
 
 using std::ifstream;
 using std::invalid_argument;
@@ -51,6 +53,8 @@ void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
 void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
 void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
+void CheckTagValidity (string& Tag);  //Check if the Tags are valid
+void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -101,6 +105,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
 #ifdef RETRIEVER_TEST
+  cout << "#############################################################" << endl;
   cout << "Initial string location= " << endl << "  " << new_location << endl;
 #endif
 
@@ -126,6 +131,13 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   //REMOVE
 #endif
  
+#ifdef RETRIEVER_DEFINITION_TEST
+ cout << endl << "************************************************" << endl;
+ cout << "List of Tags:" << endl;
+ for (int i=0; i<Tag.size();i++)
+   cout << "   Tag[" << i << "]= " << Tag[i] << endl;
+#endif
+
   //Store operators
   OperatorNumber = Tag.size();
   Ope = StoreOperators(DefinitionPart,OperatorNumber);
@@ -194,7 +206,10 @@ std::string without_white_spaces(string& location)
 void DeclaDef_separator(string& new_location,vector<string>& VecStr)
 {
   typedef std::string::size_type string_size;
-  int Dposition = new_location.find("D");
+  int Dposition = new_location.find("#");
+
+  if (Dposition == -1)
+    throw runtime_error("Declaration/Definition spacer invalid or not present");
 
   string_size taille = new_location.size();
   
@@ -214,6 +229,9 @@ vector<string> Declaration_separator(string DeclarationStr)
   typedef string::size_type string_size;
   string_size DeclarationStrSize = DeclarationStr.size();
   int SeparatorPosition = DeclarationStr.find("][");
+  
+  if (SeparatorPosition == -1)
+    throw runtime_error("Format of declaration not valid");  
 
   LocalArray_GlobalArray.push_back(DeclarationStr.substr(0,SeparatorPosition+1));
   LocalArray_GlobalArray.push_back(DeclarationStr.substr(SeparatorPosition+1,DeclarationStrSize-LocalArray_GlobalArray[0].size()));
@@ -253,19 +271,17 @@ string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<stri
       OpenBraPosition =  DefinitionPart.find(OpenBracket);
       CloseBraPosition =  DefinitionPart.find(CloseBracket);
 
-      //StringLocationGroup.erase(OpenBraPosition, CloseBraPosition);
-      //remove TagName|Definition by groupnumber
-      
+      CheckSpacerValidity(OpenBraPosition,CPosition,CloseBraPosition);
+
       Tag.push_back( DefinitionPart.substr(OpenBraPosition+1,CPosition-OpenBraPosition-1));
+      CheckTagValidity(Tag[i]);
       Def.push_back( DefinitionPart.substr(CPosition+1,CloseBraPosition-CPosition-1));
 
        DefinitionPart= DefinitionPart.substr(CloseBraPosition+1, length-CloseBraPosition-2);
       
       ++i;
     }
-
    return ReplaceTagDef_by_Grp(StringLocationGroup,HowManyTimes);
-
 }
 
 /*********************************
@@ -296,10 +312,8 @@ string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
       StringLocationGroup = part1 + Grp.str() + part2;
       //cout << "(after adding grp) s= " << StringLocationGroup << std::endl;   //REMOVE
       }
-
   return StringLocationGroup;
 }
-
 
 /*********************************
 /Store operators
@@ -316,7 +330,7 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
  //Store each position of "|" into VecIter
  VecIter = PositionSeparator(StrS,HowMany);
   
-#ifdef RETRIEVER_TEST
+#ifdef RETRIEVER_DEFINITION_TEST
  cout << endl << "List of operators:" << endl;
 #endif
 
@@ -330,14 +344,11 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
 	{
 	  Ope.push_back("OR");
 	}
-#ifdef RETRIEVER_TEST
+#ifdef RETRIEVER_DEFINITION_TEST
       cout << "   Ope[" << i << "]= " << Ope[i]<< std::endl;   //REMOVE
 #endif
-
     }	  
-  
   return Ope;
-
 }
 
 /*********************************
@@ -357,7 +368,6 @@ vector<string::iterator> PositionSeparator(string s, int TagName_Number)
       ++i;
     }
   return VecIter;
-
 }
 
 /*********************************
@@ -400,8 +410,11 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority,
 	  break;
 	}
     }
+ 
+  if (Priority != 0)
+    throw runtime_error("Format of parentheses not valid");
 
-#ifdef RETRIEVER_TEST
+#ifdef RETRIEVER_DEFINITION_TEST
   cout << endl << "List of Priority and Inverse functions" << endl;
    //for debugging only     //REMOVE
   for (int j=0; j<OperatorNumber; j++)
@@ -411,7 +424,6 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority,
       cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
       }
 #endif
-
   return;
 }
 
@@ -423,8 +435,9 @@ void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
   Grp_parameters record;
   string NewString;
 
-#ifdef RETRIEVER_TEST
-  cout << endl << "List of Definition: " << endl; 
+#ifdef RETRIEVER_DEFINITION_TEST
+ cout << endl << "************************************************" << endl;
+ cout << "List of Definition: " << endl; 
  //for debugging only     //REMOVE
   for (int i =0; i<HowManyDef;i++)
     {
@@ -481,7 +494,12 @@ void InitLastIncre (string& def, int i)
   GrpPara[i].init =atoi((def.substr(0,pos1)).c_str());
   GrpPara[i].last =atoi((def.substr(pos1+1,pos2).c_str()));
   GrpPara[i].increment = atoi((new_def.substr(pos2+1, new_def.size()-1).c_str()));
-
+  
+#ifdef RETRIEVER_DEFINITION_TEST
+  cout << endl << "List of values from loop # " << i << ": " << endl;
+  cout << "   init= "<< GrpPara[i].init;
+  cout << "   last= " << GrpPara[i].last << "   Increment= " << GrpPara[i].increment;
+#endif
   return;
 }
 
@@ -506,15 +524,14 @@ void ParseGrp_Value(string& def, int i)
       ++b;
     }
 
-#ifdef RETRIEVER_TEST
-  cout << endl << "List of values from list of identifiers: " << endl;
+#ifdef RETRIEVER_DEFINITION_TEST
+  cout << endl << endl << "List of values from list of identifiers: " << endl;
   //for debugging     //REMOVE
    for (int j=0; j<GrpPara[i].value.size(); j++)
     {
       cout << "   GrpPara.value["<<i<<"]= " << GrpPara[i].value[j]<<endl;
     }
 #endif
-
   return;
 }
 
@@ -534,9 +551,10 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
       //remove square braces
   LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
 
-#ifdef RETRIEVER_TEST
-  cout << endl << "Local and Global Array: " << endl;
-    cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
+#ifdef RETRIEVER_DECLARATION_TEST
+ cout << endl << "************************************************" << endl;
+ cout << "Local and Global Array: " << endl;
+ cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
 #endif
 
   while (b <= LocGlobArray[i].size())
@@ -561,7 +579,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
  //remove square braces
   LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
   
-#ifdef RETRIEVER_TEST
+#ifdef RETRIEVER_DECLARATION_TEST
      cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
 #endif
 
@@ -579,7 +597,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 	
       ++b;
     }
-#ifdef RETRIEVER_TEST
+#ifdef RETRIEVER_DECLARATION_TEST
   cout << endl << "Parsing of values: " << endl;
   cout << "   Local array" << endl;
 
@@ -595,10 +613,27 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
       cout << "      GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
     }
 #endif
-
-
   return;
 }
 
+/*********************************
+/Check validity of Tags
+/*********************************/
+void CheckTagValidity (string & Tag)
+{
+ if (Tag == "pixelID" || Tag == "pixelX" || Tag == "pixelY")
+    return;
+  else
+    throw runtime_error("One of the Tag is not a valid Tag");
+return;
+}
 
-
+/*********************************
+/Check if a "|" spacer is missing
+/*********************************/
+void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
+{
+  if (spacerPosition < openBra || spacerPosition > closeBra)
+    throw runtime_error("Missing \"|\" spacer");
+  return;
+}
