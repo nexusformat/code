@@ -114,7 +114,7 @@ static void print_element_names(xmlNode * a_node){
         if(cur_node->type == XML_ELEMENT_NODE){
           cout << "node type: Element, name: " << cur_node->name << endl;
         }
-        
+
         //print_element_names(cur_node->children);
     }
 }
@@ -123,7 +123,7 @@ static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::it
   // error check input
   if(begin==end)
     return NULL;
-  
+
   // locate the next part of the path
   node=find_element(node,*begin);
 
