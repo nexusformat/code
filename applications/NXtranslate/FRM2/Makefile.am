@@ -38,6 +38,6 @@ libFRM2_la_SOURCES = \
 	frm2_retriever.cpp frm2_retriever.h \
 	string_util_ext.cpp string_util_ext.h
 
-EXTRA_DIST = 
+#EXTRA_DIST = 
 
 include $(top_srcdir)/build_rules.am

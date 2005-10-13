@@ -12,6 +12,7 @@
 #include "../nexus_util.h"
 #include "../string_util.h"
 #include "../tree.hh"
+#include <math.h>
 
 using std::ifstream;
 using std::invalid_argument;
@@ -190,6 +191,7 @@ const std::string Frm2Retriever::ARRAY_SEPARATOR=",";
 
 const unsigned int Frm2Retriever::HEIDI_LINES_PER_ENTRY=3;
 const unsigned int Frm2Retriever::HEIDI_CHARS_PER_COUNT=5;
+const unsigned int Frm2Retriever::HEIDI_COLS_PER_LINE=16;
 
 
 
@@ -1124,15 +1126,15 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 			index++;
 		}
 		if (it== headers.end()) {
-			std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
-			while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
+			//std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
+			/*while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
 				if (!isdata(line)) {
 					break;
 				}
 				values.push_back("0");
 				count++;
 				line = read_line(infile);
-			}
+			}*/
 			return values;
 		}
 	}
@@ -1322,15 +1324,15 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 			index++;
 		}
 		if (it== headers.end()) {
-			std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
-			while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
+			//std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
+			/*while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
 				if (!isdata(line)) {
 					break;
 				}
 				values.push_back("0");
 				count++;
 				line = read_line(infile);
-			}
+			}*/
 			return values;
 		}
 	}
@@ -1364,6 +1366,7 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 	}
 	return values;
 }
+
 
 std::vector<unsigned int> Frm2Retriever::extract_dnr(std::ifstream &file, std::string arg, unsigned int nxtype) {
 	std::vector<unsigned int> result;
@@ -1435,6 +1438,20 @@ std::string Frm2Retriever::extract_header(std::ifstream &file, std::string arg, 
 			// scan for word ...
 			std::vector<std::string> words = string_util::split_whitespace(str);
 			
+			// special case for heidi Omat extends over 3 lines
+			if (arg.find("Omat")>=0) {
+				line = read_line(infile);
+				std::vector<std::string> words2 = string_util::split_whitespace(line);
+				for (unsigned int i=0; i< words2.size(); i++) {
+					words.push_back(words2.at(i)); 
+				}
+				line = read_line(infile);
+				std::vector<std::string> words3 = string_util::split_whitespace(line);
+				for (unsigned int i=0; i< words3.size(); i++) {
+					words.push_back(words3.at(i)); 
+				}
+			}
+			
 			//std::cout << "words: " << word << " wcount: " << wcount <<std::endl;
 			for (int j=word; j<word+wcount;j++) {
 				result.append(words[j]).append(" ");
@@ -1459,13 +1476,23 @@ std::vector<double> Frm2Retriever::extract_heidi_counts(ifstream &file, int entr
 	skip_to_line(infile, cur_line, data_section); 
 // strategy: find datasection -> skip 3*entry_num lines -> read 8 param of first line -> 
 // n = number of scans -> read n 
-	
-	for (unsigned int i=0; i<(entry_num*Frm2Retriever::HEIDI_LINES_PER_ENTRY); i++) {
-		read_line(infile);
-	}
 	std::string line = read_line(infile);
-	std::cout << "line: " << line << std::endl;
 	std::vector<std::string> words = string_util::split_whitespace(line);
+	int nitems = 1;
+	int nlines = 0;
+	if (isnumber(words.at(7))) {
+		nitems =string_util::str_to_int(words.at(7));
+		nlines = (int)ceil(((double)(nitems*2))/Frm2Retriever::HEIDI_COLS_PER_LINE);
+	}
+
+	if (entry_num>0) {
+		for (unsigned int i=0; i<((entry_num*(nlines+2))-1); i++) {
+			read_line(infile);
+		}
+		line = read_line(infile);
+	}
+	//std::cout << "line: " << line << std::endl;
+	words = string_util::split_whitespace(line);
 			
 	//std::cout << "words: " << word << " wcount: " << wcount <<std::endl;
 	int numcounts = 0;
@@ -1482,14 +1509,20 @@ std::vector<double> Frm2Retriever::extract_heidi_counts(ifstream &file, int entr
 	line = read_line(infile);
 	
 	//std::cout << "CURRENT LINE: " << line << std::endl;
-	char count_str[Frm2Retriever::HEIDI_CHARS_PER_COUNT];
+	char count_str[Frm2Retriever::HEIDI_CHARS_PER_COUNT+1];
 	if (monitor_counts) {
-		infile.seekg((Frm2Retriever::HEIDI_CHARS_PER_COUNT*numcounts), std::ios_base::cur);
+		int num_line_breaks = (int)floor(((double)numcounts)/((double)Frm2Retriever::HEIDI_COLS_PER_LINE));
+		infile.seekg(((Frm2Retriever::HEIDI_CHARS_PER_COUNT*numcounts)+num_line_breaks), std::ios_base::cur);
 	}
 	for (int i=0; i<numcounts; i++) {
 		for (int j=0; j<Frm2Retriever::HEIDI_CHARS_PER_COUNT;j++) { 
 			count_str[j] = read_char(infile);
+			if (count_str[j] == '\n') {
+				count_str[j] = read_char(infile);
+			}
 		}
+		count_str[Frm2Retriever::HEIDI_CHARS_PER_COUNT]='\0';
+		//std::cout << "pushing back: " << std::string(count_str) << std::endl;
 		values.push_back(string_util::str_to_float(std::string(count_str)));
 		//std::cout << "pushing back: " << string_util::str_to_float(std::string(count_str)) << std::endl;
 	}
@@ -1548,14 +1581,26 @@ std::string Frm2Retriever::extract_data(std::ifstream &file, int entry_num, unsi
 	reset_file(infile);
 	skip_to_line(infile, cur_line, data_section);
 
-	for (unsigned int i=0; i<((entry_num*Frm2Retriever::HEIDI_LINES_PER_ENTRY)+lineno); i++) {
-		read_line(infile);
-	}
-	
 	line = read_line(infile);
-	//std::cout << "XD line: " << line << "lineno: " << lineno<< std::endl;
 	std::vector<std::string> words = string_util::split_whitespace(line);
-			
+	int nitems = 1;
+	int nlines = 0;
+	if (isnumber(words.at(7))) {
+		nitems =string_util::str_to_int(words.at(7));
+		nlines = (int)ceil(((double)(nitems*2))/Frm2Retriever::HEIDI_COLS_PER_LINE);
+	}
+	//std::cout << "nlines: " << nlines << std::endl;
+	if (entry_num > 0) {
+		for (unsigned int i=0; i<((entry_num*(nlines+2))+lineno)-1; i++) {
+			read_line(infile);
+		}
+		line = read_line(infile);
+	}
+	//std::cout << "XD line: " << line << "lineno: " << lineno<< std::endl;
+	words = string_util::split_whitespace(line);
+	/*for (unsigned int i =0; i< words.size(); i++) {
+		std::cout << "words["<<i<<"]: " << words[i] << std::endl;
+	}*/
 	//std::cout << "XD words: " << word << " wcount: " << wcount <<std::endl;
 	for (int j=word; j<word+wcount;j++) {
 		result.append(words[j]).append(" ");
@@ -1644,7 +1689,7 @@ Frm2Retriever::Frm2Retriever(const string &str): source(str),current_line(0){
 		cur_line++;
 	}
 
-	std::cout << "data line: " << line << "  isdata?: " << !isdata(line) << "   isfileok?: " << infile.good()<< std::endl;
+	//std::cout << "data line: " << line << "  isdata?: " << !isdata(line) << "   isfileok?: " << infile.good()<< std::endl;
 	header_section = cur_line-3;
 	// this is dangerous as it assumes the unit line to be present and always under the header line
 	// alternative: check if in header line is some occurence of unit string -> treat is as unit line
@@ -1682,7 +1727,7 @@ Frm2Retriever::Frm2Retriever(const string &str): source(str),current_line(0){
 	while (infile.good()) {
 		line = read_line(infile);
 		if (string_util::contains(line, lastheader)) {
-			data_section = cur_line+1;
+			data_section = cur_line+3;
 			break;
 		}
 		cur_line++;
@@ -1742,7 +1787,7 @@ Frm2Retriever::~Frm2Retriever(){
 
 
 Node* Frm2Retriever::createEmptyNode(std::string nodename, unsigned int nxtype) {
-	int* empty_dims = new int[1];
+	/*int* empty_dims = new int[1];
 	empty_dims[0] = 1;
 	void *data;
 	
@@ -1750,7 +1795,8 @@ Node* Frm2Retriever::createEmptyNode(std::string nodename, unsigned int nxtype) 
 		throw runtime_error("NXmalloc failed");
 	}
 	*((int*)data)=0;
-	return (new Node(nodename, data, 1, empty_dims, nxtype));
+	return (new Node(nodename, data, 1, empty_dims, nxtype));*/
+	return NULL;
 }
 
 
@@ -2156,8 +2202,6 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 		std::string raw_string=raw_map["values"];
 		std::string units=raw_map["units"];
 		std::string description=raw_map["description"];
- 		cout << "dict value: '" << raw_string << "'"<<std::endl;  
- 		cout << "units value: '" << units << "'"<<std::endl;  
 		
 		if (unit_strings.find(string_util::lower_str(units))!=unit_strings.end()) {
 			units = unit_strings[units];
@@ -2374,12 +2418,12 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 	else if (method == Frm2Retriever::HEIDICTS_TAG || method == Frm2Retriever::HEIDIMON_TAG) {
 		std::cout << "creating heidi mon cts node now 0" << std::endl;
 		std::vector<double> values = extract_heidi_counts(infile, heidi_entry_num, (method==Frm2Retriever::HEIDIMON_TAG));
-		std::cout << "creating heidi mon cts node now 1" << std::endl;
+		//std::cout << "creating heidi mon cts node now 1" << std::endl;
   		if (values.size() <= 0) {
 			node = createEmptyNode(arg, convert_type(nxtype));
 		}
 		else {
-			std::cout << "creating heidi mon cts node now 2"  << std::endl;
+			//std::cout << "creating heidi mon cts node now 2"  << std::endl;
 			node = createNode("empty", values, convert_type(nxtype));
 		}
 	}
@@ -2457,9 +2501,11 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 	else {
 		// unknown method
 		node = createEmptyNode("", NX_INT32);
+		node = NULL;
 	}
-
-	tr.insert(tr.begin(),*node);
+	if (node != NULL) {
+		tr.insert(tr.begin(),*node);
+	}
 }
 
 

@@ -154,6 +154,7 @@ public:
   
   static const unsigned int HEIDI_LINES_PER_ENTRY;
   static const unsigned int HEIDI_CHARS_PER_COUNT;
+  static const unsigned int HEIDI_COLS_PER_LINE;
   
   std::map<std::string, std::string> unit_strings; 
   
