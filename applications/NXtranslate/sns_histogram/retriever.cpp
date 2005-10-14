@@ -13,9 +13,11 @@
 #include "../string_util.h"
 #include "../tree.hh"
 
-//#define RETRIEVER_TEST      //to test main part     //REMOVE
+//#define RETRIEVER_TEST               //to test main part     
 //#define RETRIEVER_DECLARATION_TEST   //to test declaration part
-//#define RETRIEVER_DEFINITION_TEST    //to test definition part
+#define RETRIEVER_DEFINITION_TEST    //to test definition part
+//#define RETRIEVER_ARRAY_TEST         //to test allocation of memory of arrays
+//#define RETRIEVER_INPUT_TEST         //to test the data read
 
 using std::ifstream;
 using std::invalid_argument;
@@ -48,13 +50,16 @@ string TagDef_separator(string& s, vector<string>& Tag, vector<string>& Def);  /
 string ReplaceTagDef_by_Grp(string& s, int a); //Tag/Def is replaced by Grp to determine the priorities of the associations
 vector<string> StoreOperators(string& s, int& HowMany);  //isolate the operators of the definition part of the string location
 vector<string::iterator> PositionSeparator(string s, int TagName_Number);  //Find the position of each separator "|"
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority, vector<int> InverseDef);  //Give priority to each grp of the definition part
+void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef);  //Give priority to each grp of the definition part
 void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
 void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
 void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
 void CheckTagValidity (string& Tag);  //Check if the Tags are valid
 void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
+double* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, double* GlobalArray);  //calculate the final array according to definiton
+int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
+void MakeArray_pixelID (double* MyGrpArray, double* GlobalArray);
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -62,10 +67,10 @@ void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
 SnsHistogramRetriever::SnsHistogramRetriever(const string &str): source(str) 
 {
   // open the file
-  infile.open(source.c_str());
+  BinaryFile=fopen(source.c_str(),"rb");
 
   // check that open was successful
-  if(!infile.is_open())
+  if (BinaryFile==NULL)
     throw invalid_argument("Could not open file: "+source);
 }
 
@@ -74,11 +79,14 @@ SnsHistogramRetriever::SnsHistogramRetriever(const string &str): source(str)
 /*********************************/
 SnsHistogramRetriever::~SnsHistogramRetriever()
 {
-  // cout << "~TextPlainRetriever()" << endl;
+  // cout << "~TextPlainRetriever()" << endl;   //REMOVE
 
   // close the file
-  if(infile)
-    infile.close();
+  if(BinaryFile)
+    fclose(BinaryFile);
+
+  //where we need to free the memory allocated to the arrays
+  
 }
 
 /*********.***********************
@@ -97,7 +105,9 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   string DefinitionPart;          //use to determine the operators
   vector<int> GrpPriority;        //Vector of priority of each group
   vector<int> InverseDef;        //True=Inverse definition, False=keep it like it is
-
+  int Everything = 0;            //0= we don't want everything, 1=we do
+  int GlobalArraySize = 1;       //Size of global array within our program
+  
 
   new_location = location;
 
@@ -116,16 +126,23 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   cout << endl << "String location without white spaces: " << endl << "  " << new_location <<endl;
 #endif
   
-  //location decided to separate its declaration part (left side of the "D")
+  //location decided to separate its declaration part (left side of the "#")
   //from its definition part --> DeclaDef vector
   DeclaDef_separator(new_location,DeclaDef);
+   
+  //check if we want everything
+  if (DeclaDef[1] == "")
+      Everything = 1;
+    
 
   //Separate declaration arrays (local and global)
   LocGlobArray = Declaration_separator(DeclaDef[0]);
 
-  //Work on definition part
-  DefinitionPart = DeclaDef[1];
-  DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
+  if (Everything == 0)
+    {
+     //Work on definition part
+     DefinitionPart = DeclaDef[1];
+     DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
   
 #ifdef RETRIEVER_TEST
   cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   //REMOVE
@@ -135,24 +152,54 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
  cout << endl << "************************************************" << endl;
  cout << "List of Tags:" << endl;
  for (int i=0; i<Tag.size();i++)
-   cout << "   Tag[" << i << "]= " << Tag[i] << endl;
+   cout << "   Tag[" << i << "]= " << Tag[i];
 #endif
 
-  //Store operators
-  OperatorNumber = Tag.size();
-  Ope = StoreOperators(DefinitionPart,OperatorNumber);
+     //Store operators
+     OperatorNumber = Tag.size();
+     Ope = StoreOperators(DefinitionPart,OperatorNumber);
 
-  //Give to each grp its priority
-  GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef);   
-  //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
-  DefinitionParametersFunction(Def,OperatorNumber);
+     //Give to each grp its priority
+     GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef);   
+     //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
 
-  //parse Local and Global Array from Declaration part
+     DefinitionParametersFunction(Def,OperatorNumber);
+    }
+   
+ //parse Local and Global Array from Declaration part
   ParseDeclarationArray(LocGlobArray);
   
   //Read the binary file and store the data into an array defined
   //by the GlobalArray part of the declaration
 
+  //prepare loops
+  //array_size is Localarray[0]*LocalArray[1]*...*grp.size()
+   
+  //allocate memory for the Global Array
+  for (int i=0; i<GlobalArray.size(); i++)
+    {
+      GlobalArraySize *= GlobalArray[i];
+    }
+  double * GlobalArray = new double [GlobalArraySize];
+  double * NewArray = new double [GlobalArraySize];    //last addition
+
+  //transfer the data from the binary file into the GlobalArray
+  fread(&GlobalArray[0],sizeof(GlobalArray[0]),GlobalArraySize,BinaryFile);
+
+  /*#ifdef RETRIEVER_INPUT_TEST
+   cout << endl << "************************************************" << endl
+   cout << "Check 10 first data of file" << endl;
+   for (int j=0; j<10; j++)
+     {
+       cout << "GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
+     }
+#endif  */
+  
+  
+  //Calculate arrays according to definition
+  NewArray = CalculateArray(GrpPriority, InverseDef,GlobalArray);
+  
+  cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 }
 
 /*********************************
@@ -331,7 +378,7 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
  VecIter = PositionSeparator(StrS,HowMany);
   
 #ifdef RETRIEVER_DEFINITION_TEST
- cout << endl << "List of operators:" << endl;
+ cout << endl <<endl << "List of operators:" << endl;
 #endif
 
   for (int i=0; i<HowMany-1; i++)
@@ -340,12 +387,14 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
       { 
 	Ope.push_back("AND");
       }
-      else
+      else if (find(VecIter[i],VecIter[i+1],operatorOR[0])!=VecIter[i+1])
 	{
 	  Ope.push_back("OR");
 	}
+      else
+	throw runtime_error("Not a valid operator");
 #ifdef RETRIEVER_DEFINITION_TEST
-      cout << "   Ope[" << i << "]= " << Ope[i]<< std::endl;   //REMOVE
+      cout << "   Ope[" << i << "]= " << Ope[i];   //REMOVE
 #endif
     }	  
   return Ope;
@@ -373,7 +422,7 @@ vector<string::iterator> PositionSeparator(string s, int TagName_Number)
 /*********************************
 /Give priority for each group
 /*********************************/
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority, vector<int> InverseDef)
+void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef)
 {
   int DefinitionString_size = s.size();
   int GrpNumberLive = 0;
@@ -415,7 +464,7 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority,
     throw runtime_error("Format of parentheses not valid");
 
 #ifdef RETRIEVER_DEFINITION_TEST
-  cout << endl << "List of Priority and Inverse functions" << endl;
+  cout << endl << endl << "List of Priority and Inverse functions" << endl;
    //for debugging only     //REMOVE
   for (int j=0; j<OperatorNumber; j++)
     {
@@ -424,6 +473,7 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int> GrpPriority,
       cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
       }
 #endif
+
   return;
 }
 
@@ -604,16 +654,19 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
   //for debugging only      //REMOVE
   for (int j=0; j<LocalArray.size();j++)
     {
-      cout << "      LocalArray["<<j<<"]= "<<LocalArray[j]<<endl;
+      cout << "      LocalArray["<<j<<"]= "<<LocalArray[j];
     }
   //for debugging only      //REMOVE
-  cout << "   Global array" << endl;
-  for (int j=0; j<GlobalArray.size();j++)
+  cout << endl <<"   Global array" << endl;
+  
+  for (int k=0; k<GlobalArray.size();++k)
     {
-      cout << "      GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
+      cout << "      GlobalArray["<<k<<"]= "<<GlobalArray[k];
     }
+
 #endif
-  return;
+
+ return;
 }
 
 /*********************************
@@ -621,7 +674,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 /*********************************/
 void CheckTagValidity (string & Tag)
 {
- if (Tag == "pixelID" || Tag == "pixelX" || Tag == "pixelY")
+ if (Tag == "pixelID" || Tag == "pixelX" || Tag == "pixelY" || Tag == "Tbin")
     return;
   else
     throw runtime_error("One of the Tag is not a valid Tag");
@@ -635,5 +688,93 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 {
   if (spacerPosition < openBra || spacerPosition > closeBra)
     throw runtime_error("Missing \"|\" spacer");
+  return;
+}
+
+/*******************************************
+/Calculate arrays according to defintion
+/*******************************************/
+ double* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, double* GlobalArray)
+{
+  int HighestPriority;
+  int GrpNumber = GrpPriority.size();
+  int ArraySize = 1;
+
+  HighestPriority = FindMaxPriority(GrpPriority);
+
+  //determine array size
+  for (int i=0; i<LocalArray.size();i++)
+    {
+      ArraySize *= LocalArray[i];
+    }
+
+  //Allocate memory for the binary array
+  double * GrpArray = new double[ArraySize];
+  
+  //Allocate memory for each grp
+  double (*MyGrpArray)[GrpNumber] =new double[ArraySize][GrpNumber];
+
+  cout << "********************************************"<<endl;
+
+    //make an array for each group
+  for (int i=0; i<GrpPriority.size();i++)
+    {
+      cout << endl << "For Grp # " << i << " , the parameters are:"<<endl;   //REMOVE
+      cout << "  Tag= " << Tag[i]<<endl;
+      cout << "  Operator= " << Def[i]<<endl;
+      cout << endl; 
+      
+      if (Tag[i]=="pixelID") 
+	{
+	  MakeArray_pixelID(MyGrpArray[i], GlobalArray);
+	}
+      else if (Tag[i]=="pixelX")
+	{
+	}
+      else if (Tag[i]=="pixelY")
+	{
+	}
+      else if (Tag[i]=="Tbin")
+	{
+	}
+      
+
+    }
+
+
+
+  for (int j=HighestPriority; j>=0; --j)
+    {
+      
+
+
+    }
+
+
+  return GlobalArray;
+}
+
+/*******************************************
+/Find highest priority
+/*******************************************/
+int FindMaxPriority (vector<int>& GrpPriority)
+{
+  int MaxValue = 0;
+  
+  for (int i=0; i<GrpPriority.size();i++)
+    {
+      if (GrpPriority[i]>MaxValue)
+	MaxValue = GrpPriority[i];
+    }
+  
+  return MaxValue;
+}
+
+/*******************************************
+/Make pixelID array
+/*******************************************/
+void MakeArray_pixelID (double* MyGrpArray, double* GlobalArray)
+{
+
   return;
 }
