@@ -15,9 +15,13 @@
 
 //#define RETRIEVER_TEST               //to test main part     
 //#define RETRIEVER_DECLARATION_TEST   //to test declaration part
-#define RETRIEVER_DEFINITION_TEST    //to test definition part
+//#define RETRIEVER_DEFINITION_TEST    //to test definition part
 //#define RETRIEVER_ARRAY_TEST         //to test allocation of memory of arrays
 //#define RETRIEVER_INPUT_TEST         //to test the data read
+//#define RETRIEVER_MAKE_ARRAY         //to test the process of making the arrays
+#define RETRIEVER_MAKE_ARRAY_PIXELID     //to test the PixelID part
+#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to list a listing of the array produced
+//#define RETRIEVER_EVERYTHING   //when we don't have everything in the definition part
 
 using std::ifstream;
 using std::invalid_argument;
@@ -31,6 +35,9 @@ using std::vector;
 vector<string> Tag, Def;
 vector<string> VecStr;
 vector<int> LocalArray, GlobalArray;  //parameters of the declaration part
+
+//Type of binary file
+typedef double binary_type;
 
 struct Grp_parameters   //parameters of the different definitions
 {
@@ -57,13 +64,18 @@ void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
 void CheckTagValidity (string& Tag);  //Check if the Tags are valid
 void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
-double* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, double* GlobalArray);  //calculate the final array according to definiton
+binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope);  //calculate the final array according to definiton
 int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
-void MakeArray_pixelID (double* MyGrpArray, double* GlobalArray);
+void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number);  //make pixelID array
+void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number);   //make pixelX array
+void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number);   //make pixelY array
+void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number);     //make Tbin array
+void MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray); //make a copy of the binary array
+
 
 /*********************************
 /SnsHistogramRetriever constructor
-/*********************************/
+`/*********************************/
 SnsHistogramRetriever::SnsHistogramRetriever(const string &str): source(str) 
 {
   // open the file
@@ -108,14 +120,13 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   int Everything = 0;            //0= we don't want everything, 1=we do
   int GlobalArraySize = 1;       //Size of global array within our program
   
-
   new_location = location;
 
   // check that the argument is not an empty string
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
 #ifdef RETRIEVER_TEST
-  cout << "#############################################################" << endl;
+  cout << "####RETRIEVER_TEST#########################################################" << endl;
   cout << "Initial string location= " << endl << "  " << new_location << endl;
 #endif
 
@@ -128,12 +139,24 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   
   //location decided to separate its declaration part (left side of the "#")
   //from its definition part --> DeclaDef vector
+ 
   DeclaDef_separator(new_location,DeclaDef);
-   
-  //check if we want everything
+ 
+ //check if we want everything
   if (DeclaDef[1] == "")
-      Everything = 1;
-    
+      {
+	Everything = 1;
+	Tag.push_back("*");
+	Ope.push_back("*");
+      }
+
+#ifdef RETRIEVER_EVERYTHING
+  if (DeclaDef[1] == "")
+    {
+      cout << "****RETRIEVER_EVERYTHING*****************************"<<endl;
+      cout << "Tag[0]= " << Tag[0]<<endl;
+    }
+#endif
 
   //Separate declaration arrays (local and global)
   LocGlobArray = Declaration_separator(DeclaDef[0]);
@@ -149,7 +172,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 #endif
  
 #ifdef RETRIEVER_DEFINITION_TEST
- cout << endl << "************************************************" << endl;
+ cout << endl << "****RETRIEVER_DEFINITION_TEST********************************************" << endl;
  cout << "List of Tags:" << endl;
  for (int i=0; i<Tag.size();i++)
    cout << "   Tag[" << i << "]= " << Tag[i];
@@ -169,35 +192,28 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
  //parse Local and Global Array from Declaration part
   ParseDeclarationArray(LocGlobArray);
   
-  //Read the binary file and store the data into an array defined
-  //by the GlobalArray part of the declaration
-
-  //prepare loops
-  //array_size is Localarray[0]*LocalArray[1]*...*grp.size()
-   
-  //allocate memory for the Global Array
+  //allocate memory for the binary Array
   for (int i=0; i<GlobalArray.size(); i++)
     {
       GlobalArraySize *= GlobalArray[i];
     }
-  double * GlobalArray = new double [GlobalArraySize];
-  double * NewArray = new double [GlobalArraySize];    //last addition
+  binary_type * BinaryArray = new binary_type [GlobalArraySize];
+  binary_type * NewArray = new binary_type [GlobalArraySize];    //last addition
 
   //transfer the data from the binary file into the GlobalArray
-  fread(&GlobalArray[0],sizeof(GlobalArray[0]),GlobalArraySize,BinaryFile);
+  fread(&BinaryArray[0],sizeof(BinaryArray[0]),GlobalArraySize,BinaryFile);
 
-  /*#ifdef RETRIEVER_INPUT_TEST
-   cout << endl << "************************************************" << endl
+#ifdef RETRIEVER_INPUT_TEST
+  cout << endl << end << "****RETRIEVER_INPUT_TEST********************************************" << endl;
    cout << "Check 10 first data of file" << endl;
    for (int j=0; j<10; j++)
      {
-       cout << "GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
+       cout << "   GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
      }
-#endif  */
-  
-  
+#endif
+    
   //Calculate arrays according to definition
-  NewArray = CalculateArray(GrpPriority, InverseDef,GlobalArray);
+  NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope);
   
   cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 }
@@ -261,8 +277,15 @@ void DeclaDef_separator(string& new_location,vector<string>& VecStr)
   string_size taille = new_location.size();
   
   VecStr.push_back(new_location.substr(0,Dposition));
-  VecStr.push_back(new_location.substr(Dposition+1, taille-VecStr[0].size()-1));
-
+  
+  if (taille - VecStr[0].size()-1 <= Dposition+1)
+    {
+      VecStr.push_back("");
+    }
+  else
+    {
+    VecStr.push_back(new_location.substr(Dposition+1, taille - VecStr[0].size()-1));
+    }
   return;
 }
 
@@ -486,7 +509,7 @@ void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
   string NewString;
 
 #ifdef RETRIEVER_DEFINITION_TEST
- cout << endl << "************************************************" << endl;
+ cout << endl << "****RETRIEVER_DEFINITION_TEST********************************************" << endl;
  cout << "List of Definition: " << endl; 
  //for debugging only     //REMOVE
   for (int i =0; i<HowManyDef;i++)
@@ -547,8 +570,8 @@ void InitLastIncre (string& def, int i)
   
 #ifdef RETRIEVER_DEFINITION_TEST
   cout << endl << "List of values from loop # " << i << ": " << endl;
-  cout << "   init= "<< GrpPara[i].init;
-  cout << "   last= " << GrpPara[i].last << "   Increment= " << GrpPara[i].increment;
+  cout << "   GrpPara["<<i<<"].init= "<< GrpPara[i].init;
+  cout << "   GrpPara["<<i<<"].last= " << GrpPara[i].last << "   increment= " << GrpPara[i].increment;
 #endif
   return;
 }
@@ -602,7 +625,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
   LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
 
 #ifdef RETRIEVER_DECLARATION_TEST
- cout << endl << "************************************************" << endl;
+ cout << endl << "****RETRIEVER_DECLARATION_TEST********************************************" << endl;
  cout << "Local and Global Array: " << endl;
  cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
 #endif
@@ -694,64 +717,128 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 /*******************************************
 /Calculate arrays according to defintion
 /*******************************************/
- double* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, double* GlobalArray)
+ binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope)
 {
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
   int ArraySize = 1;
-
-  HighestPriority = FindMaxPriority(GrpPriority);
-
+ 
+  if (Tag[0]!="*")
+    {
+    HighestPriority = FindMaxPriority(GrpPriority);
+    }
+ 
   //determine array size
   for (int i=0; i<LocalArray.size();i++)
     {
       ArraySize *= LocalArray[i];
     }
-
-  //Allocate memory for the binary array
-  double * GrpArray = new double[ArraySize];
+ 
+  //Allocate memory for the final array
+  binary_type * FinalArray = new binary_type[ArraySize];
   
+  if (Tag[0] == "*")
+    {
+      GrpNumber=1;
+      GrpPriority.push_back(1);
+    }
+ 
   //Allocate memory for each grp
-  double (*MyGrpArray)[GrpNumber] =new double[ArraySize][GrpNumber];
+  binary_type (*MyGrpArray)[GrpNumber] =new binary_type[ArraySize][GrpNumber];
 
-  cout << "********************************************"<<endl;
+#ifdef RETRIEVER_MAKE_ARRAY
+  cout << endl << "****RETRIEVER_MAKE_ARRAY********************************************"<<endl;
+#endif
 
     //make an array for each group
   for (int i=0; i<GrpPriority.size();i++)
     {
+
+#ifdef RETRIEVER_MAKE_ARRAY
       cout << endl << "For Grp # " << i << " , the parameters are:"<<endl;   //REMOVE
       cout << "  Tag= " << Tag[i]<<endl;
-      cout << "  Operator= " << Def[i]<<endl;
-      cout << endl; 
-      
+      cout << "  Operator= " << Ope[i]<<endl;
+#endif        
+   
       if (Tag[i]=="pixelID") 
 	{
-	  MakeArray_pixelID(MyGrpArray[i], GlobalArray);
+	  MakeArray_pixelID(MyGrpArray[i],BinaryArray,i);
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
+	  cout << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************";
+	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
+
+	  int ll = 0;
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)
+	    {
+	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl;
+		  ll = 0;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	    } 
+#endif
+
 	}
       else if (Tag[i]=="pixelX")
 	{
+	  MakeArray_pixelX(MyGrpArray[i],BinaryArray,i);
 	}
       else if (Tag[i]=="pixelY")
 	{
+	  MakeArray_pixelY(MyGrpArray[i],BinaryArray,i);
 	}
       else if (Tag[i]=="Tbin")
 	{
+	  MakeArray_Tbin(MyGrpArray[i],BinaryArray,i);
 	}
+      else if (Tag[i]=="*")
+	{
+	  MakeArray_Everything(MyGrpArray[i],BinaryArray);
+
+#ifdef RETRIEVER_EVERYTHING
+	  cout << "****RETRIEVER_EVERYTHING****************************************";
+	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
+
+	  int ll = 0;
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)
+	    {
+	      cout << *MyGrpArray[i]+j << " ";            //listing of MyGrpArray    
       
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl;
+		  ll = 0;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	    } 
+#endif
 
-    }
+	}
+}
 
 
-
-  for (int j=HighestPriority; j>=0; --j)
+   for (int j=HighestPriority; j>=0; --j)
     {
       
-
-
     }
 
 
-  return GlobalArray;
+
+
+
+   return FinalArray;    //return the final array
 }
 
 /*******************************************
@@ -773,8 +860,106 @@ int FindMaxPriority (vector<int>& GrpPriority)
 /*******************************************
 /Make pixelID array
 /*******************************************/
-void MakeArray_pixelID (double* MyGrpArray, double* GlobalArray)
+void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int grp_number)
 {
+  cout << endl << "****MakeArray_pixelID***************************************" << endl;
+  string loop="loop";
 
+    if (Def[grp_number][0] == loop[0]) 
+    {
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID
+      cout << "  Def["<<grp_number<<"]= "<<Def[grp_number]<<endl;
+      cout << "  GrpPara["<<grp_number<<"].init= "<<GrpPara[grp_number].init<<endl;
+      cout << "  GrpPara["<<grp_number<<"].last= "<<GrpPara[grp_number].last<<endl; 
+      cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl;
+#endif
+
+    for (int i=GrpPara[grp_number].init;i<=GrpPara[grp_number].last;i=i+GrpPara[grp_number].increment)
+      {
+        for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	  {
+                MyGrpArray[i*GlobalArray[2]+tbin]=BinaryArray[i*GlobalArray[2]+tbin];
+	  }
+      }
+    }
+  else
+    {
+      
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID
+      cout << "  List of identifiers values are: " <<endl;
+#endif
+
+      for (int j=0; j<GrpPara[grp_number].value.size();j++)
+	{
+	  for (int tbin=0; tbin < GlobalArray[2]; tbin++)
+	    {
+	     MyGrpArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin]=BinaryArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin];
+	    }
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID   //list of identifiers
+	  cout << "    GrpPara["<<grp_number<<"].value["<<j<<"]="<<GrpPara[grp_number].value[j]<<"     "<<"MyGrpArray["<<GrpPara[grp_number].value[j]<<"]= "<<MyGrpArray[GrpPara[grp_number].value[j]]<<endl;
+#endif
+	}
+    }
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
+  cout << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************";
+  cout << endl << "Check if MyGrpArray["<<grp_number<<"] is correct: " << endl;
+  cout << "MyGrpArray: " << endl;
+
+   int ll = 0;
+
+  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)
+    {
+      cout << MyGrpArray[j] << " ";            //listing of MyGrpArray    
+      
+      if (ll == (GlobalArray[2]-1))
+	{
+	  cout << endl;
+	  ll = 0;
+	}
+      else
+	{
+	  ++ll;
+	}
+    } 
+
+#endif
+    
   return;
+}
+
+/*******************************************
+/Make pixelX array
+/*******************************************/
+void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number)
+{
+  return;
+}
+
+/*******************************************
+/Make pixelY array
+/*******************************************/
+void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number)
+{
+  return;
+}
+
+/*******************************************
+/Make Tbin array
+/*******************************************/
+void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number)
+{
+  return;
+}
+
+/*******************************************
+/Make a copy of the binary Array
+/*******************************************/
+void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
+{
+  MyGrpArray = BinaryArray;
+  
+  return ;
 }
