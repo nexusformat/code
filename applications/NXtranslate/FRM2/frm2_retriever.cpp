@@ -1216,9 +1216,9 @@ std::map<std::string,std::string > Frm2Retriever::extract_dictentry(std::ifstrea
 		pos = line.find(arg);
 		if (pos != std::string::npos && pos<2) {
 			line = line.substr(pos+arg.size());
-			
+			std::cout << "got line: " << 	line << std::endl;
 			/* extract description*/
-			description = line.substr(pos+arg.size());
+			description = line;
 			pos = description.find("-");
 			if (pos != std::string::npos) {
 				description = description.substr(pos+1);
@@ -1351,7 +1351,7 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 		try {
 			//std::cout << "transforming..." << std::endl;
 			std::vector<std::string> line_values = string_util::split_values(line);
-			/*for (std::vector<std::string>::iterator itt=values.begin(); itt!=values.end(); itt++) {
+			/*for (std::vector<std::string>::iterator itt=line_values.begin(); itt!=line_values.end(); itt++) {
 				std::cout << "column------- vector: " << *itt << std::endl;
 			}*/
 			/*std::cout << endl << "pushing data: " << (string_util::str_to_float(string_values.at(index))) << std::endl;	
@@ -2179,11 +2179,13 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 				unit_pos++;
 			}
 			if (it!= headers.end()) {
-				if (unit_strings.find(string_util::lower_str(units.at(unit_pos)))!=unit_strings.end()) {
-					unit = unit_strings[units.at(unit_pos)];
-				}
-				else {
-					unit = units.at(unit_pos);
+				if (units.size()>unit_pos) {
+					if (unit_strings.find(string_util::lower_str(units.at(unit_pos)))!=unit_strings.end()) {
+						unit = unit_strings[units.at(unit_pos)];
+					}
+					else {
+						unit = units.at(unit_pos);
+					}
 				}
 			}
 			//std::cout << endl << "pushing data: " << (string_util::str_to_float(string_values.at(index))) << std::endl;	
