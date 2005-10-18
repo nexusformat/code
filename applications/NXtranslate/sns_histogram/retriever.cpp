@@ -19,9 +19,16 @@
 //#define RETRIEVER_ARRAY_TEST         //to test allocation of memory of arrays
 //#define RETRIEVER_INPUT_TEST         //to test the data read
 //#define RETRIEVER_MAKE_ARRAY         //to test the process of making the arrays
-#define RETRIEVER_MAKE_ARRAY_PIXELID     //to test the PixelID part
-#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to list a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_PIXELID     //to test the pixelID part
+//#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
 //#define RETRIEVER_EVERYTHING   //when we don't have everything in the definition part
+//#define RETRIEVER_MAKE_ARRAY_PIXELX       //to test the pixelX part
+//#define RETRIEVER_MAKE_ARRAY_PIXELX_LIST    //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_PIXELY       //to test the pixelY part
+//#define RETRIEVER_MAKE_ARRAY_PIXELY_LIST    //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_TBIN      //to test the Tbin part
+//#define RETRIEVER_MAKE_ARRAY_TBIN_LIST   //to get a listing of the array produced
+#define RETRIEVER_MAKE_PRIORITIES    //to tets the priority part
 
 using std::ifstream;
 using std::invalid_argument;
@@ -204,11 +211,11 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   fread(&BinaryArray[0],sizeof(BinaryArray[0]),GlobalArraySize,BinaryFile);
 
 #ifdef RETRIEVER_INPUT_TEST
-  cout << endl << end << "****RETRIEVER_INPUT_TEST********************************************" << endl;
+  cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
    cout << "Check 10 first data of file" << endl;
    for (int j=0; j<10; j++)
      {
-       cout << "   GlobalArray["<<j<<"]= "<<GlobalArray[j]<<endl;
+       cout << "   BinaryArray["<<j<<"]= "<<BinaryArray[j]<<endl;
      }
 #endif
     
@@ -674,12 +681,11 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
   cout << endl << "Parsing of values: " << endl;
   cout << "   Local array" << endl;
 
-  //for debugging only      //REMOVE
   for (int j=0; j<LocalArray.size();j++)
     {
       cout << "      LocalArray["<<j<<"]= "<<LocalArray[j];
     }
-  //for debugging only      //REMOVE
+
   cout << endl <<"   Global array" << endl;
   
   for (int k=0; k<GlobalArray.size();++k)
@@ -722,6 +728,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
   int ArraySize = 1;
+  int ArraySizeGlobal = 1;
  
   if (Tag[0]!="*")
     {
@@ -742,62 +749,177 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
       GrpNumber=1;
       GrpPriority.push_back(1);
     }
- 
-  //Allocate memory for each grp
-  binary_type (*MyGrpArray)[GrpNumber] =new binary_type[ArraySize][GrpNumber];
+  
+  //determine array size
+  for (int i=0; i<GlobalArray.size();i++)
+    {
+      ArraySizeGlobal *= GlobalArray[i];
+    }
 
+  //Allocate memory for each grp
+  binary_type (*MyGrpArray)[ArraySizeGlobal] = new binary_type[3][ArraySizeGlobal];  
+
+    
 #ifdef RETRIEVER_MAKE_ARRAY
   cout << endl << "****RETRIEVER_MAKE_ARRAY********************************************"<<endl;
 #endif
 
     //make an array for each group
-  for (int i=0; i<GrpPriority.size();i++)
+  for (int i=0; i<GrpPriority.size();++i)
     {
 
 #ifdef RETRIEVER_MAKE_ARRAY
-      cout << endl << "For Grp # " << i << " , the parameters are:"<<endl;   //REMOVE
+      cout << endl << "For Grp # " << i << " , the parameters are:"<<endl;   
       cout << "  Tag= " << Tag[i]<<endl;
-      cout << "  Operator= " << Ope[i]<<endl;
+      if (Ope.size()!= NULL)
+	{
+	  cout << "  Operator= " << Ope[i]<<endl;
+	}
 #endif        
-   
+
       if (Tag[i]=="pixelID") 
 	{
 	  MakeArray_pixelID(MyGrpArray[i],BinaryArray,i);
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
-	  cout << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************";
-	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
+	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
+	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl;
 
 	  int ll = 0;
+	  int mm = 0;
+	  cout << "   ";
 
-	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)  
 	    {
 	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
       
 	      if (ll == (GlobalArray[2]-1))
 		{
-		  cout << endl;
+		  cout << endl << "   ";
 		  ll = 0;
+		  ++mm;
 		}
 	      else
 		{
 		  ++ll;
 		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  mm = 0;
+		}
 	    } 
 #endif
-
 	}
       else if (Tag[i]=="pixelX")
 	{
 	  MakeArray_pixelX(MyGrpArray[i],BinaryArray,i);
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELX_LIST
+
+	  cout << "****RETRIEVER_MAKE_ARRAY_PIXELX_LIST****************************************"<<endl;
+	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelX in CalculateArray is correct: " << endl;
+
+	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+	    {
+	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  cout << "   ";
+		  mm = 0;
+		}
+	    } 
+
+#endif
 	}
       else if (Tag[i]=="pixelY")
 	{
 	  MakeArray_pixelY(MyGrpArray[i],BinaryArray,i);
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELY_LIST
+
+	  cout << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
+	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelY in CalculateArray is correct: " << endl;
+
+	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+	    {
+	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  cout << "   ";
+		  mm = 0;
+		}
+	    } 
+#endif
 	}
       else if (Tag[i]=="Tbin")
 	{
 	  MakeArray_Tbin(MyGrpArray[i],BinaryArray,i);
+
+#ifdef RETRIEVER_MAKE_ARRAY_TBIN_LIST
+
+	  cout << "****RETRIEVER_MAKE_ARRAY_TBIN_LIST****************************************"<<endl;
+	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_Tbin in CalculateArray is correct: " << endl;
+
+	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+	    {
+	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  cout << "   ";
+		  mm = 0;
+		}
+	    } 
+#endif
+
 	}
       else if (Tag[i]=="*")
 	{
@@ -824,19 +946,13 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 		}
 	    } 
 #endif
-
 	}
 }
-
 
    for (int j=HighestPriority; j>=0; --j)
     {
       
     }
-
-
-
-
 
    return FinalArray;    //return the final array
 }
@@ -853,7 +969,7 @@ int FindMaxPriority (vector<int>& GrpPriority)
       if (GrpPriority[i]>MaxValue)
 	MaxValue = GrpPriority[i];
     }
-  
+
   return MaxValue;
 }
 
@@ -862,7 +978,11 @@ int FindMaxPriority (vector<int>& GrpPriority)
 /*******************************************/
 void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int grp_number)
 {
-  cout << endl << "****MakeArray_pixelID***************************************" << endl;
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID
+  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID***************************************" << endl;
+#endif
+ 
   string loop="loop";
 
     if (Def[grp_number][0] == loop[0]) 
@@ -879,11 +999,11 @@ void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int g
       {
         for (int tbin=0; tbin < GlobalArray[2];tbin++)
 	  {
-                MyGrpArray[i*GlobalArray[2]+tbin]=BinaryArray[i*GlobalArray[2]+tbin];
+            MyGrpArray[i*GlobalArray[2]+tbin]=BinaryArray[i*GlobalArray[2]+tbin];
 	  }
       }
     }
-  else
+    else
     {
       
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID
@@ -926,7 +1046,7 @@ void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int g
     } 
 
 #endif
-    
+
   return;
 }
 
@@ -935,6 +1055,58 @@ void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int g
 /*******************************************/
 void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number)
 {
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELX
+  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELX****************************************" << endl;
+#endif
+
+  string loop="loop";
+
+    if (Def[grp_number][0] == loop[0]) 
+    {
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELX
+      cout << "  Def["<<grp_number<<"]= "<<Def[grp_number]<<endl;
+      cout << "  GrpPara["<<grp_number<<"].init= "<<GrpPara[grp_number].init<<endl;
+      cout << "  GrpPara["<<grp_number<<"].last= "<<GrpPara[grp_number].last<<endl; 
+      cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl<<endl;
+#endif
+
+   for (int y=0; y<GlobalArray[0];y++)
+     {
+       for (int x = GrpPara[grp_number].init; x <=GrpPara[grp_number].last; x = x +GrpPara[grp_number].increment)
+         {
+           for (int tbin=0; tbin < GlobalArray[2];tbin++)
+             {
+	   MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	     }
+         } 
+      }
+    }
+  else
+    {
+      
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELX
+      cout << endl<<"List of identifiers values are: " <<endl;
+      for (int i=0;i<GrpPara[grp_number].value.size();i++)
+	{
+	  cout << "   GrpPara["<<grp_number<<"].value["<<i<<"]= "<<GrpPara[grp_number].value[i]<<endl;
+	}
+      cout << endl;
+#endif
+
+      for (int y=0; y<GlobalArray[0];y++)
+	{
+	  for (int x=0; x < GrpPara[grp_number].value.size(); x++)
+	    {
+	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
+		{
+		  MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+
+		}
+	    }
+	}
+    }
+    
   return;
 }
 
@@ -943,6 +1115,58 @@ void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 /*******************************************/
 void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number)
 {
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELY
+  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY****************************************" << endl;
+#endif
+
+  string loop="loop";
+
+    if (Def[grp_number][0] == loop[0]) 
+    {
+
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELY
+      cout << "  Def["<<grp_number<<"]= "<<Def[grp_number]<<endl;
+      cout << "  GrpPara["<<grp_number<<"].init= "<<GrpPara[grp_number].init<<endl;
+      cout << "  GrpPara["<<grp_number<<"].last= "<<GrpPara[grp_number].last<<endl; 
+      cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl<<endl;
+#endif
+
+   for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = y + GrpPara[grp_number].increment)
+     {
+       for (int x = 0; x < GlobalArray[1]; ++x)
+         {
+           for (int tbin=0; tbin < GlobalArray[2];tbin++)
+             {
+	   MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	     }
+	 } 
+      }
+    }
+  else
+    {
+      
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELY
+      cout << endl<<"List of identifiers values are: " <<endl;
+      
+      for (int i=0;i<GrpPara[grp_number].value.size();i++)
+	{
+	  cout << "   GrpPara["<<grp_number<<"].value["<<i<<"]= "<<GrpPara[grp_number].value[i]<<endl;
+	}
+      cout << endl;
+
+#endif
+
+       for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
+	{
+	  for (int x=0; x < GlobalArray[1]; x++)
+	    {
+	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
+		{
+	         MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])]= BinaryArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])];
+		}
+	    }
+	}
+    }
   return;
 }
 
@@ -951,6 +1175,59 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 /*******************************************/
 void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number)
 {
+#ifdef RETRIEVER_MAKE_ARRAY_TBIN
+  cout << endl << "****RETRIEVER_MAKE_ARRAY_TBIN****************************************" << endl;
+#endif
+
+  string loop="loop";
+
+    if (Def[grp_number][0] == loop[0]) 
+    {
+
+#ifdef RETRIEVER_MAKE_ARRAY_TBIN
+      cout << "  Def["<<grp_number<<"]= "<<Def[grp_number]<<endl;
+      cout << "  GrpPara["<<grp_number<<"].init= "<<GrpPara[grp_number].init<<endl;
+      cout << "  GrpPara["<<grp_number<<"].last= "<<GrpPara[grp_number].last<<endl; 
+      cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl<<endl;
+#endif
+
+   for (int y=0; y < GlobalArray[0]; ++y )
+     {
+       for (int x = 0; x < GlobalArray[1]; ++x)
+         {
+           for (int tbin=GrpPara[grp_number].init; tbin <= GrpPara[grp_number].last; tbin = tbin + GrpPara[grp_number].increment)
+             {
+	   MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	     }
+	 } 
+      }
+    }
+  else
+    {
+      
+#ifdef RETRIEVER_MAKE_ARRAY_TBIN
+      cout << endl<<"List of identifiers values are: " <<endl;
+      
+      for (int i=0;i<GrpPara[grp_number].value.size();i++)
+	{
+	  cout << "   GrpPara["<<grp_number<<"].value["<<i<<"]= "<<GrpPara[grp_number].value[i]<<endl;
+	}
+      cout << endl;
+
+#endif
+
+       for (int y=0; y < GlobalArray[0]; ++y)
+	{
+	  for (int x=0; x < GlobalArray[1]; x++)
+	    {
+	      for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
+		{
+		  MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]]= BinaryArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]];
+	        }
+	    }
+	}
+    }
+
   return;
 }
 
@@ -963,3 +1240,4 @@ void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
   
   return ;
 }
+
