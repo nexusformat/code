@@ -13,23 +13,23 @@
 #include "../string_util.h"
 #include "../tree.hh"
 
-//#define RETRIEVER_TEST               //to test main part     
-//#define RETRIEVER_DECLARATION_TEST   //to test declaration part
-//#define RETRIEVER_DEFINITION_TEST    //to test definition part
-//#define RETRIEVER_ARRAY_TEST         //to test allocation of memory of arrays
-//#define RETRIEVER_INPUT_TEST         //to test the data read
-//#define RETRIEVER_MAKE_ARRAY         //to test the process of making the arrays
-#define RETRIEVER_MAKE_ARRAY_PIXELID     //to test the pixelID part
-#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
-//#define RETRIEVER_EVERYTHING   //when we don't have everything in the definition part
+//#define RETRIEVER_TEST                    //to test main part     
+//#define RETRIEVER_DECLARATION_TEST        //to test declaration part
+//#define RETRIEVER_DEFINITION_TEST         //to test definition part
+//#define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
+//#define RETRIEVER_INPUT_TEST              //to test the data read
+//#define RETRIEVER_MAKE_ARRAY              //to test the process of making the arrays
+//#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
+//#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
+//#define RETRIEVER_EVERYTHING              //when we don't have everything in the definition part
 //#define RETRIEVER_MAKE_ARRAY_PIXELX       //to test the pixelX part
-//#define RETRIEVER_MAKE_ARRAY_PIXELX_LIST    //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_PIXELX_LIST  //to get a listing of the array produced
 //#define RETRIEVER_MAKE_ARRAY_PIXELY       //to test the pixelY part
-//#define RETRIEVER_MAKE_ARRAY_PIXELY_LIST    //to get a listing of the array produced
-//#define RETRIEVER_MAKE_ARRAY_TBIN      //to test the Tbin part
-//#define RETRIEVER_MAKE_ARRAY_TBIN_LIST   //to get a listing of the array produced
-#define RETRIEVER_MAKE_ARRAYS_LIST   //to get a listing of all the arrays made
-//#define RETRIEVER_MAKE_PRIORITIES    //to tets the priority part
+//#define RETRIEVER_MAKE_ARRAY_PIXELY_LIST  //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_TBIN         //to test the Tbin part
+//#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
+#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
+//#define RETRIEVER_MAKE_PRIORITIES         //to tets the priority part
 
 using std::ifstream;
 using std::invalid_argument;
@@ -147,9 +147,9 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   
   //location decided to separate its declaration part (left side of the "#")
   //from its definition part --> DeclaDef vector
- 
+
   DeclaDef_separator(new_location,DeclaDef);
- 
+
  //check if we want everything
   if (DeclaDef[1] == "")
       {
@@ -176,9 +176,9 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
      DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
   
 #ifdef RETRIEVER_TEST
-  cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   //REMOVE
+  cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   
 #endif
- 
+
 #ifdef RETRIEVER_DEFINITION_TEST
  cout << endl << "****RETRIEVER_DEFINITION_TEST********************************************" << endl;
  cout << "List of Tags:" << endl;
@@ -199,7 +199,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
    
  //parse Local and Global Array from Declaration part
   ParseDeclarationArray(LocGlobArray);
-  
+
   //allocate memory for the binary Array
   for (int i=0; i<GlobalArray.size(); i++)
     {
@@ -286,9 +286,10 @@ void DeclaDef_separator(string& new_location,vector<string>& VecStr)
   
   VecStr.push_back(new_location.substr(0,Dposition));
   
-  if (taille - VecStr[0].size()-1 <= Dposition+1)
+  if (taille == Dposition+1)
+      //if (taille - VecStr[0].size()-1 <= Dposition+1)
     {
-      VecStr.push_back("");
+        VecStr.push_back("");
     }
   else
     {
@@ -313,7 +314,7 @@ vector<string> Declaration_separator(string DeclarationStr)
 
   LocalArray_GlobalArray.push_back(DeclarationStr.substr(0,SeparatorPosition+1));
   LocalArray_GlobalArray.push_back(DeclarationStr.substr(SeparatorPosition+1,DeclarationStrSize-LocalArray_GlobalArray[0].size()));
-  
+ 
   return LocalArray_GlobalArray;
 }
 
@@ -376,7 +377,6 @@ string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
   for (int j=0 ; j<HowManyTimes ; j++)
   
     {
-      //cout << std::endl << std::endl << "j= " << j << std::endl << std::endl;//REMOVE
       std::ostringstream Grp;
       OpenBraPosition =  StringLocationGroup.find(OpenBracket);
       CloseBraPosition =  StringLocationGroup.find(CloseBracket);
@@ -388,7 +388,6 @@ string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
      
       Grp << "grp" << j ;  
       StringLocationGroup = part1 + Grp.str() + part2;
-      //cout << "(after adding grp) s= " << StringLocationGroup << std::endl;   //REMOVE
       }
   return StringLocationGroup;
 }
@@ -579,7 +578,7 @@ void InitLastIncre (string& def, int i)
 #ifdef RETRIEVER_DEFINITION_TEST
   cout << endl << "List of values from loop # " << i << ": " << endl;
   cout << "   GrpPara["<<i<<"].init= "<< GrpPara[i].init;
-  cout << "   GrpPara["<<i<<"].last= " << GrpPara[i].last << "   increment= " << GrpPara[i].increment<<endl<<endl;
+  cout << "   GrpPara["<<i<<"].last= " << GrpPara[i].last << "   GrpPara["<<i<<"].increment= " << GrpPara[i].increment<<endl<<endl;
 #endif
   return;
 }
@@ -758,9 +757,16 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
     }
 
   //Allocate memory for each grp
-  binary_type (*MyGrpArray)[ArraySizeGlobal] = new binary_type[3][ArraySizeGlobal];  
-
+  //  binary_type (*MyGrpArray)[ArraySizeGlobal] = new binary_type[3][ArraySizeGlobal];     //WRONG
     
+  binary_type **MyGrpArray;
+  MyGrpArray = new binary_type*[GrpPriority.size()];
+  for (int i=0; i<GrpPriority.size();++i)
+    {
+      MyGrpArray[i]=new binary_type[ArraySizeGlobal];
+    }
+
+
 #ifdef RETRIEVER_MAKE_ARRAY
   cout << endl << "****RETRIEVER_MAKE_ARRAY********************************************"<<endl;
 #endif
@@ -780,7 +786,9 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 
       if (Tag[i]=="pixelID") 
 	{
+
 	  MakeArray_pixelID(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
 	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
@@ -815,6 +823,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
       else if (Tag[i]=="pixelX")
 	{
 	  MakeArray_pixelX(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELX_LIST
 
@@ -851,6 +860,37 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	}
       else if (Tag[i]=="pixelY")
 	{
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELY_LIST
+
+	  cout << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
+	  cout << endl << "Check if MyGrpArray["<<i<<"] before  MakeArray_pixelY in CalculateArray is correct: " << endl;
+
+	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+	    {
+	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  cout << "   ";
+		  mm = 0;
+		}
+	    } 
+#endif
 	  MakeArray_pixelY(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELY_LIST
@@ -858,8 +898,8 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	  cout << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
 	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelY in CalculateArray is correct: " << endl;
 
-	  int ll = 0;
-	  int mm = 0;
+	  ll = 0;
+	  mm = 0;
           cout << "   ";
 
 	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
@@ -951,7 +991,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 
 #ifdef RETRIEVER_MAKE_ARRAYS_LIST
   
-  cout << "****RETRIEVER_MAKE_ARRAYS_LIST******************************************"<<endl;
+  cout << endl<<endl<<"****RETRIEVER_MAKE_ARRAYS_LIST******************************************"<<endl;
   cout << "List all the arrays made"<<endl<<endl;
 
   cout << "GlobalArray[0]= " << GlobalArray[0]<<endl;
@@ -959,7 +999,8 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   cout << "GlobalArray[2]= " << GlobalArray[2]<<endl<<endl;
 
   for (int i=0; i<GrpPriority.size();++i)
-    {
+  //for (int i=0; i<2; ++i)
+       {
       cout<<"MyGrpArray["<<i<<"]:"<<endl;
 
       for (int a=0; a<GlobalArray[1];++a)
@@ -978,10 +1019,32 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	  cout << endl;
 	}
       cout << endl;
-    }
+      }
 
+   /*     i=2;
+     {
+      cout<<"MyGrpArray["<<i<<"]:"<<endl;
+
+      for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << MyGrpArray[i][c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+                  //cout << c+b*GlobalArray[1]*GlobalArray[2]+a*(GlobalArra*GlobalArray[2];
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+     }
+  */
 #endif
-
+  
 #ifdef RETRIEVER_MAKE_PRIORITIES
   cout << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
 
@@ -1289,6 +1352,18 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELY
   cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY****************************************" << endl;
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
 
   string loop="loop";
 
