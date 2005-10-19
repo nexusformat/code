@@ -29,8 +29,10 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
-SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs
+
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs 
+SUBDIRS+= FRM2
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
@@ -39,16 +41,20 @@ nxtranslate_SOURCES = \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
 	tree.hh dynamic_retriever.cpp dynamic_retriever.h
+
 EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
 	text_collist/collist_retriever.h \
 	text_plain/retriever.h \
 	text_xml/retriever.h \
-        sns_histogram/retriever.h
+   sns_histogram/retriever.h \
+	FRM2/frm2_retriever.h
 
 nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	IPNS_CPP/libIPNSRunfile.la text_collist/libTextCollist.la \
 	text_plain/libTextPlain.la text_xml/libTextXML.la \
-        sns_histogram/libSNShistogram.la
+	sns_histogram/libSNShistogram.la \
+	FRM2/libFRM2.la
+	
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
@@ -76,8 +82,19 @@ test_ipns.nxs: nxtranslate test_ipns.xml hrcs1797.run
 test_text_plain.nxs: nxtranslate test_text_plain.xml test_simple.xml
 	./nxtranslate test_text_plain.xml
 
-test_text_collist.nxs: nxtranslate test_text_collist.xml
-	./nxtranslate test_text_collist.xml
-
 test-clean:
 	rm -f $(TEST_RESULT)
+
+
+#<<<<<<< Makefile.am
+#	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp \
+#=======
+#>>>>>>> 1.15
+	
+#<<<<<<< Makefile.am
+#	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh \
+#	FRM2/frm2_retriever.h FRM2/frm2_retriever.cpp FRM2/string_util_ext.cpp \
+#	FRM2/string_util_ext.h 
+
+#nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2 
+#=======

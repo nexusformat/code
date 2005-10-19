@@ -389,11 +389,16 @@ void my_startElement(void *user_data, const xmlChar *name,
     if(!(((UserData *)user_data)->status)){
       try{
         retriever->getData(location,tree);
-        tree.begin()->set_name(str_name);
-        if( (tree.begin()->is_data()) && update_dims )
-          tree.begin()->update_dims(((UserData *)user_data)->dims);
-        node=*(tree.begin());
-        node_from_retriever=true;
+		  if (tree.size() <=0) {
+			  node_from_retriever=false;
+		  }
+		  else {
+			  tree.begin()->set_name(str_name);
+			  if( (tree.begin()->is_data()) && update_dims )
+				 tree.begin()->update_dims(((UserData *)user_data)->dims);
+			  node=*(tree.begin());
+			  node_from_retriever=true;
+		  }
       }catch(invalid_argument &e){
         print_error(((UserData *)user_data),INVALID_ARGUMENT+except_label+e.what());
       }catch(runtime_error &e){

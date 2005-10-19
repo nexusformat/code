@@ -11,8 +11,8 @@
 #ifdef TEXT_XML_RETRIEVER
 #include "text_xml/retriever.h"
 #endif
-#ifdef TEXT_COLLIST_RETRIEVER
-#include "text_collist/collist_retriever.h"
+#ifdef FRM2_RETRIEVER
+#include "FRM2/frm2_retriever.h"
 #endif
 #ifdef DYNAMIC_RETRIEVER
 #include "dynamic_retriever.h"
@@ -43,11 +43,16 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
     RetrieverPtr ptr(new TextPlainRetriever(source));
     return ptr;
 #endif
-#ifdef TEXT_COLLIST_RETRIEVER
-  }else if(type==TextCollistRetriever::MIME_TYPE){
-    RetrieverPtr ptr(new TextCollistRetriever(source));
+#ifdef FRM2_RETRIEVER
+  }else if(type==Frm2Retriever::MIME_TYPE){
+    RetrieverPtr ptr(new Frm2Retriever(source));
     return ptr;
 #endif
+/*#ifdef TEXT_HEIDI_RETRIEVER
+  }else if(type==TextHeidiRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new TextHeidiRetriever(source));
+    return ptr;
+#endif*/
 #ifdef TEXT_XML_RETRIEVER
   }else if(type==TextXmlRetriever::MIME_TYPE){
     RetrieverPtr ptr(new TextXmlRetriever(source));
