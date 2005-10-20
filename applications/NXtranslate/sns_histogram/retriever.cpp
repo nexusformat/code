@@ -28,8 +28,11 @@
 //#define RETRIEVER_MAKE_ARRAY_PIXELY_LIST  //to get a listing of the array produced
 //#define RETRIEVER_MAKE_ARRAY_TBIN         //to test the Tbin part
 //#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
-#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
-//#define RETRIEVER_MAKE_PRIORITIES         //to tets the priority part
+//#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
+//#define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
+#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
+#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
+#define RETRIEVER_MAKE_CALCULATION_AND     //to test the calculation of the arrays (and)
 
 using std::ifstream;
 using std::invalid_argument;
@@ -79,7 +82,7 @@ void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);   //make pixelY array
 void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);     //make Tbin array
 void MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray); //make a copy of the binary array
-
+void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator);  //Do the calculation between the two Arrays
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -424,7 +427,7 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
       else
 	throw runtime_error("Not a valid operator");
 #ifdef RETRIEVER_DEFINITION_TEST
-      cout << "   Ope[" << i << "]= " << Ope[i];   //REMOVE
+      cout << "   Ope[" << i << "]= " << Ope[i];  
 #endif
     }	  
   return Ope;
@@ -495,7 +498,6 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority
 
 #ifdef RETRIEVER_DEFINITION_TEST
   cout << endl << endl << "List of Priority and Inverse functions" << endl;
-   //for debugging only     //REMOVE
   for (int j=0; j<OperatorNumber; j++)
     {
       cout<<"   GrpPriority[" << j << "]= " << GrpPriority[j];
@@ -518,8 +520,7 @@ void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
 #ifdef RETRIEVER_DEFINITION_TEST
  cout << endl << "****RETRIEVER_DEFINITION_TEST********************************************" << endl;
  cout << "List of Definition: " << endl; 
- //for debugging only     //REMOVE
-  for (int i =0; i<HowManyDef;i++)
+ for (int i =0; i<HowManyDef;i++)
     {
       cout << "   Def["<<i<<"]= " << Def[i]<<endl;
     }
@@ -578,7 +579,7 @@ void InitLastIncre (string& def, int i)
 #ifdef RETRIEVER_DEFINITION_TEST
   cout << endl << "List of values from loop # " << i << ": " << endl;
   cout << "   GrpPara["<<i<<"].init= "<< GrpPara[i].init;
-  cout << "   GrpPara["<<i<<"].last= " << GrpPara[i].last << "   GrpPara["<<i<<"].increment= " << GrpPara[i].increment<<endl<<endl;
+  cout << "   GrpPara["<<i<<"].last= " << GrpPara[i].last << "   GrpPara["<<i<<"].increment= " << GrpPara[i].increment<<endl;
 #endif
   return;
 }
@@ -605,7 +606,7 @@ void ParseGrp_Value(string& def, int i)
     }
 
 #ifdef RETRIEVER_DEFINITION_TEST
-  cout << endl << endl << "List of values from list of identifiers: " << endl;
+  cout << endl << "List of values from list of identifiers: " << endl;
   //for debugging     //REMOVE
    for (int j=0; j<GrpPara[i].value.size(); j++)
     {
@@ -634,7 +635,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 #ifdef RETRIEVER_DECLARATION_TEST
  cout << endl << "****RETRIEVER_DECLARATION_TEST********************************************" << endl;
  cout << "Local and Global Array: " << endl;
- cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
+ cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   
 #endif
 
   while (b <= LocGlobArray[i].size())
@@ -660,7 +661,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
   LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
   
 #ifdef RETRIEVER_DECLARATION_TEST
-     cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   //REMOVE
+     cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   
 #endif
 
   while (b <= LocGlobArray[i].size())
@@ -757,8 +758,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
     }
 
   //Allocate memory for each grp
-  //  binary_type (*MyGrpArray)[ArraySizeGlobal] = new binary_type[3][ArraySizeGlobal];     //WRONG
-    
   binary_type **MyGrpArray;
   MyGrpArray = new binary_type*[GrpPriority.size()];
   for (int i=0; i<GrpPriority.size();++i)
@@ -999,7 +998,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   cout << "GlobalArray[2]= " << GlobalArray[2]<<endl<<endl;
 
   for (int i=0; i<GrpPriority.size();++i)
-  //for (int i=0; i<2; ++i)
        {
       cout<<"MyGrpArray["<<i<<"]:"<<endl;
 
@@ -1011,7 +1009,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 		{
 		  cout << MyGrpArray[i][c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
 		  
-                  //cout << c+b*GlobalArray[1]*GlobalArray[2]+a*(GlobalArra*GlobalArray[2];
 		  cout << " ";
 		}
 	      cout << "\t";
@@ -1021,11 +1018,42 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
       cout << endl;
       }
 
-   /*     i=2;
-     {
-      cout<<"MyGrpArray["<<i<<"]:"<<endl;
+#endif
+  
+  int CurrentPriority = HighestPriority;    
+  int GrpPriority_size = GrpPriority.size();   //number of grp
 
-      for (int a=0; a<GlobalArray[1];++a)
+  while (GrpPriority_size > 1)     //as long as we have more than just one array
+    {
+      for (int i=0; i<GrpPriority_size;++i)   
+	{
+	  //find position of first group with the highest priority
+	  if (GrpPriority[i] == CurrentPriority)
+	    {
+	      //check if it's the last one
+	      if (i == GrpPriority_size-1)
+		{
+		  --GrpPriority[i];
+		  break;   //exit the for loop
+		}
+	      else
+		{
+		  //check if the next operator has the same priority
+		  if (GrpPriority[i+1] == GrpPriority[i])
+		    {
+		      //do calculation according to Ope[i]
+#ifdef RETRIEVER_MAKE_PRIORITIES
+		      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
+		      cout << endl << "Between grp#"<<i<<" and grp#"<<i+1<<": "<<Ope[i]<<endl;
+#endif
+		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i]);
+		      
+#ifdef RETRIEVER_MAKE_CALCULATION
+
+      cout << "  #### Within Main part of program ####"<<endl<<endl;
+      cout << "    MyGrpArray["<<i<<"]:"<<endl;
+  
+  for (int a=0; a<GlobalArray[1];++a)
 	{
 	  for (int b=0; b<GlobalArray[0];++b)
 	    {
@@ -1033,7 +1061,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 		{
 		  cout << MyGrpArray[i][c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
 		  
-                  //cout << c+b*GlobalArray[1]*GlobalArray[2]+a*(GlobalArra*GlobalArray[2];
 		  cout << " ";
 		}
 	      cout << "\t";
@@ -1041,67 +1068,73 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	  cout << endl;
 	}
       cout << endl;
-     }
-  */
+   
 #endif
-  
-#ifdef RETRIEVER_MAKE_PRIORITIES
-  cout << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
-
-  int priority = HighestPriority;
-  int GrpPriority_size = GrpPriority.size();
-
-  while (priority >= 0)
-    {
-      cout << "Priority= " << priority << endl;
-      
-      for (int k=0; k<GrpPriority.size();++k)
-	    {
-	      cout << "\t"<<"Grp# "<<k<<" (pri:"<<GrpPriority[k]<<")  ";   
-	    }
-      cout << endl << endl;
-      
-      //find first array with such a priority
-      for (int i=0; i<GrpPriority_size;++i)
-	{
-	  if (GrpPriority[i]==priority)
-	    {
-	      //check if it's not the last array
-	      if (i==(GrpPriority.size()-1))
-		{
-		  //just decrease its priority of 1 unit
-		  --GrpPriority[i];
-		  --priority;
-		}
-	      else    //check if there is another array with the same priority on its right
-		{
-		  if (GrpPriority[i+1]==GrpPriority[i])
-		    {
-		      //calculate resulting array according to operator i
-		      
-		      //just for debugging   //REMOVE
-		      // MyGrpArray[i]=MyGrpArray[i+1];
-		      		      
-		      //all arrays at the right of array[i] are shift to the left 
-		      for (int l=i+1; l<GrpPriority_size-2;++l)
+		      if (i < GrpPriority_size-2)
 			{
-			  //MyGrpArray[i]=MyGrpArray[i+1];  //REMOVE 
-		        }
-		      --GrpPriority_size;
-		      --GrpPriority[i];
-                      --i;
+			 //shift to the left the rest of the GrpPriorities
+			  for (int k=i+1;k<GrpPriority_size-1;++k)
+			    {
+			      GrpPriority[k]=GrpPriority[k+1];
+			    }
+			//shift to the left the rest of the operators
+			  for (int j=i;j<GrpPriority_size-2;++j)
+			    {
+			      Ope[j]=Ope[j+1];
+			    }
+			//shift to the left the rest of the arrays
+			  for (int k=i+1;k<GrpPriority_size-1;++k)
+			    {
+			      MyGrpArray[k]=MyGrpArray[k+1];
+			    }
+			}
 		      
-		     }
+		      //we have one less array/grp
+		      --GrpPriority_size; 
+		      --i;		    
+		      }
 		  else
 		    {
-		      //just recude its priority
 		      --GrpPriority[i];
 		    }
-		 }
-	     }
+		}
+	    }
+	}
+      
+#ifdef RETRIEVER_MAKE_PRIORITIES
+      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
+
+      for (int j=0; j<GrpPriority_size;j++)
+	{
+	  if (GrpPriority[j]>-1)
+	    {
+	      cout << "   Grp["<<j<<"]/Pri#"<<GrpPriority[j];
+	    }
+	  else
+	    {
+	      cout << "   Grp["<<j<<"]/Pri#"<<GrpPriority[j]+1<<" ==>Done!"<<endl;
+	    }
+	}
+
+      cout << endl;
+
+#endif
+      
+      //check what is the highest priority
+      int find_one = 0;
+      for (int m=0; m<GrpPriority_size;++m)
+	{
+	  if (GrpPriority[m] >= CurrentPriority)
+	    {
+	      find_one = 1;
+	      break;
+	    }
+	}
+      if (find_one == 0)
+	{
+           --CurrentPriority;
 	}
     }
-#endif
 
 //free memory of the arrays used
 delete[] MyGrpArray;
@@ -1353,18 +1386,6 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
   cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY****************************************" << endl;
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
   string loop="loop";
 
     if (Def[grp_number][0] == loop[0]) 
@@ -1587,4 +1608,194 @@ void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
   MyGrpArray = BinaryArray;
   
   return ;
+}
+
+/*******************************************
+/Do the calculation between the two arrays
+/*******************************************/
+void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator)
+{
+  string AND="AND";
+
+
+  if (Operator[0] == AND[0])
+    {
+#ifdef RETRIEVER_MAKE_CALCULATION_AND
+
+      cout << endl<<"****RETRIEVER_MAKE_CALCULATION************************************"<<endl;
+
+      cout << "  --BEFORE--"<<endl<<endl;
+      cout << "    GrpArray1:"<<endl;
+
+      for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << GrpArray1[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+      
+   cout << "    GrpArray2:"<<endl;
+
+   for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << GrpArray2[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+
+#endif
+
+#ifdef RETRIEVER_MAKE_CALCULATION_AND
+      cout << "==> Operator AND"<<endl;
+#endif
+
+     for (int y=0; y<GlobalArray[0];y++)
+	 {
+	 for (int x=0; x<GlobalArray[1]; x++)
+	     {
+	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
+		{
+		  if (GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]!=0)
+		    {
+		      GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
+			GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+		    }
+	        }
+	     }
+	 }
+
+#ifdef RETRIEVER_MAKE_CALCULATION_AND
+     
+     cout << "  --AFTER--"<<endl<<endl;
+   cout << "    GrpArray1:"<<endl;
+  
+  for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << GrpArray1[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+   
+#endif
+
+    }
+  else
+    {
+
+#ifdef RETRIEVER_MAKE_CALCULATION_OR
+
+      cout << endl<<"****RETRIEVER_MAKE_CALCULATION************************************"<<endl;
+
+      cout << "  --BEFORE--"<<endl<<endl; 
+      cout << "    GrpArray1:"<<endl;
+
+      for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << GrpArray1[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+      
+   cout << "    GrpArray2:"<<endl;
+
+   for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << GrpArray2[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+
+#endif
+
+#ifdef RETRIEVER_MAKE_CALCULATION_OR
+      cout << "==> Operator OR"<<endl;
+#endif
+
+      for (int y=0; y<GlobalArray[0];y++)
+	 {
+	 for (int x=0; x<GlobalArray[1]; x++)
+	     {
+	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
+		{
+		  if (GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]!=
+		      GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])])
+		    {
+		      GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+		    }	     
+		}
+	     }
+	 }
+
+#ifdef RETRIEVER_MAKE_CALCULATION_OR
+
+      cout << "  --AFTER--"<<endl<<endl;
+      cout << "    GrpArray1:"<<endl;
+  
+  for (int a=0; a<GlobalArray[1];++a)
+	{
+	  for (int b=0; b<GlobalArray[0];++b)
+	    {
+	      for (int c=0; c<GlobalArray[2];++c)
+		{
+		  cout << GrpArray1[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+   
+#endif
+
+    }
+
+
+  return;
 }
