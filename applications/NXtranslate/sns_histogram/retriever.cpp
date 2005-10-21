@@ -13,26 +13,27 @@
 #include "../string_util.h"
 #include "../tree.hh"
 
-#define RETRIEVER_TEST                    //to test main part     
-#define RETRIEVER_DECLARATION_TEST        //to test declaration part
-#define RETRIEVER_DEFINITION_TEST         //to test definition part
-#define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
+//#define RETRIEVER_TEST                    //to test main part     
+//#define RETRIEVER_DECLARATION_TEST        //to test declaration part
+//#define RETRIEVER_DEFINITION_TEST         //to test definition part
+//#define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
 #define RETRIEVER_INPUT_TEST              //to test the data read
-#define RETRIEVER_MAKE_ARRAY              //to test the process of making the arrays
-#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
-#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
-#define RETRIEVER_EVERYTHING              //when we don't have everything in the definition part
-#define RETRIEVER_MAKE_ARRAY_PIXELX       //to test the pixelX part
-#define RETRIEVER_MAKE_ARRAY_PIXELX_LIST  //to get a listing of the array produced
-#define RETRIEVER_MAKE_ARRAY_PIXELY       //to test the pixelY part
-#define RETRIEVER_MAKE_ARRAY_PIXELY_LIST  //to get a listing of the array produced
-#define RETRIEVER_MAKE_ARRAY_TBIN         //to test the Tbin part
-#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
-#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
-#define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
-#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
-#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
-#define RETRIEVER_MAKE_CALCULATION_AND     //to test the calculation of the arrays (and)
+//#define RETRIEVER_MAKE_ARRAY              //to test the process of making the arrays
+//#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
+//#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
+//#define RETRIEVER_EVERYTHING              //when we don't have everything in the definition part
+//#define RETRIEVER_MAKE_ARRAY_PIXELX       //to test the pixelX part
+//#define RETRIEVER_MAKE_ARRAY_PIXELX_LIST  //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_PIXELY       //to test the pixelY part
+//#define RETRIEVER_MAKE_ARRAY_PIXELY_LIST  //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAY_TBIN         //to test the Tbin part
+//#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
+//#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
+//#define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
+//#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
+//#define RETRIEVER_MAKE_CALCULATION_AND    //to test the calculation of the arrays (and)
+//#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
+//#define RETRIEVER_FINAL_RESULT            //to list the final array produced
 
 using std::ifstream;
 using std::invalid_argument;
@@ -48,7 +49,7 @@ vector<string> VecStr;
 vector<int> LocalArray, GlobalArray;  //parameters of the declaration part
 
 //Type of binary file
-typedef double binary_type;
+typedef int binary_type;
 
 struct Grp_parameters   //parameters of the different definitions
 {
@@ -83,6 +84,8 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);     //make Tbin array
 void MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray); //make a copy of the binary array
 void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator);  //Do the calculation between the two Arrays
+inline void endian_swap(binary_type& x);  //to swap from little to big endian
+
 
 /*********************************
 /SnsHistogramRetriever constructor
@@ -147,6 +150,8 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //from its definition part --> DeclaDef vector
 
   DeclaDef_separator(new_location,DeclaDef);
+  if (DeclaDef[1].size() > 0 && DeclaDef[1].size()<7)
+    throw runtime_error("Definition part is not valid");
 
  //check if we want everything
   if (DeclaDef[1] == "")
@@ -172,10 +177,13 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
      //Work on definition part
      DefinitionPart = DeclaDef[1];
      DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
-  
+
 #ifdef RETRIEVER_TEST
   cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   
 #endif
+
+  if (Tag.size()<1)
+    throw runtime_error("Definition part is not valid");
 
 #ifdef RETRIEVER_DEFINITION_TEST
  cout << endl << "****RETRIEVER_DEFINITION_TEST********************************************" << endl;
@@ -211,15 +219,62 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 
 #ifdef RETRIEVER_INPUT_TEST
   cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
-   cout << "Check 10 first data of file" << endl;
-   for (int j=0; j<10; j++)
+   cout << "Check 10 first data of file (before swapping endian):" << endl;
+
+   for (int j=682600; j<682610; j++)
      {
        cout << "   BinaryArray["<<j<<"]= "<<BinaryArray[j]<<endl;
      }
 #endif
+
+for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+  {
+   endian_swap(BinaryArray[j]);
+  } 
     
+#ifdef RETRIEVER_INPUT_TEST
+  cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
+   cout << "Check 10 first data of file (after swapping endian):" << endl;
+
+   for (int j=682600; j<682610; j++)
+     {
+       cout << "   BinaryArray["<<j<<"]= "<<BinaryArray[j]<<endl;
+     }
+#endif
+
   //Calculate arrays according to definition
   NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope);
+
+#ifdef RETRIEVER_FINAL_RESULT
+	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
+	  cout << endl << "Check the final NewArray: " << endl<<endl;
+
+	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+	    {
+	      cout << NewArray[j] << " ";            //listing of NewArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  cout << "   ";
+		  mm = 0;
+		}
+	    } 
+#endif
   
   cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 }
@@ -344,6 +399,7 @@ string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<stri
 
   while (i < HowManyTimes)
     {
+
       CPosition =  DefinitionPart.find(separator[0]);
       OpenBraPosition =  DefinitionPart.find(OpenBracket);
       CloseBraPosition =  DefinitionPart.find(CloseBracket);
@@ -354,10 +410,11 @@ string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<stri
       CheckTagValidity(Tag[i]);
       Def.push_back( DefinitionPart.substr(CPosition+1,CloseBraPosition-CPosition-1));
 
-       DefinitionPart= DefinitionPart.substr(CloseBraPosition+1, length-CloseBraPosition-2);
+       DefinitionPart = DefinitionPart.substr(CloseBraPosition+1, length-CloseBraPosition-1);
       
       ++i;
     }
+
    return ReplaceTagDef_by_Grp(StringLocationGroup,HowManyTimes);
 }
 
@@ -716,6 +773,7 @@ return;
 void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 {
   if (spacerPosition < openBra || spacerPosition > closeBra)
+     
     throw runtime_error("Missing \"|\" spacer");
   return;
 }
@@ -960,19 +1018,28 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
 
 	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
 
-	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
 	    {
 	      cout << MyGrpArray[i][j] << " ";            //listing of MyGrpArray    
       
 	      if (ll == (GlobalArray[2]-1))
 		{
-		  cout << endl;
+		  cout << endl << "   ";
 		  ll = 0;
+		  ++mm;
 		}
 	      else
 		{
 		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;
+		  cout << "   ";
+		  mm = 0;
 		}
 	    } 
 #endif
@@ -1236,30 +1303,6 @@ if (Def[grp_number][0] == loop[0])
 	   }
 	}
  }
-
-#ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
-  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************";
-  cout << endl << "Check if MyGrpArray["<<grp_number<<"] is correct: " << endl;
-  cout << "MyGrpArray: " << endl;
-
-   int ll = 0;
-
-  for (int j=0; j<GlobalArray[1]*GlobalArray[2]; ++j)
-    {
-      cout << MyGrpArray[j] << " ";            //listing of MyGrpArray    
-      
-      if (ll == (GlobalArray[2]-1))
-	{
-	  cout << endl;
-	  ll = 0;
-	}
-      else
-	{
-	  ++ll;
-	}
-    } 
-
-#endif
 
   return;
 }
@@ -1598,7 +1641,20 @@ void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_n
 /*******************************************/
 void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
 {
-  MyGrpArray = BinaryArray;
+
+ for (int y=0; y<GlobalArray[0];y++)
+   {
+   for (int x=0; x<GlobalArray[1]; x++)
+     {
+     for (int tbin=0;tbin<GlobalArray[2];tbin++)
+       {
+	MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
+	  BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+       }	     
+     }
+   }
+
+      //  MyGrpArray = BinaryArray;
   
   return ;
 }
@@ -1790,4 +1846,15 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operat
     }
 
   return;
+}
+
+/*******************************************
+/To swap from little endian to big endian
+/*******************************************/
+inline void endian_swap (binary_type& x)
+{
+  x = (x>>24) |
+    ((x<<8) & 0x00FF0000) |
+    ((x>>8) & 0x0000FF00) |
+    (x<<24);
 }
