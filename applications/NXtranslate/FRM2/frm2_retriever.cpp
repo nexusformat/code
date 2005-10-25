@@ -804,7 +804,7 @@ std::map<std::string, std::string> Frm2Retriever::extract_dictmulti(std::ifstrea
 	for (std::vector<std::string>::iterator it=args.begin(); it!=args.end();it++) {
 		std::map<std::string, std::string> raw_map = extract_dictentry(file, *it, nxtype);
 		value = raw_map["values"];
-		if (raw_map["units"] != "") {
+		if (raw_map["units"] != "" && raw_map["units"] != "unknown") {
 			units = raw_map["units"];
 		}
 		values = values + value; 
@@ -814,6 +814,7 @@ std::map<std::string, std::string> Frm2Retriever::extract_dictmulti(std::ifstrea
 	}	
 	result["values"] = values;
 	result["units"] = units;
+	reset_file(infile);
 	return result;	
 }
 
@@ -911,6 +912,7 @@ std::map<std::string, std::string> Frm2Retriever::extract_dictarray(std::ifstrea
 	}
 	result["values"]=values;
 	result["units"]=units;
+	reset_file(infile);
 	return result;
 }
 
@@ -956,6 +958,7 @@ std::vector<std::vector<unsigned int> > Frm2Retriever::extract_tofcts(std::ifstr
 			count++;
 		}
 		else {
+			monitor_number = -1;
 			if (count != monitor_number) {
 				std::vector<unsigned int> counts = string_util::split_ints(line);
 				while (counts.size() < dInfo.at(1)) {
@@ -975,15 +978,16 @@ std::vector<std::vector<unsigned int> > Frm2Retriever::extract_tofcts(std::ifstr
 	}
 	
 	// if some entrys are missing -> adapt
-	while (result.size() < dInfo.at(0)) {
+	/*while (result.size() < dInfo.at(0)) {
 		// add empty vectors
 		std::vector<unsigned int> counts;
 		for (unsigned int i=0; i < dInfo.at(1); i++) {
 			counts.push_back(0);
 		}
 		result.push_back(counts);
-	}
+	}*/
 	
+	reset_file(infile);
 	return result;
 }
 
@@ -1036,7 +1040,7 @@ std::vector<double> Frm2Retriever::extract_toftof(std::ifstream &file, std::stri
 		}
 	}
 
-	
+	reset_file(infile);
 	return result;
 }
 
@@ -1087,6 +1091,7 @@ std::vector<unsigned int> Frm2Retriever::extract_desc(std::ifstream &file, std::
 			break;
 		}
 	}
+	reset_file(infile);
 	return result;
 }
 
@@ -1100,6 +1105,7 @@ std::string Frm2Retriever::extract_logcpy(std::ifstream &file, std::string filen
      ss << ch;
 	}
 	
+	reset_file(infile);
 	return ss.str();
 }
 
@@ -1166,6 +1172,8 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 		count++;
 		line = read_line(infile);
 	}
+		
+	reset_file(infile);
 	return values;
 }
 
@@ -1186,6 +1194,7 @@ std::string Frm2Retriever::extract_line_below(std::ifstream &file, std::string a
 			break;
 		}
 	}
+	reset_file(infile);
 	return line;
 }
 
@@ -1297,6 +1306,7 @@ std::map<std::string,std::string > Frm2Retriever::extract_dictentry(std::ifstrea
 	}
 	result["values"]=values;
 	result["units"]=units;
+	reset_file(infile);
 	return result;
 }
 
@@ -1364,6 +1374,7 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 		count++;
 		line = read_line(infile);
 	}
+	reset_file(infile);
 	return values;
 }
 
@@ -1411,6 +1422,7 @@ std::vector<unsigned int> Frm2Retriever::extract_dnr(std::ifstream &file, std::s
 		result.pop_back();
 	}
 	
+	reset_file(infile);
 	return result;
 }
 
@@ -1658,7 +1670,8 @@ Frm2Retriever::Frm2Retriever(const string &str): source(str),current_line(0){
 
   // check that open was successful
   if(! infile.is_open()) {
-    throw invalid_argument("Could not open file: "+source);
+    //throw invalid_argument("Could not open file: "+source);
+	 return;
   }
 	
 	initUnits();
@@ -2122,6 +2135,10 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 	cout << "Frm2Retriever::getData(" << location << ",tree)" << endl; // REMOVE
 	// check that the argument is not an empty string
 	//printf("extracting...%s", location.c_str()); 
+	if(!infile) {
+		std::cout << "infile not valid returning: " << infile << std::endl;
+		return;
+	}
 	if(location.size()<=0) {
 		throw invalid_argument("cannot parse empty string");
 	}
