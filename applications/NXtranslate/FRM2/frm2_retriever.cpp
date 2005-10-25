@@ -689,6 +689,7 @@ void Frm2Retriever::extract_headers(std::string line) {
 
 
 void Frm2Retriever::extract_toflogheaders(std::ifstream &file) {
+	int cur_line=0;
 	int i=0;
 	unsigned int pos=0;
 	std::string str="";
@@ -696,13 +697,14 @@ void Frm2Retriever::extract_toflogheaders(std::ifstream &file) {
 	std::map<int, std::string> key_pairs; 
 	
 	reset_file(file);
-	while (file.good()) {
+	while (file.good() && (cur_line++)<=data_section) {
+		
 		std::string line = read_line(file);
+		
 		// eliminate whitespace at start of line
 		while (isspace(line[0])){
 			line = line.substr(1);
 		}
-		
 		pos = line.find("#++");
 		if (pos != std::string::npos && pos<2) {
 			line = line.substr(pos+3);
@@ -732,6 +734,7 @@ void Frm2Retriever::extract_toflogheaders(std::ifstream &file) {
 	headers.clear();
 	// map map to header vector 
 	for (unsigned int i=0; i< key_pairs.size(); i++) {
+		//std::cout << "pushing " << key_pairs[i] << " into headers" << std::endl;
 		headers.push_back(key_pairs[i]);
 	}
 }
@@ -978,14 +981,14 @@ std::vector<std::vector<unsigned int> > Frm2Retriever::extract_tofcts(std::ifstr
 	}
 	
 	// if some entrys are missing -> adapt
-	/*while (result.size() < dInfo.at(0)) {
+	while (result.size() < dInfo.at(0)) {
 		// add empty vectors
 		std::vector<unsigned int> counts;
 		for (unsigned int i=0; i < dInfo.at(1); i++) {
 			counts.push_back(0);
 		}
 		result.push_back(counts);
-	}*/
+	}
 	
 	reset_file(infile);
 	return result;
@@ -1126,13 +1129,17 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 	use_col_number = isnumber(col_name);
 	
 	if (!use_col_number) {
-		std::vector<std::string>::iterator it = headers.begin();
-		while (*it != col_name && it != headers.end()) {
-			it++;
-			index++;
+		std::vector<std::string>::iterator it;
+		for (it = headers.begin(); it !=headers.end(); it++) {
+			if (*it != col_name)  {
+				index++;
+			}
+			else {
+				break;
+			}
 		}
 		if (it== headers.end()) {
-			//std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
+			std::cout << "no column '"<< col_name << "' found " << std::endl;
 			/*while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
 				if (!isdata(line)) {
 					break;
@@ -1225,7 +1232,7 @@ std::map<std::string,std::string > Frm2Retriever::extract_dictentry(std::ifstrea
 		pos = line.find(arg);
 		if (pos != std::string::npos && pos<2) {
 			line = line.substr(pos+arg.size());
-			std::cout << "got line: " << 	line << std::endl;
+			//std::cout << "got line: " << 	line << std::endl;
 			/* extract description*/
 			description = line;
 			pos = description.find("-");
@@ -1322,7 +1329,6 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 
 	//std::cout << "datasection starts at line: " << data_section << std::endl;
 	skip_to_line(infile, cur_line, data_section+((from<0)?0:from)); 
-	
 	//cout << endl << "counting headers: " << *(headers.begin()) << endl;	
 	
 	use_col_number = isnumber(col_name);
@@ -1334,7 +1340,7 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 			index++;
 		}
 		if (it== headers.end()) {
-			//std::cout << "no column '"<< col_name << "' found in file ... filling with 0s" << std::endl;
+			std::cout << "no column '"<< col_name << "' found " << std::endl;
 			/*while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
 				if (!isdata(line)) {
 					break;
@@ -1356,6 +1362,7 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 	line = read_line(infile);
 	while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
 		if (!isdata(line)) {
+			//std::cout << "NO DATA LINE:" << line << std::endl;
 			break;
 		}
 		try {
@@ -1724,12 +1731,13 @@ Frm2Retriever::Frm2Retriever(const string &str): source(str),current_line(0){
 		line = read_line(infile);
 		int pos = line.find("aDetInfo");
 		if (pos != std::string::npos) {
+			//std::cout << "seems that we got a tof file" << std::endl;
 			data_section = cur_line+3;
 			read_line(infile);
 			extract_headers(read_line(infile));
 			break;
 		}
-		cur_line=cur_line++;
+		cur_line++;
 	}
 
 	
@@ -1746,16 +1754,21 @@ Frm2Retriever::Frm2Retriever(const string &str): source(str),current_line(0){
 		cur_line++;
 	}
 
-	std::cout << "data_section: " << data_section << std::endl;
+	//std::cout << "data_section: " << data_section << std::endl;
 
 	// check if we have a tof continous log file ...
 	reset_file(infile);
 	cur_line=0;
-	int pos = str.find("_5001.raw");
-	if (pos != std::string::npos) {
-		// seems that we got a tof log file
-		extract_toflogheaders(infile);
+	int pos = str.find("_");
+	if (pos!=std::string::npos) {
+		if (str[pos+1] == '5') {
+			if (str[pos+2] == '0') {
+				//std::cout << "seems that we got a tof log file " << data_section << std::endl;
+				extract_toflogheaders(infile);
+			}
+		}
 	}
+	reset_file(infile);
 	
 	
 	/*for (std::vector<std::string>::iterator it=headers.begin(); it!= headers.end(); it++) {
@@ -2179,7 +2192,7 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 	}
 	//end: this is heidi only stuff
 	
-	cout << "location: " << method << "(\'" << arg << "\')" << "[" << from << "," << to << "]{" << nxtype <<"}" << "[" << word << "," << wcount << "]" << endl << endl;	
+	//cout << "location: " << method << "(\'" << arg << "\')" << "[" << from << "," << to << "]{" << nxtype <<"}" << "[" << word << "," << wcount << "]" << endl << endl;	
  	Node* node;
 	
 	if (method == Frm2Retriever::COLUMN_TAG) { 
@@ -2342,7 +2355,7 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 		if (unit_strings.find(string_util::lower_str(units))!=unit_strings.end()) {
 			units = unit_strings[units];
 		}
- 		cout << "dict value: '" << raw_string << "'"<<std::endl;  
+ 		//cout << "dict value: '" << raw_string << "'"<<std::endl;  
   		if (raw_string.size() <= 0) {
 			node = createEmptyNode("", convert_type(nxtype));
 		}
