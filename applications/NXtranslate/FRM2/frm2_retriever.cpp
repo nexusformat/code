@@ -1050,9 +1050,15 @@ std::vector<double> Frm2Retriever::extract_toftof(std::ifstream &file, std::stri
 
 std::string Frm2Retriever::extract_filename(std::ifstream &file, std::string source, std::string arg, unsigned int nxtype) {
 	unsigned int pos=0;
-	unsigned int from=0, to=arg.size();
+	unsigned int from=0, to=source.size();
 	std::string result="0";
-
+	
+	
+	pos = source.rfind("/");
+	if (pos != std::string::npos) {
+		result = source.substr(pos+1);
+		to = result.size();
+	}
 	pos = arg.find(":");
 	if (pos != std::string::npos) {
 		if (isnumber(arg.substr(0, pos)) && isnumber(arg.substr(pos+1))) {
@@ -1060,7 +1066,7 @@ std::string Frm2Retriever::extract_filename(std::ifstream &file, std::string sou
 			to 	= string_util::str_to_int(arg.substr(pos+1)) - from;
 		}
 	}
-	result = source.substr(from, to);
+	result = result.substr(from, to);
 	return result;
 }
 
@@ -1125,7 +1131,6 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 	
 	skip_to_line(infile, cur_line, data_section+((from<0)?0:from)); 
 	
-//cout << endl << "counting headers: " << *(headers.begin()) << endl;	
 	use_col_number = isnumber(col_name);
 	
 	if (!use_col_number) {
@@ -1140,14 +1145,6 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 		}
 		if (it== headers.end()) {
 			std::cout << "no column '"<< col_name << "' found " << std::endl;
-			/*while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
-				if (!isdata(line)) {
-					break;
-				}
-				values.push_back("0");
-				count++;
-				line = read_line(infile);
-			}*/
 			return values;
 		}
 	}
@@ -1156,15 +1153,12 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 		index--;
 	}
 	
-
-//cout << endl << "pushing data.. [" << to << ","<< count<<"] error:"<< infile.good()<< endl;	
 	line = read_line(infile);
 	while ((infile.good()) && ((to>=0 && to<count) || (to<0))) {			
 		if (!isdata(line)) {
 			break;
 		}
 		try {
-			//std::cout << "transforming..." << std::endl;
 			std::vector<std::string> line_values = string_util::split_values(line);
 			/*for (std::vector<std::string>::iterator itt=values.begin(); itt!=values.end(); itt++) {
 				std::cout << "column------- vector: " << *itt << std::endl;
@@ -2149,7 +2143,7 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 	// check that the argument is not an empty string
 	//printf("extracting...%s", location.c_str()); 
 	if(!infile) {
-		std::cout << "infile not valid returning: " << infile << std::endl;
+		//std::cout << "infile not valid returning: " << infile << std::endl;
 		return;
 	}
 	if(location.size()<=0) {
@@ -2263,12 +2257,12 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 			}
 			//cout << "dict value: '" << entry << "'"<<std::endl;
 			//node = createNode("empty", raw_string, convert_type(nxtype), units);
-		}
-		if (description.size() > 0) {	
-			std::vector<Attr> attrs;
-			Attr attr("description", description.c_str(), description.size(), NX_CHAR);
-			attrs.push_back(attr);
-			node->update_attrs(attrs);
+			if (description.size() > 0) {	
+				std::vector<Attr> attrs;
+				Attr attr("description", description.c_str(), description.size(), NX_CHAR);
+				attrs.push_back(attr);
+				node->update_attrs(attrs);
+			}
 		}
 	}
 	else if (method == Frm2Retriever::FLINE_TAG) { 
@@ -2334,7 +2328,10 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 		if (unit_strings.find(string_util::lower_str(units))!=unit_strings.end()) {
 			units = unit_strings[units];
 		}
- 		//cout << "dict value: '" << raw_string << "'"<<std::endl;  
+ 		//cout << "dict value: '" << raw_string << "'"<<std::endl; 
+		while (isspace(raw_string[0])) {
+			raw_string = raw_string.substr(1);
+		} 
   		if (raw_string.size() <= 0) {
 			node = createEmptyNode("", convert_type(nxtype));
 		}
@@ -2430,16 +2427,16 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 		}
 		else {
 			node = createNode("empty", logs, convert_type(nxtype));
-		}
-		if (arg =="nicd_time") {
-			std::map<std::string, std::string> raw_map = extract_dictentry(infile, "# File_Creation_Time", NX_CHAR);
-			std::string tstr=raw_map["values"];
-			tstr = toflog_datetime_2_iso(tstr);
-			
-			std::vector<Attr> attrs;
-			Attr attr("start", tstr.c_str(), tstr.size(), NX_CHAR);
-			attrs.push_back(attr);
-			node->update_attrs(attrs);
+			if (arg =="nicd_time") {
+				std::map<std::string, std::string> raw_map = extract_dictentry(infile, "# File_Creation_Time", NX_CHAR);
+				std::string tstr=raw_map["values"];
+				tstr = toflog_datetime_2_iso(tstr);
+				
+				std::vector<Attr> attrs;
+				Attr attr("start", tstr.c_str(), tstr.size(), NX_CHAR);
+				attrs.push_back(attr);
+				node->update_attrs(attrs);
+			}
 		}
 		
 	}
