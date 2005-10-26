@@ -17,7 +17,7 @@
 //#define RETRIEVER_DECLARATION_TEST        //to test declaration part
 //#define RETRIEVER_DEFINITION_TEST         //to test definition part
 //#define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
-#define RETRIEVER_INPUT_TEST              //to test the data read
+//#define RETRIEVER_INPUT_TEST              //to test the data read
 //#define RETRIEVER_MAKE_ARRAY              //to test the process of making the arrays
 //#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
 //#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
@@ -30,10 +30,14 @@
 //#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
 //#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
 //#define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
+//#define RETRIEVER_MAKE_CALCULATION_AND   //to test the calculation of the arrays (and)
 //#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
-//#define RETRIEVER_MAKE_CALCULATION_AND    //to test the calculation of the arrays (and)
 //#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
 //#define RETRIEVER_FINAL_RESULT            //to list the final array produced
+#define SWAP_ENDIAN                       //triger the swapping endian subroutine
+#define OUTPUT_RESULT                     //to create binary file of result (to test it with IDL)
+
+const char OutputFileName[]="output_array_binary.dat";
 
 using std::ifstream;
 using std::invalid_argument;
@@ -69,14 +73,14 @@ string TagDef_separator(string& s, vector<string>& Tag, vector<string>& Def);  /
 string ReplaceTagDef_by_Grp(string& s, int a); //Tag/Def is replaced by Grp to determine the priorities of the associations
 vector<string> StoreOperators(string& s, int& HowMany);  //isolate the operators of the definition part of the string location
 vector<string::iterator> PositionSeparator(string s, int TagName_Number);  //Find the position of each separator "|"
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef);  //Give priority to each grp of the definition part
+void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef, vector<int>& OpePriority);  //Give priority to each grp of the definition part
 void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
 void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
 void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
 void CheckTagValidity (string& Tag);  //Check if the Tags are valid
 void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
-binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope);  //calculate the final array according to definiton
+binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority);  //calculate the final array according to definiton
 int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
 void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);  //make pixelID array
 void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);   //make pixelX array
@@ -125,6 +129,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   int OperatorNumber; 
   string DefinitionPart;          //use to determine the operators
   vector<int> GrpPriority;        //Vector of priority of each group
+  vector<int> OpePriority;        //Vector of priority for each operator
   vector<int> InverseDef;        //True=Inverse definition, False=keep it like it is
   int Everything = 0;            //0= we don't want everything, 1=we do
   int GlobalArraySize = 1;       //Size of global array within our program
@@ -197,7 +202,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
      Ope = StoreOperators(DefinitionPart,OperatorNumber);
 
      //Give to each grp its priority
-     GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef);   
+     GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef, OpePriority);   
      //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
 
      DefinitionParametersFunction(Def,OperatorNumber);
@@ -219,31 +224,52 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 
 #ifdef RETRIEVER_INPUT_TEST
   cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
-   cout << "Check 10 first data of file (before swapping endian):" << endl;
+   cout << "Check 10 data of file (before swapping endian if any):" << endl;
 
-   for (int j=682600; j<682610; j++)
+   for (int j=0; j<10; j++)
      {
        cout << "   BinaryArray["<<j<<"]= "<<BinaryArray[j]<<endl;
      }
 #endif
 
-for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
-  {
-   endian_swap(BinaryArray[j]);
-  } 
+#ifdef SWAP_ENDIAN
+   for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+     {
+       endian_swap(BinaryArray[j]);
+     } 
     
 #ifdef RETRIEVER_INPUT_TEST
   cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
-   cout << "Check 10 first data of file (after swapping endian):" << endl;
+   cout << "Check 10 data of file (after swapping endian):" << endl;
 
-   for (int j=682600; j<682610; j++)
+   for (int j=0; j<10; j++)
      {
        cout << "   BinaryArray["<<j<<"]= "<<BinaryArray[j]<<endl;
      }
 #endif
+#endif
 
   //Calculate arrays according to definition
-  NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope);
+  NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority);
+
+#ifdef OUTPUT_RESULT
+  
+#ifdef RETRIEVER_INPUT_TEST
+  cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
+   cout << "Check 10 data of file (after swapping endian):" << endl;
+
+   for (int j=0; j<10; j++)
+     {
+       cout << "   NewArray["<<j<<"]= "<<NewArray[j]<<endl;
+     }
+#endif
+
+  //std::ofstream file2("output_array_binary.dat",std::ios::binary);
+  std::ofstream file2(OutputFileName,std::ios::binary);
+  file2.write((char *)NewArray,sizeof(NewArray)*GlobalArraySize);
+  file2.close();
+
+#endif
 
 #ifdef RETRIEVER_FINAL_RESULT
 	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
@@ -256,10 +282,10 @@ for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
 	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
 	    {
 	      cout << NewArray[j] << " ";            //listing of NewArray    
-      
+
 	      if (ll == (GlobalArray[2]-1))
 		{
-		  cout << endl << "   ";
+		  cout << endl << "   ";  
 		  ll = 0;
 		  ++mm;
 		}
@@ -269,14 +295,15 @@ for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
 		}
 	      if (mm == (GlobalArray[1]))
 		{
-		  cout << endl;
+		  cout << endl;    
 		  cout << "   ";
 		  mm = 0;
 		}
 	    } 
+
 #endif
-  
-  cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 }
 
 /*********************************
@@ -456,8 +483,8 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
   typedef string::iterator iter;
   std::vector<iter> VecIter;             //vector of iterators
   std::string::iterator a;
-  string operatorAND = "AND";
   string operatorOR = "OR";
+  string operatorAND = "AND";
   vector<string> Ope;
 
  //Store each position of "|" into VecIter
@@ -469,13 +496,13 @@ vector<string> StoreOperators(string& StrS, int& HowMany)
 
   for (int i=0; i<HowMany-1; i++)
     {
-      if (find(VecIter[i],VecIter[i+1],operatorAND[0])!=VecIter[i+1])
+      if (find(VecIter[i],VecIter[i+1],operatorOR[0])!=VecIter[i+1])
       { 
-	Ope.push_back("AND");
+	Ope.push_back("OR");
       }
-      else if (find(VecIter[i],VecIter[i+1],operatorOR[0])!=VecIter[i+1])
+      else if (find(VecIter[i],VecIter[i+1],operatorAND[0])!=VecIter[i+1])
 	{
-	  Ope.push_back("OR");
+	  Ope.push_back("AND");
 	}
       else
 	throw runtime_error("Not a valid operator");
@@ -510,7 +537,7 @@ vector<string::iterator> PositionSeparator(string s, int TagName_Number)
 /*********************************
 /Give priority for each group
 /*********************************/
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef)
+void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef, vector<int>& OpePriority)
 {
   int DefinitionString_size = s.size();
   int GrpNumberLive = 0;
@@ -521,6 +548,7 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority
     {
       GrpPriority.push_back(0);
       InverseDef.push_back(0);
+      OpePriority.push_back(0);   //NEW
     }
   
   //move along the definition part and look for g,A,O,!,(,and ).
@@ -542,6 +570,12 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority
 	case ')':
 	  --Priority;
           break;
+	case 'A':
+	  OpePriority[GrpNumberLive-1]=Priority;
+	  break;
+	case 'O':
+	  OpePriority[GrpNumberLive-1]=Priority;
+	  break;
 	default:
        	  //nothing
 	  break;
@@ -558,7 +592,13 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority
       cout<<"   GrpPriority[" << j << "]= " << GrpPriority[j];
       cout<<"          ";
       cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
-      }
+    }
+    cout << endl << "List of Priority of operators" << endl;
+  for (int j=0; j<OperatorNumber-1;j++)
+    {
+      cout<<"   OpePriority[" <<j<<"]= "<< OpePriority[j]<<endl;
+    }
+ 
 #endif
 
   return;
@@ -774,14 +814,14 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 {
   if (spacerPosition < openBra || spacerPosition > closeBra)
      
-    throw runtime_error("Missing \"|\" spacer");
+    throw runtime_error("Missing \"|\" spacer or wrong definition declaration");
   return;
 }
 
 /*******************************************
 /Calculate arrays according to defintion
 /*******************************************/
- binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope)
+ binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority)
 {
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
@@ -810,16 +850,26 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
     {
       ArraySizeGlobal *= GlobalArray[i];
     }
-
+  
   //Allocate memory for each grp
   binary_type **MyGrpArray;
   MyGrpArray = new binary_type*[GrpPriority.size()];
+
   for (int i=0; i<GrpPriority.size();++i)
     {
       MyGrpArray[i]=new binary_type[ArraySizeGlobal];
     }
 
-    //make an array for each group
+  //Initialize each array
+   for (int i=0; i<GrpPriority.size();++i)
+    {
+    for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)  
+      {
+      MyGrpArray[i][j]=0;          
+      }
+    }  
+  
+   //make an array for each group
   for (int i=0; i<GrpPriority.size();++i)
     {
 
@@ -836,7 +886,8 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
       if (Tag[i]=="pixelID") 
 	{
 
-	  MakeArray_pixelID(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+      MakeArray_pixelID(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
 	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
@@ -862,7 +913,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 		}
 	      if (mm == (GlobalArray[1]))
 		{
-		  cout << endl;
+		  cout << endl << "   ";
 		  mm = 0;
 		}
 	    } 
@@ -1084,87 +1135,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   int CurrentPriority = HighestPriority;    
   int GrpPriority_size = GrpPriority.size();   //number of grp
 
-  while (GrpPriority_size > 1)     //as long as we have more than just one array
-    {
-      for (int i=0; i<GrpPriority_size;++i)   
-	{
-	  //find position of first group with the highest priority
-	  if (GrpPriority[i] == CurrentPriority)
-	    {
-	      //check if it's the last one
-	      if (i == GrpPriority_size-1)
-		{
-		  --GrpPriority[i];
-		  break;   //exit the for loop
-		}
-	      else
-		{
-		  //check if the next operator has the same priority
-		  if (GrpPriority[i+1] == GrpPriority[i])
-		    {
-		      //do calculation according to Ope[i]
-
-#ifdef RETRIEVER_MAKE_PRIORITIES
-		      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
-		      cout << "Between grp#"<<i<<" and grp#"<<i+1<<": "<<Ope[i]<<endl;
-#endif
-		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i]);
-		      
-#ifdef RETRIEVER_MAKE_CALCULATION
-
-      cout << "  #### Within Main part of program ####"<<endl<<endl;
-      cout << "    MyGrpArray["<<i<<"]:"<<endl;
-  
-  for (int a=0; a<GlobalArray[1];++a)
-	{
-	  for (int b=0; b<GlobalArray[0];++b)
-	    {
-	      for (int c=0; c<GlobalArray[2];++c)
-		{
-		  cout << MyGrpArray[i][c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
-		  
-		  cout << " ";
-		}
-	      cout << "\t";
-	    }
-	  cout << endl;
-	}
-      cout << endl;
-   
-#endif
-		      if (i < GrpPriority_size-2)
-			{
-			 //shift to the left the rest of the GrpPriorities
-			  for (int k=i+1;k<GrpPriority_size-1;++k)
-			    {
-			      GrpPriority[k]=GrpPriority[k+1];
-			    }
-			//shift to the left the rest of the operators
-			  for (int j=i;j<GrpPriority_size-2;++j)
-			    {
-			      Ope[j]=Ope[j+1];
-			    }
-			//shift to the left the rest of the arrays
-			  for (int k=i+1;k<GrpPriority_size-2;++k)
-			    {
-			      MyGrpArray[k]=MyGrpArray[k+1];
-			    }
-			  //free memory of the last array 
-			  //delete[] MyGrpArray[GrpPriority_size-2];
-			}
-		      
-		      //we have one less array/grp
-		      --GrpPriority_size; 
-		      --i;		    
-		      }
-		  else
-		    {
-		      --GrpPriority[i];
-		    }
-		}
-	    }
-	}
-      
 #ifdef RETRIEVER_MAKE_PRIORITIES
       cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
 
@@ -1183,7 +1153,96 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
       cout << endl;
 
 #endif
-      
+
+  while (GrpPriority_size > 1)     //as long as we have more than just one array
+    {for (int i=0; i<GrpPriority_size;++i)   
+      {
+       //find position of first group with the highest priority
+	  if (GrpPriority[i] == CurrentPriority)
+	    {//check if it's the last one
+	      if (i == GrpPriority_size-1)
+		{
+		  --GrpPriority[i];
+		  break;   //exit the for loop
+		}
+	      else
+		{
+		  //check if the next operator has the same priority
+		    
+		      if ((OpePriority[i] == GrpPriority[i]) && (GrpPriority[i+1] == GrpPriority[i]))
+		       {//do calculation according to Ope[i]
+	
+
+#ifdef RETRIEVER_MAKE_PRIORITIES
+		      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
+		      cout << "Between grp#"<<i<<" and grp#"<<i+1<<": "<<Ope[i]<<" (priority:"<<GrpPriority[i]<<")"<<endl;
+#endif
+
+		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i]);
+
+#ifdef RETRIEVER_MAKE_CALCULATION
+
+      cout << "  #### Within Main part of program ####"<<endl<<endl;
+      cout << "    MyGrpArray["<<i<<"]:"<<endl;
+  
+  for (int a=0; a<GlobalArray[1];++a)
+	{for (int b=0; b<GlobalArray[0];++b)
+	    {for (int c=0; c<GlobalArray[2];++c)
+		{cout << MyGrpArray[i][c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]];
+		 cout << " ";}
+	     cout << "\t";}
+	cout << endl;}
+  cout << endl;
+   
+#endif
+                       if (i < GrpPriority_size-2)
+			 {  
+			 //shift to the left the rest of the GrpPriorities
+			  for (int k=i+1;k<GrpPriority_size-1;++k)
+			    {
+			      GrpPriority[k]=GrpPriority[k+1];
+			    }
+
+			//shift to the left the rest of the operators and operators priorities
+			  for (int j=i;j<GrpPriority_size-2;++j)
+			    {
+			      OpePriority[j]=OpePriority[j+1];
+			      Ope[j]=Ope[j+1];
+			    }
+
+			//shift to the left the rest of the arrays
+			  for (int k=i+1;k<GrpPriority_size-1;++k)
+			    {
+			      
+			      MyGrpArray[k]=MyGrpArray[k+1];
+			    }
+			  //free memory of the last array 
+			  //  delete[] MyGrpArray[GrpPriority_size-1];
+		
+			}
+		      
+		      //we have one less array/grp
+
+		       
+		      --GrpPriority_size; 
+		      --i;
+		      
+		      }
+		  else
+		    {
+		      --GrpPriority[i];   
+		    }
+		  
+		}
+	     }
+	}
+
+    /* if (GrpPriority_size = 1)
+      {
+	break;
+      }
+    */
+
       //check what is the highest priority
       int find_one = 0;
       for (int m=0; m<GrpPriority_size;++m)
@@ -1200,16 +1259,20 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	}
     }
 
+    delete[] MyGrpArray;  
 
-  for (int j=1; j<GrpPriority.size();++j)
+  /*
+    for (int j=1; j<GrpPriority.size();++j)   
     {
       delete[] MyGrpArray[j];
+      cout << "ok for j="<<j<<endl;  //REMOVE
     }
-
+  */
+  
    return MyGrpArray[0];    //return the final array
 }
 
-/*******************************************
+/*******************************************`<
 /Find highest priority
 /*******************************************/
 int FindMaxPriority (vector<int>& GrpPriority)
@@ -1299,10 +1362,41 @@ if (Def[grp_number][0] == loop[0])
 	   for (int tbin=0; tbin < GlobalArray[2]; tbin++)
 	     {
 	     MyGrpArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin]=BinaryArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin];
-	     }
+             }
 	   }
 	}
  }
+
+ 
+#ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
+	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
+	  cout << endl << "Check if MyGrpArray in Make_PixelID is correct: " << endl;
+
+	  int ll = 0;
+	  int mm = 0;
+	  cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)  
+	    {
+	      cout << MyGrpArray[j] << " ";            //listing of MyGrpArray    
+      
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl << "   ";
+		  mm = 0;
+		}
+	    } 
+#endif
 
   return;
 }
@@ -1664,12 +1758,12 @@ void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
 /*******************************************/
 void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator)
 {
-  string AND="AND";
+  string OR="OR";
 
-
-  if (Operator[0] == AND[0])
+  if (Operator[0] == OR[0])
     {
-#ifdef RETRIEVER_MAKE_CALCULATION_AND
+
+#ifdef RETRIEVER_MAKE_CALCULATION_OR
 
       cout << endl<<"****RETRIEVER_MAKE_CALCULATION************************************"<<endl;
 
@@ -1712,26 +1806,31 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operat
 
 #endif
 
-#ifdef RETRIEVER_MAKE_CALCULATION_AND
-      cout << "==> Operator AND"<<endl;
+#ifdef RETRIEVER_MAKE_CALCULATION_OR
+      cout << "==> Operator OR"<<endl;
 #endif
-
+      int sum =0;
      for (int y=0; y<GlobalArray[0];y++)
 	 {
-	 for (int x=0; x<GlobalArray[1]; x++)
+
+	  for (int x=0; x<GlobalArray[1]; x++)
 	     {
+	       	 
 	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
-		{
-		  if (GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]!=0)
+		{	  
+		
+		  if ((GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]==0)&&
+		      (GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]!=0))
 		    {
 		      GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
 			GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
 		    }
+		  
 	        }
 	     }
 	 }
 
-#ifdef RETRIEVER_MAKE_CALCULATION_AND
+#ifdef RETRIEVER_MAKE_CALCULATION_OR
      
      cout << "  --AFTER--"<<endl<<endl;
    cout << "    GrpArray1:"<<endl;
@@ -1757,8 +1856,8 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operat
     }
   else
     {
-
-#ifdef RETRIEVER_MAKE_CALCULATION_OR
+     
+#ifdef RETRIEVER_MAKE_CALCULATION_AND
 
       cout << endl<<"****RETRIEVER_MAKE_CALCULATION************************************"<<endl;
 
@@ -1801,12 +1900,12 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operat
 
 #endif
 
-#ifdef RETRIEVER_MAKE_CALCULATION_OR
-      cout << "==> Operator OR"<<endl;
+#ifdef RETRIEVER_MAKE_CALCULATION_AND
+      cout << "==> Operator AND"<<endl;
 #endif
 
       for (int y=0; y<GlobalArray[0];y++)
-	 {
+	{
 	 for (int x=0; x<GlobalArray[1]; x++)
 	     {
 	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
@@ -1820,7 +1919,7 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operat
 	     }
 	 }
 
-#ifdef RETRIEVER_MAKE_CALCULATION_OR
+#ifdef RETRIEVER_MAKE_CALCULATION_AND
 
       cout << "  --AFTER--"<<endl<<endl;
       cout << "    GrpArray1:"<<endl;
@@ -1844,10 +1943,10 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operat
 #endif
 
     }
-
   return;
 }
 
+#ifdef SWAP_ENDIAN
 /*******************************************
 /To swap from little endian to big endian
 /*******************************************/
@@ -1858,3 +1957,4 @@ inline void endian_swap (binary_type& x)
     ((x>>8) & 0x0000FF00) |
     (x<<24);
 }
+#endif
