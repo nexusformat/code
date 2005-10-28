@@ -80,7 +80,7 @@ void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
 void CheckTagValidity (string& Tag);  //Check if the Tags are valid
 void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
-binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority);  //calculate the final array according to definiton
+binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority,tree<Node> &tr);  //calculate the final array according to definiton
 int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
 void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);  //make pixelID array
 void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);   //make pixelX array
@@ -249,8 +249,9 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 #endif
 #endif
 
+
   //Calculate arrays according to definition
-  NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority);
+  NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr);
 
 #ifdef OUTPUT_RESULT
   
@@ -821,7 +822,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 /*******************************************
 /Calculate arrays according to defintion
 /*******************************************/
- binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority)
+ binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority, tree<Node> &tr)
 {
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
@@ -859,17 +860,10 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
     {
       MyGrpArray[i]=new binary_type[ArraySizeGlobal];
     }
-
-  //Initialize each array
-   for (int i=0; i<GrpPriority.size();++i)
-    {
-    for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)  
-      {
-      MyGrpArray[i][j]=0;          
-      }
-    }  
   
-   //make an array for each group
+  // binary_type  *MyGrpArray[] = new binary_type[ArraySizeGlobal*GrpPriority.size()];
+
+  //make an array for each group
   for (int i=0; i<GrpPriority.size();++i)
     {
 
@@ -1168,16 +1162,13 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	      else
 		{
 		  //check if the next operator has the same priority
-		    
 		      if ((OpePriority[i] == GrpPriority[i]) && (GrpPriority[i+1] == GrpPriority[i]))
 		       {//do calculation according to Ope[i]
-	
 
 #ifdef RETRIEVER_MAKE_PRIORITIES
 		      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
 		      cout << "Between grp#"<<i<<" and grp#"<<i+1<<": "<<Ope[i]<<" (priority:"<<GrpPriority[i]<<")"<<endl;
 #endif
-
 		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i]);
 
 #ifdef RETRIEVER_MAKE_CALCULATION
@@ -1213,26 +1204,20 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 			//shift to the left the rest of the arrays
 			  for (int k=i+1;k<GrpPriority_size-1;++k)
 			    {
-			      
 			      MyGrpArray[k]=MyGrpArray[k+1];
 			    }
 			  //free memory of the last array 
 			  //  delete[] MyGrpArray[GrpPriority_size-1];
-		
 			}
 		      
 		      //we have one less array/grp
-
-		       
 		      --GrpPriority_size; 
 		      --i;
-		      
 		      }
 		  else
 		    {
 		      --GrpPriority[i];   
 		    }
-		  
 		}
 	     }
 	}
@@ -1258,17 +1243,32 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
            --CurrentPriority;
 	}
     }
-
-    delete[] MyGrpArray;  
-
+  
+  // create an empty node
+  Node node("empty","empty");
+  
+  int rank=1;
+  int type=5;    //INT32=NX_INT32
+  int dims[NX_MAXRANK];
   /*
-    for (int j=1; j<GrpPriority.size();++j)   
-    {
-      delete[] MyGrpArray[j];
-      cout << "ok for j="<<j<<endl;  //REMOVE
-    }
+  //node=
+  node=Node("fluuut",MyGrpArray[0],rank,dims,type);
+  tr.insert(tr.begin(),node);
+  */
+  /*
+  // create the data
+  node=Node(name,data,rank,dims,type);
+  //node.set_name(name);
+  //node.set_data(data,rank,dims,type);
+  node.set_attrs(attrs);
+  
+  // free the temporary data
+  if(NXfree(&data)!=NX_OK)
+    throw runtime_error("NXfree failed");
   */
   
+   delete[] MyGrpArray[1];  
+
    return MyGrpArray[0];    //return the final array
 }
 
