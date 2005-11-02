@@ -1190,17 +1190,18 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	}
     }
   
-  // create an empty node
-  Node node("empty","empty");
-  
   int rank=1;
-  int type=5;    //INT32=NX_INT32
+  // int type=5;    //INT32=NX_INT32
+  int type=NX_INT32;
   int dims[NX_MAXRANK];
-  /*
-  //node=
-  node=Node("fluuut",MyGrpArray[0],rank,dims,type);
+  void * value;
+  cout << "Ok1" <<endl;
+  value = (void *)MyGrpArray[0];
+  cout << "ok2" << endl;
+  Node node("New Array according to string location definition",value,rank,dims,type);
+  cout << "ok3" << endl;
   tr.insert(tr.begin(),node);
-  */
+  cout << "Ok4"<<endl;
   /*
   // create the data
   node=Node(name,data,rank,dims,type);
@@ -1208,7 +1209,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   //node.set_data(data,rank,dims,type);
   node.set_attrs(attrs);
   
-  // free the temporary data
+  // free the temporary datac
   if(NXfree(&data)!=NX_OK)
     throw runtime_error("NXfree failed");
   */
