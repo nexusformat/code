@@ -471,7 +471,8 @@ be described in greated detail below.</para>
 
 <para>The declaration part, <parameter>[...,dim2,dim1][...,dimY,dimX]</parameter> 
 surrounded by square brackets, contains between the first brackets the size of each dimension of the array to be returned, separated by commas, and between the second set of brackets, the dimensions of the array to read from. The values are
-specified as positive integers.</para>
+specified as positive integers. The current version of the retriever returns an array of the same size as the initial array, no matter the dimensions given between the first set of brackets.
+</para>
 
 <para>The definition part,
 <parameter>{tag_name_1|operator_1}keyword_1{tag_name_2|operator2}...</parameter>,
