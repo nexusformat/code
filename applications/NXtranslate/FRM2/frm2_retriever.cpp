@@ -1953,7 +1953,7 @@ Node* Frm2Retriever::createNode(std::string nodename, std::string value, unsigne
 			*((char*)data) = static_cast<char>(string_util::str_to_int(value.c_str()));
 			break;
 		case NX_UINT8:
-			((char*)data) = (char*)value.c_str();
+                        data = const_cast<char*>(value.c_str());
 			//nxdims[0] = value.size();
 			//*((unsigned char*)data) = static_cast<unsigned char>(string_util::str_to_int(value.c_str()));
 			break;
