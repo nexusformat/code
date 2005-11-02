@@ -80,7 +80,7 @@ void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
 void CheckTagValidity (string& Tag);  //Check if the Tags are valid
 void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
-binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority,tree<Node> &tr);  //calculate the final array according to definiton
+void CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority,tree<Node> &tr);  //calculate the final array according to definiton
 int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
 void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);  //make pixelID array
 void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);   //make pixelX array
@@ -217,7 +217,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
       GlobalArraySize *= GlobalArray[i];
     }
   binary_type * BinaryArray = new binary_type [GlobalArraySize];
-  binary_type * NewArray = new binary_type [GlobalArraySize];   
+  // binary_type * NewArray = new binary_type [GlobalArraySize];   
   
   //transfer the data from the binary file into the GlobalArray
   fread(&BinaryArray[0],sizeof(BinaryArray[0]),GlobalArraySize,BinaryFile);
@@ -251,58 +251,8 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 
 
   //Calculate arrays according to definition
-  NewArray = CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr);
+  CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr);
 
-#ifdef OUTPUT_RESULT
-  
-#ifdef RETRIEVER_INPUT_TEST
-  cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
-   cout << "Check 10 data of file (after swapping endian):" << endl;
-
-   for (int j=0; j<10; j++)
-     {
-       cout << "   NewArray["<<j<<"]= "<<NewArray[j]<<endl;
-     }
-#endif
-
-  //std::ofstream file2("output_array_binary.dat",std::ios::binary);
-  std::ofstream file2(OutputFileName,std::ios::binary);
-  file2.write((char *)NewArray,sizeof(NewArray)*GlobalArraySize);
-  file2.close();
-
-#endif
-
-#ifdef RETRIEVER_FINAL_RESULT
-	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
-	  cout << endl << "Check the final NewArray: " << endl<<endl;
-
-	  int ll = 0;
-	  int mm = 0;
-          cout << "   ";
-
-	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
-	    {
-	      cout << NewArray[j] << " ";            //listing of NewArray    
-
-	      if (ll == (GlobalArray[2]-1))
-		{
-		  cout << endl << "   ";  
-		  ll = 0;
-		  ++mm;
-		}
-	      else
-		{
-		  ++ll;
-		}
-	      if (mm == (GlobalArray[1]))
-		{
-		  cout << endl;    
-		  cout << "   ";
-		  mm = 0;
-		}
-	    } 
-
-#endif
 
 cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 }
@@ -822,7 +772,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 /*******************************************
 /Calculate arrays according to defintion
 /*******************************************/
- binary_type* CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority, tree<Node> &tr)
+ void CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority, tree<Node> &tr)
 {
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
@@ -860,6 +810,8 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
     {
       MyGrpArray[i]=new binary_type[ArraySizeGlobal];
     }
+  //Allocate memory for the final array created
+  binary_type * NewArray = new binary_type [ArraySizeGlobal];   
   
   // binary_type  *MyGrpArray[] = new binary_type[ArraySizeGlobal*GrpPriority.size()];
 
@@ -1222,12 +1174,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	     }
 	}
 
-    /* if (GrpPriority_size = 1)
-      {
-	break;
-      }
-    */
-
       //check what is the highest priority
       int find_one = 0;
       for (int m=0; m<GrpPriority_size;++m)
@@ -1266,10 +1212,63 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   if(NXfree(&data)!=NX_OK)
     throw runtime_error("NXfree failed");
   */
-  
-   delete[] MyGrpArray[1];  
 
-   return MyGrpArray[0];    //return the final array
+  NewArray = MyGrpArray[0];
+
+#ifdef OUTPUT_RESULT
+  
+#ifdef RETRIEVER_INPUT_TEST
+  cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
+   cout << "Check 10 data of file (after swapping endian):" << endl;
+
+   for (int j=0; j<10; j++)
+     {
+       cout << "   NewArray["<<j<<"]= "<<NewArray[j]<<endl;
+     }
+#endif    //end of RETRIEVER_INPUT_TEST
+
+  //std::ofstream file2("output_array_binary.dat",std::ios::binary);
+  std::ofstream file2(OutputFileName,std::ios::binary);
+  file2.write((char *)NewArray,sizeof(NewArray)*ArraySizeGlobal);
+  file2.close();
+
+#endif  //end of OUTPUT_RESULT
+
+#ifdef RETRIEVER_FINAL_RESULT
+	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
+	  cout << endl << "Check the final NewArray: " << endl<<endl;
+
+	  int ll = 0;
+	  int mm = 0;
+          cout << "   ";
+
+	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+	    {
+	      cout << NewArray[j] << " ";            //listing of NewArray    
+
+	      if (ll == (GlobalArray[2]-1))
+		{
+		  cout << endl << "   ";  
+		  ll = 0;
+		  ++mm;
+		}
+	      else
+		{
+		  ++ll;
+		}
+	      if (mm == (GlobalArray[1]))
+		{
+		  cout << endl;    
+		  cout << "   ";
+		  mm = 0;
+		}
+	    } 
+
+#endif
+  
+   delete[] MyGrpArray;  
+
+   return;  
 }
 
 /*******************************************`<
