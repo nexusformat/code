@@ -3,6 +3,7 @@
 
 #include "../retriever.h"
 #include <fstream>
+#include <iostream>
 
 // this is not intended to be inherited from
 class SnsHistogramRetriever: public Retriever{
@@ -17,7 +18,7 @@ class SnsHistogramRetriever: public Retriever{
   SnsHistogramRetriever& operator=(const SnsHistogramRetriever&); //operator "=" overloading
   std::string source;
   std::string location;
-  std::ifstream infile;
+  FILE *BinaryFile;
 };
 
 #endif
