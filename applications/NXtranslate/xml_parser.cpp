@@ -254,7 +254,7 @@ static void my_characters(void *user_data, const xmlChar *ch, int len){
   ((UserData *)user_data)->char_data+=str;
 }
 
-void my_startElement(void *user_data, const xmlChar *name,
+static void my_startElement(void *user_data, const xmlChar *name,
                                                        const xmlChar ** attrs){
 #ifdef DEBUG1_XML_PARSER
   std::cout << "startElement(" << name << ")" << std::endl;
@@ -439,7 +439,7 @@ void my_startElement(void *user_data, const xmlChar *name,
   }
 }
 
-void my_endElement(void *user_data, const xmlChar *name){
+static void my_endElement(void *user_data, const xmlChar *name){
 #ifdef DEBUG1_XML_PARSER
   std::cout << "endElement(" << name << ")" << std::endl;
 #endif
