@@ -12,12 +12,16 @@
 #include "../node_util.h"
 #include "../string_util.h"
 #include "../tree.hh"
+#include "string_location_format.cpp"
+#include <time.h>
+
+//#include "test_retriever.cpp"
 
 //#define RETRIEVER_TEST                    //to test main part     
-//#define RETRIEVER_DECLARATION_TEST        //to test declaration part
-//#define RETRIEVER_DEFINITION_TEST         //to test definition part
-//#define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
-//#define RETRIEVER_INPUT_TEST              //to test the data read
+#define RETRIEVER_DECLARATION_TEST        //to test declaration part
+#define RETRIEVER_DEFINITION_TEST         //to test definition part
+#define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
+#define RETRIEVER_INPUT_TEST              //to test the data read
 //#define RETRIEVER_MAKE_ARRAY              //to test the process of making the arrays
 //#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
 //#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
@@ -29,13 +33,13 @@
 //#define RETRIEVER_MAKE_ARRAY_TBIN         //to test the Tbin part
 //#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
 //#define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
-//#define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
+#define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
 //#define RETRIEVER_MAKE_CALCULATION_AND   //to test the calculation of the arrays (and)
 //#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
 //#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
 //#define RETRIEVER_FINAL_RESULT            //to list the final array produced
-#define SWAP_ENDIAN                       //triger the swapping endian subroutine
-#define OUTPUT_RESULT                     //to create binary file of result (to test it with IDL)
+//#define SWAP_ENDIAN                       //triger the swapping endian subroutine
+//#define OUTPUT_RESULT                     //to create binary file of result (to test it with IDL)
 
 const char OutputFileName[]="output_array_binary.dat";
 
@@ -65,21 +69,10 @@ struct Grp_parameters   //parameters of the different definitions
 vector<Grp_parameters> GrpPara;
 
 //Declaration of functions
-string format_string_location(string& s);    //format the string 
-string without_white_spaces(string& s);      //remove spaces from string 
-void DeclaDef_separator(string& s,vector<string>& DeclaDef);//separate Declaration from Definition
-vector<string> Declaration_separator(string s); //Separate local array from global rarray
-string TagDef_separator(string& s, vector<string>& Tag, vector<string>& Def);  //separate Tag from Definition part and return the Grp version of the string_location
-string ReplaceTagDef_by_Grp(string& s, int a); //Tag/Def is replaced by Grp to determine the priorities of the associations
-vector<string> StoreOperators(string& s, int& HowMany);  //isolate the operators of the definition part of the string location
-vector<string::iterator> PositionSeparator(string s, int TagName_Number);  //Find the position of each separator "|"
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef, vector<int>& OpePriority);  //Give priority to each grp of the definition part
 void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
 void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
 void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
 void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
-void CheckTagValidity (string& Tag);  //Check if the Tags are valid
-void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
 void CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority,tree<Node> &tr);  //calculate the final array according to definiton
 int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
 void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);  //make pixelID array
@@ -134,11 +127,10 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   int Everything = 0;            //0= we don't want everything, 1=we do
   int GlobalArraySize = 1;       //Size of global array within our program
  
-  new_location = location;
-
   // check that the argument is not an empty string
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
+
 #ifdef RETRIEVER_TEST
   cout << "####RETRIEVER_TEST#########################################################" << endl;
   cout << "Initial string location= " << endl << "  " << new_location << endl;
@@ -146,7 +138,8 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 
   //Once upon a time, there was a string location named "location"
   //"location" became new_location after loosing its white spaces
-  new_location = format_string_location(new_location);
+  format_string_location(location, new_location);
+
 #ifdef RETRIEVER_TEST
   cout << endl << "String location without white spaces: " << endl << "  " << new_location <<endl;
 #endif
@@ -155,6 +148,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //from its definition part --> DeclaDef vector
 
   DeclaDef_separator(new_location,DeclaDef);
+
   if (DeclaDef[1].size() > 0 && DeclaDef[1].size()<7)
     throw runtime_error("Definition part is not valid");
 
@@ -175,13 +169,13 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 #endif
 
   //Separate declaration arrays (local and global)
-  LocGlobArray = Declaration_separator(DeclaDef[0]);
+  Declaration_separator(DeclaDef[0], LocGlobArray);
 
   if (Everything == 0)
     {
      //Work on definition part
      DefinitionPart = DeclaDef[1];
-     DefinitionGrpVersion = TagDef_separator(DeclaDef[1],Tag, Def);
+     TagDef_separator(DeclaDef[1],Tag, Def, DefinitionGrpVersion);
 
 #ifdef RETRIEVER_TEST
   cout << endl << "Version Grp of string location: " << endl << "   DefinitionGrpVersion= " << DefinitionGrpVersion << endl;   
@@ -199,12 +193,11 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 
      //Store operators
      OperatorNumber = Tag.size();
-     Ope = StoreOperators(DefinitionPart,OperatorNumber);
+     StoreOperators(DefinitionPart,OperatorNumber, Ope);
 
      //Give to each grp its priority
      GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef, OpePriority);   
      //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
-
      DefinitionParametersFunction(Def,OperatorNumber);
     }
    
@@ -217,14 +210,13 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
       GlobalArraySize *= GlobalArray[i];
     }
   binary_type * BinaryArray = new binary_type [GlobalArraySize];
-  // binary_type * NewArray = new binary_type [GlobalArraySize];   
   
   //transfer the data from the binary file into the GlobalArray
   fread(&BinaryArray[0],sizeof(BinaryArray[0]),GlobalArraySize,BinaryFile);
 
 #ifdef RETRIEVER_INPUT_TEST
   cout << endl << endl << "****RETRIEVER_INPUT_TEST********************************************" << endl;
-   cout << "Check 10 data of file (before swapping endian if any):" << endl;
+   cout << "Check 10 data of file (before swapping endian, if any):" << endl;
 
    for (int j=0; j<10; j++)
      {
@@ -249,12 +241,12 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 #endif
 #endif
 
-
   //Calculate arrays according to definition
   CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr);
 
-
 cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+ cout << "Time it took to run it is: " << clock() <<endl;  //REMOVE
+
 }
 
 /*********************************
@@ -265,294 +257,6 @@ const string SnsHistogramRetriever::MIME_TYPE("application/x-SNS-histogram");
 string SnsHistogramRetriever::toString() const
 {
   return "["+MIME_TYPE+"] "+source;
-}
-
-/*********************************
-/Format the string location
-/*********************************/
-std::string format_string_location(string& location)
-{
-    return without_white_spaces(location);
-}
-
-//Remove white spaces
-std::string without_white_spaces(string& location)
-{
-  typedef std::string::size_type string_size;
-  string_size i=0;
-  std::string ret="";
- 
-   while (i != location.size())
-    {
-      while (i != location.size() && isspace(location[i]))
-	{
-	  ++i;	
-        }
-     //find end of next word
-     string_size j=i;
-     while (j != location.size() && !isspace(location[j]))
-       ++j;
-
-     if (i != j)
-       {
-	 ret+=location.substr(i,j-i);
-         i=j;
-       }
-    } 
-  return ret;
-}
-
-/*********************************
-/Separate Decla from Definition
-/*********************************/
-void DeclaDef_separator(string& new_location,vector<string>& VecStr)
-{
-  typedef std::string::size_type string_size;
-  int Dposition = new_location.find("#");
-
-  if (Dposition == -1)
-    throw runtime_error("Declaration/Definition spacer invalid or not present");
-
-  string_size taille = new_location.size();
-  
-  VecStr.push_back(new_location.substr(0,Dposition));
-  
-  if (taille == Dposition+1)
-      //if (taille - VecStr[0].size()-1 <= Dposition+1)
-    {
-        VecStr.push_back("");
-    }
-  else
-    {
-        VecStr.push_back(new_location.substr(Dposition+1, taille - VecStr[0].size()-1));
-    }
-  return;
-}
-
-/*********************************
-/Separate local from global array
-/*********************************/
-vector<string> Declaration_separator(string DeclarationStr)
-{
-  std::vector<string> LocalArray_GlobalArray;
-  std::string str;
-  typedef string::size_type string_size;
-  string_size DeclarationStrSize = DeclarationStr.size();
-  int SeparatorPosition = DeclarationStr.find("][");
-  
-  if (SeparatorPosition == -1)
-    throw runtime_error("Format of declaration not valid");  
-
-  LocalArray_GlobalArray.push_back(DeclarationStr.substr(0,SeparatorPosition+1));
-  LocalArray_GlobalArray.push_back(DeclarationStr.substr(SeparatorPosition+1,DeclarationStrSize-LocalArray_GlobalArray[0].size()));
- 
-  return LocalArray_GlobalArray;
-}
-
-/*********************************
-/Separate Tag from Definition
-/*********************************/
-string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<string>& Def)
-{
-  std::vector<string> ret;
-  typedef string::iterator iter;
-  iter b = DefinitionPart.begin(), e =  DefinitionPart.end(), a;
-  int CPosition, OpenBraPosition, CloseBraPosition = 1;
-  string  separator = "|";
-  string StringLocationGroup = DefinitionPart;
-  static const string OpenBracket = "{";
-  static const string CloseBracket = "}";
-  int HowManyTimes = 0, i = 0, length =  DefinitionPart.size();
-
-  while (b!=e)
-    { 
-       if (find(b,  DefinitionPart.end(), separator[0]) !=  DefinitionPart.end())
-      	{
-	   ++HowManyTimes;
-	   b = find(b, DefinitionPart.end(),separator[0]);
-	   b=b+1;
-	}
-        b=b+1;
-    }
-
-  while (i < HowManyTimes)
-    {
-
-      CPosition =  DefinitionPart.find(separator[0]);
-      OpenBraPosition =  DefinitionPart.find(OpenBracket);
-      CloseBraPosition =  DefinitionPart.find(CloseBracket);
-
-      CheckSpacerValidity(OpenBraPosition,CPosition,CloseBraPosition);
-
-      Tag.push_back( DefinitionPart.substr(OpenBraPosition+1,CPosition-OpenBraPosition-1));
-      CheckTagValidity(Tag[i]);
-      Def.push_back( DefinitionPart.substr(CPosition+1,CloseBraPosition-CPosition-1));
-
-       DefinitionPart = DefinitionPart.substr(CloseBraPosition+1, length-CloseBraPosition-1);
-      
-      ++i;
-    }
-
-   return ReplaceTagDef_by_Grp(StringLocationGroup,HowManyTimes);
-}
-
-/*********************************
-/Replace Tag/Def part by Grp#
-/*********************************/
-string ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes)
-{
-  static const string  separator = "|";
-  static const string OpenBracket = "{";
-  static const string CloseBracket = "}";
-  string part1, part2;
-  int OpenBraPosition, CloseBraPosition;
- 
-  for (int j=0 ; j<HowManyTimes ; j++)
-  
-    {
-      std::ostringstream Grp;
-      OpenBraPosition =  StringLocationGroup.find(OpenBracket);
-      CloseBraPosition =  StringLocationGroup.find(CloseBracket);
-      
-       StringLocationGroup.erase(OpenBraPosition, CloseBraPosition+1-OpenBraPosition);
-     
-      part1 = StringLocationGroup.substr(0,OpenBraPosition);
-      part2 = StringLocationGroup.substr(OpenBraPosition, StringLocationGroup.size());
-     
-      Grp << "grp" << j ;  
-      StringLocationGroup = part1 + Grp.str() + part2;
-      }
-  
-  return StringLocationGroup;
-}
-
-/*********************************
-/Store operators
-/*********************************/
-vector<string> StoreOperators(string& StrS, int& HowMany)
-{
-  typedef string::iterator iter;
-  std::vector<iter> VecIter;             //vector of iterators
-  std::string::iterator a;
-  string operatorOR = "OR";
-  string operatorAND = "AND";
-  vector<string> Ope;
-
- //Store each position of "|" into VecIter
- VecIter = PositionSeparator(StrS,HowMany);
-  
-#ifdef RETRIEVER_DEFINITION_TEST
- cout << endl <<endl << "List of operators:" << endl;
-#endif
-
-  for (int i=0; i<HowMany-1; i++)
-    {
-      if (find(VecIter[i],VecIter[i+1],operatorOR[0])!=VecIter[i+1])
-      { 
-	Ope.push_back("OR");
-      }
-      else if (find(VecIter[i],VecIter[i+1],operatorAND[0])!=VecIter[i+1])
-	{
-	  Ope.push_back("AND");
-	}
-      else
-	throw runtime_error("Not a valid operator");
-
-#ifdef RETRIEVER_DEFINITION_TEST
-      cout << "   Ope[" << i << "]= " << Ope[i];  
-#endif
-
-    }	  
-  return Ope;
-}
-
-/*********************************
-/Find iterator for each separator
-/*********************************/
-vector<string::iterator> PositionSeparator(string s, int TagName_Number)
-{ std::vector<string::iterator> VecIter;
-  int i = 0;
-  typedef string::iterator iter;
-  iter b = s.begin();  
-  string separator = "|";
-
-  while (i < TagName_Number)
-    {
-      VecIter.push_back(find(b, s.end(), separator[0]));
-      b = find(b,s.end(),separator[0])+1;
-      ++i;
-    }
-  return VecIter;
-}
-
-/*********************************
-/Give priority for each group
-/*********************************/
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef, vector<int>& OpePriority)
-{
-  int DefinitionString_size = s.size();
-  int GrpNumberLive = 0;
-  int Priority = 0;
-    
-  //Initialization of vector<int> and vector<bool>
-  for (int i=0; i<OperatorNumber; i++)
-    {
-      GrpPriority.push_back(0);
-      InverseDef.push_back(0);
-      OpePriority.push_back(0);   //NEW
-    }
-  
-  //move along the definition part and look for g,A,O,!,(,and ).
-  for (int j=0; j<DefinitionString_size; j++)
-    {
-      switch (s[j])
-	{
-	case 'g':
-          j=j+3;   //move to end of grp#
-	  GrpPriority[GrpNumberLive]=Priority;
-   	  ++GrpNumberLive;
-     	  break;
-	case '!':
-	  InverseDef[GrpNumberLive]=1;
-          break;
-	case '(':
-	  ++Priority;
-          break;
-	case ')':
-	  --Priority;
-          break;
-	case 'A':
-	  OpePriority[GrpNumberLive-1]=Priority;
-	  break;
-	case 'O':
-	  OpePriority[GrpNumberLive-1]=Priority;
-	  break;
-	default:
-       	  //nothing
-	  break;
-	}
-    }
- 
-  if (Priority != 0)
-    throw runtime_error("Format of parentheses not valid");
-
-#ifdef RETRIEVER_DEFINITION_TEST
-  cout << endl << endl << "List of Priority and Inverse functions" << endl;
-  for (int j=0; j<OperatorNumber; j++)
-    {
-      cout<<"   GrpPriority[" << j << "]= " << GrpPriority[j];
-      cout<<"          ";
-      cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
-    }
-    cout << endl << "List of Priority of operators" << endl;
-  for (int j=0; j<OperatorNumber-1;j++)
-    {
-      cout<<"   OpePriority[" <<j<<"]= "<< OpePriority[j]<<endl;
-    }
- 
-#endif
-
-  return;
 }
 
 /*********************************
@@ -746,28 +450,6 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
  return;
 }
 
-/*********************************
-/Check validity of Tags
-/*********************************/
-void CheckTagValidity (string & Tag)
-{
- if (Tag == "pixelID" || Tag == "pixelX" || Tag == "pixelY" || Tag == "Tbin")
-    return;
-  else
-    throw runtime_error("One of the Tag is not a valid Tag");
-return;
-}
-
-/*********************************
-/Check if a "|" spacer is missing
-/*********************************/
-void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
-{
-  if (spacerPosition < openBra || spacerPosition > closeBra)
-     
-    throw runtime_error("Missing \"|\" spacer or wrong definition declaration");
-  return;
-}
 
 /*******************************************
 /Calculate arrays according to defintion
@@ -1055,7 +737,11 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   cout << "GlobalArray[1]= " << GlobalArray[1]<<endl;
   cout << "GlobalArray[2]= " << GlobalArray[2]<<endl<<endl;
 
-  for (int i=0; i<GrpPriority.size();++i)
+for (int i=0; i<GrpPriority.size();++i)
+       {
+	 //	 plot_array(GlobalArray[0], GlobalArray[1], GlobalArray[2], i, "MyGrpArray", MyGrpArray);
+
+	   for (int i=0; i<GrpPriority.size();++i)
        {
       cout<<"MyGrpArray["<<i<<"]:"<<endl;
 
@@ -1074,6 +760,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	  cout << endl;
 	}
       cout << endl;
+	 
       }
 
 #endif
@@ -1190,6 +877,7 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 	}
     }
   
+  /*
   int rank=1;
   // int type=5;    //INT32=NX_INT32
   int type=NX_INT32;
@@ -1202,16 +890,6 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   cout << "ok3" << endl;
   tr.insert(tr.begin(),node);
   cout << "Ok4"<<endl;
-  /*
-  // create the data
-  node=Node(name,data,rank,dims,type);
-  //node.set_name(name);
-  //node.set_data(data,rank,dims,type);
-  node.set_attrs(attrs);
-  
-  // free the temporary datac
-  if(NXfree(&data)!=NX_OK)
-    throw runtime_error("NXfree failed");
   */
 
   NewArray = MyGrpArray[0];
