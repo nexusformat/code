@@ -38,6 +38,7 @@ bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \
+        xml_util.h xml_util.cpp \
 	attr.h nexus_retriever.h nexus_util.h node.h node_util.h \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
 	tree.hh dynamic_retriever.cpp dynamic_retriever.h
@@ -54,7 +55,7 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	text_plain/libTextPlain.la text_xml/libTextXML.la \
 	sns_histogram/libSNShistogram.la \
 	FRM2/libFRM2.la
-	
+
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
@@ -90,7 +91,6 @@ test-clean:
 #	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp \
 #=======
 #>>>>>>> 1.15
-	
 #<<<<<<< Makefile.am
 #	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh \
 #	FRM2/frm2_retriever.h FRM2/frm2_retriever.cpp FRM2/string_util_ext.cpp \
