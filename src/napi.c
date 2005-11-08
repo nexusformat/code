@@ -34,14 +34,13 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <stdarg.h>
 #include "napi.h"
 
-  
-  static int iFortifyScope;
+static int iFortifyScope;
 /*------------------------------------------------------------------------
   HDF-5 cache size special stuff
   -------------------------------------------------------------------------*/
 long nx_cacheSize =  1024000; /* 1MB, HDF-5 default */
 
-NXstatus CALLING_STYLE NXsetcache(long newVal)
+NXstatus NXsetcache(long newVal)
 {
   if(newVal > 0)
   {
@@ -50,6 +49,8 @@ NXstatus CALLING_STYLE NXsetcache(long newVal)
   }
   return NX_ERROR;
 }
+
+    
 /*-----------------------------------------------------------------------*/
 static NXstatus NXisXML(CONSTCHAR *filename)
 {
@@ -66,6 +67,7 @@ static NXstatus NXisXML(CONSTCHAR *filename)
   }
   return NX_ERROR;
 }
+
 /*-------------------------------------------------------------------------*/
  
 
@@ -83,7 +85,7 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 
   /*---------------------------------------------------------------------*/
 
-  NX_EXTERNAL void CALLING_STYLE NXMSetError(void *pData, 
+  extern void NXMSetError(void *pData, 
 			      void (*NewError)(void *pD, char *text))
   {
     NXpData = pData;
@@ -143,7 +145,7 @@ static int determineFileType(CONSTCHAR *filename)
   return 0;
 }
 /*-----------------------------------------------------------------------*/
-  NXstatus CALLING_STYLE  NXopen(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
+  NXstatus   NXopen(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
   {
     int hdf_type=0;
     int iRet=0;
@@ -274,7 +276,7 @@ static int determineFileType(CONSTCHAR *filename)
 
 /* ------------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXclose (NXhandle *fid)
+  NXstatus  NXclose (NXhandle *fid)
   { 
     NXhandle hfil; 
     int status;
@@ -293,7 +295,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /*-----------------------------------------------------------------------*/   
 
-  NXstatus CALLING_STYLE NXmakegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
+  NXstatus  NXmakegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
      pNexusFunction pFunc = (pNexusFunction)fid;
      return pFunc->nxmakegroup(pFunc->pNexusData, name, nxclass);   
@@ -301,7 +303,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /*------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXopengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
+  NXstatus  NXopengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxopengroup(pFunc->pNexusData, name, nxclass);  
@@ -309,7 +311,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXclosegroup (NXhandle fid)
+  NXstatus  NXclosegroup (NXhandle fid)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxclosegroup(pFunc->pNexusData);  
@@ -317,7 +319,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* --------------------------------------------------------------------- */
   
-  NXstatus CALLING_STYLE NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
+  NXstatus  NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int dimensions[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
@@ -336,7 +338,7 @@ static int determineFileType(CONSTCHAR *filename)
 
  /* --------------------------------------------------------------------- */
   
-  NXstatus CALLING_STYLE NXcompmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
+  NXstatus  NXcompmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
                            int rank, int dimensions[],int compress_type, int chunk_size[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid; 
@@ -355,7 +357,7 @@ static int determineFileType(CONSTCHAR *filename)
  
   /* --------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXcompress (NXhandle fid, int compress_type)
+  NXstatus  NXcompress (NXhandle fid, int compress_type)
   {
     pNexusFunction pFunc = (pNexusFunction)fid; 
     return pFunc->nxcompress (pFunc->pNexusData, compress_type); 
@@ -364,7 +366,7 @@ static int determineFileType(CONSTCHAR *filename)
  
   /* --------------------------------------------------------------------- */
   
-  NXstatus CALLING_STYLE NXopendata (NXhandle fid, CONSTCHAR *name)
+  NXstatus  NXopendata (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFunction pFunc = (pNexusFunction)fid; 
     return pFunc->nxopendata(pFunc->pNexusData, name); 
@@ -373,7 +375,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ----------------------------------------------------------------- */
     
-  NXstatus CALLING_STYLE NXclosedata (NXhandle fid)
+  NXstatus  NXclosedata (NXhandle fid)
   { 
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxclosedata(pFunc->pNexusData);
@@ -381,7 +383,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXputdata (NXhandle fid, void *data)
+  NXstatus  NXputdata (NXhandle fid, void *data)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxputdata(pFunc->pNexusData, data);
@@ -389,7 +391,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
+  NXstatus  NXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
                                   int datalen, int iType)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
@@ -398,7 +400,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxputslab(pFunc->pNexusData, data, iStart, iSize);
@@ -406,7 +408,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXgetdataID (NXhandle fid, NXlink* sRes)
+  NXstatus  NXgetdataID (NXhandle fid, NXlink* sRes)
   {  
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetdataID(pFunc->pNexusData, sRes);
@@ -415,13 +417,13 @@ static int determineFileType(CONSTCHAR *filename)
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NXmakelink (NXhandle fid, NXlink* sLink)
+  NXstatus  NXmakelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxmakelink(pFunc->pNexusData, sLink);
   }
   /* --------------------------------------------------------------------*/
-  NXstatus CALLING_STYLE NXopensourcegroup(NXhandle fid)
+  NXstatus  NXopensourcegroup(NXhandle fid)
   {
     char target_path[512];
     int status, type = NX_CHAR, length = 511;
@@ -436,7 +438,7 @@ static int determineFileType(CONSTCHAR *filename)
   }
   /*----------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXflush(NXhandle *pHandle)
+  NXstatus  NXflush(NXhandle *pHandle)
   {
     NXhandle hfil; 
     int status;
@@ -452,7 +454,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   /*-------------------------------------------------------------------------*/
   
-  NXstatus CALLING_STYLE NXmalloc (void** data, int rank, 
+  NXstatus  NXmalloc (void** data, int rank, 
 				   int dimensions[], int datatype)
   {
     int i;
@@ -487,7 +489,7 @@ static int determineFileType(CONSTCHAR *filename)
     
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXfree (void** data)
+  NXstatus  NXfree (void** data)
   {
     if (data == NULL) {
        NXIReportError (NXpData, "ERROR: passing NULL to NXfree");
@@ -505,7 +507,7 @@ static int determineFileType(CONSTCHAR *filename)
   /* --------------------------------------------------------------------- */
            
  
-  NXstatus CALLING_STYLE NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
+  NXstatus  NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetnextentry(pFunc->pNexusData, name, nxclass, datatype);  
@@ -552,7 +554,7 @@ static char *nxitrim(char *str)
 }
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetdata (NXhandle fid, void *data)
+  NXstatus  NXgetdata (NXhandle fid, void *data)
   {
     int status, type, rank, iDim[NX_MAXRANK];
     char *pPtr, *pPtr2;
@@ -577,7 +579,7 @@ static char *nxitrim(char *str)
     
   /*-------------------------------------------------------------------------*/
  
-  NXstatus CALLING_STYLE NXgetinfo (NXhandle fid, int *rank, 
+  NXstatus  NXgetinfo (NXhandle fid, int *rank, 
 				    int dimension[], int *iType)
   {
     int status;
@@ -607,7 +609,7 @@ static char *nxitrim(char *str)
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetslab (NXhandle fid, void *data, 
+  NXstatus  NXgetslab (NXhandle fid, void *data, 
 				    int iStart[], int iSize[])
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
@@ -617,7 +619,7 @@ static char *nxitrim(char *str)
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetnextattr (NXhandle fileid, NXname pName,
+  NXstatus  NXgetnextattr (NXhandle fileid, NXname pName,
                                      int *iLength, int *iType)
   {
     pNexusFunction pFunc = (pNexusFunction)fileid;
@@ -627,7 +629,7 @@ static char *nxitrim(char *str)
 
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+  NXstatus  NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetattr(pFunc->pNexusData, name, data, datalen, iType);  
@@ -636,7 +638,7 @@ static char *nxitrim(char *str)
 
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetattrinfo (NXhandle fid, int *iN)
+  NXstatus  NXgetattrinfo (NXhandle fid, int *iN)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetattrinfo(pFunc->pNexusData, iN);  
@@ -645,7 +647,7 @@ static char *nxitrim(char *str)
 
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetgroupID (NXhandle fileid, NXlink* sRes)
+  NXstatus  NXgetgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFunction pFunc = (pNexusFunction)fileid;
     return pFunc->nxgetgroupID(pFunc->pNexusData, sRes);  
@@ -653,7 +655,7 @@ static char *nxitrim(char *str)
 
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  NXstatus  NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxgetgroupinfo(pFunc->pNexusData, iN, pName, pClass);  
@@ -662,7 +664,7 @@ static char *nxitrim(char *str)
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NXsameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
+  NXstatus  NXsameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
     pNexusFunction pFunc = (pNexusFunction)fileid;
     return pFunc->nxsameID(pFunc->pNexusData, pFirstID, pSecondID);  
@@ -670,14 +672,14 @@ static char *nxitrim(char *str)
 
   /*-------------------------------------------------------------------------*/
   
-  NXstatus CALLING_STYLE NXinitattrdir (NXhandle fid)
+  NXstatus  NXinitattrdir (NXhandle fid)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxinitattrdir(pFunc->pNexusData);
   }
   /*-------------------------------------------------------------------------*/
   
-  NXstatus CALLING_STYLE NXsetnumberformat (NXhandle fid, 
+  NXstatus  NXsetnumberformat (NXhandle fid, 
 					    int type, char *format)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
@@ -698,7 +700,7 @@ static char *nxitrim(char *str)
   
   /*-------------------------------------------------------------------------*/
  
-  NXstatus CALLING_STYLE NXinitgroupdir (NXhandle fid)
+  NXstatus  NXinitgroupdir (NXhandle fid)
   {
     pNexusFunction pFunc = (pNexusFunction)fid;
     return pFunc->nxinitgroupdir(pFunc->pNexusData);
@@ -927,7 +929,7 @@ static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
   return NX_ERROR;              
 }
 /*---------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXopenpath(NXhandle hfil, CONSTCHAR *path)
+NXstatus  NXopenpath(NXhandle hfil, CONSTCHAR *path)
 {
   int status, run = 1;
   NXname pathElement;
@@ -964,7 +966,7 @@ NXstatus CALLING_STYLE NXopenpath(NXhandle hfil, CONSTCHAR *path)
   return NX_OK;
 }
 /*---------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
+NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
 {
   int status, run = 1;
   NXname pathElement;
@@ -1081,7 +1083,7 @@ char *NXIformatNeXusTime(){
    * NXhandle. We could store the NXhandle value in the FORTRAN array
    * instead, but that would mean writing far more wrappers
    */
-  NXstatus CALLING_STYLE NXfopen(char * filename, NXaccess* am, 
+  NXstatus  NXfopen(char * filename, NXaccess* am, 
                                  NexusFunction* pHandle)
   {
 	NXstatus ret;
@@ -1106,7 +1108,7 @@ char *NXIformatNeXusTime(){
  * array holding the NexusFunction structure. We need to malloc()
  * a temporary copy as NXclose will try to free() this
  */
-  NXstatus CALLING_STYLE NXfclose (NexusFunction* pHandle)
+  NXstatus  NXfclose (NexusFunction* pHandle)
   {
     NXhandle h;
     NXstatus ret;
@@ -1118,7 +1120,7 @@ char *NXIformatNeXusTime(){
   }
   
 /*---------------------------------------------------------------------*/  
-  NXstatus CALLING_STYLE NXfflush(NexusFunction* pHandle)
+  NXstatus  NXfflush(NexusFunction* pHandle)
   {
     NXhandle h;
     NXstatus ret;
@@ -1129,7 +1131,7 @@ char *NXIformatNeXusTime(){
     return ret;
   }
 /*----------------------------------------------------------------------*/
-  NXstatus CALLING_STYLE NXfmakedata(NXhandle fid, char *name, int *pDatatype,
+  NXstatus  NXfmakedata(NXhandle fid, char *name, int *pDatatype,
 		int *pRank, int dimensions[])
   {
     NXstatus ret;
@@ -1157,7 +1159,7 @@ char *NXIformatNeXusTime(){
   }
 
 
-  NXstatus CALLING_STYLE NXfcompmakedata(NXhandle fid, char *name, 
+  NXstatus  NXfcompmakedata(NXhandle fid, char *name, 
                 int *pDatatype,
 		int *pRank, int dimensions[],
                 int *compression_type, int chunk[])
@@ -1190,12 +1192,12 @@ char *NXIformatNeXusTime(){
     return ret;
   }
 /*-----------------------------------------------------------------------*/
-  NXstatus CALLING_STYLE NXfcompress(NXhandle fid, int *compr_type)
+  NXstatus  NXfcompress(NXhandle fid, int *compr_type)
   { 
       return NXcompress(fid,*compr_type);
   }
 /*-----------------------------------------------------------------------*/
-  NXstatus CALLING_STYLE NXfputattr(NXhandle fid, char *name, void *data, 
+  NXstatus  NXfputattr(NXhandle fid, char *name, void *data, 
                                    int *pDatalen, int *pIType)
   {
     return NXputattr(fid, name, data, *pDatalen, *pIType);
@@ -1214,3 +1216,242 @@ char *NXIformatNeXusTime(){
 	  va_end(valist);
 	  return ret;
   }
+
+/*
+ * windows stdcall aliases
+ */
+#ifdef _WIN32
+
+NXstatus __stdcall NXISETCACHE(long newVal)
+{
+    return NXsetcache(newVal);
+}
+
+void __stdcall NXNXNXREPORTERROR(void *pData, char *string)
+{
+    NXNXNXReportError(pData, string);
+}
+     
+NXstatus __stdcall NXIOPEN(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
+{
+    return NXopen(filename, am, gHandle);
+}
+
+NXstatus __stdcall NXICLOSE(NXhandle *fid)
+{
+    return NXclose(fid);
+}
+
+NXstatus __stdcall NXIFLUSH(NXhandle* pHandle)
+{
+    return NXflush(pHandle);
+}
+
+NXstatus __stdcall NXIMAKEGROUP(NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass)
+{
+    return NXmakegroup(handle, name, NXclass);
+}
+
+NXstatus __stdcall NXIOPENGROUP(NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass)
+{
+    return NXopengroup(handle, name, NXclass);
+}
+
+NXstatus __stdcall NXIOPENPATH(NXhandle handle, CONSTCHAR *path)
+{
+    return NXopenpath(handle, path);
+}
+
+NXstatus __stdcall NXIOPENGROUPPATH (NXhandle handle, CONSTCHAR *path)
+{
+    return NXopengrouppath(handle, path);
+}
+
+NXstatus __stdcall NXICLOSEGROUP(NXhandle handle)
+{
+    return NXclosegroup(handle);
+}
+  
+NXstatus __stdcall NXIMAKEDATA (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[])
+{
+    return NXmakedata (handle, label, datatype, rank, dim);
+}
+
+NXstatus __stdcall NXICOMPMAKEDATA (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[])
+{
+    return NXcompmakedata (handle, label, datatype, rank, dim, comp_typ, bufsize);
+}
+
+NXstatus __stdcall NXICOMPRESS (NXhandle handle, int compr_type)
+{
+    return NXcompress (handle, compr_type);
+}
+
+NXstatus __stdcall NXIOPENDATA (NXhandle handle, CONSTCHAR* label)
+{
+    return NXopendata (handle, label);
+}
+
+NXstatus __stdcall NXICLOSEDATA(NXhandle handle)
+{
+    return NXclosedata(handle);
+}
+
+NXstatus __stdcall NXIPUTDATA(NXhandle handle, void* data)
+{
+    return NXputdata(handle, data);
+}
+
+NXstatus __stdcall NXIPUTATTR(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType)
+{
+    return NXputattr(handle, name, data, iDataLen, iType);
+}
+
+NXstatus __stdcall NXIPUTSLAB(NXhandle handle, void* data, int start[], int size[])
+{
+    return NXputslab(handle, data, start, size);
+}
+
+NXstatus __stdcall NXIGETDATAID(NXhandle handle, NXlink* pLink)
+{
+    return NXgetdataID(handle, pLink);
+}
+
+NXstatus __stdcall NXIMAKELINK(NXhandle handle, NXlink* pLink)
+{
+    return NXmakelink(handle, pLink);
+}
+
+NXstatus __stdcall NXIOPENSOURCEGROUP(NXhandle handle)
+{
+    return NXopensourcegroup(handle);
+}
+
+NXstatus __stdcall NXIGETDATA(NXhandle handle, void* data)
+{
+    return NXgetdata(handle, data);
+}
+
+NXstatus __stdcall NXIGETINFO(NXhandle handle, int* rank, int dimension[], int* datatype)
+{
+    return NXgetinfo(handle, rank, dimension, datatype);
+}
+
+NXstatus __stdcall NXIGETNEXTENTRY(NXhandle handle, NXname name, NXname nxclass, int* datatype)
+{
+    return NXgetnextentry(handle, name, nxclass, datatype);
+}
+
+NXstatus __stdcall NXIGETSLAB(NXhandle handle, void* data, int start[], int size[])
+{
+    return NXgetslab(handle, data, start, size);
+}
+
+NXstatus __stdcall NXIGETNEXTATTR(NXhandle handle, NXname pName, int *iLength, int *iType)
+{
+    return NXgetnextattr(handle, pName, iLength, iType);
+}
+
+NXstatus __stdcall NXIGETATTR(NXhandle handle, char* name, void* data, int* iDataLen, int* iType)
+{
+    return NXgetattr(handle, name, data, iDataLen, iType);
+}
+
+NXstatus __stdcall NXIGETATTRINFO(NXhandle handle, int* no_items)
+{
+    return NXgetattrinfo(handle, no_items);
+}
+
+NXstatus __stdcall NXIGETGROUPID(NXhandle handle, NXlink* pLink)
+{
+    return NXgetgroupID(handle, pLink);
+}
+
+NXstatus __stdcall NXIGETGROUPINFO(NXhandle handle, int* no_items, NXname name, NXname nxclass)
+{
+    return NXgetgroupinfo(handle, no_items, name, nxclass);
+}
+
+NXstatus __stdcall NXISAMEID(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID)
+{
+    return NXsameID(handle, pFirstID, pSecondID);
+}
+
+NXstatus __stdcall NXIINITGROUPDIR(NXhandle handle)
+{
+    return  NXinitgroupdir(handle);
+}
+NXstatus __stdcall NXIINITATTRDIR(NXhandle handle)
+{
+    return  NXinitattrdir(handle);
+}
+NXstatus __stdcall NXISETNUMBERFORMAT(NXhandle handle, int type, char *format)
+{
+    return  NXsetnumberformat(handle,type, format);
+}
+
+NXstatus __stdcall NXIMALLOC(void** data, int rank, int dimensions[], int datatype)
+{
+    return NXmalloc(data, rank, dimensions, datatype);
+}
+
+NXstatus __stdcall NXIFREE(void** data)
+{
+    return NXfree(data);
+}
+
+#if 0
+/*-----------------------------------------------------------------------
+    NAPI internals 
+------------------------------------------------------------------------*/
+extern  void  NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
+extern void (*NXIReportError)(void *pData,char *text);
+extern void *NXpData;
+extern char *NXIformatNeXusTime();
+#endif
+
+/* FORTRAN internals */
+
+NXstatus __stdcall NXIFOPEN(char * filename, NXaccess* am, 
+					NexusFunction* pHandle)
+{
+    return NXfopen(filename, am, pHandle);
+}
+
+NXstatus __stdcall NXIFCLOSE (NexusFunction* pHandle)
+{
+  return  NXfclose (pHandle);
+}
+
+NXstatus __stdcall NXIFPUTATTR(NXhandle fid, char *name, void *data, 
+                                   int *pDatalen, int *pIType)
+{
+  return  NXfputattr(fid, name, data, pDatalen, pIType);
+}
+
+NXstatus __stdcall NXIFCOMPRESS(NXhandle fid, int *compr_type)
+{
+  return  NXfcompress(fid, compr_type);
+}
+
+NXstatus __stdcall NXIFCOMPMAKEDATA(NXhandle fid, char *name, 
+                int *pDatatype,
+		int *pRank, int dimensions[],
+                int *compression_type, int chunk[])
+{
+  return  NXfcompmakedata(fid, name, pDatatype, pRank, dimensions,
+                compression_type, chunk);
+}
+
+NXstatus __stdcall NXIFMAKEDATA(NXhandle fid, char *name, int *pDatatype,
+		int *pRank, int dimensions[])
+{
+  return  NXfmakedata(fid, name, pDatatype, pRank, dimensions);
+}
+
+NXstatus __stdcall NXIFFLUSH(NexusFunction* pHandle)
+{
+  return NXfflush(pHandle);
+}
+
+#endif /* _WIN32 */

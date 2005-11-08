@@ -92,7 +92,7 @@ static void errorCallbackForMxml(const char *txt){
   NXIReportError(NXpData,(char *)txt);
 }
 /*-----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am, 
+NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am, 
 			       NXhandle* pHandle) {
   pXMLNexus xmlHandle = NULL;
   FILE *fp = NULL;
@@ -171,7 +171,7 @@ NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, NXaccess am,
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXclose (NXhandle* fid){
+NXstatus  NXXclose (NXhandle* fid){
   pXMLNexus xmlHandle = NULL;
   FILE *fp = NULL;
 
@@ -193,7 +193,7 @@ NXstatus CALLING_STYLE NXXclose (NXhandle* fid){
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXflush(NXhandle *fid){
+NXstatus  NXXflush(NXhandle *fid){
   pXMLNexus xmlHandle = NULL;
   FILE *fp = NULL;
 
@@ -214,7 +214,7 @@ NXstatus CALLING_STYLE NXXflush(NXhandle *fid){
 /*=======================================================================
                    Group functions
 =========================================================================*/
-NXstatus CALLING_STYLE NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
 				     CONSTCHAR *nxclass){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
@@ -261,7 +261,7 @@ static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name,
   return NULL;
 }
 /*------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXopengroup (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name, 
 				     CONSTCHAR *nxclass){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
@@ -295,7 +295,7 @@ NXstatus CALLING_STYLE NXXopengroup (NXhandle fid, CONSTCHAR *name,
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXclosegroup (NXhandle fid){
+NXstatus  NXXclosegroup (NXhandle fid){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
   char error[1024];
@@ -317,7 +317,7 @@ NXstatus CALLING_STYLE NXXclosegroup (NXhandle fid){
 /*=========================================================================
          dataset functions
 =========================================================================*/
-NXstatus CALLING_STYLE NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
 					int datatype, 
 					int rank, 
 					int dimensions[],
@@ -357,7 +357,7 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
   return typestring;
 }
 /*------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXmakedata (NXhandle fid, 
+NXstatus  NXXmakedata (NXhandle fid, 
 				    CONSTCHAR *name, int datatype, 
 				    int rank, int dimensions[]){
   pXMLNexus xmlHandle = NULL;
@@ -453,7 +453,7 @@ static int strtrimcr(char *szStr, char *szSet)
       return(j - i);    /* Return the difference between old and new length */
 }
 /*-----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXopendata (NXhandle fid, CONSTCHAR *name){
+NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *dataNode = NULL;
   char error[1024];
@@ -492,7 +492,7 @@ NXstatus CALLING_STYLE NXXopendata (NXhandle fid, CONSTCHAR *name){
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXclosedata (NXhandle fid){
+NXstatus  NXXclosedata (NXhandle fid){
   pXMLNexus xmlHandle = NULL;
 
   xmlHandle = (pXMLNexus)fid;
@@ -518,7 +518,7 @@ static mxml_node_t *findData(mxml_node_t *node){
   return NULL;
 }
 /*------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXputdata (NXhandle fid, void *data){
+NXstatus  NXXputdata (NXhandle fid, void *data){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
@@ -550,7 +550,7 @@ NXstatus CALLING_STYLE NXXputdata (NXhandle fid, void *data){
   return NX_OK;
 }
 /*------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetdata (NXhandle fid, void *data){
+NXstatus  NXXgetdata (NXhandle fid, void *data){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
@@ -582,7 +582,7 @@ NXstatus CALLING_STYLE NXXgetdata (NXhandle fid, void *data){
   return NX_OK;
 }
 /*------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetinfo (NXhandle fid, int *rank, 
+NXstatus  NXXgetinfo (NXhandle fid, int *rank, 
 				   int dimension[], int *iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
@@ -671,7 +671,7 @@ static void putSlabData(pNXDS dataset, pNXDS slabData, int dim,
   }
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXputslab (NXhandle fid, void *data, 
+NXstatus  NXXputslab (NXhandle fid, void *data, 
 				   int iStart[], int iSize[]){
   
   pXMLNexus xmlHandle = NULL;
@@ -735,7 +735,7 @@ static void getSlabData(pNXDS dataset, pNXDS slabData, int dim,
   }
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetslab (NXhandle fid, void *data, 
+NXstatus  NXXgetslab (NXhandle fid, void *data, 
 				   int iStart[], int iSize[]){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
@@ -772,7 +772,7 @@ NXstatus CALLING_STYLE NXXgetslab (NXhandle fid, void *data,
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-static NXstatus CALLING_STYLE NXXsetnumberformat(NXhandle fid,
+static NXstatus  NXXsetnumberformat(NXhandle fid,
 						 int type, char *format){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
@@ -873,7 +873,7 @@ static char *formatAttributeData(void *data, int datalen, int iType){
   return number;
 }
 /*---------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
+NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
 				   int datalen, int iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
@@ -909,7 +909,7 @@ NXstatus CALLING_STYLE NXXputattr (NXhandle fid, CONSTCHAR *name, void *data,
   return NX_OK;
 }
 /*--------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetattr (NXhandle fid, char *name, 
+NXstatus  NXXgetattr (NXhandle fid, char *name, 
 				   void *data, int* datalen, int* iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
@@ -1006,7 +1006,7 @@ NXstatus CALLING_STYLE NXXgetattr (NXhandle fid, char *name,
   return NX_OK;
 }
 /*====================== search functions =================================*/
-NXstatus CALLING_STYLE NXXgetnextentry (NXhandle fid,NXname name, 
+NXstatus  NXXgetnextentry (NXhandle fid,NXname name, 
 					NXname nxclass, int *datatype){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *next = NULL, *userData;
@@ -1084,7 +1084,7 @@ NXstatus CALLING_STYLE NXXgetnextentry (NXhandle fid,NXname name,
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXinitgroupdir(NXhandle fid){
+extern  NXstatus NXXinitgroupdir(NXhandle fid){
   pXMLNexus xmlHandle = NULL;
   int stackPtr;
 
@@ -1101,7 +1101,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXXinitgroupdir(NXhandle fid){
   return NX_OK;
 }
 /*-------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetnextattr (NXhandle fid, NXname pName,
+NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
 					  int *iLength, int *iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
@@ -1157,7 +1157,7 @@ NXstatus CALLING_STYLE NXXgetnextattr (NXhandle fid, NXname pName,
   return NX_OK;
 }
 /*-------------------------------------------------------------------------*/
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXinitattrdir(NXhandle fid){
+extern  NXstatus  NXXinitattrdir(NXhandle fid){
   pXMLNexus xmlHandle = NULL;
   int stackPtr;
 
@@ -1180,7 +1180,7 @@ NX_EXTERNAL  NXstatus CALLING_STYLE NXXinitattrdir(NXhandle fid){
   return NX_OK;
 }
 /*-------------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetgroupinfo (NXhandle fid, int *iN, 
+NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN, 
 					NXname pName, NXname pClass){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *child = NULL;
@@ -1213,7 +1213,7 @@ NXstatus CALLING_STYLE NXXgetgroupinfo (NXhandle fid, int *iN,
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetattrinfo (NXhandle fid, int *iN){
+NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
   int stackPtr, currentAtt;
@@ -1328,7 +1328,7 @@ static char *findLinkPath(mxml_node_t *node){
   return result;
 }
 /*--------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetdataID (NXhandle fid, NXlink* sRes){
+NXstatus  NXXgetdataID (NXhandle fid, NXlink* sRes){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
   char *linkPath = NULL;
@@ -1351,7 +1351,7 @@ NXstatus CALLING_STYLE NXXgetdataID (NXhandle fid, NXlink* sRes){
   return NX_OK;
 }
 /*--------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXgetgroupID (NXhandle fid, NXlink* sRes){
+NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
   char *linkPath = NULL;
@@ -1379,7 +1379,7 @@ NXstatus CALLING_STYLE NXXgetgroupID (NXhandle fid, NXlink* sRes){
   return NX_OK;
 }
 /*-----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink){
+NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL, *linkNode = NULL;
   mxml_node_t *linkedNode = NULL;
@@ -1405,7 +1405,7 @@ NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink){
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus CALLING_STYLE NXXsameID (NXhandle fileid, NXlink* pFirstID, 
+NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID, 
 				  NXlink* pSecondID){
   if(strcmp(pFirstID->targetPath,pSecondID->targetPath) == 0) {
     return NX_OK;

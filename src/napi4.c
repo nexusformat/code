@@ -320,7 +320,7 @@ extern	void *NXpData;
    ---------------------------------------------------------------------*/
 
 
-   NXstatus CALLING_STYLE NX4open(CONSTCHAR *filename, NXaccess am, 
+   NXstatus  NX4open(CONSTCHAR *filename, NXaccess am, 
 				  NXhandle* pHandle)
   {
     pNexusFile pNew = NULL;
@@ -454,7 +454,7 @@ extern	void *NXpData;
 
 /*-----------------------------------------------------------------------*/
  
-  NXstatus CALLING_STYLE NX4close (NXhandle* fid)
+  NXstatus  NX4close (NXhandle* fid)
   {
     pNexusFile pFile = NULL;
     int iRet;
@@ -492,7 +492,7 @@ extern	void *NXpData;
 /*-----------------------------------------------------------------------*/   
 
   
-  NXstatus CALLING_STYLE NX4makegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
+  NXstatus  NX4makegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
     pNexusFile pFile;
     int32 iNew, iRet;
@@ -536,7 +536,7 @@ extern	void *NXpData;
   /*------------------------------------------------------------------------*/
 
   
-  NXstatus CALLING_STYLE NX4opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
+  NXstatus  NX4opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     pNexusFile pFile;
     int32 iRef;
@@ -570,7 +570,7 @@ extern	void *NXpData;
   /* ------------------------------------------------------------------- */
 
   
-   NXstatus CALLING_STYLE NX4closegroup (NXhandle fid)
+   NXstatus  NX4closegroup (NXhandle fid)
   {
     pNexusFile pFile;
   
@@ -603,7 +603,7 @@ extern	void *NXpData;
   
   /* --------------------------------------------------------------------- */
   
-  NXstatus CALLING_STYLE NX4makedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
+  NXstatus  NX4makedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
               int dimensions[])
   {
     pNexusFile pFile;
@@ -728,7 +728,7 @@ extern	void *NXpData;
  /* --------------------------------------------------------------------- */
   
    
-  NXstatus CALLING_STYLE NX4compmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
+  NXstatus  NX4compmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
               int dimensions[],int compress_type, int chunk_size[])
   {
     pNexusFile pFile;
@@ -895,7 +895,7 @@ extern	void *NXpData;
   /* --------------------------------------------------------------------- */
 
    
-  NXstatus CALLING_STYLE NX4compress (NXhandle fid, int compress_type)
+  NXstatus  NX4compress (NXhandle fid, int compress_type)
   {
     pNexusFile pFile;
     int32 iRank, iAtt, iType, iRet;
@@ -959,7 +959,7 @@ extern	void *NXpData;
   /* --------------------------------------------------------------------- */
   
  
-  NXstatus CALLING_STYLE NX4opendata (NXhandle fid, CONSTCHAR *name)
+  NXstatus  NX4opendata (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFile pFile;
     int32 iNew;
@@ -1001,7 +1001,7 @@ extern	void *NXpData;
   /* ----------------------------------------------------------------- */
     
   
-  NXstatus CALLING_STYLE NX4closedata (NXhandle fid)
+  NXstatus  NX4closedata (NXhandle fid)
   {
     pNexusFile pFile;
     int iRet;
@@ -1026,7 +1026,7 @@ extern	void *NXpData;
   
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX4putdata (NXhandle fid, void *data)
+  NXstatus  NX4putdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
     int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS], iStride[MAX_VAR_DIMS];
@@ -1063,7 +1063,7 @@ extern	void *NXpData;
   /* ------------------------------------------------------------------- */
 
   NXstatus
-  CALLING_STYLE NX4putattr (NXhandle fid, CONSTCHAR *name, void *data, int datalen, int iType)
+   NX4putattr (NXhandle fid, CONSTCHAR *name, void *data, int datalen, int iType)
   {
     pNexusFile pFile;
     int iRet, type;
@@ -1126,7 +1126,7 @@ extern	void *NXpData;
    /* ------------------------------------------------------------------- */
 
    
-  NXstatus CALLING_STYLE NX4putslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NX4putslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
     int iRet;
@@ -1183,7 +1183,7 @@ extern	void *NXpData;
   
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX4getdataID (NXhandle fid, NXlink* sRes)
+  NXstatus  NX4getdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile pFile;
   
@@ -1206,7 +1206,7 @@ extern	void *NXpData;
   /* ------------------------------------------------------------------- */
 
   
-  NXstatus CALLING_STYLE NX4makelink (NXhandle fid, NXlink* sLink)
+  NXstatus  NX4makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
     int32 iVG, iRet, dataID, type = DFNT_CHAR8, length;
@@ -1233,7 +1233,7 @@ extern	void *NXpData;
   
   /*----------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX4flush(NXhandle *pHandle)
+  NXstatus  NX4flush(NXhandle *pHandle)
   {
     char *pFileName, *pCopy = NULL;
     int access, dummy, iRet, i, iStack;
@@ -1314,7 +1314,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
   
 
-  NXstatus CALLING_STYLE NX4getnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
+  NXstatus  NX4getnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile pFile;
     int iRet, iStackPtr, iCurDir;
@@ -1396,7 +1396,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
    
-  NXstatus CALLING_STYLE NX4getdata (NXhandle fid, void *data)
+  NXstatus  NX4getdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
     int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS];
@@ -1421,7 +1421,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
   NXstatus
-  CALLING_STYLE NX4getinfo (NXhandle fid, int *rank, int dimension[], 
+   NX4getinfo (NXhandle fid, int *rank, int dimension[], 
 			    int *iType)
   {
     pNexusFile pFile;
@@ -1453,7 +1453,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
   
-  NXstatus CALLING_STYLE NX4getslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NX4getslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
     int32 myStart[MAX_VAR_DIMS], mySize[MAX_VAR_DIMS];
@@ -1496,7 +1496,7 @@ extern	void *NXpData;
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX4getnextattr (NXhandle fileid, NXname pName,
+  NXstatus  NX4getnextattr (NXhandle fileid, NXname pName,
            int *iLength, int *iType)
   {
     pNexusFile pFile;
@@ -1539,7 +1539,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
 
-  NXstatus CALLING_STYLE NX4getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+  NXstatus  NX4getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
     int32 iNew, iType32;
@@ -1648,7 +1648,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
     
-  NXstatus CALLING_STYLE NX4getattrinfo (NXhandle fid, int *iN)
+  NXstatus  NX4getattrinfo (NXhandle fid, int *iN)
   {
     pNexusFile pFile;
     int iRet;
@@ -1674,7 +1674,7 @@ extern	void *NXpData;
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX4getgroupID (NXhandle fileid, NXlink* sRes)
+  NXstatus  NX4getgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile pFile;
   
@@ -1697,7 +1697,7 @@ extern	void *NXpData;
  /*-------------------------------------------------------------------------*/
 
   NXstatus
-  CALLING_STYLE NX4getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+   NX4getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile pFile;
   
@@ -1718,7 +1718,7 @@ extern	void *NXpData;
   
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX4sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
+  NXstatus  NX4sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
     pNexusFile pFile;
 
@@ -1733,7 +1733,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
 
   
-  NXstatus CALLING_STYLE NX4initattrdir (NXhandle fid)
+  NXstatus  NX4initattrdir (NXhandle fid)
   {
     pNexusFile pFile;
     int iRet;
@@ -1750,7 +1750,7 @@ extern	void *NXpData;
   /*-------------------------------------------------------------------------*/
  
   
-  NXstatus CALLING_STYLE NX4initgroupdir (NXhandle fid)
+  NXstatus  NX4initgroupdir (NXhandle fid)
   {
     pNexusFile pFile;
     int iRet;

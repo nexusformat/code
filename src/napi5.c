@@ -62,7 +62,7 @@ extern  void *NXpData;
    forward declaration of NX5closegroup in order to get rid of a nasty
    warning
 */
-NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
+NXstatus  NX5closegroup (NXhandle fid);
   
   /*--------------------------------------------------------------------*/
 
@@ -112,7 +112,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    ---------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX5open(CONSTCHAR *filename, NXaccess am, 
+  NXstatus  NX5open(CONSTCHAR *filename, NXaccess am, 
 				 NXhandle* pHandle)
   {
   hid_t attr1,aid1, aid2;
@@ -297,7 +297,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
  
   /* ------------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5close (NXhandle* fid)
+  NXstatus  NX5close (NXhandle* fid)
   {
     pNexusFile5 pFile = NULL;
     int iRet;
@@ -344,7 +344,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
  /*-----------------------------------------------------------------------*/   
 
-  NXstatus CALLING_STYLE NX5makegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
+  NXstatus  NX5makegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
     pNexusFile5 pFile;
     hid_t iRet;
@@ -400,7 +400,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
     return strstr(member_name, attr_name) ? 1 : 0;
   }
 
-  NXstatus CALLING_STYLE NX5opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
+  NXstatus  NX5opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
 
     pNexusFile5 pFile;
@@ -502,7 +502,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5closegroup (NXhandle fid)
+  NXstatus  NX5closegroup (NXhandle fid)
   {
     pNexusFile5 pFile;
     int i,ii;
@@ -559,7 +559,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
  /* --------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5compmakedata (NXhandle fid, CONSTCHAR *name, 
+  NXstatus  NX5compmakedata (NXhandle fid, CONSTCHAR *name, 
 					  int datatype, 
 					  int rank, int dimensions[],
 					  int compress_type, int chunk_size[])
@@ -728,7 +728,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
   /* --------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5makedata (NXhandle fid, CONSTCHAR *name, int datatype, 
+  NXstatus  NX5makedata (NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int dimensions[])
   {
   pNexusFile5 pFile;
@@ -752,7 +752,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /* --------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5compress (NXhandle fid, int compress_type)
+  NXstatus  NX5compress (NXhandle fid, int compress_type)
   {
     printf(" NXcompress ERROR: NeXus API  based  on  HDF5  doesn't support\n");
     printf("                   NXcompress  function!  Using  HDF5 library,\n");
@@ -763,7 +763,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
   /* --------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5opendata (NXhandle fid, CONSTCHAR *name)
+  NXstatus  NX5opendata (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFile5 pFile;
     char pBuffer[256];
@@ -803,7 +803,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /* ----------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5closedata (NXhandle fid)
+  NXstatus  NX5closedata (NXhandle fid)
   {
     pNexusFile5 pFile;
     int iRet;
@@ -824,7 +824,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
 
 
-  NXstatus CALLING_STYLE NX5putdata (NXhandle fid, void *data)
+  NXstatus  NX5putdata (NXhandle fid, void *data)
   {
     pNexusFile5 pFile;
     hid_t iRet;
@@ -846,7 +846,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5putattr (NXhandle fid, CONSTCHAR *name, void *data, 
+  NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, void *data, 
                                   int datalen, int iType)
   {
     pNexusFile5 pFile;
@@ -963,7 +963,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /* ------------------------------------------------------------------- */
  
-  NXstatus CALLING_STYLE NX5putslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NX5putslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile5 pFile;
     int iRet, i;
@@ -1032,7 +1032,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
  
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5getdataID (NXhandle fid, NXlink* sRes)
+  NXstatus  NX5getdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile5 pFile;
   
@@ -1052,7 +1052,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
  /* ------------------------------------------------------------------- */
  
-  NXstatus CALLING_STYLE NX5makelink (NXhandle fid, NXlink* sLink)
+  NXstatus  NX5makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile5 pFile;
 /*    int iRet; */
@@ -1123,7 +1123,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
  
   /*----------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX5flush(NXhandle *pHandle)
+  NXstatus  NX5flush(NXhandle *pHandle)
   {
     pNexusFile5 pFile = NULL;
     int iRet;
@@ -1202,7 +1202,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX5getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  NXstatus  NX5getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile5 pFile;
     hid_t atype,attr_id;
@@ -1239,7 +1239,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
  
   /*-------------------------------------------------------------------------*/
 
-  NXstatus CALLING_STYLE NX5getnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype)
+  NXstatus  NX5getnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile5 pFile;
     hid_t grp, attr1,type,atype;
@@ -1381,7 +1381,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus CALLING_STYLE NX5getdata (NXhandle fid, void *data)
+   NXstatus  NX5getdata (NXhandle fid, void *data)
    {
      pNexusFile5 pFile;
      int iStart[H5S_MAX_RANK], status;
@@ -1464,7 +1464,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus CALLING_STYLE NX5getinfo (NXhandle fid, int *rank, int dimension[], int *iType)
+   NXstatus  NX5getinfo (NXhandle fid, int *rank, int dimension[], int *iType)
    {
      pNexusFile5 pFile;
      int i, iRank, mType, iRet;
@@ -1547,7 +1547,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus CALLING_STYLE NX5getslab (NXhandle fid, void *data, int iStart[], int iSize[])
+   NXstatus  NX5getslab (NXhandle fid, void *data, int iStart[], int iSize[])
    {
      pNexusFile5 pFile;
      hssize_t myStart[H5S_MAX_RANK];
@@ -1682,7 +1682,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
      return 1;
    }
 
-   NXstatus CALLING_STYLE NX5getnextattr (NXhandle fileid, NXname pName,
+   NXstatus  NX5getnextattr (NXhandle fileid, NXname pName,
 				       int *iLength, int *iType)
    {
      pNexusFile5 pFile;
@@ -1832,7 +1832,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus CALLING_STYLE NX5getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+   NXstatus  NX5getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
    {
      pNexusFile5 pFile;
      int iNew, iRet;
@@ -1934,7 +1934,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus CALLING_STYLE NX5getattrinfo (NXhandle fid, int *iN)
+   NXstatus  NX5getattrinfo (NXhandle fid, int *iN)
    {
      pNexusFile5 pFile;
      char *iname = NULL; 
@@ -1996,7 +1996,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
 
    /*-------------------------------------------------------------------------*/
-   NXstatus CALLING_STYLE NX5getgroupID (NXhandle fileid, NXlink* sRes)
+   NXstatus  NX5getgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile5 pFile;
     int u;
@@ -2021,7 +2021,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
  
   /* ------------------------------------------------------------------- */
 
-  NXstatus CALLING_STYLE NX5sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
+  NXstatus  NX5sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
     pNexusFile5 pFile;
 
@@ -2037,7 +2037,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
  
  /*-------------------------------------------------------------------------*/
  
-  NXstatus CALLING_STYLE NX5initattrdir (NXhandle fid)
+  NXstatus  NX5initattrdir (NXhandle fid)
   {
     pNexusFile5 pFile;
         
@@ -2048,7 +2048,7 @@ NXstatus CALLING_STYLE NX5closegroup (NXhandle fid);
 
   /*-------------------------------------------------------------------------*/
  
-  NXstatus CALLING_STYLE NX5initgroupdir (NXhandle fid)
+  NXstatus  NX5initgroupdir (NXhandle fid)
   {
     pNexusFile5 pFile;
         

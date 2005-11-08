@@ -34,35 +34,35 @@
 extern "C" {
 #endif /* __cplusplus */
 
-NX_EXTERNAL  NXstatus CALLING_STYLE NXUwriteglobals(NXhandle file_id, const char* user, const char* affiliation, const char* address, const char* phone, const char* fax, const char* email);
+extern  NXstatus  NXUwriteglobals(NXhandle file_id, const char* user, const char* affiliation, const char* address, const char* phone, const char* fax, const char* email);
 
-NX_EXTERNAL  NXstatus CALLING_STYLE NXUwritegroup(NXhandle file_id, const char* group_name, const char* group_class);
+extern  NXstatus  NXUwritegroup(NXhandle file_id, const char* group_name, const char* group_class);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUwritedata(NXhandle file_id, const char* data_name, const void* data, int data_type, int rank, const int dim[], const char* units, const int start[], const int size[]);
+extern NXstatus  NXUwritedata(NXhandle file_id, const char* data_name, const void* data, int data_type, int rank, const int dim[], const char* units, const int start[], const int size[]);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUreaddata(NXhandle file_id, const char* data_name, void* data, char* units, const int start[], const int size[]);
+extern NXstatus  NXUreaddata(NXhandle file_id, const char* data_name, void* data, char* units, const int start[], const int size[]);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUwritehistogram(NXhandle file_id, const char* data_name, const void* data, const char* units);
+extern NXstatus  NXUwritehistogram(NXhandle file_id, const char* data_name, const void* data, const char* units);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUreadhistogram(NXhandle file_id, const char* data_name, void* data, char* units);
+extern NXstatus  NXUreadhistogram(NXhandle file_id, const char* data_name, void* data, char* units);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUsetcompress(NXhandle file_id, int comp_type, int comp_size);
+extern NXstatus  NXUsetcompress(NXhandle file_id, int comp_type, int comp_size);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfindgroup(NXhandle file_id, const char* group_name, char* group_class);
+extern NXstatus  NXUfindgroup(NXhandle file_id, const char* group_name, char* group_class);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfindclass(NXhandle file_id, const char* group_class, char* group_name, int find_index);
+extern NXstatus  NXUfindclass(NXhandle file_id, const char* group_class, char* group_name, int find_index);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfinddata(NXhandle file_id, const char* data_name);
+extern NXstatus  NXUfinddata(NXhandle file_id, const char* data_name);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfindattr(NXhandle file_id, const char* attr_name);
+extern NXstatus  NXUfindattr(NXhandle file_id, const char* attr_name);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfindsignal(NXhandle file_id, int signal, char* data_name, int* data_rank, int* data_type, int data_dimensions[]);
+extern NXstatus  NXUfindsignal(NXhandle file_id, int signal, char* data_name, int* data_rank, int* data_type, int data_dimensions[]);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfindaxis(NXhandle file_id, int axis, int primary, char* data_name, int* data_rank, int* data_type, int data_dimensions[]);
+extern NXstatus  NXUfindaxis(NXhandle file_id, int axis, int primary, char* data_name, int* data_rank, int* data_type, int data_dimensions[]);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUfindlink(NXhandle file_id, NXlink* group_id, const char* group_class);
+extern NXstatus  NXUfindlink(NXhandle file_id, NXlink* group_id, const char* group_class);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXUresumelink(NXhandle file_id, NXlink group_id);
+extern NXstatus  NXUresumelink(NXhandle file_id, NXlink group_id);
 
 #ifdef __cplusplus
 }

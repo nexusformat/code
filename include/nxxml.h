@@ -22,55 +22,55 @@
 #ifndef NEXUSXML
 #define NEXUSXML
 
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXopen(CONSTCHAR *filename, 
+extern  NXstatus  NXXopen(CONSTCHAR *filename, 
 					    NXaccess access_method, 
 					    NXhandle* pHandle);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXclose(NXhandle* pHandle);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXflush(NXhandle* pHandle);
+extern  NXstatus  NXXclose(NXhandle* pHandle);
+extern  NXstatus  NXXflush(NXhandle* pHandle);
 
-NXstatus CALLING_STYLE NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
 				     CONSTCHAR *nxclass);
-NXstatus CALLING_STYLE NXXopengroup (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name, 
 				     CONSTCHAR *nxclass);
-NXstatus CALLING_STYLE NXXclosegroup (NXhandle fid);
+NXstatus  NXXclosegroup (NXhandle fid);
 
-NXstatus CALLING_STYLE NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
 					int datatype, 
 					int rank, 
 					int dimensions[],
 					int compress_type, int chunk_size[]);
-NXstatus CALLING_STYLE NXXmakedata (NXhandle fid, 
+NXstatus  NXXmakedata (NXhandle fid, 
 				    CONSTCHAR *name, int datatype, 
 				    int rank, int dimensions[]);
-NXstatus CALLING_STYLE NXXopendata (NXhandle fid, CONSTCHAR *name);
-NXstatus CALLING_STYLE NXXclosedata (NXhandle fid);
-NXstatus CALLING_STYLE NXXputdata (NXhandle fid, void *data);
-NXstatus CALLING_STYLE NXXgetdata (NXhandle fid, void *data);
-NXstatus CALLING_STYLE NXXgetinfo (NXhandle fid, int *rank, 
+NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name);
+NXstatus  NXXclosedata (NXhandle fid);
+NXstatus  NXXputdata (NXhandle fid, void *data);
+NXstatus  NXXgetdata (NXhandle fid, void *data);
+NXstatus  NXXgetinfo (NXhandle fid, int *rank, 
 				   int dimension[], int *iType);
-NXstatus CALLING_STYLE NXXputslab (NXhandle fid, void *data, 
+NXstatus  NXXputslab (NXhandle fid, void *data, 
 				   int iStart[], int iSize[]);
-NXstatus CALLING_STYLE NXXgetslab (NXhandle fid, void *data, 
+NXstatus  NXXgetslab (NXhandle fid, void *data, 
 				   int iStart[], int iSize[]);
-NXstatus CALLING_STYLE NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
+NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
 				   int datalen, int iType);
-NXstatus CALLING_STYLE NXXgetattr (NXhandle fid, char *name, 
+NXstatus  NXXgetattr (NXhandle fid, char *name, 
 				   void *data, int* datalen, int* iType);
 
-NXstatus CALLING_STYLE NXXgetnextentry (NXhandle fid,NXname name, 
+NXstatus  NXXgetnextentry (NXhandle fid,NXname name, 
 					NXname nxclass, int *datatype);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXgetnextattr(NXhandle handle, 
+extern  NXstatus  NXXgetnextattr(NXhandle handle, 
 				NXname pName, int *iLength, int *iType);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXinitgroupdir(NXhandle handle);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXinitattrdir(NXhandle handle);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXgetattrinfo (NXhandle fid, int *iN);
-NX_EXTERNAL  NXstatus CALLING_STYLE NXXgetgroupinfo (NXhandle fid, int *iN, 
+extern  NXstatus  NXXinitgroupdir(NXhandle handle);
+extern  NXstatus  NXXinitattrdir(NXhandle handle);
+extern  NXstatus  NXXgetattrinfo (NXhandle fid, int *iN);
+extern  NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN, 
 					NXname pName, NXname pClass);
 
-NX_EXTERNAL NXstatus CALLING_STYLE NXXgetdataID (NXhandle fid, NXlink* sRes);
-NX_EXTERNAL NXstatus CALLING_STYLE NXXgetgroupID (NXhandle fid, NXlink* sRes);
-NX_EXTERNAL NXstatus CALLING_STYLE NXXmakelink (NXhandle fid, NXlink* sLink);
-NX_EXTERNAL NXstatus CALLING_STYLE NXXsameID (NXhandle fileid, 
+extern NXstatus  NXXgetdataID (NXhandle fid, NXlink* sRes);
+extern NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes);
+extern NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink);
+extern NXstatus  NXXsameID (NXhandle fileid, 
 					      NXlink* pFirstID, NXlink* pSecondID);
 
 void NXXassignFunctions(pNexusFunction fHandle);
