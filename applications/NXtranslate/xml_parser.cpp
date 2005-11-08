@@ -11,6 +11,7 @@
 #include "retriever.h"
 #include "string_util.h"
 #include "xml_parser.h"
+#include "xml_util.h"
 #include "Ptr.h"
 #include "tree.hh"
 #include "nxtranslate_debug.h"
@@ -126,36 +127,6 @@ static StrVector split_on_bracket(const string str){
   return result;
 }
 
-/*
- * If len<0 then just return the whole string
- */
-static string xmlChar_to_str(const xmlChar *ch, int len){
-#ifdef DEBUG3_XML_PARSER
-  std::cout << "xmlChar_to_str(\"" << ch << "\"," << len << ")" << std::endl;
-#endif
-
-  string result((char *)ch);
-  if( (len>0) && ((unsigned int)len<result.size()) )
-    result.erase(result.begin()+len,result.end());
-
-  return string_util::trim(result);
-}
-
-static vector<string> xmlattr_to_strvec(const xmlChar* char_array[]){
-  StrVector result;
-  int i=0;
-  while(true){
-    if((char_array+i)==NULL || *(char_array+i)==NULL)
-      break;
-    else{
-      string str=xmlChar_to_str(*(char_array+i),-1);
-      result.push_back(str);
-    }
-    i++;
-  }
-
-  return result;
-}
 #ifdef DEBUG1_XML_PARSER
 static void print_strvec(const StrVector &vec){
   // print out the string vector
@@ -244,7 +215,7 @@ static void my_characters(void *user_data, const xmlChar *ch, int len){
   if(((UserData *)user_data)->expand) return;
 
   // convert to a string
-  string str=xmlChar_to_str(ch,len);
+  string str=xml_util::xmlChar_to_str(ch,len);
   // if it is empty just return
   if(str.size()<=0) return;
 
@@ -263,11 +234,11 @@ static void my_startElement(void *user_data, const xmlChar *name,
   static const string RIGHT = "]";
 
   // convert the name to a string
-  string str_name=xmlChar_to_str(name,-1);
+  string str_name=xml_util::xmlChar_to_str(name,-1);
   // create a label for the element when writing out exceptions
   string except_label="<"+str_name+">:";
   // convert the attributes to a vector<string>
-  StrVector str_attrs=xmlattr_to_strvec(attrs);
+  StrVector str_attrs=xml_util::xmlattr_to_strvec(attrs);
 
   // check if it is a link
   bool is_link=(str_name==LINK);
@@ -448,7 +419,7 @@ static void my_endElement(void *user_data, const xmlChar *name){
   bool is_link=((UserData *)user_data)->is_link;
 
   // create a label for the element when writing out exceptions
-  string except_label="</"+xmlChar_to_str(name,-1)+">";
+  string except_label="</"+xml_util::xmlChar_to_str(name,-1)+">";
 
   // get an alias to the node, this uses the copy constructor
   Node node=*(((UserData *)user_data)->nodes.rbegin());
