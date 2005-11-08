@@ -12,7 +12,7 @@
 #include "../node_util.h"
 #include "../string_util.h"
 #include "../tree.hh"
-#include "string_location_format.cpp"
+#include "string_location_format.h"
 #include <time.h>
 
 //#include "test_retriever.cpp"

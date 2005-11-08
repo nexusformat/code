@@ -1,6 +1,7 @@
 #include "string_location_format.h"
 #include <stdexcept>
 #include <string>
+#include <sstream>
 
 using std::string;
 using std::vector;

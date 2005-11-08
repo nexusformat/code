@@ -34,7 +34,8 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libSNShistogram.la
 
 libSNShistogram_la_SOURCES = \
-	retriever.cpp retriever.h
+	string_location_format.cpp string_location_format.h \
+        retriever.cpp retriever.h
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 

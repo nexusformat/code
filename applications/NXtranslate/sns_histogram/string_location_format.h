@@ -9,7 +9,7 @@ void format_string_location(const string & s, string& s_output);    //format the
 void without_white_spaces(const string & s, string& s_output);      //remove spaces from string 
 void DeclaDef_separator(string & s,vector<string>& DeclaDef);//separate Declaration from Definition
 void Declaration_separator(string s, vector<string>& LocGlobArray); //Separate local array from global rarray
-string TagDef_separator(string& s, vector<string>& Tag, vector<string>& Def);  //separate Tag from Definition part and return the Grp version of the string_location
+string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<string>& Def, string& DefinitionGrpVersion); //separate Tag from Definition part and return the Grp version of the string_location
 void ReplaceTagDef_by_Grp(string& s, int a, string& GrpVersion); //Tag/Def is replaced by Grp to determine the priorities of the associations
 void CheckSpacerValidity(int i, int j, int k);  //check if a "|" is missing
 void CheckTagValidity (string& Tag);  //Check if the Tags are valid
