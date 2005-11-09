@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "retriever.h"
+#include "xml_retriever_dom.h"
 #include "../node.h"
 #include "../node_util.h"
 #include "../string_util.h"
@@ -119,10 +120,15 @@ static void print_element_names(xmlNode * a_node){
     }
 }
 
+static string getStrAttr(const xmlNodePtr &node,string&name); // REMOVE
+
 static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::iterator end){
   // error check input
   if(begin==end)
     return NULL;
+
+  string name("type"); // REMOVE
+  //cout << "[" << node->name << ":" << *begin  << ":" << getStrAttr(node,name) << "]->" ; // REMOVE
 
   // locate the next part of the path
   node=find_element(node,*begin);
@@ -130,6 +136,11 @@ static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::it
   // if it returned poorly then get out now
   if(node==NULL)
     return NULL;
+
+  /*
+  string name("type"); // REMOVE
+  cout << "(" << getStrAttr(node,name) << ")->"; // REMOVE
+  */
 
   // go to next step
   begin++;
@@ -141,12 +152,51 @@ static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::it
 }
 
 static string getStrValue(const xmlDocPtr &doc, const xmlNodePtr &node){
-  xmlChar *char_value=xmlNodeListGetString(doc,node,1);
+  return xmlChar_to_str(node->content,-1);
+}
+
+static string getStrAttr(const xmlNodePtr &node,string&name){
+  //cout << "getStrAttr(" << node->name << "," << name << ")" << endl; // REMOVE
+
+  // error check the input
+  if(node==NULL)
+    throw runtime_error("Encountered NULL Node in getStrAttr(node,"+name+")");
+  if(name.size()<=0)
+    return string("");
+
+  // get the value
+  xmlChar* c_name=xmlCharStrdup(name.c_str());
+  //  xmlAttrPtr attr=xmlHasProp(node,(xmlChar*)c_name);
+  xmlChar *char_value=xmlGetProp(node,(xmlChar*)c_name);
+
+  //  cout << "*****NODE:" << node->name << endl; // REMOVE
+  xmlAttrPtr attr=(xmlAttrPtr)(node->properties);
+  while(attr!=0){
+    cout << "     " << attr->name << ":" << attr->children->content << endl;
+    attr=attr->next;
+  }
+
+  //  cout << "*****SIBL:" << node->next->name << endl;
+  //  cout << "*****PARE:" << node->parent->name << endl;
+  /*
+  if(node->type==XML_TEXT_NODE) // REMOVE
+    cout << "     is text node" << endl; // REMOVE
+  else // REMOVE
+    cout << "     CHIL:" << node->children->name << endl; // REMOVE
+  */
+  // free the name of the attribute
+  xmlFree(c_name);
+
+  // convert the value to a string
   if(char_value==NULL)
-    throw runtime_error("blah");
+    return string("");
   string value=xmlChar_to_str(char_value,-1);
+
+  // free the value
   xmlFree(char_value);
-  return value;
+
+  // return the result
+  return string_util::trim(value);
 }
 
 /**
@@ -154,10 +204,12 @@ static string getStrValue(const xmlDocPtr &doc, const xmlNodePtr &node){
  * specifies where to locate the data (e.g. a filename), but
  * interpreting the string is left up to the implementing code.
  */
-TextXmlRetriever::TextXmlRetriever(const string &str): source(str) /*,current_line(0)*/{
-  cout << "****************************************" 
-       << "****************************************" << endl; // REMOVE
-  cout << "TextXmlRetriever(" << source << ")" << endl; // REMOVE
+TextXmlRetriever::TextXmlRetriever(const string &str): source(str){
+
+  // BEGIN PARSING WITH NEW METHOD
+  tree<Node> tr;
+  string warn=buildTree(str,tr);
+  // END PARSING WITH NEW METHOD
 
   // open the file
   doc=xmlParseFile(source.c_str());
@@ -218,7 +270,7 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
     // remove the separating colon
     str_path=str_path.substr(1,str_path.size());
   }
-  std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
+  //std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
   StringVec path=string_util::string_to_path(str_path);
   Node::NXtype int_type=node_type(type);
 
@@ -228,8 +280,36 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
 
   // open the path
   xml_node=open_path(xml_node,path.begin(),path.end());
+  //cout << endl; // REMOVE
   if(xml_node==NULL)
     throw invalid_argument("path ["+location+"] does not exist in file");
+  //cout << "TYPE=" << xml_node->type << endl;
+
+  // print the children
+  /*cout << "CHILDREN=" ; // REMOVE
+  for( xmlNodePtr itter=xml_node->children ; itter!=xml_node->last ; itter=itter->next ){
+    cout << itter->name << "[" << itter->type << "] ";
+  }
+  cout << endl;
+  */
+  // print the siblings
+  /* cout << "SIBS="; // REMOVE
+  for( xmlNodePtr it=xml_node->next ; it!=NULL ; it=it->next )
+    cout << it->name << "[" << it->type << "] ";
+  cout << endl;
+  */
+
+  // get the attributes
+  //cout << "NODE:" << node.name() << ":" << value << endl; // REMOVE
+  string name("type");
+  string attr=getStrAttr(xml_node,name);
+  //  cout << "ATTR:" << name << "=" << attr << endl; // REMOVE
+  name="axis";
+  attr=getStrAttr(xml_node,name);
+  //cout << "ATTR:" << name << "=" << attr << endl; // REMOVE
+  //  name="units";
+  attr=getStrAttr(xml_node,name);
+  //  cout << "ATTR:" << name << "=" << attr << endl; // REMOVE
 
   // get the value
   string value=getStrValue(doc, xml_node);
