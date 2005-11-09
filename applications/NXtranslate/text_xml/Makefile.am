@@ -34,7 +34,8 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include `xml2-config --cflags`
 noinst_LTLIBRARIES = libTextXML.la
 
 libTextXML_la_SOURCES = \
-	xml_retriever.cpp retriever.h
+	xml_retriever.cpp retriever.h \
+        xml_retriever_dom.cpp xml_retriever_dom.h
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 
