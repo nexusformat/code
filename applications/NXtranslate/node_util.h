@@ -19,5 +19,6 @@ extern void void_ptr_from_string(void *&value, std::string &char_data,
 extern void update_node_from_string(Node &node, std::string &char_data,
                                   std::vector<int> &v_dims, Node::NXtype type);
 extern Node::NXtype node_type(const std::string &str);
+extern Attr make_attr(const std::string &name, const std::string &value);
 #endif
 
