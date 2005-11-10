@@ -21,7 +21,9 @@ using std::endl;
 using std::vector;
 using string_util::starts_with;
 
-typedef vector<string> StringVec;
+typedef vector<string>     StringVec;
+typedef tree<Node>         NodeTree;
+typedef NodeTree::iterator NodeTreeIter;
 
 static string get_type(const string &location){
   static const string CHAR("CHAR");
@@ -96,146 +98,48 @@ static string get_dims(const string &location){
     return result;
 }
 
-static xmlNode* find_element(xmlNode *a_node, const string &name){
-  xmlNode *cur_node=NULL;
-
-  string nodeName;
-  for( cur_node=a_node ; cur_node!=NULL ; cur_node=cur_node->next ){
-    nodeName=xmlChar_to_str(cur_node->name,-1);
-    if(nodeName==name)
-      return cur_node->xmlChildrenNode;
-  }
-  return NULL;
-}
-
-static void print_element_names(xmlNode * a_node){
-    xmlNode *cur_node = NULL;
-
-    for( cur_node=a_node ; cur_node!=NULL ; cur_node=cur_node->next ){
-        if(cur_node->type == XML_ELEMENT_NODE){
-          cout << "node type: Element, name: " << cur_node->name << endl;
-        }
-
-        //print_element_names(cur_node->children);
-    }
-}
-
-static string getStrAttr(const xmlNodePtr &node,string&name); // REMOVE
-
-static xmlNode* open_path(xmlNode *node,StringVec::iterator begin, StringVec::iterator end){
-  // error check input
-  if(begin==end)
-    return NULL;
-
-  string name("type"); // REMOVE
-  //cout << "[" << node->name << ":" << *begin  << ":" << getStrAttr(node,name) << "]->" ; // REMOVE
-
-  // locate the next part of the path
-  node=find_element(node,*begin);
-
-  // if it returned poorly then get out now
-  if(node==NULL)
-    return NULL;
-
-  /*
-  string name("type"); // REMOVE
-  cout << "(" << getStrAttr(node,name) << ")->"; // REMOVE
-  */
-
-  // go to next step
-  begin++;
-  if(begin==end)
-    return node;
-
-  // recursively call self
-  return open_path(node,begin,end);
-}
-
-static string getStrValue(const xmlDocPtr &doc, const xmlNodePtr &node){
-  return xmlChar_to_str(node->content,-1);
-}
-
-static string getStrAttr(const xmlNodePtr &node,string&name){
-  //cout << "getStrAttr(" << node->name << "," << name << ")" << endl; // REMOVE
-
-  // error check the input
-  if(node==NULL)
-    throw runtime_error("Encountered NULL Node in getStrAttr(node,"+name+")");
-  if(name.size()<=0)
-    return string("");
-
-  // get the value
-  xmlChar* c_name=xmlCharStrdup(name.c_str());
-  //  xmlAttrPtr attr=xmlHasProp(node,(xmlChar*)c_name);
-  xmlChar *char_value=xmlGetProp(node,(xmlChar*)c_name);
-
-  //  cout << "*****NODE:" << node->name << endl; // REMOVE
-  xmlAttrPtr attr=(xmlAttrPtr)(node->properties);
-  while(attr!=0){
-    cout << "     " << attr->name << ":" << attr->children->content << endl;
-    attr=attr->next;
-  }
-
-  //  cout << "*****SIBL:" << node->next->name << endl;
-  //  cout << "*****PARE:" << node->parent->name << endl;
-  /*
-  if(node->type==XML_TEXT_NODE) // REMOVE
-    cout << "     is text node" << endl; // REMOVE
-  else // REMOVE
-    cout << "     CHIL:" << node->children->name << endl; // REMOVE
-  */
-  // free the name of the attribute
-  xmlFree(c_name);
-
-  // convert the value to a string
-  if(char_value==NULL)
-    return string("");
-  string value=xmlChar_to_str(char_value,-1);
-
-  // free the value
-  xmlFree(char_value);
-
-  // return the result
-  return string_util::trim(value);
-}
-
 /**
  * The factory will call the constructor with a string. The string
  * specifies where to locate the data (e.g. a filename), but
  * interpreting the string is left up to the implementing code.
  */
-TextXmlRetriever::TextXmlRetriever(const string &str): source(str){
+TextXmlRetriever::TextXmlRetriever(const string &str): source(str), __tree(new tree<Node>){
 
-  // BEGIN PARSING WITH NEW METHOD
-  tree<Node> tr;
-  string warn=buildTree(str,tr);
-  // END PARSING WITH NEW METHOD
-
-  // open the file
-  doc=xmlParseFile(source.c_str());
-
-  // check that open was successful
-  if(doc==NULL){
-    xmlFreeDoc(doc);
-    xmlCleanupParser();
-    throw runtime_error("Parsing "+source+" was not successful");
-  }
+  // fill tree
+  string warn=buildTree(str,*__tree);
 
   // check that the document is not empty
-  xmlNode *xml_node = NULL;
-  xml_node = xmlDocGetRootElement(doc);
-  if(xml_node==NULL)
+  if(__tree->size()<=0)
     throw runtime_error("Empty document ["+source+"]");
 }
 
 TextXmlRetriever::~TextXmlRetriever(){
   //cout << "~TextXmlRetriever()" << endl;
+  
+  // __tree does not need to be deleted
+}
 
-  if(doc==NULL) return;
+static Node getNode(Ptr<NodeTree> tr, const StringVec &path){
+  // set up iterators for dealing with the path
+  StringVec::const_iterator path_it=path.begin();
+  StringVec::const_iterator path_end=path.end();
+  
+  for( NodeTreeIter it=tr->begin() ; it!=tr->end() ;  ){
+    if(it->name()==(*path_it)){
+      path_it++;
+      if(path_it==path_end)
+        return *it;
+      it=tr->child(it,0);
+    }else{
+      it=tr->next_sibling(it);
+    }
+  }
 
-  // close the file
-  xmlFreeDoc(doc);
-  xmlCleanupParser();
+  // when the code gets here the path was not found
+  string error;
+  for( StringVec::const_iterator it=path.begin() ; it!=path_end ; it++ )
+    error+="/"+(*it);
+  throw runtime_error("PATH["+error+"] NOT FOUND IN FILE");
 }
 
 /**
@@ -245,7 +149,7 @@ TextXmlRetriever::~TextXmlRetriever(){
  * code.
  */
 void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
-  cout << "TextXmlRetriever::getData(" << location << ",tree)" << endl; // REMOVE
+  //  cout << "TextXmlRetriever::getData(" << location << ",tree)" << endl; // REMOVE
   // check that the argument is not an empty string
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
@@ -271,54 +175,12 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
     str_path=str_path.substr(1,str_path.size());
   }
   //std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
+
   StringVec path=string_util::string_to_path(str_path);
   Node::NXtype int_type=node_type(type);
+  Node node=getNode(__tree,path);
 
-  // get the root
-  xmlNode *xml_node = NULL;
-  xml_node = xmlDocGetRootElement(doc);
-
-  // open the path
-  xml_node=open_path(xml_node,path.begin(),path.end());
-  //cout << endl; // REMOVE
-  if(xml_node==NULL)
-    throw invalid_argument("path ["+location+"] does not exist in file");
-  //cout << "TYPE=" << xml_node->type << endl;
-
-  // print the children
-  /*cout << "CHILDREN=" ; // REMOVE
-  for( xmlNodePtr itter=xml_node->children ; itter!=xml_node->last ; itter=itter->next ){
-    cout << itter->name << "[" << itter->type << "] ";
-  }
-  cout << endl;
-  */
-  // print the siblings
-  /* cout << "SIBS="; // REMOVE
-  for( xmlNodePtr it=xml_node->next ; it!=NULL ; it=it->next )
-    cout << it->name << "[" << it->type << "] ";
-  cout << endl;
-  */
-
-  // get the attributes
-  //cout << "NODE:" << node.name() << ":" << value << endl; // REMOVE
-  string name("type");
-  string attr=getStrAttr(xml_node,name);
-  //  cout << "ATTR:" << name << "=" << attr << endl; // REMOVE
-  name="axis";
-  attr=getStrAttr(xml_node,name);
-  //cout << "ATTR:" << name << "=" << attr << endl; // REMOVE
-  //  name="units";
-  attr=getStrAttr(xml_node,name);
-  //  cout << "ATTR:" << name << "=" << attr << endl; // REMOVE
-
-  // get the value
-  string value=getStrValue(doc, xml_node);
-  if(value.size()<=0)
-    throw runtime_error("Encountered empty value ["+source+","+location+"]");
-
-  // create an empty node
-  Node node(*(path.rbegin()),"empty");
-
+/* OLD
   // put the data in the node
   vector<int> dims;
   if(int_type==Node::CHAR){
@@ -328,16 +190,10 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
   }
 
   update_node_from_string(node,value,dims,int_type);
+*/
 
+  // put the node in the supplied tree to pass it back
   tr.insert(tr.begin(),node);
-}
-
-static void openPath(  xmlNode *root_element, const std::vector<std::string> &path, int &num_group, int &num_data){
-
-}
-
-static void closePath(  xmlNode *root_element, int &num_group, int &num_data){
-
 }
 
 const string TextXmlRetriever::MIME_TYPE("text/xml");

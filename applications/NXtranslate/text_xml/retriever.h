@@ -1,9 +1,11 @@
 #ifndef __TEXT_XML_RETRIEVER_GUARD
 #define __TEXT_XML_RETRIEVER_GUARD
 
-#include "../retriever.h"
-#include <fstream>
 #include <libxml/parser.h>
+#include "../node.h"
+#include "../Ptr.h"
+#include "../retriever.h"
+#include "../tree.hh"
 
 // this is not intended to be inherited from
 class TextXmlRetriever: public Retriever{
@@ -17,6 +19,6 @@ class TextXmlRetriever: public Retriever{
   TextXmlRetriever(const TextXmlRetriever&);
   TextXmlRetriever& operator=(const TextXmlRetriever&);
   std::string source;
-  xmlDocPtr doc;
+  Ptr< tree<Node> > __tree;
 };
 #endif
