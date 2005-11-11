@@ -611,8 +611,9 @@ as a double precision float the location is
 
 <listitem><para>In the case where the field has a "type" attribute
 with the value being one of the types above that will be used rather
-than as a character array. Specifying the type in the location will
-override what is in the source file.</para></listitem>
+than as a character array. Attempting to override the type in the
+source file with the location string will generate an
+error.</para></listitem>
 
 <listitem><para>Arrays can be specified as part of the type as either
 an attribute in the XML file or in the location string. To get a six
