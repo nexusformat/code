@@ -142,6 +142,86 @@ static Node getNode(Ptr<NodeTree> tr, const StringVec &path){
   throw runtime_error("PATH["+error+"] NOT FOUND IN FILE");
 }
 
+// determine if there is a call for an attribute (denoted by #)
+static string strip_attr(StringVec &path){
+  static string HASH("#");
+
+  // the attribute call can only be on the last part of the path
+  string last=*(path.end()-1);
+
+  // determine if it contains a hash
+  int start=last.find(HASH);
+  if(start<=0) return string();
+
+  // get the attribute out
+  string attr=last.substr(start+1,last.size());
+  last=last.erase(start,last.size());
+
+  // repair the path
+  path.pop_back();
+  path.push_back(last);
+
+  return attr;
+}
+
+/**
+ * Turns an attribute from a node into a node.
+ */
+static Node promoteAttribute(const Node &node, const string &name){
+  cout << "promoteAttribute(" << node.name() << "," << name << ")" << endl;
+
+  int num_attr=node.num_attr();
+  for( int i=0 ; i<num_attr ; i++ ){
+    Attr attr(node.get_attr(i));
+
+    if(attr.name()==name){
+      int dims[1]={attr.length()};
+      Node result(name,attr.value(),1,dims,attr.type());
+      return result;
+    }
+  }
+
+  throw runtime_error("Attribute ["+name+"] not found");
+}
+
+static Node convertType(const Node &node, const string &type,string &str_dims){
+  // can not convert non-data
+  if(!node.is_data())
+    throw invalid_argument("Cannot convert non-data to data");
+
+  // convert type to integer
+  Node::NXtype int_type=node_type(type);
+
+  // if they are already the same type, then just return the node
+  if(int_type==node.int_type())
+    return node;
+
+  // can only convert from strings
+  if(node.int_type()!=Node::CHAR)
+    throw runtime_error("Cannot convert original type to "+type);
+
+  // convert null pointer to string
+  string value((char *)node.data());
+
+  // move dimensions over to vector<int> that the functions expect
+  vector<int> dims=string_util::str_to_intVec(str_dims);
+
+  // create the new node and return the result
+  Node result(node.name(),"ERROR");
+  update_node_from_string(result,value,dims,int_type);
+  return result;
+
+/*
+  int int_dims[rank];
+  for( int i=0 ; i<rank ; i++ )
+    int_dims[i]=dims[i];
+
+  // create the resulting node and return it
+  Node result(node.name(),attr.value(),rank,int_dims,int_type);
+  return result;
+*/
+}
+
 /**
  * This is the method for retrieving data from a file. The whole
  * tree will be written to the new file immediately after being
@@ -176,21 +256,22 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
   }
   //std::cout << "TYPE=" << type << " DIMS=" << str_dims << " PATH=" << str_path << std::endl; // REMOVE
 
+  // split path up
   StringVec path=string_util::string_to_path(str_path);
-  Node::NXtype int_type=node_type(type);
+
+  // get out the attribute
+  string attr=strip_attr(path);
+
+  // get the requested node
   Node node=getNode(__tree,path);
 
-/* OLD
-  // put the data in the node
-  vector<int> dims;
-  if(int_type==Node::CHAR){
-    dims.push_back(value.size());
-  }else{
-    dims=string_util::str_to_intVec(str_dims);
+  // upgrade attributes to be a node, if requested
+  if(attr.size()>0){
+    node=promoteAttribute(node,attr);
   }
 
-  update_node_from_string(node,value,dims,int_type);
-*/
+  // change the type of a node
+  node=convertType(node,type,str_dims);
 
   // put the node in the supplied tree to pass it back
   tr.insert(tr.begin(),node);
