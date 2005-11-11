@@ -208,43 +208,6 @@ const void Node::set_name(const string &name){
 }
 
 const void Node::set_data(void *&data,const int irank, const int* dims,const int type){
-/*
-  std::cout << "VALUE OF " << __name << " IS ";
-  if(__value!=NULL)
-    std::cout << "NOT ";
-  std::cout << "NULL" << std::endl;
-  // check for unique data
-  bool same_data(__value==data);
-  // check for unique type
-  std::string str_type=convert_type(type);
-  bool same_type(__type==str_type);
-  // check for dimensions being the same
-  bool same_dims(__dims.size()==rank);
-  if(same_dims){ // confirm that more than rank matches
-    for( int i=0 ; i<rank ; i++ ){
-      if(__dims[i]!=dims[i]){
-        same_dims=false;
-        break;
-      }
-    }
-  }
-  // check for number items being the same
-  bool same_num_item(false);
-  if(!same_dims){
-    int old_total=1;
-    for(vector<int>::const_iterator it=__dims.begin();it!=__dims.end();it++)
-      old_total*=(*it);
-    int new_total=1;
-    for( int i=0 ; i<rank ; i++ )
-      new_total*=(dims[i]);
-    same_num_item=(old_total==new_total);
-  }
-
-  // delete the old version
-  if(__value!=NULL)
-    NXfree(&__value);
-*/
-
   // copy the dimensions
   __dims.clear();
   int my_dims[irank];
