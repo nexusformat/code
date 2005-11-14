@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 using std::string;
 using std::vector;
@@ -97,7 +98,7 @@ void Declaration_separator(string DeclarationStr, vector<string>& LocGlobArray)
 /*********************************
 /Separate Tag from Definition
 /*********************************/
-string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<string>& Def, string& DefinitionGrpVersion)
+void TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<string>& Def, string& DefinitionGrpVersion)
 {
   std::vector<string> ret;
   typedef string::iterator iter;
@@ -139,7 +140,7 @@ string TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<stri
     };
 
    ReplaceTagDef_by_Grp(StringLocationGroup,HowManyTimes,DefinitionGrpVersion );
-   return DefinitionGrpVersion;
+   return;
 }
 
 /*********************************
@@ -160,15 +161,15 @@ void ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes, string 
       OpenBraPosition =  StringLocationGroup.find(OpenBracket);
       CloseBraPosition =  StringLocationGroup.find(CloseBracket);
       
-       StringLocationGroup.erase(OpenBraPosition, CloseBraPosition+1-OpenBraPosition);
+      StringLocationGroup.erase(OpenBraPosition, CloseBraPosition+1-OpenBraPosition);
      
       part1 = StringLocationGroup.substr(0,OpenBraPosition);
       part2 = StringLocationGroup.substr(OpenBraPosition, StringLocationGroup.size());
-     
       Grp << "grp" << j ;  
-      DefinitionGrpVersion = part1 + Grp.str() + part2;
+      StringLocationGroup = part1 + Grp.str() + part2;
       }
-  
+  DefinitionGrpVersion = StringLocationGroup;
+
   return;
 }
 
