@@ -15,9 +15,7 @@
 #include "string_location_format.h"
 #include <time.h>
 
-//#include "test_retriever.cpp"
-
-//#define RETRIEVER_TEST                    //to test main part     
+#define RETRIEVER_TEST                    //to test main part     
 #define RETRIEVER_DECLARATION_TEST        //to test declaration part
 #define RETRIEVER_DEFINITION_TEST         //to test definition part
 #define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
@@ -41,7 +39,7 @@
 //#define SWAP_ENDIAN                       //triger the swapping endian subroutine
 //#define OUTPUT_RESULT                     //to create binary file of result (to test it with IDL)
 
-const char OutputFileName[]="output_array_binary.dat";
+const char OutputFileName[]="output_array_binary.dat";    //only used for testing
 
 using std::ifstream;
 using std::invalid_argument;
@@ -51,11 +49,6 @@ using std::cout;
 using std::endl;
 using std::vector;
    
-//Global variable
-vector<string> Tag, Def;
-vector<string> VecStr;
-vector<int> LocalArray, GlobalArray;  //parameters of the declaration part
-
 //Type of binary file
 typedef int binary_type;
 
@@ -70,17 +63,17 @@ vector<Grp_parameters> GrpPara;
 
 //Declaration of functions
 void DefinitionParametersFunction(vector<string> Def,int OperatorNumber);
-void InitLastIncre (string& def, int i);   //Isolate loop(init,last,increment)
-void ParseGrp_Value (string& def, int i);  //Isolate values of (....)
-void ParseDeclarationArray(vector<string>& LocGlobArray);  //Parse Local and Global array from the declaration part
-void CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority,tree<Node> &tr);  //calculate the final array according to definiton
+void InitLastIncre (string & def, int i);   //Isolate loop(init,last,increment)
+void ParseGrp_Value (string & def, int i);  //Isolate values of (....)
+void ParseDeclarationArray(vector<string> & LocGlobArray, vector<int> & LocalArray, vector<int> & GlobalArray);  //Parse Local and Global array from the declaration part
+void CalculateArray (vector<int> & GrpPriority, vector<int> & InverseDef, binary_type * BinaryArray, vector<string> Ope, vector<int> & OpePriority,tree<Node> & tr, vector<string> & Tag, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray);  //calculate the final array according to definiton
 int FindMaxPriority (vector<int>& GrpPriority);  //find highest priority of Grp
-void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);  //make pixelID array
-void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);   //make pixelX array
-void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);   //make pixelY array
-void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef);     //make Tbin array
-void MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray); //make a copy of the binary array
-void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator);  //Do the calculation between the two Arrays
+void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray);  //make pixelID array
+void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray);   //make pixelX array
+void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray);   //make pixelY array
+void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray);     //make Tbin array
+void MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray, vector<int> & LocalArray, vector<int> & GlobalArray); //make a copy of the binary array
+void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator, vector<int> & LocalArray, vector<int> & GlobalArray);  //Do the calculation between the two Arrays
 inline void endian_swap(binary_type& x);  //to swap from little to big endian
 
 
@@ -115,7 +108,7 @@ SnsHistogramRetriever::~SnsHistogramRetriever()
 void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 {
   string new_location;
-  string DefinitionGrpVersion;    //use to determine priorities
+  string DefinitionGrpVersion="";    //use to determine priorities
   vector<string> DeclaDef;        //declaration and definition parts
   vector<string> LocGlobArray;    //local and global array (declaration part)
   vector<string> Ope;             //Operators of the defintion part
@@ -126,14 +119,18 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   vector<int> InverseDef;        //True=Inverse definition, False=keep it like it is
   int Everything = 0;            //0= we don't want everything, 1=we do
   int GlobalArraySize = 1;       //Size of global array within our program
- 
+  vector<string> Tag, Def;
+  vector<int> LocalArray, GlobalArray;
+
+  //  vector<int> LocalArray, GlobalArray;  //parameters of the declaration part  
+
   // check that the argument is not an empty string
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
 
 #ifdef RETRIEVER_TEST
   cout << "####RETRIEVER_TEST#########################################################" << endl;
-  cout << "Initial string location= " << endl << "  " << new_location << endl;
+  cout << "Initial string location= " << endl << "  " << location << endl;
 #endif
 
   //Once upon a time, there was a string location named "location"
@@ -147,7 +144,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //location decided to separate its declaration part (left side of the "#")
   //from its definition part --> DeclaDef vector
 
-  DeclaDef_separator(new_location,DeclaDef);
+  DeclaDef_separator(new_location, DeclaDef);
 
   if (DeclaDef[1].size() > 0 && DeclaDef[1].size()<7)
     throw runtime_error("Definition part is not valid");
@@ -202,7 +199,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
     }
    
  //parse Local and Global Array from Declaration part
-  ParseDeclarationArray(LocGlobArray);
+  ParseDeclarationArray(LocGlobArray, LocalArray, GlobalArray);
 
   //allocate memory for the binary Array
   for (int i=0; i<GlobalArray.size(); i++)
@@ -242,7 +239,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 #endif
 
   //Calculate arrays according to definition
-  CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr);
+  CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr, Tag, Def, LocalArray, GlobalArray);
 
 cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
  cout << "Time it took to run it is: " << clock() <<endl;  //REMOVE
@@ -262,7 +259,7 @@ string SnsHistogramRetriever::toString() const
 /*********************************
 /Store values of the definition
 /*********************************/
-void DefinitionParametersFunction(vector<string> Def,int HowManyDef)
+void DefinitionParametersFunction(vector<string> Def, int HowManyDef)
 {
   Grp_parameters record;
   string NewString;
@@ -370,9 +367,7 @@ void ParseGrp_Value(string& def, int i)
 /*********************************
 /Parse Local and Global array
 /*********************************/
-
-
-void ParseDeclarationArray(vector<string>& LocGlobArray)
+void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   int a=0, b=0;
   
@@ -454,7 +449,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 /*******************************************
 /Calculate arrays according to defintion
 /*******************************************/
- void CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority, tree<Node> &tr)
+ void CalculateArray (vector<int>& GrpPriority, vector<int>& InverseDef, binary_type* BinaryArray, vector<string> Ope, vector<int>& OpePriority, tree<Node> &tr, vector<string>& Tag, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
@@ -514,7 +509,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
       if (Tag[i]=="pixelID") 
 	{
 
-      MakeArray_pixelID(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+      MakeArray_pixelID(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray);
 
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
@@ -549,7 +544,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 	}
       else if (Tag[i]=="pixelX")
 	{
-	  MakeArray_pixelX(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+	  MakeArray_pixelX(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray);
 
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELX_LIST
@@ -618,7 +613,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 		}
 	    } 
 #endif
-	  MakeArray_pixelY(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+	  MakeArray_pixelY(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray);
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELY_LIST
 
@@ -654,7 +649,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 	}
       else if (Tag[i]=="Tbin")
 	{
-	  MakeArray_Tbin(MyGrpArray[i],BinaryArray,i,InverseDef[i]);
+	  MakeArray_Tbin(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray);
 
 #ifdef RETRIEVER_MAKE_ARRAY_TBIN_LIST
 
@@ -690,7 +685,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray)
 	}
       else if (Tag[i]=="*")
 	{
-	  MakeArray_Everything(MyGrpArray[i],BinaryArray);
+	  MakeArray_Everything(MyGrpArray[i],BinaryArray, LocalArray, GlobalArray);
 
 #ifdef RETRIEVER_EVERYTHING
 	  cout << endl << "****RETRIEVER_EVERYTHING****************************************";
@@ -808,7 +803,7 @@ for (int i=0; i<GrpPriority.size();++i)
 		      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
 		      cout << "Between grp#"<<i<<" and grp#"<<i+1<<": "<<Ope[i]<<" (priority:"<<GrpPriority[i]<<")"<<endl;
 #endif
-		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i]);
+		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i], LocalArray, GlobalArray);
 
 #ifdef RETRIEVER_MAKE_CALCULATION
 
@@ -877,21 +872,6 @@ for (int i=0; i<GrpPriority.size();++i)
 	}
     }
   
-  /*
-  int rank=1;
-  // int type=5;    //INT32=NX_INT32
-  int type=NX_INT32;
-  int dims[NX_MAXRANK];
-  void * value;
-  cout << "Ok1" <<endl;
-  value = (void *)MyGrpArray[0];
-  cout << "ok2" << endl;
-  Node node("New Array according to string location definition",value,rank,dims,type);
-  cout << "ok3" << endl;
-  tr.insert(tr.begin(),node);
-  cout << "Ok4"<<endl;
-  */
-
   NewArray = MyGrpArray[0];
 
 #ifdef OUTPUT_RESULT
@@ -969,7 +949,7 @@ int FindMaxPriority (vector<int>& GrpPriority)
 /*******************************************
 /Make pixelID array
 /*******************************************/
-void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int grp_number,int InverseDef)
+ void MakeArray_pixelID (binary_type* MyGrpArray, binary_type* BinaryArray, int grp_number, int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   string loop="loop";
 
@@ -1082,7 +1062,7 @@ if (Def[grp_number][0] == loop[0])
 /*******************************************
 /Make pixelX array
 /*******************************************/
-void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef)
+void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   string loop="loop";
 
@@ -1189,7 +1169,7 @@ void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 /*******************************************
 /Make pixelY array
 /*******************************************/
-void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef)
+void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   string loop="loop";
 
@@ -1299,7 +1279,7 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 /*******************************************
 /Make Tbin array
 /*******************************************/
-void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef)
+void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_number,int InverseDef, vector<string> & Def, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   string loop="loop";
 
@@ -1411,7 +1391,7 @@ void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_n
 /*******************************************
 /Make a copy of the binary Array
 /*******************************************/
-void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
+void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
 
  for (int y=0; y<GlobalArray[0];y++)
@@ -1426,15 +1406,13 @@ void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray)
      }
    }
 
-      //  MyGrpArray = BinaryArray;
-  
   return ;
 }
 
 /*******************************************
 /Do the calculation between the two arrays
 /*******************************************/
-void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator)
+void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2, string Operator, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
   string OR="OR";
 
