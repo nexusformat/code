@@ -35,7 +35,8 @@ noinst_LTLIBRARIES = libTextXML.la
 
 libTextXML_la_SOURCES = \
 	xml_retriever.cpp retriever.h \
-        xml_retriever_dom.cpp xml_retriever_dom.h
+        xml_retriever_dom.cpp xml_retriever_dom.h \
+        void_copy.cpp void_copy.h
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 
