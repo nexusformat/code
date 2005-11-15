@@ -7,6 +7,7 @@
 #include <vector>
 #include "retriever.h"
 #include "xml_retriever_dom.h"
+#include "void_copy.h"
 #include "../node.h"
 #include "../node_util.h"
 #include "../string_util.h"
@@ -168,7 +169,7 @@ static string strip_attr(StringVec &path){
  * Turns an attribute from a node into a node.
  */
 static Node promoteAttribute(const Node &node, const string &name){
-  cout << "promoteAttribute(" << node.name() << "," << name << ")" << endl;
+  //cout << "promoteAttribute(" << node.name() << "," << name << ")" << endl;
 
   int num_attr=node.num_attr();
   for( int i=0 ; i<num_attr ; i++ ){
@@ -184,6 +185,121 @@ static Node promoteAttribute(const Node &node, const string &name){
   throw runtime_error("Attribute ["+name+"] not found");
 }
 
+static int getElementCount(const vector<int> &vec){
+  if(vec.size()<=0)
+    throw invalid_argument("Cannot get number of elements from empty dimension");
+
+  int tot=1;
+  for( vector<int>::const_iterator it=vec.begin() ; it!=vec.end() ; it++ ){
+    tot*=(*it);
+  }
+
+  return tot;
+}
+
+static Node convertFromString(const string &name, string &data, vector<int> &dims, Node::NXtype type){
+  static string DEF_TYPE="EMPTY";
+  Node result(name,DEF_TYPE);
+  update_node_from_string(result, data, dims, type);
+  return result;
+}
+
+static Node convertFromNumeric(const Node &node, vector<int> &dims, const string &type){
+  // get the name of the resulting node
+  string name=node.name();
+
+  // determine the numeric types
+  Node::NXtype source_type=node.int_type();
+  Node::NXtype copy_type=node_type(type);
+
+  // if the types match, just return the node given
+  if(source_type==copy_type)
+    return node;
+
+  // create the dimension and rank information
+  int rank=dims.size();
+  int int_dims[rank];
+  int tot_num=1;
+  for( int i=0 ; i<rank ; i++ ){
+    int_dims[i]=dims[i];
+    tot_num*=dims[i];
+  }
+
+  // allocate space for the data array
+  void *value(NULL);
+  NXmalloc(&value,rank,int_dims,copy_type);
+
+  // temporary variable stating whether or not the cast worked
+  bool worked=false;
+
+  // make the cast
+  if(source_type==Node::FLOAT32)
+    worked=void_copy::from_float(((float*)(node.data())),value,tot_num,copy_type);
+  else if(source_type==Node::FLOAT64)
+    worked=void_copy::from_double(((double*)(node.data())),value,tot_num,copy_type);
+  // ---------- add code here to work with other types
+
+  // error out if the cast did not work
+  if(!worked){
+    NXfree(&value);
+    value=NULL;
+    throw runtime_error("Cannot convert "+node.type()+" to "+type);
+  }
+
+  // package up the result
+  Node result(name,"EMPTY");
+  result.set_data(value,rank,int_dims,copy_type);
+
+  // free up the temporary memory
+  NXfree(&value);
+  value=NULL;
+
+  // return the result of the cast
+  return result;
+}
+
+static Node convertFromFloat32(const Node &node, vector<int> &dims, const string &type){
+  cout << "convertFromFloat32(" << node.name() << "....)" << endl; // REMOVE
+  // get the name of the resulting node
+  string name=node.name();
+
+  // get the result type
+  Node::NXtype int_type=node_type(type);
+
+  // create the dimension and rank information
+  int rank=dims.size();
+  int int_dims[rank];
+  int tot_num=1;
+  for( int i=0 ; i<rank ; i++ ){
+    int_dims[i]=dims[i];
+    tot_num*=dims[i];
+  }
+
+  // allocate space for the data array
+  void *value(NULL);
+  NXmalloc(&value,rank,int_dims,int_type);
+
+  // make the cast
+  bool worked=void_copy::from_float(((float*)(node.data())),value,tot_num,int_type);
+
+  // throw an exception if the casting did not work
+  if(!worked){
+    NXfree(&value);
+    value=NULL;
+    throw("Cannot convert "+node.type()+" to "+type);
+  }
+
+  // package up the result
+  Node result(name,"EMPTY");
+  result.set_data(value,rank,int_dims,int_type);
+
+  // free up temporary memory
+  NXfree(&value);
+
+  // return the result
+  return result;
+}
+
 static Node convertType(const Node &node, const string &type,string &str_dims){
   // can not convert non-data
   if(!node.is_data())
@@ -191,35 +307,36 @@ static Node convertType(const Node &node, const string &type,string &str_dims){
 
   // convert type to integer
   Node::NXtype int_type=node_type(type);
-
-  // if they are already the same type, then just return the node
-  if(int_type==node.int_type())
-    return node;
-
-  // can only convert from strings
-  if(node.int_type()!=Node::CHAR)
-    throw runtime_error("Cannot convert original type to "+type);
-
-  // convert null pointer to string
-  string value((char *)node.data());
+  Node::NXtype node_int_type=node.int_type();
 
   // move dimensions over to vector<int> that the functions expect
   vector<int> dims=string_util::str_to_intVec(str_dims);
 
-  // create the new node and return the result
-  Node result(node.name(),"ERROR");
-  update_node_from_string(result,value,dims,int_type);
-  return result;
+  // convert from string
+  if(node_int_type==Node::CHAR){
+    // convert void pointer to string
+    string value((char *)node.data());
 
-/*
-  int int_dims[rank];
-  for( int i=0 ; i<rank ; i++ )
-    int_dims[i]=dims[i];
+    // do the actual conversion
+    return convertFromString(node.name(),value,dims,int_type);
+  }
 
-  // create the resulting node and return it
-  Node result(node.name(),attr.value(),rank,int_dims,int_type);
-  return result;
-*/
+  // if they are already the same type, update the dimensions and return
+  if(int_type==node_int_type){
+    // change the dimensionality for numerics
+    Node result(node);
+    result.update_dims(dims);
+    return result;
+  }
+
+  // check that the number of elements is unchanged
+  int node_tot=getElementCount(node.dims());
+  int res_tot =getElementCount(dims);
+  if(node_tot!=res_tot)
+    throw runtime_error("Cannot change number of elements in a node");
+
+  // do the actual conversion
+  return convertFromNumeric(node,dims,type);
 }
 
 /**
@@ -271,7 +388,8 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
   }
 
   // change the type of a node
-  node=convertType(node,type,str_dims);
+  if((node.type()!=type) && (str_dims.size()>0))
+    node=convertType(node,type,str_dims);
 
   // put the node in the supplied tree to pass it back
   tr.insert(tr.begin(),node);
