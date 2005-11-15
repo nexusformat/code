@@ -8,15 +8,14 @@ using std::endl;
 using std::vector;
 
 
-void CheckMakeArrayPixelXList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray, string str);
-//void CheckMakeArrayPixelYList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray);
+void CheckMakeArrayPixelList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray, string str);
+void checkMakePriorities(vector<int> & GrpPriority, int GrpPriority_size);
+void checkGrpParaValue(int i, vector<Grp_parameters> & GrpPara);
+void view_array(int & x, int & y, int & z, binary_type * MyGrpArray);
+void checkDeclaration(vector<int> & LocalArray, vector<int> & GlobalArray);
 
 
-
-
-
-
-void CheckMakeArrayPixelXList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray, string str)
+void CheckMakeArrayPixelList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray, string str)
 {
 
     if (str == "PIXELX")
@@ -43,6 +42,16 @@ void CheckMakeArrayPixelXList (int i, vector<int> & GlobalArray, binary_type * M
     {
 	  cout << endl << "****RETRIEVER_EVERYTHING****************************************";
 	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
+    }
+    else if (str == "FINAL")
+    {
+	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
+	  cout << endl << "Check the final NewArray: " << endl<<endl;
+    }
+    else if (str == "PIXELID")
+    {
+	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
+	  cout << endl << "Check if MyGrpArray in Make_PixelID is correct: " << endl;
     }
 
 	  int ll = 0;
@@ -71,5 +80,82 @@ void CheckMakeArrayPixelXList (int i, vector<int> & GlobalArray, binary_type * M
 		}
 	    } 
 
+  return;
+}
+
+void checkMakePriorities(vector<int> & GrpPriority, int GrpPriority_size)
+{
+    cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
+
+      for (int j=0; j<GrpPriority_size;j++)
+	{
+	  if (GrpPriority[j]>-1)
+	    {
+	      cout << "   Grp["<<j<<"]/Pri#"<<GrpPriority[j];
+	    }
+	  else
+	    {
+	      cout << "   Grp["<<j<<"]/Pri#"<<GrpPriority[j]+1<<" ==>Done!"<<endl;
+	    }
+	}
+
+      cout << endl;
+
+  return;
+}
+
+void checkGrpParaValue(int i, vector<Grp_parameters> & GrpPara)
+{
+  cout << endl << "Def["<<i<<"], list of values from list of identifiers: " << endl;
+
+   for (int j=0; j<GrpPara[i].value.size(); j++)
+    {
+      cout << "   GrpPara.value["<<i<<"]= " << GrpPara[i].value[j]<<endl;
+    }
+
+  return;
+}
+
+/*******************************************
+/Print array for testing purpose
+/*******************************************/
+void view_array(int & x, int & y, int & z, binary_type * MyGrpArray)
+{
+   for (int a=0; a<y;++a)
+	{
+	  for (int b=0; b<x;++b)
+	    {
+	      for (int c=0; c<z;++c)
+		{
+		  cout << MyGrpArray[c+b*y*z+a*z];
+		  
+		  cout << " ";
+		}
+	      cout << "\t";
+	    }
+	  cout << endl;
+	}
+      cout << endl;
+	 
+      return;
+}
+
+
+void checkDeclaration(vector<int> & LocalArray, vector<int> & GlobalArray)
+{
+  cout << endl << "Parsing of values: " << endl;
+  cout << "   Local array" << endl;
+
+  for (int j=0; j<LocalArray.size();j++)
+    {
+      cout << "      LocalArray["<<j<<"]= "<<LocalArray[j];
+    }
+
+  cout << endl <<"   Global array" << endl;
+  
+  for (int k=0; k<GlobalArray.size();++k)
+    {
+      cout << "      GlobalArray["<<k<<"]= "<<GlobalArray[k];
+    }
   return;
 }
