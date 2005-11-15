@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
-#include <stdlib.h>
+#include <stdlib.h>¶
 #include "retriever.h"
 #include "../node.h"
 #include "../node_util.h"
@@ -17,16 +17,23 @@
 //Type of binary file
 typedef int binary_type;
 
+struct Grp_parameters   //parameters of the different definitions
+{
+  int init, last, increment;  //with loop(init,end,increment)
+  vector<int> value;          //(value[0],value[1],....)
+  char c;                     //c=l for loop and c=p for (x,y,z,...)
+};
+
 #include "retriever_test.cpp"
 
-#define RETRIEVER_TEST                    //to test main part     
+//#define RETRIEVER_TEST                    //to test main part     
 #define RETRIEVER_DECLARATION_TEST        //to test declaration part
 #define RETRIEVER_DEFINITION_TEST         //to test definition part
 #define RETRIEVER_ARRAY_TEST              //to test allocation of memory of arrays
 #define RETRIEVER_INPUT_TEST              //to test the data read
 //#define RETRIEVER_MAKE_ARRAY              //to test the process of making the arrays
-//#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
-//#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
+#define RETRIEVER_MAKE_ARRAY_PIXELID      //to test the pixelID part
+#define RETRIEVER_MAKE_ARRAY_PIXELID_LIST //to get a listing of the array produced
 //#define RETRIEVER_EVERYTHING              //when we don't have everything in the definition part
 //#define RETRIEVER_MAKE_ARRAY_PIXELX       //to test the pixelX part
 //#define RETRIEVER_MAKE_ARRAY_PIXELX_LIST  //to get a listing of the array produced
@@ -36,21 +43,14 @@ typedef int binary_type;
 //#define RETRIEVER_MAKE_ARRAY_TBIN_LIST    //to get a listing of the array produced
 #define RETRIEVER_MAKE_ARRAYS_LIST        //to get a listing of all the arrays made
 #define RETRIEVER_MAKE_PRIORITIES         //to test the priority part
-//#define RETRIEVER_MAKE_CALCULATION_AND   //to test the calculation of the arrays (and)
-//#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
-//#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
+#define RETRIEVER_MAKE_CALCULATION_AND   //to test the calculation of the arrays (and)
+#define RETRIEVER_MAKE_CALCULATION_OR     //to test the calculation of the arrays (or)
+#define RETRIEVER_MAKE_CALCULATION        //to test the Calculation of the array
 //#define RETRIEVER_FINAL_RESULT            //to list the final array produced`
 //#define SWAP_ENDIAN                       //triger the swapping endian subroutine
 //#define OUTPUT_RESULT                     //to create binary file of result (to test it with IDL)
 
 const char OutputFileName[]="output_array_binary.dat";    //only used for testing
-
-struct Grp_parameters   //parameters of the different definitions
-{
-  int init, last, increment;  //with loop(init,end,increment)
-  vector<int> value;          //(value[0],value[1],....)
-  char c;                     //c=l for loop and c=p for (x,y,z,...)
-};
 
 using std::ifstream;
 using std::invalid_argument;
@@ -75,11 +75,24 @@ void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_n
 void MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray, vector<int> & LocalArray, vector<int> & GlobalArray); //make a copy of the binary array
 void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2,string Operator, vector<int> & LocalArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara);  //Do the calculation between the two Arrays
 inline void endian_swap(binary_type & x);  //to swap from little to big endian
-void view_array(int & x, int & y, int & z, binary_type * MyGrpArray);  //for testing purpose, print the array
 void InitializeArray(binary_type * MyGrpArray, vector<int> & GlobalArray);    //Initialize all the array created
-void CheckMakeArrayPixelXList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray);
-
-
+void InversePixelIDLoop (binary_type* MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);  //Make MyGrpArray when tag is !pixelID
+void PixelIDLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void InversePixelIDList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void PixelIDList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void InversePixelXLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void PixelXLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void InversePixelXList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void PixelXList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void InversePixelYLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+void PixelYLoop  (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+void InversePixelYList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+void PixelYList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+void InverseTbinLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+void TbinLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number);
+void InverseTbinList  (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+void TbinList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number); 
+ 
 /*********************************
 /SnsHistogramRetriever constructor
 `/*********************************/
@@ -277,7 +290,7 @@ void DefinitionParametersFunction(vector<string> Def, int HowManyDef, vector<Grp
     }
 #endif  
 
-  //find out first if it's a loop or a (....)
+  //find out first if it's a loop or a list of identifiers
   for (int i =0; i<HowManyDef;i++)
     {
       if (Def[i].find("loop") < Def[i].size()) 
@@ -358,12 +371,7 @@ void ParseGrp_Value(string& def, int i, vector<Grp_parameters> & GrpPara)
     }
 
 #ifdef RETRIEVER_DEFINITION_TEST
-  cout << endl << "Def["<<i<<"], list of values from list of identifiers: " << endl;
-
-   for (int j=0; j<GrpPara[i].value.size(); j++)
-    {
-      cout << "   GrpPara.value["<<i<<"]= " << GrpPara[i].value[j]<<endl;
-    }
+  checkGrpParaValue(i, GrpPara);
 #endif
 
   return;
@@ -407,8 +415,8 @@ void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArra
   
 //Parse Global Array
 
- //remove square braces
-  LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
+//remove square braces
+LocGlobArray[i]=LocGlobArray[i].substr(1,LocGlobArray[i].size()-2);
   
 #ifdef RETRIEVER_DECLARATION_TEST
      cout << "   LocGlobArray[" << i << "]= " << LocGlobArray[i]<<endl;   
@@ -429,6 +437,9 @@ void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArra
       ++b;
     }
 #ifdef RETRIEVER_DECLARATION_TEST
+  checkDeclaration(LocalArray, GlobalArray);
+
+  /*
   cout << endl << "Parsing of values: " << endl;
   cout << "   Local array" << endl;
 
@@ -443,7 +454,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArra
     {
       cout << "      GlobalArray["<<k<<"]= "<<GlobalArray[k];
     }
-
+  */
 #endif
 
  return;
@@ -552,20 +563,20 @@ void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArra
 	  MakeArray_pixelX(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray, GrpPara);
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELX_LIST
-      CheckMakeArrayPixelXList (i, GlobalArray, MyGrpArray[i], "PIXELX");
+      CheckMakeArrayPixelList (i, GlobalArray, MyGrpArray[i], "PIXELX");
 #endif
 	}
       else if (Tag[i]=="pixelY")
 	{
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELY_LIST
-      CheckMakeArrayPixelXList (i, GlobalArray, MyGrpArray[i], "PIXELYbefore");
+      CheckMakeArrayPixelList (i, GlobalArray, MyGrpArray[i], "PIXELYbefore");
 #endif
 
 	  MakeArray_pixelY(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray, GrpPara);
 
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELY_LIST
-      CheckMakeArrayPixelXList (i, GlobalArray, MyGrpArray[i], "PIXELY");
+      CheckMakeArrayPixelList (i, GlobalArray, MyGrpArray[i], "PIXELY");
 #endif
 	}
       else if (Tag[i]=="Tbin")
@@ -573,7 +584,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArra
 	  MakeArray_Tbin(MyGrpArray[i],BinaryArray,i,InverseDef[i], Def, LocalArray, GlobalArray, GrpPara);
 
 #ifdef RETRIEVER_MAKE_ARRAY_TBIN_LIST
-      CheckMakeArrayPixelXList (i, GlobalArray, MyGrpArray[i], "TBIN");
+      CheckMakeArrayPixelList (i, GlobalArray, MyGrpArray[i], "TBIN");
 #endif
 	}
       else if (Tag[i]=="*")
@@ -581,7 +592,7 @@ void ParseDeclarationArray(vector<string>& LocGlobArray, vector<int> & LocalArra
 	  MakeArray_Everything(MyGrpArray[i],BinaryArray, LocalArray, GlobalArray);
 
 #ifdef RETRIEVER_EVERYTHING
-      CheckMakeArrayPixelXList (i, GlobalArray, MyGrpArray[i], "EVERYTHING");
+      CheckMakeArrayPixelList (i, GlobalArray, MyGrpArray[i], "EVERYTHING");
 #endif
 
 	}
@@ -611,30 +622,17 @@ for (int i=0; i<GrpPriority.size();++i)
   int GrpPriority_size = GrpPriority.size();   //number of grp
 
 #ifdef RETRIEVER_MAKE_PRIORITIES
-      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
-
-      for (int j=0; j<GrpPriority_size;j++)
-	{
-	  if (GrpPriority[j]>-1)
-	    {
-	      cout << "   Grp["<<j<<"]/Pri#"<<GrpPriority[j];
-	    }
-	  else
-	    {
-	      cout << "   Grp["<<j<<"]/Pri#"<<GrpPriority[j]+1<<" ==>Done!"<<endl;
-	    }
-	}
-
-      cout << endl;
-
+  checkMakePriorities(GrpPriority, GrpPriority_size);
 #endif
 
   while (GrpPriority_size > 1)     //as long as we have more than just one array
-    {for (int i=0; i<GrpPriority_size;++i)   
+    {
+      for (int i=0; i<GrpPriority_size;++i)   
       {
        //find position of first group with the highest priority
 	  if (GrpPriority[i] == CurrentPriority)
-	    {//check if it's the last one
+	    {
+	      //check if it's the last one
 	      if (i == GrpPriority_size-1)
 		{
 		  --GrpPriority[i];
@@ -643,8 +641,9 @@ for (int i=0; i<GrpPriority.size();++i)
 	      else
 		{
 		  //check if the next operator has the same priority
-		      if ((OpePriority[i] == GrpPriority[i]) && (GrpPriority[i+1] == GrpPriority[i]))
-		       {//do calculation according to Ope[i]
+		  if ((OpePriority[i] == GrpPriority[i]) && (GrpPriority[i+1] == GrpPriority[i]))
+		   {
+		     //do calculation according to Ope[i]
 
 #ifdef RETRIEVER_MAKE_PRIORITIES
 		      cout << endl << "****RETRIEVER_MAKE_PRIORITIES***************************"<<endl;
@@ -653,11 +652,9 @@ for (int i=0; i<GrpPriority.size();++i)
 		      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i], LocalArray, GlobalArray, GrpPara);
 
 #ifdef RETRIEVER_MAKE_CALCULATION
-
       cout << "  #### Within Main part of program ####"<<endl<<endl;
       cout << "    MyGrpArray["<<i<<"]:"<<endl;
       view_array(GlobalArray[0], GlobalArray[1], GlobalArray[2], MyGrpArray[i]);
-
 #endif
                        if (i < GrpPriority_size-2)
 			 {  
@@ -733,35 +730,7 @@ for (int i=0; i<GrpPriority.size();++i)
 #endif  //end of OUTPUT_RESULT
 
 #ifdef RETRIEVER_FINAL_RESULT
-	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
-	  cout << endl << "Check the final NewArray: " << endl<<endl;
-
-	  int ll = 0;
-	  int mm = 0;
-          cout << "   ";
-
-	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
-	    {
-	      cout << NewArray[j] << " ";            //listing of NewArray    
-
-	      if (ll == (GlobalArray[2]-1))
-		{
-		  cout << endl << "   ";  
-		  ll = 0;
-		  ++mm;
-		}
-	      else
-		{
-		  ++ll;
-		}
-	      if (mm == (GlobalArray[1]))
-		{
-		  cout << endl;    
-		  cout << "   ";
-		  mm = 0;
-		}
-	    } 
-
+      CheckMakeArrayPixelList (i, GlobalArray, MyGrpArray[i], "FINAL");
 #endif
   
    delete[] MyGrpArray;  
@@ -792,7 +761,7 @@ int FindMaxPriority (vector<int>& GrpPriority)
 {
   string loop="loop";
 
-if (Def[grp_number][0] == loop[0]) 
+  if (Def[grp_number][0] == loop[0])  //case with loop
  {
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID
       cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID***************************************" << endl;
@@ -801,98 +770,30 @@ if (Def[grp_number][0] == loop[0])
       cout << "  GrpPara["<<grp_number<<"].last= "<<GrpPara[grp_number].last<<endl; 
       cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl;
 #endif
-
-      if (InverseDef==1)    //case inverse
-     {
-
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
       
-       for (int i=GrpPara[grp_number].init;i<=GrpPara[grp_number].last;i=i+GrpPara[grp_number].increment)
-        {
-          for (int tbin=0; tbin < GlobalArray[2];tbin++)
-	    {
-            MyGrpArray[i*GlobalArray[2]+tbin]=0;
-	    }
-        }
-     }
-      else   //normal case
-     {
-        for (int i=GrpPara[grp_number].init;i<=GrpPara[grp_number].last;i=i+GrpPara[grp_number].increment)
-        {
-          for (int tbin=0; tbin < GlobalArray[2];tbin++)
-	    {
-            MyGrpArray[i*GlobalArray[2]+tbin]=BinaryArray[i*GlobalArray[2]+tbin];
-	    }
-        }
-     }
+      if (InverseDef==1)    //case inverse for loop
+	{
+	  InversePixelIDLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+	}
+      else   //normal case for loop
+	{
+	  PixelIDLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+	}
  }
  else   //case with list of identifiers
- {
-      if (InverseDef==1)   //case inverse
-	{
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	  for (int j=0; j<GrpPara[grp_number].value.size();j++)
-	   {
-	   for (int tbin=0; tbin < GlobalArray[2]; tbin++)
-	     {
-	       MyGrpArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin]=0;
-	     }
-	   }
-	}
-      else
-	{
-         for (int j=0; j<GrpPara[grp_number].value.size();j++)
-	   {
-	   for (int tbin=0; tbin < GlobalArray[2]; tbin++)
-	     {
-	     MyGrpArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin]=BinaryArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin];
-             }
-	   }
-	}
- }
-
+   {
+     if (InverseDef==1)   //case inverse for list
+       {
+	 InversePixelIDList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+       }
+     else   //normal case for list
+       {
+	 PixelIDList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+       }
+   }
  
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELID_LIST
-	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
-	  cout << endl << "Check if MyGrpArray in Make_PixelID is correct: " << endl;
-
-	  int ll = 0;
-	  int mm = 0;
-	  cout << "   ";
-
-	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)  
-	    {
-	      cout << MyGrpArray[j] << " ";            //listing of MyGrpArray    
-      
-	      if (ll == (GlobalArray[2]-1))
-		{
-		  cout << endl << "   ";
-		  ll = 0;
-		  ++mm;
-		}
-	      else
-		{
-		  ++ll;
-		}
-	      if (mm == (GlobalArray[1]))
-		{
-		  cout << endl << "   ";
-		  mm = 0;
-		}
-	    } 
+      CheckMakeArrayPixelList (1, GlobalArray, MyGrpArray, "PIXELID");
 #endif
 
   return;
@@ -915,94 +816,38 @@ void MakeArray_pixelX (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
       cout << "  GrpPara["<<grp_number<<"].last= "<<GrpPara[grp_number].last<<endl; 
       cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl<<endl;
 #endif
-      if (InverseDef==1)   //case inverse
+      if (InverseDef==1)   //case inverse with loop
 	{
-
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	  for (int y=0; y<GlobalArray[0];y++)
-	    {
-	      for (int x = GrpPara[grp_number].init; x <= GrpPara[grp_number].last; x = x + GrpPara[grp_number].increment)
-		{
-		  for (int tbin=0; tbin < GlobalArray[2];tbin++)
-		    {
-		      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
-		    }
-		} 
-	    }
+	  InversePixelXLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
-      else   //normal case
+      else   //normal case with loop
 	{
-	  for (int y=0; y<GlobalArray[0];y++)
-	    {
-	      for (int x = GrpPara[grp_number].init; x <= GrpPara[grp_number].last; x = x + GrpPara[grp_number].increment)
-		{
-		  for (int tbin=0; tbin < GlobalArray[2];tbin++)
-		    {
-		      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
-		    }
-		} 
-	    }
+	  PixelXLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
     }  
-
-  else
-    {
-      
+    else
+      {
+	
 #ifdef RETRIEVER_MAKE_ARRAY_PIXELX
-      cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELX****************************************" << endl;
-      cout << endl<<"List of identifiers values are: " <<endl;
-      for (int i=0;i<GrpPara[grp_number].value.size();i++)
-	{
-	  cout << "   GrpPara["<<grp_number<<"].value["<<i<<"]= "<<GrpPara[grp_number].value[i]<<endl;
-	}
-      cout << endl;
+	cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELX****************************************" << endl;
+	cout << endl<<"List of identifiers values are: " <<endl;
+	for (int i=0;i<GrpPara[grp_number].value.size();i++)
+	  {
+	    cout << "   GrpPara["<<grp_number<<"].value["<<i<<"]= "<<GrpPara[grp_number].value[i]<<endl;
+	  }
+	cout << endl;
 #endif
-
-      if(InverseDef==1) //case inverse
+	
+	if(InverseDef==1) //case inverse with list
+	  {
+	    InversePixelXList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+	  }
+      else   //normal case with list
 	{
-
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	  for (int y=0; y<GlobalArray[0];y++)
-	    {
-	    for (int x=0; x < GrpPara[grp_number].value.size(); x++)
-	      {
-	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
-		{
-		  MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
-		}
-	      }
-	    }
- 	 }
-      else   //normal case
-	{
-      for (int y=0; y<GlobalArray[0];y++)
-	{
-	  for (int x=0; x < GrpPara[grp_number].value.size(); x++)
-	    {
-	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
-		{
-		  MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
-
-		}
-	    }
-	 }
+	  PixelXList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+	}
       }
-    }
-  return;
+    return;
 }
 
 /*******************************************
@@ -1023,43 +868,15 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
       cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl<<endl;
 #endif
 
-      if (InverseDef==1)  //inverse case
+      if (InverseDef==1)  //inverse case for loop
 	{
-
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	  for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = y + GrpPara[grp_number].increment)
-	    {
-	      for (int x = 0; x < GlobalArray[1]; ++x)
-		{
-		  for (int tbin=0; tbin < GlobalArray[2];tbin++)
-		    {
-		      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
-		    }
-		} 
-	    }
+	  InversePixelYLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
-      else  //normal case
+      else  //normal case for loop
 	{
-   for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = y + GrpPara[grp_number].increment)
-     {
-       for (int x = 0; x < GlobalArray[1]; ++x)
-         {
-           for (int tbin=0; tbin < GlobalArray[2];tbin++)
-             {
-	   MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
-	     }
-	 } 
-      }
-     }
+	  PixelYLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
+	}
     }
-
   else
     {
       
@@ -1075,44 +892,16 @@ void MakeArray_pixelY (binary_type* MyGrpArray, binary_type* BinaryArray,int grp
 
 #endif
 
-      if (InverseDef==1)   //case inverse
+      if (InverseDef==1)   //case inverse with list
 	{
-
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	 for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
-	{
-	  for (int x=0; x < GlobalArray[1]; x++)
-	    {
-	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
-		{
-		  MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])]=0;
-		}
-	     }
-	  } 
+	  InversePixelYList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
       else    //normal case
 	{
-      for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
-	{
-	  for (int x=0; x < GlobalArray[1]; x++)
-	    {
-	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
-		{
-	         MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])]= 
-                   BinaryArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])];
-		}
-	    }
+	  PixelYList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
-      }
     }
-  return;
+    return;
 }
 
 /*******************************************
@@ -1133,47 +922,18 @@ void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_n
       cout << "  GrpPara["<<grp_number<<"].increment= "<<GrpPara[grp_number].increment<<endl<<endl;
 #endif
 
-      if (InverseDef ==1)  //case inverse
+      if (InverseDef ==1)  //case inverse with loop
 	{
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	  for (int y=0; y < GlobalArray[0]; ++y )
-	    {
-	      for (int x = 0; x < GlobalArray[1]; ++x)
-		{
-		  for (int tbin=GrpPara[grp_number].init; tbin <= GrpPara[grp_number].last; tbin = tbin + GrpPara[grp_number].increment)
-		    {
-		      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
-		    }
-		} 
-	    }
+	  InverseTbinLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
-      else   //normal case
+      else   //normal case with loop
 	{
-	  for (int y=0; y < GlobalArray[0]; ++y )
-	    {
-	      for (int x = 0; x < GlobalArray[1]; ++x)
-		{
-		  for (int tbin=GrpPara[grp_number].init; tbin <= GrpPara[grp_number].last; tbin = tbin + GrpPara[grp_number].increment)
-		    {
-		      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
-			BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
-		    }
-		} 
-	    }
+	  TbinLoop (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
     }
-  
     else
-    
-    {
-      
+      {
+	
 #ifdef RETRIEVER_MAKE_ARRAY_TBIN
       cout << endl << "****RETRIEVER_MAKE_ARRAY_TBIN****************************************" << endl;
       cout << endl<<"List of identifiers values are: " <<endl;
@@ -1185,44 +945,16 @@ void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_n
       cout << endl;
 
 #endif
-
-      if (InverseDef==1)
+      
+      if (InverseDef==1)  //case inverse with list
 	{
-	  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
-	    {
-	      for (int k=0; k<GlobalArray[2];k++)
-		{
-		  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
-		}
-	    }
-
-	 for (int y=0; y < GlobalArray[0]; ++y)
-	{
-	  for (int x=0; x < GlobalArray[1]; x++)
-	    {
-	      for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
-		{
-		  MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]]=0;
-	        }
-	    }
-	  } 
+	  InverseTbinList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
-      else
+      else  //normal case with list
 	{
-
-       for (int y=0; y < GlobalArray[0]; ++y)
-	{
-	  for (int x=0; x < GlobalArray[1]; x++)
-	    {
-	      for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
-		{
-		  MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]]= 
-		    BinaryArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]];
-	        }
-	    }
+	  TbinList (MyGrpArray, BinaryArray, GlobalArray, GrpPara, grp_number);
 	}
-    }
-  }
+      }
 
   return;
 }
@@ -1232,19 +964,17 @@ void MakeArray_Tbin (binary_type* MyGrpArray, binary_type* BinaryArray,int grp_n
 /*******************************************/
 void  MakeArray_Everything (binary_type* MyGrpArray, binary_type* BinaryArray, vector<int> & LocalArray, vector<int> & GlobalArray)
 {
-
- for (int y=0; y<GlobalArray[0];y++)
-   {
-   for (int x=0; x<GlobalArray[1]; x++)
-     {
-     for (int tbin=0;tbin<GlobalArray[2];tbin++)
-       {
-	MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
-	  BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
-       }	     
-     }
-   }
-
+  for (int y=0; y<GlobalArray[0];y++)
+    {
+      for (int x=0; x<GlobalArray[1]; x++)
+	{
+	  for (int tbin=0;tbin<GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
+		BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	    }	     
+	}
+    }
   return ;
 }
 
@@ -1276,10 +1006,10 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2, string Opera
       cout << "==> Operator OR"<<endl;
 #endif
     
-     for (int y=0; y<GlobalArray[0];y++)
-	 {
+      for (int y=0; y<GlobalArray[0];y++)
+	{
 	  for (int x=0; x<GlobalArray[1]; x++)
-	     {
+	    {
 	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
 		{	  
 		  if ((GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]==0)&&
@@ -1289,9 +1019,9 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2, string Opera
 			GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
 		    }
 	        }
-	     }
-	 }
-
+	    }
+	}
+      
 #ifdef RETRIEVER_MAKE_CALCULATION_OR
      
      cout << "  --AFTER--"<<endl<<endl;
@@ -1323,19 +1053,19 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2, string Opera
 
       for (int y=0; y<GlobalArray[0];y++)
 	{
-	 for (int x=0; x<GlobalArray[1]; x++)
-	     {
+	  for (int x=0; x<GlobalArray[1]; x++)
+	    {
 	      for (int tbin=0;tbin<GlobalArray[2];tbin++)
 		{
 		  if (GrpArray2[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]!=
-		        GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])])
+		      GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])])
 		    {
 		      GrpArray1[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
 		    }	     
 		}
-	     }
-	 }
-
+	    }
+	}
+      
 #ifdef RETRIEVER_MAKE_CALCULATION_AND
 
       cout << "  --AFTER--"<<endl<<endl;
@@ -1348,7 +1078,6 @@ void DoCalculation (binary_type* GrpArray1, binary_type* GrpArray2, string Opera
   return;
 }
 
-#ifdef SWAP_ENDIAN
 /*******************************************
 /To swap from little endian to big endian
 /*******************************************/
@@ -1359,50 +1088,356 @@ inline void endian_swap (binary_type& x)
     ((x>>8) & 0x0000FF00) |
     (x<<24);
 }
-#endif
-
-/*******************************************
-/Print array for testing purpose
-/*******************************************/
-void view_array(int & x, int & y, int & z, binary_type * MyGrpArray)
-{
-   for (int a=0; a<y;++a)
-	{
-	  for (int b=0; b<x;++b)
-	    {
-	      for (int c=0; c<z;++c)
-		{
-		  cout << MyGrpArray[c+b*y*z+a*z];
-		  
-		  cout << " ";
-		}
-	      cout << "\t";
-	    }
-	  cout << endl;
-	}
-      cout << endl;
-	 
-      return;
-}
 
 /*******************************************
 /Initialize the array
 /*******************************************/
 void InitializeArray(binary_type * MyGrpArray, vector<int> & GlobalArray)
 {
-   for (int a=0; a<GlobalArray[1];++a)
+  for (int a=0; a<GlobalArray[1];++a)
+    {
+      for (int b=0; b<GlobalArray[0];++b)
 	{
-	  for (int b=0; b<GlobalArray[0];++b)
+	  for (int c=0; c<GlobalArray[2];++c)
 	    {
-	      for (int c=0; c<GlobalArray[2];++c)
-		{
-		  MyGrpArray[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]]=0;
-		}
+	      MyGrpArray[c+b*GlobalArray[1]*GlobalArray[2]+a*GlobalArray[2]]=0;
 	    }
-	}  
-   return;   
- }
+	}
+    }  
+  return;   
+}
 
+/*******************************************
+/Calculate MyGrpArray for !pixelID with grp
+/*******************************************/
+void InversePixelIDLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int i=GrpPara[grp_number].init;i<=GrpPara[grp_number].last;i=i+GrpPara[grp_number].increment)
+    {
+      for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+tbin]=0;
+	}
+    }
+  return;
+}
 
+/*******************************************
+/Calculate MyGrpArray for pixelID with grp
+/*******************************************/
+void PixelIDLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int i=GrpPara[grp_number].init;i<=GrpPara[grp_number].last;i=i+GrpPara[grp_number].increment)
+    {
+      for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+tbin]=BinaryArray[i*GlobalArray[2]+tbin];
+	}
+    }
+  return;
+}
 
+/*******************************************
+/Calculate MyGrpArray for !pixelID with list
+/*******************************************/
+void InversePixelIDList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int j=0; j<GrpPara[grp_number].value.size();j++)
+    {
+      for (int tbin=0; tbin < GlobalArray[2]; tbin++)
+	{
+	  MyGrpArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin]=0;
+	}
+    }
+  return;
+}
 
+/*******************************************
+/Calculate MyGrpArray for pixelID with list
+/*******************************************/
+void PixelIDList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int j=0; j<GrpPara[grp_number].value.size();j++)
+    {
+      for (int tbin=0; tbin < GlobalArray[2]; tbin++)
+	{
+	  MyGrpArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin]=BinaryArray[GrpPara[grp_number].value[j]*GlobalArray[2]+tbin];
+	}
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for !pixelX with loop
+/*******************************************/
+void InversePixelXLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int y=0; y<GlobalArray[0];y++)
+    {
+      for (int x = GrpPara[grp_number].init; x <= GrpPara[grp_number].last; x = x + GrpPara[grp_number].increment)
+	{
+	  for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+	    }
+	} 
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for pixelX with loop
+/*******************************************/
+void PixelXLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int y=0; y<GlobalArray[0];y++)
+    {
+      for (int x = GrpPara[grp_number].init; x <= GrpPara[grp_number].last; x = x + GrpPara[grp_number].increment)
+	{
+	  for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	    }
+	} 
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for !pixelX with list
+/*******************************************/
+void InversePixelXList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int y=0; y<GlobalArray[0];y++)
+    {
+      for (int x=0; x < GrpPara[grp_number].value.size(); x++)
+	{
+	  for (int tbin=0;tbin<GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+	    }
+	}
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for pixelX with list
+/*******************************************/
+void PixelXList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number)
+{
+  for (int y=0; y<GlobalArray[0];y++)
+    {
+      for (int x=0; x < GrpPara[grp_number].value.size(); x++)
+	{
+	  for (int tbin=0;tbin<GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	    }
+	}
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for !pixelY with loop
+/*******************************************/
+void InversePixelYLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = y + GrpPara[grp_number].increment)
+    {
+      for (int x = 0; x < GlobalArray[1]; ++x)
+	{
+	  for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+	    }
+	} 
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for pixelY with loop
+/*******************************************/
+void PixelYLoop  (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = y + GrpPara[grp_number].increment)
+    {
+      for (int x = 0; x < GlobalArray[1]; ++x)
+	{
+	  for (int tbin=0; tbin < GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	    }
+	} 
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for !pixelY with list
+/*******************************************/
+void InversePixelYList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
+    {
+      for (int x=0; x < GlobalArray[1]; x++)
+	{
+	  for (int tbin=0;tbin<GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])]=0;
+	    }
+	}
+    } 
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for pixelY with list
+/*******************************************/
+void PixelYList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
+    {
+      for (int x=0; x < GlobalArray[1]; x++)
+	{
+	  for (int tbin=0;tbin<GlobalArray[2];tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])]= 
+		BinaryArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*GlobalArray[2]*GlobalArray[1])];
+	    }
+	}
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for !Tbin with loop
+/*******************************************/
+void InverseTbinLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int y=0; y < GlobalArray[0]; ++y )
+    {
+      for (int x = 0; x < GlobalArray[1]; ++x)
+	{
+	  for (int tbin=GrpPara[grp_number].init; tbin <= GrpPara[grp_number].last; tbin = tbin + GrpPara[grp_number].increment)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+	    }
+	} 
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for Tbin with loop
+/*******************************************/
+void TbinLoop (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int y=0; y < GlobalArray[0]; ++y )
+    {
+      for (int x = 0; x < GlobalArray[1]; ++x)
+	{
+	  for (int tbin=GrpPara[grp_number].init; tbin <= GrpPara[grp_number].last; tbin = tbin + GrpPara[grp_number].increment)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
+		BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+	    }
+	} 
+    }
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for !Tbin with list
+/*******************************************/
+void InverseTbinList  (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+    {
+      for (int k=0; k<GlobalArray[2];k++)
+	{
+	  MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
+	}
+    }
+  for (int y=0; y < GlobalArray[0]; ++y)
+    {
+      for (int x=0; x < GlobalArray[1]; x++)
+	{
+	  for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]]=0;
+	    }
+	}
+    } 
+  return;
+}
+
+/*******************************************
+/Calculate MyGrpArray for Tbin with list
+/*******************************************/
+void TbinList (binary_type * MyGrpArray, binary_type * BinaryArray, vector<int> & GlobalArray, vector<Grp_parameters> & GrpPara, int grp_number) 
+{
+  for (int y=0; y < GlobalArray[0]; ++y)
+    {
+      for (int x=0; x < GlobalArray[1]; x++)
+	{
+	  for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
+	    {
+	      MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]]= 
+		BinaryArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+y*GlobalArray[2]*GlobalArray[1]];
+	    }
+	}
+    }
+  return;
+}
