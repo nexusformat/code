@@ -237,6 +237,14 @@ static Node convertFromNumeric(const Node &node, vector<int> &dims, const string
     worked=void_copy::from_float(((float*)(node.data())),value,tot_num,copy_type);
   else if(source_type==Node::FLOAT64)
     worked=void_copy::from_double(((double*)(node.data())),value,tot_num,copy_type);
+  else if(source_type==Node::INT16)
+    worked=void_copy::from_short(((short int*)(node.data())),value,tot_num,copy_type);
+  else if(source_type==Node::INT32)
+    worked=void_copy::from_int(((int*)(node.data())),value,tot_num,copy_type);
+  else if(source_type==Node::UINT16)
+    worked=void_copy::from_ushort(((unsigned short int*)(node.data())),value,tot_num,copy_type);
+  else if(source_type==Node::UINT32)
+    worked=void_copy::from_uint(((unsigned int*)(node.data())),value,tot_num,copy_type);
   // ---------- add code here to work with other types
 
   // error out if the cast did not work
