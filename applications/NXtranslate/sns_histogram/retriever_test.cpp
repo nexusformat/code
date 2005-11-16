@@ -17,45 +17,49 @@ void checkDeclaration(vector<int> & LocalArray, vector<int> & GlobalArray);
 
 void CheckMakeArrayPixelList (int i, vector<int> & GlobalArray, binary_type * MyGrpArray, string str)
 {
-
-    if (str == "PIXELX")
+  if (str == "PIXELX")
     {
-	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELX_LIST****************************************"<<endl;
-	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelX in CalculateArray is correct: " << endl;
+      cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELX_LIST****************************************"<<endl;
+      cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelX in CalculateArray is correct: " << endl;
     }
   else if (str == "PIXELY")
     {
-          cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
-	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelY in CalculateArray is correct: " << endl;
+      cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
+      cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_pixelY in CalculateArray is correct: " << endl;
     }
-    else if (str == "PIXELYbefore")
+  else if (str == "PIXELYbefore")
     {
-          cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
-	  cout << endl << "Check if MyGrpArray["<<i<<"] before MakeArray_pixelY in CalculateArray is correct: " << endl;
+      cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELY_LIST****************************************"<<endl;
+      cout << endl << "Check if MyGrpArray["<<i<<"] before MakeArray_pixelY in CalculateArray is correct: " << endl;
     }
-    else if (str == "TBIN")
+  else if (str == "TBIN")
     {
-	  cout << endl << "****RETRIEVER_MAKE_ARRAY_TBIN_LIST****************************************"<<endl;
-	  cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_Tbin in CalculateArray is correct: " << endl;
+      cout << endl << "****RETRIEVER_MAKE_ARRAY_TBIN_LIST****************************************"<<endl;
+      cout << endl << "Check if MyGrpArray["<<i<<"] after MakeArray_Tbin in CalculateArray is correct: " << endl;
     }
-    else if (str == "EVERYTHING")
+  else if (str == "EVERYTHING")
     {
-	  cout << endl << "****RETRIEVER_EVERYTHING****************************************";
-	  cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
+      cout << endl << "****RETRIEVER_EVERYTHING****************************************";
+      cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl<<endl;
     }
-    else if (str == "FINAL")
+  else if (str == "FINAL")
     {
-	  cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
-	  cout << endl << "Check the final NewArray: " << endl<<endl;
+      cout << endl << "****RETRIEVER_FINAL_RESULT****************************************";
+      cout << endl << "Check the final NewArray: " << endl<<endl;
     }
-    else if (str == "PIXELID")
+  else if (str == "PIXELID")
     {
-	  cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
-	  cout << endl << "Check if MyGrpArray in Make_PixelID is correct: " << endl;
+      cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
+      cout << endl << "Check if MyGrpArray in Make_PixelID is correct: " << endl;
     }
-
-	  int ll = 0;
-	  int mm = 0;
+  else if (str == "PIXELIDbefore")
+    {
+      cout << endl << "****RETRIEVER_MAKE_ARRAY_PIXELID_LIST*******************************"<<endl;;
+      cout << endl << "Check if MyGrpArray["<<i<<"] in CalculateArray is correct: " << endl;
+    }
+  
+  int ll = 0;
+  int mm = 0;
           cout << "   ";
 
 	  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
