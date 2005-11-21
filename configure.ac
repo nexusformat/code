@@ -90,7 +90,7 @@ else
 fi
 
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
-	[], [with_f90=yes])
+	[], [with_f90=no])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
 		AC_CHECK_PROGS(FC, [f90 f95 ifort])
