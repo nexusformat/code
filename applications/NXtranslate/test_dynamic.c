@@ -4,14 +4,14 @@
  * test/example program for NXtranslate DynamicRetriever class
  * implements functions required by dynamic_retriever.h
  *
- * build shaed library with 
+ * build shared library with 
  *
  *                 gcc -shared -o test_dynamic.so test_dynamic.c
  *
  * and then use
  *                 "dynamic/test_dynamic.so"
  *
- * as the NXtranslate mime type to activate it.
+ * as the NXtranslate NXS:mime_type to activate it.
  *
  * Freddie Akeroyd, CCLRC ISIS Facility <F.A.Akeroyd@rl.ac.uk>
  *

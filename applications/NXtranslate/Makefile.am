@@ -31,8 +31,12 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
-SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs 
-SUBDIRS+= FRM2
+
+if HAVE_OPENGENIE
+GENIESUBDIR=opengenie
+endif
+SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs \
+	FRM2 $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
@@ -68,6 +72,10 @@ test_dynamic.nxs: nxtranslate test_dynamic.xml test_dynamic.so
 test_dynamic.so : test_dynamic.c
 	gcc -I$(top_srcdir)/include -shared -o $@ test_dynamic.c
 
+test_opengenie.nxs: nxtranslate test_opengenie.xml
+	ln -sf ./opengenie/.libs/libnxgenie.so .
+	env LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:@OPENGENIEROOT@/genie:. GENIE_SMALLTALK_IMAGE=@OPENGENIEROOT@/genie/genie.im ./nxtranslate test_opengenie.xml
+
 test_simple.nxs: nxtranslate test_simple.xml
 	./nxtranslate test_simple.xml
 
@@ -87,14 +95,3 @@ test-clean:
 	rm -f $(TEST_RESULT)
 
 
-#<<<<<<< Makefile.am
-#	IPNS_CPP/ipns_retriever.cpp text_plain/text_retriever.cpp \
-#=======
-#>>>>>>> 1.15
-#<<<<<<< Makefile.am
-#	text_plain/retriever.h IPNS_CPP/ipns_retriever.h tree.hh \
-#	FRM2/frm2_retriever.h FRM2/frm2_retriever.cpp FRM2/string_util_ext.cpp \
-#	FRM2/string_util_ext.h 
-
-#nxtranslate_LDADD = IPNS_CPP/libIPNSRunfile.la $(LIBNEXUS) -lxml2 
-#=======
