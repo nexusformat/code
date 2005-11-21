@@ -152,7 +152,7 @@ endif
 if HAVE_F90
 NXtest_SOURCES = NXtest.f90
 NXtest_LDADD = $(LIBNEXUS90)
-NXtest_LINK = $(F90LINK)
+NXtest_LINK = $(FCLINK)
 else
 NXtest_SOURCES = dummy.c
 NXtest_LINK = $(LINK)

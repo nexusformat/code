@@ -33,19 +33,19 @@ libNeXus90_la_SOURCES = NXmodule.f90 NXUmodule.f90
 libNeXus90_la_LIBADD = $(top_builddir)/bindings/f77/libNeXus77.la \
 			$(top_builddir)/src/libNeXus.la
 libNeXus90_la_LDFLAGS = @SHARED_LDFLAGS@ $(LDFLAGS)
-libNeXus90_la_LINK = $(F90LINK)
+libNeXus90_la_LINK = $(FCLINK)
 
 NXUmodule.o: NXUmodule.f90 NXmodule.o
 
 # This is needed as f90 is not supported as a valid tag in libtool
 # and the relink command (used during an install) which is written to
 # libNeXus90.la will not work. 
-all: all-am libNeXus90.la_orig
+#all: all-am libNeXus90.la_orig
 
-libNeXus90.la_orig: libNeXus90.la
-	mv libNeXus90.la $@
-	sed -e 's/--mode=relink/--mode=relink @LTF90LINKTAG@/' < $@ > libNeXus90.la
-	touch $@
+#libNeXus90.la_orig: libNeXus90.la
+#	mv libNeXus90.la $@
+#	sed -e 's/--mode=relink/--mode=relink @LTF90LINKTAG@/' < $@ > libNeXus90.la
+#	touch $@
 
 include $(top_srcdir)/build_rules.am
 

@@ -93,22 +93,21 @@ AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FO
 	[], [with_f90=yes])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(F90, [f90 f95 ifort])
+		AC_CHECK_PROGS(FC, [f90 f95 ifort])
 	else
-		AC_CHECK_PROGS(F90, ["$with_f90"])
+		AC_CHECK_PROGS(FC, ["$with_f90"])
 	fi
 	dnl f90 has a "module path" option - hard to get as you really need a
 	dnl ready compiled module to point the option at so for now we are just
 	dnl check that the option takes a directory and the compiler works
 	mytop=`pwd`
-	F90FLAGS="$F90FLAGS -I$mytop/bindings/f90"
+	FCFLAGS="$FCFLAGS -I$mytop/bindings/f90"
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-qextname])
-	AC_SUBST(F90)
-	AC_SUBST(F90FLAGS)
+	AC_FC_LIBRARY_LDFLAGS
 else
-	F90=
+	FC=
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [], [with_swig=no])
@@ -206,15 +205,15 @@ fi
 
 dnl These are used in build_rules.am to pass any approptiate 
 dnl tag to libtool for f90 building
-if test `$EGREP "available_tags=.*F77" libtool | wc -l` -gt 0; then
-    LTF90COMPILETAG="--tag=F77"
-    LTF90LINKTAG="--tag=CC"
-else
-    LTF90COMPILETAG=""
-    LTF90LINKTAG=""
-fi
-AC_SUBST(LTF90COMPILETAG)
-AC_SUBST(LTF90LINKTAG)
+#if test `$EGREP "available_tags=.*F77" libtool | wc -l` -gt 0; then
+#    LTF90COMPILETAG="--tag=F77"
+#    LTF90LINKTAG="--tag=CC"
+#else
+#    LTF90COMPILETAG=""
+#    LTF90LINKTAG=""
+#fi
+#AC_SUBST(LTF90COMPILETAG)
+#AC_SUBST(LTF90LINKTAG)
 
 dnl
 dnl First any host specific bits
@@ -253,10 +252,10 @@ dnl does not get set with the commands to create a shared library
 	chmod +x libtool
 	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
-	F90FLAGS="$F90FLAGS -qextname"
+	FCFLAGS="$FCFLAGS -qextname"
 	SHARED_LDFLAGS="-Wl,-single_module"
-	LTF90COMPILETAG="--tag=F77"
-	LTF90LINKTAG="--tag=CC"
+#	LTF90COMPILETAG="--tag=F77"
+#	LTF90LINKTAG="--tag=CC"
 dnl	LDFLAGS="$LDFLAGS -flat_namespace"
 dnl     if $CC -dumpspecs 2>&1 | grep 'single_module' >/dev/null ; then
 dnl           lt_int_apple_cc_single_mod=yes
@@ -277,6 +276,7 @@ dnl
 dnl first see if one has been given
 dnl
 H4ROOT=""
+H4SUBROOT=""
 H5ROOT=""
 MXMLROOT=""
 AC_SUBST(H4ROOT)
@@ -303,6 +303,10 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     for i in $HDF4SEARCH; do
 	if test -z "$H4ROOT" -a -r ${i}/lib/libdf.$HDF_EXT; then H4ROOT=$i; fi
     done
+    if test -r /usr/include/hdf/mfhdf.h; then
+	H4ROOT=/usr
+	H4SUBROOT=hdf
+    fi
     if test -z "$H4ROOT"; then 
 	AC_MSG_RESULT(unknown)
     else 
@@ -310,12 +314,12 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     fi
 fi
 if test "$H4ROOT"; then
-    H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
+    H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/${H4SUBROOT}/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
     case $H4VERSION in
 	4.[[12]]*) 
     		HDF4_LDFLAGS="-lmfhdf -ldf";
-		LDFLAGS="-L$H4ROOT/lib $LDFLAGS"
-    		HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4" ;;
+		LDFLAGS="-L$H4ROOT/lib/${H4SUBROOT} $LDFLAGS"
+    		HDF4_CPPFLAGS="-I$H4ROOT/include/${H4SUBROOT} -DHDF4" ;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
 		H4ROOT="";;
     esac		
@@ -409,7 +413,7 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
-AM_CONDITIONAL(HAVE_F90, [test ! -z "$F90"])
+AM_CONDITIONAL(HAVE_F90, [test ! -z "$FC"])
 AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
@@ -473,7 +477,7 @@ HDF4SUPPORT=`if test -n "$H4ROOT" ; then echo yes ; else echo no ; echo "       
 HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "                found version $H5VERSION"; fi`
 XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
-F90BINDING=`if test -n "$F90" ; then echo yes ; else echo no ; fi`
+F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
@@ -494,7 +498,7 @@ Configuration (NeXus):
 
         Source code location:  ${srcdir}
         Version:               ${VERSION}
-        Compiler:              ${CC},${CXX},${F77},${F90}
+        Compiler:              ${CC},${CXX},${F77},${FC}
 
 build:
         NeXus with:

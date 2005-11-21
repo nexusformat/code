@@ -27,21 +27,38 @@
 ##  For further information, see <http://www.neutron.anl.gov/NeXus/>
 ##
 ##====================================================================
-SUFFIXES = .f90 .o .java .i
-.f90.o:
-	$(F90) $(F90FLAGS) -c $<
+LTFCCOMPILE = $(LIBTOOL) --mode=compile --tag=F77 $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+FCLINK = $(LIBTOOL) --mode=link --tag=CC $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-.java.class:
-	$(JAVAC) $<
-
-.i.c:
-	$(SWIG) $(SWIGFLAGS) -o $@ $<
-
-.f90.lo:
-	$(LTF90COMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
-
-F90COMPILE = $(F90) $(AM_F90FLAGS) $(F90FLAGS)
-LTF90COMPILE = $(LIBTOOL) --mode=compile @LTF90COMPILETAG@ $(F90) $(AM_FFLAGS) $(F90FLAGS)
-F90LD = $(F90)
-F90LINK = $(LIBTOOL) --mode=link @LTF90LINKTAG@ $(F90LD) $(AM_F90FLAGS) $(F90FLAGS) \
-        $(AM_LDFLAGS) $(LDFLAGS) -o $@ $(LIBG2C)
+#SUFFIXES = .f90 .o .java .i
+#.f90.o:
+#	$(F90) $(F90FLAGS) -c $<
+#
+#.java.class:
+#	$(JAVAC) $<
+#
+#.i.c:
+#	$(SWIG) $(SWIGFLAGS) -o $@ $<
+#
+#.f90.lo:
+#	$(LTF90COMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+#
+#F90COMPILE = $(F90) $(AM_F90FLAGS) $(F90FLAGS)
+#LTF90COMPILE = $(LIBTOOL) --mode=compile @LTF90COMPILETAG@ $(F90) $(AM_FFLAGS) $(F90FLAGS)
+#F90LD = $(F90)
+#F90LINK = $(LIBTOOL) --mode=link @LTF90LINKTAG@ $(F90LD) $(AM_F90FLAGS) $(F90FLAGS) \
+#        $(AM_LDFLAGS) $(LDFLAGS) -o $@ $(LIBG2C)
+#
+#	-cpp $(AM_CPPFLAGS) -C -P $< > $*_cpp.f90
+#.f90.o :
+#	-cpp $(AM_CPPFLAGS) -C $< > $*_cpp.f90
+#	perl -p -i.bak -e 's/^\s+(\w)/$$1/' $*_cpp.f90
+#	$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c $*_cpp.f90 -o $@
+#	$(RM) $*_cpp.f90.bak
+#
+#.f90.lo :
+#	-cpp $(AM_CPPFLAGS) -C $< > $*_cpp.f90
+#	perl -p -i.bak -e 's/^\s+(\w)/$$1/' $*_cpp.f90
+#	$(LTFCCOMPILE) -c -o $@ `test -f '$*_cpp.f90' || echo '$(srcdir)/'`$*_cpp.f90
+#	$(RM) $*_cpp.f90.bak

@@ -304,7 +304,7 @@ AT_CHECK([ $HAVE_F77 && $HAVE_HDF5 && napif_test-hdf5 | sed -e 's/\r$//' ], [],
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the F90 binding using HDF5 .])
+AT_SETUP([Check the F90 binding using HDF5.])
 AT_CHECK([ $HAVE_F90 && $HAVE_HDF5 && NXtest | sed -e 's/\r$//' ], [], 
 [[ Writing character data
  Number of global attributes:  4

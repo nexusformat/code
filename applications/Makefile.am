@@ -72,10 +72,10 @@ nx2dtd_LDFLAGS = -static $(LDFLAGS)
 
 NXdump_SOURCES = NXdump.f90
 NXdump_LDADD = $(LIBNEXUS90)
-NXdump_LINK = $(F90LINK)
+NXdump_LINK = $(FCLINK)
 
 NXbrowse90_SOURCES = NXbrowse90.f90
 NXbrowse90_LDADD = $(LIBNEXUS90)
-NXbrowse90_LINK = $(F90LINK)
+NXbrowse90_LINK = $(FCLINK)
 
 include $(top_srcdir)/build_rules.am

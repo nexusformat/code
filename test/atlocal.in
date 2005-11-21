@@ -32,7 +32,7 @@ else
 fi
 export HAVE_F77
 #
-if test ! -z "@F90@"; then
+if test ! -z "@FC@"; then
     HAVE_F90=run_test
 else
     HAVE_F90=skip_test
