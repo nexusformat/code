@@ -38,5 +38,6 @@ libSNShistogram_la_SOURCES = \
         retriever.cpp retriever.h
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
+EXTRA_DIST = retriever_test.cpp
 
 include $(top_srcdir)/build_rules.am
