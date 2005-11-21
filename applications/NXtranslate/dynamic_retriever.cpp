@@ -22,6 +22,7 @@
 #define dlopen(a,b)	NULL
 #define dlsym(a,b)	NULL
 #define dlclose(a)	NULL
+#define dlerror()	"Dynamic loading not supported - no <dlfcn.h>"
 #define RTLD_NOW	2
 #endif /* HAVE_DLFCN_H */
 
@@ -38,18 +39,18 @@ DynamicRetriever::DynamicRetriever(const string &source, const string& mime_type
     m_dlhandle = dlopen(m_module_name.c_str(), RTLD_NOW);
     if (m_dlhandle == NULL)
     {
-	throw invalid_argument("Cannot load " + m_module_name);
+	throw invalid_argument("Cannot load " + m_module_name + ": " + dlerror());
     }
     // initialize and getdata are required
     m_init_func = (init_func_t)dlsym(m_dlhandle, "nxtinit");
     if (m_init_func == NULL)
     {
-	throw invalid_argument("Cannot find initialize() in " + m_module_name);
+	throw invalid_argument("Cannot find initialize() in " + m_module_name + ": " + dlerror());
     }
     m_data_func = (getData_func_t)dlsym(m_dlhandle, "nxtgetdata");
     if (m_data_func == NULL)
     {
-	throw invalid_argument("Cannot find getdata() in " + m_module_name);
+	throw invalid_argument("Cannot find getdata() in " + m_module_name + ": " + dlerror());
     }
     // freedata and cleanup are optional
     m_free_func = (free_func_t)dlsym(m_dlhandle, "nxtfreedata");
