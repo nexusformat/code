@@ -134,7 +134,7 @@ AC_DEFUN(
                        [Specify location of $1 install directory]),
 	[if test x$withval != xno; then $2=$withval; fi], 
         [])
-    if test x$withval != xno -a x[$]$2 = x; then
+    if test x$with_$1 != xno -a x[$]$2 = x; then
         AC_MSG_CHECKING(for $1 root installation directory)
         for i in $3; do
 	    if test x[$]$2 = x -a -r $i/$4; then $2=$i; fi

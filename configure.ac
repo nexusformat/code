@@ -111,6 +111,15 @@ else
 	F90=
 fi
 
+AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [], [with_swig=no])
+if test x$with_swig != xno; then
+    if test x$with_swig != xyes; then
+	SWIG=$with_swig
+    fi
+    AC_CHECK_PROGS(SWIG,[swig])
+else
+    SWIG=
+fi
 
 java_host="linux"
 javaroot=""
@@ -169,27 +178,27 @@ AC_SUBST(NXTESTDIR)
 AM_PROG_GCJ
 AM_PATH_PYTHON(,, :)
 
-AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
-AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
-AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[include/python$PYTHON_VERSION/Python.h])
-
 AC_PROG_LIBTOOL
 
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-AC_CHECK_PROGS(SWIG,[swig])
 AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
 AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
 
+AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
+AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
+AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[include/python$PYTHON_VERSION/Python.h])
+AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
+
 dnl  flags for building swig guile bindings
 AC_SUBST(SWGUILEFLAGS)  
 if ! test -z "$GUILEROOT"; then
     if test `$SWIG -guile -help 2>&1 | grep -i '\-linkage' | wc -l` -gt 0; then
-	SWGUILEFLAGS="-linkage ltmod"
+	SWGUILEFLAGS="-Linkage ltdlmod"
     else
 	SWGUILEFLAGS=""
     fi
@@ -417,6 +426,7 @@ AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
 #AM_CONDITIONAL(INSTALL_NXPYTHON, [test ! -z "$INSTALL_NXPYTHON"])
 AM_CONDITIONAL(HAVE_MZSCHEME, [test ! -z "$INSTALL_NXPYTHON"])
 AM_CONDITIONAL(MINGW_MSYS, [test x$MINGW_MSYS = xyes])
+AM_CONDITIONAL(HAVE_OPENGENIE, [test ! -z "$OPENGENIEROOT"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
@@ -434,6 +444,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXtranslate/Makefile
 		applications/NXtranslate/IPNS_CPP/Makefile
 		applications/NXtranslate/FRM2/Makefile
+		applications/NXtranslate/opengenie/Makefile
 		applications/NXtranslate/text_collist/Makefile
 		applications/NXtranslate/text_plain/Makefile
 		applications/NXtranslate/text_xml/Makefile
