@@ -35,7 +35,8 @@ bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 if HAVE_SWIG
 if HAVE_PYTHON
 LIBNXPYTHON=libnxpython.la
-libnxpython_la_SOURCES=$(PYTHONWRAP) $(COMMON_SRC)
+libnxpython_la_SOURCES=$(COMMON_SRC)
+nodist_libnxpython_la_SOURCES=$(PYTHONWRAP)
 libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) $(CFLAGS)
 libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
 PYTHONWRAP=nxpython_wrap.c
@@ -50,7 +51,8 @@ if HAVE_TCL
 LIBNXTCL=libnxtcl.la
 NXINTER=nxinter
 TCLLIB=-L$(TCLROOT)/lib -ltcl
-libnxtcl_la_SOURCES=$(TCLWRAP) $(COMMON_SRC)
+libnxtcl_la_SOURCES=$(COMMON_SRC)
+nodist_libnxtcl_la_SOURCES=$(TCLWRAP)
 libnxtcl_la_CFLAGS=-I$(TCLROOT)/include
 libnxtcl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 
@@ -68,7 +70,8 @@ if HAVE_GUILE
 LIBNXGUILE=libnxguile.la
 NXGUILE=nxguile
 GGLIB=-L$(GUILEROOT)/lib -lguile
-libnxguile_la_SOURCES=$(GUILEWRAP) $(COMMON_SRC)
+libnxguile_la_SOURCES=$(COMMON_SRC)
+nodist_libnxguile_la_SOURCES=$(GUILEWRAP)
 libnxguile_la_CFLAGS=-I$(GUILEROOT)/include/guile \
   -DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();"\
   $(CFLAGS)
@@ -88,7 +91,8 @@ if HAVE_MZSCHEME
 LIBNXSCHEME=libnxscheme.la
 MZINC=/data/koenneck/opt/plt
 MZLIB=-L$(MZINC)/lib -lmzscheme -lmzgc $(MZINC)/lib/mzdyn.o
-libnxscheme_la_SOURCES=$(SCHEMEWRAP) $(COMMON_SRC)
+libnxscheme_la_SOURCES=$(COMMON_SRC)
+nodist_libnxscheme_la_SOURCES=$(SCHEMEWRAP)
 libnxscheme_la_CFLAGS=-I$(MZINC)/include $(CFLAGS)
 libnxscheme_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(MZLIB) $(LDFLAGS)
 SCHEMEWRAP=nxscheme_wrap.c
@@ -123,3 +127,5 @@ EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
 		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) \
 		$(DOC_OUTPUT) $(DOC_SRC)
 
+BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
+CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
