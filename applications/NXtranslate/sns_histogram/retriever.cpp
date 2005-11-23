@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
-#include <stdlib.h>¶
+#include <stdlib.h>
 #include "retriever.h"
 #include "../node.h"
 #include "../node_util.h"
