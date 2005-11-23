@@ -56,7 +56,7 @@ nodist_libnxtcl_la_SOURCES=$(TCLWRAP)
 libnxtcl_la_CFLAGS=-I$(TCLROOT)/include
 libnxtcl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 
-nxinter_SOURCES=libnxtcl.la
+nodist_nxinter_SOURCES=libnxtcl.la
 nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la $(TCLLIB) $(LDFLAGS)
 TCLWRAP=nxinter_wrap.c
 endif
@@ -77,7 +77,7 @@ libnxguile_la_CFLAGS=-I$(GUILEROOT)/include/guile \
   $(CFLAGS)
 libnxguile_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
 
-nxguile_SOURCES=libnxguile.la
+nodist_nxguile_SOURCES=libnxguile.la
 nxguile_LDFLAGS=-static libnxguile.la $(top_builddir)/src/libNeXus.la $(GGLIB) $(LDFLAGS)
 GUILEWRAP=nxguile_wrap.c
 endif
@@ -124,7 +124,6 @@ endif
 COMMON_SRC=nxinterhelper.c $(NXDATASET)
 
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
-		$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) \
 		$(DOC_OUTPUT) $(DOC_SRC)
 
 BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
