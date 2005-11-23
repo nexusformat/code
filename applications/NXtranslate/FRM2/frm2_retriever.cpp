@@ -455,17 +455,17 @@ void Frm2Retriever::parse_range(std::string location, int &x, int &y){
 			
 			pos = sub_str.find_first_of(Frm2Retriever::RANGE_SEPARATOR);
 			if (pos != std::string::npos) {
-				if (isnumber(sub_str.substr(0,pos))) {
+				if (isNumber(sub_str.substr(0,pos))) {
 					x = string_util::str_to_int(sub_str.substr(0,pos));
 				}
-				if (isnumber(sub_str.substr(pos))) {
+				if (isNumber(sub_str.substr(pos))) {
 					y = string_util::str_to_int(sub_str.substr(pos));
 				}
 				return;
 			}
 			else {
 				// if no range separator is found -> go specified position to end of column
-				if (isnumber(sub_str)) {
+				if (isNumber(sub_str)) {
 					x = string_util::str_to_int(sub_str);
 				}
 				return;
@@ -594,7 +594,7 @@ bool Frm2Retriever::isunit(std::string line) {
 }
 
 
-bool Frm2Retriever::isnumber(std::string str) {
+bool Frm2Retriever::isNumber(std::string str) {
 	// eliminate whitespace on both ends
 	while (isspace(str[0])){
 		str = str.substr(1);
@@ -723,7 +723,7 @@ void Frm2Retriever::extract_toflogheaders(std::ifstream &file) {
 					str = str.substr(0, str.size()-1);
 				}
 				
-				if (isnumber(str)) {
+				if (isNumber(str)) {
 					int key = string_util::str_to_int(str);
 					key_pairs[key] = value;
 				}
@@ -931,7 +931,7 @@ std::vector<std::vector<unsigned int> > Frm2Retriever::extract_tofcts(std::ifstr
 	std::string raw_minput = raw_map["values"];
 	std::string units= raw_map["units"];
 	
-	if (isnumber(raw_minput)) {
+	if (isNumber(raw_minput)) {
 		monitor_number = string_util::str_to_int(raw_minput);
 	}
 	
@@ -1007,7 +1007,7 @@ std::vector<double> Frm2Retriever::extract_toftof(std::ifstream &file, std::stri
 	std::map<std::string, std::string> raw_map = extract_dictentry(infile, "TOF_ChannelWidth", NX_INT32);
 	std::string ch_width = raw_map["values"];
 	
-	if (isnumber(ch_width)) {
+	if (isNumber(ch_width)) {
 		channel_width = string_util::str_to_int(ch_width);
 	}
 
@@ -1061,7 +1061,7 @@ std::string Frm2Retriever::extract_filename(std::ifstream &file, std::string sou
 	}
 	pos = arg.find(":");
 	if (pos != std::string::npos) {
-		if (isnumber(arg.substr(0, pos)) && isnumber(arg.substr(pos+1))) {
+		if (isNumber(arg.substr(0, pos)) && isNumber(arg.substr(pos+1))) {
 			from 	= string_util::str_to_int(arg.substr(0, pos));
 			to 	= string_util::str_to_int(arg.substr(pos+1)) - from;
 		}
@@ -1131,7 +1131,7 @@ std::vector<std::string> Frm2Retriever::extract_toflog(std::ifstream &file, std:
 	
 	skip_to_line(infile, cur_line, data_section+((from<0)?0:from)); 
 	
-	use_col_number = isnumber(col_name);
+	use_col_number = isNumber(col_name);
 	
 	if (!use_col_number) {
 		std::vector<std::string>::iterator it;
@@ -1325,7 +1325,7 @@ std::vector<std::string> Frm2Retriever::extract_column(ifstream &file, std::stri
 	skip_to_line(infile, cur_line, data_section+((from<0)?0:from)); 
 	//cout << endl << "counting headers: " << *(headers.begin()) << endl;	
 	
-	use_col_number = isnumber(col_name);
+	use_col_number = isNumber(col_name);
 	
 	if (!use_col_number) {
 		std::vector<std::string>::iterator it = headers.begin();
@@ -1390,7 +1390,7 @@ std::vector<unsigned int> Frm2Retriever::extract_dnr(std::ifstream &file, std::s
 	std::map<std::string, std::string> raw_map = extract_dictentry(infile, "TOF_MonitorInput", NX_INT32);
 	std::string raw_minput = raw_map["values"];
 	
-	if (isnumber(raw_minput)) {
+	if (isNumber(raw_minput)) {
 		monitor_number= string_util::str_to_int(raw_minput);
 	}
 	
@@ -1493,7 +1493,7 @@ std::vector<double> Frm2Retriever::extract_heidi_counts(ifstream &file, int entr
 	std::vector<std::string> words = string_util::split_whitespace(line);
 	int nitems = 1;
 	int nlines = 0;
-	if (isnumber(words.at(7))) {
+	if (isNumber(words.at(7))) {
 		nitems =string_util::str_to_int(words.at(7));
 		nlines = (int)ceil(((double)(nitems*2))/Frm2Retriever::HEIDI_COLS_PER_LINE);
 	}
@@ -1509,7 +1509,7 @@ std::vector<double> Frm2Retriever::extract_heidi_counts(ifstream &file, int entr
 			
 	//std::cout << "words: " << word << " wcount: " << wcount <<std::endl;
 	int numcounts = 0;
-	if (isnumber(words[7])) {
+	if (isNumber(words[7])) {
 		numcounts = string_util::str_to_int(words[7]);
 	}
 	else {
@@ -1598,7 +1598,7 @@ std::string Frm2Retriever::extract_data(std::ifstream &file, int entry_num, unsi
 	std::vector<std::string> words = string_util::split_whitespace(line);
 	int nitems = 1;
 	int nlines = 0;
-	if (isnumber(words.at(7))) {
+	if (isNumber(words.at(7))) {
 		nitems =string_util::str_to_int(words.at(7));
 		nlines = (int)ceil(((double)(nitems*2))/Frm2Retriever::HEIDI_COLS_PER_LINE);
 	}
@@ -2180,7 +2180,7 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 	
 	int heidi_entry_num = 0;
 	if (args.size()>0) {
-		if (isnumber(args.at(0))) {
+		if (isNumber(args.at(0))) {
 			heidi_entry_num = string_util::str_to_int(args.at(0));
 		}
 	}

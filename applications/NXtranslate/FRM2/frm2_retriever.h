@@ -116,7 +116,7 @@ protected:
 public: 
   static bool isdata(std::string line);
   bool isunit(std::string line);
-  static bool isnumber(std::string str);
+  static bool isNumber(std::string str);
   static bool isheidicountdata(std::string line);
   static bool isheidiheader(std::string line);
   static const std::string COLUMN_TAG;
