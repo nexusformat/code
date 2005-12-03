@@ -74,7 +74,7 @@ else
 fi
 
 AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[], [with_f77=yes])
+	[], [with_f77=no])
 if test x"$with_f77" != x"no" ; then
 	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
 	AC_PROG_F77
@@ -93,7 +93,7 @@ AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FO
 	[], [with_f90=no])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(FC, [f90 f95 ifort])
+		AC_CHECK_PROGS(FC, [g95 f90 f95 ifort])
 	else
 		AC_CHECK_PROGS(FC, ["$with_f90"])
 	fi
@@ -301,12 +301,16 @@ HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
     for i in $HDF4SEARCH; do
-	if test -z "$H4ROOT" -a -r ${i}/lib/libdf.$HDF_EXT; then H4ROOT=$i; fi
+        for j in lib64 lib; do
+	    if test -z "$H4ROOT" -a -r ${i}/$j/libdf.$HDF_EXT; then H4ROOT=$i; fi
+        done
     done
-    if test -r /usr/include/hdf/mfhdf.h; then
-	H4ROOT=/usr
-	H4SUBROOT=hdf
-    fi
+    for i in lib64 lib; do
+        if test -r /usr/$i/hdf/libdf.$HDF_EXT; then
+	    H4ROOT=/usr
+	    H4SUBROOT=hdf
+        fi
+    done
     if test -z "$H4ROOT"; then 
 	AC_MSG_RESULT(unknown)
     else 
@@ -318,8 +322,10 @@ if test "$H4ROOT"; then
     case $H4VERSION in
 	4.[[12]]*) 
     		HDF4_LDFLAGS="-lmfhdf -ldf";
-		LDFLAGS="-L$H4ROOT/lib/${H4SUBROOT} $LDFLAGS"
-    		HDF4_CPPFLAGS="-I$H4ROOT/include/${H4SUBROOT} -DHDF4" ;;
+		for j in lib lib64; do
+		    if test -d $H4ROOT/$j/$H4SUBROOT; then LDFLAGS="-L$H4ROOT/$j/$H4SUBROOT $LDFLAGS"; fi
+		done
+    		HDF4_CPPFLAGS="-I$H4ROOT/include/$H4SUBROOT -DHDF4" ;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
 		H4ROOT="";;
     esac		
@@ -332,7 +338,9 @@ HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
     for i in $HDF5SEARCH; do
-	if test -z "$H5ROOT" -a -r ${i}/lib/libhdf5.$HDF_EXT; then H5ROOT=$i; fi
+	for j in lib lib64; do
+	    if test -z "$H5ROOT" -a -r ${i}/$j/libhdf5.$HDF_EXT; then H5ROOT=$i; fi
+        done
     done
     if test -z "$H5ROOT"; then 
 	AC_MSG_RESULT(unknown)
@@ -345,7 +353,9 @@ if test "$H5ROOT"; then
     case $H5VERSION in
 	1.[[6]]*)
     		HDF5_LDFLAGS="-lhdf5 -lz"
-		LDFLAGS="-L$H5ROOT/lib $LDFLAGS"
+		for j in lib lib64; do
+		    if test -d $H5ROOT/$j; then LDFLAGS="-L$H5ROOT/$j $LDFLAGS"; fi
+		done
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
 		H5ROOT="";;
@@ -374,7 +384,9 @@ if test "$MXMLROOT"; then
 fi
 AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
-LDFLAGS="$LDFLAGS -L/usr/local/lib"
+if test -d /usr/local/lib; then
+    LDFLAGS="$LDFLAGS -L/usr/local/lib"
+fi
 AC_SUBST(LIBG2C)
 
 dnl finally set LIBS variable if we 
