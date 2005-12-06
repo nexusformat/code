@@ -7,7 +7,7 @@ Installation Instructions
 =========================
 
 Unix (including Mac OS X)
-----
+-------------------------
 
 We have recently changed the installation procedure to use the GNU autoconf 
 system.  This will automatically check for the relevant HDF and other libraries
@@ -88,6 +88,10 @@ and adjust the configuration scripts accordingly.
 Windows
 -------
    See README.WIN32.
+
+Mac OS X
+--------
+   See README.macosx
 
 VMS
 ---

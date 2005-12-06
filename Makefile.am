@@ -34,7 +34,7 @@ test: check
 SUBDIRS=include src bindings applications test scripts examples doc contrib
 
 EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autoversion.sh \
-		build_rpm.in README.cygwin README.WIN32 \
+		build_rpm.in README.cygwin README.WIN32 README.macosx \
 		ReleaseNotes
 
 
