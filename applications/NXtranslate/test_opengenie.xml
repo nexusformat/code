@@ -8,25 +8,83 @@
         GET("TITL") needs to be written as  GET(&quot;TITL&quot;)
 -->
 <NXroot>
-<entry1 type="NXentry" NXS:source="hrp00273.raw" NXS:mime_type="dynamic/libnxgenie.so">
+<entry1 type="NXentry" NXS:source="HET16538.RAW" NXS:mime_type="dynamic/libnxgenie.so">
 <title  NXS:location="GET(&quot;TITL&quot;)" />
 <definition url="http://www.nexus.anl.gov/xml/NXTOFRAW.xml" version="1.0">NeXus time of flight raw</definition>
 <definition_local url="http://www.isis.rl.ac.uk/xml/IXTOFRAW.xml" version="1.0">ISIS time of flight raw</definition_local>
 <good_frames NXS:location="(GET(&quot;IRPB&quot;))[10]" />
 <raw_frames NXS:location="(GET(&quot;IRPB&quot;))[11]" />
 <run_number NXS:location="GET(&quot;RUN&quot;)" />
-<program_name type="NX_CHAR">ICP1SEP89</program_name>
+<program_name type="NX_CHAR" version="1.0">ICP1SEP89</program_name>
 <run_cycle type="NX_CHAR">05/3</run_cycle>
 <experiment_identifier NXS:location="&quot;RB&quot;+AS_STRING((GET(&quot;IRPB&quot;))[22])" />
-<user NXS:location="(GET(&quot;USER&quot;))[1]" />
-<inst_short NXS:location="SUBSTRING(GET(&quot;HDR&quot;),1,3)" />
-<inst_full NXS:location="GET(&quot;NAME&quot;)" />
 <start_time NXS:location="SUBSTRING(GET(&quot;HDR&quot;),53,64) + &quot; &quot; + SUBSTRING(GET(&quot;HDR&quot;),65,72)" />
 <end_time NXS:location="(GET(&quot;CRPB&quot;))[17] + &quot; &quot; + (GET(&quot;CRPB&quot;))[20]" />
-<user NXS:location="(GET(&quot;USER&quot;))[1]" />
-<duration_sec NXS:location="(GET(&quot;IRPB&quot;))[13]" /> <!-- or [1] -->
-<good_uamph NXS:location="(GET(&quot;RRPB&quot;))[8]" />
-<raw_uamph NXS:location="(GET(&quot;RRPB&quot;))[9]" />
-<twotheta NXS:location="GET(&quot;TTHE&quot;)" />
+<duration NXS:location="(GET(&quot;IRPB&quot;))[13]" units="second"/> <!-- or [1] -->
+<collection_time NXS:location="(GET(&quot;IRPB&quot;))[13]" units="second"/> <!-- or [1] -->
+<proton_charge NXS:location="(GET(&quot;RRPB&quot;))[8]" units="uamp.hour" />
+<!-- raw_uamph NXS:location="(GET(&quot;RRPB&quot;))[9]" -->
+<user type="NXuser">
+   <name NXS:location="(GET(&quot;USER&quot;))[1]" />
+   <role>Principle Investigator</role>
+   <facility_user_id>12345</facility_user_id>
+</user>
+<sample type="NXsample">
+    <name>some sample</name>
+    <identifier>12345</identifier>
+    <nature>powder</nature>
+</sample>
+<instrument type="NXinstrument">
+   <name NXS:location="GET(&quot;NAME&quot;)" />
+   <name_short NXS:location="SUBSTRING(GET(&quot;HDR&quot;),1,3)" />
+   <beamline>N3</beamline>
+   <bank1 type="NXdetector">
+     <data units="counts" axes="[time_of_flight,detector_number]" NXS:location="GETDAT(&quot;CNT1&quot;)" />
+     <detector_number NXS:location="GETDAT:GANG(&quot;UDET&quot;)" />
+     <detector_number_unganged NXS:location="GETDAT(&quot;UDET&quot;)" />
+     <polar_angle units="degree" NXS:location="GETDAT:GANG(&quot;TTHE&quot;)" />
+     <polar_angle_unganged units="degree" NXS:location="GETDAT(&quot;TTHE&quot;)" />
+     <azimuthal_angle units="degree" NXS:location="GETDAT:GANG(&quot;UT01&quot;)" />
+     <azimuthal_angle_unganged units="degree" NXS:location="GETDAT(&quot;UT01&quot;)" />
+     <distance units="metre" NXS:location="GETDAT:GANG(&quot;LEN2&quot;)" />
+     <distance_unganged units="metre" NXS:location="GETDAT(&quot;LEN2&quot;)" />
+     <time_of_flight units="micro.second" NXS:location="GET(&quot;TIM1&quot;)" />
+     <time_of_flight_raw units="clock_pulse" frequency="NX_INT32:32000000" NXS:location="GET(&quot;TCB1&quot;)" />
+     <group_index units="degree" NXS:location="GETDAT(&quot;GROUP_INDEX&quot;)" />
+     <gang_count units="degree" NXS:location="GETDAT(&quot;GANG_COUNT&quot;)" />
+     <gang_index units="degree" NXS:location="GETDAT(&quot;GANG_INDEX&quot;)" />
+   </bank1>
+   <moderator type="NXmoderator">
+     <distance NXS:location="-(GET(&quot;RVPB&quot;))[23]" units="metre" />
+   </moderator>
+   <source type="NXsource">
+     <name>ISIS</name>
+     <type>Pulsed Neutron Source</type>
+     <probe>neutrons</probe>
+     <frequency units="hertz" type="NX_INT32">50</frequency>
+     <period units="micro.second" type="NX_INT32">20000</period>
+   </source>
+   <detector_groups type="NXdetector_groups">
+     <group_names>bank1</group_names>
+     <group_index type="NX_INT32[1]">1</group_index>
+     <group_parent type="NX_INT32[1]">0</group_parent>
+     <group_type>bank</group_type>
+   </detector_groups>
+</instrument>
+<bank1 type="NXdata">
+<NAPIlink target="/entry1/instrument/bank1/data" />
+<NAPIlink target="/entry1/instrument/bank1/time_of_flight" />
+<NAPIlink target="/entry1/instrument/bank1/detector_number" />
+</bank1>
+<monitor type="NXmonitor">
+  <distance units="metre"></distance>
+  <range units="micro.second"></range>
+  <integral type="NX_FLOAT32"></integral>
+  <data units="counts" axes="[time_of_flight]" NXS:location="GETDAT(&quot;MON1&quot;)" />
+  <NAPIlink target="/entry1/instrument/bank1/time_of_flight" />
+  <monitor_number type="NX_INT32">1</monitor_number>
+  <detector_number NXS:location="GETDAT:GANG(&quot;MON1_DET&quot;)" />
+  <detector_number_unganged NXS:location="GETDAT(&quot;MON1_DET&quot;)" />
+</monitor>
 </entry1>
 </NXroot>

@@ -73,22 +73,6 @@ else
 	CXX=
 fi
 
-AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[], [with_f77=no])
-if test x"$with_f77" != x"no" ; then
-	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
-	AC_PROG_F77
-	dnl Check FORTRAN compiler options
-	dnl 	AC_CHECK_F77_OPTION([-Wno-globals])
-	dnl 	AC_CHECK_F77_OPTION([-fno-common])  # use with caution
-	mytop=`pwd`
-	dnl get right F77 include option
-	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
-	AC_F77_LIBRARY_LDFLAGS
-else
-	F77=
-fi
-
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
 	[], [with_f90=no])
 if test x"$with_f90" != x"no" ; then
@@ -106,8 +90,26 @@ if test x"$with_f90" != x"no" ; then
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-qextname])
 	AC_FC_LIBRARY_LDFLAGS
+#        if test x$with_f77=xno; then with_f77=$FC; fi
+        if test x$with_f77=xno; then with_f77=yes; fi
 else
 	FC=
+fi
+
+AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
+	[], [with_f77=no])
+if test x"$with_f77" != x"no" ; then
+	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
+	AC_PROG_F77
+	dnl Check FORTRAN compiler options
+	dnl 	AC_CHECK_F77_OPTION([-Wno-globals])
+	dnl 	AC_CHECK_F77_OPTION([-fno-common])  # use with caution
+	mytop=`pwd`
+	dnl get right F77 include option
+	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
+	AC_F77_LIBRARY_LDFLAGS
+else
+	F77=
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [], [with_swig=no])

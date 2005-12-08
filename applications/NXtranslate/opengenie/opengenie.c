@@ -15,7 +15,13 @@
 // this is called when a DynamicRetriever instance is created
 void* nxtinit(const char* source)
 {
+    char command[256];
     GX_activate_session("GENIE",1,1);
+    if (getenv("NXGENIE_INIT") != NULL)
+    {
+	sprintf(command, "INCLUDE \"%s\"", getenv("NXGENIE_INIT"));
+        GX_assign_handle(command, "");
+    }
     return strdup(source); // this will be passed back as "ref" argument to 
                            // other functions. It can be anything e.g. a 
                            // file pointer or handle
