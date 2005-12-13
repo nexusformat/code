@@ -11,7 +11,7 @@ PROCEDURE GETDAT
 QUALIFIERS /GANG # want values by spectrum
 PARAMETERS name=String
 RESULT RES
-GLOBAL CNT1 SPEC UDET NSP NDET MDET NTC sorted_spec
+GLOBAL CNT1 SPEC UDET NSP NDET MDET NTC sorted_spec LEN2
 LOCAL TMP dstidx i j
 IF NOT DEFINED(CNT1)
     SPEC <~ GET("SPEC")
@@ -24,6 +24,7 @@ IF NOT DEFINED(CNT1)
     cnt1 <~ tmp[2:(nsp+1),2:(ntc+1)] # remove spectrum 0 and time channel 0
     mdet <~ GET("MDET")
     ndet <~ GET("NDET")
+    len2 <~ GET("LEN2")
 ENDIF
 IF name = "CNT1"
     res <~ cnt1
@@ -38,6 +39,11 @@ IF name = "MON1_DET"
     ELSE
         res <~ UDET[i]
     ENDIF
+    RETURN
+ENDIF
+IF name = "MON1_DIST"
+    i <~ MDET[1]
+    res <~ len2[i]
     RETURN
 ENDIF
 IF name = "MON1"

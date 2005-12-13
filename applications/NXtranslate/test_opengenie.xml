@@ -8,7 +8,7 @@
         GET("TITL") needs to be written as  GET(&quot;TITL&quot;)
 -->
 <NXroot>
-<entry1 type="NXentry" NXS:source="HET16538.RAW" NXS:mime_type="dynamic/libnxgenie.so">
+<entry1 type="NXentry" NXS:source="INPUT_FILE" NXS:mime_type="dynamic/libnxgenie.so">
 <title  NXS:location="GET(&quot;TITL&quot;)" />
 <definition url="http://www.nexus.anl.gov/xml/NXTOFRAW.xml" version="1.0">NeXus time of flight raw</definition>
 <definition_local url="http://www.isis.rl.ac.uk/xml/IXTOFRAW.xml" version="1.0">ISIS time of flight raw</definition_local>
@@ -77,7 +77,6 @@
 <NAPIlink target="/entry1/instrument/bank1/detector_number" />
 </bank1>
 <monitor type="NXmonitor">
-  <distance units="metre"></distance>
   <range units="micro.second"></range>
   <integral type="NX_FLOAT32"></integral>
   <data units="counts" axes="[time_of_flight]" NXS:location="GETDAT(&quot;MON1&quot;)" />
@@ -85,6 +84,7 @@
   <monitor_number type="NX_INT32">1</monitor_number>
   <detector_number NXS:location="GETDAT:GANG(&quot;MON1_DET&quot;)" />
   <detector_number_unganged NXS:location="GETDAT(&quot;MON1_DET&quot;)" />
+  <distance units="metre" NXS:location="GETDAT:GANG(&quot;MON1_DIST&quot;)" />
 </monitor>
 </entry1>
 </NXroot>

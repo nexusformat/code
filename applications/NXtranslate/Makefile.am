@@ -72,9 +72,11 @@ test_dynamic.nxs: nxtranslate test_dynamic.xml test_dynamic.so
 test_dynamic.so : test_dynamic.c
 	gcc -I$(top_srcdir)/include -shared -o $@ test_dynamic.c
 
-test_opengenie.nxs: nxtranslate test_opengenie.xml
-	ln -sf ./opengenie/.libs/libnxgenie.so .
-	env LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:@OPENGENIEROOT@/genie:. GENIE_SMALLTALK_IMAGE=@OPENGENIEROOT@/genie/genie.im ./nxtranslate test_opengenie.xml
+test_opengenie: nxtranslate test_opengenie.xml
+	( cd opengenie; for i in *.raw; do \
+	     for j in 4 5; do \
+		env LD_LIBRARY_PATH=.:.libs:../../../src/.libs:@OPENGENIEROOT@/genie:$$LD_LIBRARY_PATH GENIE_SMALLTALK_IMAGE=@OPENGENIEROOT@/genie/genie.im GENIE_GROWTO_IMAGE_SIZE=64 NXGENIE_INIT=nxgenie.gcl ../nxtranslate --hdf$$j -DINPUT_FILE=$$i -o $$i.nx$$j ../test_opengenie.xml; \
+          done; done )
 
 test_simple.nxs: nxtranslate test_simple.xml
 	./nxtranslate test_simple.xml
