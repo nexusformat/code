@@ -1378,6 +1378,18 @@ NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes){
   free(linkPath);
   return NX_OK;
 }
+
+/*-----------------------------------------------------------------------*/
+  NXstatus  NXXprintlink (NXhandle fid, NXlink* sLink)
+  {
+    pXMLNexus xmlHandle = NULL;
+    xmlHandle = (pXMLNexus)fid;
+    assert(xmlHandle);
+
+    printf("XML link: target=\"%s\"\n", sLink->targetPath);
+    return NX_OK;
+  }
+  
 /*-----------------------------------------------------------------------*/
 NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink){
   pXMLNexus xmlHandle = NULL;
@@ -1448,5 +1460,6 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxinitgroupdir=NXXinitgroupdir;
       fHandle->nxinitattrdir=NXXinitattrdir;
       fHandle->nxsetnumberformat=NXXsetnumberformat;
+      fHandle->nxprintlink=NXXprintlink;
 }
 

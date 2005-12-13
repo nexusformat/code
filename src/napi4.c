@@ -1229,7 +1229,16 @@ extern	void *NXpData;
     }
     return NX_OK;
   }
+
+  /*----------------------------------------------------------------------*/
   
+  NXstatus  NX4printlink (NXhandle fid, NXlink* sLink)
+  {
+    pNexusFile pFile;
+    pFile = NXIassert (fid);
+     printf("HDF4 link: iTag = %d, iRef = %d, target=\"%s\"\n", sLink->iTag, sLink->iRef, sLink->targetPath);
+    return NX_OK;
+  }
   
   /*----------------------------------------------------------------------*/
 
@@ -1795,4 +1804,5 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxsameID=NX4sameID;
       fHandle->nxinitgroupdir=NX4initgroupdir;
       fHandle->nxinitattrdir=NX4initattrdir;
+      fHandle->nxprintlink=NX4printlink;
 }

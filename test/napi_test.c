@@ -265,19 +265,48 @@ int main (int argc, char *argv[])
      }
   } while (entry_status == NX_OK);
   if (NXclosegroup (fileid) != NX_OK) return 1;
-  if (NXopengroup (fileid, "link", "NXentry") != NX_OK) return 1;
-     if (NXgetgroupID (fileid, &glink) != NX_OK) return 1;
+/*
+ * check links
+ */
+  if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
+    if (NXopengroup (fileid, "sample", "NXsample") != NX_OK) return 1;
+      if (NXgetgroupID (fileid, &glink) != NX_OK) return 1;
+    if (NXclosegroup (fileid) != NX_OK) return 1;
+    if (NXopengroup (fileid, "data", "NXdata") != NX_OK) return 1;
+      if (NXopendata (fileid, "r8_data") != NX_OK) return 1;
+        if (NXgetdataID (fileid, &dlink) != NX_OK) return 1;
+      if (NXclosedata (fileid) != NX_OK) return 1;
+    if (NXclosegroup (fileid) != NX_OK) return 1;
+    if (NXopendata (fileid, "r8_data") != NX_OK) return 1;
+      if (NXgetdataID (fileid, &blink) != NX_OK) return 1;
+    if (NXclosedata (fileid) != NX_OK) return 1;
+    if (NXsameID(fileid, &dlink, &blink) != NX_OK)
+    {
+         printf ("Link check FAILED (r8_data)\n");
+         printf ("original data\n");
+	 NXIprintlink(fileid, &dlink);
+         printf ("linked data\n");
+	 NXIprintlink(fileid, &blink);
+	 return 1;
+    }
   if (NXclosegroup (fileid) != NX_OK) return 1;
+
   if (NXopengroup (fileid, "link", "NXentry") != NX_OK) return 1;
-     if (NXgetgroupID (fileid, &blink) != NX_OK) return 1;
-     if (NXsameID(fileid, &glink, &blink) == NX_OK) {
-         printf ("Link check OK\n");
-     }
-     else
-     {
-         printf ("Link check FAILED\n");
-     }
-  if (NXclosegroup (fileid) != NX_OK) return 1;  
+    if (NXopengroup (fileid, "sample", "NXsample") != NX_OK) return 1;
+      if (NXgetgroupID (fileid, &blink) != NX_OK) return 1;
+        if (NXsameID(fileid, &glink, &blink) != NX_OK)
+	{
+             printf ("Link check FAILED (sample)\n");
+             printf ("original group\n");
+	     NXIprintlink(fileid, &glink);
+             printf ("linked group\n");
+	     NXIprintlink(fileid, &blink);
+	     return 1;
+	}
+      if (NXclosegroup (fileid) != NX_OK) return 1;
+    if (NXclosegroup (fileid) != NX_OK) return 1;
+  if (NXclosegroup (fileid) != NX_OK) return 1;
+  printf ("Link check OK\n");
 
   /*
     tests for NXopenpath

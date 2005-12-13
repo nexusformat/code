@@ -41,6 +41,8 @@ extern  NXstatus  NX4getnextattr(NXhandle handle, NXname pName, int *iLength, in
 extern  NXstatus  NX4getgroupID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX4getdataID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX4makelink(NXhandle handle, NXlink* pLink);
+extern  NXstatus  NX4printlink(NXhandle handle, NXlink* pLink);
+
 void NX4assignFunctions(pNexusFunction fHandle);
 
   

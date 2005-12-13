@@ -1044,6 +1044,7 @@ NXstatus  NX5closegroup (NXhandle fid);
     if(pFile->iCurrentD <= 0){
       return NX_ERROR;
     }
+    strcpy(sRes->iTag5,"");
     strcpy(sRes->iRef5,"/");
     strcat(sRes->iRef5,pFile->name_ref);
     strcpy(sRes->iRefd,pFile->iCurrentLD);
@@ -1052,6 +1053,16 @@ NXstatus  NX5closegroup (NXhandle fid);
 
  /* ------------------------------------------------------------------- */
  
+  NXstatus  NX5printlink (NXhandle fid, NXlink* sLink)
+  {
+    pNexusFile5 pFile;
+    pFile = NXI5assert (fid);
+     printf("HDF5 link: iTag5 = \"%s\", iRef5 = \"%s\", iRefd = \"%s\"\n", sLink->iTag5, sLink->iRef5, sLink->iRefd);
+    return NX_OK;
+  }
+
+ /* ------------------------------------------------------------------- */
+  
   NXstatus  NX5makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile5 pFile;
@@ -2026,8 +2037,8 @@ NXstatus  NX5closegroup (NXhandle fid);
     pNexusFile5 pFile;
 
     pFile = NXI5assert (fileid);
-    if ((strcmp(pFirstID->iTag5,pSecondID->iTag5) == 0) &
-        (strcmp(pFirstID->iRef5,pSecondID->iRef5) == 0) & 
+    if ((strcmp(pFirstID->iTag5,pSecondID->iTag5) == 0) &&
+        (strcmp(pFirstID->iRef5,pSecondID->iRef5) == 0) && 
         (strcmp(pFirstID->iRefd,pSecondID->iRefd) == 0)) {
        return NX_OK;
     } else {
@@ -2086,5 +2097,5 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxsameID=NX5sameID;
       fHandle->nxinitgroupdir=NX5initgroupdir;
       fHandle->nxinitattrdir=NX5initattrdir;
-
+      fHandle->nxprintlink=NX5printlink;
 }

@@ -70,6 +70,7 @@ extern  NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
 extern NXstatus  NXXgetdataID (NXhandle fid, NXlink* sRes);
 extern NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes);
 extern NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink);
+extern NXstatus  NXXprintlink (NXhandle fid, NXlink* sLink);
 extern NXstatus  NXXsameID (NXhandle fileid, 
 					      NXlink* pFirstID, NXlink* pSecondID);
 

@@ -1002,6 +1002,13 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
   }
   return NX_OK;
 }
+
+NXstatus NXIprintlink(NXhandle fid, NXlink* link)
+{
+     pNexusFunction pFunc = (pNexusFunction)fid;
+     return pFunc->nxprintlink(pFunc->pNexusData, link);   
+}
+
 /*--------------------------------------------------------------------
   format NeXus time. Code needed in every NeXus file driver
   ---------------------------------------------------------------------*/

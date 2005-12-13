@@ -24,6 +24,7 @@ extern  NXstatus  NX5putslab(NXhandle handle, void* data, int start[], int size[
 
 extern  NXstatus  NX5getdataID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX5makelink(NXhandle handle, NXlink* pLink);
+extern  NXstatus  NX5printlink(NXhandle handle, NXlink* pLink);
 
 extern  NXstatus  NX5getdata(NXhandle handle, void* data);
 extern  NXstatus  NX5getinfo(NXhandle handle, int* rank, int dimension[], int* datatype);

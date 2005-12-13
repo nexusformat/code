@@ -239,6 +239,7 @@ extern  void  NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
 extern void (*NXIReportError)(void *pData,char *text);
 extern void *NXpData;
 extern char *NXIformatNeXusTime();
+extern  NXstatus  NXIprintlink(NXhandle fid, NXlink* link);
 
 /*
   another special function for setting the default cache size for HDF-5
@@ -275,8 +276,8 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxsameID)(NXhandle handle, NXlink* pFirstID, NXlink* pSecondID);
         NXstatus ( *nxinitgroupdir)(NXhandle handle);
         NXstatus ( *nxinitattrdir)(NXhandle handle);
-        NXstatus ( *nxsetnumberformat)(NXhandle handle,
-						    int type,char *format);
+        NXstatus ( *nxsetnumberformat)(NXhandle handle, int type, char *format);
+        NXstatus ( *nxprintlink)(NXhandle handle, NXlink* link);
   } NexusFunction, *pNexusFunction;
   /*---------------------*/
   extern long nx_cacheSize;
