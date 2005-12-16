@@ -91,7 +91,7 @@ if test x"$with_f90" != x"no" ; then
 	dnl AC_CHECK_F90_OPTION([-qextname])
 	AC_FC_LIBRARY_LDFLAGS
 #        if test x$with_f77=xno; then with_f77=$FC; fi
-        if test x$with_f77=xno; then with_f77=yes; fi
+#        if test x$with_f77=xno; then with_f77=yes; fi
 else
 	FC=
 fi
