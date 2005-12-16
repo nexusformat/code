@@ -521,11 +521,14 @@ build:
                 XML support:   ${XMLSUPPORT}
 
         bindings:
-                F77 :          ${F77BINDING} 
-                F90 :          ${F90BINDING} 
+                F77 :          ${F77BINDING} (--with-f77=${F77})
+            F90/F95 :          ${F90BINDING} (--with-f90=${FC})
                 JAVA:          ${JAVABINDING} (--with-java-home=${javaroot})
 		SWIG:	       ${SWIGBINDING}
 
-Please check whether the configuration I detected matches what you
-would like to have.
+Please check whether the configuration I detected matches what you would
+like to have. If not, re-run configure adding the appropriate  --with  option
+or setting the relevant environment variable.
+
+For a list of available options type    ./configure --help
 ])
