@@ -6,13 +6,15 @@
 # Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
 #
 PRINTIN "Loading additional OpenGENIE  procedures"
+TOGGLE/INFO/OFF
+TOGGLE/DEBUG/OFF
 
 PROCEDURE GETDAT
 QUALIFIERS /GANG # want values by spectrum
-PARAMETERS name=String
+PARAMETERS name=String num=Integer
 RESULT RES
-GLOBAL CNT1 SPEC UDET NSP NDET MDET NTC sorted_spec LEN2
-LOCAL TMP dstidx i j
+GLOBAL CNT1 SPEC UDET NSP NDET MDET NTC NMON sorted_spec LEN2 tcb tcb_widths
+LOCAL TMP dstidx i j dummy_int_array
 IF NOT DEFINED(CNT1)
     SPEC <~ GET("SPEC")
     sorted_spec = spec
@@ -25,6 +27,9 @@ IF NOT DEFINED(CNT1)
     mdet <~ GET("MDET")
     ndet <~ GET("NDET")
     len2 <~ GET("LEN2")
+    nmon <~ GET("NMON")
+    tcb <~ GET("TIM1")
+    tcb_widths <~ tcb[2:(ntc+1)] - tcb[1:(ntc)]
 ENDIF
 IF name = "CNT1"
     res <~ cnt1
@@ -32,8 +37,10 @@ IF name = "CNT1"
 ENDIF
 dstidx <~ dimensions(nsp)
 fill dstidx 1 1
-IF name = "MON1_DET"
-    i <~ MDET[1]
+IF name = "MON_DET"
+    IF (num > nmon); res = 0; RETURN; ENDIF
+    i <~ MDET[num]
+    IF (i < 1) OR (i > NDET); res = 0; RETURN; ENDIF
     IF GANG
         res <~ SPEC[i]
     ELSE
@@ -41,14 +48,21 @@ IF name = "MON1_DET"
     ENDIF
     RETURN
 ENDIF
-IF name = "MON1_DIST"
-    i <~ MDET[1]
+IF name = "MON_DIST"
+    IF (num > nmon); res = 0.0; RETURN; ENDIF
+    i <~ MDET[num]
+    IF (i < 1) OR (i > NDET); res = 0.0; RETURN; ENDIF
     res <~ len2[i]
     RETURN
 ENDIF
-IF name = "MON1"
-    i <~ MDET[1]
+IF name = "MON"
+    dummy_int_array <~ dimensions(ntc)
+    fill dummy_int_array 0
+    IF (num > nmon); res <~ dummy_int_array; RETURN; ENDIF
+    i <~ MDET[num]
+    IF (i < 1) OR (i > NDET); res <~ dummy_int_array; RETURN; ENDIF
     j <~ SPEC[i]
+    IF (j < 1) OR (j > NSP); res <~ dummy_int_array; RETURN; ENDIF
     RES <~ redim(CNT1[j,1:(ntc)],ntc)
     RETURN
 ENDIF

@@ -74,6 +74,7 @@ test_dynamic.so : test_dynamic.c
 
 test_opengenie: nxtranslate test_opengenie.xml
 	( cd opengenie; for i in *.raw; do \
+             echo "Processing  $$i"; \
 	     for j in 4 5; do \
 		env LD_LIBRARY_PATH=.:.libs:../../../src/.libs:@OPENGENIEROOT@/genie:$$LD_LIBRARY_PATH GENIE_SMALLTALK_IMAGE=@OPENGENIEROOT@/genie/genie.im GENIE_GROWTO_IMAGE_SIZE=64 NXGENIE_INIT=nxgenie.gcl ../nxtranslate --hdf$$j -DINPUT_FILE=$$i -o $$i.nx$$j ../test_opengenie.xml; \
           done; done )
