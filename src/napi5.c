@@ -432,6 +432,11 @@ NXstatus  NX5closegroup (NXhandle fid);
        }
        /* check contents of group attribute */
        attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
+       if (attr1 < 0)
+       {
+          NXIReportError (NXpData, "Error opening group attribute!");
+          return NX_ERROR; 
+       }
        atype=H5Tcopy(H5T_C_S1);
        H5Tset_size(atype,128);  
        iRet = H5Aread(attr1, atype, data);
@@ -474,6 +479,11 @@ NXstatus  NX5closegroup (NXhandle fid);
        }
        /* check contains of group attribute */
        attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
+       if (attr1 < 0)
+       {
+          NXIReportError (NXpData, "Error opening group attribute!");
+          return NX_ERROR; 
+       }
        atype=H5Tcopy(H5T_C_S1);
        H5Tset_size(atype,128);  
        iRet = H5Aread(attr1, atype, data);
@@ -1260,6 +1270,7 @@ NXstatus  NX5closegroup (NXhandle fid);
     char ph_name[1024];
     info_type op_data;
     int iRet_iNX=-1;
+    char pBuffer[256];
      
     pFile = NXI5assert (fid);
     op_data.iname = NULL;
@@ -1302,7 +1313,17 @@ NXstatus  NX5closegroup (NXhandle fid);
            }
            strcat(ph_name,name);
            grp=H5Gopen(pFile->iFID,ph_name);
+           if (grp < 0) {
+              sprintf (pBuffer, "ERROR: Group %s does not exist!", ph_name);
+              NXIReportError (NXpData, pBuffer);
+              return NX_ERROR;  
+           }
            attr1 = H5Aopen_name(grp, "NX_class");
+           if (attr1 < 0) {
+              H5Gclose(grp);
+              NXIReportError (NXpData, "Error opening group class");
+              return NX_ERROR;  
+           }
            type=H5T_C_S1;
            atype=H5Tcopy(type);
            H5Tset_size(atype,128);  
