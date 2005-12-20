@@ -502,6 +502,7 @@ NXstatus  NX5closegroup (NXhandle fid);
     pFile->iStack5[pFile->iStackPtr].iVref=pFile->iCurrentG;
     strcpy(pFile->iStack5[pFile->iStackPtr].irefn,name);
     pFile->iAtt5.iCurrentIDX=0;
+    pFile->iCurrentD = 0;
     if(pFile->iCurrentLGG != NULL){
       free(pFile->iCurrentLGG);
     }
@@ -1745,7 +1746,7 @@ NXstatus  NX5closegroup (NXhandle fid);
 	   NXIReportError (NXpData, "ERROR iterating through ROOT Attr. list!");
 	   return NX_ERROR;  
 	} 
-     } else { 
+     } else if (pFile->iCurrentD > 0) { 
 	intern_idx=H5Aget_num_attrs(pFile->iCurrentD);
 	if (intern_idx > idx) {
 	   iRet=H5Aiterate(pFile->iCurrentD,&idx,attr_info,&iname);
@@ -1756,9 +1757,14 @@ NXstatus  NX5closegroup (NXhandle fid);
 	} 
 	intern_idx=-1;
 	if (iRet < 0) {
-	   NXIReportError (NXpData, "ERROR iterating through Attr. list!");
+	   NXIReportError (NXpData, "ERROR iterating through data Attr. list!");
 	   return NX_ERROR;  
 	}
+     }
+     else  
+     {
+	pFile->iAtt5.iCurrentIDX = 0;
+	return NX_EOD;  /* no group attributes */
      }
      if (iRet>0)
        {
