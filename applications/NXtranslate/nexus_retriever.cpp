@@ -24,6 +24,9 @@ typedef tree<Node> NodeTree;
  * interpreting the string is left up to the implementing code.
  */
 NexusRetriever::NexusRetriever(const string &str): source(str){
+  // allocate memory for the handle
+  handle=new NXhandle;
+
   // check if the filename is nonzero
   if(str.size()<=0)
     throw invalid_argument("Cannot initialize from an empty string");
@@ -41,7 +44,7 @@ NexusRetriever::NexusRetriever(const string &str): source(str){
   char filename[50];
   strcpy(filename,str.c_str());
   if(NXopen(filename,NXACC_READ,handle)!=NX_OK){
-    handle=NULL;
+    delete handle;
     throw runtime_error("NXopen failed");
   }
 
@@ -51,7 +54,7 @@ NexusRetriever::~NexusRetriever(){
   if(handle!=NULL){
     if(NXclose(handle)!=NX_OK)
       throw runtime_error("NXclose failed");
-    handle=NULL;
+    delete handle;
   }
 }
 
