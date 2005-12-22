@@ -41,9 +41,9 @@ access routines, documentation, examples and a basic NeXus file browser.
 %build
 # RPM_BUILD_ROOT - where to install software
 if ! test -z "$RPM_BUILD_ROOT"; then
-    ./configure --prefix=$RPM_BUILD_ROOT/usr/local
+    ./configure --prefix=$RPM_BUILD_ROOT/usr/local $NEXUS_CONFIG_OPTIONS
 else
-    ./configure
+    ./configure $NEXUS_CONFIG_OPTIONS
 fi
 make
 %install
