@@ -180,6 +180,7 @@ AM_PROG_GCJ
 AM_PATH_PYTHON(,, :)
 
 AC_PROG_LIBTOOL
+dnl AC_LIBTOOL_WIN32_DLL
 
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
@@ -235,7 +236,7 @@ case $host in
 	;;
 
     *mingw*)
-	SHARED_LDFLAGS="-no-undefined"
+	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
 	;;
@@ -327,9 +328,15 @@ if test "$H4ROOT"; then
 		for j in lib lib64; do
 		    if test -d $H4ROOT/$j/$H4SUBROOT; then LDFLAGS="-L$H4ROOT/$j/$H4SUBROOT $LDFLAGS"; fi
 		done
-    		HDF4_CPPFLAGS="-I$H4ROOT/include/$H4SUBROOT -DHDF4" ;;
+		if test -z "$H4SUBROOT"; then
+    		    HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4"
+		else
+    		    HDF4_CPPFLAGS="-I$H4ROOT/include/$H4SUBROOT -DHDF4"
+		fi
+		;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
-		H4ROOT="";;
+		H4ROOT=""
+		;;
     esac		
 fi
 AC_SUBST(HDF4_LDFLAGS)
