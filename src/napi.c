@@ -91,6 +91,10 @@ static NXstatus NXisXML(CONSTCHAR *filename)
     NXpData = pData;
     NXIReportError = NewError;
   }
+/*----------------------------------------------------------------------*/
+extern ErrFunc NXMGetError(){
+  return NXIReportError;
+}
   
 #ifdef HDF5
 #include "napi5.h"

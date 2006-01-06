@@ -63,7 +63,9 @@ extern  void *NXpData;
    warning
 */
 NXstatus  NX5closegroup (NXhandle fid);
-  
+/*-------------------------------------------------------------------*/
+static void ignoreError(void *data, char *text){
+}
   /*--------------------------------------------------------------------*/
 
   static pNexusFile5 NXI5assert(NXhandle fid)
@@ -124,7 +126,11 @@ NXstatus  NX5closegroup (NXhandle fid);
   unsigned int vers_major, vers_minor, vers_release, am1 ;
   hid_t fapl;     
   int mdc_nelmts;
+#ifdef H5_WANT_H5_V1_4_COMPAT
   int rdcc_nelmts;
+#else
+  size_t rdcc_nelmts;
+#endif
   size_t rdcc_nbytes;
   double rdcc_w0;
 
@@ -1046,6 +1052,8 @@ NXstatus  NX5closegroup (NXhandle fid);
   NXstatus  NX5getdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile5 pFile;
+    ErrFunc oldErr;
+    int datalen, type = NX_CHAR;
   
     pFile = NXI5assert (fid);
 
@@ -1059,6 +1067,11 @@ NXstatus  NX5closegroup (NXhandle fid);
     strcpy(sRes->iRef5,"/");
     strcat(sRes->iRef5,pFile->name_ref);
     strcpy(sRes->iRefd,pFile->iCurrentLD);
+    oldErr = NXMGetError();
+    NXMSetError(NXpData, ignoreError);
+    datalen = 1024;
+    memset(&sRes->targetPath,0,datalen*sizeof(char));
+    NX5getattr(fid,"target",&sRes->targetPath,&datalen,&type);
     return NX_OK;
   }
 
@@ -2051,6 +2064,11 @@ NXstatus  NX5closegroup (NXhandle fid);
       strcpy(sRes->iTag5,"/");
       strcat(sRes->iTag5, pFile->iCurrentLGG); 
       strcpy(sRes->iRefd,"");
+      /*
+	TODO: once we have group attributes, this should be set to 
+	the groups target attribute
+      */
+      strcpy(sRes->targetPath, sRes->iTag5);
       return NX_OK;
     }
     /* not reached */
@@ -2064,9 +2082,7 @@ NXstatus  NX5closegroup (NXhandle fid);
     pNexusFile5 pFile;
 
     pFile = NXI5assert (fileid);
-    if ((strcmp(pFirstID->iTag5,pSecondID->iTag5) == 0) &&
-        (strcmp(pFirstID->iRef5,pSecondID->iRef5) == 0) && 
-        (strcmp(pFirstID->iRefd,pSecondID->iRefd) == 0)) {
+    if ((strcmp(pFirstID->targetPath,pSecondID->targetPath) == 0)){
        return NX_OK;
     } else {
        return NX_ERROR;
@@ -2097,6 +2113,7 @@ NXstatus  NX5closegroup (NXhandle fid);
 /*------------------------------------------------------------------------*/
 void NX5assignFunctions(pNexusFunction fHandle)
 {
+
       fHandle->nxclose=NX5close;
       fHandle->nxflush=NX5flush;
       fHandle->nxmakegroup=NX5makegroup;

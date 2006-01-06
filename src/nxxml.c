@@ -1020,11 +1020,8 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     /*
-      be nice to users: close the open dataset even as this is
-      a usage error
+      be nice to user: silently fix this problem
     */
-    NXIReportError(NXpData,
-		   "WARNING: fixing bad NAPI usage: dataset still open");
     NXXclosedata(fid);
   }
 

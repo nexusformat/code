@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <stdarg.h>
 #include "../node.h"
 #include "../node_util.h"
 #include "../string_util.h"

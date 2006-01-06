@@ -498,10 +498,23 @@ char *nexusWriteCallback(mxml_node_t *node){
   myxml_add_char('\0',&bufPtr,&buffer,&bufsize);
   return (char *)buffer;
 }
+/*------------------------------------------------------------------*/
+int isDataNode(mxml_node_t *node){
+  if(mxmlElementGetAttr(node,"name") != NULL){
+    return 0;
+  }
+  if(strcmp(node->value.element.name,"NXroot") == 0){
+    return 0;
+  }
+  if(strcmp(node->value.element.name,"NAPIlink") == 0){
+    return 0;
+  }
+  return 1;
+}
 /*--------------------------------------------------------------------*/
 static int isTextData(mxml_node_t *node){
   const char *attr = NULL;
-  int rank, type, iDim[NX_MAXRANK];
+  int rank, type = 0, iDim[NX_MAXRANK];
 
   if(!isDataNode(node)){
     return 0;
@@ -554,19 +567,6 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
     }
   }
   return NULL;
-}
-  /*------------------------------------------------------------------*/
-int isDataNode(mxml_node_t *node){
-  if(mxmlElementGetAttr(node,"name") != NULL){
-    return 0;
-  }
-  if(strcmp(node->value.element.name,"NXroot") == 0){
-    return 0;
-  }
-  if(strcmp(node->value.element.name,"NAPIlink") == 0){
-    return 0;
-  }
-  return 1;
 }
 /*-----------------------------------------------------------------------*/
 #ifdef TESTMAIN

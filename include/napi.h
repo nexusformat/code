@@ -235,7 +235,9 @@ extern  NXstatus  NXfree(void** data);
 /*-----------------------------------------------------------------------
     NAPI internals 
 ------------------------------------------------------------------------*/
-extern  void  NXMSetError(void *pData, void (*ErrFunc)(void *pD, char *text));
+typedef void (*ErrFunc)(void *data, char *text);
+extern  void  NXMSetError(void *pData, ErrFunc);
+extern ErrFunc NXMGetError();
 extern void (*NXIReportError)(void *pData,char *text);
 extern void *NXpData;
 extern char *NXIformatNeXusTime();

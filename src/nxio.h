@@ -40,4 +40,6 @@ void getNumberText(int nx_type, char *typestring, int typeLen);
 void destroyDataset(void *data);
 int translateTypeCode(char *code);
 int isDataNode(mxml_node_t *node);
+
+
 #endif
