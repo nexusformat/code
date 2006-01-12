@@ -239,6 +239,7 @@ case $host in
 	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
+	java_host="win32"
 	;;
 
     *darwin*)

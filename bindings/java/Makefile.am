@@ -27,6 +27,28 @@
 #
 #
 #====================================================================
+
+AM_JAVACFLAGS	= -classpath .
+
+JAVAROOT	= .
+
+# jar file definitions
+javadir		= $(prefix)/nexus/java
+java_DATA = jnexus.jar README.JNEXUS COPYING.NCSA
+jnexus_jar_ARCHIVE = jnexus.jar
+
+jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \
+               ncsa/hdf/hdflib/HDFJavaException.class \
+               ncsa/hdf/hdflib/HDFConstants.class \
+               ncsa/hdf/hdflib/HDFNativeData.class \
+               ncsa/hdf/hdflib/HDFArray.class \
+               ncsa/hdf/hdflib/HDFNotImplementedException.class \
+               neutron/nexus/AttributeEntry.class \
+               neutron/nexus/NexusException.class \
+               neutron/nexus/NXlink.class \
+               neutron/nexus/NeXusFileInterface.class \
+               neutron/nexus/NexusFile.class
+
 # jni definitions
 lib_LTLIBRARIES		= libjnexus.la
 libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
@@ -34,34 +56,17 @@ libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
                        native/handle.c \
                        native/NexusFile.c
 libjnexus_la_LIBADD 	= $(top_builddir)/src/libNeXus.la
-libjnexus_la_LDFLAGS 	= @SHARED_LDFLAGS@ $(LDFLAGS)
+libjnexus_la_LDFLAGS 	= @SHARED_LDFLAGS@ $(LDFLAGS) $(JNEXUS_LDFLAGS)
 libjnexus_la_CFLAGS 	= -I$(top_srcdir)/include -Inative @JAVAINCLUDE@ \
-     			@HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@
+     			@HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ $(JNEXUS_CFLAGS)
 
 BUILT_SOURCES		= native/neutron_nexus_NexusFile.h
 nodist_noinst_HEADERS 	= native/neutron_nexus_NexusFile.h 
 noinst_HEADERS		= native/handle.h
 
-AM_JAVACFLAGS	= 
-
-JAVAROOT	= .
-
-# jar file definitions
-jnexus_ARCHIVE = jnexus.jar
-jnexus_CLASS = ncsa/hdf/hdflib/HDFArray.class \
-               ncsa/hdf/hdflib/ArrayDescriptor.class \
-               ncsa/hdf/hdflib/HDFConstants.class \
-               ncsa/hdf/hdflib/HDFException.class \
-               ncsa/hdf/hdflib/HDFJavaException.class \
-               ncsa/hdf/hdflib/HDFNativeData.class \
-               ncsa/hdf/hdflib/HDFNotImplementedException.class \
-               neutron/nexus/AttributeEntry.class \
-               neutron/nexus/NexusException.class \
-               neutron/nexus/NeXusFileInterface.class \
-               neutron/nexus/NexusFile.class \
-               neutron/nexus/NXlink.class
-
-CLEANFILES	= $(jnexus_CLASS) $(jnexus_ARCHIVE) $(BUILT_SOURCES) 
+CLEANFILES	= $(jnexus_jar_CLASS) $(jnexus_jar_ARCHIVE) $(BUILT_SOURCES) \
+	libjnexus.def libjnexus.dll.lib libjnexus.dll.exp \
+               ncsa/hdf/hdflib/ArrayDescriptor.class
 
 clean-local:
 		rm -rf apidoc
@@ -79,20 +84,20 @@ noinst_JAVA	= ncsa/hdf/hdflib/HDFArray.java \
 		neutron/nexus/NexusFile.java \
 		test/TestJapi.java
 
-EXTRA_DIST	= $(noinst_JAVA)
+EXTRA_DIST	= $(noinst_JAVA) README.JNEXUS COPYING.NCSA 
 
 # specific targets
+# neutron/nexus/NexusFile.class:	neutron/nexus/NexusFile.java
 
-neutron/nexus/NexusFile.class:	neutron/nexus/NexusFile.java
-
-native/neutron_nexus_NexusFile.h: neutron/nexus/NexusFile.class
+native/neutron_nexus_NexusFile.h: jnexus.jar # neutron/nexus/NexusFile.class
 	test -d native || mkdir native
-	$(JAVAH) -jni -d native neutron.nexus.NexusFile
+	$(JAVAH) -jni -d native -classpath . neutron.nexus.NexusFile
 
-jnexus.jar: $(jnexus_CLASS)
-	$(JAR) cvf jnexus.jar $(jnexus_CLASS)
+jnexus.jar: $(jnexus_jar_CLASS)
+	$(JAR) cvf jnexus.jar $(jnexus_jar_CLASS) \
+               ncsa/hdf/hdflib/ArrayDescriptor.class
 
-all: $(jnexus_ARCHIVE) $(lib_LTLIBRARIES) javadoc
+#all: $(jnexus_jar_ARCHIVE) $(lib_LTLIBRARIES) javadoc
 
 javadoc:	$(noinst_JAVA)
 	test -d apidoc || mkdir apidoc
@@ -102,6 +107,20 @@ javadoc:	$(noinst_JAVA)
 SUFFIXES = .java .class
 
 .java.class:
-	$(JAVAC) -d $(JAVAROOT) -classpath $(srcdir) $<
+	$(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $<
+
+# Windows import library for DLL
+
+if MINGW_MSYS
+JNEXUS_CFLAGS=-D_JNI_IMPLEMENTATION_
+JNEXUS_LDFLAGS=-Wl,--kill-at
+msimplibdir = ${libdir}
+msimplib_DATA = libjnexus.dll.lib libjnexus.dll.exp libjnexus.def
+libjnexus.def: libjnexus.la
+	pexports .libs/libjnexus-0.dll > libjnexus.def
+libjnexus.dll.exp: libjnexus.dll.lib
+libjnexus.dll.lib: libjnexus.def
+	LIB /MACHINE:I386 /DEF:libjnexus.def /OUT:libjnexus.dll.lib
+endif
 
 ## include $(top_srcdir)/build_rules.am
