@@ -34,7 +34,7 @@ JAVAROOT	= .
 
 # jar file definitions
 javadir		= $(prefix)/nexus/java
-java_DATA = jnexus.jar README.JNEXUS COPYING.NCSA
+java_DATA = jnexus.jar TestJapi.class README.JNEXUS COPYING.NCSA
 jnexus_jar_ARCHIVE = jnexus.jar
 
 jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \
@@ -65,7 +65,7 @@ nodist_noinst_HEADERS 	= native/neutron_nexus_NexusFile.h
 noinst_HEADERS		= native/handle.h
 
 CLEANFILES	= $(jnexus_jar_CLASS) $(jnexus_jar_ARCHIVE) $(BUILT_SOURCES) \
-	libjnexus.def libjnexus.dll.lib libjnexus.dll.exp \
+	libjnexus.def libjnexus.dll.lib libjnexus.dll.exp jnexus.dll \
                ncsa/hdf/hdflib/ArrayDescriptor.class
 
 clean-local:
@@ -121,6 +121,10 @@ libjnexus.def: libjnexus.la
 libjnexus.dll.exp: libjnexus.dll.lib
 libjnexus.dll.lib: libjnexus.def
 	LIB /MACHINE:I386 /DEF:libjnexus.def /OUT:libjnexus.dll.lib
+jnexusbindir = ${bindir}
+jnexusbin_DATA = jnexus.dll
+jnexus.dll : libjnexus.la
+	ln -sf .libs/libjnexus-0.dll jnexus.dll
 endif
 
 ## include $(top_srcdir)/build_rules.am
