@@ -184,6 +184,9 @@ const std::string Frm2Retriever::HEADER_TAG = "header";
 const std::string Frm2Retriever::DATA_TAG = "data";
 const std::string Frm2Retriever::HEIDICTS_TAG = "heidi_cts";
 const std::string Frm2Retriever::HEIDIMON_TAG = "heidi_mon";
+const std::string Frm2Retriever::HEIDIIDS_TAG = "heidi_ids";
+const std::string Frm2Retriever::HEIDIOMG_TAG = "heidi_omg";
+const std::string Frm2Retriever::HEIDISO_TAG = "heidi_so";
 const std::string Frm2Retriever::ARRAY_OPEN_BRACKET="[";
 const std::string Frm2Retriever::ARRAY_CLOSE_BRACKET="]";
 const std::string Frm2Retriever::ARRAY_RANGE_SEPARATOR=":";
@@ -234,6 +237,26 @@ static unsigned int convert_type(std::string nxtype) {
 	}
 	return NX_FLOAT64;
 }
+
+static double arsin(double x)
+{
+  if (x>0)
+    return(asin(MIN(x, 1.0)));
+  if (x<0)
+    return(asin(MAX(x,-1.0)));
+  return(0);
+}
+
+static double sgn(double x)
+{
+  if (x>0)
+    return(1);
+  else if (x<0)
+    return(-1);
+  else
+    return(0);
+}
+
 
 static void reset_file(ifstream &file) {
 	file.clear();
@@ -331,7 +354,7 @@ std::vector<unsigned int> Frm2Retriever::parse_dims(std::string dimstr) {
 		pos = sub_str.find_first_of(Frm2Retriever::ARRAY_CLOSE_BRACKET);
 		if (pos != std::string::npos) {
 			sub_str = sub_str.substr(0,pos);
-			dims = string_util::split_ints(sub_str);	
+			dims = string_util::split_uints(sub_str);	
 		}
 	}
 	return dims;
@@ -593,6 +616,14 @@ bool Frm2Retriever::isunit(std::string line) {
 	return false;
 }
 
+void Frm2Retriever::strip(std::string& str) {
+	while (isspace(str[0])){
+		str = str.substr(1);
+	}
+	while (isspace(str[str.size()-1])){
+		str = str.substr(0, str.size()-1);
+	}
+}
 
 bool Frm2Retriever::isNumber(std::string str) {
 	// eliminate whitespace on both ends
@@ -955,7 +986,7 @@ std::vector<std::vector<unsigned int> > Frm2Retriever::extract_tofcts(std::ifstr
 		line = read_line(infile);
 		if (is_monitor) {
 			if (count == monitor_number) {
-				std::vector<unsigned int> counts = string_util::split_ints(line);
+				std::vector<unsigned int> counts = string_util::split_uints(line);
 				result.push_back(counts);
 			}
 			count++;
@@ -963,7 +994,7 @@ std::vector<std::vector<unsigned int> > Frm2Retriever::extract_tofcts(std::ifstr
 		else {
 			monitor_number = -1;
 			if (count != monitor_number) {
-				std::vector<unsigned int> counts = string_util::split_ints(line);
+				std::vector<unsigned int> counts = string_util::split_uints(line);
 				while (counts.size() < dInfo.at(1)) {
 					// add missing .. zeros
 					counts.push_back(0);
@@ -1028,7 +1059,7 @@ std::vector<double> Frm2Retriever::extract_toftof(std::ifstream &file, std::stri
 
 	if (infile.good()) {
 		line = read_line(infile);
-		std::vector<unsigned int> counts = string_util::split_ints(line);
+		std::vector<unsigned int> counts = string_util::split_uints(line);
 		while (counts.size() < dInfo.at(1)) {
 			// add missing .. zeros
 			counts.push_back(0);
@@ -1094,7 +1125,7 @@ std::vector<unsigned int> Frm2Retriever::extract_desc(std::ifstream &file, std::
 				pos = line.find(Frm2Retriever::METHOD_CLOSE_BRACKET);
 				if (pos != std::string::npos) {
 					line = line.substr(0,pos);
-					result = string_util::split_ints(line);	
+					result = string_util::split_uints(line);	
 				}
 			}
 			break;
@@ -1435,7 +1466,9 @@ std::string Frm2Retriever::extract_header(std::ifstream &file, std::string arg, 
 	std::string result="";
 
 	reset_file(infile);
-	arg.append("=");
+	if (arg[arg.size()-1]!='=') {
+		arg.append("=");
+	}
 	
 	//std::cout << "data_section: " << data_section << std::endl;
 	while (i<data_section) {
@@ -1475,6 +1508,200 @@ std::string Frm2Retriever::extract_header(std::ifstream &file, std::string arg, 
 		i++;
 	}
 	//std::cout << "extract_header returning: " << result << std::endl; //REMOVE
+	return result;
+}
+
+
+std::vector<double> Frm2Retriever::extract_heidi_so(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int word, unsigned int wcount) {
+	const double dlim=1e-8;
+	int i=0, j=0;
+	double x, y;
+	double vl, wl;
+	double psi;
+	double xyz[3];
+  
+	double c;
+	
+	double schi0;
+	double cchi0;
+	double omg1;
+	double phi1;
+	double psr;
+	
+	double angle[5]; 
+	
+	std::vector<double> result;
+	
+	//unsigned int k=0, l=0, u1=0, u2=0;
+	//unsigned int pos=0, pos2=0;
+	//double omat[3][3]; 
+	//std::string str="";
+	//std::string result="";
+	
+	//reset_file(infile);
+	
+printf("extract the orientation matrix\n");	
+	// extract the orientation matrix
+	std::string omat_str = extract_header(file, "Omat", NX_FLOAT64, 0, 9);
+printf("orientation matrix extracted\n");	
+   std::vector<double> om = string_util::split_doubles(omat_str);	
+printf("vector of doubles created: \n%f%f%f\n%f%f%f\n%f%f%f\n\n", om[0], om[1],om[2],om[3],om[4],om[5],om[6],om[7],om[8]);	
+	
+	// extract wavelength
+	std::string wl_str = extract_header(file, "Wave", NX_FLOAT64, 0, 1);
+   wl = string_util::str_to_float(wl_str);	
+	
+	// extract the hkls 
+   std::string hkl_str = extract_data(file, entry_num, NX_INT32, 0, 0, 3);
+printf("hkls extracted:%s\n",hkl_str.c_str());	
+	std::vector<int> hkl = string_util::split_ints(hkl_str);	
+printf("hkls extracted:%d %d %d\n",hkl[0], hkl[1], hkl[2]);	
+	
+	// extract psi
+	std::string psi_str = extract_data(file, entry_num, NX_FLOAT64, 0, 6, 1); 
+printf("psi extracted:%s\n",psi_str.c_str());	
+	psi = (double)atoi(psi_str.c_str());
+
+	// calculate vector length
+	//vl=sqrt(pow(xyz[0], 2)+pow(xyz[1], 2)+pow(xyz[2], 2));
+
+
+  // calculate direction vectors
+  for (i=0; i<3; ++i)
+  {
+    xyz[i]=0.0;
+    for (j=0; j<3; ++j)
+      xyz[i]+=om[(i*3)+j]*hkl[j];
+  }
+
+  // calculate scalar product
+  c=0.0;
+  for (i=0; i<3; ++i) {
+    c+=xyz[i]*xyz[i];
+  }
+  
+  vl=sqrt(c);
+
+  if (vl<dlim)
+    vl=1.0;
+
+  for (i=0; i<3; ++i) {
+    xyz[i]/=vl;
+  }
+
+  x       =xyz[0];
+  y       =xyz[1];
+  schi0   =xyz[2];
+
+  printf("vl:%f, xyz: %f %f %f, psi:%f\n", vl, xyz[0], xyz[1], xyz[2]);
+  angle[2]=arsin(0.5*vl*wl);
+  angle[1]=2.0*angle[2];
+  angle[3]=arsin(schi0);
+  angle[4]=0;
+
+  if ((x*x+y*y)>0) {
+    angle[4]=atan2(-y, x);
+  }
+
+  // psi rotation
+  if (psi!=0)
+  {
+    psr=psi*1.74532925199e-2;
+    cchi0=cos(angle[3]);
+
+    // chi0=0
+    if (fabs(angle[3])==0)
+    {
+      omg1=90.0*1.74532925199e-2;
+      angle[3]=psr+angle[3];
+      phi1=sgn(omg1);
+    }
+    else
+    {
+      if (fabs(cchi0)==0)
+      {
+        omg1=0.0;
+        phi1=psr*sgn(-angle[3]);
+      }
+      else
+      {
+        omg1=atan(sin(psr)*cchi0/schi0);
+        x=cos(omg1);
+        angle[3]=atan2(schi0/x, cchi0*cos(psr));
+        phi1=atan2(-sin(omg1)/cchi0, x*cos(angle[3])/cchi0);
+      }
+    }
+    angle[2]-=omg1;
+    angle[4]-=phi1;
+  }
+
+  for (i=1; i<5; ++i) {
+    angle[i]*=57.2957795130;
+  }
+  x=angle[3];
+
+  if (fabs(x)>180) {
+    angle[3]=x-sgn(360-x);
+  }
+
+  angle[4]+=round(-angle[4]/360)*360.0;
+  if (/*(lphi==0) &&*/ (angle[4]<0)) {
+      angle[4]=angle[4]+360.0;
+  }
+
+  result.push_back(angle[0]);
+  result.push_back(angle[1]);
+  result.push_back(angle[2]);
+  result.push_back(angle[3]);
+	// now we hopefully got the orientation matrix
+   // re-calculate angles, omega, chi and phi  now ...
+   // convert strings to floats
+	// do matrix calculations (inverse from dif4)
+	
+	//std::cout << "extract_header returning: " << result << std::endl; //REMOVE
+	
+	/*while (i<data_section) {
+		std::string line = read_line(infile);
+		pos = line.find(arg);
+		//std::cout << "line: " << line << std::endl;
+		//std::cout << "arg: " << arg << std::endl;
+		if (pos != std::string::npos) {
+			//got the right line in data_section !!
+			str = line.substr(pos+arg.size());
+			//std::cout << "getting val: " << str << std::endl;
+			
+			// scan for word ...
+			std::vector<std::string> words = string_util::split_whitespace(str);
+			for (unsigned int i=0; i< words.size(); i++) {
+				omat[0][i] = string_util::str_to_float(words.at(i));	
+			}
+			
+			// special case for heidi Omat extends over 3 lines
+			if (arg.find("Omat")>=0) {
+				line = read_line(infile);
+				std::vector<std::string> words2 = string_util::split_whitespace(line);
+				for (unsigned int i=0; i< words2.size(); i++) {
+					words.push_back(words2.at(i)); 
+					omat[1][i] = string_util::str_to_float(words2.at(i));	
+			   }		
+				line = read_line(infile);
+				std::vector<std::string> words3 = string_util::split_whitespace(line);
+				for (unsigned int i=0; i< words3.size(); i++) {
+					words.push_back(words3.at(i)); 
+					omat[2][i] = string_util::str_to_float(words2.at(i));	
+				}
+			}
+			
+			//std::cout << "words: " << word << " wcount: " << wcount <<std::endl;
+			for (int j=word; j<word+wcount;j++) {
+				result.append(words[j]).append(" ");
+				//std::cout << "appending: " <<  words[j] <<std::endl;
+			}
+			break;
+		}
+		i++;
+	 }*/
+   
 	return result;
 }
 
@@ -1624,7 +1851,72 @@ std::string Frm2Retriever::extract_data(std::ifstream &file, int entry_num, unsi
 }
 
 
+std::string Frm2Retriever::extract_heidiids(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int lineno, unsigned int word)
+{
+	int cur_line=0;
+	std::string result="";
 
+	std::string line;
+
+	reset_file(infile);
+	skip_to_line(infile, cur_line, data_section);
+
+	line = read_line(infile);
+	std::vector<std::string> words = string_util::split_whitespace(line);
+	int nitems = 1;
+	int nlines = 0;
+	if (isNumber(words.at(7))) {
+		nitems =string_util::str_to_int(words.at(7));
+		nlines = (int)ceil(((double)(nitems*2))/Frm2Retriever::HEIDI_COLS_PER_LINE);
+	}
+	//std::cout << "nlines: " << nlines << std::endl;
+	if (entry_num > 0) {
+		for (unsigned int i=0; i<((entry_num*(nlines+2))+lineno)-1; i++) {
+			read_line(infile);
+		}
+		line = read_line(infile);
+	}
+	//std::cout << "XD line: " << line << "lineno: " << lineno<< std::endl;
+	words = string_util::split_whitespace(line);
+	/*for (unsigned int i =0; i< words.size(); i++) {
+		std::cout << "words["<<i<<"]: " << words[i] << std::endl;
+	}*/
+	//std::cout << "XD words: " << word << " wcount: " << wcount <<std::endl;
+	
+	result.append(std::string(1,words[word][0])).append(" ");
+	result.append(std::string(1,words[word][1]));
+		//std::cout << "XD appending: " <<  words[j] <<std::endl;
+	//std::cout << "XD result: " << result<< std::endl;
+	return result;
+}
+
+
+std::string Frm2Retriever::extract_heidi_omg(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int word, unsigned int wcount)
+{	
+	int ncts=0;
+	double domg=0.0;
+	std::string result="";
+	std::string line;
+	
+   line =  extract_data(file, entry_num, nxtype, 0, 7, 1);
+	if (isNumber(line)) {
+		strip(line);
+		ncts = string_util::str_to_int(line);
+	}
+	line = extract_header(file, "Scan", nxtype, 0, 1);
+	domg = string_util::str_to_float(line); 
+	
+	for (int i=0; i<ncts; i++) {
+   	std::stringstream ss;
+		ss << domg*((double)(i+1));
+		printf("ss.str(): %s\n", ss.str().c_str());
+		result.append(ss.str());
+		if (i<(ncts-1)) {
+			result.append(" ");
+		}
+	}
+	return result;
+}
 
 
 int Frm2Retriever::number_of_columns(std::string header_line) {
@@ -2525,6 +2817,73 @@ void Frm2Retriever::getData(const string &location, tree<Node> &tr){
 				values = string_util::split_doubles(raw_string);	
 				node = createNode("empty", values, convert_type(nxtype), "", vdims);
 			}
+		}
+	}
+	else if (method == Frm2Retriever::HEIDIIDS_TAG) {
+		std::cout << "extracting ids now... '"  << "'" << std::endl;
+		std::string raw_string = extract_heidiids(infile, heidi_entry_num, convert_type(nxtype), line, word);
+		std::cout << "extracted ids string: '" << raw_string << "'" << std::endl;
+		std::vector<double> values;
+  		if (raw_string.size() <= 0) {
+			node = createEmptyNode(arg, convert_type(nxtype));
+		}
+		else {
+			unsigned int pos = raw_string.find("value:");
+			if (pos != std::string::npos) {
+				raw_string = raw_string.substr(pos+6);
+			}
+			if (convert_type(nxtype) == NX_CHAR) {
+				std::cout << "bingo ... got a char ..." << std::endl;
+				if (nxtype == "ISO8601") {
+					std::cout << "bingo ... got a time value ..." << std::endl;
+					// check if its in heidi form
+					if (count_chars(raw_string, '.') > 1) {
+						raw_string = toftof_datetime_2_iso(raw_string);
+					}
+					else if (count_chars(raw_string, '/') > 1) {
+						std::cout << "bingo ... convert ..." << std::endl;
+						raw_string = nicos_datetime_2_iso(raw_string);
+					}
+					else if (count_chars(raw_string, '-') > 1) {
+						raw_string = heidi_datetime_2_iso(raw_string);
+					}
+				}
+				node = createNode("empty", raw_string, convert_type(nxtype));
+			}
+			else {
+				values = string_util::split_doubles(raw_string);	
+				node = createNode("empty", values, convert_type(nxtype), "", vdims);
+			}
+		}
+	}
+	else if (method == Frm2Retriever::HEIDISO_TAG) {
+		std::cout << "getting heidiso data now" << std::endl;
+		std::vector<double> values = extract_heidi_so(infile, heidi_entry_num, convert_type(nxtype), word, wcount);
+		for (int ii=0; ii< values.size(); ii++) {
+			printf("values[%d]:%f\n", ii, values.at(ii));
+		}
+  		if (values.size() <= 0) {
+			node = createEmptyNode(arg, convert_type(nxtype));
+		}
+		else {
+			// remove first value (2theta)
+			values.erase(values.begin());
+			node = createNode("empty", values, convert_type(nxtype), "", vdims);
+		}
+	}
+	else if (method == Frm2Retriever::HEIDIOMG_TAG) {
+		std::string raw_string = extract_heidi_omg(infile, heidi_entry_num, convert_type(nxtype), word, wcount);
+		std::vector<double> values;
+  		if (raw_string.size() <= 0) {
+			node = createEmptyNode(arg, convert_type(nxtype));
+		}
+		else {
+			unsigned int pos = raw_string.find("value:");
+			if (pos != std::string::npos) {
+				raw_string = raw_string.substr(pos+6);
+			}
+			values = string_util::split_doubles(raw_string);	
+			node = createNode("empty", values, convert_type(nxtype), "", vdims);
 		}
 	}
 	else {

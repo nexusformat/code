@@ -5,6 +5,9 @@
 #include <fstream>
 #include <map>
 
+#define MIN(a,b) ( (a)<(b)? (a):(b) )
+#define MAX(a,b) ( (a)>(b)? (a):(b) )
+
 
 class NXunits {
 	public:
@@ -70,6 +73,9 @@ protected:
 
   std::string 										extract_header			(std::ifstream &file, std::string arg, unsigned int nxtype, unsigned int word=0, unsigned int wcount=1);
   std::string 										extract_data			(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int lineno, unsigned int word=0, unsigned int wcount=1);
+  std::vector<double>							extract_heidi_so		(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int word=0, unsigned int wcount=1);
+  std::string 										extract_heidi_omg		(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int word=0, unsigned int wcount=1);
+  std::string 										extract_heidiids			(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int lineno, unsigned int word=0);
   std::vector<double> 							extract_heidi_counts	(std::ifstream &file, int entry_num, bool monitor_counts=false);
   std::vector<std::vector<unsigned int> > extract_tofcts			(std::ifstream &file, std::string arg, unsigned int nxtype, bool is_monitor=false);
   std::vector<double> 							extract_toftof			(std::ifstream &file, std::string arg, unsigned int nxtype, bool is_monitor=false);
@@ -115,6 +121,7 @@ protected:
   
 public: 
   static bool isdata(std::string line);
+  static void strip(std::string& line);
   bool isunit(std::string line);
   static bool isNumber(std::string str);
   static bool isheidicountdata(std::string line);
@@ -128,6 +135,9 @@ public:
   static const std::string DATA_TAG;
   static const std::string HEIDIMON_TAG;
   static const std::string HEIDICTS_TAG;
+  static const std::string HEIDIIDS_TAG;
+  static const std::string HEIDIOMG_TAG;
+  static const std::string HEIDISO_TAG;
   static const std::string TOFCTS_TAG;
   static const std::string TOFTOF_TAG;
   static const std::string TOFDNR_TAG;

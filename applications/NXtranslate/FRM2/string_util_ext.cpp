@@ -78,7 +78,35 @@ extern std::vector<std::string> string_util::split_values(const string &str){
 /*
  * split a line of numeric entrys using whitespace, commas, semicolons, ... as delimiter 
  */
-extern std::vector<unsigned int> string_util::split_ints(const std::string &str){
+extern std::vector<int> string_util::split_ints(const std::string &str){
+  std::vector<int> result;
+  typedef std::string::size_type string_size;
+
+  string_size i=0;
+  while(i<str.size()){
+    // skip seperators at end of last word
+    while(i<str.size() && (isspace(str[i]) || (ispunct(str[i]) && str[i]!='.' && str[i]!='-') )) {
+      i++;
+	 }
+
+    // find end of "word"
+    string_size j=i;
+    while(j<str.size() && !isspace(str[j]) && !(ispunct(str[j]) && str[j]!='.' && str[i]!='-') ){
+      j++;
+    }
+
+    if(i!=j){
+      result.push_back(string_util::str_to_int(str.substr(i,j-i)));
+      i=j;
+    }
+  }
+
+  return result;
+}
+/*
+ * split a line of numeric entrys using whitespace, commas, semicolons, ... as delimiter 
+ */
+extern std::vector<unsigned int> string_util::split_uints(const std::string &str){
   std::vector<unsigned int> result;
   typedef std::string::size_type string_size;
 
@@ -111,8 +139,10 @@ extern std::vector<unsigned int> string_util::split_ints(const std::string &str)
 extern std::vector<double> string_util::split_doubles(const string &str){
   std::vector<double> result;
   typedef std::string::size_type string_size;
-
+  std::string tempstr;
+  
   string_size i=0;
+
   while(i<str.size()){
     // skip seperators at end of last word
     while(i<str.size() && isspace(str[i]) )
@@ -125,7 +155,16 @@ extern std::vector<double> string_util::split_doubles(const string &str){
     }
 
     if(i!=j){
-      result.push_back(string_util::str_to_float(str.substr(i,j-i)));
+		 tempstr = str.substr(i,j-i);
+		 
+		while (isspace(tempstr[0])){
+			tempstr = tempstr.substr(1);
+		}
+		while (isspace(tempstr[tempstr.size()-1])){
+			tempstr = tempstr.substr(0, tempstr.size()-1);
+		}
+		 
+      result.push_back(string_util::str_to_float(tempstr));
       i=j;
     }
   }
