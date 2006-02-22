@@ -124,7 +124,7 @@ endif
 COMMON_SRC=nxinterhelper.c $(NXDATASET)
 
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
-		$(DOC_OUTPUT) $(DOC_SRC)
+		$(DOC_OUTPUT) $(DOC_SRC) nxpython_test.py
 
 BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
 CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
