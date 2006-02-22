@@ -42,7 +42,7 @@ libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
 PYTHONWRAP=nxpython_wrap.c
 endif
 nxpython_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -python nxinter.i 
+	$(SWIG) -o $@ -python -module nxpython -interface libnxpython nxinter.i 
 endif
 
 # tcl wrapper
