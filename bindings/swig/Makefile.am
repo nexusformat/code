@@ -42,7 +42,7 @@ libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
 PYTHONWRAP=nxpython_wrap.c
 endif
 nxpython_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -python -module nxpython -interface libnxpython nxinter.i 
+	$(SWIG) -I$(srcdir) -o $@ -python -module nxpython -interface libnxpython nxinter.i 
 endif
 
 # tcl wrapper
@@ -61,7 +61,7 @@ nxinter_LDFLAGS=-static libnxtcl.la $(top_builddir)/src/libNeXus.la $(TCLLIB) $(
 TCLWRAP=nxinter_wrap.c
 endif
 nxinter_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -tcl8 -ltclsh.i nxinter.i 
+	$(SWIG) -I$(srcdir) -o $@ -tcl8 -ltclsh.i nxinter.i 
 endif
 
 # guile wrapper
@@ -82,7 +82,7 @@ nxguile_LDFLAGS=-static libnxguile.la $(top_builddir)/src/libNeXus.la $(GGLIB) $
 GUILEWRAP=nxguile_wrap.c
 endif
 nxguile_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -guile -lguilemain.i $(SWGUILEFLAGS) nxinter.i
+	$(SWIG) -I$(srcdir) -o $@ -guile -lguilemain.i $(SWGUILEFLAGS) nxinter.i
 endif
 
 # mzscheme wrapper
@@ -98,7 +98,7 @@ libnxscheme_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(MZLIB) $(LDFLAGS)
 SCHEMEWRAP=nxscheme_wrap.c
 endif
 nxscheme_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -o $@ -mzscheme nxinter.i 
+	$(SWIG) -I$(srcdir) -o $@ -mzscheme nxinter.i 
 endif
 
 DOC_SRC		= nxinter.tex
@@ -127,4 +127,4 @@ EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
 		$(DOC_OUTPUT) $(DOC_SRC) nxpython_test.py
 
 BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
-CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
+CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) nxpython.py
