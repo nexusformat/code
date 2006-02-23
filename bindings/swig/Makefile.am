@@ -28,12 +28,14 @@
 #
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include
-lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXPYTHON) $(LIBNXSCHEME) $(LIBNXGUILE)
+lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXSCHEME) $(LIBNXGUILE) $(LIBNXPERL)
+python_LTLIBRARIES=$(LIBNXPYTHON)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 
 # python wrapper
 if HAVE_SWIG
 if HAVE_PYTHON
+nodist_python_PYTHON=nxpython.py
 LIBNXPYTHON=libnxpython.la
 libnxpython_la_SOURCES=$(COMMON_SRC)
 nodist_libnxpython_la_SOURCES=$(PYTHONWRAP)
@@ -43,6 +45,20 @@ PYTHONWRAP=nxpython_wrap.c
 endif
 nxpython_wrap.c: nxinter.i nxdataset.i
 	$(SWIG) -I$(srcdir) -o $@ -python -module nxpython -interface libnxpython nxinter.i 
+endif
+
+# perl wrapper (not working yet)
+if HAVE_SWIG
+if HAVE_PERL
+LIBNXPERL=libnxperl.la
+libnxperl_la_SOURCES=$(COMMON_SRC)
+nodist_libnxperl_la_SOURCES=$(PERLWRAP)
+libnxperl_la_CFLAGS=-I/usr/lib/perl5/5.8.6/i386-linux-thread-multi/CORE/ $(CFLAGS)
+libnxperl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
+PERLWRAP=nxperl_wrap.c
+endif
+nxperl_wrap.c: nxinter.i nxdataset.i
+	$(SWIG) -I$(srcdir) -o $@ -perl5 -module nxperl nxinter.i 
 endif
 
 # tcl wrapper
@@ -126,5 +142,5 @@ COMMON_SRC=nxinterhelper.c $(NXDATASET)
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
 		$(DOC_OUTPUT) $(DOC_SRC) nxpython_test.py
 
-BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP)
+BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) nxpython.py
 CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) nxpython.py
