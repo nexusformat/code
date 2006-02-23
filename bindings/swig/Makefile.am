@@ -48,18 +48,18 @@ nxpython_wrap.c: nxinter.i nxdataset.i
 endif
 
 # perl wrapper (not working yet)
-if HAVE_SWIG
-if HAVE_PERL
-LIBNXPERL=libnxperl.la
-libnxperl_la_SOURCES=$(COMMON_SRC)
-nodist_libnxperl_la_SOURCES=$(PERLWRAP)
-libnxperl_la_CFLAGS=-I/usr/lib/perl5/5.8.6/i386-linux-thread-multi/CORE/ $(CFLAGS)
-libnxperl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
-PERLWRAP=nxperl_wrap.c
-endif
-nxperl_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -I$(srcdir) -o $@ -perl5 -module nxperl nxinter.i 
-endif
+#if HAVE_SWIG
+#if HAVE_PERL
+#LIBNXPERL=libnxperl.la
+#libnxperl_la_SOURCES=$(COMMON_SRC)
+#nodist_libnxperl_la_SOURCES=$(PERLWRAP)
+#libnxperl_la_CFLAGS=-I/usr/lib/perl5/5.8.6/i386-linux-thread-multi/CORE/ $(CFLAGS)
+#libnxperl_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
+#PERLWRAP=nxperl_wrap.c
+#endif
+#nxperl_wrap.c: nxinter.i nxdataset.i
+#	$(SWIG) -I$(srcdir) -o $@ -perl5 -module nxperl nxinter.i 
+#endif
 
 # tcl wrapper
 if HAVE_SWIG
