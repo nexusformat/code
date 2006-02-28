@@ -146,8 +146,6 @@ static void my_characters(void *user_data, const xmlChar *ch, int len){
   if(str.size()<=0) return;
 
   // add the characters with a space between it and what was there
-  if(((UserData *)user_data)->char_data.size()>0)
-    ((UserData *)user_data)->char_data+=" ";
   ((UserData *)user_data)->char_data+=str;
 
 #ifdef DEBUG_XML_RETRIEVER_DOM

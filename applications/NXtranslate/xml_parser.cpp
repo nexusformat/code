@@ -172,8 +172,6 @@ static void my_characters(void *user_data, const xmlChar *ch, int len){
   if(str.size()<=0) return;
 
   // add the characters with a space between it and what was there
-  if(((UserData *)user_data)->char_data.size()>0)
-    ((UserData *)user_data)->char_data+=" ";
   ((UserData *)user_data)->char_data+=str;
 }
 
@@ -379,6 +377,8 @@ static void my_endElement(void *user_data, const xmlChar *name){
   NXhandle *handle=((UserData *)user_data)->handle;
   
   // deal with character data if necessary
+  ((UserData *)user_data)->char_data
+    =string_util::trim(((UserData *)user_data)->char_data);
   if(((UserData *)user_data)->char_data.size()>0){
     // update the node with the character value
     try{

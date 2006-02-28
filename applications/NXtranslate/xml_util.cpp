@@ -12,7 +12,8 @@ extern string xml_util::xmlChar_to_str(const xmlChar *ch, int len){
   if( (len>0) && ((unsigned int)len<result.size()) )
     result.erase(result.begin()+len,result.end());
 
-  return string_util::trim(result);
+  return result;
+  //  return string_util::trim(result);
 }
 
 extern vector<string> xml_util::xmlattr_to_strvec(const xmlChar* char_array[]){
