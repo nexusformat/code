@@ -376,6 +376,8 @@ void TextXmlRetriever::getData(const string &location, tree<Node> &tr){
     // get the dimensions and remove it from the location
     str_dims=get_dims(str_path);
     str_path=str_path.substr(str_dims.size(),str_path.size());
+    if(str_dims.empty())
+      str_dims="[1]";
     // remove the separating colon
     str_path=str_path.substr(1,str_path.size());
   }
