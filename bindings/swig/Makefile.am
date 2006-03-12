@@ -28,7 +28,7 @@
 #
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include
-lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXSCHEME) $(LIBNXGUILE) $(LIBNXPERL)
+lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXSCHEME) $(LIBNXGUILE) # $(LIBNXPERL)
 python_LTLIBRARIES=$(LIBNXPYTHON)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 

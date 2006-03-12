@@ -222,6 +222,11 @@ dnl
 dnl First any host specific bits
 dnl
 MINGW_MSYS=no
+
+dnl microsoft LIB command (used in MinGW makefile to create .LIB file)
+AC_CHECK_PROGS(MS_LIB, [LIB])
+AM_CONDITIONAL(HAVE_MS_LIB, [test ! -z "$MS_LIB"])
+
 HDF_EXT=a # library file extent to look for with HDF libraries
 case $host in
     alpha*-dec-osf*)

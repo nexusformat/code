@@ -1,0 +1,32 @@
+Install MinGW from http://www.mingw.org/ using the MINGW installer -
+I used MinGW-5.0.2.exe and installed the "current" binaries. As you need
+to install MSYS later on, do not install MINGW make.
+
+Now download the MSYS installer (I used MSYS-1.0.10.exe) and also the MSYS developer toolkit (msysDTK-1.0.1.exe in my case) from the MinGW downloads page and install. You also need to install mingw-utils (for the pexports command), whihc you download as a .tar.gz file and then unpack to your c:/MinGW directory
+
+Now edit the file "make_mingw_links" as instructed within and run 
+
+If you wish a Microsoft compatible import library to also be built, you need to make sure the LIB command is available in your MinGW path. Type LIB at the MSYS prompt now to check
+
+Now just type
+
+./configure
+make
+make check
+make install
+
+If you get a compile error about redeclaration of ssize_t when including the HDF5 header, you need to edit H5pubconf.h in the HDF5 distribution and change the definition of H5_SIZEOF_SSIZE_T to e.g.
+
+#define H5_SIZEOF_SSIZE_T  4 /* for 32 bit machines */
+
+
+get
+
+lib/libNeXus.a : static library
+lib/libNeXus.dll.a : import library for libNeXus-0.dll
+bin/libNeXus-0.dll
+
+--
+
+$Id$
+Freddie Akeroyd (F.A.Akeroyd@rl.ac.uk)

@@ -50,12 +50,17 @@ lib_LTLIBRARIES = libNeXus.la
 
 if MINGW_MSYS
 msimplibdir = ${libdir}
-msimplib_DATA = libNeXus.dll.lib libNeXus.dll.exp libNeXus.def
 libNeXus.def: libNeXus.la
 	pexports .libs/libNeXus-0.dll > libNeXus.def
+if HAVE_MS_LIB
+msimplib_DATA = libNeXus.dll.lib libNeXus.dll.exp libNeXus.def
 libNeXus.dll.exp: libNeXus.dll.lib
 libNeXus.dll.lib: libNeXus.def
-	LIB /MACHINE:I386 /DEF:libNeXus.def /OUT:libNeXus.dll.lib
+	rm -f libNeXus.dll.lib libNeXus.dll.exp
+	$(MS_LIB) /MACHINE:I386 /DEF:libNeXus.def /OUT:libNeXus.dll.lib
+else
+msimplib_DATA = libNeXus.def
+endif
 endif
 
 #SUBDIRS=nxdict
