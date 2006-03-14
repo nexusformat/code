@@ -1050,7 +1050,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_debugstop
 
    while(iStop)
    {
-#ifdef WIN32
+#if 0 /* defined(WIN32) /* we use mingw now */
 	   Sleep(2000);
 #else
        sleep(2);
