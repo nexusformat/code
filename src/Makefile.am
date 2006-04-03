@@ -46,6 +46,9 @@ endif
 
 lib_LTLIBRARIES = libNeXus.la
 
+nexus_symbols.sym : nexus_symbols.txt
+	cp $(srcdir)/nexus_symbols.txt nexus_symbols.sym
+
 # Windows import library for DLL
 
 if MINGW_MSYS
@@ -66,7 +69,8 @@ endif
 #SUBDIRS=nxdict
 
 libNeXus_la_SOURCES = napi.c napiu.c $(H4SRC) $(H5SRC) $(XMLSRC)
-libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+libNeXus_la_LDFLAGS = -export-symbols nexus_symbols.sym @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 
 ## The following part is the solution for automake >= 1.7
 ## 
@@ -81,7 +85,7 @@ libNeXus_la_LDFLAGS = @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAG
 ## libNeXus_la_LIBADD += -lhdf5 
 ## endif
 
-EXTRA_DIST=nxio.h nxdataset.h
-CLEANFILES=libNeXus.def libNeXus.dll.lib libNeXus.dll.exp
+EXTRA_DIST=nxio.h nxdataset.h nexus_symbolos.txt
+CLEANFILES=libNeXus.def libNeXus.dll.lib libNeXus.dll.exp nexus_symbols.sym
 
 include $(top_srcdir)/build_rules.am
