@@ -85,7 +85,7 @@ libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 ## libNeXus_la_LIBADD += -lhdf5 
 ## endif
 
-EXTRA_DIST=nxio.h nxdataset.h nexus_symbolos.txt
+EXTRA_DIST=nxio.h nxdataset.h nexus_symbols.txt
 CLEANFILES=libNeXus.def libNeXus.dll.lib libNeXus.dll.exp nexus_symbols.sym
 
 include $(top_srcdir)/build_rules.am
