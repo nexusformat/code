@@ -24,7 +24,7 @@ struct Grp_parameters   //parameters of the different definitions
   char c;                     //c=l for loop and c=p for (x,y,z,...)
 };
 
-#define SWAP_ENDIAN                       //triger the swapping endian subroutine (if needed)
+#define SWAP_ENDIAN  //triger the swapping endian subroutine (if needed)
 
 using std::ifstream;
 using std::invalid_argument;
@@ -970,10 +970,10 @@ void DoCalculation (binary_type* GrpArray1,
 /*******************************************/
 inline void endian_swap (binary_type& x)
 {
-  x = (x>>24) |
+  x = ((x>>24) & 0x000000FF) |
     ((x<<8) & 0x00FF0000) |
     ((x>>8) & 0x0000FF00) |
-    (x<<24);
+    ((x<<24) & 0xFF000000);
 }
 
 /*******************************************
