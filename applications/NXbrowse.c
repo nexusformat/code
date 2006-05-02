@@ -190,21 +190,55 @@ int main(int argc, char *argv[])
    } while (status == NX_OK);
    return NX_OK;
 }
+/* Checks for attributes and outputs their values */
+void PrintGroupAttributes (NXhandle fileId, char *groupname)
+{
+   int status, attrLen, attrType;
+   NXname attrName;
+   void *attrBuffer;
+
+   do {
+      status = NXgetnextattr (fileId, attrName, &attrLen, &attrType);
+      if (status == NX_ERROR) return;
+      if (status == NX_OK) {
+         attrLen++; /* Add space for string termination */
+         if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return;
+         if (NXgetattr (fileId, attrName, attrBuffer,&attrLen , &attrType) != NX_OK) return;
+         printf ("             %s attribute: %s = ", groupname, attrName);
+         PrintData (attrBuffer, attrType, attrLen);
+         printf ("\n");
+         if (NXfree((void**)&attrBuffer) != NX_OK) return;
+      }
+   } while (status != NX_EOD);
+   return;
+}
 
 /* Outputs the contents of a NeXus group */
 int NXBdir (NXhandle fileId)
 {
-   int status, dataType, dataRank, dataDimensions[NX_MAXRANK];
-   NXname name, class;
+   int status, dataType, dataRank, dataDimensions[NX_MAXRANK], length;
+   NXname name, class, nxurl;
 
    if (NXinitgroupdir (fileId) != NX_OK) return NX_ERROR;
    do {
       status = NXgetnextentry (fileId, name, class, &dataType);
       if (status == NX_ERROR) break;
       if (status == NX_OK) {
-         if (!strncmp(class,"NX",2))
-            printf ("  NX Group : %s (%s)\n", name, class);
-         if (!strncmp(class,"SDS",3)) {
+	if (strstr(class,"SDS") == NULL && strstr(class,"NX") != NULL){
+	    length = sizeof(nxurl);
+	    if(NXisexternalgroup(fileId, name,class,nxurl,length) == NX_OK){
+	      printf ("  NX external Group: %s (%s), linked to: %s \n",name,class,nxurl); 
+            } else {
+	      printf ("  NX Group : %s (%s)\n", name, class);
+	      if((status = NXopengroup(fileId,name,class)) != NX_OK){
+		return status;
+	      } 
+	      PrintGroupAttributes(fileId, name);
+	      if((status = NXclosegroup(fileId)) != NX_OK){
+		return status;
+	      } 
+            }
+	} else if(strstr(class,"CDF") == NULL){ 
             printf ("  NX Data  : %s", name);
             if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
             if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
@@ -213,7 +247,7 @@ int NXBdir (NXhandle fileId)
             printf (" ");
             PrintType (dataType);
             printf ("\n");
-         }
+	}
       }
    } while (status == NX_OK);
    return status;

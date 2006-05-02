@@ -95,6 +95,8 @@ int PrintGroup ()
    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], dataLen;     
    NXname name, class;
 
+   PrintAttributes();
+
    indent += 3;
    do {
       status = NXgetnextentry (inId, name, class, &dataType);

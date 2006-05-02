@@ -3,7 +3,7 @@
   
   Application Program Interface Routines
   
-  Copyright (C) 1997-2000 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2006 Mark Koennecke, Przemek Klosowski
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 
 ----------------------------------------------------------------------------*/
 
-static const char* rscid = "$Id$";	/* Revision interted by CVS */
+static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,8 +33,81 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #include <time.h>
 #include <stdarg.h>
 #include "napi.h"
+#include "nxstack.h"
 
+/*---------------------------------------------------------------------
+ Recognized and handled napimount URLS
+ -----------------------------------------------------------------------*/
+#define NXBADURL 0
+#define NXFILE 1
+
+/*--------------------------------------------------------------------*/
 static int iFortifyScope;
+/*----------------------------------------------------------------------
+  This is a section with code for searching the NX_LOAD_PATH
+  -----------------------------------------------------------------------*/
+#ifdef _WIN32
+#define LIBSEP ";"
+#define PATHSEP "\\"
+#else
+#define LIBSEP ":"
+#define PATHSEP "/"
+#endif
+extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
+/*---------------------------------------------------------------------
+ wrapper for getenv. This is a future proofing thing for porting to OS
+ which have different ways of accessing environment variables
+ --------------------------------------------------------------------*/ 
+static char *nxgetenv(const char *name){
+  return getenv(name);
+}
+/*----------------------------------------------------------------------*/
+static int canOpen(char *filename){
+  FILE *fd = NULL;
+
+  fd = fopen(filename,"r");
+  if(fd != NULL){
+    fclose(fd);
+    return 1;
+  } else {
+    return 0;
+  }
+} 
+/*--------------------------------------------------------------------*/
+static char *locateNexusFileInPath(char *startName){
+  char *loadPath = NULL, *testPath = NULL, *pPtr = NULL;
+  char pathPrefix[256];
+  int length;
+
+  if(canOpen(startName)){
+    return strdup(startName);
+  }
+
+  loadPath = nxgetenv("NX_LOAD_PATH");
+  if(loadPath == NULL){
+    /* file not found will be issued by upper level code */
+    return strdup(startName);
+  }
+
+  pPtr = stptok(loadPath,pathPrefix,255,LIBSEP);
+  while(pPtr != NULL){
+    length = strlen(pathPrefix) + strlen(startName) + strlen(PATHSEP) + 2;
+    testPath = malloc(length*sizeof(char));
+    if(testPath == NULL){
+      return strdup(startName);
+    }
+    memset(testPath,0,length*sizeof(char));
+    strcpy(testPath, pathPrefix);
+    strcat(testPath,PATHSEP);
+    strcat(testPath,startName);
+    if(canOpen(testPath)){
+      return(testPath);
+    }
+    free(testPath);
+    pPtr = stptok(pPtr,pathPrefix,255,LIBSEP);
+  }
+  return  strdup(startName);
+}
 /*------------------------------------------------------------------------
   HDF-5 cache size special stuff
   -------------------------------------------------------------------------*/
@@ -49,7 +122,6 @@ NXstatus NXsetcache(long newVal)
   }
   return NX_ERROR;
 }
-
     
 /*-----------------------------------------------------------------------*/
 static NXstatus NXisXML(CONSTCHAR *filename)
@@ -69,22 +141,14 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 }
 
 /*-------------------------------------------------------------------------*/
- 
-
-   /*---------------------------------------------------------------------*/
-
   void NXNXNXReportError(void *pData, char *string)
   {
     printf("%s \n",string);
   }
-     
   /*---------------------------------------------------------------------*/
-
   void *NXpData = NULL;
   void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
-
   /*---------------------------------------------------------------------*/
-
   extern void NXMSetError(void *pData, 
 			      void (*NewError)(void *pD, char *text))
   {
@@ -95,7 +159,11 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 extern ErrFunc NXMGetError(){
   return NXIReportError;
 }
-  
+/*----------------------------------------------------------------------*/
+void NXNXNoReport(void *pData, char *string){
+  /* do nothing */
+}  
+/*----------------------------------------------------------------------*/
 #ifdef HDF5
 #include "napi5.h"
 #endif
@@ -105,7 +173,6 @@ extern ErrFunc NXMGetError(){
 #ifdef NXXML
 #include "nxxml.h"
 #endif  
-
   /* ---------------------------------------------------------------------- 
   
                           Definition of NeXus API
@@ -148,8 +215,36 @@ static int determineFileType(CONSTCHAR *filename)
   */
   return 0;
 }
+/*---------------------------------------------------------------------*/
+static pNexusFunction handleToNexusFunc(NXhandle fid){
+  pFileStack fileStack = NULL;
+  fileStack = (pFileStack)fid;
+  if(fileStack != NULL){
+    return peekFileOnStack(fileStack);
+  } else {
+    return NULL;
+  }
+}
+/*----------------------------------------------------------------------*/
+NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
+  int status;
+  pFileStack fileStack = NULL;
+  NXhandle hfile;
+
+  fileStack = makeFileStack();
+  if(fileStack == NULL){
+    NXIReportError (NXpData,"ERROR: no memory to create filestack");
+      return NX_ERROR;
+  }
+  status = NXinternalopen(userfilename,am,fileStack);
+  if(status == NX_OK){
+    *gHandle = fileStack;
+  }
+
+  return status;
+}
 /*-----------------------------------------------------------------------*/
-  NXstatus   NXopen(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
+NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileStack)
   {
     int hdf_type=0;
     int iRet=0;
@@ -159,6 +254,7 @@ static int determineFileType(CONSTCHAR *filename)
     pNexusFunction fHandle;
     NXstatus retstat;
     char error[1024];
+    char *filename = NULL;
         
     /* configure fortify 
     iFortifyScope = Fortify_EnterScope();
@@ -168,13 +264,12 @@ static int determineFileType(CONSTCHAR *filename)
     /*
       allocate data
     */
-    *gHandle = NULL;
     fHandle = (pNexusFunction)malloc(sizeof(NexusFunction));
     if (fHandle == NULL) {
       NXIReportError (NXpData,"ERROR: no memory to create Function structure");
       return NX_ERROR;
     }
-	memset(fHandle, 0, sizeof(NexusFunction)); /* so any functions we miss are NULL */
+    memset(fHandle, 0, sizeof(NexusFunction)); /* so any functions we miss are NULL */
        
     /*
       test the strip flag. Elimnate it for the rest of the tests to work
@@ -188,16 +283,26 @@ static int determineFileType(CONSTCHAR *filename)
     if (am==NXACC_CREATE) {
       /* HDF4 will be used ! */
       hdf_type=1;
+      filename = strdup(userfilename);
     } else if (am==NXACC_CREATE4) {
       /* HDF4 will be used ! */
       hdf_type=1;   
+      filename = strdup(userfilename);
     } else if (am==NXACC_CREATE5) {
       /* HDF5 will be used ! */
       hdf_type=2;   
+      filename = strdup(userfilename);
     } else if (am==NXACC_CREATEXML) {
       /* XML will be used ! */
       hdf_type=3;   
+      filename = strdup(userfilename);
     } else {
+      filename = locateNexusFileInPath((char *)userfilename);
+      if(filename == NULL){
+	NXIReportError(NXpData,"Out of memory in NeXus-API");
+	free(fHandle);
+	return NX_ERROR;
+      }
       /* check file type hdf4/hdf5/XML for reading */
       iRet = determineFileType(filename);
       if(iRet < 0) {
@@ -207,28 +312,35 @@ static int determineFileType(CONSTCHAR *filename)
 	return NX_ERROR;
       }
       if(iRet == 0){
-	snprintf(error,1023,"failed to detrmine filetype for %s ",
+	snprintf(error,1023,"failed to determine filetype for %s ",
 		 filename);
 	NXIReportError(NXpData,error);
+	free(fHandle);
 	return NX_ERROR;
       }
       hdf_type = iRet;
     }
+    if(filename == NULL){
+	NXIReportError(NXpData,"Out of memory in NeXus-API");
+	return NX_ERROR;
+    }
+
     if (hdf_type==1) {
       /* HDF4 type */
 #ifdef HDF4
       retstat = NX4open((const char *)filename,am,&hdf4_handle);
       if(retstat != NX_OK){
 	free(fHandle);
+	free(filename);
 	return retstat;
       }
       fHandle->pNexusData=hdf4_handle;
       NX4assignFunctions(fHandle);
-      *gHandle = fHandle;
+      pushFileStack(fileStack,fHandle,filename);
 #else
       NXIReportError (NXpData,
          "ERROR: Attempt to create HDF4 file when not linked with HDF4");
-      *gHandle = NULL;
+      free(filename);
       retstat = NX_ERROR;
 #endif /* HDF4 */
       return retstat; 
@@ -238,15 +350,16 @@ static int determineFileType(CONSTCHAR *filename)
       retstat = NX5open(filename,am,&hdf5_handle);
       if(retstat != NX_OK){
 	free(fHandle);
+	free(filename);
 	return retstat;
       }
       fHandle->pNexusData=hdf5_handle;
       NX5assignFunctions(fHandle);
-      *gHandle = fHandle;
+      pushFileStack(fileStack,fHandle, filename);
 #else
       NXIReportError (NXpData,
 	 "ERROR: Attempt to create HDF5 file when not linked with HDF5");
-      *gHandle = NULL;
+      free(filename);
       retstat = NX_ERROR;
 #endif /* HDF5 */
       return retstat;
@@ -258,23 +371,24 @@ static int determineFileType(CONSTCHAR *filename)
       retstat = NXXopen(filename,am,&xmlHandle);
       if(retstat != NX_OK){
 	free(fHandle);
+	free(filename);
 	return retstat;
       }
       fHandle->pNexusData=xmlHandle;
       NXXassignFunctions(fHandle);
-      *gHandle = fHandle;
+      pushFileStack(fileStack,fHandle, filename);
 #else
       NXIReportError (NXpData,
 	 "ERROR: Attempt to create XML file when not linked with XML");
-      *gHandle = NULL;
       retstat = NX_ERROR;
 #endif
     } else {
       NXIReportError (NXpData,
           "ERROR: Format not readable by this NeXus library");
-      *gHandle = NULL;
+      free(filename);
       return NX_ERROR;
     }
+    free(filename); 
     return NX_OK;
   }
 
@@ -284,13 +398,19 @@ static int determineFileType(CONSTCHAR *filename)
   { 
     NXhandle hfil; 
     int status;
+    pFileStack fileStack = NULL;
    
     pNexusFunction pFunc=NULL;
-    pFunc = (pNexusFunction)*fid;
+    fileStack = (pFileStack)*fid;
+    pFunc = peekFileOnStack(fileStack);
     hfil = pFunc->pNexusData;
     status =  pFunc->nxclose(&hfil);
     pFunc->pNexusData = hfil;
     free(pFunc);
+    popFileStack(fileStack);
+    if(fileStackDepth(fileStack) < 0){
+      killFileStack(fileStack);
+    }
     /* 
     Fortify_CheckAllMemory();
     */
@@ -301,24 +421,112 @@ static int determineFileType(CONSTCHAR *filename)
 
   NXstatus  NXmakegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
-     pNexusFunction pFunc = (pNexusFunction)fid;
+     pNexusFunction pFunc = handleToNexusFunc(fid);
      return pFunc->nxmakegroup(pFunc->pNexusData, name, nxclass);   
   }
+  /*------------------------------------------------------------------------*/
+static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen, 
+			    char *extPath, int extPathLen){
+  char *pPtr = NULL, *path = NULL;
+  int length;
 
+  memset(extFile,0,extFileLen);
+  memset(extPath,0,extPathLen);
+  pPtr = strstr(napiMount,"nxfile://");
+  if(pPtr == NULL){
+    return NXBADURL;
+  }
+  path = strrchr(napiMount,'#');
+  if(path == NULL){
+    length = strlen(napiMount) - 9;
+    if(length > extFileLen){
+      NXIReportError(NXpData,"ERROR: internal errro with external linking");
+      return NXBADURL;
+    }
+    memcpy(extFile,pPtr+9,length);
+    strcpy(extPath,"/");
+    return NXFILE;
+  } else {
+    pPtr += 9;
+    length = path - pPtr;
+    if(length > extFileLen){
+      NXIReportError(NXpData,"ERROR: internal errro with external linking");
+      return NXBADURL;
+    }
+    memcpy(extFile,pPtr,length);
+    length = strlen(path-1);
+    if(length > extPathLen){
+      NXIReportError(NXpData,"ERROR: internal errro with external linking");
+      return NXBADURL;
+    }
+    strcpy(extPath,path+1);
+    return NXFILE;
+  }
+  return NXBADURL;
+}
   /*------------------------------------------------------------------------*/
 
   NXstatus  NXopengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
-    return pFunc->nxopengroup(pFunc->pNexusData, name, nxclass);  
+    int status, attStatus, type = NX_CHAR, length = 1023;
+    NXaccess access = NXACC_RDWR;
+    NXlink breakID;
+    pFileStack fileStack;    
+    char nxurl[1024], exfile[512], expath[512];
+    ErrFunc oldError;
+
+    fileStack = (pFileStack)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+
+    status = pFunc->nxopengroup(pFunc->pNexusData, name, nxclass);  
+    oldError = NXMGetError();
+    NXIReportError = NXNXNoReport;
+    attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
+    NXIReportError = oldError;
+    if(attStatus == NX_OK){
+      /*
+	this is an external linking group
+      */
+      status = analyzeNapimount(nxurl,exfile,511,expath,511);
+      if(status == NXBADURL){
+	return NX_ERROR;
+      }
+      status = NXinternalopen(exfile,access, fileStack);
+      if(status == NX_ERROR){
+	return status;
+      }
+      status = NXopenpath(fid,expath);
+      NXgetgroupID(fid,&breakID);
+      setCloseID(fileStack,breakID);
+    }
+    
+    return status;
   } 
 
   /* ------------------------------------------------------------------- */
 
   NXstatus  NXclosegroup (NXhandle fid)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
-    return pFunc->nxclosegroup(pFunc->pNexusData);  
+    int status;
+    pFileStack fileStack = NULL;
+    NXlink closeID, currentID;
+
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    fileStack = (pFileStack)fid;
+    if(fileStackDepth(fileStack) == 0){
+      return pFunc->nxclosegroup(pFunc->pNexusData);  
+    } else {
+      /* we have to check for leaving an external file */
+      NXgetgroupID(fid,&currentID);
+      peekIDOnStack(fileStack,&closeID);
+      if(NXsameID(fid,&closeID,&currentID) == NX_OK){
+	NXclose(&fid);
+	status = NXclosegroup(fid);
+      } else {
+	status = pFunc->nxclosegroup(pFunc->pNexusData);
+      }
+      return status;
+    }
   }   
 
   /* --------------------------------------------------------------------- */
@@ -326,7 +534,7 @@ static int determineFileType(CONSTCHAR *filename)
   NXstatus  NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int dimensions[])
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     if ( (datatype == NX_CHAR) && (rank > 1) )
     {
         NXIReportError (NXpData,
@@ -345,7 +553,7 @@ static int determineFileType(CONSTCHAR *filename)
   NXstatus  NXcompmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
                            int rank, int dimensions[],int compress_type, int chunk_size[])
   {
-    pNexusFunction pFunc = (pNexusFunction)fid; 
+    pNexusFunction pFunc = handleToNexusFunc(fid); 
     if ( (datatype == NX_CHAR) && (rank > 1) )
     {
         NXIReportError (NXpData,
@@ -363,7 +571,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   NXstatus  NXcompress (NXhandle fid, int compress_type)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid; 
+    pNexusFunction pFunc = handleToNexusFunc(fid); 
     return pFunc->nxcompress (pFunc->pNexusData, compress_type); 
   }
   
@@ -372,7 +580,7 @@ static int determineFileType(CONSTCHAR *filename)
   
   NXstatus  NXopendata (NXhandle fid, CONSTCHAR *name)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid; 
+    pNexusFunction pFunc = handleToNexusFunc(fid); 
     return pFunc->nxopendata(pFunc->pNexusData, name); 
   } 
 
@@ -381,7 +589,7 @@ static int determineFileType(CONSTCHAR *filename)
     
   NXstatus  NXclosedata (NXhandle fid)
   { 
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxclosedata(pFunc->pNexusData);
   }
 
@@ -389,7 +597,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   NXstatus  NXputdata (NXhandle fid, void *data)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxputdata(pFunc->pNexusData, data);
   }
 
@@ -398,7 +606,7 @@ static int determineFileType(CONSTCHAR *filename)
   NXstatus  NXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
                                   int datalen, int iType)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxputattr(pFunc->pNexusData, name, data, datalen, iType);
   }
 
@@ -406,7 +614,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   NXstatus  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxputslab(pFunc->pNexusData, data, iStart, iSize);
   }
 
@@ -414,7 +622,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   NXstatus  NXgetdataID (NXhandle fid, NXlink* sRes)
   {  
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxgetdataID(pFunc->pNexusData, sRes);
   }
 
@@ -423,7 +631,7 @@ static int determineFileType(CONSTCHAR *filename)
 
   NXstatus  NXmakelink (NXhandle fid, NXlink* sLink)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxmakelink(pFunc->pNexusData, sLink);
   }
   /* --------------------------------------------------------------------*/
@@ -445,10 +653,12 @@ static int determineFileType(CONSTCHAR *filename)
   NXstatus  NXflush(NXhandle *pHandle)
   {
     NXhandle hfil; 
+    pFileStack fileStack = NULL;
     int status;
    
     pNexusFunction pFunc=NULL;
-    pFunc = (pNexusFunction)*pHandle;
+    fileStack = (pFileStack)*pHandle;
+    pFunc = peekFileOnStack(fileStack);
     hfil = pFunc->pNexusData;
     status =  pFunc->nxflush(&hfil);
     pFunc->pNexusData = hfil;
@@ -513,7 +723,7 @@ static int determineFileType(CONSTCHAR *filename)
  
   NXstatus  NXgetnextentry (NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxgetnextentry(pFunc->pNexusData, name, nxclass, datatype);  
   }
 /*----------------------------------------------------------------------*/
@@ -563,7 +773,7 @@ static char *nxitrim(char *str)
     int status, type, rank, iDim[NX_MAXRANK];
     char *pPtr, *pPtr2;
 
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type); /* unstripped size if string */
     if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) )
     {
@@ -589,7 +799,7 @@ static char *nxitrim(char *str)
     int status;
     char *pPtr = NULL;
 
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     status = pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
     /*
       the length of a string may be trimmed....
@@ -616,7 +826,7 @@ static char *nxitrim(char *str)
   NXstatus  NXgetslab (NXhandle fid, void *data, 
 				    int iStart[], int iSize[])
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxgetslab(pFunc->pNexusData, data, iStart, iSize);
   }
   
@@ -626,7 +836,7 @@ static char *nxitrim(char *str)
   NXstatus  NXgetnextattr (NXhandle fileid, NXname pName,
                                      int *iLength, int *iType)
   {
-    pNexusFunction pFunc = (pNexusFunction)fileid;
+    pNexusFunction pFunc = handleToNexusFunc(fileid);
     return pFunc->nxgetnextattr(pFunc->pNexusData, pName, iLength, iType);  
   }
  
@@ -635,7 +845,7 @@ static char *nxitrim(char *str)
 
   NXstatus  NXgetattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxgetattr(pFunc->pNexusData, name, data, datalen, iType);  
   }
 
@@ -644,7 +854,7 @@ static char *nxitrim(char *str)
 
   NXstatus  NXgetattrinfo (NXhandle fid, int *iN)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxgetattrinfo(pFunc->pNexusData, iN);  
   }
 
@@ -653,7 +863,7 @@ static char *nxitrim(char *str)
 
   NXstatus  NXgetgroupID (NXhandle fileid, NXlink* sRes)
   {
-    pNexusFunction pFunc = (pNexusFunction)fileid;
+    pNexusFunction pFunc = handleToNexusFunc(fileid);
     return pFunc->nxgetgroupID(pFunc->pNexusData, sRes);  
   }
 
@@ -661,7 +871,7 @@ static char *nxitrim(char *str)
 
   NXstatus  NXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxgetgroupinfo(pFunc->pNexusData, iN, pName, pClass);  
   }
 
@@ -670,7 +880,7 @@ static char *nxitrim(char *str)
 
   NXstatus  NXsameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
-    pNexusFunction pFunc = (pNexusFunction)fileid;
+    pNexusFunction pFunc = handleToNexusFunc(fileid);
     return pFunc->nxsameID(pFunc->pNexusData, pFirstID, pSecondID);  
   }
 
@@ -678,7 +888,7 @@ static char *nxitrim(char *str)
   
   NXstatus  NXinitattrdir (NXhandle fid)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxinitattrdir(pFunc->pNexusData);
   }
   /*-------------------------------------------------------------------------*/
@@ -686,7 +896,7 @@ static char *nxitrim(char *str)
   NXstatus  NXsetnumberformat (NXhandle fid, 
 					    int type, char *format)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     if(pFunc->nxsetnumberformat != NULL)
     {
       return pFunc->nxsetnumberformat(pFunc->pNexusData,type,format);
@@ -706,10 +916,78 @@ static char *nxitrim(char *str)
  
   NXstatus  NXinitgroupdir (NXhandle fid)
   {
-    pNexusFunction pFunc = (pNexusFunction)fid;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxinitgroupdir(pFunc->pNexusData);
   }
+/*----------------------------------------------------------------------*/
+ NXstatus  NXinquirefile(NXhandle handle, char *filename, 
+				int filenameBufferLength){
+  pFileStack fileStack;
+  char *pPtr = NULL;
+  int length;
 
+  fileStack = (pFileStack)handle;
+  pPtr = peekFilenameOnStack(fileStack);
+  if(pPtr != NULL){
+    length = strlen(pPtr);
+    if(length > filenameBufferLength){
+      length = filenameBufferLength -1;
+    }
+    memset(filename,0,filenameBufferLength);
+    memcpy(filename,pPtr, length);
+    return NX_OK;
+  } else {
+    return NX_ERROR;
+  }
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *class, 
+			    char *url, int urlLen){
+  int status, attStatus, length = 1023, type = NX_CHAR;
+  ErrFunc oldError;
+  char nxurl[1024];
+
+  pNexusFunction pFunc = handleToNexusFunc(fid);
+
+  status = pFunc->nxopengroup(pFunc->pNexusData, name,class);
+  if(status != NX_OK){
+    return status;
+  }
+  oldError = NXMGetError();
+  NXIReportError = NXNXNoReport;
+  attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
+  NXIReportError = oldError;
+  pFunc->nxclosegroup(pFunc->pNexusData);
+  if(attStatus == NX_OK){
+    length = strlen(nxurl);
+    if(length > urlLen){
+      length = urlLen - 1;
+    }
+    memset(url,0,urlLen);
+    memcpy(url,nxurl,length);
+    return attStatus;
+  } else {
+    return NX_ERROR;
+  }
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *class, 
+			 CONSTCHAR *url){
+  int status, type = NX_CHAR, length;
+  pNexusFunction pFunc = handleToNexusFunc(fid);
+
+  status = pFunc->nxopengroup(pFunc->pNexusData,name,class);
+  if(status != NX_OK){
+    return status;
+  }
+  length = strlen(url);
+  status = NXputattr(fid, "napimount",(void *)url,length, type);
+  if(status != NX_OK){
+    return status;
+  }
+  pFunc->nxclosegroup(pFunc->pNexusData);
+  return NX_OK;
+}
 /*------------------------------------------------------------------------
   Implementation of NXopenpath. 
   --------------------------------------------------------------------------*/
@@ -1009,7 +1287,7 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
 
 NXstatus NXIprintlink(NXhandle fid, NXlink* link)
 {
-     pNexusFunction pFunc = (pNexusFunction)fid;
+     pNexusFunction pFunc = handleToNexusFunc(fid);
      return pFunc->nxprintlink(pFunc->pNexusData, link);   
 }
 

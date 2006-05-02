@@ -17,6 +17,8 @@
    Updated for NXopengrouppath, NXopensourcepath
    Mark Koennecke, December 2004
 
+   Updated for external linking, Mark Koennecke, April 2006
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -1038,6 +1040,80 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nextattr
         (*env)->ReleaseIntArrayElements(env,args,jarray,0);
     }
     return iRet;
+}
+/*-----------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxinquirefile(JNIEnv *env, 
+				      jobject obj , jint handle, jobjectArray jnames){
+    NXhandle nxhandle;
+    int status, length = 1024;
+    char filename[1024];
+    jstring rstring;
+
+   /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+    status = NXinquirefile(nxhandle,filename,1023);
+    if(status == NX_OK){
+      rstring = (*env)->NewStringUTF(env,filename);
+      (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
+    }
+}
+/*------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxlinkexternal
+(JNIEnv *env, jobject obj, jint handle, jstring name, 
+ jstring nxclass, jstring nxurl){
+    int status;
+    NXhandle nxhandle;
+    char *Name, *Nxclass, *Nxurl;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+  
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+    Nxclass = (char *) (*env)->GetStringUTFChars(env,nxclass,0);    
+    Nxurl = (char *) (*env)->GetStringUTFChars(env,nxurl,0);    
+    status = NXlinkexternal(nxhandle,Name,Nxclass,Nxurl);
+    
+    /* release strings */
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseStringUTFChars(env,nxclass, Nxclass);
+    (*env)->ReleaseStringUTFChars(env,nxurl, Nxurl);
+}
+/*------------------------------------------------------------------------*/
+JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nxisexternalgroup
+(JNIEnv *env, jobject obj, jint handle, jstring name, jstring nxclass, 
+ jobjectArray jnames){
+    int status, length = 1024;
+    NXhandle nxhandle;
+    char *Name, *Nxclass, nxurl[1024];
+    jstring rstring;
+    
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+  
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+    Nxclass = (char *) (*env)->GetStringUTFChars(env,nxclass,0);    
+
+    status = NXisexternalgroup(nxhandle,Name,Nxclass,nxurl,length);
+
+    /* release strings */
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseStringUTFChars(env,nxclass, Nxclass);
+    
+    if(status == NX_OK){
+      rstring = (*env)->NewStringUTF(env,nxurl);
+      (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
+    }
 }
 /*------------------------------------------------------------------------
                                debugstop

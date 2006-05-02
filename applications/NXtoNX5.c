@@ -83,6 +83,7 @@ int WriteGroup ()
    NXname name, class;
    void *dataBuffer;
 
+   WriteAttributes();
    do {
       status = NXgetnextentry (inId, name, class, &dataType);
       if (status == NX_ERROR) return NX_ERROR;

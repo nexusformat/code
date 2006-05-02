@@ -30,6 +30,8 @@
 #include "napi.h"
 
 static void print_data (const char *prefix, void *data, int type, int num);
+static int testLoadPath();
+static int testExternal(char *progName);
 
 int main (int argc, char *argv[])
 {
@@ -57,6 +59,7 @@ int main (int argc, char *argv[])
   int nx_creation_code;
   char nxFile[80];
   int xmlFlag = 0;
+  char filename[256];
 
   if(strstr(argv[0],"napi_test-hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
@@ -75,6 +78,8 @@ int main (int argc, char *argv[])
   NXsetnumberformat(fileid,NX_FLOAT32,"%9.3f");
   if (NXmakegroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
+  if(NXputattr(fileid,"hugo","namenlos",strlen("namenlos"), NX_CHAR) != NX_OK) return 1;
+  if(NXputattr(fileid,"cucumber","passion",strlen("passion"), NX_CHAR) != NX_OK) return 1;
      NXlen = 10;
      if (NXmakedata (fileid, "ch_data", NX_CHAR, 1, &NXlen) != NX_OK) return 1;
      if (NXopendata (fileid, "ch_data") != NX_OK) return 1;
@@ -164,6 +169,10 @@ int main (int argc, char *argv[])
     read test
   */
   if (NXopen (nxFile, NXACC_RDWR,&fileid) != NX_OK) return 1;
+  if(NXinquirefile(fileid,filename,256) != NX_OK){
+    return 1;
+  }
+  printf("NXinquirefile found: %s\n", filename);
   NXgetattrinfo (fileid, &i);
   if (i > 0) {
      printf ("Number of global attributes: %d\n", i);
@@ -177,7 +186,6 @@ int main (int argc, char *argv[])
               NXlen = sizeof (char_buffer);
               if (NXgetattr (fileid, name, char_buffer, &NXlen, &NXtype) 
 		  != NX_OK) return 1;
-		/* ignore these as they will always change and cause the test to fail */
 		if ( strcmp(name, "file_time") &&
 		     strcmp(name, "HDF_version") &&
 		     strcmp(name, "HDF5_Version") &&
@@ -190,6 +198,21 @@ int main (int argc, char *argv[])
      }
   } while (attr_status == NX_OK);
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
+  NXgetattrinfo(fileid,&i);
+  printf("Number of group attributes: %d\n", i);
+  do { 
+     attr_status = NXgetnextattr (fileid, name, NXdims, &NXtype);
+     if (attr_status == NX_ERROR) return 1;
+     if (attr_status == NX_OK) {
+        switch (NXtype) {
+           case NX_CHAR:
+              NXlen = sizeof (char_buffer);
+              if (NXgetattr (fileid, name, char_buffer, &NXlen, &NXtype) 
+		  != NX_OK) return 1;
+                 printf ("   %s = %s\n", name, char_buffer);
+        }
+     }
+  } while (attr_status == NX_OK);
   if (NXgetgroupinfo (fileid, &i, group_name, class_name) != NX_OK) return 1;
      printf ("Group: %s(%s) contains %d items\n", group_name, class_name, i);
   do {
@@ -327,9 +350,131 @@ int main (int argc, char *argv[])
 
   if (NXclose (&fileid) != NX_OK) return 1;
 
+  if(testLoadPath() != 0) return 1;
+
+  if(testExternal(argv[0]) != 0) {
+    return 1;
+  }
+
   return 0;
 }
+/*---------------------------------------------------------------------*/
+static int testLoadPath() {
+  NXhandle h;
+  int status;
 
+  if(getenv("NX_LOAD_PATH") != NULL){
+    if (NXopen ("dmc01.hdf", NXACC_RDWR,&h) != NX_OK) {
+      printf("Loading NeXus file dmc01.hdf from path %s FAILED\n", getenv("NX_LOAD_PATH"));   
+      return 1;
+    } else {
+      printf("Success loading NeXus file from path\n");
+      NXclose(&h);
+      return 0;
+    }
+  }
+  return 0;
+}
+/*---------------------------------------------------------------------*/
+static int testExternal(char *progName){
+  char nxfile[255], ext[5], testFile[80], time[132], filename[256];
+  int status, create;
+  NXhandle hfil;
+
+  if(strstr(progName,"hdf4") != NULL){
+    strcpy(ext,"hdf");
+    create = NXACC_CREATE;
+  } else if(strstr(progName,"hdf5") != NULL){
+    strcpy(ext,"h5");
+    create = NXACC_CREATE5;
+  } else if(strstr(progName,"xml") != NULL){
+    strcpy(ext,"xml");
+    create = NXACC_CREATEXML;
+  } else {
+    printf("Failed to recognise napi_test program in testExternal\n");
+    return 1;
+  }
+
+  sprintf(testFile,"nxext.%s", ext);
+
+  /*
+    create the test file
+  */
+  if(NXopen(testFile,create,&hfil) != NX_OK){
+    return 1;
+  }
+  if(NXmakegroup(hfil,"entry1","NXentry") != NX_OK){
+    return 1;
+  }
+  sprintf(nxfile,"nxfile://data/dmc01.%s#/entry1",ext);
+  if(NXlinkexternal(hfil,"entry1","NXentry",nxfile) != NX_OK){
+    return 1;
+  }
+  if(NXmakegroup(hfil,"entry2","NXentry") != NX_OK){
+    return 1;
+  }
+  sprintf(nxfile,"nxfile://data/dmc02.%s#/entry1",ext);
+  if(NXlinkexternal(hfil,"entry2","NXentry",nxfile) != NX_OK){
+    return 1;
+  }
+  if(NXclose(&hfil) != NX_OK){
+    return 1;
+  }
+
+  /*
+    actually test linking
+  */
+  if(NXopen(testFile,NXACC_RDWR,&hfil) != NX_OK){
+    return 1;
+  }
+
+  if(NXopenpath(hfil,"/entry1/start_time") != NX_OK){
+    return 1;
+  }
+  memset(time,0,132);
+  if(NXgetdata(hfil,time) != NX_OK){
+    return 1;
+  }
+  printf("First file time: %s\n", time);
+
+  if(NXinquirefile(hfil,filename,256) != NX_OK){
+    return 1;
+  }
+  printf("NXinquirefile found: %s\n", filename);
+
+  if(NXopenpath(hfil,"/entry2/sample/sample_name") != NX_OK){
+    return 1;
+  }
+  memset(time,0,132);
+  if(NXgetdata(hfil,time) != NX_OK){
+    return 1;
+  }
+  printf("Second file sample: %s\n", time);
+  if(NXinquirefile(hfil,filename,256) != NX_OK){
+    return 1;
+  }
+  printf("NXinquirefile found: %s\n", filename);
+
+  if(NXopenpath(hfil,"/entry2/start_time") != NX_OK){
+    return 1;
+  }
+  memset(time,0,132);
+  if(NXgetdata(hfil,time) != NX_OK){
+    return 1;
+  }
+  printf("Second file time: %s\n", time);
+  NXopenpath(hfil,"/");
+  if(NXisexternalgroup(hfil,"entry1","NXentry",filename,255) != NX_OK){
+    return 1;
+  } else {
+    printf("entry1 external URL = %s\n", filename);
+  }
+
+  NXclose(&hfil);
+  printf("External File Linking tested OK\n");
+  return 0;
+}
+/*----------------------------------------------------------------------*/
 static void
 print_data (const char *prefix, void *data, int type, int num)
 {

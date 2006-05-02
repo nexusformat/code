@@ -2,7 +2,7 @@
  * This is the implementation file for the XML file driver
  * for NeXus
  *
- *   Copyright (C) 2004 Mark Koennecke
+ *   Copyright (C) 2006 Mark Koennecke
  * 
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -882,16 +882,8 @@ NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data,
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
-  if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    /*
-      global attribute
-    */
-    current = xmlHandle->stack[0].current;
-  } else {
-    /*
-      dataset attribute
-    */
-    current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     if(strcmp(name,TYPENAME) == 0){
       NXIReportError(NXpData,"type is a reserved attribute name, rejected");
       return  NX_ERROR;
@@ -922,17 +914,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
-  if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    /*
-      global attribute
-    */
-    current = xmlHandle->stack[0].current;
-  } else {
-    /*
-      dataset attribute
-    */
-    current = xmlHandle->stack[xmlHandle->stackPointer].current;
-  }
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
 
   attribute = mxmlElementGetAttr(current,name);
   if(!attribute){
@@ -1108,17 +1090,7 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
-  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    /*
-      dataset attribute
-    */
-    stackPtr = xmlHandle->stackPointer;
-  } else {
-    /*
-      global attribute
-    */
-    stackPtr = 0;
-  }
+  stackPtr = xmlHandle->stackPointer;
 
   current = xmlHandle->stack[stackPtr].current;
   currentAtt = xmlHandle->stack[stackPtr].currentAttribute;
@@ -1129,9 +1101,19 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
   }
 
   /*
+    hide group name attribute
+  */
+  if(strcmp(current->value.element.attrs[currentAtt].name,"name") == 0
+     && !isDataNode(current) ){
+    xmlHandle->stack[stackPtr].currentAttribute++;
+    return NXXgetnextattr(fid,pName,iLength,iType);
+  }
+
+  /*
     hide type attribute
   */
-  if(strcmp(current->value.element.attrs[currentAtt].name,TYPENAME) == 0){
+  if(strcmp(current->value.element.attrs[currentAtt].name,TYPENAME) == 0
+     && isDataNode(current)){
     xmlHandle->stack[stackPtr].currentAttribute++;
     return NXXgetnextattr(fid,pName,iLength,iType);
   }
@@ -1161,18 +1143,7 @@ extern  NXstatus  NXXinitattrdir(NXhandle fid){
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
-  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    /*
-      dataset attribute
-    */
-    stackPtr = xmlHandle->stackPointer;
-  } else {
-    /*
-      global attribute
-    */
-    stackPtr = 0;
-  }
-
+  stackPtr = xmlHandle->stackPointer;
   xmlHandle->stack[stackPtr].currentAttribute = 0;
   return NX_OK;
 }
@@ -1218,22 +1189,17 @@ NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
-  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    /*
-      dataset attribute
-    */
-    stackPtr = xmlHandle->stackPointer;
-  } else {
-    /*
-      global attribute
-    */
-    stackPtr = 0;
-  }
+  stackPtr = xmlHandle->stackPointer;
 
   current = xmlHandle->stack[stackPtr].current;
+
   /*
-    hide type attribute
+    hide type and group name attributes
   */
+  if(!isDataNode(current)) {
+    *iN = current->value.element.num_attrs -1;
+    return NX_OK;
+  }
   if(mxmlElementGetAttr(current,TYPENAME) != NULL){
     *iN = current->value.element.num_attrs -1;
   } else {

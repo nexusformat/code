@@ -12,6 +12,8 @@
   *
   * @author Mark Koennecke, October 2000
   *
+  * Updated: Mark Koennecke, April 2006
+  *
   * copyright: see accompanying COPYRIGHT file
   */
 package neutron.nexus;
@@ -678,6 +680,55 @@ public class  NexusFile implements NeXusFileInterface {
 	    throw new NexusException("Illegal number type requested");
         }
     } 
+
+    // external file interface
+    // native methods for this section
+    protected native void nxinquirefile(int handle, String names[]);
+    protected native void nxlinkexternal(int handle, String name, String nxclass, String nxurl);
+    protected native int nxisexternalgroup(int handle, String name, String nxclass, String nxurl[]); 
+    /**
+     * inquirefile inquires which file we are currently in. This is
+     * a support function for external linking
+     * @return The current file
+     * @throws NexusException when things are wrong
+     */
+    public String inquirefile() throws NexusException {
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	String names[] = new String[1];
+	nxinquirefile(handle,names);
+	return names[0];
+    }
+    /** 
+     * linkexternal links group name, nxclass to the URL nxurl
+     * @param name The name of the vgroup to link to
+     * @apram nxcall The class name of the linked vgroup
+     * @param nxurl The URL to the linked external file
+     * @throws NexusException if things are wrong
+     */
+    public void linkexternal(String name, String nxclass, String nxurl) throws NexusException{
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	nxlinkexternal(handle,name,nxclass,nxurl);
+    }
+    /**
+     * nxisexternalgroup test the group name, nxclass if it is linked externally.
+     * @param name of the group to test
+     * @param  nxclass class of the group to test
+     * @return null when the group is not linked, else a string giving the URL of the
+     * linked file.
+     * @throws NexusException if things are wrong
+     */
+    public String isexternalgroup(String name, String nxclass) throws NexusException{
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	String nxurl[] = new String[1];
+
+	int status = nxisexternalgroup(handle,name,nxclass,nxurl);
+	if(status == 1){
+	    return nxurl[0];
+	} else {
+	    return null;
+	}
+    }
+
     /**
       * debugstop is a debugging helper function which goes into an 
       * endless loop in the dynamic link library. Then a unix debugger

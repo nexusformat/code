@@ -3,7 +3,7 @@
   
   Application Program Interface (HDF4) Routines
   
-  Copyright (C) 1997-2002 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2006 Mark Koennecke, Przemek Klosowski
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -264,8 +264,15 @@ extern	void *NXpData;
     if (pFile->iCurrentSDS != 0) {        /* SDS level */
       iRet = SDgetinfo (pFile->iCurrentSDS, pNam, &iRank, iDim, &iType,
                         &iAtt);
-    } else {                      /* global level */
-      iRet = SDfileinfo (pFile->iSID, &iData, &iAtt);
+    } else {
+      if(pFile->iCurrentVG == 0){
+	/* global level */
+	iRet = SDfileinfo (pFile->iSID, &iData, &iAtt);
+      } else {
+	/* group attribute */
+	iRet = Vnattrs(pFile->iCurrentVG);
+	iAtt = iRet;
+      }
     }
     if (iRet < 0) {
       NXIReportError (NXpData, "ERROR: HDF cannot read attribute numbers");
@@ -1110,10 +1117,15 @@ extern	void *NXpData;
       iRet = SDsetattr (pFile->iCurrentSDS, (char*)name, (int32)type,
                         (int32)datalen, data);
     } else {
-      /* global attribute */
-      iRet = SDsetattr (pFile->iSID, (char*)name, (int32)type,
-                        (int32)datalen, data);
-  
+      if(pFile->iCurrentVG == 0){
+	/* global attribute */
+	iRet = SDsetattr (pFile->iSID, (char*)name, (int32)type,
+			  (int32)datalen, data);
+      } else {
+	/* group attribute */
+	iRet = Vsetattr(pFile->iCurrentVG, (char *)name, (int32) type,
+			(int32)datalen,data);
+      }
     }
     iType = type;
     if (iRet < 0) {
@@ -1510,7 +1522,7 @@ extern	void *NXpData;
   {
     pNexusFile pFile;
     int iRet;
-    int32 iPType, iCount;
+    int32 iPType, iCount, count;
   
     pFile = NXIassert (fileid);
   
@@ -1527,9 +1539,16 @@ extern	void *NXpData;
       return NX_EOD;
     }
     /* well, there must be data to copy */
-    if (pFile->iCurrentSDS == 0) {        /* global attribute */
-      iRet = SDattrinfo (pFile->iSID, pFile->iAtt.iCurDir,
-                         pName, &iPType, &iCount);
+    if (pFile->iCurrentSDS == 0) {        
+      if(pFile->iCurrentVG == 0) {
+	/* global attribute */
+	iRet = SDattrinfo (pFile->iSID, pFile->iAtt.iCurDir,
+			   pName, &iPType, &iCount);
+      }else {
+	/* group attribute */
+	iRet = Vattrinfo(pFile->iCurrentVG, pFile->iAtt.iCurDir,
+			 pName, &iPType, &iCount, &count);
+      }
     } else {
       iRet = SDattrinfo (pFile->iCurrentSDS, pFile->iAtt.iCurDir,
                          pName, &iPType, &iCount);
@@ -1551,7 +1570,7 @@ extern	void *NXpData;
   NXstatus  NX4getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
-    int32 iNew, iType32;
+    int32 iNew, iType32, count;
     void *pData = NULL;
     int32 iLen, iRet;
     int type;
@@ -1603,8 +1622,13 @@ extern	void *NXpData;
       /* SDS attribute */
       iNew = SDfindattr (pFile->iCurrentSDS, name);
     } else {
-      /* global attribute */
-      iNew = SDfindattr (pFile->iSID, name);
+      if(pFile->iCurrentVG == 0){
+       /* global attribute */
+       iNew = SDfindattr (pFile->iSID, name);
+      } else {
+        /* group attribute */
+	iNew = Vfindattr(pFile->iCurrentVG, name); 
+      }
     }
     if (iNew < 0) {
       sprintf (pBuffer, "ERROR: attribute %s not found", name);
@@ -1616,7 +1640,12 @@ extern	void *NXpData;
     if (pFile->iCurrentSDS != 0) {
       iRet = SDattrinfo (pFile->iCurrentSDS, iNew, pNam, &iType32, &iLen);
     } else {
-      iRet = SDattrinfo (pFile->iSID, iNew, pNam, &iType32, &iLen);
+      if(pFile->iCurrentVG == 0){
+	iRet = SDattrinfo (pFile->iSID, iNew, pNam, &iType32, &iLen);
+      } else {
+	iRet = Vattrinfo(pFile->iCurrentVG,iNew,pNam,&iType32,&count,
+			 &iLen);
+      }
     }
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: HDF could not read attribute info");
@@ -1636,7 +1665,11 @@ extern	void *NXpData;
     if (pFile->iCurrentSDS != 0) {
       iRet = SDreadattr (pFile->iCurrentSDS, iNew, pData);
     } else {
-      iRet = SDreadattr (pFile->iSID, iNew, pData);
+      if(pFile->iCurrentVG == 0){
+	iRet = SDreadattr (pFile->iSID, iNew, pData);
+      } else {
+	iRet = Vgetattr(pFile->iCurrentVG, iNew, pData);
+      }
     }
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: HDF could not read attribute data");
@@ -1645,7 +1678,8 @@ extern	void *NXpData;
     }
     /* copy data to caller */
     memset (data, 0, *datalen);
-    if ((*datalen <= iLen) && (*iType == DFNT_UINT8 || *iType == DFNT_CHAR8 || *iType == DFNT_UCHAR8)) {
+    if ((*datalen <= iLen) && 
+     (*iType == DFNT_UINT8 || *iType == DFNT_CHAR8 || *iType == DFNT_UCHAR8)) {
       iLen = *datalen - 1;
     }
     memcpy (data, pData, iLen);
@@ -1669,8 +1703,14 @@ extern	void *NXpData;
     if (pFile->iCurrentSDS != 0) {        /* SDS level */
       iRet = SDgetinfo (pFile->iCurrentSDS, pNam, &iRank, iDim, &iType,
                         &iAtt);
-    } else {                      /* global level */
-      iRet = SDfileinfo (pFile->iSID, &iData, &iAtt);
+    } else {
+      if(pFile->iCurrentVG == 0){  
+	/* global level */
+	iRet = SDfileinfo (pFile->iSID, &iData, &iAtt);
+      } else {
+	iRet = Vnattrs(pFile->iCurrentVG);
+        iAtt = iRet;
+      }
     }
     if (iRet < 0) {
       NXIReportError (NXpData, "NX_ERROR: HDF cannot read attribute numbers");

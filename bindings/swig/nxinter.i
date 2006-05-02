@@ -6,6 +6,8 @@
    The criminal act of writing this code was initially commited by:
 	
    Mark Koennecke in October 2002
+
+   Updated: April 2006, Mark Koennecke
 */
 %module nxinter
 %{
@@ -23,6 +25,7 @@
 #define NXACC_CREATE  3
 #define NXACC_CREATE4 4
 #define NXACC_CREATE5 5
+#define NXACC_CREATEXML 6
 
 /* data types */
 #define NX_FLOAT32   5
@@ -81,3 +84,8 @@ extern void *nx_getattr(void *handle, char *name, int type, int length);
 %section "Making Links"
 extern int nx_makelink(void *handle, void *link);
 extern int nx_opensourcegroup(void *handle);
+
+%section "External Linking"
+extern char *nx_inquirefile(void *handle);
+extern void *nx_isexternalgroup(void *handle, char *name);
+extern int nx_linkexternal(void *handle, char *name, char *nxclass, char *nxurl);

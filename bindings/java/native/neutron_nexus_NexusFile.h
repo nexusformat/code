@@ -271,6 +271,30 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopensourcepath
 
 /*
  * Class:     neutron_nexus_NexusFile
+ * Method:    nxinquirefile
+ * Signature: (I[Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxinquirefile
+  (JNIEnv *, jobject, jint, jobjectArray);
+
+/*
+ * Class:     neutron_nexus_NexusFile
+ * Method:    nxlinkexternal
+ * Signature: (ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxlinkexternal
+  (JNIEnv *, jobject, jint, jstring, jstring, jstring);
+
+/*
+ * Class:     neutron_nexus_NexusFile
+ * Method:    nxisexternalgroup
+ * Signature: (ILjava/lang/String;Ljava/lang/String;[Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nxisexternalgroup
+  (JNIEnv *, jobject, jint, jstring, jstring, jobjectArray);
+
+/*
+ * Class:     neutron_nexus_NexusFile
  * Method:    debugstop
  * Signature: ()V
  */

@@ -40,7 +40,7 @@ CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml
 
 ## testdir=$(prefix)/nexus/test
 
-HDF4_TARGETS = napi_test-hdf4 napi_test-hdf4-static
+HDF4_TARGETS = napi_test-hdf4 napi_test-hdf4-static 
 
 HDF5_TARGETS = napi_test-hdf5 napi_test-hdf5-static
 

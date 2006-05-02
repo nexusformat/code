@@ -68,7 +68,7 @@ endif
 
 #SUBDIRS=nxdict
 
-libNeXus_la_SOURCES = napi.c napiu.c $(H4SRC) $(H5SRC) $(XMLSRC)
+libNeXus_la_SOURCES = napi.c napiu.c nxstack.c $(H4SRC) $(H5SRC) $(XMLSRC)
 libNeXus_la_LDFLAGS = -export-symbols nexus_symbols.sym @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 

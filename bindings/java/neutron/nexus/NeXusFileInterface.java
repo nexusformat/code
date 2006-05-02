@@ -303,6 +303,29 @@ public interface NeXusFileInterface {
       */
     public void   opensourcepath()throws
                           NexusException;     
-
+    /**
+     * inquirefile inquires which file we are currently in. This is
+     * a support function for external linking
+     * @return The current file
+     * @throws NexusException when things are wrong
+     */
+    public String inquirefile() throws NexusException;
+    /** 
+     * linkexternal links group name, nxclass to the URL nxurl
+     * @param name The name of the vgroup to link to
+     * @apram nxcall The class name of the linked vgroup
+     * @param nxurl The URL to the linked external file
+     * @throws NexusException if things are wrong
+     */
+    public void linkexternal(String name, String nxclass, String nxurl) throws NexusException;
+    /**
+     * nxisexternalgroup test the group name, nxclass if it is linked externally.
+     * @param name of the group to test
+     * @param  nxclass class of the group to test
+     * @return null when the group is not linked, else a string giving the URL of the
+     * linked file.
+     * @throws NexusException if things are wrong
+     */
+    public String isexternalgroup(String name, String nxclass) throws NexusException;
 }
   

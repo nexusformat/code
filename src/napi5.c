@@ -3,7 +3,7 @@
   
   Application Program Interface (HDF5) Routines
   
-  Copyright (C) 1997-2002 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2006 Mark Koennecke, Przemek Klosowski
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -107,7 +107,25 @@ static void ignoreError(void *data, char *text){
     }
     self->iAtt5.iCurrentIDX = 0;
   }
+/*---------------------------------------------------------------------*/
+static void buildCurrentPath(pNexusFile5 self, char *pathBuffer, 
+			     int pathBufferLen){
+  int length;
 
+  memset(pathBuffer,0,pathBufferLen);
+  if(self->iCurrentG != 0) {
+    strcpy(pathBuffer,"/");
+    if(strlen(self->name_ref) + 1 < pathBufferLen){
+      strcat(pathBuffer, self->name_ref);
+    }
+  }
+  if(self->iCurrentD != 0){
+    strcat(pathBuffer,"/");
+    if(strlen(self->iCurrentLD) + strlen(pathBuffer) < pathBufferLen){
+      strcat(pathBuffer,self->iCurrentLD);
+    }
+  }
+}
   /* ---------------------------------------------------------------------- 
   
                           Definition of NeXus API
@@ -860,7 +878,27 @@ static void ignoreError(void *data, char *text){
     }
     return NX_OK;
   }
-  
+/*------------------------------------------------------------------*/
+static int getAttVID(pNexusFile5 pFile){
+  int vid;
+     if(pFile->iCurrentG == 0 && pFile->iCurrentD == 0){
+       /* global attribute */
+       vid = H5Gopen(pFile->iFID,"/");
+     } else if(pFile->iCurrentD != 0) {
+       /* dataset attribute */
+       vid = pFile->iCurrentD;
+     } else {
+       /* group attribute */;
+       vid = pFile->iCurrentG;
+     }
+     return vid;
+}
+/*---------------------------------------------------------------*/
+static void killAttVID(pNexusFile5 pFile, int vid){
+  if(pFile->iCurrentG == 0 && pFile->iCurrentD == 0){
+    H5Gclose(vid);
+  }
+}
   /* ------------------------------------------------------------------- */
 
   NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, void *data, 
@@ -870,7 +908,8 @@ static void ignoreError(void *data, char *text){
     hid_t  attr1, aid1, aid2;
     hid_t type;
     int iRet;
-  
+    int vid;  
+
     pFile = NXI5assert (fid);
     if (iType == NX_CHAR)
     {
@@ -908,73 +947,41 @@ static void ignoreError(void *data, char *text){
     {
         type=H5T_NATIVE_DOUBLE;
     }
-    if (pFile->iCurrentD != 0) {
-       /* Dataset attribute */
-       aid2=H5Screate(H5S_SCALAR);
-       aid1=H5Tcopy(type);
-       if (iType == NX_CHAR)
-         {
-           H5Tset_size(aid1,datalen); 
-         }         
-       iRet = H5Aopen_name(pFile->iCurrentD, name);
-       if (iRet>0) {
-          H5Aclose(iRet);
-          iRet=H5Adelete(pFile->iCurrentD,name);
-          if (iRet<0) {
-              NXIReportError (NXpData, "ERROR: Old attribute cannot removed! ");
-              return NX_ERROR;
-          }
-       }
-       attr1 = H5Acreate(pFile->iCurrentD, name, aid1, aid2, H5P_DEFAULT);
-       if (attr1 < 0) {
-          NXIReportError (NXpData, "ERROR: Attribute cannot created! ");
-          return NX_ERROR;
-       }   
-       if (H5Awrite(attr1,aid1,data) < 0) 
-       {
-          NXIReportError (NXpData, "ERROR: HDF failed to store attribute ");
-          return NX_ERROR;
-       }
-       /* Close attribute dataspace */
-       iRet=H5Tclose(aid1);
-       iRet=H5Sclose(aid2); 
-       /* Close attribute  */
-       iRet=H5Aclose(attr1); 
-    } else {
-       /* global attribute */
-       pFile->iVID=H5Gopen(pFile->iFID,"/");
-       aid2=H5Screate(H5S_SCALAR);
-       aid1=H5Tcopy(type);
-       if (iType == NX_CHAR)
-         {
-           H5Tset_size(aid1,datalen); 
-         }         
-       iRet = H5Aopen_name(pFile->iVID, name);
-       if (iRet>0) {
-          H5Aclose(iRet);
-          iRet=H5Adelete(pFile->iVID,name);
-          if (iRet<0) {
-              NXIReportError (NXpData, "ERROR: Old attribute cannot removed! ");
-              return NX_ERROR;
-          }
-       } 
-       attr1 = H5Acreate(pFile->iVID, name, aid1, aid2, H5P_DEFAULT);
-       if (attr1 < 0) {
-          NXIReportError (NXpData, "ERROR: Attribute cannot created! ");
-          return NX_ERROR;
-       } 
-       if (H5Awrite(attr1,aid1,data) < 0) 
-       {
-          NXIReportError (NXpData, "ERROR: HDf failed to store attribute ");
-          return NX_ERROR;
-       } 
-       /* Close attribute dataspace */
-       iRet=H5Tclose(aid1);
-       iRet=H5Sclose(aid2); 
-        /* Close attribute */
-       iRet=H5Aclose(attr1); 
-       H5Gclose(pFile->iVID);
+   
+    /* determine vid */
+    vid = getAttVID(pFile);
+    aid2=H5Screate(H5S_SCALAR);
+    aid1=H5Tcopy(type);
+    if (iType == NX_CHAR){
+      H5Tset_size(aid1,datalen); 
+    }         
+    iRet = H5Aopen_name(vid, name);
+    if (iRet>0) {
+      H5Aclose(iRet);
+      iRet=H5Adelete(vid,name);
+      if (iRet<0) {
+	NXIReportError (NXpData, "ERROR: Old attribute cannot removed! ");
+	killAttVID(pFile,vid);
+	return NX_ERROR;
+      }
+    }    
+    attr1 = H5Acreate(vid, name, aid1, aid2, H5P_DEFAULT);
+    if (attr1 < 0) {
+      NXIReportError (NXpData, "ERROR: Attribute cannot created! ");
+      killAttVID(pFile,vid);
+      return NX_ERROR;
+    }   
+    if (H5Awrite(attr1,aid1,data) < 0) {
+      NXIReportError (NXpData, "ERROR: HDF failed to store attribute ");
+      killAttVID(pFile,vid);
+      return NX_ERROR;
     }
+    /* Close attribute dataspace */
+    iRet=H5Tclose(aid1);
+    iRet=H5Sclose(aid2); 
+    /* Close attribute  */
+    iRet=H5Aclose(attr1); 
+    killAttVID(pFile,vid);
     return NX_OK;
   }
   
@@ -1072,6 +1079,7 @@ static void ignoreError(void *data, char *text){
     datalen = 1024;
     memset(&sRes->targetPath,0,datalen*sizeof(char));
     NX5getattr(fid,"target",&sRes->targetPath,&datalen,&type);
+    NXMSetError(NXpData,oldErr);
     return NX_OK;
   }
 
@@ -1090,9 +1098,8 @@ static void ignoreError(void *data, char *text){
   NXstatus  NX5makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile5 pFile;
-/*    int iRet; */
     herr_t status, dataID, aid1, aid2, attID;
-    int size_type;
+    int size_type, type = NX_CHAR, length;
     char buffer[1024];
     char name[] = "target";
 
@@ -1123,35 +1130,39 @@ static void ignoreError(void *data, char *text){
       strcat(sLink->iTag5,sLink->iRefd);
     }
     status = H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->iRef5, sLink->iTag5);
+    length = strlen(sLink->iRef5);
     if(size_type > 0)
     {
       dataID = H5Dopen(pFile->iFID,sLink->iRef5);
-      /*
-	remove old attribute if existing
-      */
-      status = H5Aopen_name(dataID,name);
-      if(status > 0)
-      {
-	H5Aclose(status);
-	status = H5Adelete(dataID,name);
-	if(status < 0)
-	{
-	  return NX_OK;
-	}
-      }
-      aid2 = H5Screate(H5S_SCALAR);
-      aid1 = H5Tcopy(H5T_C_S1);
-      H5Tset_size(aid1,strlen(sLink->iRef5));
-      attID = H5Acreate(dataID,name,aid1,aid2,H5P_DEFAULT);
-      if(attID < 0)
+    } else {
+      dataID = H5Gopen(pFile->iFID,sLink->iRef5);
+    }
+    status = H5Aopen_name(dataID,name);
+    if(status > 0)
+    {
+      H5Aclose(status);
+      status = H5Adelete(dataID,name);
+      if(status < 0)
       {
 	return NX_OK;
       }
-      H5Awrite(attID,aid1,sLink->iRef5);
-      H5Tclose(aid1);
-      H5Sclose(aid2); 
-      H5Aclose(attID); 
+    }
+    aid2 = H5Screate(H5S_SCALAR);
+    aid1 = H5Tcopy(H5T_C_S1);
+    H5Tset_size(aid1,strlen(sLink->iRef5));
+    attID = H5Acreate(dataID,name,aid1,aid2,H5P_DEFAULT);
+    if(attID < 0)
+    {
+	return NX_OK;
+    }
+    H5Awrite(attID,aid1,sLink->iRef5);
+    H5Tclose(aid1);
+    H5Sclose(aid2); 
+    H5Aclose(attID); 
+    if(size_type > 0){
       H5Dclose(dataID);
+    } else {
+      H5Gclose(dataID);
     }
     return NX_OK;
    }
@@ -1738,155 +1749,107 @@ static void ignoreError(void *data, char *text){
      char *iname = NULL; 
      unsigned int idx;
      int intern_idx=-1;
+     int vid;
+
 
      pFile = NXI5assert (fileid);
+
+     vid = getAttVID(pFile);
+
      idx=pFile->iAtt5.iCurrentIDX;
      iRet=0;
-     if ((pFile->iCurrentD == 0) && (pFile->iCurrentG==0)) 
-     {
-     /* global attribute */
-	pFile->iVID=H5Gopen(pFile->iFID,"/");
-	intern_idx=H5Aget_num_attrs(pFile->iVID);
-	if (intern_idx > idx) {
-	   iRet=H5Aiterate(pFile->iVID,&idx,attr_info,&iname);
-	} 
-	else
-	{
-	  iRet=0;
-	} 
-	intern_idx=-1;
-	if (iRet < 0) {
-	   NXIReportError (NXpData, "ERROR iterating through ROOT Attr. list!");
-	   return NX_ERROR;  
-	} 
-     } else if (pFile->iCurrentD > 0) { 
-	intern_idx=H5Aget_num_attrs(pFile->iCurrentD);
-	if (intern_idx > idx) {
-	   iRet=H5Aiterate(pFile->iCurrentD,&idx,attr_info,&iname);
-	} 
-	else
-	{
-	  iRet=0;
-	} 
-	intern_idx=-1;
-	if (iRet < 0) {
-	   NXIReportError (NXpData, "ERROR iterating through data Attr. list!");
-	   return NX_ERROR;  
-	}
+     intern_idx=H5Aget_num_attrs(vid);
+     if(intern_idx == idx) {
+       killAttVID(pFile,vid);
+       return NX_EOD;
      }
-     else  
-     {
-	pFile->iAtt5.iCurrentIDX = 0;
-	return NX_EOD;  /* no group attributes */
-     }
-     if (iRet>0)
-       {
-	 pFile->iAtt5.iCurrentIDX++;
-	 strcpy(pName, iname);
-	 if (iname != NULL) {
-	    free(iname);
-	 } 
-	 if ((pFile->iCurrentD == 0) && (pFile->iCurrentG==0)) {
-	    /* global attribute */
-	    pFile->iCurrentA = H5Aopen_name(pFile->iVID, pName);
-	 } else { 
-	    pFile->iCurrentA = H5Aopen_name(pFile->iCurrentD, pName);
-	 }
-	 atype  = H5Aget_type(pFile->iCurrentA);
-	 aspace = H5Aget_space(pFile->iCurrentA);
-	 rank = H5Sget_simple_extent_ndims(aspace);
-	 attr_id = H5Tget_class(atype);
-	 if (attr_id==H5T_STRING) {
-	    iPType=NX_CHAR;
-	    rank = H5Tget_size(atype);
-	 }
-	 if (rank == 0) {
-	    rank++;
-	 }  
-	 if (attr_id==H5T_INTEGER)
-	    {
-	    size_id=H5Tget_size(atype);
-	    sign_id=H5Tget_sign(atype);
-	    if (size_id==1)
-	    {
-	       if (sign_id==H5T_SGN_2)
-	       {
-	       iPType=NX_INT8;
-	       } else {
-	       iPType=NX_UINT8;
-	       }
-	    } 
-	    else if (size_id==2) 
-	    {
-	       if (sign_id==H5T_SGN_2)
-	       {
-	       iPType=NX_INT16;
-	       } else {
-	       iPType=NX_UINT16;
-	       }
-	    }
-	    else if (size_id==4) 
-	    {
-	       if (sign_id==H5T_SGN_2)
-	       {
-	       iPType=NX_INT32;
-	       } else {
-	       iPType=NX_UINT32;
-	       }
-	    }
-	 } else if (attr_id==H5T_FLOAT)     
-	   {
-	   size_id=H5Tget_size(atype);
-	   if (size_id==4)
-	   {
-	   iPType=NX_FLOAT32;
-	   } 
-	   else if (size_id==8) 
-	   {
-	   iPType=NX_FLOAT64;
-	   }
-	 } 
-	 *iType=iPType;
-	 *iLength=rank;
-	 H5Tclose(atype);
-	 H5Sclose(aspace);
-	 H5Aclose(pFile->iCurrentA);
-	 return NX_OK;
-       }      
-       else
-       { 
-	 if ((pFile->iCurrentD == 0) && (pFile->iCurrentG==0)) 
-	 {
-	    /* global attribute */
-	    intern_idx=H5Aget_num_attrs(pFile->iVID);
-	 } else {
-	    if (pFile->iCurrentD>0){
-	       intern_idx=H5Aget_num_attrs(pFile->iCurrentD);
-	    } else {
-	       intern_idx=H5Aget_num_attrs(pFile->iCurrentG);
-	    }
-	 }
-	 if ((intern_idx == 0)||(intern_idx == idx)) {
-	     pFile->iAtt5.iCurrentIDX = 0;
-	     if (iname != NULL) {
-		free(iname);
-	     } 
-	     return NX_EOD;
-	 }
-	 NXIReportError (NXpData, 
-			    "ERROR: Iteration was not successful");
-	 return NX_ERROR;              
+
+     if (intern_idx > idx) {
+       iRet=H5Aiterate(vid,&idx,attr_info,&iname);
+     } else {
+       iRet=0;
+     } 
+     intern_idx=-1;
+     if (iRet < 0) {
+	   NXIReportError (NXpData, "ERROR iterating through attribute list!");
+	   killAttVID(pFile,vid);
+	   return NX_ERROR;  
+     } 
+     pFile->iAtt5.iCurrentIDX++;
+     if (iname != NULL) {
+       if(strcmp(iname, "NX_class") == 0 && pFile->iCurrentG != 0) {
+	 /*
+	   skip NXclass attribute which is internal 
+	 */
+	 killAttVID(pFile, vid);
+	 return NX5getnextattr(fileid, pName, iLength, iType);
        }
+       strcpy(pName, iname);
+       iname = NULL;
+       free(iname);
+     } else {
+       strcpy(pName,"What is this?");
+     }
+     pFile->iCurrentA = H5Aopen_name(vid, pName);
+     atype  = H5Aget_type(pFile->iCurrentA);
+     aspace = H5Aget_space(pFile->iCurrentA);
+     rank = H5Sget_simple_extent_ndims(aspace);
+     attr_id = H5Tget_class(atype);
+     if (attr_id==H5T_STRING) {
+       iPType=NX_CHAR;
+       rank = H5Tget_size(atype);
+     }
+     if (rank == 0) {
+       rank++;
+     }  
+     if (attr_id==H5T_INTEGER){
+       size_id=H5Tget_size(atype);
+       sign_id=H5Tget_sign(atype);
+       if (size_id==1){
+	 if (sign_id==H5T_SGN_2){
+	   iPType=NX_INT8;
+	 } else {
+	   iPType=NX_UINT8;
+	 }
+       } else if (size_id==2) {
+	 if (sign_id==H5T_SGN_2){
+	   iPType=NX_INT16;
+	 } else {
+	   iPType=NX_UINT16;
+	 }
+       }else if (size_id==4) {
+	 if (sign_id==H5T_SGN_2){
+	   iPType=NX_INT32;
+	 } else {
+	   iPType=NX_UINT32;
+	 }
+       }
+     } else if (attr_id==H5T_FLOAT) {
+       size_id=H5Tget_size(atype);
+       if (size_id==4){
+	 iPType=NX_FLOAT32;
+       } else if (size_id==8) {
+	   iPType=NX_FLOAT64;
+       }
+     } 
+     *iType=iPType;
+     *iLength=rank;
+     H5Tclose(atype);
+     H5Sclose(aspace);
+     H5Aclose(pFile->iCurrentA);
+  
+     intern_idx=H5Aget_num_attrs(vid);
+
+     killAttVID(pFile,vid);
+     return NX_OK;
    }
+ /*-------------------------------------------------------------------------*/
 
-
-
-   /*-------------------------------------------------------------------------*/
-
-   NXstatus  NX5getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+   NXstatus  NX5getattr (NXhandle fid, char *name, 
+			 void *data, int* datalen, int* iType)
    {
      pNexusFile5 pFile;
-     int iNew, iRet;
+     int iNew, iRet, vid;
      hid_t type, atype, glob;
      char pBuffer[256];
 
@@ -1929,26 +1892,11 @@ static void ignoreError(void *data, char *text){
      {
 	 type=H5T_NATIVE_DOUBLE;
      }
-     /* find attribute */
-     if (pFile->iCurrentD != 0) 
-       {
-       /* Dataset attribute */
-       iNew = H5Aopen_name(pFile->iCurrentD, name);
-       } 
-       else 
-       {
-	 /* globale and group attributes */
-	 if (pFile->iCurrentG != 0) {
-	  /* group attribute */
-	  iNew = H5Aopen_name(pFile->iCurrentG, name);
-       } else {
-	  /* global attributes */
-	  glob=H5Gopen(pFile->iFID,"/");
-	  iNew = H5Aopen_name(glob, name);
-       }
-     }
+     vid = getAttVID(pFile);
+     iNew = H5Aopen_name(vid, name);
      if (iNew < 0) {
        sprintf (pBuffer, "ERROR: attribute %s not found", name);
+       killAttVID(pFile,vid);
        NXIReportError (NXpData, pBuffer);
        return NX_ERROR;
      }
@@ -1968,14 +1916,13 @@ static void ignoreError(void *data, char *text){
      if (iRet < 0) {
        sprintf (pBuffer, "ERROR: HDF could not read attribute data");
        NXIReportError (NXpData, pBuffer);
+       killAttVID(pFile,vid);
        return NX_ERROR;
      }
 
      iRet = H5Aclose(pFile->iCurrentA);
-     if (glob > 0)
-     {
-     H5Gclose(glob);
-     }
+
+     killAttVID(pFile,vid);
      if (type==H5T_C_S1)
      {
        H5Tclose(atype);
@@ -1990,59 +1937,27 @@ static void ignoreError(void *data, char *text){
      pNexusFile5 pFile;
      char *iname = NULL; 
      unsigned int idx;
+     int vid;
      herr_t iRet;
 
      pFile = NXI5assert (fid);
      idx=0;
      *iN = idx;
-     if (pFile->iCurrentD == 0 && pFile->iCurrentG == 0) {
-       /*
-	 global attribute
-       */
-	pFile->iVID=H5Gopen(pFile->iFID,"/");
-	iRet = H5Aiterate(pFile->iVID,&idx,attr_info,&iname);
-	if (iRet < 0) {
-	   NXIReportError (NXpData, "iterating ERROR!");
-	   return NX_ERROR;  
-	}      
-	idx=H5Aget_num_attrs(pFile->iVID);
 
-	if (idx > 0) {
-	  *iN = idx;
-	} else {
-	  *iN = 1;   
-	}
-	/*
-	if (iname != NULL) {
-	    free(iname);
-	} 
-	*/ 
-	return NX_OK;
-     } 
-     else
-     {
-       if (pFile->iCurrentD>0) {
-	 iRet=H5Aiterate(pFile->iCurrentD,&idx,attr_info,&iname);
+     vid = getAttVID(pFile);
+
+     idx=H5Aget_num_attrs(vid);
+     if (idx > 0) {
+       if(pFile->iCurrentG > 0){
+	 *iN = idx -1; 
        } else {
-	 iRet=H5Aiterate(pFile->iCurrentG,&idx,attr_info,&iname);
+	 *iN = idx;
        }
+     } else {
+       *iN = 0;   
      }
-     if (iRet<0) {
-       NXIReportError (NXpData, "Attribute number cannot be fixed!");
-       return NX_ERROR;
-     }
-     if ((idx==0) && (iRet==0)) {
-	*iN=idx;
-	return NX_OK;
-     }
-       idx=H5Aget_num_attrs(pFile->iCurrentD);
-       if (idx > 0) {
-	  *iN = idx;
-       } else {
-	  *iN = 1;   
-       }
+     killAttVID(pFile,vid);
      return NX_OK;
-
    }
 
 
@@ -2050,8 +1965,9 @@ static void ignoreError(void *data, char *text){
    NXstatus  NX5getgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile5 pFile;
-    int u;
+    int u, datalen, type = NX_CHAR;
     char group_name[64], class_name[64];
+    ErrFunc oldErr;
   
     pFile = NXI5assert (fileid);
     if (pFile->iCurrentG == 0) {
@@ -2068,7 +1984,15 @@ static void ignoreError(void *data, char *text){
 	TODO: once we have group attributes, this should be set to 
 	the groups target attribute
       */
-      strcpy(sRes->targetPath, sRes->iTag5);
+      oldErr = NXMGetError();
+      NXMSetError(NXpData, ignoreError);
+      datalen = 1024;
+      memset(sRes->targetPath,0,datalen*sizeof(char));
+      if(NX5getattr(fileid,"target",sRes->targetPath,&datalen,&type) != NX_OK){
+	buildCurrentPath(pFile,sRes->targetPath,1024);
+      }
+      NXMSetError(NXpData,oldErr);
+      /* strcpy(sRes->targetPath, sRes->iTag5); */
       return NX_OK;
     }
     /* not reached */

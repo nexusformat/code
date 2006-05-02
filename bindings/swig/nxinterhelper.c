@@ -554,6 +554,49 @@ int nx_opensourcegroup(void *handle){
     return 0;
   }
 }
+/*-----------------------------------------------------------------------*/
+char *nx_inquirefile(void *handle){
+  int status;
+  NXhandle hfil;
+  char *pPtr = NULL;
+
+  hfil = (NXhandle)handle;
+  pPtr = malloc(1024*sizeof(char));
+  status = NXinquirefile(hfil,pPtr, 1024);
+  if(status == NX_OK){
+    return pPtr;
+  } else {
+    return NULL;
+  }
+}
+/*-----------------------------------------------------------------------*/
+void *nx_isexternalgroup(void *handle, char *name, char *nxclass){
+  int status, length = 1024;
+  NXhandle hfil;
+  char url[1024];
+
+  hfil = (NXhandle)handle;
+  status = NXisexternalgroup(hfil,name, nxclass,url,length);
+  if(status == NX_OK){
+    createTextNXDataset(url);
+  } else {
+    return NULL;
+  }
+}
+/*-----------------------------------------------------------------------*/
+int nx_linkexternal(void *handle, char *name, char *nxclass, 
+		       char *url){
+  int status;
+  NXhandle hfil;
+
+  hfil = (NXhandle)handle;
+  status = NXlinkexternal(hfil,name, nxclass,url);
+  if(status == NX_OK){
+    return 1;
+  } else {
+    return 0;
+  }
+}
 
 
 
