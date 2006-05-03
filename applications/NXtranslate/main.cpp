@@ -176,8 +176,9 @@ int main(int argc, char *argv[]){
     string::size_type size=options.outfile.size();
     if(options.outfile.substr(size-4,size)==".xml")
       options.outfile.erase(size-4,size);
+    else if(options.outfile.substr(size-4,size)==".nxt")
+      options.outfile.erase(size-4,size);
     options.outfile+=".nxs";
-
   }
 
   // open the output file
