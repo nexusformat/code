@@ -30,13 +30,13 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 
 if HAVE_OPENGENIE
 GENIESUBDIR=opengenie
 endif
 SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs \
-	FRM2 $(GENIESUBDIR)
+	FRM2 loopy $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
@@ -51,14 +51,16 @@ EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
 	text_collist/collist_retriever.h \
 	text_plain/retriever.h \
 	text_xml/retriever.h \
-   sns_histogram/retriever.h \
-	FRM2/frm2_retriever.h
+        sns_histogram/retriever.h \
+	FRM2/frm2_retriever.h \
+        loopy/retriever.h
 
 nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	IPNS_CPP/libIPNSRunfile.la text_collist/libTextCollist.la \
 	text_plain/libTextPlain.la text_xml/libTextXML.la \
 	sns_histogram/libSNShistogram.la \
-	FRM2/libFRM2.la
+	FRM2/libFRM2.la \
+        loopy/libLoopy.la
 
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 

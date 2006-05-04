@@ -20,6 +20,9 @@
 #ifdef SNS_HISTOGRAM_RETRIEVER
 #include "sns_histogram/retriever.h"
 #endif
+#ifdef LOOPY_RETRIEVER
+#include "loopy/retriever.h"
+#endif
 
 using std::string;
 using std::invalid_argument;
@@ -66,6 +69,11 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #ifdef SNS_HISTOGRAM_RETRIEVER
   }else if(type==SnsHistogramRetriever::MIME_TYPE){
     RetrieverPtr ptr(new SnsHistogramRetriever(source));
+    return ptr;
+#endif
+#ifdef LOOPY_RETRIEVER
+  }else if(type==LoopyRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new LoopyRetriever(source));
     return ptr;
 #endif
   }
