@@ -24,7 +24,7 @@ struct Grp_parameters   //parameters of the different definitions
   char c;                     //c=l for loop and c=p for (x,y,z,...)
 };
 
-#define SWAP_ENDIAN  //triger the swapping endian subroutine (if needed)
+//#define SWAP_ENDIAN  //triger the swapping endian subroutine (if needed)
 
 using std::ifstream;
 using std::invalid_argument;
