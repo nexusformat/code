@@ -9,49 +9,69 @@ using std::vector;
 using std::runtime_error;
 using std::invalid_argument;
 
-/*********************************
-/Format the string location
-/*********************************/
-void format_string_location(const string& location, string& new_location)
+/**
+ * \brief This function format the string location to be able to work
+ * on it (remove white spaces....)
+ *
+ * \param location (INPUT) is the string location as found in the
+ * translation file
+ * \param new_location (OUTPUT) is the string location formated
+ */
+void format_string_location(const string & location, 
+                            string & new_location)
 {
   without_white_spaces(location, new_location);
   return;
 }
 
-/*********************************
-/Remove white spaces
-/*********************************/
-void without_white_spaces(const string& location, string& new_location)
+/**
+ * \brief This function removes white spaces in the string location
+ *
+ * \param location (INPUT) is the string location as found in the 
+ * translation file
+ * \param new_location (INPUT) is the string location without white spaces 
+ */
+void without_white_spaces(const string & location,
+                          string & new_location)
 {
   typedef std::string::size_type string_size;
   string_size i=0;
   std::string ret="";
  
-   while (i != location.size())
+  while (i != location.size())
     {
       while (i != location.size() && isspace(location[i]))
 	{
 	  ++i;	
         }
-     //find end of next word
-     string_size j=i;
-     while (j != location.size() && !isspace(location[j]))
-       ++j;
-
-     if (i != j)
-       {
-	 ret+=location.substr(i,j-i);
-         i=j;
-       }
+      
+      //find end of next word
+      string_size j=i;
+      while (j != location.size() && !isspace(location[j]))
+        {
+          ++j;
+        }
+      
+      if (i != j)
+        {
+          ret+=location.substr(i,j-i);
+          i=j;
+        }
     } 
-   new_location = ret;
-   return;
+  new_location = ret;
+  return;
 }
 
-/*************************************
-/Separate Declaration from definition
-/*************************************/
-void DeclaDef_separator(string& new_location,vector<string>& VecStr)
+/**
+ * \brief This function separates the definition part from the declaration
+ * part in the string location
+ *
+ * \param new_location (INPUT) the string location formated (whithout white
+ * spaces for example)
+ * \param VecStr (OUTPUT) is the declaration and definition part isolated
+ */
+void DeclaDef_separator(string & new_location,
+                        vector<string> & VecStr)
 {
   typedef std::string::size_type string_size;
   int Dposition = new_location.find("#");
@@ -64,13 +84,13 @@ void DeclaDef_separator(string& new_location,vector<string>& VecStr)
   VecStr.push_back(new_location.substr(0,Dposition));
   
   if (taille == Dposition+1)
-      //if (taille - VecStr[0].size()-1 <= Dposition+1)
     {
         VecStr.push_back("");
     }
   else
     {
-        VecStr.push_back(new_location.substr(Dposition+1, taille - VecStr[0].size()-1));
+        VecStr.push_back(new_location.substr(Dposition+1, 
+                                             taille - VecStr[0].size()-1));
     }
   return;
 }
@@ -78,9 +98,18 @@ void DeclaDef_separator(string& new_location,vector<string>& VecStr)
 /*********************************
 /Separate local from global array
 /*********************************/
-void Declaration_separator(string DeclarationStr, vector<string>& LocGlobArray)
+/**
+ * \brief This function separates the two parts of the declaration part, the
+ * local and global array declaration
+ *
+ * \param DeclarationStr (INPUT) is the declaration part of the string
+ * location
+ * \param LocGlobArray (OUTPUT) is the local and global parts of the 
+ * declaration part
+ */
+void Declaration_separator(string DeclarationStr, 
+                           vector<string> & LocGlobArray)
 {
-  // std::vector<string> LocalArray_GlobalArray;
   std::string str;
   typedef string::size_type string_size;
   string_size DeclarationStrSize = DeclarationStr.size();
@@ -90,35 +119,54 @@ void Declaration_separator(string DeclarationStr, vector<string>& LocGlobArray)
     throw runtime_error("Format of declaration not valid");  
 
   LocGlobArray.push_back(DeclarationStr.substr(0,SeparatorPosition+1));
-  LocGlobArray.push_back(DeclarationStr.substr(SeparatorPosition+1,DeclarationStrSize-LocGlobArray[0].size()));
+  LocGlobArray.push_back(DeclarationStr.substr(SeparatorPosition+1,
+                         DeclarationStrSize-LocGlobArray[0].size()));
   
   return;
 }
 
-/*********************************
-/Separate Tag from Definition
-/*********************************/
-void TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<string>& Def, string& DefinitionGrpVersion)
+/**
+ * \brief This function separates the tag parts from the definition part
+ * of the string location. A tag is a set of tag_name and a operator.
+ *
+ * \param DefinitionPart (INPUT) is the definition part of the string location
+ * \param Tag (OUTPUT) is the tag_name part of the tag
+ * \param Def (OUTPUT) is the operator part of the tag
+ * \DefinitionGrpVersion (OUTPUT) is a string where all the tags are replaces
+ * by the word "grp" + their index. This will be used later to determine
+ * the priorities of the tags
+ */
+void TagDef_separator(string & DefinitionPart, 
+                      vector<string> & Tag, 
+                      vector<string> & Def, 
+                      string & DefinitionGrpVersion)
 {
   std::vector<string> ret;
   typedef string::iterator iter;
-  iter b = DefinitionPart.begin(), e =  DefinitionPart.end(), a;
-  int CPosition, OpenBraPosition, CloseBraPosition = 1;
+  iter b = DefinitionPart.begin();
+  iter e =  DefinitionPart.end();
+  iter a;
+  int CPosition;
+  int OpenBraPosition;
+  int CloseBraPosition = 1;
   string  separator = "|";
   string StringLocationGroup = DefinitionPart;
   static const string OpenBracket = "{";
   static const string CloseBracket = "}";
-  int HowManyTimes = 0, i = 0, length =  DefinitionPart.size();
+  int HowManyTimes = 0;
+  int i = 0;
+  int length = DefinitionPart.size();
 
   while (b!=e)
     { 
-       if (find(b,  DefinitionPart.end(), separator[0]) !=  DefinitionPart.end())
+       if (find(b, DefinitionPart.end(), separator[0]) 
+           !=  DefinitionPart.end())
       	{
 	   ++HowManyTimes;
 	   b = find(b, DefinitionPart.end(),separator[0]);
-	   b=b+1;
+	   b+=1;
 	}
-        b=b+1;
+        b+=1;
     }
 
   while (i < HowManyTimes)
@@ -129,24 +177,39 @@ void TagDef_separator(string& DefinitionPart, vector<string>& Tag, vector<string
 
       CheckSpacerValidity(OpenBraPosition,CPosition,CloseBraPosition);
 
-      Tag.push_back( DefinitionPart.substr(OpenBraPosition+1,CPosition-OpenBraPosition-1));
+      Tag.push_back( DefinitionPart.substr(OpenBraPosition+1,
+                                           CPosition-OpenBraPosition-1));
    
       CheckTagValidity(Tag[i]);
-      Def.push_back( DefinitionPart.substr(CPosition+1,CloseBraPosition-CPosition-1));
+      Def.push_back( DefinitionPart.substr(CPosition+1,
+                                           CloseBraPosition-CPosition-1));
 
-       DefinitionPart = DefinitionPart.substr(CloseBraPosition+1, length-CloseBraPosition-1);
-      
-      ++i;
+       DefinitionPart = DefinitionPart.substr(CloseBraPosition+1, 
+                                              length-CloseBraPosition-1);
+       ++i;
     };
 
-   ReplaceTagDef_by_Grp(StringLocationGroup,HowManyTimes,DefinitionGrpVersion );
+   ReplaceTagDef_by_Grp(StringLocationGroup,
+                        HowManyTimes,
+                        DefinitionGrpVersion );
    return;
 }
 
-/*********************************
-/Replace Tag/Def part by Grp#
-/*********************************/
-void ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes, string & DefinitionGrpVersion)
+/**
+ * \brief This function replaces the set of tag_name and operator, also
+ * called the tag_definition, by "grp"
+ *
+ * \param StringLocationGroup (INPUT) is the definition part of the string
+ * location
+ * \param HowManyTimes (INPUT) is the number of tag_name/tag_operator in the
+ * definition part
+ * \param DefinitionGrpVersion (OUTPUT) is the definition part of the string
+ * location where the set of tag_names and tag_definition have been replaced 
+ * by "grp"
+ */
+void ReplaceTagDef_by_Grp(string & StringLocationGroup, 
+                          int HowManyTimes, 
+                          string & DefinitionGrpVersion)
 {
   static const string  separator = "|";
   static const string OpenBracket = "{";
@@ -154,28 +217,37 @@ void ReplaceTagDef_by_Grp(string& StringLocationGroup, int HowManyTimes, string 
   string part1, part2;
   int OpenBraPosition, CloseBraPosition;
  
-  for (int j=0 ; j<HowManyTimes ; j++)
+  for (int j=0 ; j<HowManyTimes ; ++j)
   
     {
       std::ostringstream Grp;
       OpenBraPosition =  StringLocationGroup.find(OpenBracket);
       CloseBraPosition =  StringLocationGroup.find(CloseBracket);
       
-      StringLocationGroup.erase(OpenBraPosition, CloseBraPosition+1-OpenBraPosition);
+      StringLocationGroup.erase(OpenBraPosition, 
+                                CloseBraPosition + 1 - OpenBraPosition);
      
       part1 = StringLocationGroup.substr(0,OpenBraPosition);
-      part2 = StringLocationGroup.substr(OpenBraPosition, StringLocationGroup.size());
+      part2 = StringLocationGroup.substr(OpenBraPosition, 
+                                         StringLocationGroup.size());
+      
       Grp << "grp" << j ;  
       StringLocationGroup = part1 + Grp.str() + part2;
-      }
+    }
+
   DefinitionGrpVersion = StringLocationGroup;
 
   return;
 }
 
-/*********************************
-/Check if a "|" spacer is missing
-/*********************************/
+/**
+ * \brief This function check if there is a "|" present in each
+ * group
+ *
+ * \param OpenBra (INPUT) is the position of the open bracket of the group
+ * \param spacerPosition (INPUT) is the position of the "|"
+ * \param closeBra (INPUT) is the position of the close bracket of the group
+ */
 void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 {
   if (spacerPosition < openBra || spacerPosition > closeBra)
@@ -184,9 +256,11 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
   return;
 }
 
-/*********************************
-/Check validity of Tags
-/*********************************/
+/**
+ * \brief This function checks if the tag_name is a valid tag
+ *
+ * \param Tag (INPUT) is the tag_name part of the tag
+ */
 void CheckTagValidity (string & Tag)
 {
  if (Tag == "pixelID" || Tag == "pixelX" || Tag == "pixelY" || Tag == "Tbin")
@@ -196,10 +270,16 @@ void CheckTagValidity (string & Tag)
 return;
 }
 
-/*********************************
-/Store operators
-/*********************************/
-void StoreOperators(string& StrS, int& HowMany, vector<string>& Ope)
+/**
+ * \brief This function stores the operators which are between the tags
+ *
+ * \param StrS (INPUT) is the definition part of the string location
+ * \param HowMany (INPUT) is the number of groups, or tags
+ * \param Ope (INPUT) is a list of the operators 
+ */
+void StoreOperators(string & StrS, 
+                    int & HowMany, 
+                    vector<string> & Ope)
 {
   typedef string::iterator iter;
   std::vector<iter> VecIter;             //vector of iterators
@@ -210,11 +290,7 @@ void StoreOperators(string& StrS, int& HowMany, vector<string>& Ope)
  //Store each position of "|" into VecIter
  VecIter = PositionSeparator(StrS,HowMany);
   
-#ifdef RETRIEVER_DEFINITION_TEST
- cout << endl <<endl << "List of operators:" << endl;
-#endif
-
-  for (int i=0; i<HowMany-1; i++)
+  for (int i=0 ; i<HowMany-1; ++i)
     {
       if (find(VecIter[i],VecIter[i+1],operatorOR[0])!=VecIter[i+1])
       { 
@@ -226,20 +302,20 @@ void StoreOperators(string& StrS, int& HowMany, vector<string>& Ope)
 	}
       else
 	throw runtime_error("Not a valid operator");
-
-#ifdef RETRIEVER_DEFINITION_TEST
-      cout << "   Ope[" << i << "]= " << Ope[i];  
-#endif
-
     }	  
   return;
 }
 
-/*********************************
-/Find iterator for each separator
-/*********************************/
-vector<string::iterator> PositionSeparator(string s, int TagName_Number)
-{ std::vector<string::iterator> VecIter;
+/**
+ * \brief This function localize the position of each operator
+ *
+ * \param s (INPUT) is the definition part of the string location
+ * \param TagName_Number (INPUT) is the number of tags, or groups.
+ */
+vector<string::iterator> PositionSeparator(string s, 
+                                           int TagName_Number)
+{ 
+  std::vector<string::iterator> VecIter;
   int i = 0;
   typedef string::iterator iter;
   iter b = s.begin();  
@@ -257,7 +333,21 @@ vector<string::iterator> PositionSeparator(string s, int TagName_Number)
 /*********************************
 /Give priority for each group
 /*********************************/
-void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority, vector<int>& InverseDef, vector<int>& OpePriority)
+/**
+ * \brief This function gives for each group a priority value
+ *
+ * \param s (INPUT) is the definition part of the string location
+ * \param OperatorNumber (INPUT) is the number of operator
+ * \param GrpPriority (OUTPUT) is a list of groups priorities
+ * \param InverseDef (OUTPUT) equals to 1 or 0 for each groups; 1 means we want
+ * to reverse the tag_operator meaning.
+ * \param OpePriority (OUTPUT) is the list of the groups priorities
+ */
+void GivePriorityToGrp ( string & s, 
+                         int OperatorNumber, 
+                         vector<int> & GrpPriority, 
+                         vector<int> & InverseDef, 
+                         vector<int> & OpePriority)
 {
   int DefinitionString_size = s.size();
   int GrpNumberLive = 0;
@@ -268,11 +358,11 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority
     {
       GrpPriority.push_back(0);
       InverseDef.push_back(0);
-      OpePriority.push_back(0);   //NEW
+      OpePriority.push_back(0);
     }
   
   //move along the definition part and look for g,A,O,!,(,and ).
-  for (int j=0; j<DefinitionString_size; j++)
+  for (int j=0 ; j<DefinitionString_size; ++j)
     {
       switch (s[j])
 	{
@@ -297,29 +387,13 @@ void GivePriorityToGrp ( string& s, int OperatorNumber, vector<int>& GrpPriority
 	  OpePriority[GrpNumberLive-1]=Priority;
 	  break;
 	default:
-       	  //nothing
+          // do nothing
 	  break;
 	}
     }
  
   if (Priority != 0)
     throw runtime_error("Format of parentheses not valid");
-
-#ifdef RETRIEVER_DEFINITION_TEST
-  cout << endl << endl << "List of Priority and Inverse functions" << endl;
-  for (int j=0; j<OperatorNumber; j++)
-    {
-      cout<<"   GrpPriority[" << j << "]= " << GrpPriority[j];
-      cout<<"          ";
-      cout<<"InverseDef["<<j<<"]= "<<InverseDef[j]<<endl;
-    }
-    cout << endl << "List of Priority of operators" << endl;
-  for (int j=0; j<OperatorNumber-1;j++)
-    {
-      cout<<"   OpePriority[" <<j<<"]= "<< OpePriority[j]<<endl;
-    }
- 
-#endif
 
   return;
 }
