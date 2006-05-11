@@ -1070,41 +1070,52 @@ void PixelXLoop (binary_type * MyGrpArray,
                  vector<Grp_parameters> & GrpPara, 
                  int grp_number)
 {
-  for (int y=0; y<GlobalArray[0];y++)
+  for (int y=0 ; y<GlobalArray[0] ; ++y)
     {
-      for (int x = GrpPara[grp_number].init; x <= GrpPara[grp_number].last; x = x + GrpPara[grp_number].increment)
+      for (int x = GrpPara[grp_number].init; 
+           x <= GrpPara[grp_number].last; 
+           x = x + GrpPara[grp_number].increment)
         {
-          for (int tbin=0; tbin < GlobalArray[2];tbin++)
+          for (int tbin=0 ; tbin<GlobalArray[2] ; ++tbin)
             {
-              MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
-                BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+              MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (y*GlobalArray[2]*GlobalArray[1])]=
+                BinaryArray[(x*GlobalArray[2]+tbin)+
+                            (y*GlobalArray[2]*GlobalArray[1])];
             }
         } 
     }
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for !pixelX with list
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>!pixelX</b> case
+ * for the <b>list of identifiers</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void InversePixelXList (binary_type * MyGrpArray, 
                         binary_type * BinaryArray, 
                         vector<int> & GlobalArray, 
                         vector<Grp_parameters> & GrpPara, 
                         int grp_number)
 {
-  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+  for (int i=0 ; i<GlobalArray[0]*GlobalArray[1] ; ++i)
     {
-      for (int k=0; k<GlobalArray[2];k++)
+      for (int k=0 ; k<GlobalArray[2]; ++k)
         {
           MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
         }
     }
-  for (int y=0; y<GlobalArray[0];y++)
+  for (int y=0 ; y<GlobalArray[0] ; ++y)
     {
-      for (int x=0; x < GrpPara[grp_number].value.size(); x++)
+      for (int x=0 ; x<GrpPara[grp_number].value.size() ; ++x)
         {
-          for (int tbin=0;tbin<GlobalArray[2];tbin++)
+          for (int tbin=0 ; tbin<GlobalArray[2] ; ++tbin)
             {
               MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+
                          (y*GlobalArray[2]*GlobalArray[1])]=0;
@@ -1114,20 +1125,27 @@ void InversePixelXList (binary_type * MyGrpArray,
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for pixelX with list
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>pixelX</b> case
+ * for the <b>list of identifiers</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void PixelXList (binary_type * MyGrpArray, 
                  binary_type * BinaryArray, 
                  vector<int> & GlobalArray, 
                  vector<Grp_parameters> & GrpPara, 
                  int grp_number)
 {
-  for (int y=0; y<GlobalArray[0];y++)
+  for (int y=0 ; y<GlobalArray[0] ; ++y)
     {
-      for (int x=0; x < GrpPara[grp_number].value.size(); x++)
+      for (int x=0 ; x<GrpPara[grp_number].value.size() ; ++x)
         {
-          for (int tbin=0;tbin<GlobalArray[2];tbin++)
+          for (int tbin=0 ; tbin<GlobalArray[2] ; ++tbin)
             {
               MyGrpArray[(GrpPara[grp_number].value[x]*GlobalArray[2]+tbin)+
                          (y*GlobalArray[2]*GlobalArray[1])]=
@@ -1139,190 +1157,252 @@ void PixelXList (binary_type * MyGrpArray,
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for !pixelY with loop
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>!pixelY</b> case
+ * for the <b>loop</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void InversePixelYLoop (binary_type * MyGrpArray, 
                         binary_type * BinaryArray, 
                         vector<int> & GlobalArray, 
                         vector<Grp_parameters> & GrpPara, 
                         int grp_number) 
 {
-  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+  for (int i=0 ; i<GlobalArray[0]*GlobalArray[1] ; ++i)
     {
-      for (int k=0; k<GlobalArray[2];k++)
+      for (int k=0 ; k<GlobalArray[2] ; ++k)
         {
           MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
         }
     }
-  for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = 
-         y + GrpPara[grp_number].increment)
+  for (int y=GrpPara[grp_number].init; 
+       y<=GrpPara[grp_number].last; 
+       y=y + GrpPara[grp_number].increment)
     {
-      for (int x = 0; x < GlobalArray[1]; ++x)
+      for (int x=0; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=0; tbin < GlobalArray[2];tbin++)
+          for (int tbin=0; tbin<GlobalArray[2] ; ++tbin)
             {
-              MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+              MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (y*GlobalArray[2]*GlobalArray[1])]=0;
             }
         } 
     }
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for pixelY with loop
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>pixelY</b> case
+ * for the <b>loop</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void PixelYLoop  (binary_type * MyGrpArray, 
                   binary_type * BinaryArray, 
                   vector<int> & GlobalArray, 
                   vector<Grp_parameters> & GrpPara, 
                   int grp_number) 
 {
-  for (int y=GrpPara[grp_number].init; y <= GrpPara[grp_number].last; y = 
-         y + GrpPara[grp_number].increment)
+  for (int y=GrpPara[grp_number].init; 
+       y<=GrpPara[grp_number].last; 
+       y=y + GrpPara[grp_number].increment)
     {
-      for (int x = 0; x < GlobalArray[1]; ++x)
+      for (int x=0 ; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=0; tbin < GlobalArray[2];tbin++)
+          for (int tbin=0; tbin<GlobalArray[2] ; ++tbin)
             {
-              MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
-                BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+              MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (y*GlobalArray[2]*GlobalArray[1])]=
+                BinaryArray[(x*GlobalArray[2]+tbin)+
+                            (y*GlobalArray[2]*GlobalArray[1])];
             }
         } 
     }
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for !pixelY with list
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>!pixelY</b> case
+ * for the <b>list of identifiers</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void InversePixelYList (binary_type * MyGrpArray, 
                         binary_type * BinaryArray, 
                         vector<int> & GlobalArray, 
                         vector<Grp_parameters> & GrpPara, 
                         int grp_number) 
 {
-  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+  for (int i=0 ; i<GlobalArray[0]*GlobalArray[1] ; ++i)
     {
-      for (int k=0; k<GlobalArray[2];k++)
+      for (int k=0 ; k<GlobalArray[2] ; ++k)
         {
           MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
         }
     }
-  for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
+  for (int y=0 ; y<GrpPara[grp_number].value.size() ; ++y)
     {
-      for (int x=0; x < GlobalArray[1]; x++)
+      for (int x=0 ; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=0;tbin<GlobalArray[2];tbin++)
+          for (int tbin=0 ; tbin<GlobalArray[2] ; ++tbin)
             {
-              MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*
-                                                  GlobalArray[2]*GlobalArray[1])]=0;
+              MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (GrpPara[grp_number].value[y]*
+                          GlobalArray[2]*GlobalArray[1])]=0;
             }
         }
     } 
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for pixelY with list
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>pixelY</b> case
+ * for the <b>list of identifiers</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void PixelYList (binary_type * MyGrpArray, 
                  binary_type * BinaryArray, 
                  vector<int> & GlobalArray, 
                  vector<Grp_parameters> & GrpPara, 
                  int grp_number) 
 {
-  for (int y=0; y < GrpPara[grp_number].value.size(); ++y)
+  for (int y=0 ; y<GrpPara[grp_number].value.size() ; ++y)
     {
-      for (int x=0; x < GlobalArray[1]; x++)
+      for (int x=0; x<GlobalArray[1] ;++x)
         {
-          for (int tbin=0;tbin<GlobalArray[2];tbin++)
+          for (int tbin=0 ; tbin<GlobalArray[2] ; ++tbin)
 	    {
-	      MyGrpArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*
-                                              GlobalArray[2]*GlobalArray[1])]= 
-            BinaryArray[(x*GlobalArray[2]+tbin)+(GrpPara[grp_number].value[y]*
-                                                 GlobalArray[2]*GlobalArray[1])];
+	      MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (GrpPara[grp_number].value[y]*
+                          GlobalArray[2]*GlobalArray[1])]= 
+                BinaryArray[(x*GlobalArray[2]+tbin)+
+                            (GrpPara[grp_number].value[y]*
+                             GlobalArray[2]*GlobalArray[1])];
 	    }
         }
     }
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for !Tbin with loop
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>!Tbin</b> case
+ * for the <b>loop</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void InverseTbinLoop (binary_type * MyGrpArray, 
                       binary_type * BinaryArray, 
                       vector<int> & GlobalArray, 
                       vector<Grp_parameters> & GrpPara, 
                       int grp_number) 
 {
-  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+  for (int i=0 ; i<GlobalArray[0]*GlobalArray[1] ; ++i)
     {
-      for (int k=0; k<GlobalArray[2];k++)
+      for (int k=0 ; k<GlobalArray[2] ; ++k)
         {
           MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
         }
     }
-  for (int y=0; y < GlobalArray[0]; ++y )
+  for (int y=0 ; y<GlobalArray[0] ; ++y )
     {
-      for (int x = 0; x < GlobalArray[1]; ++x)
+      for (int x=0 ; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=GrpPara[grp_number].init; tbin <= GrpPara[grp_number].last; 
+          for (int tbin=GrpPara[grp_number].init; 
+               tbin <= GrpPara[grp_number].last; 
                tbin = tbin + GrpPara[grp_number].increment)
             {
-              MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=0;
+              MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (y*GlobalArray[2]*GlobalArray[1])]=0;
             }
         } 
     }
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for Tbin with loop
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>Tbin</b> case
+ * for the <b>loop</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void TbinLoop (binary_type * MyGrpArray, 
                binary_type * BinaryArray, 
                vector<int> & GlobalArray, 
                vector<Grp_parameters> & GrpPara, 
                int grp_number) 
 {
-  for (int y=0; y < GlobalArray[0]; ++y )
+  for (int y=0 ; y<GlobalArray[0] ; ++y )
     {
-      for (int x = 0; x < GlobalArray[1]; ++x)
+      for (int x=0; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=GrpPara[grp_number].init; tbin <= 
-                 GrpPara[grp_number].last; tbin = tbin + GrpPara[grp_number].increment)
+          for (int tbin=GrpPara[grp_number].init; 
+               tbin <= GrpPara[grp_number].last;
+               tbin = tbin + GrpPara[grp_number].increment)
             {
-              MyGrpArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])]=
-                BinaryArray[(x*GlobalArray[2]+tbin)+(y*GlobalArray[2]*GlobalArray[1])];
+              MyGrpArray[(x*GlobalArray[2]+tbin)+
+                         (y*GlobalArray[2]*GlobalArray[1])]=
+                BinaryArray[(x*GlobalArray[2]+tbin)+
+                            (y*GlobalArray[2]*GlobalArray[1])];
             }
         } 
     }
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for !Tbin with list
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>!Tbin</b> case
+ * for the <b>list of identifiers</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void InverseTbinList  (binary_type * MyGrpArray, 
                        binary_type * BinaryArray, 
                        vector<int> & GlobalArray, 
                        vector<Grp_parameters> & GrpPara, 
                        int grp_number) 
 {
-  for (int i=0; i<GlobalArray[0]*GlobalArray[1];i++)
+  for (int i=0 ; i<GlobalArray[0]*GlobalArray[1] ; ++i)
     {
-      for (int k=0; k<GlobalArray[2];k++)
+      for (int k=0 ; k<GlobalArray[2] ; ++k)
         {
           MyGrpArray[i*GlobalArray[2]+k]=BinaryArray[i*GlobalArray[2]+k];
         }
     }
-  for (int y=0; y < GlobalArray[0]; ++y)
+  for (int y=0 ; y<GlobalArray[0] ; ++y)
     {
-      for (int x=0; x < GlobalArray[1]; x++)
+      for (int x=0 ; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
+          for (int tbin=0 ; tbin<GrpPara[grp_number].value.size() ; ++tbin)
             {
               MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+
                          y*GlobalArray[2]*GlobalArray[1]]=0;
@@ -1332,71 +1412,92 @@ void InverseTbinList  (binary_type * MyGrpArray,
   return;
 }
 
-/*******************************************
-/Calculate MyGrpArray for Tbin with list
-/*******************************************/
+/**
+ * \brief This function calculates the array for the <b>Tbin</b> case
+ * for the <b>list of identifiers</b> case
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) is the resulting array
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param GlobalArray (INPUT) is the the size of the array to return
+ * \param GrpPara (INPUT) is the list of the parameters of the loop operator
+ * \param grp_number (INPUT) is the index of the group 
+ */
 void TbinList (binary_type * MyGrpArray, 
                binary_type * BinaryArray, 
                vector<int> & GlobalArray, 
                vector<Grp_parameters> & GrpPara, 
                int grp_number) 
 {
-  for (int y=0; y < GlobalArray[0]; ++y)
+  for (int y=0 ; y<GlobalArray[0] ; ++y)
     {
-      for (int x=0; x < GlobalArray[1]; x++)
+      for (int x=0 ; x<GlobalArray[1] ; ++x)
         {
-          for (int tbin=0;tbin<GrpPara[grp_number].value.size();tbin++)
+          for (int tbin=0 ; tbin<GrpPara[grp_number].value.size() ; tbin++)
             {
               MyGrpArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+
                          y*GlobalArray[2]*GlobalArray[1]]= 
 		BinaryArray[(x*GlobalArray[2]+GrpPara[grp_number].value[tbin])+
-                    y*GlobalArray[2]*GlobalArray[1]];
+                            y*GlobalArray[2]*GlobalArray[1]];
             }
         }
     }
   return;
 }
 
-/************************************************
-/Check Highest priority to calculate final array
-/***********************************************/
+/**
+ * \brief This function check for the highest priority in all the groups
+ *
+ * \param GrpPriority_size (INPUT) is the number of groups
+ * \param CurrentPriority (INPUT/OUTPUT) is the current highest priority
+ * \param GrpPriority (INPUT) is the list of the groups priority
+ */
 void CheckHighestPriority (int & GrpPriority_size, 
                            int &  CurrentPriority, 
                            vector<int> & GrpPriority)
 {
   int find_one = 0;
-  for (int m=0; m<GrpPriority_size;++m)
-	{
-	  if (GrpPriority[m] >= CurrentPriority)
-	    {
-	      find_one = 1;
-	      break;
-	    }
-	}
+  for (int m=0 ; m<GrpPriority_size ; ++m)
+    {
+      if (GrpPriority[m] >= CurrentPriority)
+        {
+          find_one = 1;
+          break;
+        }
+    }
   if (find_one == 0)
-	{
-	  --CurrentPriority;
-	}
+    {
+      --CurrentPriority;
+    }
   return;
 }
 
-/************************************************
-/Shift to the left the GrpPriority places after i
-/***********************************************/
+/**
+ * \brief This function shift to the left all the priority of the groups
+ * behind index i
+ *
+ * \param GrpPriority (INPUT/OUTPUT) is the list of groups priority
+ * \param GrpPriority_size (INPUT) is the size of the groups priority
+ * \param i (INPUT) is the index of the group priority of interest
+ */
 void Shift_GrpPriorities_Left (vector<int> & GrpPriority, 
                                int & GrpPriority_size, 
                                int & i)
 {
-  for (int k=i+1;k<GrpPriority_size-1;++k)
+  for (int k=i+1 ; k<GrpPriority_size-1 ; ++k)
     {
       GrpPriority[k]=GrpPriority[k+1];
     }
   return;
 }
 
-/*************************************************************************
-/Shift to the left the operators and operators priorities (places after i)
-/*************************************************************************/
+/**
+ * \brief This function shift to the left all the operators behind index i
+ *
+ * \param OpePriority (INPUT/OUTPUT) is the list of operator priority
+ * \param Ope (INPUT/OUTPUT) is the list of operators 
+ * \param GrpPriority_size (INPUT) is the number of groups 
+ * \param i (INPUT) is the index of the operator priority of interest
+ */
 void Shift_Ope_OpePriority_Left (vector<int> & OpePriority, 
                                  vector<string> & Ope, 
                                  int & GrpPriority_size, 
@@ -1410,9 +1511,14 @@ void Shift_Ope_OpePriority_Left (vector<int> & OpePriority,
   return;
 }
 
-/*************************************************************************
-/Shift to the left the rest of the MyGrpArrays (after i)
-/*************************************************************************/
+/**
+ * \brief This function shift to the left all the array corresponding to 
+ * each groups
+ *
+ * \param MyGrpArray (INPUT/OUTPUT) are the array of each group
+ * \param GrpPriority_size (INPUT) is the number of groups
+ * \param i (INPUT) is the index of the array of interest
+ */
 void Shift_MyGrpArray_Left (binary_type ** MyGrpArray, 
                             int & GrpPriority_size, 
                             int & i)
@@ -1424,9 +1530,19 @@ void Shift_MyGrpArray_Left (binary_type ** MyGrpArray,
   return;
 }
 
-/**************************************************
-/Calculate the final array according to priorities
-/*************************************************/
+/**
+ * \brief This function calculated the final array according to the priorities
+ * of all the groups and of all the operators
+ *
+ * \param GrpPriority (INPUT) is the list of groups priority
+ * \param HighestPriority (INPUT) is the highest priority
+ * \param OpePriority (INPUT) is the list of the operators priority
+ * \param MyGrpArray (INPUT) are the array of each groups
+ * \param GlobalArray (OUTPUT) is the final array
+ * \param LocalArray (INPUT) 
+ * \param Ope (INPUT) is the list of operators
+ * \param GrpPara (INPUT) is the list of the groups parameters
+ */
 void MakePriorities (vector<int> & GrpPriority, 
                      int & HighestPriority, 
                      vector<int> & OpePriority, 
@@ -1439,9 +1555,9 @@ void MakePriorities (vector<int> & GrpPriority,
   int CurrentPriority = HighestPriority;    
   int GrpPriority_size = GrpPriority.size();   //number of grp
   
-  while (GrpPriority_size > 1)     //as long as we have more than just one array
+  while (GrpPriority_size > 1) //as long as we have more than just one array
     {
-      for (int i=0; i<GrpPriority_size;++i)   
+      for (int i=0 ; i<GrpPriority_size ; ++i)   
         {
           //find position of first group with the highest priority
           if (GrpPriority[i] == CurrentPriority)
@@ -1455,23 +1571,35 @@ void MakePriorities (vector<int> & GrpPriority,
               else
                 {
                   //check if the next operator has the same priority
-                  if ((OpePriority[i] == GrpPriority[i]) && (GrpPriority[i+1] == 
-                                                             GrpPriority[i]))
+                  if ((OpePriority[i] == GrpPriority[i]) && 
+                      (GrpPriority[i+1] == GrpPriority[i]))
                     {
                       //do calculation according to Ope[i]
-                      
-                      DoCalculation(MyGrpArray[i],MyGrpArray[i+1],Ope[i], LocalArray, 
-                                    GlobalArray, GrpPara);
+                      DoCalculation(MyGrpArray[i],
+                                    MyGrpArray[i+1],
+                                    Ope[i], 
+                                    LocalArray, 
+                                    GlobalArray, 
+                                    GrpPara);
+
                       if (i < GrpPriority_size-2)
                         {  
                           //shift to the left the rest of the GrpPriorities
-                          Shift_GrpPriorities_Left (GrpPriority, GrpPriority_size, i);
+                          Shift_GrpPriorities_Left(GrpPriority, 
+                                                   GrpPriority_size, 
+                                                   i);
                           
-                          //shift to the left the rest of the operators and operators priorities
-                          Shift_Ope_OpePriority_Left (OpePriority, Ope, GrpPriority_size, i);
+                          //shift to the left the rest of the 
+                          //operators and operators priorities
+                          Shift_Ope_OpePriority_Left(OpePriority,
+                                                     Ope, 
+                                                     GrpPriority_size, 
+                                                     i);
                           
                           //shift to the left the rest of the arrays
-                          Shift_MyGrpArray_Left (MyGrpArray, GrpPriority_size, i);
+                          Shift_MyGrpArray_Left(MyGrpArray, 
+                                                GrpPriority_size,
+                                                i);
                         }
                       
                       //we have one less array/grp
@@ -1487,14 +1615,21 @@ void MakePriorities (vector<int> & GrpPriority,
         }
       
       //check what is the highest priority
-      CheckHighestPriority (GrpPriority_size, CurrentPriority, GrpPriority);
+      CheckHighestPriority(GrpPriority_size, 
+                           CurrentPriority, 
+                           GrpPriority);
     }
   return;
 }  
 
-/*********************************************
-/Check if we want everything (no tags, no ope)
-/********************************************/
+/**
+ * \brief This function checks if we want everything
+ *
+ * \param DeclaDef (INPUT) is the declaration part of the string location
+ * \param Everything (INPUT,OUTPUT) is 1 if we want everything
+ * \param Tag (INPUT) is the list of tags
+ * \param Ope (INPUT) is the list of Operators
+ */
 void Check_Want_Everything (vector<string> & DeclaDef, 
                             int & Everything, 
                             vector<string> & Tag, 
@@ -1512,9 +1647,16 @@ void Check_Want_Everything (vector<string> & DeclaDef,
 /*********************************************
 /Loop through BinaryArray to swap all endians
 /********************************************/
-void SwapEndian (vector<int> & GlobalArray, binary_type * BinaryArray)
+/**
+ * \brief This function swap endians of all the numbers of the BinaryArray
+ *
+ * \param GlobalArray (INPUT) is the size of the binary array
+ * \param BinaryArray (INPUT/OUTPUT) is the array coming from the binary file
+ */
+void SwapEndian (vector<int> & GlobalArray, 
+                 binary_type * BinaryArray)
 {
-  for (int j=0; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0]; ++j)
+  for (int j=0 ; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0] ; ++j)
     {
       endian_swap(BinaryArray[j]);
     } 
