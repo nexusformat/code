@@ -170,7 +170,6 @@ void DefinitionParametersFunction(vector<string> Def,
                                   vector<Grp_parameters> & GrpPara, 
                                   Grp_parameters & record)
 {
-
   //find out first if it's a loop or a list of identifiers
   for (int i = 0; i<HowManyDef;i++)
     {
@@ -1644,9 +1643,6 @@ void Check_Want_Everything (vector<string> & DeclaDef,
   return;
 }
 
-/*********************************************
-/Loop through BinaryArray to swap all endians
-/********************************************/
 /**
  * \brief This function swap endians of all the numbers of the BinaryArray
  *
