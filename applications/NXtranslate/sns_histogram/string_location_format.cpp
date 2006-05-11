@@ -68,29 +68,29 @@ void without_white_spaces(const string & location,
  *
  * \param new_location (INPUT) the string location formated (whithout white
  * spaces for example)
- * \param VecStr (OUTPUT) is the declaration and definition part isolated
+ * \param decla_def (OUTPUT) is the declaration and definition part isolated
  */
 void DeclaDef_separator(string & new_location,
-                        vector<string> & VecStr)
+                        vector<string> & decla_def)
 {
   typedef std::string::size_type string_size;
   int Dposition = new_location.find("#");
-
+  
   if (Dposition == -1)
     throw runtime_error("Declaration/Definition spacer invalid or not present");
-
+  
   string_size taille = new_location.size();
   
-  VecStr.push_back(new_location.substr(0,Dposition));
+  decla_def.push_back(new_location.substr(0,Dposition));
   
   if (taille == Dposition+1)
     {
-        VecStr.push_back("");
+        decla_def.push_back("");
     }
   else
     {
-        VecStr.push_back(new_location.substr(Dposition+1, 
-                                             taille - VecStr[0].size()-1));
+      decla_def.push_back(new_location.substr(Dposition+1, 
+                                              taille - decla_def[0].size()-1));
     }
   return;
 }
@@ -102,25 +102,25 @@ void DeclaDef_separator(string & new_location,
  * \brief This function separates the two parts of the declaration part, the
  * local and global array declaration
  *
- * \param DeclarationStr (INPUT) is the declaration part of the string
+ * \param declaration_part (INPUT) is the declaration part of the string
  * location
  * \param LocGlobArray (OUTPUT) is the local and global parts of the 
  * declaration part
  */
-void declaration_separator(string DeclarationStr, 
+void declaration_separator(string declaration_part, 
                            vector<string> & LocGlobArray)
 {
   std::string str;
   typedef string::size_type string_size;
-  string_size DeclarationStrSize = DeclarationStr.size();
-  int SeparatorPosition = DeclarationStr.find("][");
+  string_size declaration_partSize = declaration_part.size();
+  int SeparatorPosition = declaration_part.find("][");
   
   if (SeparatorPosition == -1)
     throw runtime_error("Format of declaration not valid");  
 
-  LocGlobArray.push_back(DeclarationStr.substr(0,SeparatorPosition+1));
-  LocGlobArray.push_back(DeclarationStr.substr(SeparatorPosition+1,
-                         DeclarationStrSize-LocGlobArray[0].size()));
+  LocGlobArray.push_back(declaration_part.substr(0,SeparatorPosition+1));
+  LocGlobArray.push_back(declaration_part.substr(SeparatorPosition+1,
+                         declaration_partSize-LocGlobArray[0].size()));
   
   return;
 }
@@ -139,7 +139,7 @@ void declaration_separator(string DeclarationStr,
 void TagDef_separator(string & DefinitionPart, 
                       vector<string> & Tag, 
                       vector<string> & Def, 
-                      string & DefinitionGrpVersion)
+                      string & definition_version_with_groups)
 {
   std::vector<string> ret;
   typedef string::iterator iter;
@@ -191,7 +191,7 @@ void TagDef_separator(string & DefinitionPart,
 
    ReplaceTagDef_by_Grp(StringLocationGroup,
                         HowManyTimes,
-                        DefinitionGrpVersion );
+                        definition_version_with_groups);
    return;
 }
 
@@ -209,7 +209,7 @@ void TagDef_separator(string & DefinitionPart,
  */
 void ReplaceTagDef_by_Grp(string & StringLocationGroup, 
                           int HowManyTimes, 
-                          string & DefinitionGrpVersion)
+                          string & definition_version_with_groups)
 {
   static const string  separator = "|";
   static const string OpenBracket = "{";
@@ -235,7 +235,7 @@ void ReplaceTagDef_by_Grp(string & StringLocationGroup,
       StringLocationGroup = part1 + Grp.str() + part2;
     }
 
-  DefinitionGrpVersion = StringLocationGroup;
+  definition_version_with_groups = StringLocationGroup;
 
   return;
 }

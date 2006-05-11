@@ -33,10 +33,10 @@ void without_white_spaces(const string & s,
  *
  * \param new_location (INPUT) the string location formated (whithout white
  * spaces for example)
- * \param VecStr (OUTPUT) is the declaration and definition part isolated
+ * \param decla_def (OUTPUT) is the declaration and definition part isolated
  */
 void DeclaDef_separator(string & s,
-                        vector<string> & DeclaDef);
+                        vector<string> & decla_def);
 
 /*********************************
 /Separate local from global array
@@ -45,12 +45,12 @@ void DeclaDef_separator(string & s,
  * \brief This function separates the two parts of the declaration part, the
  * local and global array declaration
  *
- * \param DeclarationStr (INPUT) is the declaration part of the string
+ * \param declaration_part (INPUT) is the declaration part of the string
  * location
  * \param LocGlobArray (OUTPUT) is the local and global parts of the 
  * declaration part
  */
-void declaration_separator(string s, 
+void declaration_separator(string declaration_part, 
                            vector<string> & LocGlobArray); 
 
 /**
@@ -67,7 +67,7 @@ void declaration_separator(string s,
 void TagDef_separator(string & DefinitionPart, 
                       vector<string> & Tag, 
                       vector<string> & Def, 
-                      string & DefinitionGrpVersion); 
+                      string & definition_version_with_groups); 
 
 
 /**

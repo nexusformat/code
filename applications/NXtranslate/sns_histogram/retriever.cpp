@@ -44,8 +44,9 @@ SnsHistogramRetriever::~SnsHistogramRetriever()
 void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 {
   string new_location;
-  string DefinitionGrpVersion="";    //use to determine priorities
-  vector<string> DeclaDef;           //declaration and definition parts
+  string definition_version_with_groups = "";  //use to determine priorities
+
+  vector<string> decla_def;           //declaration and definition parts
   vector<string> LocGlobArray; //local and global array (declaration part)
   vector<string> Ope;                //Operators of the defintion part
   int OperatorNumber; 
@@ -68,25 +69,25 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //format the string location (remove white spaces)
   format_string_location(location, new_location);  
   
-  DeclaDef_separator(new_location, DeclaDef);  //Separate Declaration part from Definition part -> DeclaDef
+  DeclaDef_separator(new_location, decla_def);  //Separate Declaration part from Definition part -> decla_def
   
   //check if the defintion part has a valid format
-  if (DeclaDef[1].size() > 0 && DeclaDef[1].size()<7)
+  if (decla_def[1].size() > 0 && decla_def[1].size()<7)
     throw runtime_error("Definition part is not valid");
   
   //check if we want everything
-  check_want_everything (DeclaDef, Everything, Tag, Ope);
+  check_want_everything (decla_def, Everything, Tag, Ope);
   
   //Separate declaration arrays (local and global)
-  declaration_separator(DeclaDef[0], LocGlobArray);
+  declaration_separator(decla_def[0], LocGlobArray);
   
   if (Everything == 0)
     {
       //Work on definition part
-      DefinitionPart = DeclaDef[1];
+      DefinitionPart = decla_def[1];
       
       //Parse defintion part, separate Tag from Def
-      TagDef_separator(DeclaDef[1], Tag, Def, DefinitionGrpVersion);
+      TagDef_separator(decla_def[1], Tag, Def, definition_version_with_groups);
       
       //check if we have at least one tag
       if (Tag.size()<1)
@@ -99,7 +100,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
                       Ope);
       
       //Give to each grp its priority
-      assign_grps_priority(DefinitionGrpVersion, 
+      assign_grps_priority(definition_version_with_groups, 
                            OperatorNumber, 
                            GrpPriority, 
                            InverseDef,
@@ -1649,17 +1650,17 @@ void MakePriorities (vector<int> & GrpPriority,
 /**
  * \brief This function checks if we want everything
  *
- * \param DeclaDef (INPUT) is the declaration part of the string location
+ * \param decla_def (INPUT) is the declaration part of the string location
  * \param Everything (INPUT,OUTPUT) is 1 if we want everything
  * \param Tag (INPUT) is the list of tags
  * \param Ope (INPUT) is the list of Operators
  */
-void check_want_everything (vector<string> & DeclaDef, 
+void check_want_everything (vector<string> & decla_def, 
                             int & Everything, 
                             vector<string> & Tag, 
                             vector<string> & Ope) 
 {
-  if (DeclaDef[1] == "")
+  if (decla_def[1] == "")
     {
       Everything = 1;
       Tag.push_back("*");
