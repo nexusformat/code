@@ -251,8 +251,9 @@ void ReplaceTagDef_by_Grp(string & StringLocationGroup,
 void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
 {
   if (spacerPosition < openBra || spacerPosition > closeBra)
-     
-    throw runtime_error("Missing \"|\" spacer or wrong definition declaration");
+    {
+      throw runtime_error("Missing \"|\" spacer or wrong definition declaration");
+    }
   return;
 }
 
@@ -263,10 +264,17 @@ void CheckSpacerValidity(int openBra, int spacerPosition, int closeBra)
  */
 void CheckTagValidity (string & Tag)
 {
- if (Tag == "pixelID" || Tag == "pixelX" || Tag == "pixelY" || Tag == "Tbin")
-    return;
+ if (Tag == "pixelID" ||
+     Tag == "pixelX" || 
+     Tag == "pixelY" || 
+     Tag == "Tbin")
+   {
+     return;
+   }
   else
-    throw runtime_error("One of the Tag is not a valid Tag");
+    {
+      throw runtime_error("One of the Tag is not a valid Tag");
+    }
 return;
 }
 
@@ -301,7 +309,9 @@ void StoreOperators(string & StrS,
 	  Ope.push_back("AND");
 	}
       else
-	throw runtime_error("Not a valid operator");
+        {
+          throw runtime_error("Not a valid operator");
+        }
     }	  
   return;
 }
@@ -393,7 +403,9 @@ void GivePriorityToGrp ( string & s,
     }
  
   if (Priority != 0)
-    throw runtime_error("Format of parentheses not valid");
+    {
+      throw runtime_error("Format of parentheses not valid");
+    }
 
   return;
 }
