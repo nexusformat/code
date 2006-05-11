@@ -37,10 +37,10 @@ struct Grp_parameters   //parameters of the different definitions
  * \param record (OUTPUT) is a structure Grp_parameters that contains
  * all the information of the different defintion part
  */
-void DefinitionParametersFunction(vector<string> Def,
-                                  int OperatorNumber, 
-                                  vector<Grp_parameters> & GrpPara, 
-                                  Grp_parameters & record);
+void store_para_of_definition(vector<string> Def,
+                              int OperatorNumber, 
+                              vector<Grp_parameters> & GrpPara, 
+                              Grp_parameters & record);
 
 /**
  * brief This function parse the definition and isolate the three parts 
@@ -72,7 +72,7 @@ void ParseGrp_Value (string & def,
  * \param LocalArray (OUTPUT) is the list of parameters of the local part
  * \param GlobalArray (OUTPUT) is the list of parameters of the global part
  */
-void ParseDeclarationArray(vector<string> & LocGlobArray, 
+void parse_declaration_array(vector<string> & LocGlobArray, 
                            vector<int> & LocalArray,
                            vector<int> & GlobalArray);  
 
@@ -87,18 +87,37 @@ void ParseDeclarationArray(vector<string> & LocGlobArray,
 int FindMaxPriority (vector<int>& GrpPriority);  
 
 
-//calculate the final array according to definiton
-void CalculateArray (vector<int> & GrpPriority, 
-                     vector<int> & InverseDef, 
-                     binary_type * BinaryArray, 
-                     vector<string> Ope, 
-                     vector<int> & OpePriority,
-                     tree<Node> & tr, 
-                     vector<string> & Tag, 
-                     vector<string> & Def, 
-                     vector<int> & LocalArray, 
-                     vector<int> & GlobalArray, 
-                     vector<Grp_parameters> & GrpPara);  
+/**
+ * \brief This function calculates the final array according to the 
+ * string location
+ *
+ * \param GrpPriority (INPUT) is a list of the groups priorities
+ * \param InverseDef (INPUT) inverses or not the meaning of the definition
+ * part having the same index
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param Ope (INPUT) is the list of the operators
+ * \param OpePriority (INPUT) is a list of the operator priorities
+ * \param tr (INPUT) is the final location of the array in the NeXus file
+ * \param Tag (INPUT) is the list of the tag_names
+ * \param Def (INPUT) is the list of the tag_definitions
+ * \param LocalArray (INPUT) is the list of parameters of the local declaration
+ * part
+ * \param GlobalArray (INPUT) is the list of parameters of the global 
+ * declaration part
+ * \param GrpPara (INPUT) is a list of structures of all the parameters of the
+ * defintion part
+ */
+void calculate_array (vector<int> & GrpPriority, 
+                      vector<int> & InverseDef, 
+                      binary_type * BinaryArray, 
+                      vector<string> Ope, 
+                      vector<int> & OpePriority,
+                      tree<Node> & tr, 
+                      vector<string> & Tag, 
+                      vector<string> & Def, 
+                      vector<int> & LocalArray, 
+                      vector<int> & GlobalArray, 
+                      vector<Grp_parameters> & GrpPara);  
 /**
  * \brief This function calculates the array if the definition tag is PixelID
  *
@@ -571,7 +590,7 @@ void MakePriorities (vector<int> & GrpPriority,
  * \param Tag (INPUT) is the list of tags
  * \param Ope (INPUT) is the list of Operators
  */
-void Check_Want_Everything (vector<string> & DeclaDef, 
+void check_want_everything (vector<string> & DeclaDef, 
                             int & Everything, 
                             vector<string> & Tag, 
                             vector<string> & Ope); 
@@ -582,5 +601,5 @@ void Check_Want_Everything (vector<string> & DeclaDef,
  * \param GlobalArray (INPUT) is the size of the binary array
  * \param BinaryArray (INPUT/OUTPUT) is the array coming from the binary file
  */
-void SwapEndian (vector<int> & GlobalArray, 
-                 binary_type * BinaryArray);
+void swap_endian (vector<int> & GlobalArray, 
+                  binary_type * BinaryArray);

@@ -50,7 +50,7 @@ void DeclaDef_separator(string & s,
  * \param LocGlobArray (OUTPUT) is the local and global parts of the 
  * declaration part
  */
-void Declaration_separator(string s, 
+void declaration_separator(string s, 
                            vector<string> & LocGlobArray); 
 
 /**
@@ -112,7 +112,7 @@ void CheckTagValidity (string & Tag);
  * \param HowMany (INPUT) is the number of groups, or tags
  * \param Ope (INPUT) is a list of the operators 
  */
-void StoreOperators(string & s, 
+void store_operators(string & s, 
                     int & HowMany, 
                     vector<string> & Ope);
 
@@ -138,9 +138,9 @@ vector<string::iterator> PositionSeparator(string s,
  * to reverse the tag_operator meaning.
  * \param OpePriority (OUTPUT) is the list of the groups priorities
  */
-void GivePriorityToGrp ( string & s, 
-                         int OperatorNumber, 
-                         vector<int> & GrpPriority, 
-                         vector<int> & InverseDef, 
-                         vector<int> & OpePriority);
+void assign_grps_priority( string & s, 
+                           int OperatorNumber, 
+                           vector<int> & GrpPriority, 
+                           vector<int> & InverseDef, 
+                           vector<int> & OpePriority);
 

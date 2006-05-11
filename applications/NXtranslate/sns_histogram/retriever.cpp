@@ -46,13 +46,13 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   string new_location;
   string DefinitionGrpVersion="";    //use to determine priorities
   vector<string> DeclaDef;           //declaration and definition parts
-  vector<string> LocGlobArray;       //local and global array (declaration part)
+  vector<string> LocGlobArray; //local and global array (declaration part)
   vector<string> Ope;                //Operators of the defintion part
   int OperatorNumber; 
   string DefinitionPart;             //use to determine the operators
   vector<int> GrpPriority;           //Vector of priority of each group
   vector<int> OpePriority;           //Vector of priority for each operator
-  vector<int> InverseDef;            //True=Inverse definition, False=keep it like it is
+  vector<int> InverseDef; //True=Inverse definition, False=keep it like it is
   int Everything = 0;                //0= we don't want everything, 1=we do
   int GlobalArraySize = 1;           //Size of global array within our program
   vector<string> Tag, Def;
@@ -65,7 +65,8 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   if(location.size()<=0)
     throw invalid_argument("cannot parse empty string");
   
-  format_string_location(location, new_location);  //format string location (remove white spaces)
+  //format the string location (remove white spaces)
+  format_string_location(location, new_location);  
   
   DeclaDef_separator(new_location, DeclaDef);  //Separate Declaration part from Definition part -> DeclaDef
   
@@ -74,10 +75,10 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
     throw runtime_error("Definition part is not valid");
   
   //check if we want everything
-  Check_Want_Everything (DeclaDef, Everything, Tag, Ope);
+  check_want_everything (DeclaDef, Everything, Tag, Ope);
   
   //Separate declaration arrays (local and global)
-  Declaration_separator(DeclaDef[0], LocGlobArray);
+  declaration_separator(DeclaDef[0], LocGlobArray);
   
   if (Everything == 0)
     {
@@ -93,17 +94,29 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
       
       //Store operators
       OperatorNumber = Tag.size();
-      StoreOperators(DefinitionPart,OperatorNumber, Ope);
+      store_operators(DefinitionPart,
+                      OperatorNumber, 
+                      Ope);
       
       //Give to each grp its priority
-      GivePriorityToGrp(DefinitionGrpVersion, OperatorNumber, GrpPriority, InverseDef, OpePriority);   
+      assign_grps_priority(DefinitionGrpVersion, 
+                           OperatorNumber, 
+                           GrpPriority, 
+                           InverseDef,
+                           OpePriority);   
       
       //Store parameters of the definition part into GrpPara[0], GrpPara[1]...
-      DefinitionParametersFunction(Def,OperatorNumber, GrpPara, record);
+      
+      store_para_of_definition(Def,
+                               OperatorNumber,
+                               GrpPara,
+                               record);
     }
   
   //parse Local and Global Array from Declaration part
-  ParseDeclarationArray(LocGlobArray, LocalArray, GlobalArray);
+  parse_declaration_array(LocGlobArray, 
+                          LocalArray, 
+                          GlobalArray);
   
   //allocate memory for the binary Array
   for (int i=0; i<GlobalArray.size(); i++)
@@ -119,22 +132,22 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   //swap endian if necessary
 #ifdef SWAP_ENDIAN
 
-  SwapEndian (GlobalArray, BinaryArray);
+  swap_endian (GlobalArray, BinaryArray);
   
 #endif  //SWAP_ENDIAN
   
   //Calculate arrays according to definition
-  CalculateArray(GrpPriority,
-                 InverseDef, 
-                 BinaryArray, 
-                 Ope, 
-                 OpePriority, 
-                 tr,
-                 Tag,
-                 Def,
-                 LocalArray,
-                 GlobalArray,
-                 GrpPara);
+  calculate_array(GrpPriority,
+                  InverseDef, 
+                  BinaryArray, 
+                  Ope, 
+                  OpePriority, 
+                  tr,
+                  Tag,
+                  Def,
+                  LocalArray,
+                  GlobalArray,
+                  GrpPara);
 }
 
 /*********************************
@@ -159,10 +172,10 @@ string SnsHistogramRetriever::toString() const
  * \param record (OUTPUT) is a structure Grp_parameters that contains
  * all the information of the different defintion part
  */
-void DefinitionParametersFunction(vector<string> Def, 
-                                  int HowManyDef, 
-                                  vector<Grp_parameters> & GrpPara, 
-                                  Grp_parameters & record)
+void store_para_of_definition(vector<string> Def, 
+                              int HowManyDef, 
+                              vector<Grp_parameters> & GrpPara, 
+                              Grp_parameters & record)
 {
   //find out first if it's a loop or a list of identifiers
   for (int i=0; i<HowManyDef ; ++i)
@@ -261,9 +274,9 @@ void ParseGrp_Value(string& def, int i,
  * \param LocalArray (OUTPUT) is the list of parameters of the local part
  * \param GlobalArray (OUTPUT) is the list of parameters of the global part
  */
-void ParseDeclarationArray(vector<string> & LocGlobArray,
-                           vector<int> & LocalArray,
-                           vector<int> & GlobalArray)
+void parse_declaration_array(vector<string> & LocGlobArray,
+                             vector<int> & LocalArray,
+                             vector<int> & GlobalArray)
 {
   int a=0, b=0;
   
@@ -313,20 +326,37 @@ void ParseDeclarationArray(vector<string> & LocGlobArray,
   return;
 }
 
-/*******************************************
-/Calculate arrays according to defintion
-/*******************************************/
-void CalculateArray (vector<int>& GrpPriority, 
-                     vector<int>& InverseDef, 
-                     binary_type* BinaryArray, 
-                     vector<string> Ope, 
-                     vector<int>& OpePriority, 
-                     tree<Node> &tr, 
-                     vector<string>& Tag, 
-                     vector<string> & Def, 
-                     vector<int> & LocalArray, 
-                     vector<int> & GlobalArray, 
-                     vector<Grp_parameters> & GrpPara)
+/**
+ * \brief This function calculates the final array according to the 
+ * string location
+ *
+ * \param GrpPriority (INPUT) is a list of the groups priorities
+ * \param InverseDef (INPUT) inverses or not the meaning of the definition
+ * part having the same index
+ * \param BinaryArray (INPUT) is the array coming from the binary file
+ * \param Ope (INPUT) is the list of the operators
+ * \param OpePriority (INPUT) is a list of the operator priorities
+ * \param tr (INPUT) is the final location of the array in the NeXus file
+ * \param Tag (INPUT) is the list of the tag_names
+ * \param Def (INPUT) is the list of the tag_definitions
+ * \param LocalArray (INPUT) is the list of parameters of the local declaration
+ * part
+ * \param GlobalArray (INPUT) is the list of parameters of the global 
+ * declaration part
+ * \param GrpPara (INPUT) is a list of structures of all the parameters of the
+ * defintion part
+ */
+void calculate_array (vector<int> & GrpPriority, 
+                      vector<int> & InverseDef, 
+                      binary_type * BinaryArray, 
+                      vector<string> Ope, 
+                      vector<int> & OpePriority, 
+                      tree<Node> & tr, 
+                      vector<string> & Tag, 
+                      vector<string> & Def, 
+                      vector<int> & LocalArray, 
+                      vector<int> & GlobalArray, 
+                      vector<Grp_parameters> & GrpPara)
 {
   int HighestPriority;
   int GrpNumber = GrpPriority.size();
@@ -1624,7 +1654,7 @@ void MakePriorities (vector<int> & GrpPriority,
  * \param Tag (INPUT) is the list of tags
  * \param Ope (INPUT) is the list of Operators
  */
-void Check_Want_Everything (vector<string> & DeclaDef, 
+void check_want_everything (vector<string> & DeclaDef, 
                             int & Everything, 
                             vector<string> & Tag, 
                             vector<string> & Ope) 
@@ -1644,7 +1674,7 @@ void Check_Want_Everything (vector<string> & DeclaDef,
  * \param GlobalArray (INPUT) is the size of the binary array
  * \param BinaryArray (INPUT/OUTPUT) is the array coming from the binary file
  */
-void SwapEndian (vector<int> & GlobalArray, 
+void swap_endian (vector<int> & GlobalArray, 
                  binary_type * BinaryArray)
 {
   for (int j=0 ; j<GlobalArray[1]*GlobalArray[2]*GlobalArray[0] ; ++j)
