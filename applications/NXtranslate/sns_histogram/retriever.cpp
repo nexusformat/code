@@ -12,7 +12,7 @@ using std::vector;
    
 /*********************************
 /SnsHistogramRetriever constructor
-`/*********************************/
+/*********************************/
 SnsHistogramRetriever::SnsHistogramRetriever(const string &str): source(str) 
 {
   // open the file
@@ -33,28 +33,14 @@ SnsHistogramRetriever::~SnsHistogramRetriever()
     fclose(BinaryFile);
 }
 
-void fillDummy(Node &node){
-  cout << "fillDummy" << endl;
-  void *data;
-  int dims[]={2,3,4};
-  int rank=3;
-  int type=NX_INT32;
-
-  NXmalloc(&data,rank,dims,type);
-
-  for(int i=0 ; i<24 ; i++ ){
-    *(((int*)data)+1)=i;
-  }
-
-  node.set_data(data,rank,dims,type);
-
-  NXfree(&data);
-}
-
-/*********.***********************
-/* This is the method for retrieving data from a file. 
-/* Interpreting the string is left up to the implementing code.
-/********************************/
+/**
+ * \brief This function creates the array according to the 
+ * string location
+ *
+ * \param location (INPUT) is the string location coming from the 
+ * translation file
+ * \param tr (INPUT) is where to put the final array created
+ */
 void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 {
   string new_location;
@@ -138,9 +124,17 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 #endif  //SWAP_ENDIAN
   
   //Calculate arrays according to definition
-
-  CalculateArray(GrpPriority, InverseDef, BinaryArray, Ope, OpePriority, tr, Tag, Def, LocalArray, GlobalArray, GrpPara);
-
+  CalculateArray(GrpPriority,
+                 InverseDef, 
+                 BinaryArray, 
+                 Ope, 
+                 OpePriority, 
+                 tr,
+                 Tag,
+                 Def,
+                 LocalArray,
+                 GlobalArray,
+                 GrpPara);
 }
 
 /*********************************
@@ -171,7 +165,7 @@ void DefinitionParametersFunction(vector<string> Def,
                                   Grp_parameters & record)
 {
   //find out first if it's a loop or a list of identifiers
-  for (int i = 0; i<HowManyDef;i++)
+  for (int i=0; i<HowManyDef ; ++i)
     {
       if (Def[i].find("loop") < Def[i].size()) 
 	{
@@ -185,7 +179,7 @@ void DefinitionParametersFunction(vector<string> Def,
     }
   
   //isolate the variable
-  for (int i=0; i<HowManyDef;i++)
+  for (int i=0; i<HowManyDef ; ++i)
     {
       if (GrpPara[i].c == 'l')      //loop
 	{
@@ -345,7 +339,7 @@ void CalculateArray (vector<int>& GrpPriority,
     }
   
   //determine array size
-  for (int i=0; i<LocalArray.size();i++)
+  for (int i=0 ; i<LocalArray.size() ; ++i)
     {
       ArraySize *= LocalArray[i];
     }
@@ -357,7 +351,7 @@ void CalculateArray (vector<int>& GrpPriority,
     }
   
   //determine array size
-  for (int i=0; i<GlobalArray.size();i++)
+  for (int i=0 ; i<GlobalArray.size() ; ++i)
     {
       ArraySizeGlobal *= GlobalArray[i];
     }
@@ -366,7 +360,7 @@ void CalculateArray (vector<int>& GrpPriority,
   binary_type **MyGrpArray;
   MyGrpArray = new binary_type*[GrpPriority.size()];
 
-  for (int i=0; i<GrpPriority.size();++i)
+  for (int i=0 ; i<GrpPriority.size() ; ++i)
     {
       MyGrpArray[i]=new binary_type[ArraySizeGlobal];
       InitializeArray(MyGrpArray[i], GlobalArray);
@@ -376,7 +370,7 @@ void CalculateArray (vector<int>& GrpPriority,
   void * NewArray;
   int rank=3;
   int dims[GlobalArray.size()];
-  for (int j=0; j< GlobalArray.size(); j++)
+  for (int j=0 ; j< GlobalArray.size() ; ++j)
     {
       dims[j]=GlobalArray[j];
     }
@@ -385,7 +379,7 @@ void CalculateArray (vector<int>& GrpPriority,
   NXmalloc(&NewArray,rank,dims,NX_INT32);
   
   //make an array for each group
-  for (int i=0; i<GrpPriority.size();++i)
+  for (int i=0 ; i<GrpPriority.size() ; ++i)
     {
       
       if (Tag[i]=="pixelID") 
@@ -445,7 +439,8 @@ void CalculateArray (vector<int>& GrpPriority,
   //free memory of binary array 
   delete[] BinaryArray;    
   
-  //calculate the final Array according to all the parameters retrieved in the rest of the code 
+  //calculate the final Array according to all the parameters 
+  //retrieved in the rest of the code 
   MakePriorities (GrpPriority, 
                   HighestPriority, 
                   OpePriority, 
@@ -481,7 +476,7 @@ int FindMaxPriority (vector<int> & GrpPriority)
 {
   int MaxValue = 0;
   
-  for (int i=0; i<GrpPriority.size();i++)
+  for (int i=0 ; i<GrpPriority.size() ; ++i)
     {
       if (GrpPriority[i]>MaxValue)
         {
