@@ -4,6 +4,9 @@
 #
 # @configure_input@
 #
+SETUP_TEST="ln -sf $abs_srcdir/data ."
+export SETUP_TEST
+#
 if test ! -z "@H4ROOT@"; then
     HAVE_HDF4="napi_test-hdf4-static -q"
 else

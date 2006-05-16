@@ -52,7 +52,7 @@ F90_TARGETS = NXtest
 
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
 			NXtest.f90 napif_test.f README.tests \
-			napi_test.c napif4_test.f napif5_test.f
+			napi_test.c napif4_test.f napif5_test.f data/dmc*
 
 TESTSUITE	= $(srcdir)/testsuite
 
