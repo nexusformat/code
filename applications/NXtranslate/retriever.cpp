@@ -23,6 +23,9 @@
 #ifdef LOOPY_RETRIEVER
 #include "loopy/retriever.h"
 #endif
+#ifdef BINARY_RETRIEVER
+#include "binary/BinaryRetriever.hpp"
+#endif
 
 using std::string;
 using std::invalid_argument;
@@ -74,6 +77,11 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #ifdef LOOPY_RETRIEVER
   }else if(type==LoopyRetriever::MIME_TYPE){
     RetrieverPtr ptr(new LoopyRetriever(source));
+    return ptr;
+#endif
+#ifdef BINARY_RETRIEVER
+  }else if(type==BinaryRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new BinaryRetriever(source));
     return ptr;
 #endif
   }

@@ -30,13 +30,13 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 
 if HAVE_OPENGENIE
 GENIESUBDIR=opengenie
 endif
 SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs \
-	FRM2 loopy $(GENIESUBDIR)
+	FRM2 loopy binary $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \
@@ -60,7 +60,8 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	text_plain/libTextPlain.la text_xml/libTextXML.la \
 	sns_histogram/libSNShistogram.la \
 	FRM2/libFRM2.la \
-        loopy/libLoopy.la
+        loopy/libLoopy.la \
+	binary/libBinaryRetriever.la
 
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 

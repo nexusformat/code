@@ -481,6 +481,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXtranslate/text_xml/Makefile
 		applications/NXtranslate/sns_histogram/Makefile
 		applications/NXtranslate/loopy/Makefile
+		applications/NXtranslate/binary/Makefile
 		applications/NXtranslate/docs/Makefile
 		examples/Makefile
 		doc/Makefile
