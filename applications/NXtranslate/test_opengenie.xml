@@ -18,27 +18,28 @@
 <program_name type="NX_CHAR" version="1.0">ICP1SEP89</program_name>
 <run_cycle type="NX_CHAR">05/3</run_cycle>
 <experiment_identifier NXS:location="&quot;RB&quot;+AS_STRING((GET(&quot;IRPB&quot;))[22])" />
-<start_time NXS:location="SUBSTRING(GET(&quot;HDR&quot;),53,64) + &quot; &quot; + SUBSTRING(GET(&quot;HDR&quot;),65,72)" />
-<end_time NXS:location="(GET(&quot;CRPB&quot;))[17] + &quot; &quot; + (GET(&quot;CRPB&quot;))[20]" />
-<duration NXS:location="(GET(&quot;IRPB&quot;))[13]" units="second"/> <!-- or [1] -->
-<collection_time NXS:location="(GET(&quot;IRPB&quot;))[13]" units="second"/> <!-- or [1] -->
+<start_time NXS:location="GETDAT(&quot;START&quot;)" />
+<end_time NXS:location="GETDAT(&quot;END&quot;)" />
+<duration NXS:location="(GET(&quot;IRPB&quot;))[13] * 1.0" units="second"/> <!-- or [1] -->
+<collection_time NXS:location="(GET(&quot;IRPB&quot;))[13] * 1.0" units="second"/> <!-- or [1] -->
 <proton_charge NXS:location="(GET(&quot;RRPB&quot;))[8]" units="uamp.hour" />
 <!-- raw_uamph NXS:location="(GET(&quot;RRPB&quot;))[9]" -->
 <user type="NXuser">
    <name NXS:location="(GET(&quot;USER&quot;))[1]" />
    <role>Principle Investigator</role>
-   <facility_user_id>12345</facility_user_id>
+   <facility_user_id>00000</facility_user_id>
 </user>
 <sample type="NXsample">
-    <name>some sample</name>
-    <identifier>12345</identifier>
-    <nature>powder</nature>
+    <name>unknown</name>
+    <identifier>unknown</identifier>
+    <nature>unknown</nature>
 </sample>
 <instrument type="NXinstrument">
-   <name NXS:location="GET(&quot;NAME&quot;)" />
-   <name_short NXS:location="SUBSTRING(GET(&quot;HDR&quot;),1,3)" />
-   <beamline>N3</beamline>
+   <!--name NXS:location="GET(&quot;NAME&quot;)" short_name="SHORT_NAME" /-->
+   <name NXS:location="GET(&quot;NAME&quot;)" short_name="HRP" />
+   <beamline>R55</beamline>
    <bank1 type="NXdetector">
+     <stored>general</stored>
      <data units="counts" axes="[detector_number,time_of_flight]" signal="NX_INT32:1" long_name="Detector Counts" NXS:location="GETDAT(&quot;CNT1&quot;)" />
      <detector_number NXS:location="GETDAT:GANG(&quot;UDET&quot;)" />
      <detector_number_unganged NXS:location="GETDAT(&quot;UDET&quot;)" />
@@ -55,6 +56,8 @@
      <gang_index units="degree" NXS:location="GETDAT(&quot;GANG_INDEX&quot;)" />
    </bank1>
    <moderator type="NXmoderator">
+     <type>unknown</type>
+     <temperature units="kelvin" type="NX_FLOAT32">0</temperature>
      <distance NXS:location="-(GET(&quot;RVPB&quot;))[23]" units="metre" />
    </moderator>
    <source type="NXsource">
@@ -64,7 +67,7 @@
      <frequency units="hertz" type="NX_INT32">50</frequency>
      <period units="micro.second" type="NX_INT32">20000</period>
    </source>
-   <detector_groups type="NXdetector_groups">
+   <detector_groups type="NXdetector_group">
      <group_names>bank1</group_names>
      <group_index type="NX_INT32[1]">1</group_index>
      <group_parent type="NX_INT32[1]">0</group_parent>

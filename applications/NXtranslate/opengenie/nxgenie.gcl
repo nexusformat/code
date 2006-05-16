@@ -9,12 +9,35 @@ PRINTIN "Loading additional OpenGENIE  procedures"
 TOGGLE/INFO/OFF
 TOGGLE/DEBUG/OFF
 
+PROCEDURE MKISO
+PARAMETERS name=String
+RESULT RES
+LOCAL day month year s
+day=SUBSTRING(name,1,2)
+IF substring(day,1,1) = " "; day = "0" + substring(day,2,1); ENDIF
+month=substring(name,4,3)
+year=substring(name,8,4)
+IF month = "JAN"; s = "01"; ENDIF
+IF month = "FEB"; s = "02"; ENDIF
+IF month = "MAR"; s = "03"; ENDIF
+IF month = "APR"; s = "04"; ENDIF
+IF month = "MAY"; s = "05"; ENDIF
+IF month = "JUN"; s = "06"; ENDIF
+IF month = "JUL"; s = "07"; ENDIF
+IF month = "AUG"; s = "08"; ENDIF
+IF month = "SEP"; s = "09"; ENDIF
+IF month = "OCT"; s = "10"; ENDIF
+IF month = "NOV"; s = "11"; ENDIF
+IF month = "DEC"; s = "12"; ENDIF
+res <~ year + "-" + s + "-" + day
+ENDPROCEDURE
+
 PROCEDURE GETDAT
 QUALIFIERS /GANG # want values by spectrum
 PARAMETERS name=String num=Integer
 RESULT RES
 GLOBAL CNT1 SPEC UDET NSP NDET MDET NTC NMON sorted_spec LEN2 tcb tcb_widths
-LOCAL TMP dstidx i j dummy_int_array
+LOCAL TMP dstidx i j dummy_int_array hdr
 IF NOT DEFINED(CNT1)
     SPEC <~ GET("SPEC")
     sorted_spec = spec
@@ -33,6 +56,15 @@ IF NOT DEFINED(CNT1)
 ENDIF
 IF name = "CNT1"
     res <~ cnt1
+    RETURN
+ENDIF
+IF name = "START"
+    hdr <~ GET("HDR")
+    res <~ MKISO(substring(hdr,53,11)) + "T" + substring(hdr,65,8) + "Z"
+    RETURN
+ENDIF
+IF name = "END"
+    res <~ MKISO((GET("CRPB"))[17]) + "T" + (GET("CRPB"))[20] + "Z"
     RETURN
 ENDIF
 dstidx <~ dimensions(nsp)
