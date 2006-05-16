@@ -35,7 +35,7 @@ noinst_LTLIBRARIES = libSNShistogram.la
 
 libSNShistogram_la_SOURCES = \
 	string_location_format.cpp string_location_format.h \
-        retriever.cpp retriever.h
+        retriever.cpp retriever.h retriever.hpp
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 EXTRA_DIST = retriever_test.cpp
