@@ -14,7 +14,7 @@ class IpnsRetriever: public Retriever{
   std::string fixDate(char *, char *);
   static const std::string MIME_TYPE;
  private:
-  void IpnsRetriever::getData(Node &, const std::string &);
+  void getData(Node &, const std::string &);
   IpnsRetriever(const IpnsRetriever&);
   IpnsRetriever& operator=(const IpnsRetriever&);
   //  NXhandle *handle;

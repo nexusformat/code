@@ -46,7 +46,7 @@ class Node{
   const void update_dims(std::vector<int> &dims);
 
  private:
-  const void Node::update_attr(Attr &attr);
+  const void update_attr(Attr &attr);
 
   std::string __name;
   std::string __type;
