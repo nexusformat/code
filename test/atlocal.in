@@ -4,7 +4,7 @@
 #
 # @configure_input@
 #
-SETUP_TEST="ln -sf $abs_srcdir/data ."
+SETUP_TEST="sh $abs_srcdir/setup_test $abs_srcdir"
 export SETUP_TEST
 #
 if test ! -z "@H4ROOT@"; then
