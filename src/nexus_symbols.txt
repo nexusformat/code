@@ -43,3 +43,6 @@ nxisetnumberformat_
 NXMSetError
 NXIReportError
 NXIprintlink
+nxiinquirefile_
+nxilinkexternal_
+nxiisexternalgroup_
