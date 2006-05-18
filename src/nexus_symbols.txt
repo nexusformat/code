@@ -40,6 +40,9 @@ nxiputslab_
 nxisameid_
 nxisetcache_
 nxisetnumberformat_
+nxilinkexternal_
+nxiinquirefile_
+nxiisexternalgroup_
 NXMSetError
 NXIReportError
 NXIprintlink
