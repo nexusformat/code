@@ -90,10 +90,10 @@ skip_test_LDFLAGS=-static $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
-napi_test_xml_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_xml_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_static_SOURCES = napi_test.c
-napi_test_xml_static_CPPFLAGS = @XML_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_xml_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_static_LDFLAGS = -static $(LDFLAGS)
 else
@@ -104,10 +104,10 @@ endif
 
 if HAVE_HDF4
 napi_test_hdf4_SOURCES = napi_test.c
-napi_test_hdf4_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf4_CPPFLAGS = -I$(top_srcdir)/include @HDF4_CPPFLAGS@
 napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 napi_test_hdf4_static_SOURCES = napi_test.c
-napi_test_hdf4_static_CPPFLAGS = @HDF4_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf4_static_CPPFLAGS = -I$(top_srcdir)/include @HDF4_CPPFLAGS@
 napi_test_hdf4_static_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 napi_test_hdf4_static_LDFLAGS = -static $(LDFLAGS)
 if HAVE_F77
@@ -128,10 +128,10 @@ endif
 
 if HAVE_HDF5
 napi_test_hdf5_SOURCES = napi_test.c
-napi_test_hdf5_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf5_CPPFLAGS = -I$(top_srcdir)/include @HDF5_CPPFLAGS@
 napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 napi_test_hdf5_static_SOURCES = napi_test.c
-napi_test_hdf5_static_CPPFLAGS = @HDF5_CPPFLAGS@ -I$(top_srcdir)/include
+napi_test_hdf5_static_CPPFLAGS = -I$(top_srcdir)/include @HDF5_CPPFLAGS@
 napi_test_hdf5_static_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 napi_test_hdf5_static_LDFLAGS = -static $(LDFLAGS)
 if HAVE_F77
