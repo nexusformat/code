@@ -52,6 +52,7 @@ nexus_symbols.sym : nexus_symbols.txt
 # Windows import library for DLL
 
 if MINGW_MSYS
+MINGW_SRC=napi_exports.c napi_exports2.c napi_exports.h
 msimplibdir = ${libdir}
 libNeXus.def: libNeXus.la
 	pexports .libs/libNeXus-0.dll > libNeXus.def
@@ -68,7 +69,7 @@ endif
 
 #SUBDIRS=nxdict
 
-libNeXus_la_SOURCES = napi.c napiu.c nxstack.c nxstack.h stptok.c $(H4SRC) $(H5SRC) $(XMLSRC)
+libNeXus_la_SOURCES = napi.c napiu.c nxstack.c nxstack.h stptok.c $(H4SRC) $(H5SRC) $(XMLSRC) $(MINGW_SRC)
 libNeXus_la_LDFLAGS = -export-symbols nexus_symbols.sym @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 
