@@ -49,3 +49,6 @@ NXIprintlink
 nxiinquirefile_
 nxilinkexternal_
 nxiisexternalgroup_
+NXMGetError
+NXMDisableErrorReporting
+NXMEnableErrorReporting

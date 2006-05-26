@@ -245,6 +245,8 @@ extern  NXstatus  NXfree(void** data);
 typedef void (*ErrFunc)(void *data, char *text);
 extern  void  NXMSetError(void *pData, ErrFunc);
 extern ErrFunc NXMGetError();
+extern  void  NXMDisableErrorReporting();
+extern  void  NXMEnableErrorReporting();
 extern void (*NXIReportError)(void *pData,char *text);
 extern void *NXpData;
 extern char *NXIformatNeXusTime();

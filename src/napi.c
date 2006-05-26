@@ -159,10 +159,26 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 extern ErrFunc NXMGetError(){
   return NXIReportError;
 }
+
 /*----------------------------------------------------------------------*/
 void NXNXNoReport(void *pData, char *string){
   /* do nothing */
 }  
+/*----------------------------------------------------------------------*/
+
+static ErrFunc last_errfunc = NXNXNXReportError;
+
+extern void NXMDisableErrorReporting()
+{
+    last_errfunc = NXMGetError();
+    NXMSetError(NXpData, NXNXNoReport);
+}
+
+extern void NXMEnableErrorReporting()
+{
+    NXMSetError(NXpData, last_errfunc);
+}
+
 /*----------------------------------------------------------------------*/
 #ifdef HDF5
 #include "napi5.h"
