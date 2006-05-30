@@ -56,40 +56,6 @@ BinaryRetriever::~BinaryRetriever()
   // there is nothing to deallocate
 }
 
-/**
- * Split the string based on supplied character.
- *
- * \param source
- * \param split
- */
-static vector<string> split(const string &source,const string &split)
-{
-  string::size_type number=string_util::count_occur(source,split);
-  if(number==0)
-    {
-      throw invalid_argument("\""+source+"\" does not contain \""+split+"\"");
-    }
-
-  vector<string> result;
-  string::size_type start=0;
-  string::size_type stop=0;
-  while(true)
-    {
-      stop=source.find(split,start);
-      if(stop==string::npos)
-        {
-          result.push_back(source.substr(start));
-          break;
-        }
-      else
-        {
-          result.push_back(source.substr(start,stop-start));
-          start=stop+split.size();
-        }
-    }
-  return result;
-}
-
 static size_t calculate_position(const vector<int> &file_size, 
                                  const vector<int> &pos)
 {
@@ -145,7 +111,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   string start_str;
   string size_str;
   {
-    vector<string> temp=split(location,"][");
+    vector<string> temp=string_util::split(location,"][");
     if(temp.size()!=3)
       {
         throw invalid_argument("wrong number of groups in location string");
