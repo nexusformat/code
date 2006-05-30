@@ -435,3 +435,21 @@ extern std::string string_util::erase(const std::string &in_str,const std::strin
 
   return result;
 }
+
+extern string::size_type string_util::count_occur(const string &str, const string &ch)
+{
+  string::size_type count=0;
+  string::size_type index=0;
+
+  // infinite loop to make sure that the entire string is parsed.
+  while(true)
+    {
+      index=str.find(ch,index+1);
+      if(index==string::npos)
+        {
+          break;
+        }
+      count++;
+    }
+  return count;
+}

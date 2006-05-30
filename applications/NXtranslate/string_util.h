@@ -30,6 +30,15 @@ namespace string_util{
   extern std::vector<int> int_list_str_to_intVect(std::string &);
   extern std::string intVec_to_str(const std::vector<int> &);
   extern std::string erase(const std::string &in_str, const std::string &match_str);
+/**
+ * Count the number of occurences of the character occuring in the string.
+ *
+ * \param str the string to search through
+ * \param ch the character to look for
+ *
+ * \return The number of occurences
+ */
+  extern std::string::size_type count_occur(const std::string &str, const std::string &ch);
 
 /*
  * This method takes a string as an argument and attempts to convert this 
