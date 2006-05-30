@@ -417,3 +417,21 @@ extern string string_util::intVec_to_str(const vector<int> &vec){
 
   return result;
 }
+
+extern std::string string_util::erase(const std::string &in_str,const std::string &match_str){
+  string result=in_str;
+  string::size_type match_size=match_str.size();
+  string::size_type index=0;
+
+  while(true)
+    {
+      index=result.find(match_str,index);
+      if(index==string::npos)
+        {
+          break;
+        }
+      result.erase(index,match_size);
+    }
+
+  return result;
+}

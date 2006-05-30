@@ -29,6 +29,8 @@ namespace string_util{
   extern void str_to_doubleArray(std::string &,double *, const unsigned int);
   extern std::vector<int> int_list_str_to_intVect(std::string &);
   extern std::string intVec_to_str(const std::vector<int> &);
+  extern std::string erase(const std::string &in_str, const std::string &match_str);
+
 /*
  * This method takes a string as an argument and attempts to convert this 
  * string into a vector of integers.  The string is in the form of a comma 
