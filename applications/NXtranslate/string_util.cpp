@@ -135,32 +135,43 @@ extern bool string_util::is_comma(char c){
   return find(COMMA.begin(),COMMA.end(),c)!=COMMA.end();
 }
 
+extern StrVec string_util::split(const string &source,const string &split)
+{
+  string::size_type number=count_occur(source,split);
+  if(number==0)
+    {
+      StrVec result;
+      result.push_back(source);
+      return result;
+    }
+
+  vector<string> result;
+  string::size_type start=0;
+  string::size_type stop=0;
+  while(true)
+    {
+      stop=source.find(split,start);
+      if(stop==string::npos)
+        {
+          result.push_back(source.substr(start));
+          break;
+        }
+      else
+        {
+          result.push_back(source.substr(start,stop-start));
+          start=stop+split.size();
+        }
+    }
+  return result;
+}
+
 /*
  * split a string up using commas as the delimiter
  */
 extern StrVec string_util::split(const string &str){
-  StrVec result;
-  typedef string::size_type string_size;
+  static const string COMMA=",";
 
-  string_size i=0;
-  while(i<str.size()){
-    // skip seperators at end of last word
-    while(i<str.size() && is_comma(str[i]))
-      i++;
-
-    // find end of "word"
-    string_size j=i;
-    while(j<str.size() && !is_comma(str[j])){
-      j++;
-    }
-
-    if(i!=j){
-      result.push_back(str.substr(i,j-i));
-      i=j;
-    }
-  }
-
-  return result;
+  return split(str,COMMA);
 }
 
 static bool is_slash(char c){

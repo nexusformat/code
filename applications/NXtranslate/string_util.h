@@ -39,6 +39,13 @@ namespace string_util{
  * \return The number of occurences
  */
   extern std::string::size_type count_occur(const std::string &str, const std::string &ch);
+/**
+ * Split the string based on supplied character.
+ *
+ * \param source
+ * \param split
+ */
+  extern std::vector<std::string> split(const std::string &source,const std::string &split);
 
 /*
  * This method takes a string as an argument and attempts to convert this 
