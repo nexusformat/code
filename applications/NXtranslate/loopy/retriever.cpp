@@ -51,29 +51,6 @@ LoopyRetriever::~LoopyRetriever()
 }
 
 /**
- * Count the number of occurences of the character occuring in the string.
- *
- * \param str the string to search through
- * \param ch the character to look for
- *
- * \return The number of occurences
- */
-static string::size_type count_occur(const string &str, const string &ch){
-  string::size_type count=0;
-  string::size_type index=0;
-
-  // infinite loop to make sure that the entire string is parsed.
-  while(true)
-    {
-      index=str.find(ch,index+1);
-      if(index==string::npos)
-        break;
-      count++;
-    }
-  return count;
-}
-
-/**
  * Converts a string describing a type into an enumeration.
  *
  * \param type The string version of the type.
@@ -161,13 +138,13 @@ void LoopyRetriever::getData(const string &location, tree<Node> &tr)
     }
 
   // check that it has the correct number of colons
-  if(count_occur(location,":")!=1)
+  if(string_util::count_occur(location,":")!=1)
     {
       throw invalid_argument("location must contain only one colon");
     }
 
   // check that it has 
-  if(count_occur(location,",")!=2)
+  if(string_util::count_occur(location,",")!=2)
     {
       throw invalid_argument("location must contain only two commas");
     }

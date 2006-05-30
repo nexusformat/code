@@ -57,32 +57,6 @@ BinaryRetriever::~BinaryRetriever()
 }
 
 /**
- * Count the number of occurences of the character occuring in the string.
- *
- * \param str the string to search through
- * \param ch the character to look for
- *
- * \return The number of occurences
- */
-static string::size_type count_occur(const string &str, const string &ch)
-{
-  string::size_type count=0;
-  string::size_type index=0;
-
-  // infinite loop to make sure that the entire string is parsed.
-  while(true)
-    {
-      index=str.find(ch,index+1);
-      if(index==string::npos)
-        {
-          break;
-        }
-      count++;
-    }
-  return count;
-}
-
-/**
  * Split the string based on supplied character.
  *
  * \param source
@@ -90,7 +64,7 @@ static string::size_type count_occur(const string &str, const string &ch)
  */
 static vector<string> split(const string &source,const string &split)
 {
-  string::size_type number=count_occur(source,split);
+  string::size_type number=string_util::count_occur(source,split);
   if(number==0)
     {
       throw invalid_argument("\""+source+"\" does not contain \""+split+"\"");
