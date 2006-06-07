@@ -372,7 +372,7 @@ static void my_endElement(void *user_data, const xmlChar *name){
                                ((UserData *)user_data)->dims, node.int_type());
       }catch(runtime_error &e){
         print_error(((UserData *)user_data),RUNTIME_ERROR+": "+except_label
-                                                +" group cannot contain data");
+                    +e.what());
       }
     }catch(invalid_argument &e){
       print_error(((UserData *)user_data),
