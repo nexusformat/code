@@ -73,7 +73,7 @@ static bool increment_position(const vector<int> &offset,
                                const vector<int> &size,
                                vector<int> &pos)
 {
-  int index=size.size()-1;
+  int index=size.size()-2;
 
   while(index>=0){
     if(pos[index]+1<offset[index]+size[index])
@@ -186,7 +186,6 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   size_t buffer_size=num_items; // read a single element at a time
   data_t data_buffer[buffer_size];
   */
-  data_t data_buffer;
 
   // open the file
   std::ifstream data_file(filename.c_str(), std::ios::binary);
@@ -213,19 +212,29 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   // index into data array
   size_t data_index=0;
 
+  // buffer to read data into
+  size_t num_items=*(size.rbegin());
+  size_t buffer_size=num_items*data_size;
+  data_t data_buffer[num_items];
+
   // push through the file grabbing the proper bits
   scalar_position=data_size*calculate_position(file_size,pos);
   data_file.seekg(scalar_position,std::ios::beg);
-  data_file.read(reinterpret_cast<char *>(&data_buffer),data_size);
-  (static_cast<data_t *>(data))[data_index]=data_buffer;
-  data_index++;
+  data_file.read(reinterpret_cast<char *>(data_buffer),buffer_size);
+
+  // copy into final array
+  memcpy((static_cast<data_t *>(data))+data_index,data_buffer,buffer_size);
+  data_index+=num_items;
+
   while(increment_position(start,size,pos))
     {
+      // calculate where to go and read in a block of data
       scalar_position=data_size*calculate_position(file_size,pos);
       data_file.seekg(scalar_position,std::ios::beg);
-      data_file.read(reinterpret_cast<char *>(&data_buffer),data_size);
-      (static_cast<data_t *>(data))[data_index]=data_buffer;
-      data_index++;
+      data_file.read(reinterpret_cast<char *>(data_buffer),buffer_size);
+      // copy into final array
+      memcpy((static_cast<data_t *>(data))+data_index,data_buffer,buffer_size);
+      data_index+=num_items;
     }
 
   // close the file
