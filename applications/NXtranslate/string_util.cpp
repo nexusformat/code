@@ -148,6 +148,7 @@ extern StrVec string_util::split(const string &source,const string &split)
   vector<string> result;
   string::size_type start=0;
   string::size_type stop=0;
+  string inner;
   while(true)
     {
       stop=source.find(split,start);
@@ -208,8 +209,30 @@ extern vector<string> string_util::string_to_path(const string &str){
   return result;
 }
 
+static bool global_replace(string &str, const string &search, 
+                           const string &replace){
+  string::size_type index=str.find(search);
+
+  if(index==string::npos){
+    return false;
+  }
+
+  string::size_type search_size=search.size();
+  string::size_type replace_size=replace.size();
+  while(index!=string::npos){
+    // replace the search string with the replace string
+    str.replace(index,search_size,replace);
+    // the next place to look is just past where we last found the
+    // search string (which is now the replace string)
+    index=str.find(search,index+replace_size);
+  }
+
+  return true;
+}
+
 static StrVec shrink_and_split(string &str){
   static const char *COMMA=",";
+  typedef string::size_type string_size;
 
   // replace brackets with commas
   for( string::iterator ch=str.begin() ; ch!=str.end() ; ch++ ){
@@ -232,8 +255,6 @@ static StrVec shrink_and_split(string &str){
 
   // remove spaces
   {
-    typedef string::size_type string_size;
-
     string new_str="";
     string_size i=0;
     while(i<str.size()){
@@ -253,6 +274,11 @@ static StrVec shrink_and_split(string &str){
       }
     }
     str=new_str;
+  }
+
+  // remove commas that are next to each other
+  while(global_replace(str,",,",",")){
+    // the test does the work
   }
 
   // trim extra commas off of the beginning
@@ -362,7 +388,7 @@ extern void string_util::str_to_floatArray(std::string & str,float *array, const
   StrVec splitted=shrink_and_split(str);
 
   if(splitted.size()!=len)
-    throw runtime_error("array and string not same size");
+    throw runtime_error("array and string not same size ("+string_util::int_to_str(splitted.size())+"!="+string_util::int_to_str(len)+")");
 
   // turn each string into a short
   StrVecIter strIt=splitted.begin();
