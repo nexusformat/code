@@ -3,18 +3,6 @@
 #include "retriever.h"
 #include "../string_util.h"
 
-// use STDINT if possible, otherwise define the types here
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#else
-typedef signed char             int8_t;
-typedef short int               int16_t;
-typedef int                     int32_t;
-typedef unsigned char           uint8_t;
-typedef unsigned short int      uint16_t;
-typedef unsigned int            uint32_t;
-#endif
-
 using std::invalid_argument;
 using std::runtime_error;
 using std::string;
