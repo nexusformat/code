@@ -238,6 +238,20 @@ extern  NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxcla
 extern  NXstatus  NXmalloc(void** data, int rank, int dimensions[], int datatype);
 extern  NXstatus  NXfree(void** data);
 
+/*
+ * Type definitions
+ */
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#else
+typedef signed char             int8_t;
+typedef short int               int16_t;
+typedef int                     int32_t;
+typedef unsigned char           uint8_t;
+typedef unsigned short int      uint16_t;
+typedef unsigned int            uint32_t;
+#endif
+
 
 /*-----------------------------------------------------------------------
     NAPI internals 
