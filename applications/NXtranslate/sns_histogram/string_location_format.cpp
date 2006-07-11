@@ -10,21 +10,6 @@ using std::runtime_error;
 using std::invalid_argument;
 
 /**
- * \brief This function format the string location to be able to work
- * on it (remove white spaces....)
- *
- * \param location (INPUT) is the string location as found in the
- * translation file
- * \param new_location (OUTPUT) is the string location formated
- */
-void format_string_location(const string & location, 
-                            string & new_location)
-{
-  without_white_spaces(location, new_location);
-  return;
-}
-
-/**
  * \brief This function removes white spaces in the string location
  *
  * \param location (INPUT) is the string location as found in the 
