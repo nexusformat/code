@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include "nxconfig.h"
+#include "napiconfig.h"
 #include "retriever.h"
 #include "../string_util.h"
 

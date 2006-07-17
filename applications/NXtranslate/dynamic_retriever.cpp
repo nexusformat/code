@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <nxconfig.h>
+#include <napiconfig.h>
 #include "node.h"
 #include "node_util.h"
 #include "string_util.h"

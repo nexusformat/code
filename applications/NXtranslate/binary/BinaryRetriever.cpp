@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include "nxconfig.h"
+#include "napiconfig.h"
 #include "binary/BinaryRetriever.hpp"
 #include "string_util.h"
 
