@@ -58,7 +58,7 @@ static const string MAXLENGTH="--max-array";
 static const string MAXLENGTH_SHORT="-l";
 static const string PRINTDATA="-o";
 static const string NOT_PRINTDATA="+o";
-static const string VERSION="--version";
+static const string ARG_VERSION="--version";
 static const string PATH="-p";
 static const string HELP="--help";
 static const string HELP_SHORT="-h";
@@ -313,7 +313,7 @@ static void print_help(const string progname, int length){
   // ----- print the dynamic text
   cout << "About NXdir" << endl;
   cout << "  " << HELP_SHORT << "|" << HELP << "                 Print this help information" << endl;
-  cout << "  " << VERSION << "                 Print the version information" << endl;
+  cout << "  " << ARG_VERSION << "                 Print the version information" << endl;
   cout << endl;
   cout << "Node Selection" << endl;
   cout << "  " << PATH << "                        Path inside the file to look in. This can be \n" << HELP_PAD << "absolute or relative and can be class or name of a \n" << HELP_PAD << "given field. To anchor the path at the beginning or \n" << HELP_PAD << "end place a \"/\" there.\n" << HELP_PAD << "To specify that a level must exist, but\n" << HELP_PAD << "the name or class can be anything, use a dot \".\"." << endl;
@@ -431,7 +431,7 @@ int main(int argc, char *argv[]){
     if(arg1==HELP || arg1==HELP_SHORT){
       print_help(progname,1);
       exit(0);
-    }else if(arg1==VERSION){
+    }else if(arg1==ARG_VERSION){
       print_version(progname,1);
       exit(0);
     }else if(starts_with(arg1,TREEMODE)){
