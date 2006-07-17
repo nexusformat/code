@@ -1,5 +1,14 @@
 NeXus example programs and files
 --------------------------------
 
+napi_test.c uses the name of the executable file
+it is compiled into to determine what type of file to create
+i.e. HDF5 if it is called napi_test-hdf5  etc.
+
+You can build these examples using the  nxbuild  script
+that is installed into /usr/local/bin e.g.
+
+    nxbuild -o napi_test-hdf5 napi_test.c
+
 --
 $Id$
