@@ -247,6 +247,10 @@ case $host in
 	java_host="win32"
 	;;
 
+    *cygwin*)
+#	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
+	;;
+
     *darwin*)
 	dnl -no-cpp-precomp needed on MacOS-X (and others?)
 	AC_CHECK_C_OPTION([-no-cpp-precomp])
