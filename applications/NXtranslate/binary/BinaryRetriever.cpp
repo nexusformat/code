@@ -13,8 +13,17 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-typedef uint32_t data_t;
+static const string INT8("INT8");
+static const string INT16("INT16");
+static const string INT32("INT32");
+static const string UINT8("UINT8");
+static const string UINT16("UINT16");
+static const string UINT32("UINT32");
+static const string FLOAT32("FLOAT32");
+static const string FLOAT64("FLOAT64");
+static const string BYTE("BYTE");
 
+static const int DEFAULT_TYPE=NX_UINT32;
 
 /**
  * \file NXtranslate/binary/BinaryRetriever.cpp
@@ -79,6 +88,64 @@ static bool increment_position(const vector<int> &offset,
 }
 
 /**
+ * This function turns the type as a string into an integer for use
+ * with NeXus.
+ */
+static int getDataType(const string &str_type){
+  if(str_type.empty()){
+    return DEFAULT_TYPE;
+  }else if(str_type==INT8){
+    return NX_INT8;
+  }else if(str_type==INT16){
+    return NX_INT16;
+  }else if(str_type==INT32){
+    return NX_INT32;
+  }else if(str_type==UINT8){
+    return NX_UINT8;
+  }else if(str_type==UINT16){
+    return NX_UINT16;
+  }else if(str_type==UINT32){
+    return NX_UINT32;
+  }else if(str_type==FLOAT32){
+    return NX_FLOAT32;
+  }else if(str_type==FLOAT64){
+    return NX_FLOAT64;
+  }else if(str_type==BYTE){
+    return NX_CHAR;
+  }else{
+    throw invalid_argument("Invalid type: "+str_type);
+  }
+}
+
+/**
+ * This function turns the type as a string into a platform dependent
+ * size.
+ */
+static size_t getDataTypeSize(const int type){
+  if(type==NX_INT8){
+    return sizeof(int8_t);
+  }else if(type==NX_INT16){
+    return sizeof(int16_t);
+  }else if(type==NX_INT32){
+    return sizeof(int32_t);
+  }else if(type==NX_UINT8){
+    return sizeof(uint8_t);
+  }else if(type==NX_UINT16){
+    return sizeof(uint16_t);
+  }else if(type==NX_UINT32){
+    return sizeof(uint32_t);
+  }else if(type==NX_FLOAT32){
+    return sizeof(float);
+  }else if(type==NX_FLOAT64){
+    return sizeof(double);
+  }else if(type==NX_CHAR){
+    return sizeof(char);
+  }else{
+    throw invalid_argument("This statement should never be reached");
+  }
+}
+
+/**
  * This is the method for retrieving data from a file. The string must
  * be of the form "type:offset,delta,number".
  *
@@ -94,12 +161,30 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
       throw invalid_argument("cannot parse empty string");
     }
 
+  // break the location string into a type and sizing information
+  int type;
+  string sizing;
+  {
+    vector<string> temp=string_util::split(location,":");
+    cout << "SIZE=" << temp.size() << endl;
+    if(temp.size()==1){
+      type=getDataType("");
+      sizing=location;
+    }else if(temp.size()==2){
+      type=getDataType(temp[0]);
+      sizing=temp[1];
+    }else{
+      throw invalid_argument("can only specify one type in location string");
+    }
+    cout << "\"" << type << "\" \"" << sizing << "\"" << endl;
+  }
+
   // break the location string into three parts: file_size,data_start,data_size
   string file_size_str;
   string start_str;
   string size_str;
   {
-    vector<string> temp=string_util::split(location,"][");
+    vector<string> temp=string_util::split(sizing,"][");
     if(temp.size()!=3)
       {
         throw invalid_argument("wrong number of groups in location string");
@@ -162,13 +247,14 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
 
   // allocate the space for the result
   void *data;
-  if(NXmalloc(&data,rank,dims,NX_UINT32)!=NX_OK)
+  cout << "TYPE=" << type << endl;
+  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
     {
       throw runtime_error("NXmalloc failed");
     }
 
   // prepare data buffer
-  size_t data_size=sizeof(data_t);
+  size_t data_size=getDataTypeSize(type);
   /*
   size_t num_items=1;
   size_t buffer_size=num_items; // read a single element at a time
@@ -203,15 +289,15 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   // buffer to read data into
   size_t num_items=*(size.rbegin());
   size_t buffer_size=num_items*data_size;
-  data_t data_buffer[num_items];
+  char   data_buffer[buffer_size];
 
   // push through the file grabbing the proper bits
   scalar_position=data_size*calculate_position(file_size,pos);
   data_file.seekg(scalar_position,std::ios::beg);
-  data_file.read(reinterpret_cast<char *>(data_buffer),buffer_size);
+  data_file.read(data_buffer,buffer_size);
 
   // copy into final array
-  memcpy((static_cast<data_t *>(data))+data_index,data_buffer,buffer_size);
+  memcpy((static_cast<char *>(data))+data_index*data_size,data_buffer,buffer_size);
   data_index+=num_items;
 
   while(increment_position(start,size,pos))
@@ -221,7 +307,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
       data_file.seekg(scalar_position,std::ios::beg);
       data_file.read(reinterpret_cast<char *>(data_buffer),buffer_size);
       // copy into final array
-      memcpy((static_cast<data_t *>(data))+data_index,data_buffer,buffer_size);
+      memcpy((static_cast<char *>(data))+data_index*data_size,data_buffer,buffer_size);
       data_index+=num_items;
     }
 
