@@ -289,7 +289,8 @@ dnl
 dnl first see if one has been given
 dnl
 H4ROOT=""
-H4SUBROOT=""
+H4INCSUBROOT=""
+H4LIBSUBROOT=""
 H5ROOT=""
 MXMLROOT=""
 AC_SUBST(H4ROOT)
@@ -321,9 +322,12 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     for i in lib64 lib; do
         if test -r /usr/$i/hdf/libdf.$HDF_EXT; then
 	    H4ROOT=/usr
-	    H4SUBROOT=hdf
+	    H4LIBSUBROOT=hdf
         fi
     done
+    if test -r $H4ROOT/include/hdf; then
+        H4INCSUBROOT=hdf
+    fi
     if test -z "$H4ROOT"; then 
 	AC_MSG_RESULT(unknown)
     else 
@@ -331,17 +335,17 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     fi
 fi
 if test "$H4ROOT"; then
-    H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/${H4SUBROOT}/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
+    H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/${H4INCSUBROOT}/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
     case $H4VERSION in
 	4.[[12]]*) 
     		HDF4_LDFLAGS="-lmfhdf -ldf";
 		for j in lib lib64; do
-		    if test -d $H4ROOT/$j/$H4SUBROOT; then LDFLAGS="-L$H4ROOT/$j/$H4SUBROOT $LDFLAGS"; fi
+		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $LDFLAGS"; fi
 		done
-		if test -z "$H4SUBROOT"; then
+		if test -z "$H4INCSUBROOT"; then
     		    HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4"
 		else
-    		    HDF4_CPPFLAGS="-I$H4ROOT/include/$H4SUBROOT -DHDF4"
+    		    HDF4_CPPFLAGS="-I$H4ROOT/include/$H4INCSUBROOT -DHDF4"
 		fi
 		;;
 	*) 	AC_MSG_WARN([The HDF 4 installation has not the right version ($H4VERSION). You need at least 4.1])
