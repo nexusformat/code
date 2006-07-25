@@ -166,7 +166,6 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   string sizing;
   {
     vector<string> temp=string_util::split(location,":");
-    cout << "SIZE=" << temp.size() << endl;
     if(temp.size()==1){
       type=getDataType("");
       sizing=location;
@@ -176,7 +175,6 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
     }else{
       throw invalid_argument("can only specify one type in location string");
     }
-    cout << "\"" << type << "\" \"" << sizing << "\"" << endl;
   }
 
   // break the location string into three parts: file_size,data_start,data_size
@@ -247,7 +245,6 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
 
   // allocate the space for the result
   void *data;
-  cout << "TYPE=" << type << endl;
   if(NXmalloc(&data,rank,dims,type)!=NX_OK)
     {
       throw runtime_error("NXmalloc failed");
@@ -305,7 +302,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
       // calculate where to go and read in a block of data
       scalar_position=data_size*calculate_position(file_size,pos);
       data_file.seekg(scalar_position,std::ios::beg);
-      data_file.read(reinterpret_cast<char *>(data_buffer),buffer_size);
+      data_file.read(data_buffer,buffer_size);
       // copy into final array
       memcpy((static_cast<char *>(data))+data_index*data_size,data_buffer,buffer_size);
       data_index+=num_items;
@@ -315,7 +312,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   data_file.close();
 
   // create the node - this copies the data
-  Node node=Node(NAME,data,rank,dims,NX_UINT32);
+  Node node=Node(NAME,data,rank,dims,type);
 
   // insert the data into the tree
   tr.insert(tr.begin(),node);
