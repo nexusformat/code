@@ -80,20 +80,26 @@ extern void nexus_util::open(NXhandle *handle, const Node &node){
       }
 
       // create the data
-      if(node.compress_type()==Node::COMP_NONE){
+      int comp_type=node.compress_type();
+      if(comp_type==Node::COMP_NONE){
         //std::cout << "in open: " << node.type() << " " << *(node.dims().begin()) << std::endl; // REMOVE
         if(NXmakedata(*handle,name,type,rank,dims)!=NX_OK){
           std::cout << "NXmakedata failed" << std::endl;
           throw runtime_error("NXmakedata failed");
         }
       }else{
-        int comp_type=node.compress_type();
-        // warn that this is not supported
-        std::cout << "WARN: do not currently support compression (type=" << comp_type << ")" << std::endl;
-        return;
-        /* TAKEN FROM <napi.h>
-           NX_EXTERNAL  NXstatus CALLING_STYLE NXcompmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
-        */
+        vector<int> buff_size_vec=node.comp_buffer_dims();
+        int *buff_size=new int[rank];
+        for( size_t i=0 ; i<rank ; i++ ){
+          buff_size[i]=buff_size_vec[i];
+        }
+
+        buff_size[rank-1]=dims[rank-1];
+        if(NXcompmakedata(*handle,name,type,rank,dims,comp_type,buff_size)!=NX_OK){
+          std::cout << "NXcompmakedata failed" << std::endl;
+          throw runtime_error("NXcompmakedata failed");
+        }
+        delete buff_size; // FIXME - is this the correct form?
       }
     }
     // open the data that was just created

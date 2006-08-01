@@ -39,6 +39,7 @@ typedef vector<string> StrVector;
 typedef vector<Node> NodeVector;
 typedef NodeVector* NodeVectorP;
 typedef Ptr<Retriever> RetrieverPtr;
+typedef tree<Node> NodeTree;
 
 static const int    GROUP_STRING_LEN  = 128;
 static const unsigned int   MAX_NODE_DEPTH    = 20;
@@ -46,6 +47,7 @@ static const string DEFAULT_MIME_TYPE = "NeXus";
 static const string MIME_TYPE         = "NXS:mime_type";
 static const string SOURCE            = "NXS:source";
 static const string LOCATION          = "NXS:location";
+static const string COMPRESSION       = "NXS:compression";
 static const string LINK              = "NAPIlink";
 static const string TARGET            = "target";
 static const string TYPE              = "type";
@@ -189,22 +191,25 @@ static void my_startElement(void *user_data, const xmlChar *name,
   bool is_link=(str_name==LINK);
 
   // check for "name", "type", "source", "mime_type", "location",
-  // "target" attributes
+  // "target", "compression" attributes
   string source;
   string mime_type;
   string location;
+  string compression;
   string type;
   bool update_dims=false;
   vector<Attr> node_attrs;
   for( StrVector::iterator it=str_attrs.begin() ; it!=str_attrs.end() ; it+=2){
     if( (*it==SOURCE) || (*it==MIME_TYPE) || (*it==LOCATION) || (*it==TYPE)
-             || ((*it==TARGET) && (is_link)) || (*it==NAME) ){
+        || ((*it==TARGET) && (is_link)) || (*it==NAME) || (*it==COMPRESSION) ){
       if(*it==SOURCE){
         source=*(it+1);
       }else if(*it==MIME_TYPE){
         mime_type=*(it+1);
       }else if(*it==LOCATION){
         location=*(it+1);
+      }else if(*it==COMPRESSION){
+        compression=*(it+1);
       }else if(*it==NAME){
         type=str_name;
         str_name=*(it+1);
@@ -312,6 +317,17 @@ static void my_startElement(void *user_data, const xmlChar *name,
       }catch(exception &e){
         print_error(((UserData *)user_data),EXCEPTION+except_label+e.what());
       }
+    }
+  }
+
+  // set the compression flag
+  if(!compression.empty()){
+    if(node_from_retriever){
+      for( NodeTree::iterator it=tree.begin() ; it!=tree.end() ; ++it ){
+        it->set_comp(compression);
+      }
+    }else{
+      node.set_comp(compression);
     }
   }
 

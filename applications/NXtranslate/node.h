@@ -31,6 +31,7 @@ class Node{
   const bool is_data() const;
   const int rank() const;
   const std::vector<int> dims() const;
+  const std::vector<int> comp_buffer_dims() const;
   const NXtype int_type() const;
   const NXcompress compress_type() const;
   void* data() const; // do not mutate value
@@ -39,6 +40,7 @@ class Node{
   Attr get_attr(const int) const;
 
   // mutator methods
+  const void set_comp(const std::string &comp_type);
   const void set_name(const std::string &name);
   const void set_data(void *&data,const int rank,const int* dims,const int type);
   const void set_attrs(const std::vector<Attr> &attrs);
@@ -52,6 +54,7 @@ class Node{
   std::string __type;
   bool __is_data;
   std::vector<int> __dims;
+  std::vector<int> __comp_buffer_dims;
   void *__value;
   std::vector<Attr> __attrs;
   NXcompress __comp_type;

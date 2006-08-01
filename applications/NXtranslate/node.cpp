@@ -166,6 +166,10 @@ const Node::NXcompress Node::compress_type() const{
   return __comp_type;
 }
 
+const std::vector<int> Node::comp_buffer_dims() const{
+  return __comp_buffer_dims;
+}
+
 void* Node::data() const{
   return __value;
 }
@@ -201,6 +205,34 @@ Attr Node::get_attr(const int attr_num) const{
   if(attr_num>this->num_attr())
     throw out_of_range("asked for attribute with higher index than size");
   return (*(__attrs.begin()+attr_num));
+}
+
+const void Node::set_comp(const string &comp_type){
+  if(string_util::starts_with(comp_type,"NONE")){
+    __comp_type=COMP_NONE;
+  }else if(string_util::starts_with(comp_type,"LZW")){
+    __comp_type=COMP_LZW;
+  }else if(string_util::starts_with(comp_type,"RLE")){
+    __comp_type=COMP_RLE;
+  }else if(string_util::starts_with(comp_type,"HUF")){
+    __comp_type=COMP_HUF;
+  }else{
+    throw invalid_argument("Do not understand compression type: "+comp_type);
+  }
+
+  // work with user specified dimension information
+  vector<string> temp=string_util::split(comp_type,":");
+  if(temp.size()==2){
+    __comp_buffer_dims=string_util::str_to_intVec(*(temp.rbegin()));
+  }
+
+  // use default if anything is wrong
+  if(__comp_buffer_dims.size()!=__dims.size()){
+    __comp_buffer_dims=__dims;
+    for( size_t i=0 ; i<__comp_buffer_dims.size()-1 ; ++i ){
+      __comp_buffer_dims[i]=1;
+    }
+  }
 }
 
 const void Node::set_name(const string &name){
