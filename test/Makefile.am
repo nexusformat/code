@@ -187,4 +187,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig nxconvert
+DISTCLEANFILES = atconfig nxconvert data/dmc*
