@@ -28,7 +28,8 @@ C *** Version of NeXus interface - should be consistent with napi.h!
       CHARACTER*5 NEXUS_VERSION
       PARAMETER(NEXUS_VERSION='3.0.0')
 C *** NXaccess enum - access modes for NXopen
-      INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE, NXACC_CREATE5
+      INTEGER NXACC_READ,NXACC_RDWR,NXACC_CREATE, NXACC_CREATE5,
+     +  NXACC_CREATE4, NXACC_CREATEXML
       PARAMETER(NXACC_READ=1,NXACC_RDWR=2,NXACC_CREATE=3,
      +    NXACC_CREATE4=4,NXACC_CREATE5=5,NXACC_CREATEXML=6)
 C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
@@ -58,7 +59,7 @@ C *** NeXus names for HDF parameters
      +        NX_BOOLEAN
       PARAMETER(NX_FLOAT32=5,NX_FLOAT64=6,NX_INT8=20,
      +          NX_UINT8=21,NX_INT16=22,NX_UINT16=23,
-     +          NX_INT32=24,NX_UINT32=25,NX_CHAR=4,NX_BOLLEAN=21,
+     +          NX_INT32=24,NX_UINT32=25,NX_CHAR=4,NX_BOOLEAN=21,
      +          NX_BINARY=21)
 C**** NeXus compression schemes
       INTEGER NX_COMP_NONE, NX_COMP_LZW, NX_COMP_HUF, NX_COMP_RLE
