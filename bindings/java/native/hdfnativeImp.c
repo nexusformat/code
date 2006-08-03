@@ -28,9 +28,11 @@
  *     2.  These routines copy the data at least once -- a serious
  *         but unavoidable performance hit.
  */
-#include "hdf.h"
 
 #include <stdio.h>
+
+/* #include "hdf.h"    /* this only seems to be needed to define "intn" */
+typedef int intn;
 
 #include "jni.h"
 
