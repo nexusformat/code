@@ -136,7 +136,7 @@ if test -d "$with_java_home"; then
 	    JAVACFLAGS="-C"	# force creation of .class files
 	fi
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAR,jar,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAR,jar fastjar,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin:$PATH])
 fi
@@ -285,7 +285,10 @@ dnl	fi
 esac
 
 if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
-    JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
+# avoid adding /usr/include/linux to include path
+    if test "$javaroot" != "/usr" -a "$javaroot" != "/usr/"; then
+        JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
+    fi
 fi
 
 dnl
