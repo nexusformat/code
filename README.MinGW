@@ -14,10 +14,15 @@ applications/NXtranslate/Makefile.am and in both replace
 
 Now just type
 
-./configure
-make
-make check
-make install
+  ./configure
+  make
+  make check
+  make install
+
+To build the JAVA interface with gcj you need to pass the JAVA home
+directory to configure. If your gcj command is  /mingw/bin/gcj  then use
+
+  ./configure --with-java-home=/mingw
 
 If you get a compile error about redeclaration of ssize_t when including the HDF5 header, you need to edit /usr/local/hdf5/include/H5pubconf.h and change the definition of H5_SIZEOF_SSIZE_T to e.g.
 
