@@ -131,12 +131,16 @@ if test -d "$with_java_home"; then
 	javaroot="$with_java_home"
 	AC_MSG_NOTICE([Java SDK home is $javaroot])
 	JAVAINCLUDE="-I$javaroot/include"
-	AC_PATH_PROGS(JAVAC,javac,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAVAC,gcj javac,,[$javaroot/bin:$PATH])
+	if test `basename "$JAVAC"` = "gcj"; then
+	    JAVACFLAGS="-C"	# force creation of .class files
+	fi
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAVA,java,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAVAH,javah,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin:$PATH])
 fi
+
 
 #AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
 #	[], [with_java=yes])
@@ -164,6 +168,7 @@ fi
 #	JAVAC=
 #	JAVAINCLUDE=
 #fi
+AC_SUBST(JAVACFLAGS)
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
 AC_SUBST(PACKAGE_RELEASE)

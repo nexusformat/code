@@ -33,8 +33,8 @@ ln -sf "/c/program files/hdf/42r1-win/release/dll/hm421m.dll" /usr/local/hdf4/li
 #
 # HDF5 windows binary install  (from http://hdf.ncsa.uiuc.edu)
 #
-ln -sf "/c/program files/hdf/5-164-win/include" /usr/local/hdf5/include
-ln -sf "/c/program files/hdf/5-164-win/dll/hdf5dll.dll" /usr/local/hdf5/lib/libhdf5.dll
+ln -sf "/c/program files/hdf/5-165-win/include" /usr/local/hdf5/include
+ln -sf "/c/program files/hdf/5-165-win/dll/hdf5dll.dll" /usr/local/hdf5/lib/libhdf5.dll
 #
 # ZLIB (from http://www.gzip.org/zlib/)
 #
@@ -42,7 +42,7 @@ ln -sf "/c/program files/hdf/zlib122-windows/zlib1.dll" /usr/local/lib/libz.dll
 #
 # SZIP from http://hdf.ncsa.uiuc.edu/
 #
-ln -sf "/c/program files/hdf/szip20-win-xp-enc/dll/szlibdll.dll" /usr/local/lib/libsz.dll
+ln -sf "/c/program files/hdf/szip20-win-xp-noenc/dll/szlibdll.dll" /usr/local/lib/libsz.dll
 #
 # LIBXML2 (optional; only needed for NXtranslate) from http://xmlsoft.org/
 #
