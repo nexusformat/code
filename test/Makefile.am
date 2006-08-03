@@ -80,7 +80,7 @@ nxconvert:
 
 # this sets the test running environment - in case we
 # have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
-TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib:/usr/local/lib
+TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib:/usr/local/lib DYLD_LIBRARY_PATH=$${DYLD_LIBRARY_PATH}:$(H4ROOT)/lib:$(H5ROOT)/lib:/usr/local/lib
 
 run_test_SOURCES=run_test.c
 run_test_LDFLAGS=-static $(LDFLAGS)
