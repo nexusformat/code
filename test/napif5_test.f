@@ -29,7 +29,7 @@ C------------------------------------------------------------------------------
       INTEGER ENTRY_STATUS, ATTR_STATUS
       INTEGER*4 I, J
       REAL*4 R
-      BYTE I1_ARRAY(4)
+      INTEGER*1 I1_ARRAY(4)
       INTEGER*2 I2_ARRAY(4)
       INTEGER*4 I4_ARRAY(4) 
       REAL*4 R4_ARRAY(4,5)
@@ -39,13 +39,13 @@ C------------------------------------------------------------------------------
       INTEGER*4 SLAB_START(2), SLAB_SIZE(2)
       CHARACTER*64 NAME, CLASS
       CHARACTER*128 CHAR_BUFFER
-      BYTE CHAR_BUFFER_B(128)
+      INTEGER*1 CHAR_BUFFER_B(128)
       CHARACTER*64 GROUP_NAME, CLASS_NAME
       INTEGER FILEID(NXHANDLESIZE)
       INTEGER GLINK(NXLINKSIZE), DLINK(NXLINKSIZE), BLINK(NXLINKSIZE)
       INTEGER*4 COMP_ARRAY(20,100)
       INTEGER*4 DIMS(2), CDIMS(2), UDIMS(1)
-      BYTE I1_BUFFER(4)
+      INTEGER*1 I1_BUFFER(4)
       INTEGER*2 I2_BUFFER(4)
       INTEGER*4 I4_BUFFER(4), U_BUFFER(7)
       REAL*4 R4_BUFFER(4)

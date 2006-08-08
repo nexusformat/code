@@ -168,6 +168,7 @@ fi
 #	JAVAC=
 #	JAVAINCLUDE=
 #fi
+AC_SUBST(FCFLAGS)
 AC_SUBST(JAVACFLAGS)
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
@@ -261,7 +262,7 @@ case $host in
 	AC_CHECK_C_OPTION([-no-cpp-precomp])
 	CPPFLAGS="$CPPFLAGS -D__unix"
 	CFLAGS="$CFLAGS -g"
-	FFLAGS="$FFLAGS -g -Wno-globals"
+	FFLAGS="$FFLAGS -g"
 dnl This is a hack for libtool - for some reason the F77 tag
 dnl does not get set with the commands to create a shared library
 	AC_MSG_NOTICE([Patching libtool for F77 shared linking])
