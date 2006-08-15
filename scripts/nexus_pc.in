@@ -9,5 +9,5 @@ Description:Libraries and utilities for using NeXus format data files
 Version:@VERSION@
 Requires:
 Conflicts:
-Libs:	-L${libdir} -lNeXus @HDF4_LDFLAGS@ @HDF4_LDFLAGS@ @XML_LDFLAGS@
+Libs:	-L${libdir} -lNeXus @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@
 Cflags:	-I${includedir} @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
