@@ -39,7 +39,7 @@
 #endif
 // -------------------- end TIMING TEST stuff
 
-#define NXDIR_VERSION "0.2.5"
+#define NXDIR_VERSION "0.2.6"
 
 // bring stuff into this name space
 using std::cout;
@@ -48,6 +48,7 @@ using std::string;
 using std::vector;
 
 // some constants for command line flags
+static const string BINDUMP="--dump";
 static const string WRITEDATA="--write-data";
 static const string TREEMODE="--tree-mode";
 static const string TREEMODE_SHORT="-t";
@@ -165,9 +166,9 @@ static int set_treemode(const string arg1, const string arg2, const string flag,
 static string get_treemode_help(){
   string result="  ";
 
-  result+=TREEMODE_SHORT+"|"+TREEMODE+"<value>";
+  result+=TREEMODE_SHORT+"|"+TREEMODE+" <value>";
 
-  result+="     ";
+  result+="    ";
 
   result+="Sets the formatting of the tree. Allowed values are \n";
   result+=HELP_PAD;
@@ -202,7 +203,7 @@ static int set_pathmode(const string arg1, const string arg2, const string flag,
 }
 
 static string get_pathmode_help(){
-  string result="  "+PATHMODE+"<value>        ";
+  string result="  "+PATHMODE+" <value>       ";
 
   result+="Select whether paths are written with names or \n";
   result+=HELP_PAD;
@@ -237,7 +238,7 @@ static int set_datamode(const string arg1, const string arg2, const string flag,
 }
 
 static string get_datamode_help(){
-  string result="  "+DATAMODE+"<value>        ";
+  string result="  "+DATAMODE+" <value>       ";
 
   result+="How data is printed. Allowed values are (script)";
 
@@ -262,7 +263,7 @@ static int set_outputmode(const string arg1, const string arg2, const string fla
 }
 
 static string get_outputmode_help(){
-  string result="  "+OUTPUTMODE+"<value>        ";
+  string result="  "+OUTPUTMODE+" <value>       ";
 
   result+="How data is printed with respect to tree. Allowed \n";
   result+=HELP_PAD;
@@ -337,8 +338,9 @@ static void print_help(const string progname, int length){
   cout << get_pathmode_help() << endl;
   cout << get_datamode_help() << endl;
   cout << get_outputmode_help() << endl;
-  cout << "  " << WRITEDATA << "<filename>    "
+  cout << "  " << WRITEDATA << " <filename>   "
        << "Select a file to write out selected NXdata to." << endl;
+  cout << "  " << BINDUMP << " <filename>         " << "Generate a binary dump of the selected node." << endl;
 }
 
 // check if the file exists by opening for reading
@@ -474,6 +476,8 @@ int main(int argc, char *argv[]){
         exit(-1);
       }
       i+=ret;
+    }else if(starts_with(arg1,BINDUMP)){
+      i+=get_arg(arg1,arg2,BINDUMP,&print_config.dump_data_file);
     }else if(starts_with(arg1,WRITEDATA)){
       i+=get_arg(arg1,arg2,WRITEDATA,&print_config.data_out_file);
     }else if(arg1==VERBOSE){
@@ -631,6 +635,8 @@ int main(int argc, char *argv[]){
       if(print_config.data_out_file.length()>0){
         std::ofstream out_file(print_config.data_out_file.c_str());
         write_data(out_file,handle,tree,print_config);
+      }else if(!print_config.dump_data_file.empty()){
+        dump_data(print_config.dump_data_file,handle,tree,print_config);
       }else{
         print_tree_result(handle,tree,print_config);
       }

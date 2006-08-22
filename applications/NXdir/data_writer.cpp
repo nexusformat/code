@@ -23,8 +23,10 @@
  * SOFTWARE.
  */
 #include "napi.h"
+#include <fstream>
 #include <iostream>
 #include "nxdir.h"
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <map>
@@ -516,4 +518,72 @@ extern void write_data(ostream &out,NXhandle handle, const Tree &tree,
   for( Tree::const_iterator path=tree.begin() ; path!=tree.end() ; path++ ){
     write_one_data(out,handle,*path,config);
   }
+}
+
+extern void dump_data(std::string &filename,NXhandle handle, const Tree &tree,
+                      const PrintConfig &config){
+  // error check the arguments
+  if(tree.size()!=1){
+    throw std::runtime_error("Can dump only one node");
+  }
+  if(filename.empty()){
+    throw std::runtime_error("Encountered empty filename");
+  }
+
+  // go to the right place in the file
+  Path path=*(tree.begin());
+  open_path(handle,path);
+
+  // find out about the data
+  int rank;
+  int dims[NX_MAXRANK];
+  int type;
+  if(NXgetinfo(handle,&rank,dims,&type)!=NX_OK){
+    close_path(handle,path);
+    throw std::runtime_error("NXgetinfo failed");
+  }
+
+  // determine the "size" of the data
+  int size=1;
+  for( int i=0 ; i<rank ; i++ ){
+    size*=dims[i];
+  }
+  if(type==NX_CHAR || type==NX_INT8 || type==NX_UINT8){
+    // do nothing
+  }else if(type==NX_INT16 || type==NX_UINT16){
+    size*=2;
+  }else if(type==NX_INT32 || type==NX_UINT32 || type==NX_FLOAT32){
+    size*=4;
+  }else if(type==NX_FLOAT64){
+    size*=8;
+  }else{
+    // NX_BOOLEAN NX_UINT
+    // NX_BINARY   21
+    throw std::runtime_error("Do not understand supplied type");
+  }
+
+  // allocate space for the data
+  void *data;
+  if(NXmalloc(&data,rank,dims,type)!=NX_OK){
+    close_path(handle,path);
+    throw "NXmalloc failed";
+  }
+
+  // retrieve the data from the file
+  if(NXgetdata(handle,data)!=NX_OK){
+    close_path(handle,path);
+    throw "NXgetdata failed";
+  }
+
+  // close the path
+  close_path(handle,path);
+
+  // open the output file
+  std::ofstream dump_file(filename.c_str(),std::ios::binary);
+  if(!dump_file.is_open()){
+    throw std::runtime_error("Failed opening dump file");
+  }
+
+  // dump the data
+  dump_file.write(reinterpret_cast<char *>(data),size);
 }

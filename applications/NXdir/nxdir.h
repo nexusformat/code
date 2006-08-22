@@ -70,6 +70,7 @@ typedef struct{
   bool print_data; // print array values to cout
   bool show_filename;
   int max_length;
+  std::string dump_data_file; // binary dump of data
   std::string data_out_file; // write data as formatted ascii into file
 }PrintConfig;
 
@@ -111,5 +112,7 @@ extern bool compPath(const Path path1, const Path path2);
 // -------------------- data_writer.cpp
 extern void write_data(std::ostream &out,NXhandle handle, const Tree &tree,
                                                     const PrintConfig &config);
+extern void dump_data(std::string &filename,NXhandle handle, const Tree &tree,
+                      const PrintConfig &config);
 extern Tree remove_nondata(const Tree &tree);
 #endif
