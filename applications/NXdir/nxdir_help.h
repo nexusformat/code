@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 const char* vers_text[]={
-  "Copyright (c) 2004, P.F.Peterson <petersonpf@ornl.gov>",
+  "Copyright (c) 2004-2006, P.F.Peterson <petersonpf@ornl.gov>",
   "NXdir can be copied and/or modified under the terms of the \"MIT License\", ",
   "which may be found in the source distribution.",
   NULL,

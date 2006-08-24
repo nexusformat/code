@@ -39,7 +39,7 @@
 #endif
 // -------------------- end TIMING TEST stuff
 
-#define NXDIR_VERSION "0.2.6"
+#define NXDIR_VERSION "0.3.0"
 
 // bring stuff into this name space
 using std::cout;
