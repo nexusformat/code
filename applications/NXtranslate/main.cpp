@@ -14,6 +14,8 @@ using std::find;
 using std::string;
 using string_util::starts_with;
 
+static const string VERSION="0.3.0";
+
 // structure to hold options
 typedef struct{
   string infile;
@@ -63,7 +65,18 @@ static void trim_arg(string &arg, const string &flag){
     arg.erase(0,1);
 }
 
+static void print_version(){
+  cout << "nxtranslate (NXtranslate) version " << VERSION << endl;
+  cout << endl;
+  cout << "Copyright (c) 2004-2006, P.F.Peterson <petersonpf@ornl.gov>" << endl;
+  cout << "NXtranslate can be copied under the terms of the \"MIT License\", which may be " << endl;
+  cout << "found in the source distribution." << endl;
+}
+
 static void print_help(const string &progname, int level){
+  print_version();
+  cout << endl;
+
   cout << "USAGE: " << progname << " [filename] <options>" << endl;
 
   if(level<1) return;
@@ -71,6 +84,7 @@ static void print_help(const string &progname, int level){
   cout << endl;
   cout << "OPTIONS:" << endl;
   cout << " --help        Print out this message and exit" << endl;
+  cout << " --version     Print out the version and exit" << endl;
   cout << "  -o <outfile> Specify output file. The default is the translation file with\n"
        << "               \".nxs\" appended." << endl;
   cout << " --append <outfile> Specify appending to the output file." << endl;
@@ -102,6 +116,9 @@ int main(int argc, char *argv[]){
 
     if(starts_with(arg1,"--help")){
       print_help(argv[0],10);
+      exit(0);
+    }else if(starts_with(arg1,"--version")){
+      print_version();
       exit(0);
     }else if(starts_with(arg1,"-o")){
       trim_arg(arg1,"-o");
