@@ -29,7 +29,7 @@
 #define NEXUSAPI
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "3.9.0"                /* major.minor.patch */
+#define NEXUS_VERSION   "3.0.1"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
@@ -166,9 +166,6 @@ typedef struct {
 #    define NXinitattrdir       MANGLE(nxiinitattrdir)
 #    define NXsetnumberformat   MANGLE(nxisetnumberformat)
 #    define NXsetcache          MANGLE(nxisetcache)
-#    define NXinquirefile       MANGLE(nxiinquirefile)
-#    define NXisexternalgroup   MANGLE(nxiisexternalgroup)
-#    define NXlinkexternal      MANGLE(nxilinkexternal)
 
 /* 
  * FORTRAN helpers - for NeXus internal use only 
@@ -230,10 +227,6 @@ extern  NXstatus  NXinitgroupdir(NXhandle handle);
 extern  NXstatus  NXinitattrdir(NXhandle handle);
 extern  NXstatus  NXsetnumberformat(NXhandle handle,
  						      int type, char *format);
-
-extern  NXstatus  NXinquirefile(NXhandle handle, char *filename, int filenameBufferLength);
-extern  NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, char *url, int urlLen); 
-extern  NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, CONSTCHAR *url);
 
 extern  NXstatus  NXmalloc(void** data, int rank, int dimensions[], int datatype);
 extern  NXstatus  NXfree(void** data);
