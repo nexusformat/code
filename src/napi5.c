@@ -1948,7 +1948,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 
      idx=H5Aget_num_attrs(vid);
      if (idx > 0) {
-       if(pFile->iCurrentG > 0){
+       if(pFile->iCurrentG > 0 && pFile->iCurrentD == 0){
 	 *iN = idx -1; 
        } else {
 	 *iN = idx;
