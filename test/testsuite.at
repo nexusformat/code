@@ -372,38 +372,38 @@ AT_CLEANUP
 
 AT_SETUP([Check the F90 binding using HDF5.])
 AT_CHECK([ $HAVE_F90 && $HAVE_HDF5 && $SETUP_TEST && NXtest | sed -e 's/\r$//' ], [], 
-[[ Writing character data
- Number of global attributes:  4
-    NeXus_version = 3.0.0
-    file_name = NXtest.nxs
- Group: entry(NXentry) contains  8 items
-    ch_data : NX_CHAR
-    Values : NeXus data
-    Subgroup: data(NXdata)
-    i1_data : NX_INT8
-    Values :  1 2 3 4
-    i2_data : NX_INT16
-    Values :  1000 2000 3000 4000
-    i4_data : NX_INT32
-    Values :  1000000 2000000 3000000 4000000
-    r4_data : NX_FLOAT32
+[[Writing character data
+Number of global attributes:        4
+   NeXus_version = 3.9.0
+   file_name = NXtest.nxs
+Group: entry(NXentry) contains        8 items
+   ch_data : NX_CHAR
+   Values : NeXus data
+   Subgroup: data(NXdata)
+   i1_data : NX_INT8
+   Values :        1       2       3       4
+   i2_data : NX_INT16
+   Values :     1000    2000    3000    4000
+   i4_data : NX_INT32
+   Values :  1000000 2000000 3000000 4000000
+   r4_data : NX_FLOAT32
    Values :    1.0000000   2.0000000   3.0000000   4.0000000
           :    5.0000000   6.0000000   7.0000000   8.0000000
           :    9.0000000  10.0000000  11.0000000  12.0000000
           :   13.0000000  14.0000000  15.0000000  16.0000000
           :   17.0000000  18.0000000  19.0000000  20.0000000
-    r8_data : NX_FLOAT64
+   r8_data : NX_FLOAT64
    Values :    1.0000000   2.0000000   3.0000000   4.0000000
           :    5.0000000   6.0000000   7.0000000   8.0000000
           :    9.0000000  10.0000000  11.0000000  12.0000000
           :   13.0000000  14.0000000  15.0000000  16.0000000
           :   17.0000000  18.0000000  19.0000000  20.0000000
-    ch_attribute : NeXus
-    i4_attribute :  42
-   r4_attribute :    3.1415930
-    target : /entry/r8_data
-    Subgroup: sample(NXsample)
- Link Check OK
+   ch_attribute : NeXus
+   i4_attribute :       42
+   r4_attribute :    3.1415927
+   target : /entry/r8_data
+   Subgroup: sample(NXsample)
+Link Check OK
 ]])
 AT_CLEANUP
 

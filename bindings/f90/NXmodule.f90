@@ -61,29 +61,20 @@ MODULE NXmodule
 ! *** NeXus limits
    INTEGER, PARAMETER, PUBLIC :: NX_MAXRANK = 32
    INTEGER, PARAMETER, PUBLIC :: NX_MAXNAMELEN = 64
-   INTEGER, PARAMETER, PUBLIC :: NX_MAXSTACK = 50
-! *** NeXus type definitions
-   TYPE, PUBLIC :: NXstack
-      CHARACTER(1048) :: stackBuffer
-   END TYPE NXstack
-   TYPE, PUBLIC :: NXhandle
-      TYPE(NXstack) :: Stack(NX_MAXSTACK)
-      TYPE(NXstack) :: Att
-      CHARACTER(len=2176) :: handleBuffer
-   END TYPE
-   TYPE, PUBLIC :: NXlink
-      INTEGER(kind=selected_int_kind(8)) :: tag
-      INTEGER(kind=selected_int_kind(8)) :: ref
-      CHARACTER(len=1024) :: tag5
-      CHARACTER(len=1024) :: ref5
-      CHARACTER(len=1024) :: refd
-   END TYPE
+   INTEGER, PARAMETER, PUBLIC :: NX_MAXSTACK = 20
 ! *** Kind parameters for different byte lengths (not guaranteed to work)
    INTEGER, PARAMETER, PUBLIC :: NXi1 = selected_int_kind(2)
    INTEGER, PARAMETER, PUBLIC :: NXi2 = selected_int_kind(4)
    INTEGER, PARAMETER, PUBLIC :: NXi4 = selected_int_kind(8)
    INTEGER, PARAMETER, PUBLIC :: NXr4 = kind(1.0)
    INTEGER, PARAMETER, PUBLIC :: NXr8 = kind(1.0D0)
+! *** NeXus type definitions
+   TYPE, PUBLIC :: NXlink
+      INTEGER(kind=NXi4) :: dummy(1040) ! at least as large as in napi.h
+   END TYPE
+   TYPE, PUBLIC :: NXhandle
+      INTEGER(kind=NXi4) :: dummy(5120) ! at least as large as in nxstack.c
+   END TYPE
 ! *** Buffers for each type of parameter
    INTEGER(KIND=NXi1), ALLOCATABLE, PRIVATE :: buffer_i1(:)
    INTEGER(KIND=NXi2), ALLOCATABLE, PRIVATE :: buffer_i2(:)

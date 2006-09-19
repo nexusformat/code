@@ -100,7 +100,7 @@ program NXtest
       if (NXclosegroup(fileid) /= NX_OK) stop
       if (NXmakegroup(fileid, "sample", "NXsample") /= NX_OK) stop
       if (NXopengroup(fileid, "sample", "NXsample") /= NX_OK) stop
-         print *, "Writing character data"
+         print 300, "Writing character data"
          if (NXmakedata(fileid, "ch_data", NX_CHAR, 1, (/12/)) /= NX_OK) stop
          if (NXopendata(fileid, "ch_data") /= NX_OK) stop
             if (NXputdata(fileid, "NeXus sample") /= NX_OK) stop
@@ -116,7 +116,7 @@ program NXtest
 ! *** read data
    if (NXopen("NXtest.nxs", NXACC_READ, fileid) /= NX_OK) stop
    if (NXgetattrinfo(fileid, i) /= NX_OK) stop
-   if (i > 0) print *, "Number of global attributes: ", i
+   if (i > 0) print 200, "Number of global attributes: ", i
    attr_status = NX_OK
    do while (attr_status == NX_OK)
       attr_status = NXgetnextattr(fileid, name, NXlen, NXtype)
@@ -128,14 +128,14 @@ program NXtest
                case (NX_CHAR)
                   NXlen = len(char_buffer)
                   if (NXgetattr(fileid, name, char_buffer, NXlen, NXtype) /= NX_OK) stop
-                     print *, "   "//trim(name)//" = "//trim(char_buffer)
+                     print 300, "   "//trim(name)//" = "//trim(char_buffer)
             end select
          end if
       end if
    end do
    if (NXopengroup(fileid, "entry", "NXentry") /= NX_OK) stop
    if (NXgetgroupinfo(fileid, i, name, class) /= NX_OK) stop
-      print *, "Group: "//trim(name)//"("//trim(class)//") contains ", i, "items"
+      print '(A,i8,A)', "Group: "//trim(name)//"("//trim(class)//") contains ", i, " items"
    do
       entry_status = NXgetnextentry(fileid, name, class, NXtype)
       if (entry_status == NX_ERROR) then
@@ -143,17 +143,17 @@ program NXtest
       else if (entry_status == NX_EOD) then
          exit
       else if (trim(class) /= "SDS") then
-         print *, "   Subgroup: "//trim(name)//"("//trim(class)//")"
+         print 300, "   Subgroup: "//trim(name)//"("//trim(class)//")"
       else if (entry_status == NX_OK) then
          if (NXopendata(fileid, name) /= NX_OK) stop
             if (NXgetinfo(fileid, NXrank, NXdims, NXtype) /= NX_OK) stop
-            print *, "   "//trim(name)//" : ", trim(NXdatatype(NXtype))
+            print 300, "   "//trim(name)//" : ", trim(NXdatatype(NXtype))
             if (NXtype == NX_CHAR) then
                if (NXgetdata(fileid, char_buffer) /= NX_OK) stop
-               print *, "   Values : ", trim(char_buffer)
+               print 300, "   Values : ", trim(char_buffer)
             else if (NXtype == NX_INT8 .or. NXtype == NX_INT16 .or. NXtype == NX_INT32) then
                if (NXgetdata(fileid, i4_buffer) /= NX_OK) stop
-               print *, "   Values : ", i4_buffer
+               print 200, "   Values : ", i4_buffer
             else if (NXtype == NX_FLOAT32 .or. NXtype == NX_FLOAT64) then
                if (NXgetslab(fileid, r4_buffer, (/1,1/), (/4,1/)) /= NX_OK) stop
                print 100, "   Values : ", r4_buffer
@@ -175,10 +175,10 @@ program NXtest
                else if (attr_status == NX_OK) then
                   if (NXtype == NX_CHAR) then
                      if (NXgetattr(fileid, name, char_buffer) /= NX_OK) stop
-                     print *, "   "//trim(name)//" : ", trim(char_buffer)
+                     print 300, "   "//trim(name)//" : ", trim(char_buffer)
                   else if (NXtype == NX_INT32) then
                      if (NXgetattr(fileid, name, i) /= NX_OK) stop
-                     print *, "   "//trim(name)//" : ", i
+                     print 200, "   "//trim(name)//" : ", i
                   else if (NXtype == NX_FLOAT32) then
                      if (NXgetattr(fileid, name, r) /= NX_OK) stop
                      print 100, "   "//trim(name)//" : ", r
@@ -195,13 +195,15 @@ program NXtest
    if (NXopengroup(fileid, "link", "NXentry") /= NX_OK) stop
       if (NXgetgroupID(fileid, blink) /= NX_OK) stop
       if (NXsameID(fileid, glink, blink)) then
-         print *, "Link Check OK"
+         print 300, "Link Check OK"
       else
-         print *, "Link Check Failed"
+         print 300, "Link Check Failed"
       end if
    if (NXclosegroup(fileid) /= NX_OK) stop
    if (NXclose(fileid) /= NX_OK) stop
 
  100 format(A,4f12.7)
+ 200 format(A,4i8)
+ 300 format(4A)
 
 end program NXtest
