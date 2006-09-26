@@ -8,23 +8,17 @@
 #ifdef TEXT_PLAIN_RETRIEVER
 #include "text_plain/retriever.h"
 #endif
+#ifdef SPEC_RETRIEVER
+#include "specR/spec_retriever.h"
+#endif
+#ifdef EDF_RETRIEVER
+#include "edfR/edf_retriever.h"
+#endif
 #ifdef TEXT_XML_RETRIEVER
 #include "text_xml/retriever.h"
 #endif
-#ifdef FRM2_RETRIEVER
-#include "FRM2/frm2_retriever.h"
-#endif
-#ifdef DYNAMIC_RETRIEVER
-#include "dynamic_retriever.h"
-#endif
-#ifdef SNS_HISTOGRAM_RETRIEVER
-#include "sns_histogram/retriever.h"
-#endif
-#ifdef LOOPY_RETRIEVER
-#include "loopy/retriever.h"
-#endif
-#ifdef BINARY_RETRIEVER
-#include "binary/BinaryRetriever.hpp"
+#ifdef TEXT_COLLIST_RETRIEVER
+#include "text_collist/collist_retriever.h"
 #endif
 
 using std::string;
@@ -49,39 +43,24 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
     RetrieverPtr ptr(new TextPlainRetriever(source));
     return ptr;
 #endif
-#ifdef FRM2_RETRIEVER
-  }else if(type==Frm2Retriever::MIME_TYPE){
-    RetrieverPtr ptr(new Frm2Retriever(source));
+#ifdef SPEC_RETRIEVER
+  }else if(type==SpecRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new SpecRetriever(source));
     return ptr;
 #endif
-/*#ifdef TEXT_HEIDI_RETRIEVER
-  }else if(type==TextHeidiRetriever::MIME_TYPE){
-    RetrieverPtr ptr(new TextHeidiRetriever(source));
+#ifdef EDF_RETRIEVER
+  }else if(type==EdfRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new EdfRetriever(source));
     return ptr;
-#endif*/
+#endif
+#ifdef TEXT_COLLIST_RETRIEVER
+  }else if(type==TextCollistRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new TextCollistRetriever(source));
+    return ptr;
+#endif
 #ifdef TEXT_XML_RETRIEVER
   }else if(type==TextXmlRetriever::MIME_TYPE){
     RetrieverPtr ptr(new TextXmlRetriever(source));
-    return ptr;
-#endif
-#ifdef DYNAMIC_RETRIEVER
-  }else if(type.substr(0,8) == "dynamic/") {
-    RetrieverPtr ptr(new DynamicRetriever(source, type));
-    return ptr;
-#endif
-#ifdef SNS_HISTOGRAM_RETRIEVER
-  }else if(type==SnsHistogramRetriever::MIME_TYPE){
-    RetrieverPtr ptr(new SnsHistogramRetriever(source));
-    return ptr;
-#endif
-#ifdef LOOPY_RETRIEVER
-  }else if(type==LoopyRetriever::MIME_TYPE){
-    RetrieverPtr ptr(new LoopyRetriever(source));
-    return ptr;
-#endif
-#ifdef BINARY_RETRIEVER
-  }else if(type==BinaryRetriever::MIME_TYPE){
-    RetrieverPtr ptr(new BinaryRetriever(source));
     return ptr;
 #endif
   }
