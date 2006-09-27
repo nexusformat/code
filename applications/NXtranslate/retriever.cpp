@@ -9,10 +9,10 @@
 #include "text_plain/retriever.h"
 #endif
 #ifdef SPEC_RETRIEVER
-#include "specR/spec_retriever.h"
+#include "spec/spec_retriever.h"
 #endif
 #ifdef EDF_RETRIEVER
-#include "edfR/edf_retriever.h"
+#include "esrf_edf/edf_retriever.h"
 #endif
 #ifdef TEXT_XML_RETRIEVER
 #include "text_xml/retriever.h"

@@ -30,7 +30,7 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -IIPNS_CPP -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER -DEDF_RETRIEVER -DSPEC_RETRIEVER `xml2-config --cflags` @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 
 if HAVE_OPENGENIE
 GENIESUBDIR=opengenie
@@ -61,7 +61,9 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	sns_histogram/libSNShistogram.la \
 	FRM2/libFRM2.la \
         loopy/libLoopy.la \
-	binary/libBinaryRetriever.la
+	binary/libBinaryRetriever.la \
+	spec/libSpec.la \
+	esrf_edf/libEdf.la
 
 nxtranslate_LDFLAGS = -static $(LDFLAGS)
 
