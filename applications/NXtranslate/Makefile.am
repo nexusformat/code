@@ -36,7 +36,7 @@ if HAVE_OPENGENIE
 GENIESUBDIR=opengenie
 endif
 SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs \
-	FRM2 loopy binary $(GENIESUBDIR)
+	FRM2 loopy binary spec esrf_edf $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
 nxtranslate_SOURCES = \

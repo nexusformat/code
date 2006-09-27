@@ -29,7 +29,7 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include `--cflags`
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
 noinst_LTLIBRARIES = libSpec.la
 

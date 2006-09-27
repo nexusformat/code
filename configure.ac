@@ -409,7 +409,7 @@ if test "$with_xml" != "no" -a -z "$MXMLROOT"; then
 	AC_MSG_RESULT($MXMLROOT)
     fi
 fi
-if test "$MXMLROOT"; then
+if test ! -z "$MXMLROOT"; then
     XML_LDFLAGS="-lmxml"
     LDFLAGS="-L$XMLROOT/lib $LDFLAGS"
     XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
@@ -499,6 +499,8 @@ AC_CONFIG_FILES([Makefile
 		applications/NXtranslate/sns_histogram/Makefile
 		applications/NXtranslate/loopy/Makefile
 		applications/NXtranslate/binary/Makefile
+		applications/NXtranslate/spec/Makefile
+		applications/NXtranslate/esrf_edf/Makefile
 		applications/NXtranslate/docs/Makefile
 		examples/Makefile
 		doc/Makefile
