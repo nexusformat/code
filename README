@@ -20,7 +20,7 @@ and adjust the configuration scripts accordingly.
    The libraries, which are available as precompiled binaries for a wide
    range of systems, may be downloaded from:
    
-    http://hdf.ncsa.uiuc.edu/
+    http://www.hdfgroup.org/
 
 2) At present it is necessary to run the autogen shell script to produce the 
    correct configure file.
