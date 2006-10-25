@@ -99,7 +99,7 @@ VMS
    the HDF4 libraries.  Ensure that you have the current versions, 
    which are available as precompiled binaries at:
    
-    http://hdf.ncsa.uiuc.edu/
+    http://www.hdfgroup.org/
 
    The NeXus libraries link against the following libraries:
    
