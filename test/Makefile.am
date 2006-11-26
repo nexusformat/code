@@ -114,6 +114,7 @@ if HAVE_F77
 napif_test_hdf4_SOURCES = napif4_test.f
 napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
 napif_test_hdf4_LINK = $(F77LINK)
+napif_test_hdf4_LDFLAGS = -static $(LDFLAGS)
 else
 napif_test_hdf4_SOURCES = dummy.c
 napif_test_hdf4_LINK = $(LINK)
@@ -138,6 +139,7 @@ if HAVE_F77
 napif_test_hdf5_SOURCES = napif5_test.f
 napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
 napif_test_hdf5_LINK = $(F77LINK)
+napif_test_hdf5_LDFLAGS = -static $(LDFLAGS)
 else
 napif_test_hdf5_SOURCES = dummy.c
 napif_test_hdf5_LINK = $(LINK)
