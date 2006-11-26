@@ -55,7 +55,7 @@ AM_INIT_AUTOMAKE([1.6])
 AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
-	[], [with_cc=yes])
+	[with_cc=$withval], [with_cc=yes])
 if test x"$with_cc" != x"no" ; then
 	if test x"$with_cc" != x"yes" ; then CC="$with_cc"; fi
 	AC_PROG_CC
@@ -65,7 +65,7 @@ else
 	AC_MSG_ERROR([You need a C compiler to compile this package])
 fi
 
-AC_ARG_WITH([cxx], AC_HELP_STRING([--with-cxx=c++ compiler], [Specify name of C++ compiler]), [], [with_cxx=yes])
+AC_ARG_WITH([cxx], AC_HELP_STRING([--with-cxx=c++ compiler], [Specify name of C++ compiler]), [with_cxx=$withval], [with_cxx=yes])
 if test x"$with_cxx" != x"no" ; then
 	if test x"$with_cxx" != x"yes" ; then CXX="$with_cxx"; fi
 	AC_PROG_CXX
@@ -74,12 +74,12 @@ else
 fi
 
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
-	[], [with_f90=no])
+	[with_f90=$withval], [with_f90=no])
 if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
 		AC_CHECK_PROGS(FC, [g95 f90 f95 ifort])
 	else
-		AC_CHECK_PROGS(FC, ["$with_f90"])
+		AC_CHECK_PROGS(FC, [$with_f90])
 	fi
 	dnl f90 has a "module path" option - hard to get as you really need a
 	dnl ready compiled module to point the option at so for now we are just
@@ -97,7 +97,7 @@ else
 fi
 
 AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[], [with_f77=no])
+	[with_f77=$withval], [with_f77=no])
 if test x"$with_f77" != x"no" ; then
 	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
 	AC_PROG_F77
@@ -112,7 +112,7 @@ else
 	F77=
 fi
 
-AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [], [with_swig=no])
+AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [with_swig=$withval], [with_swig=no])
 if test x$with_swig != xno; then
     if test x$with_swig != xyes; then
 	SWIG=$with_swig
@@ -233,6 +233,17 @@ dnl microsoft LIB command (used in MinGW makefile to create .LIB file)
 AC_CHECK_PROGS(MS_LIB, [LIB])
 AM_CONDITIONAL(HAVE_MS_LIB, [test ! -z "$MS_LIB"])
 
+dnl extra FCFLAGS
+if ! test -z "$FC"; then
+    fcpathlc=`which $FC 2>/dev/null | tr 'A-Z' 'a-z'`
+    case "$fcpathlc" in
+	*absort*)
+	    echo "Absoft compiler detected - adjusting FCFLAGS"
+	    FCFLAGS="$FCFLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	    ;;
+    esac
+fi
+
 HDF_EXT=a # library file extent to look for with HDF libraries
 case $host in
     alpha*-dec-osf*)
@@ -271,7 +282,7 @@ dnl does not get set with the commands to create a shared library
 	chmod +x libtool
 	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
-	FCFLAGS="$FCFLAGS -qextname"
+dnl	FCFLAGS="$FCFLAGS -qextname"
 	SHARED_LDFLAGS="-Wl,-single_module"
 #	LTF90COMPILETAG="--tag=F77"
 #	LTF90LINKTAG="--tag=CC"

@@ -305,7 +305,6 @@ C *** read data
          ENDIF
       IF (NXCLOSEGROUP(FILEID) .NE. NX_OK) STOP
       IF (NXCLOSE(FILEID) .NE. NX_OK) STOP
-      STOP
       END
 C----------------------------------------------------------------------
 C     LEN_TRIM trims remaining blanks and tabs from the end of "string"

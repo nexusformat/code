@@ -28,6 +28,10 @@ echo "Using $libtoolversion"
 case $autoconfversion in
     *2.5[2-79])
 	;;
+    *2.6*)
+	;;
+    *2.7*)
+	;;
     *)
 	echo "This autoconf version is not supported by NeXus."
 	echo "NeXus only supports autoconf 2.5[2-79]."
