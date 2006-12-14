@@ -224,7 +224,19 @@ int NXBdir (NXhandle fileId)
       status = NXgetnextentry (fileId, name, class, &dataType);
       if (status == NX_ERROR) break;
       if (status == NX_OK) {
-	if (strstr(class,"SDS") == NULL && strstr(class,"NX") != NULL){
+	if (strncmp(class,"CDF",3) == 0){ 
+	    ;
+	}
+	else if (strcmp(class,"SDS") == 0){ 
+            printf ("  NX Data  : %s", name);
+            if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
+            if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
+            if (NXclosedata(fileId) != NX_OK) return NX_ERROR;
+            PrintDimensions (dataRank, dataDimensions);
+            printf (" ");
+            PrintType (dataType);
+            printf ("\n");
+	} else {
 	    length = sizeof(nxurl);
 	    if(NXisexternalgroup(fileId, name,class,nxurl,length) == NX_OK){
 	      printf ("  NX external Group: %s (%s), linked to: %s \n",name,class,nxurl); 
@@ -238,15 +250,6 @@ int NXBdir (NXhandle fileId)
 		return status;
 	      } 
             }
-	} else if(strstr(class,"CDF") == NULL){ 
-            printf ("  NX Data  : %s", name);
-            if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
-            if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
-            if (NXclosedata(fileId) != NX_OK) return NX_ERROR;
-            PrintDimensions (dataRank, dataDimensions);
-            printf (" ");
-            PrintType (dataType);
-            printf ("\n");
 	}
       }
    } while (status == NX_OK);
@@ -639,8 +642,11 @@ int FindGroup (NXhandle fileId, char *groupName, char *groupClass)
                return NX_OK;
             }
             else {
-               printf ("NX_ERROR: %s is not a group\n", groupName);
-               return NX_ERROR;
+/*
+ *               printf ("NX_ERROR: %s is not a group\n", groupName);
+ *               return NX_ERROR;
+ */
+		return NX_OK; /* allow non NX (i.e. user defined) groups */
             }
          }
       }
