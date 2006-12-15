@@ -47,8 +47,13 @@ endif
 
 lib_LTLIBRARIES = libNeXus.la
 
-nexus_symbols.sym : nexus_symbols.txt
+if MINGW_MSYS
+nexus_symbols.sym : $(srcdir)/nexus_symbols.txt $(srcdir)/nexus_symbols_win.txt
+	cat $(srcdir)/nexus_symbols.txt $(srcdir)/nexus_symbols_win.txt >> nexus_symbols.sym
+else
+nexus_symbols.sym : $(srcdir)/nexus_symbols.txt
 	cp $(srcdir)/nexus_symbols.txt nexus_symbols.sym
+endif
 
 # Windows import library for DLL
 
@@ -87,7 +92,7 @@ libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 ## libNeXus_la_LIBADD += -lhdf5 
 ## endif
 
-EXTRA_DIST=nexus_symbols.txt
+EXTRA_DIST=nexus_symbols.txt nexus_symbols_win.txt
 CLEANFILES=libNeXus.def libNeXus.dll.lib libNeXus.dll.exp nexus_symbols.sym
 
 include $(top_srcdir)/build_rules.am
