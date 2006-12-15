@@ -6,6 +6,7 @@
 #
 # Mark Koennecke, October 2000
 #------------------------------------------------------------------------
+javac -classpath ../jnexus.jar:. TestJapi.java
 java -cp ../jnexus.jar:. \
- -Dneutron.nexus.JNEXUSLIB=$HOME/nt/k/src/nexus/bindings/java/bin/rh62/libjnexus.so TestJapi $1
+ -Dorg.nexusformat.JNEXUSLIB=/afs/psi.ch/user/k/koennecke/src/trunk/bindings/java/.libs/libjnexus.so.0.0.0 TestJapi $1
  

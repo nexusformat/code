@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "neutron_nexus_NexusFile.h"
+#include "org_nexusformat_NexusFile.h"
 #include <napi.h>
 #include "handle.h"
 
@@ -73,7 +73,7 @@ static void JapiError(void *pData, char *text)
 #ifdef DEBUG
     fprintf(fd,"JapiError called with: %s\n", text); 
 #endif
-    jc = (*env)->FindClass(env,"neutron/nexus/NexusException");
+    jc = (*env)->FindClass(env,"org/nexusformat/NexusException");
     assert(jc);
     jm = (*env)->GetMethodID(env, jc, "<init>","(Ljava/lang/String;)V");
     assert(jm != NULL);
@@ -87,7 +87,7 @@ static void JapiError(void *pData, char *text)
 /*------------------------------------------------------------------------
             init or NXopen
 -------------------------------------------------------------------------*/
-JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_init
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_init
   (JNIEnv *env, jobject obj, jstring filename, jint access)
 {
     NXhandle handle;
@@ -131,7 +131,7 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_init
 /*-----------------------------------------------------------------------
                      nxflush
 ------------------------------------------------------------------------*/ 
-JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nxflush
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxflush
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
@@ -162,7 +162,7 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nxflush
 /*-----------------------------------------------------------------------
                      close or NXclose
 ------------------------------------------------------------------------*/ 
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_close
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_close
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
@@ -185,7 +185,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_close
 /*------------------------------------------------------------------------
                      nxmakegroup
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakegroup
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakegroup
   (JNIEnv *env, jobject obj, jint handle, jstring name, jstring nxclass)
 {
     char *Name, *Nxclass;
@@ -212,7 +212,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakegroup
 /*------------------------------------------------------------------------
                      nxopengroup
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengroup
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengroup
   (JNIEnv *env, jobject obj, jint handle, jstring name, jstring nxclass)
 {
     char *Name, *Nxclass;
@@ -244,7 +244,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengroup
 /*------------------------------------------------------------------------
                      nxopenpath
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopenpath
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopenpath
   (JNIEnv *env, jobject obj, jint handle, jstring path)
 {
     char *nxpath;
@@ -274,7 +274,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopenpath
 /*------------------------------------------------------------------------
                      nxopengrouppath
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengrouppath
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengrouppath
   (JNIEnv *env, jobject obj, jint handle, jstring path)
 {
     char *nxpath;
@@ -304,7 +304,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopengrouppath
 /*------------------------------------------------------------------------
                      nxclosegroup
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxclosegroup
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosegroup
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
@@ -322,7 +322,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxclosegroup
 /*------------------------------------------------------------------------
                                nxmakedata
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakedata
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakedata
   (JNIEnv *env, jobject obj, jint handle, jstring name, jint type, 
   jint rank, jintArray dim)
 {
@@ -353,7 +353,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakedata
 /*-----------------------------------------------------------------------
                                nxcompmakedata
 -------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakecompdata
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakecompdata
   (JNIEnv *env, jobject obj, jint handle, jstring name, jint type, 
    jint rank, jintArray dim, jint compression_type, jintArray chunk)
 {
@@ -389,7 +389,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakecompdata
 /*------------------------------------------------------------------------
                                nxopendata
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopendata
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopendata
   (JNIEnv *env, jobject obj, jint handle , jstring name)
 {
    char *Name;
@@ -413,7 +413,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopendata
 /*------------------------------------------------------------------------
                                nxclosedata
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxclosedata
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosedata
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
@@ -431,7 +431,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxclosedata
 /*------------------------------------------------------------------------
                                nxcompress
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxcompress
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxcompress
   (JNIEnv *env, jobject obj, jint handle , jint comp_type)
 {
     NXhandle nxhandle;
@@ -451,7 +451,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxcompress
 /*------------------------------------------------------------------------
                                nxputdata
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputdata
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputdata
   (JNIEnv *env, jobject obj, jint handle, jbyteArray data)
 {
     NXhandle nxhandle;
@@ -481,7 +481,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputdata
 /*------------------------------------------------------------------------
                                nxputslab
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputslab
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputslab
   (JNIEnv *env, jobject obj, jint handle, jbyteArray data, 
    jintArray start, jintArray end)
 {
@@ -512,7 +512,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputslab
 /*------------------------------------------------------------------------
                                nxputattr
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputattr
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
   (JNIEnv *env, jobject obj, jint handle , jstring name, 
            jbyteArray data, jint type)
 {
@@ -542,7 +542,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxputattr
 /*------------------------------------------------------------------------
                                nxgetdata
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdata
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdata
   (JNIEnv *env, jobject obj, jint handle, jbyteArray data)
 {
     NXhandle nxhandle;
@@ -572,7 +572,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdata
 /*------------------------------------------------------------------------
                                nxgetslab
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetslab
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetslab
   (JNIEnv *env, jobject obj, jint handle, jintArray start, 
    jintArray end, jbyteArray data)
 {
@@ -603,7 +603,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetslab
 /*------------------------------------------------------------------------
                                nxgetattr
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetattr
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetattr
   (JNIEnv *env, jobject obj, jint handle, jstring name, 
     jbyteArray data, jintArray args)
 {
@@ -649,7 +649,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetattr
 /*------------------------------------------------------------------------
                                nxgetgroupid
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
   (JNIEnv *env, jobject obj, jint handle, jobject linki)
 {
     NXhandle nxhandle;
@@ -731,7 +731,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetgroupid
 /*------------------------------------------------------------------------
                                nxgetgroupid
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
   (JNIEnv *env, jobject obj, jint handle, jobject linki)
 {
     NXhandle nxhandle;
@@ -814,7 +814,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetdataid
 /*------------------------------------------------------------------------
                                nxmakelink
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
   (JNIEnv *env, jobject obj, jint handle, jobject target)
 {
     NXhandle nxhandle;
@@ -902,7 +902,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxmakelink
 /*------------------------------------------------------------------------
                      nxopensourcepath
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopensourcegroup
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopensourcegroup
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
@@ -920,7 +920,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxopensourcegroup
 /*----------------------------------------------------------------------
                            nxsetnumberformat
 -----------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxsetnumberformat
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxsetnumberformat
     (JNIEnv *env, jobject obj, jint handle, jint type, jstring format)
 {
     NXhandle nxhandle;
@@ -950,7 +950,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxsetnumberformat
 /*------------------------------------------------------------------------
                                nxgetinfo
 --------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetinfo
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetinfo
     (JNIEnv *env, jobject obj, jint handle, jintArray dim, jintArray args)
 {
     int rank, type, iRet, iDim[NX_MAXRANK], i;
@@ -984,7 +984,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxgetinfo
 /*------------------------------------------------------------------------
                                nextentry
 --------------------------------------------------------------------------*/
-JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nextentry
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextentry
   (JNIEnv *env, jobject obj, jint handle, jobjectArray jnames)
 {
     NXhandle nxhandle;
@@ -1013,7 +1013,7 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nextentry
 /*------------------------------------------------------------------------
                                nextattr
 --------------------------------------------------------------------------*/
-JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nextattr
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextattr
   (JNIEnv *env, jobject obj, jint handle, jobjectArray jnames, jintArray args)
 {
     NXhandle nxhandle;
@@ -1042,7 +1042,7 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nextattr
     return iRet;
 }
 /*-----------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxinquirefile(JNIEnv *env, 
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxinquirefile(JNIEnv *env, 
 				      jobject obj , jint handle, jobjectArray jnames){
     NXhandle nxhandle;
     int status, length = 1024;
@@ -1061,7 +1061,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxinquirefile(JNIEnv *env,
     }
 }
 /*------------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxlinkexternal
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxlinkexternal
 (JNIEnv *env, jobject obj, jint handle, jstring name, 
  jstring nxclass, jstring nxurl){
     int status;
@@ -1086,7 +1086,7 @@ JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_nxlinkexternal
     (*env)->ReleaseStringUTFChars(env,nxurl, Nxurl);
 }
 /*------------------------------------------------------------------------*/
-JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nxisexternalgroup
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
 (JNIEnv *env, jobject obj, jint handle, jstring name, jstring nxclass, 
  jobjectArray jnames){
     int status, length = 1024;
@@ -1119,7 +1119,7 @@ JNIEXPORT jint JNICALL Java_neutron_nexus_NexusFile_nxisexternalgroup
                                debugstop
 --------------------------------------------------------------------------*/
 
-JNIEXPORT void JNICALL Java_neutron_nexus_NexusFile_debugstop
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_debugstop
   (JNIEnv *env, jobject obj)
 {
    int iStop = 1;

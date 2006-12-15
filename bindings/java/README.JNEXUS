@@ -44,7 +44,7 @@
           environment variable LD_LIBRARY_PATH to point to that directory.
 	  More info on this in the manpages of your systems loader.
 	- You explicitly tell the Java Runtime where the shared library is
-	  through the -Dneutron.nexus.JNEXUSLIB=full-path-to-library
+	  through the -Dorg.nexusformat.JNEXUSLIB=full-path-to-library
 	  option.  
 
         Furthermore you need to include the jnexus.jar file in your Java

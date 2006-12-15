@@ -8,9 +8,10 @@
   * 
   * Mark Koennecke, August 2001
   */
-import neutron.nexus.*;
 import java.util.Hashtable;
 import java.util.Enumeration;
+
+import org.nexusformat.*;
 
 public class TestJapi {
     static public void main(String args[])

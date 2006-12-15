@@ -116,7 +116,7 @@ LD_LIBRARY_PATH environment variable to point to the directory of your
 choice.
 <li>Specify the full pathname of the jnexus shared library on the
 java command line with the
--Dneutron.nexus.JNEXUSLIB=full-path-2-shared-library option. 
+-Dorg.nexusformat.JNEXUSLIB=full-path-2-shared-library option. 
 </ul>
 </p>
 <h3>Locating jnexus.jar</h3>
@@ -130,11 +130,11 @@ A unix example shell script:
 <pre>
 #!/sbin/sh
 java -classpath /usr/lib/classes.zip:../jnexus.jar:. \
- -Dneutron.nexus.JNEXUSLIB=../bin/du40/libjnexus.so TestJapi
+ -Dorg.nexusformat.JNEXUSLIB=../bin/du40/libjnexus.so TestJapi
  </pre>
 A Windows 32 example batch file:
 <pre>
-set JL=-Dneutron.nexus.JNEXUSLIB=..\jnexus\bin\win32\jnexus.dll
+set JL=-Dorg.nexusformat.JNEXUSLIB=..\jnexus\bin\win32\jnexus.dll
 java -classpath C:\jdk1.1.5\lib\classes.zip;..\jnexus.jar;. %JL% TestJapi
 </pre>
 </p>
@@ -149,10 +149,10 @@ their C equivalents. A full API documentation is available in Java
 documentation format. For full reference look especially at:
 <ul>
 <li>The interface <a
-href="apidoc/neutron.nexus.NeXusFileInterface.html">NeXusFileInterface
+href="apidoc/org.nexusformat.NeXusFileInterface.html">NeXusFileInterface
 </a> first. It gives an uncluttered view of the API.
 <li>The implementation <a
-href="apidoc/neutron.nexus.NexusFile.html">NexusFile</a> which gives more
+href="apidoc/org.nexusformat.NexusFile.html">NexusFile</a> which gives more
 details about constructors and constants. However this documentation
 is interspersed with information about native methods which should not
 be called by an application programmer as they are not part of the

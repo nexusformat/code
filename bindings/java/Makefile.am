@@ -25,6 +25,8 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
+# Modified after change to org.nexusformat package name change: 
+# Mark Koennecke, December 2006
 #
 #====================================================================
 
@@ -33,7 +35,7 @@ AM_JAVACFLAGS	= -classpath .
 JAVAROOT	= .
 
 # jar file definitions
-javadir		= $(prefix)/nexus/java
+javadir		= $(prefix)/nexusformat/java
 java_DATA = jnexus.jar TestJapi.class README.JNEXUS COPYING.NCSA
 jnexus_jar_ARCHIVE = jnexus.jar
 
@@ -43,11 +45,11 @@ jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \
                ncsa/hdf/hdflib/HDFNativeData.class \
                ncsa/hdf/hdflib/HDFArray.class \
                ncsa/hdf/hdflib/HDFNotImplementedException.class \
-               neutron/nexus/AttributeEntry.class \
-               neutron/nexus/NexusException.class \
-               neutron/nexus/NXlink.class \
-               neutron/nexus/NeXusFileInterface.class \
-               neutron/nexus/NexusFile.class
+               org/nexusformat/AttributeEntry.class \
+               org/nexusformat/NexusException.class \
+               org/nexusformat/NXlink.class \
+               org/nexusformat/NeXusFileInterface.class \
+               org/nexusformat/NexusFile.class
 
 # jni definitions
 lib_LTLIBRARIES		= libjnexus.la
@@ -60,8 +62,8 @@ libjnexus_la_LDFLAGS 	= @SHARED_LDFLAGS@ $(LDFLAGS) $(JNEXUS_LDFLAGS)
 libjnexus_la_CFLAGS 	= -I$(top_srcdir)/include -Inative @JAVAINCLUDE@ \
      			@HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ $(JNEXUS_CFLAGS)
 
-BUILT_SOURCES		= native/neutron_nexus_NexusFile.h
-nodist_noinst_HEADERS 	= native/neutron_nexus_NexusFile.h 
+BUILT_SOURCES		= native/org_nexusformat_NexusFile.h
+nodist_noinst_HEADERS 	= native/org_nexusformat_NexusFile.h 
 noinst_HEADERS		= native/handle.h
 
 CLEANFILES	= $(jnexus_jar_CLASS) $(jnexus_jar_ARCHIVE) $(BUILT_SOURCES) \
@@ -77,21 +79,21 @@ noinst_JAVA	= ncsa/hdf/hdflib/HDFArray.java \
 		ncsa/hdf/hdflib/HDFJavaException.java \
 		ncsa/hdf/hdflib/HDFNativeData.java \
 		ncsa/hdf/hdflib/HDFNotImplementedException.java \
-		neutron/nexus/AttributeEntry.java \
-		neutron/nexus/NXlink.java \
-		neutron/nexus/NeXusFileInterface.java \
-		neutron/nexus/NexusException.java \
-		neutron/nexus/NexusFile.java \
+		org/nexusformat/AttributeEntry.java \
+		org/nexusformat/NXlink.java \
+		org/nexusformat/NeXusFileInterface.java \
+		org/nexusformat/NexusException.java \
+		org/nexusformat/NexusFile.java \
 		test/TestJapi.java
 
 EXTRA_DIST	= $(noinst_JAVA) README.JNEXUS COPYING.NCSA 
 
 # specific targets
-# neutron/nexus/NexusFile.class:	neutron/nexus/NexusFile.java
+# org/nexusformat/NexusFile.class:	org/nexusformat/NexusFile.java
 
-native/neutron_nexus_NexusFile.h: jnexus.jar # neutron/nexus/NexusFile.class
+native/org_nexusformat_NexusFile.h: jnexus.jar # org/nexusformat/NexusFile.class
 	test -d native || mkdir native
-	$(JAVAH) -jni -d native -classpath . neutron.nexus.NexusFile
+	$(JAVAH) -jni -d native -classpath . org.nexusformat.NexusFile
 
 jnexus.jar: $(jnexus_jar_CLASS)
 	$(JAR) cvf jnexus.jar $(jnexus_jar_CLASS) \
@@ -102,7 +104,7 @@ jnexus.jar: $(jnexus_jar_CLASS)
 javadoc:	$(noinst_JAVA)
 	test -d apidoc || mkdir apidoc
 	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath . \
-                      -sourcepath $(srcdir) neutron.nexus ncsa.hdf.hdflib
+                      -sourcepath $(srcdir) org.nexusformat ncsa.hdf.hdflib
 
 SUFFIXES = .java .class
 
