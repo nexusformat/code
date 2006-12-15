@@ -1,0 +1,11 @@
+#!/bin/sh
+#------------------------------------------------------------------------
+# shell script for running the test program for the Java NeXus API
+#
+# Version for Redhat 
+#
+# Mark Koennecke, October 2000
+#------------------------------------------------------------------------
+java -cp ../jnexus.jar:. \
+ -Dneutron.nexus.JNEXUSLIB=$HOME/nt/k/src/nexus/bindings/java/bin/rh62/libjnexus.so TestJapi $1
+ 
