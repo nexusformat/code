@@ -35,7 +35,7 @@ AM_JAVACFLAGS	= -classpath .
 JAVAROOT	= .
 
 # jar file definitions
-javadir		= $(prefix)/nexusformat/java
+javadir		= $(prefix)/nexus/java
 java_DATA = jnexus.jar TestJapi.class README.JNEXUS COPYING.NCSA
 jnexus_jar_ARCHIVE = jnexus.jar
 
