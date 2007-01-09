@@ -55,6 +55,7 @@ void *nx_getattr(void *handle, char *name, int type, int length);
 
 /*---------------------- link -----------------------------------*/
 int nx_makelink(void *handle, void *link);
+int nx_makenamedlink(void *handle, char *name, void *link);
 int nx_opensourcgroup(void *handle);
 /*----------------- error handling -----------------------------*/
 char *nx_getlasterr(void);

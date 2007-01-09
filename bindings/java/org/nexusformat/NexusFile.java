@@ -263,7 +263,7 @@ public class  NexusFile implements NeXusFileInterface {
       * a selection of values.
       * @param rank The rank or number of dimensions of the dataset.
       * @param dim An array containing the length of each dimension. dim must
-      * have at least rank entries. The first dimension can be 0 which
+      * have at least rank entries. The first dimension can be -1 which
       * means it is an unlimited dimension.
       * @param compression_type determines the compression type. 
       * @param iChunk With HDF-5, slabs can be written to compressed data 
@@ -296,7 +296,7 @@ public class  NexusFile implements NeXusFileInterface {
       * a selection of values.
       * @param rank The rank or number of dimensions of the dataset.
       * @param dim An array containing the length of each dimension. dim must
-      * have at least rank entries. The first dimension can be 0 which
+      * have at least rank entries. The first dimension can be -1 which
       * means it is an unlimited dimension.
       * @exception NexusException when the dataset could not be created.
       */ 
@@ -611,6 +611,7 @@ public class  NexusFile implements NeXusFileInterface {
     protected native void nxgetgroupid(int handle, NXlink link);
     protected native void nxgetdataid(int handle, NXlink link);
     protected native void nxmakelink(int handle, NXlink target); 
+    protected native void nxmakenamedlink(int handle, String name, NXlink target); 
     protected native void nxopensourcepath(int handle); 
     /**
       * getgroupID gets the data necessary for linking the current vGroup
@@ -652,6 +653,20 @@ public class  NexusFile implements NeXusFileInterface {
       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
       nxmakelink(handle,target);
     }
+    /**
+      * makenamedlink links the object described by target into the current
+      * vGroup. The object will have a new name in the group into which it is 
+      * linked
+      * @param target The Object to link into the current group.
+      * @param name The name of this object in the current group
+      * @exception NexusException if an error occurs.
+      */
+    public void   makenamedlink(String name, NXlink target)throws
+	NexusException {
+      if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+      nxmakenamedlink(handle,name, target);
+    }     
+
     /**
       * opensourcepath opens the group from which the current item was linked
       * Returns an error if the current item is not linked.

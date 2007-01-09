@@ -110,6 +110,11 @@ public class TestJapi {
 	   // closedata
 	   nf.closedata();
 
+           // try unlimimited dim
+	   int unDim[] = new int[1];
+	   unDim[0] = -1;
+	   nf.makedata("Stuart",NexusFile.NX_FLOAT64,1,unDim);
+
 	   // write a compressed data set
 	   nf.compmakedata("iData1_compressed",NexusFile.NX_INT32,2,iDim,
 			  NexusFile.NX_COMP_LZW,iDim);

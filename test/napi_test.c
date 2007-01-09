@@ -158,6 +158,8 @@ int main (int argc, char *argv[])
   if (NXmakegroup (fileid, "link", "NXentry") != NX_OK) return 1;
   if (NXopengroup (fileid, "link", "NXentry") != NX_OK) return 1;
      if (NXmakelink (fileid, &glink) != NX_OK) return 1;
+     if (NXmakenamedlink (fileid,"renLinkGroup", &glink) != NX_OK) return 1;
+     if (NXmakenamedlink (fileid, "renLinkData", &dlink) != NX_OK) return 1;
   if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclose (&fileid) != NX_OK) return 1;
 
@@ -327,7 +329,32 @@ int main (int argc, char *argv[])
 	     return 1;
 	}
       if (NXclosegroup (fileid) != NX_OK) return 1;
-    if (NXclosegroup (fileid) != NX_OK) return 1;
+
+    if (NXopengroup (fileid, "renLinkGroup", "NXsample") != NX_OK) return 1;
+      if (NXgetgroupID (fileid, &blink) != NX_OK) return 1;
+        if (NXsameID(fileid, &glink, &blink) != NX_OK)
+	{
+             printf ("Link check FAILED (renLinkGroup)\n");
+             printf ("original group\n");
+	     NXIprintlink(fileid, &glink);
+             printf ("linked group\n");
+	     NXIprintlink(fileid, &blink);
+	     return 1;
+	}
+      if (NXclosegroup (fileid) != NX_OK) return 1;
+
+    if(NXopendata(fileid,"renLinkData") != NX_OK) return 1;
+      if(NXgetdataID(fileid,&blink) != NX_OK) return 1;
+        if (NXsameID(fileid, &dlink, &blink) != NX_OK)
+	{
+             printf ("Link check FAILED (renLinkData)\n");
+             printf ("original group\n");
+	     NXIprintlink(fileid, &glink);
+             printf ("linked group\n");
+	     NXIprintlink(fileid, &blink);
+	     return 1;
+	}
+    if(NXclosedata(fileid) != NX_OK) return 1;	
   if (NXclosegroup (fileid) != NX_OK) return 1;
   printf ("Link check OK\n");
 

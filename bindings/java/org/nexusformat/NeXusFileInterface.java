@@ -106,7 +106,7 @@ public interface NeXusFileInterface {
       * a selection of values.
       * @param rank The rank or number of dimensions of the dataset.
       * @param dim An array containing the length of each dimension. dim must
-      * have at least rank entries. The first dimension can be 0 which
+      * have at least rank entries. The first dimension can be -1 which
       * means it is an unlimited dimension.
       * @exception NexusException when the dataset could not be created.
       */ 
@@ -120,7 +120,7 @@ public interface NeXusFileInterface {
       * a selection of values.
       * @param rank The rank or number of dimensions of the dataset.
       * @param dim An array containing the length of each dimension. dim must
-      * have at least rank entries. The first dimension can be 0 which
+      * have at least rank entries. The first dimension can be -1 which
       * means it is an unlimited dimension.
       * @param compression_type determines the compression type. 
       * @param iChunk With HDF-5, slabs can be written to compressed data 
@@ -300,6 +300,16 @@ public interface NeXusFileInterface {
       * @exception NexusException if an error occurs.
       */
     public void   makelink(NXlink target)throws
+                          NexusException;     
+    /**
+      * makenamedlink links the object described by target into the current
+      * vGroup. The object will have a new name in the group into which it is 
+      * linked
+      * @param target The Object to link into the current group.
+      * @param name The name of this object in the current group
+      * @exception NexusException if an error occurs.
+      */
+    public void   makenamedlink(String name, NXlink target)throws
                           NexusException;     
     /**
       * opensourcepath opens the group from which the current item was linked

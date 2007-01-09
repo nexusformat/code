@@ -83,6 +83,7 @@ extern void *nx_getattr(void *handle, char *name, int type, int length);
 
 %section "Making Links"
 extern int nx_makelink(void *handle, void *link);
+extern int nx_makenamedlink(void *handle, char *name, void *link);
 extern int nx_opensourcegroup(void *handle);
 
 %section "External Linking"

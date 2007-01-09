@@ -18,7 +18,7 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  For further information, see <http://www.neutron.anl.gov/NeXus/>
+ *  For further information, see <http://www.nexusformat.org>
  */
 #include <stdio.h>
 #include <napi.h>
@@ -243,6 +243,7 @@ static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name,
   mxml_node_t *current;
   mxml_node_t *test = NULL;
   const char *linkTarget;
+  const char *linkName = NULL;
 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   linkNode = current;
@@ -253,6 +254,17 @@ static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name,
     if(test != NULL){
       if(strcmp(test->value.element.name,nxclass) == 0){
 	if(strcmp(mxmlElementGetAttr(test,"name"),name) == 0){
+	  return test;
+	}
+      }
+    }
+    /*
+      test for named links
+    */
+    linkName = mxmlElementGetAttr(linkNode,"name");
+    if(test != NULL && linkName != NULL){
+      if(strcmp(test->value.element.name,nxclass) == 0){
+	if(strcmp(linkName, name) == 0){
 	  return test;
 	}
       }
@@ -419,6 +431,7 @@ static mxml_node_t *searchSDSLinks(pXMLNexus xmlHandle, CONSTCHAR *name){
   mxml_node_t *current;
   mxml_node_t *test = NULL;
   const char *linkTarget;
+  const char *linkName = NULL;
 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   linkNode = current;
@@ -428,6 +441,15 @@ static mxml_node_t *searchSDSLinks(pXMLNexus xmlHandle, CONSTCHAR *name){
     test = getLinkTarget(xmlHandle,linkTarget);
     if(test != NULL){
       if(strcmp(test->value.element.name,name) == 0){
+	return test;
+      }
+    }
+    /*
+      test for named links
+    */
+    linkName = mxmlElementGetAttr(linkNode,"name");
+    if(test != NULL && linkName != NULL){
+      if(strcmp(linkName,name) == 0){
 	return test;
       }
     }
@@ -996,6 +1018,7 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
   const char *target = NULL, *attname = NULL;
   pNXDS dataset;
   char pBueffel[256];
+  const char *linkName = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1027,6 +1050,7 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
   }
   if(strcmp(next->value.element.name,"NAPIlink") == 0){
     target = mxmlElementGetAttr(next,"target");
+    linkName = mxmlElementGetAttr(next,"name");
     if(target == NULL){
       NXIReportError(NXpData,"Corrupted file, NAPIlink without target");
       return NX_ERROR;
@@ -1059,6 +1083,12 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
     strcpy(nxclass,next->value.element.name);
     attname = mxmlElementGetAttr(next,"name");
     strcpy(name,attname);
+  }
+  /*
+    this is for named links
+  */
+  if(linkName != NULL){
+    strcpy(name,linkName);
   }
   return NX_OK;
 }
@@ -1379,6 +1409,34 @@ NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink){
   }
   return NX_OK;
 }
+  
+/*-----------------------------------------------------------------------*/
+NXstatus  NXXmakenamedlink (NXhandle fid, char *name, NXlink* sLink){
+  pXMLNexus xmlHandle = NULL;
+  mxml_node_t *current = NULL, *linkNode = NULL;
+  mxml_node_t *linkedNode = NULL;
+
+  xmlHandle = (pXMLNexus)fid;
+  assert(xmlHandle);
+
+  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
+    NXIReportError(NXpData,"No group to link to open");
+    return NX_ERROR;
+  } 
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  linkNode = mxmlNewElement(current,"NAPIlink");
+  if(!linkNode){
+    NXIReportError(NXpData,"Failed to allocate new link element");
+    return NX_ERROR;
+  }
+  mxmlElementSetAttr(linkNode,"target",sLink->targetPath);
+  mxmlElementSetAttr(linkNode,"name",name);
+  linkedNode = getLinkTarget(xmlHandle,sLink->targetPath);
+  if(linkedNode != NULL){
+    mxmlElementSetAttr(linkedNode,"target",sLink->targetPath);
+  }
+  return NX_OK;
+}
 /*----------------------------------------------------------------------*/
 NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID, 
 				  NXlink* pSecondID){
@@ -1410,6 +1468,7 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxputslab=NXXputslab;    
       fHandle->nxgetdataID=NXXgetdataID;
       fHandle->nxmakelink=NXXmakelink;
+      fHandle->nxmakenamedlink=NXXmakenamedlink;
       fHandle->nxgetdata=NXXgetdata;
       fHandle->nxgetinfo=NXXgetinfo;
       fHandle->nxgetnextentry=NXXgetnextentry;

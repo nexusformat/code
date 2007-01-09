@@ -541,6 +541,22 @@ int nx_makelink(void *handle, void *link){
   }
 }
 /*-----------------------------------------------------------------------*/
+int nx_makenamedlink(void *handle, char *name, void *link){
+  NXhandle hfil;
+  NXlink* lk;
+  int status;
+
+  hfil = (NXhandle)handle;
+  lk = (NXlink *)link;
+
+  status = NXmakenamedlink(hfil,name,lk);
+  if(status == NX_OK){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+/*-----------------------------------------------------------------------*/
 int nx_opensourcegroup(void *handle){
   NXhandle hfil;
   int status;

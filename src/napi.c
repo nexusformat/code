@@ -472,7 +472,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     memcpy(extFile,pPtr,length);
     length = strlen(path-1);
     if(length > extPathLen){
-      NXIReportError(NXpData,"ERROR: internal errro with external linking");
+      NXIReportError(NXpData,"ERROR: internal error with external linking");
       return NXBADURL;
     }
     strcpy(extPath,path+1);
@@ -649,6 +649,13 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   {
     pNexusFunction pFunc = handleToNexusFunc(fid);
     return pFunc->nxmakelink(pFunc->pNexusData, sLink);
+  }
+  /* ------------------------------------------------------------------- */
+
+  NXstatus  NXmakenamedlink (NXhandle fid, CONSTCHAR *newname,  NXlink* sLink)
+  {
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    return pFunc->nxmakenamedlink(pFunc->pNexusData, newname, sLink);
   }
   /* --------------------------------------------------------------------*/
   NXstatus  NXopensourcegroup(NXhandle fid)

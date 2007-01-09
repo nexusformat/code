@@ -15,12 +15,10 @@
 package org.nexusformat;
 
 public class NXlink {
-    public int tag, ref;
-    public String ref5, refd, targetPath;
+    public int tag, ref, linkType;
+    public String targetPath;
    
     public NXlink(){
-       ref5 = new String("");
-       refd = new String("");
        targetPath = new String("");
     }
 }

@@ -64,13 +64,50 @@ extern	void *NXpData;
     assert(pRes->iNXID == NXSIGNATURE);
     return pRes;
   }
-  
+  /*----------------------------------------------------------------------*/
+static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
+{
+  NXname classText, linkClass;
+  int32 tags[2], attID, linkID, groupID;
+
+  groupID = Vattach(pFile->iVID,groupRef,"r");
+  Vgetclass(groupID, classText);
+  if(strcmp(classText,"NAPIlink") != 0)
+  {
+    /* normal group */
+    strcpy(nxclass,classText);
+    Vdetach(groupID);
+    return groupRef;
+  }
+  else 
+  {
+    /* code for linked renamed groups */
+    attID = Vfindattr(groupID,"NAPIlink");
+    if(attID >= 0)
+    {
+      Vgetattr(groupID,attID, tags);
+      linkID = Vattach(pFile->iVID,tags[1],"r");
+      Vgetclass(linkID, linkClass);
+      Vdetach(groupID);
+      Vdetach(linkID);
+      strcpy(nxclass,linkClass);
+      return tags[1];
+    } 
+    else
+    {
+      /* this allows for finding the NAPIlink group in NXmakenamedlink */
+      strcpy(nxclass,classText);
+      Vdetach(groupID);
+      return groupRef;
+    }
+  } 
+}
   /* --------------------------------------------------------------------- */
 
   static int32 NXIFindVgroup (pNexusFile pFile, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     int32 iNew, iRef, iTag;
-    int iN, i;
+    int iN, i, status;
     int32 *pArray = NULL;
     NXname pText;
   
@@ -93,17 +130,16 @@ extern	void *NXpData;
       for (i = 0; i < iN; i++) {
         iNew = Vattach (pFile->iVID, pArray[i], "r");
         Vgetname (iNew, pText);
+        Vdetach(iNew);
         if (strcmp (pText, name) == 0) {
-          Vgetclass (iNew, pText);
+          pArray[i] = findNapiClass(pFile,pArray[i],pText);
           if (strcmp (pText, nxclass) == 0) {
             /* found ! */
-            Vdetach (iNew);
             iNew = pArray[i];
             free (pArray);
             return iNew;
           }
         }
-        Vdetach (iNew);
       }
       /* nothing found */
       free (pArray);
@@ -115,15 +151,13 @@ extern	void *NXpData;
         if (iTag == DFTAG_VG) {
           iNew = Vattach (pFile->iVID, iRef, "r");
           Vgetname (iNew, pText);
+          Vdetach(iNew);
           if (strcmp (pText, name) == 0) {
-            Vgetclass (iNew, pText);
+	    iRef = findNapiClass(pFile,iRef, pText);
             if (strcmp (pText, nxclass) == 0) {
-              /* found ! */
-              Vdetach (iNew);
               return iRef;
             }
           }
-          Vdetach (iNew);
         }
       }                           /* end for */
     }                             /* end else */
@@ -541,8 +575,6 @@ extern	void *NXpData;
 
 
   /*------------------------------------------------------------------------*/
-
-  
   NXstatus  NX4opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     pNexusFile pFile;
@@ -573,7 +605,6 @@ extern	void *NXpData;
     NXIKillDir (pFile);
     return NX_OK;
   }
-  
   /* ------------------------------------------------------------------- */
 
   
@@ -969,7 +1000,7 @@ extern	void *NXpData;
   NXstatus  NX4opendata (NXhandle fid, CONSTCHAR *name)
   {
     pNexusFile pFile;
-    int32 iNew;
+    int32 iNew, attID, tags[2];
     char pBuffer[256];
     int iRet;
   
@@ -993,10 +1024,19 @@ extern	void *NXpData;
     }
     /* clear pending attribute directories first */
     NXIKillAttDir (pFile);
-  
-    /* open the SDS */
+
+    /* open the SDS, thereby watching for linked SDS under a different name */
     iNew = SDreftoindex (pFile->iSID, iNew);
     pFile->iCurrentSDS = SDselect (pFile->iSID, iNew);
+    attID = SDfindattr(pFile->iCurrentSDS,"NAPIlink");
+    if(attID >= 0)
+    {
+      SDreadattr(pFile->iCurrentSDS,attID, tags);
+      SDendaccess(pFile->iCurrentSDS);
+      iNew = SDreftoindex (pFile->iSID, tags[1]);
+      pFile->iCurrentSDS = SDselect (pFile->iSID, iNew);
+    }
+
     if (pFile->iCurrentSDS < 0) {
       NXIReportError (NXpData, "ERROR: HDF error opening SDS");
       pFile->iCurrentSDS = 0;
@@ -1230,14 +1270,65 @@ extern	void *NXpData;
       return NX_ERROR;
     }
     Vaddtagref(pFile->iCurrentVG, sLink->iTag, sLink->iRef);
+    length = strlen(sLink->targetPath);
     if(sLink->iTag == DFTAG_SDG || sLink->iTag == DFTAG_NDG ||
        sLink->iTag == DFTAG_SDS)
     {
       dataID = SDreftoindex(pFile->iSID,sLink->iRef);
       dataID = SDselect(pFile->iSID,dataID);
-      length = strlen(sLink->targetPath);
       SDsetattr(dataID,name,type,length,sLink->targetPath);
       SDendaccess(dataID);
+    }
+    else 
+    {
+      dataID = Vattach(pFile->iVID,sLink->iRef,"w");
+      Vsetattr(dataID, (char *)name, type, (int32) length, sLink->targetPath);
+      Vdetach(dataID);
+    }
+    return NX_OK;
+  }
+  /* ------------------------------------------------------------------- */
+
+  
+  NXstatus  NX4makenamedlink (NXhandle fid, CONSTCHAR* newname, NXlink* sLink)
+  {
+    pNexusFile pFile;
+    int32 iVG, iRet, dataID, type = DFNT_CHAR8, length, dataType = NX_CHAR, 
+      rank = 1, attType = NX_INT32;
+    int iDim[1];
+    char name[] = "target";
+    int tags[2];  
+
+    pFile = NXIassert (fid);
+  
+    if (pFile->iCurrentVG == 0) { /* root level, can not link here */
+      return NX_ERROR;
+    }
+
+    tags[0] = sLink->iTag;
+    tags[1] = sLink->iRef;
+
+    length = strlen(sLink->targetPath); 
+    if(sLink->iTag == DFTAG_SDG || sLink->iTag == DFTAG_NDG ||
+       sLink->iTag == DFTAG_SDS)
+    {
+      iDim[0] = 1;
+      NX4makedata(fid,newname, dataType,rank,iDim);
+      NX4opendata(fid,newname);
+      NX4putattr(fid,"NAPIlink",tags, 2, attType);
+      NX4closedata(fid); 
+      dataID = SDreftoindex(pFile->iSID,sLink->iRef);
+      dataID = SDselect(pFile->iSID,dataID);
+      SDsetattr(dataID,name,type,length,sLink->targetPath);
+      SDendaccess(dataID);
+    } else {
+      NX4makegroup(fid,newname,"NAPIlink");
+      NX4opengroup(fid,newname,"NAPIlink");
+      NX4putattr(fid,"NAPIlink",tags, 2, attType);
+      NX4closegroup(fid);
+      dataID = Vattach(pFile->iVID,sLink->iRef,"w");
+      Vsetattr(dataID, (char *)name, type, (int32) length, sLink->targetPath);
+      Vdetach(dataID);
     }
     return NX_OK;
   }
@@ -1356,11 +1447,13 @@ extern	void *NXpData;
         return NX_EOD;
       }
     }
+
     /* Next case: end of directory */
     if (iCurDir >= pFile->iStack[pFile->iStackPtr].iNDir) {
       NXIKillDir (pFile);
       return NX_EOD;
     }
+
     /* Next case: we have data! supply it and increment counter */
     if (pFile->iCurrentVG == 0) { /* root level */
       iTemp = Vattach (pFile->iVID,
@@ -1370,10 +1463,10 @@ extern	void *NXpData;
         return NX_ERROR;
       }
       Vgetname (iTemp, name);
-      Vgetclass (iTemp, nxclass);
+      Vdetach (iTemp);
+      findNapiClass(pFile, pFile->iStack[pFile->iStackPtr].iRefDir[iCurDir], nxclass);
       *datatype = DFTAG_VG;
       pFile->iStack[pFile->iStackPtr].iCurDir++;
-      Vdetach (iTemp);
       return NX_OK;
     } else {                      /* in Vgroup */
       if (pFile->iStack[iStackPtr].iTagDir[iCurDir] == DFTAG_VG) {/* Vgroup */
@@ -1384,7 +1477,8 @@ extern	void *NXpData;
           return NX_ERROR;
         }
         Vgetname (iTemp, name);
-        Vgetclass (iTemp, nxclass);
+        Vdetach(iTemp);
+	findNapiClass(pFile, pFile->iStack[pFile->iStackPtr].iRefDir[iCurDir], nxclass);
         *datatype = DFTAG_VG;
         pFile->iStack[pFile->iStackPtr].iCurDir++;
         Vdetach (iTemp);
@@ -1832,6 +1926,7 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxputslab=NX4putslab;    
       fHandle->nxgetdataID=NX4getdataID;
       fHandle->nxmakelink=NX4makelink;
+      fHandle->nxmakenamedlink=NX4makenamedlink;
       fHandle->nxgetdata=NX4getdata;
       fHandle->nxgetinfo=NX4getinfo;
       fHandle->nxgetnextentry=NX4getnextentry;

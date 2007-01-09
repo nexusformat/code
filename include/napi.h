@@ -3,7 +3,7 @@
   
   Application Program Interface Header File
   
-  Copyright (C) 2000-2005 Mark Koennecke, Uwe Filges
+  Copyright (C) 2000-2007 Mark Koennecke, Uwe Filges
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  
-  For further information, see <http://www.neutron.anl.gov/NeXus/>
+  For further information, see <http://www.nexusformat.org>
   
   $Id$
 
@@ -113,10 +113,8 @@ typedef struct {
 typedef struct {
                 long iTag;          /* HDF4 variable */
                 long iRef;          /* HDF4 variable */
-                char iTag5[1024];     /* HDF5 variable */ 
-                char iRef5[1024];     /* HDF5 variable */
-                char iRefd[1024];     /* HDF5 variable */
-                char targetPath[1024]; /* XML path */
+                char targetPath[1024]; /* path to item to link */
+                int linkType;          /* HDF5: 0 for group link, 1 for SDS link */
                } NXlink;
 
 #define NXMAXSTACK 50
@@ -146,6 +144,7 @@ typedef struct {
 #    define NXputattr           MANGLE(nxiputattr)
 #    define NXgetdataID         MANGLE(nxigetdataid)
 #    define NXmakelink          MANGLE(nximakelink)
+#    define NXmakenamedlink     MANGLE(nximakenamedlink)
 #    define NXopensourcegroup   MANGLE(nxiopensourcegroup)
 #    define NXmalloc            MANGLE(nximalloc)
 #    define NXfree              MANGLE(nxifree)
@@ -212,6 +211,7 @@ extern  NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]
 
 extern  NXstatus  NXgetdataID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NXmakelink(NXhandle handle, NXlink* pLink);
+extern  NXstatus  NXmakenamedlink(NXhandle handle, CONSTCHAR* newname, NXlink* pLink);
 extern  NXstatus  NXopensourcegroup(NXhandle handle);
 
 extern  NXstatus  NXgetdata(NXhandle handle, void* data);
@@ -275,6 +275,7 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
         NXstatus ( *nxgetdataID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakelink)(NXhandle handle, NXlink* pLink);
+        NXstatus ( *nxmakenamedlink)(NXhandle handle, CONSTCHAR *newname, NXlink* pLink);
         NXstatus ( *nxgetdata)(NXhandle handle, void* data);
         NXstatus ( *nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
         NXstatus ( *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);

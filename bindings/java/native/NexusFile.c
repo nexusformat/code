@@ -684,6 +684,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
             return;
         }
         (*env)->SetIntField(env,linki,fid,myLink.iTag);
+
         fid = (*env)->GetFieldID(env,cls,"ref","I");
         if(fid == 0)
 	{
@@ -697,25 +698,25 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
         /* 
          set HDF-5 String variables
 	*/
-        fid = (*env)->GetFieldID(env,cls,"ref5","Ljava/lang/String;");
+        fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
 	{
 	    NXIReportError(env,
-	       "ERROR: failed to locate fieldID in nxgetgroupid");
+	       "ERROR: failed to locate targetPath in nxgetgroupid");
             return;
         }
-	jstr = (*env)->NewStringUTF(env,myLink.iRef5);
+	jstr = (*env)->NewStringUTF(env,myLink.targetPath);
         (*env)->SetObjectField(env, linki, fid, jstr);
 
-        fid = (*env)->GetFieldID(env,cls,"refd","Ljava/lang/String;");
+        fid = (*env)->GetFieldID(env,cls,"linkType","I");
         if(fid == 0)
 	{
 	    NXIReportError(env,
-	       "ERROR: failed to locate fieldID in nxgetgroupid");
+	       "ERROR: failed to locate linkType in nxgetgroupid");
             return;
         }
-	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
-        (*env)->SetObjectField(env, linki, fid, jstr);
+        (*env)->SetIntField(env,linki,fid,myLink.linkType);
+
 #endif        
         fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
@@ -779,25 +780,25 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
         /* 
          set HDF-5 String variables
 	*/
-        fid = (*env)->GetFieldID(env,cls,"ref5","Ljava/lang/String;");
+        fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
 	{
 	    NXIReportError(env,
-	       "ERROR: failed to locate fieldID in nxgetdataid");
+	       "ERROR: failed to locate targetPath in nxgetgroupid");
             return;
         }
-	jstr = (*env)->NewStringUTF(env,myLink.iRef5);
+	jstr = (*env)->NewStringUTF(env,myLink.targetPath);
         (*env)->SetObjectField(env, linki, fid, jstr);
 
-        fid = (*env)->GetFieldID(env,cls,"refd","Ljava/lang/String;");
+        fid = (*env)->GetFieldID(env,cls,"linkType","I");
         if(fid == 0)
 	{
 	    NXIReportError(env,
-	       "ERROR: failed to locate fieldID in nxgetdataid");
+	       "ERROR: failed to locate linkType in nxgetgroupid");
             return;
         }
-	jstr = (*env)->NewStringUTF(env,myLink.iRefd);
-        (*env)->SetObjectField(env, linki, fid, jstr);
+        (*env)->SetIntField(env,linki,fid,myLink.linkType);
+
 #endif
         fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
@@ -860,29 +861,27 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      /*
        get the HDF-5 Strings
      */
-     fid = (*env)->GetFieldID(env,cls,"ref5","Ljava/lang/String;");
+     fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
      if(fid == 0)
      {
 	  NXIReportError(env,
-	       "ERROR: failed to locate fieldID in nxmakelink");
+	       "ERROR: failed to locate targetPath in nxmakelink");
           return;
      }
      jstr = (*env)->GetObjectField(env, target, fid);
      cData = (*env)->GetStringUTFChars(env, jstr, 0);          
-     strcpy(myLink.iRef5,cData);
+     strcpy(myLink.targetPath,cData);
      (*env)->ReleaseStringUTFChars(env, jstr, cData);
 
-     fid = (*env)->GetFieldID(env,cls,"refd","Ljava/lang/String;");
+     fid = (*env)->GetFieldID(env,cls,"linkType","I");
      if(fid == 0)
      {
 	  NXIReportError(env,
-	       "ERROR: failed to locate fieldID in nxmakelink");
+	       "ERROR: failed to locate linkType in nxmakelink");
           return;
      }
-     jstr = (*env)->GetObjectField(env, target, fid);
-     cData = (*env)->GetStringUTFChars(env, jstr, 0);          
-     strcpy(myLink.iRefd,cData);
-     (*env)->ReleaseStringUTFChars(env, jstr, cData);
+     myLink.linkType = (*env)->GetIntField(env,target,fid);
+
 #endif
      fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
      if(fid == 0)
@@ -899,6 +898,98 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      // do actually link
      iRet = NXmakelink(nxhandle, &myLink);
 }
+/*------------------------------------------------------------------------
+                               nxmakenamedlink
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
+  (JNIEnv *env, jobject obj, jint handle, jstring name, jobject target)
+{
+    NXhandle nxhandle;
+    NXlink myLink;
+    int iRet;
+    jclass cls;
+    jfieldID fid;
+    jstring jstr;
+    const char *cData;
+    char *Name; 
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* get link name */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    // convert target object data to myLink structure */
+    cls = (*env)->GetObjectClass(env, target);
+    if(cls == NULL)
+    {
+	 NXIReportError(env,
+	       "ERROR: failed to locate class in nxmakelink");
+         return;
+     }
+     fid = (*env)->GetFieldID(env,cls,"tag","I");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxmakelink");
+          return;
+     }
+     myLink.iTag = (*env)->GetIntField(env,target,fid);
+     fid = (*env)->GetFieldID(env,cls,"ref","I");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate fieldID in nxmakelink");
+          return;
+     }
+     myLink.iRef = (*env)->GetIntField(env,target,fid);
+
+#ifdef HDF5    
+     /*
+       get the HDF-5 Strings
+     */
+     fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate targetPath in nxmakelink");
+          return;
+     }
+     jstr = (*env)->GetObjectField(env, target, fid);
+     cData = (*env)->GetStringUTFChars(env, jstr, 0);          
+     strcpy(myLink.targetPath,cData);
+     (*env)->ReleaseStringUTFChars(env, jstr, cData);
+
+     fid = (*env)->GetFieldID(env,cls,"linkType","I");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate linkType in nxmakelink");
+          return;
+     }
+     myLink.linkType = (*env)->GetIntField(env,target,fid);
+
+#endif
+     fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
+     if(fid == 0)
+     {
+	  NXIReportError(env,
+	       "ERROR: failed to locate targetPath in nxmakelink");
+          return;
+     }
+     jstr = (*env)->GetObjectField(env, target, fid);
+     cData = (*env)->GetStringUTFChars(env, jstr, 0);          
+     strcpy(myLink.targetPath,cData);
+     (*env)->ReleaseStringUTFChars(env, jstr, cData);
+
+
+     // do actually link
+     iRet = NXmakenamedlink(nxhandle, Name,  &myLink);
+}
+
 /*------------------------------------------------------------------------
                      nxopensourcepath
 --------------------------------------------------------------------------*/
