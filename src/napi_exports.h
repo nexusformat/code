@@ -248,3 +248,8 @@ NXstatus CALL_MODE NXILINKEXTERNAL(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxc
 {
     return NXlinkexternal(fid, name, nxclass, url);
 }
+
+NXstatus CALL_MODE NXIMAKENAMEDLINK(NXhandle fid, CONSTCHAR *newname, NXlink* pLink)
+{
+    return NXmakenamedlink(fid, newname, pLink);
+}

@@ -183,6 +183,11 @@ typedef struct {
 
 /* 
  * Standard interface 
+ *
+ * Functions added here are not automatically exported from 
+ * a shared library/dll - the symbol name must also be added
+ * to the file   src/nexus_symbols.txt
+ * 
  */
 
 #ifdef __cplusplus

@@ -52,3 +52,4 @@ nxiisexternalgroup_
 NXMGetError
 NXMDisableErrorReporting
 NXMEnableErrorReporting
+nximakenamedlink_
