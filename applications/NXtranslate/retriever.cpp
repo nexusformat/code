@@ -20,6 +20,9 @@
 #ifdef TEXT_COLLIST_RETRIEVER
 #include "text_collist/collist_retriever.h"
 #endif
+#ifdef BINARY_RETRIEVER
+#include "binary/BinaryRetriever.hpp"
+#endif
 
 using std::string;
 using std::invalid_argument;
@@ -61,6 +64,11 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 #ifdef TEXT_XML_RETRIEVER
   }else if(type==TextXmlRetriever::MIME_TYPE){
     RetrieverPtr ptr(new TextXmlRetriever(source));
+    return ptr;
+#endif
+#ifdef BINARY_RETRIEVER
+  }else if(type==BinaryRetriever::MIME_TYPE){
+    RetrieverPtr ptr(new BinaryRetriever(source));
     return ptr;
 #endif
   }
