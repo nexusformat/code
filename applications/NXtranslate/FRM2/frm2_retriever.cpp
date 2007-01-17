@@ -7,7 +7,6 @@
 #include <vector>
 #include <map>
 #include "frm2_retriever.h"
-#include "string_util_ext.h"
 #include "../node.h"
 #include "../nexus_util.h"
 #include "../string_util.h"
@@ -24,6 +23,35 @@ using std::vector;
 using std::isspace;
 using std::isdigit;
 using std::isalpha;
+
+#define MIN(a,b) ( (a)<(b)? (a):(b) )
+#define MAX(a,b) ( (a)>(b)? (a):(b) )
+
+class NXunits {
+	public:
+	static const std::string second;		 
+	static const std::string millisecond;	
+	static const std::string microsecond;
+	static const std::string nanosecond;
+	static const std::string minute;
+	static const std::string degree;	
+	static const std::string count;
+	static const std::string volt;
+	static const std::string ampere;
+	static const std::string angstrom;
+	static const std::string inverse_angstrom;
+	static const std::string bar;
+	static const std::string millibar;
+	static const std::string meter;
+	static const std::string millimeter;
+	static const std::string rpm;
+	static const std::string hertz;
+	static const std::string megahertz;
+	static const std::string gigahertz;
+	static const std::string terahertz;
+	static const std::string kelvin;
+	// to be completed later
+};
 
 
 static const int BUFFER_SIZE=4096;

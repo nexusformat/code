@@ -35,8 +35,7 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libFRM2.la
 
 libFRM2_la_SOURCES = \
-	frm2_retriever.cpp frm2_retriever.h \
-	string_util_ext.cpp string_util_ext.h
+	frm2_retriever.cpp frm2_retriever.h
 
 #EXTRA_DIST = 
 

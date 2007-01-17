@@ -5,16 +5,6 @@
 #include <fstream>
 #include <map>
 
-
-class NXunits {
-	public:
-	static const std::string milliseconds;	
-	static const std::string seconds;		 
-	static const std::string degrees;	
-	static const std::string counts;	
-	// to be completed later
-};
-
 // this is not intended to be inherited from
 class TextCollistRetriever: public Retriever{
  public:

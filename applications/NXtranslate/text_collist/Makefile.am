@@ -34,8 +34,7 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libTextCollist.la
 
 libTextCollist_la_SOURCES = \
-	collist_retriever.cpp collist_retriever.h \
-	string_util_ext.cpp string_util_ext.h
+	collist_retriever.cpp collist_retriever.h
 
 EXTRA_DIST = mira.txt
 

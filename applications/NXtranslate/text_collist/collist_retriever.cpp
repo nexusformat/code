@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include "collist_retriever.h"
-#include "string_util_ext.h"
 #include "../node.h"
 #include "../nexus_util.h"
 #include "../string_util.h"
@@ -21,6 +20,14 @@ using std::isspace;
 using std::isdigit;
 using std::isalpha;
 
+class NXunits {
+	public:
+	static const std::string milliseconds;	
+	static const std::string seconds;		 
+	static const std::string degrees;	
+	static const std::string counts;	
+	// to be completed later
+};
 
 static const int BUFFER_SIZE=256;
 
