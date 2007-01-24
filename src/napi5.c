@@ -627,13 +627,19 @@ static int nxToHDF5Type(int datatype)
     }
     if (datatype == NX_CHAR)
     {
-      byte_zahl=dimensions[0]; 
-      dimensions[0]=rank;
+/* 
+ *  This assumes string lenght is in the last dimensions and
+ *  the logic must be the same as used in NX5getglab and NX5getinfo
+ *
+ *  search for tests on H5T_STRING
+ */
+      byte_zahl=dimensions[rank-1]; 
+      dimensions[rank-1]=1;
       for(i = 0; i < rank; i++)
          {
          mydim1[i] = dimensions[i];
          }
-      dimensions[0] = byte_zahl;
+      dimensions[rank-1] = byte_zahl;
          dataspace=H5Screate_simple(rank,mydim1,NULL);
     } else {
       if (dimensions[0] == NX_UNLIMITED)
@@ -653,6 +659,7 @@ static int nxToHDF5Type(int datatype)
     if (datatype == NX_CHAR)
     {
        H5Tset_size(datatype1, byte_zahl);
+/*       H5Tset_strpad(H5T_STR_SPACEPAD); */
     }
     if(compress_type == NX_COMP_LZW)
     {
@@ -1566,11 +1573,8 @@ static int h5MemType(hid_t atype)
      iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
      /* conversion to proper ints for the platform */ 
      *iType = (int)mType;
-     if (data_id==H5T_STRING) {
-	for (i = 0; i < iRank; i++)
-	{
-	  myDim[i] = H5Tget_size(pFile->iCurrentT);    
-	}
+     if (data_id==H5T_STRING && myDim[iRank-1] == 1) {
+        myDim[iRank-1] = H5Tget_size(pFile->iCurrentT);
      } 
      *rank = (int)iRank;
      for (i = 0; i < iRank; i++)
@@ -1610,6 +1614,10 @@ static int h5MemType(hid_t atype)
 	}
       data_id = H5Tget_class(pFile->iCurrentT);
       if (data_id == H5T_STRING) {
+/* 
+ * FAA 24/1/2007: I don't think this will work for multidimensional
+ * string arrays. 
+*/
 	 mtype = NX_CHAR;
 	 if (mySize[0] == 1) {
 	     mySize[0]  = H5Tget_size(pFile->iCurrentT);

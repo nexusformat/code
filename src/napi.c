@@ -551,16 +551,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
                                   int rank, int dimensions[])
   {
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    if ( (datatype == NX_CHAR) && (rank > 1) )
-    {
-        NXIReportError (NXpData,
-          "ERROR: multi-dimensional NX_CHAR arrays are not supported by the NeXus library");
-	return NX_ERROR;
-    }
-    else
-    {
-        return pFunc->nxmakedata(pFunc->pNexusData, name, datatype, rank, dimensions); 
-    }
+    return pFunc->nxmakedata(pFunc->pNexusData, name, datatype, rank, dimensions); 
   }
 
 
@@ -570,16 +561,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
                            int rank, int dimensions[],int compress_type, int chunk_size[])
   {
     pNexusFunction pFunc = handleToNexusFunc(fid); 
-    if ( (datatype == NX_CHAR) && (rank > 1) )
-    {
-        NXIReportError (NXpData,
-          "ERROR: multi-dimensional NX_CHAR arrays are not supported by the NeXus library");
-	return NX_ERROR;
-    }
-    else
-    {
-        return pFunc->nxcompmakedata (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size); 
-    }
+    return pFunc->nxcompmakedata (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size); 
   } 
   
  
@@ -798,7 +780,8 @@ static char *nxitrim(char *str)
 
     pNexusFunction pFunc = handleToNexusFunc(fid);
     status = pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type); /* unstripped size if string */
-    if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) )
+    /* only strip one dimensional strings */
+    if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) && (rank == 1) )
     {
 	pPtr = (char*)malloc(iDim[0]+1);
         memset(pPtr, 0, iDim[0]+1);
@@ -827,7 +810,8 @@ static char *nxitrim(char *str)
     /*
       the length of a string may be trimmed....
     */
-    if(*iType == NX_CHAR && pFunc->stripFlag == 1){
+    /* only strip one dimensional strings */
+    if((*iType == NX_CHAR) && (pFunc->stripFlag == 1) && (*rank == 1)){
       pPtr = (char *)malloc((dimension[0]+1)*sizeof(char));
       if(pPtr != NULL){
 	memset(pPtr,0,(dimension[0]+1)*sizeof(char));
@@ -836,11 +820,6 @@ static char *nxitrim(char *str)
 	free(pPtr);
       }
     } 
-    if ( (*iType == NX_CHAR) && (*rank > 1) )
-    {
-	NXIReportError(NXpData,
-      "WARNING: multi-dimensional character arrays are not really supported");
-    }
     return status;
   }
   

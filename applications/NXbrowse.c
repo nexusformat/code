@@ -273,7 +273,7 @@ int NXBopen (NXhandle fileId, NXname groupName)
 /* Outputs requested data */
 int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
 {
-   int dataRank, dataDimensions[NX_MAXRANK], dataType, start[NX_MAXRANK], size[NX_MAXRANK], i, j;
+   int dataRank, dataDimensions[NX_MAXRANK], dataType, start[NX_MAXRANK], size[NX_MAXRANK], i, j, total_size;
    char dimString[80], *subString;
    void *dataBuffer;
   
@@ -319,6 +319,11 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
          }
       }
    }
+   total_size = 1;
+   for(i = 0; i < dataRank; i++)
+   {
+       total_size *= dataDimensions[i];
+   }
    if (NXmalloc((void**)&dataBuffer, dataRank, size, dataType) != NX_OK) return NX_ERROR;
    /* Read in the data with NXgetslab */
    if (dataType == NX_CHAR) {
@@ -339,7 +344,12 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
    /* Output the data according to data type */
    if (dimensions == NULL) {  /* Print the first few values (max 3) */
       if (dataType == NX_CHAR) { /* If the data is a string, output the whole buffer */
-         PrintData (dataBuffer, dataType, dataDimensions[0]);
+/* this prints the first line of an array; could print more */
+         for(i=0; i<total_size / dataDimensions[dataRank-1]; i++)
+	 {
+             PrintData (dataBuffer + i * dataDimensions[dataRank-1], dataType, dataDimensions[dataRank-1]);
+	     PrintData ("\n", NX_CHAR, 1);
+         }
       }
       else {
          if (dataRank == 1 && dataDimensions[0] == 1) {    /* It's a scalar */

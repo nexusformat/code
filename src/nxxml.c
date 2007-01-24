@@ -390,6 +390,10 @@ NXstatus  NXXmakedata (NXhandle fid,
 		   "NeXus XML-API does not support unlimited dimensions");
     return NX_ERROR;
   }
+  if ((datatype == NX_CHAR) && (rank > 1)) {
+    NXIReportError(NXpData,"NeXus XML-API does not yet support multi-dimensional character arrays");
+    return NX_ERROR;
+  }
 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   /*
