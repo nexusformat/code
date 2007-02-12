@@ -30,7 +30,7 @@ dnl
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT([NeXus Library], [4.0.0], [nexus-developers@anl.gov], [nexus])
+AC_INIT([NeXus Library], [4.0.0], [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
@@ -196,6 +196,8 @@ AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
+AC_CHECK_PROGS(PDFLATEX,[pdflatex])
+AC_CHECK_PROGS(DOXYGEN,[doxygen])
 
 AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
 AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
@@ -486,6 +488,8 @@ AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
 AM_CONDITIONAL(HAVE_MZSCHEME, [test ! -z "$INSTALL_NXPYTHON"])
 AM_CONDITIONAL(MINGW_MSYS, [test x$MINGW_MSYS = xyes])
 AM_CONDITIONAL(HAVE_OPENGENIE, [test ! -z "$OPENGENIEROOT"])
+AM_CONDITIONAL(HAVE_DOXYGEN, [test ! -z "$DOXYGEN"])
+AM_CONDITIONAL(HAVE_PDFLATEX, [test ! -z "$PDFLATEX"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
@@ -515,6 +519,8 @@ AC_CONFIG_FILES([Makefile
 		applications/NXtranslate/docs/Makefile
 		examples/Makefile
 		doc/Makefile
+		doc/doxygen/Makefile
+		doc/doxygen/Doxyfile
 		doc/api/Makefile
 		doc/nxdict/Makefile
 		doc/tech_ref/Makefile

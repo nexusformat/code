@@ -5,7 +5,13 @@
 #
 
 # documenttion subdirectories
-SUBDIRS=api nxdict tech_ref
+if HAVE_DOXYGEN
+if HAVE_PDFLATEX
+DOXYSUB=doxygen
+endif
+endif
+SUBDIRS=api nxdict tech_ref $(DOXYSUB)
+
 nxdocdir		= $(NXDOCDIR)
 
 # add files and example code here from this directory
