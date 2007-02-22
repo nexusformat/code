@@ -30,6 +30,8 @@
 #include "napi.h"
 #include "napi5.h"
 
+#define NX_UNKNOWN_GROUP "" /* for when no NX_class attr */
+
 extern  void *NXpData;
 
   typedef struct __NexusFile5 {
@@ -432,39 +434,41 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     strcpy(pFile->name_tmp,pBuffer);
     strcpy(pFile->name_ref,pBuffer);
 
-    /* check group attribute */
-    iRet=H5Aiterate(pFile->iCurrentG,NULL,attr_check,NULL);
-    if (iRet < 0) {
-      NXIReportError (NXpData, "ERROR iterating through group!");
-      return NX_ERROR;  
-    } else if (iRet == 1) {
+    if ((nxclass != NULL) && (strcmp(nxclass, NX_UNKNOWN_GROUP) != 0))
+    {
+        /* check group attribute */
+        iRet=H5Aiterate(pFile->iCurrentG,NULL,attr_check,NULL);
+        if (iRet < 0) {
+          NXIReportError (NXpData, "ERROR iterating through group!");
+          return NX_ERROR;  
+        } else if (iRet == 1) {
          /* group attribute was found */
-    } else {
+        } else {
          /* no group attribute available */
          NXIReportError (NXpData, "No group attribute available");
          return NX_ERROR;
+        }
+        /* check contents of group attribute */
+        attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
+        if (attr1 < 0)
+        {
+              NXIReportError (NXpData, "Error opening NX_class group attribute!");
+              return NX_ERROR; 
+        }
+        atype=H5Tcopy(H5T_C_S1);
+        H5Tset_size(atype,128);  
+        iRet = H5Aread(attr1, atype, data);
+        if (strcmp(data, nxclass) == 0) {
+              /* test OK */
+        } else {
+              NXIReportError (NXpData, "Group class is not identical!");
+              iRet = H5Tclose(atype);
+              iRet = H5Aclose(attr1); 
+              return NX_ERROR; 
+        }          
+        iRet = H5Tclose(atype);
+        iRet = H5Aclose(attr1); 
     }
-
-    /* check contents of group attribute */
-    attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
-    if (attr1 < 0)
-    {
-          NXIReportError (NXpData, "Error opening group attribute!");
-          return NX_ERROR; 
-    }
-    atype=H5Tcopy(H5T_C_S1);
-    H5Tset_size(atype,128);  
-    iRet = H5Aread(attr1, atype, data);
-    if (strcmp(data, nxclass) == 0) {
-          /* test OK */
-    } else {
-          NXIReportError (NXpData, "Group class is not identical!");
-          iRet = H5Tclose(atype);
-          iRet = H5Aclose(attr1); 
-          return NX_ERROR; 
-    }          
-    iRet = H5Tclose(atype);
-    iRet = H5Aclose(attr1); 
 
     /* maintain stack */
     pFile->iStackPtr++;
@@ -1258,7 +1262,7 @@ NXstatus NX5makenamedlink(NXhandle fid, char *name, NXlink *sLink)
       strcpy (pName,pFile->name_ref);
       attr_id = H5Aopen_name(pFile->iCurrentG,"NX_class");
       if (attr_id<0) {
-         strcpy(pClass,"non");
+         strcpy(pClass, NX_UNKNOWN_GROUP);
       } else {
         atype=H5Tcopy(H5T_C_S1);
         H5Tset_size(atype,64);  
@@ -1405,7 +1409,7 @@ static int h5MemType(hid_t atype)
        strcpy(pFile->name_ref,"/");
     }  
     iRet=H5Giterate(pFile->iFID,pFile->name_ref,&idx,nxgroup_info,&op_data);
-    strcpy(nxclass,"");
+    strcpy(nxclass, NX_UNKNOWN_GROUP);
    
     /*
       figure out the number of items in the current group. We need this in order to
@@ -1452,18 +1456,17 @@ static int h5MemType(hid_t atype)
            }
            attr1 = H5Aopen_name(grp, "NX_class");
            if (attr1 < 0) {
-              H5Gclose(grp);
-              NXIReportError (NXpData, "Error opening group class");
-              return NX_ERROR;  
+	      strcpy(nxclass, NX_UNKNOWN_GROUP);
+           } else {
+               type=H5T_C_S1;
+               atype=H5Tcopy(type);
+               H5Tset_size(atype,128);  
+               iRet = H5Aread(attr1, atype, data);
+               strcpy(nxclass,data);
+               H5Tclose(atype);
+	       H5Aclose(attr1);
            }
-           type=H5T_C_S1;
-           atype=H5Tcopy(type);
-           H5Tset_size(atype,128);  
-           iRet = H5Aread(attr1, atype, data);
-           strcpy(nxclass,data);
-           H5Tclose(atype);
            H5Gclose(grp);
-	   H5Aclose(attr1);
         } else if (op_data.type==H5G_DATASET)
         {
 	  /*
