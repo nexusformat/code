@@ -36,7 +36,7 @@ JAVAROOT	= .
 
 # jar file definitions
 javadir		= $(prefix)/nexus/java
-java_DATA = jnexus.jar TestJapi.class README.JNEXUS COPYING.NCSA
+java_DATA = jnexus.jar test/TestJapi.class README.JNEXUS COPYING.NCSA
 jnexus_jar_ARCHIVE = jnexus.jar
 
 jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \

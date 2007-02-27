@@ -386,9 +386,7 @@ NXstatus  NXXmakedata (NXhandle fid,
     return NX_ERROR;
   }
   if(dimensions[0] < 0){
-    NXIReportError(NXpData,
-		   "NeXus XML-API does not support unlimited dimensions");
-    return NX_ERROR;
+    dimensions[0] = 1;
   }
   if ((datatype == NX_CHAR) && (rank > 1)) {
     NXIReportError(NXpData,"NeXus XML-API does not yet support multi-dimensional character arrays");
@@ -696,6 +694,38 @@ static void putSlabData(pNXDS dataset, pNXDS slabData, int dim,
     }
   }
 }
+/*----------------------------------------------------------------------
+ This is in order to support unlimited dimensions along the first axis
+ -----------------------------------------------------------------------*/
+static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset, 
+				 int start[], int size[]){
+  int dim0, byteLength;
+  void *oldData = NULL;
+  char *typestring = NULL;
+
+  dim0 = start[0] + size[0];
+  if(dim0 > dataset->dim[0]){
+    byteLength = getNXDatasetByteLength(dataset);
+    oldData = dataset->u.ptr;
+    dataset->dim[0] = dim0;
+    dataset->u.ptr = malloc(getNXDatasetByteLength(dataset));
+    if(dataset->u.ptr == NULL){
+      return 0;
+    }
+    memset(dataset->u.ptr,0,getNXDatasetByteLength(dataset));
+    memcpy(dataset->u.ptr,oldData,byteLength);
+    free(oldData);
+    typestring = buildTypeString(dataset->type,dataset->rank,dataset->dim);
+    if(typestring != NULL){
+      mxmlElementSetAttr(node,TYPENAME,typestring);
+      free(typestring);
+    } else {
+      NXIReportError(NXpData,"Failed to allocate typestring");
+      return 0;
+    }
+  }
+  return 1;
+}
 /*----------------------------------------------------------------------*/
 NXstatus  NXXputslab (NXhandle fid, void *data, 
 				   int iStart[], int iSize[]){
@@ -704,7 +734,7 @@ NXstatus  NXXputslab (NXhandle fid, void *data,
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset, slabData;
-  int sourcePos[NX_MAXRANK], targetPos[NX_MAXRANK];
+  int sourcePos[NX_MAXRANK], targetPos[NX_MAXRANK], status;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -723,11 +753,20 @@ NXstatus  NXXputslab (NXhandle fid, void *data,
   }
   dataset = (pNXDS)userData->value.custom.data;
   assert(dataset);
+
+  status = checkAndExtendDataset(current,dataset,iStart,iSize);
+  if(status == 0){
+    NXIReportError(NXpData,"Out of memory extending dataset");
+    return NX_ERROR;
+  }
+
   slabData = makeSlabData(dataset, data, iSize);
   if(slabData == NULL){
     NXIReportError(NXpData,"Failed to allocate slab data");
     return NX_ERROR;
   }
+  
+
   putSlabData(dataset,slabData,0,iStart,sourcePos,targetPos);
   free(slabData->dim);
   free(slabData);

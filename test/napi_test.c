@@ -58,7 +58,6 @@ int main (int argc, char *argv[])
   int cdims[2];
   int nx_creation_code;
   char nxFile[80];
-  int xmlFlag = 0;
   char filename[256];
 
   if(strstr(argv[0],"napi_test-hdf5") != NULL){
@@ -67,7 +66,6 @@ int main (int argc, char *argv[])
   }else if(strstr(argv[0],"napi_test-xml") != NULL){
     nx_creation_code = NXACC_CREATEXML;
     strcpy(nxFile,"NXtest.xml");
-    xmlFlag = 1;
   } else {
     nx_creation_code = NXACC_CREATE;
     strcpy(nxFile,"NXtest.hdf");
@@ -133,16 +131,14 @@ int main (int argc, char *argv[])
            if (NXputdata (fileid, comp_array) != NX_OK) return 1;
         if (NXclosedata (fileid) != NX_OK) return 1;  
         if (NXflush (&fileid) != NX_OK) return 1;
-	if(!xmlFlag){
-	  if (NXmakedata (fileid, "flush_data", NX_INT32, 1, unlimited_dims) != NX_OK) return 1;
-	  slab_size[0] = 1;
-	  for (i = 0; i < 7; i++)
+	if (NXmakedata (fileid, "flush_data", NX_INT32, 1, unlimited_dims) != NX_OK) return 1;
+	slab_size[0] = 1;
+	for (i = 0; i < 7; i++)
 	    {
 	      slab_start[0] = i;
 	      if (NXopendata (fileid, "flush_data") != NX_OK) return 1;
 	        if (NXputslab (fileid, &i, slab_start, slab_size) != NX_OK) return 1;
 		if (NXflush (&fileid) != NX_OK) return 1;
-	    }
 	}
      if (NXclosegroup (fileid) != NX_OK) return 1;
      if (NXmakegroup (fileid, "sample", "NXsample") != NX_OK) return 1;

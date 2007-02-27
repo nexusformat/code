@@ -598,14 +598,17 @@ static int nxToHDF5Type(int datatype)
     int i, byte_zahl;
     hsize_t chunkdims[H5S_MAX_RANK];
     hsize_t mydim[H5S_MAX_RANK], mydim1[H5S_MAX_RANK];  
-    hsize_t size[2];
-    hsize_t maxdims[1] = {H5S_UNLIMITED};
+    hsize_t size[H5S_MAX_RANK];
+    hsize_t maxdims[H5S_MAX_RANK];
 
     pFile = NXI5assert (fid);
   
     for (i = 0; i < rank; i++)
        {
          chunkdims[i]=chunk_size[i];
+         mydim[i] = dimensions[i];
+         maxdims[i] = dimensions[i];
+         size[i] = dimensions[i];
        }   
 
     type = nxToHDF5Type(datatype);
@@ -648,13 +651,10 @@ static int nxToHDF5Type(int datatype)
     } else {
       if (dimensions[0] == NX_UNLIMITED)
       {
-        mydim[0]=0;
+        mydim[0] = 1;
+        maxdims[0] = H5S_UNLIMITED;
         dataspace=H5Screate_simple(rank, mydim, maxdims);
       } else {
-        for(i = 0; i < rank; i++)
-        {
-        mydim[i] = dimensions[i];
-        }
         /* dataset creation */
         dataspace=H5Screate_simple(rank, mydim, NULL);  
         }
@@ -706,7 +706,6 @@ static int nxToHDF5Type(int datatype)
     if (dimensions[0] == NX_UNLIMITED)
     {      
       size[0]   = 1; 
-      size[1]   = 1; 
       iNew = H5Dextend (pFile->iCurrentD, size);
       if (iNew < 0) {
         sprintf (pBuffer, "ERROR: cannot create Dataset %s, check arguments",
