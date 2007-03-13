@@ -27,6 +27,7 @@
 #define __NXSUMMARY_H_GUARD__
 
 #include <string>
+#include <vector>
 
 // useful constants
 static const size_t BLOCK_SIZE = 2048;
@@ -35,9 +36,15 @@ static const std::string NOT_FOUND = "NOT FOUND";
 static const std::string UNKNOWN_TYPE = "UNKNOWN TYPE";
 
 // define the configuration object
+struct Item{
+  std::string path;
+  std::string label;
+  std::string operation;
+};
+
 struct Config{
   bool verbose;
   bool multifile;
+  std::vector<Item> preferences;
 };
-
 #endif

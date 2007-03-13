@@ -30,6 +30,7 @@
 #include <tclap/CmdLine.h>
 #include <vector>
 #include "nxsummary.hpp"
+#include "preferences.hpp"
 #include "string_util.hpp"
 
 using std::cerr;
@@ -42,36 +43,6 @@ using namespace TCLAP;
 using namespace nxsum;
 
 static const string NXSUM_VERSION = "0.1.0";
-
-// path to information in the summary
-static vector<string> paths;
-static vector<string> labels;
-
-static void addPathLabel(const string &path, const string &label) {
-  paths.push_back(path);
-  labels.push_back(label);
-}
-
-static void initPathLabels() {
-  addPathLabel("/entry/title", "TITLE");
-  addPathLabel("/entry/notes", "NOTES");
-  addPathLabel("/entry/start_time", "START TIME");
-  addPathLabel("/entry/end_time", "END TIME");
-  addPathLabel("/entry/duration", "DURATION");
-  addPathLabel("/entry/proton_charge", "PROTON CHARGE");
-  addPathLabel("/entry/sample/name", "SAMPLE NAME");
-  addPathLabel("/entry/sample/nature", "SAMPLE NATURE");
-  addPathLabel("/entry/sample/type", "SAMPLE TYPE");
-  addPathLabel("/entry/sample/identifier", "SAMPLE IDENTIFIER");
-  /*
-static const char*  TOTAL_COUNTS_PATH = "";
-static const string TOTAL_COUNTS_LABEL = "TOTAL COUNTS";
-static const char*  TOTAL_MON_COUNTS_PATH = "";
-static const string TOTAL_MON_COUNTS_LABEL = "MONITOR COUNTS";
-static const char*  PI_PATH = "";
-static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
-  */
-}
 
 static string readAsString(NXhandle handle, const string &path, 
                            const Config &config) {
@@ -168,11 +139,11 @@ static string readAttrAsString(NXhandle handle, const string label, const Config
   return "";
 }
 
-static void printInfo(NXhandle handle, const string &path, const string &label, const Config &config) {
+static void printInfo(NXhandle handle, const Item &item, const Config &config) {
   try {
-    string value = readAsString(handle, path, config);
+    string value = readAsString(handle, item.path, config);
     string units = readAttrAsString(handle, "units", config);
-    cout << label << ':' << value << ' ' << units << endl;
+    cout << item.label << ':' << value << ' ' << units << endl;
   } catch(runtime_error &e) {
     // let it drop on the floor
   }
@@ -191,9 +162,9 @@ static void printSummary(const string &file, Config &config) {
       throw runtime_error("Could not open file");
     }
 
-  int length = paths.size();
+  int length = config.preferences.size();
   for (int i = 0 ; i < length ; ++i ) {
-    printInfo(handle, paths[i], labels[i], config);
+    printInfo(handle, config.preferences[i], config);
   }
 
   if(NXclose(&handle)!=NX_OK)
@@ -208,14 +179,14 @@ int main(int argc, char *argv[]) {
       // set up the parser
       CmdLine cmd("Generate summary of a NeXus file", ' ', NXSUM_VERSION);
 
-      // verbose argument
+      // configure the arguments
       SwitchArg verboseArg("", "verbose", "Turn on verbose printing", 
                            false, cmd);
-
-      // the filename arguments
       UnlabeledMultiArg<string> filenameArg("filename",
                                             "Name of a file to be viewed",
                                             "filename",cmd);
+      ValueArg<string> configArg("", "config", "Specify configuration file",
+                                 false, "", "config", cmd);
 
       // parse the arguments
       cmd.parse(argc, argv);
@@ -234,9 +205,13 @@ int main(int argc, char *argv[]) {
       config.verbose = verboseArg.getValue();
       config.multifile = (files.size()>1);
 
-      initPathLabels();
+      // load in the preferences
+      loadPreferences(configArg.getValue(), config.preferences);
+
+      // turn of NeXus debug printing
       NXMDisableErrorReporting();
 
+      // go through the list of files
       for (vector<string>::const_iterator file = files.begin() ;
            file != files.end() ; file++ )
         {
