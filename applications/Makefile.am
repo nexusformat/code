@@ -34,7 +34,7 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 if HAVE_LIBXML2
 NXTRANSLATE=NXtranslate
 endif
-SUBDIRS = NXdir $(NXTRANSLATE)
+SUBDIRS = NXdir $(NXTRANSLATE) NXsummary
 #if HAVE_HDF4
 #HDF4_TARGETS = NXtoNX4
 #endif
