@@ -42,9 +42,9 @@ int main (int argc, char *argv[])
   short int i2_array[4] = {1000, 2000, 3000, 4000};
   int i4_array[4] = {1000000, 2000000, 3000000, 4000000};
   float r4_array[5][4] =
-  {1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18., 19., 20.};
+  {{1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13., 14., 15., 16.}, {17., 18., 19., 20.}};
   double r8_array[5][4] =
-  {1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18., 19., 20.};
+  {{1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13., 14., 15., 16.}, {17., 18., 19., 20.}};
   int array_dims[2] = {5, 4};
   int unlimited_dims[1] = {NX_UNLIMITED};
   int chunk_size[2]={5,4};
@@ -384,7 +384,6 @@ int main (int argc, char *argv[])
 /*---------------------------------------------------------------------*/
 static int testLoadPath() {
   NXhandle h;
-  int status;
 
   if(getenv("NX_LOAD_PATH") != NULL){
     if (NXopen ("dmc01.hdf", NXACC_RDWR,&h) != NX_OK) {
@@ -401,7 +400,7 @@ static int testLoadPath() {
 /*---------------------------------------------------------------------*/
 static int testExternal(char *progName){
   char nxfile[255], ext[5], testFile[80], time[132], filename[256];
-  int status, create;
+  int create;
   NXhandle hfil;
 
   if(strstr(progName,"hdf4") != NULL){

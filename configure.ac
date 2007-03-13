@@ -53,6 +53,9 @@ AM_INIT_AUTOMAKE([1.6])
 
 
 AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
+
+AC_ARG_ENABLE([debug], AC_HELP_STRING([--enable-debug],[Turn off optimisation]), [enable_debug=$enableval],[enable_debug=no])
+
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[with_cc=$withval], [with_cc=yes])
@@ -234,6 +237,21 @@ MINGW_MSYS=no
 dnl microsoft LIB command (used in MinGW makefile to create .LIB file)
 AC_CHECK_PROGS(MS_LIB, [LIB])
 AM_CONDITIONAL(HAVE_MS_LIB, [test ! -z "$MS_LIB"])
+
+# check for debug
+if test "$enable_debug" = "yes"; then
+    CFLAGS="-O0 -g"
+    CXXFLAGS="-O0 -g"
+fi
+
+# enable compiler warnings if gcc
+if test "$CC" = "gcc"; then
+    CFLAGS="$CFLAGS -Wall"
+fi
+
+if test "$CXX" = "g++"; then
+    CXXFLAGS="$CXXFLAGS -Wall"
+fi
 
 dnl extra FCFLAGS
 if ! test -z "$FC"; then

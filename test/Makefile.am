@@ -36,7 +36,8 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
-CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml
+CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml \
+	leak_test1.nxs leak_test2_*.nxs
 
 ## testdir=$(prefix)/nexus/test
 
@@ -64,7 +65,7 @@ AUTOTEST	= $(AUTOM4TE) --language=autotest
 check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
 nxtestdir=$(NXTESTDIR)
-nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
+nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) leak_test1 leak_test2
 nxtest_DATA = README.tests
 
 nxexampledir=$(NXEXAMPLEDIR)
@@ -87,6 +88,14 @@ run_test_LDFLAGS=-static $(LDFLAGS)
 
 skip_test_SOURCES=skip_test.c
 skip_test_LDFLAGS=-static $(LDFLAGS)
+
+leak_test1_SOURCES=leak_test1.c
+leak_test1_LDADD=$(LIBNEXUS)
+leak_test1_LDFLAGS=-static $(LDFLAGS)
+
+leak_test2_SOURCES=leak_test2.cxx
+leak_test2_LDADD=$(LIBNEXUS)
+leak_test2_LDFLAGS=-static $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
