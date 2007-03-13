@@ -32,7 +32,7 @@ LIBNEXUS=$(top_builddir)/src/libNeXus.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
 bin_PROGRAMS = nxsummary
-nxsummary_SOURCES = main.cpp
+nxsummary_SOURCES = main.cpp string_util.cpp nxsummary.hpp string_util.hpp
 nxsummary_LDADD = $(LIBNEXUS)
 nxsummary_LDFLAGS = -static $(LDFLAGS)
 EXTRA_DIST = CHANGES LICENSE README TODO

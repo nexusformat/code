@@ -29,6 +29,8 @@
 #include <string>
 #include <tclap/CmdLine.h>
 #include <vector>
+#include "nxsummary.hpp"
+#include "string_util.hpp"
 
 using std::cerr;
 using std::cout;
@@ -37,23 +39,13 @@ using std::runtime_error;
 using std::string;
 using std::vector;
 using namespace TCLAP;
+using namespace nxsum;
 
-// useful constants
-static const size_t BLOCK_SIZE = 2048;
-static const size_t GROUP_STRING_LEN = 512;
 static const string NXSUM_VERSION = "0.1.0";
-static const string NOT_FOUND = "NOT FOUND";
-static const string UNKNOWN_TYPE = "UNKNOWN TYPE";
 
 // path to information in the summary
 static vector<string> paths;
 static vector<string> labels;
-
-// define the configuration object
-struct Config{
-  bool verbose;
-  bool multifile;
-};
 
 static void addPathLabel(const string &path, const string &label) {
   paths.push_back(path);
@@ -79,45 +71,6 @@ static const string TOTAL_MON_COUNTS_LABEL = "MONITOR COUNTS";
 static const char*  PI_PATH = "";
 static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
   */
-}
-
-template <typename NumT>
-static string toString(const NumT thing) {
-  std::stringstream s;
-  s << thing;
-  return s.str();
-}
-
-template <typename NumT>
-static string toString(const NumT *data, const int dims[], const int rank, const Config &config) {
-  int num_ele = 1;
-  for (size_t i = 0; i < rank; ++i ) {
-    num_ele *= dims[i];
-  }
-  if (num_ele == 1)
-    {
-      return toString(data[0]);
-    }
-  else
-    {
-      throw runtime_error("Do not know how to work with arrays");
-    }
-}
-
-static string toString(const void *data, const int dims[], const int rank,
-                       const int type, const Config &config) {
-  if (type == NX_CHAR)
-    {
-      return (char *) data;
-    }
-  else if (type == NX_FLOAT32)
-    {
-      return toString((float *)data, dims, rank, config);
-    }
-  else
-    {
-      return UNKNOWN_TYPE;
-    }
 }
 
 static string readAsString(NXhandle handle, const string &path, 
@@ -194,16 +147,16 @@ static string readAttrAsString(NXhandle handle, const string label, const Config
     if (label == name)
       {
         void *data;
-        int dims[1]  = {length};
-        if (NXmalloc(&data, 1, dims, type)!=NX_OK)
+        if (NXmalloc(&data, 1, &length, type)!=NX_OK)
           {
             throw runtime_error("NXmalloc failed");
           }
+        int dims[1]  = {length};
         if (NXgetattr(handle, name, data, dims, &type)!=NX_OK)
           {
             throw runtime_error("NXgetattr failed");
           }
-        string result = toString(data, dims, 1, type, config);
+        string result = toString(data, length, type, config);
         if (NXfree(&data)!=NX_OK)
           {
             throw runtime_error("NXfree failed");
