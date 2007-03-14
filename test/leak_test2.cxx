@@ -3,7 +3,8 @@
 
 #define PSZ(s) (s).c_str()
 
-const int nFiles = 1000000;
+//const int nFiles = 1000000;
+const int nFiles = 10;
 const int nEntry = 10;
 const int nData = 10;
 int array_dims[2] = {5, 4};
@@ -16,6 +17,7 @@ int main (int argc, char* argv[])
         for( iFile = 0; iFile < nFiles; iFile++ )
         {
                 sprintf(strFile, "leak_test2_%03d.nxs", iFile);
+                unlink(strFile);
                 printf("file %s\n", strFile);
                 NXhandle fileid;
                 if (NXopen(strFile, access_mode, &fileid) != NX_OK) return 1;
@@ -46,10 +48,13 @@ int main (int argc, char* argv[])
                         if (NXclosegroup (fileid) != NX_OK) return 1;
                 }
                 if (NXclose (&fileid) != NX_OK) return 1;
+		fileid = NULL;
 
                 // Delete file
                 unlink(strFile);
         }
+        printf("done ... now sleeping so you can Ctrl-C\n");
+	sleep(2000);
 	return 0;
 
 }

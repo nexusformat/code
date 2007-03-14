@@ -264,11 +264,11 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
   {
     int hdf_type=0;
     int iRet=0;
-    NXhandle hdf5_handle;
-    NXhandle hdf4_handle;
-    NXhandle xmlHandle;
-    pNexusFunction fHandle;
-    NXstatus retstat;
+    NXhandle hdf5_handle = NULL;
+    NXhandle hdf4_handle = NULL;
+    NXhandle xmlHandle = NULL;
+    pNexusFunction fHandle = NULL;
+    NXstatus retstat = NX_ERROR;
     char error[1024];
     char *filename = NULL;
         
@@ -325,12 +325,14 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
 	snprintf(error,1023,"failed to open %s for reading",
 		 filename);
 	NXIReportError(NXpData,error);
+	free(filename);
 	return NX_ERROR;
       }
       if(iRet == 0){
 	snprintf(error,1023,"failed to determine filetype for %s ",
 		 filename);
 	NXIReportError(NXpData,error);
+	free(filename);
 	free(fHandle);
 	return NX_ERROR;
       }
@@ -356,10 +358,8 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
 #else
       NXIReportError (NXpData,
          "ERROR: Attempt to create HDF4 file when not linked with HDF4");
-      free(filename);
       retstat = NX_ERROR;
 #endif /* HDF4 */
-      return retstat; 
     } else if (hdf_type==2) {
       /* HDF5 type */
 #ifdef HDF5
@@ -375,10 +375,8 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
 #else
       NXIReportError (NXpData,
 	 "ERROR: Attempt to create HDF5 file when not linked with HDF5");
-      free(filename);
       retstat = NX_ERROR;
 #endif /* HDF5 */
-      return retstat;
     } else if(hdf_type == 3){
       /*
 	XML type
@@ -401,11 +399,12 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
     } else {
       NXIReportError (NXpData,
           "ERROR: Format not readable by this NeXus library");
-      free(filename);
-      return NX_ERROR;
+      retstat = NX_ERROR;
     }
-    free(filename); 
-    return NX_OK;
+    if (filename != NULL) {
+ 	free(filename); 
+    }
+    return retstat;
   }
 
 /* ------------------------------------------------------------------------- */

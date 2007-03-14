@@ -366,7 +366,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   {
     pNexusFile pNew = NULL;
     char pBuffer[512];
-    char *time_puffer;
+    char *time_puffer = NULL;
     char HDF_VERSION[64];
     uint32 lmajor, lminor, lrelease;
     int32 am1=0;
@@ -390,8 +390,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       return NX_ERROR;
     }
     memset (pNew, 0, sizeof (NexusFile));
-
-    time_puffer = NXIformatNeXusTime();
 
 #if WRITE_OLD_IDENT     /* not used at moment */
 /*
@@ -443,6 +441,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
           return NX_ERROR;
       }
     }
+
+    time_puffer = NXIformatNeXusTime();
     if (am == NXACC_CREATE || am == NXACC_CREATE4) {
       if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), (char*)filename) < 0) {
         NXIReportError (NXpData, "ERROR: HDF failed to store file_name attribute ");
@@ -456,8 +456,10 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
 	  free(time_puffer);
 	  return NX_ERROR;
 	}
-	free(time_puffer);
       }
+    }
+    if (time_puffer != NULL) {
+	free(time_puffer);
     }
 
     /* 
