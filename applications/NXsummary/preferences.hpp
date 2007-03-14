@@ -7,6 +7,7 @@
 
 namespace nxsum {
   void loadPreferences(std::string &filename, std::vector<Item> &preferences);
+  void writePreferences(std::string &filename, std::vector<Item> &preferences);
 }
 
 #endif

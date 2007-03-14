@@ -187,9 +187,30 @@ int main(int argc, char *argv[]) {
                                             "filename",cmd);
       ValueArg<string> configArg("", "config", "Specify configuration file",
                                  false, "", "config", cmd);
+      ValueArg<string> writeConfigArg("", "writeconfig",
+                              "Write the default configuration out to a file",
+                                      false, "", "config", cmd);
 
       // parse the arguments
       cmd.parse(argc, argv);
+
+      // fill in the config object
+      struct Config config;
+      config.verbose = verboseArg.getValue();
+
+      // load in the preferences
+      loadPreferences(configArg.getValue(), config.preferences);
+
+      // write out the preferences and exit
+      string configOut = writeConfigArg.getValue();
+      if (configOut != "")
+        {
+          writePreferences(configOut, config.preferences);
+          return 0;
+        }
+
+      // turn of NeXus debug printing
+      NXMDisableErrorReporting();
 
       // get the list of filenames
       vector<string> files=filenameArg.getValue();
@@ -199,17 +220,7 @@ int main(int argc, char *argv[]) {
           cmd.getOutput()->usage(cmd);
           return -1;
         }
-
-      // fill in the config object
-      struct Config config;
-      config.verbose = verboseArg.getValue();
       config.multifile = (files.size()>1);
-
-      // load in the preferences
-      loadPreferences(configArg.getValue(), config.preferences);
-
-      // turn of NeXus debug printing
-      NXMDisableErrorReporting();
 
       // go through the list of files
       for (vector<string>::const_iterator file = files.begin() ;

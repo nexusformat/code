@@ -58,6 +58,7 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
   */
   }
 
+#if defined(LIBXML_TREE_ENABLED)
   void loadPreferences(std::string &filename, xmlDocPtr &doc) {
     xmlLineNumbersDefault(1);
     doc = xmlReadFile(filename.c_str(), NULL, 0);
@@ -149,5 +150,45 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
         loadPreferences(root_node, preferences);
         cleanupXml(doc);
       }
+  }
+#else
+  void loadPreferences(std::string &filename, std::vector<Item> &preferences) {
+    cout << "LIBXML2 tree support not present. Using default preferences."
+         << endl;
+    setDefaultPreferences(preferences);
+  }
+#endif    
+
+  void writePreference(xmlNodePtr &parent, const Item &preference) {
+    xmlNodePtr node = xmlNewChild(parent, NULL, item_name, NULL);
+    xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
+    xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
+  }
+
+  void writePreferences(string &filename, vector<Item> &preferences) {
+#if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
+    // set up variables for creating the document
+    xmlDocPtr doc = NULL;        // document pointer
+    xmlNodePtr root_node = NULL; // node pointers
+    xmlNodePtr node = NULL;      // node pointers
+    char buff[256];
+    int i, j;
+
+    // create the document and the root node
+    doc = xmlNewDoc(BAD_CAST "1.0");
+    root_node = xmlNewNode(NULL, root_name);
+    xmlDocSetRootElement(doc, root_node);
+
+    for (vector<Item>::const_iterator it = preferences.begin() ; it != preferences.end() ; it++ ) {
+      writePreference(root_node, *it);
+    }
+
+    // write out to file
+    xmlSaveFormatFileEnc(filename.c_str(), doc, "UTF-8", 1);
+    cleanupXml(doc);
+#else
+    throw runtime_error(
+                      "LIBXML2 tree support not present. Cannot write config");
+#endif
   }
 }
