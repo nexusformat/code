@@ -27,11 +27,11 @@
 #include <napi.h>
 #include <stdexcept>
 #include <string>
-#include <tclap/CmdLine.h>
 #include <vector>
 #include "nxsummary.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
+#include "tclap/CmdLine.h"
 
 using std::cerr;
 using std::cout;

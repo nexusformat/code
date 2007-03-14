@@ -36,6 +36,6 @@ nxsummary_SOURCES = main.cpp string_util.cpp nxsummary.hpp string_util.hpp \
          preferences.hpp preferences.cpp
 nxsummary_LDADD = $(LIBNEXUS)
 nxsummary_LDFLAGS = -static $(LDFLAGS)
-EXTRA_DIST = CHANGES LICENSE README TODO
+EXTRA_DIST = LICENSE
 
 include $(top_srcdir)/build_rules.am
