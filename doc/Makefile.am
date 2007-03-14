@@ -7,7 +7,9 @@
 # documenttion subdirectories
 if HAVE_DOXYGEN
 if HAVE_PDFLATEX
+if HAVE_DOT
 DOXYSUB=doxygen
+endif
 endif
 endif
 SUBDIRS=api nxdict tech_ref $(DOXYSUB)
