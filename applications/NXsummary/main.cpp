@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "data_util.hpp"
 #include "nxsummary.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
@@ -44,115 +45,24 @@ using namespace nxsum;
 
 static const string NXSUM_VERSION = "0.1.0";
 
-static string readAsString(NXhandle handle, const string &path, 
-                           const Config &config) {
-  // convert the path to something c-friendly
-  char c_path[GROUP_STRING_LEN];
-  strcpy(c_path, path.c_str());
-
-  // open the path
-  if(NXopenpath(handle, c_path)!=NX_OK)
-    {
-      throw runtime_error("COULD NOT OPEN PATH");
-      return "";
-    }
-
-  // determine rank and dimension
-  int rank = 0;
-  int type = 0;
-  int dims[NX_MAXRANK];
-  if (NXgetinfo(handle, &rank, dims, &type)!=NX_OK)
-    {
-      throw runtime_error("COULD NOT GET NODE INFORMATION");
-    }
-
-  // confirm dimension isn't too high
-  if (rank > NX_MAXRANK)
-    {
-      throw runtime_error("DIMENSIONALITY IS TOO HIGH");
-    }
-
-  // allocate space for data
-  void *data;
-  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
-    {
-      throw runtime_error("NXmalloc falied");
-    }
-
-  // retrieve data from the file
-  if(NXgetdata(handle,data)!=NX_OK)
-    {
-      throw runtime_error("NXgetdata failed");
-    }
-
-  // convert result to string
-  string result = toString(data, dims, rank, type, config);
-
-  //free up the pointer
-  if(NXfree(&data)!=NX_OK)
-    {
-      throw runtime_error("NXfree failed");
-    }
-
-  return result;
-}
-
-static string readAttrAsString(NXhandle handle, const string label, const Config &config) {
-  if (NXinitattrdir(handle)!=NX_OK)
-    {
-      throw runtime_error("NXinitattrdir failed");
-    }
-  int num_attr;
-  if (NXgetattrinfo(handle, &num_attr)!=NX_OK)
-    {
-      throw runtime_error("NXgetattrinfo failed");
-    }
-  char name[GROUP_STRING_LEN];
-  int length;
-  int type;
-  for (int i = 0 ; i < num_attr ; ++i) {
-    if (NXgetnextattr(handle, name, &length, &type)!=NX_OK)
-      {
-        throw runtime_error("NXgetnextattr failed");
-      }
-    if (label == name)
-      {
-        void *data;
-        if (NXmalloc(&data, 1, &length, type)!=NX_OK)
-          {
-            throw runtime_error("NXmalloc failed");
-          }
-        int dims[1]  = {length};
-        if (NXgetattr(handle, name, data, dims, &type)!=NX_OK)
-          {
-            throw runtime_error("NXgetattr failed");
-          }
-        string result = toString(data, length, type, config);
-        if (NXfree(&data)!=NX_OK)
-          {
-            throw runtime_error("NXfree failed");
-          }
-        return result;
-      }
-  }
-
-  return "";
-}
-
 static void printInfo(NXhandle handle, const Item &item, const Config &config) {
   try {
-    string value = readAsString(handle, item.path, config);
-    string units = readAttrAsString(handle, "units", config);
+    string value = readAsString(handle, item.path, item.operation);
+    //    string units = readAttrAsString(handle, "units", config);
     if (config.show_label)
       {
-        cout << item.label << ';';
+        cout << item.label << ':';
       }
-    cout << value << ' ' << units << endl;
+    cout << value << endl;
   } catch(runtime_error &e) {
     if (config.verbose)
       {
-        cout << NOT_FOUND << "\"" << item.label << "\" at \"" << item.path
-             << "\"" << endl;
+        cout << '[' << item.label << ',' << item.path;
+        if (item.operation.size() > 0)
+          {
+            cout << ',' << item.operation;
+          }
+        cout << "] ERROR: " << e.what() << endl;
       }
     // let it drop on the floor
   }

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <stdlib.h>
+#include "data_util.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
 
@@ -54,7 +55,17 @@ namespace nxsum {
     Item item;
     item.path = path;
     item.label = label;
-    item.operation = operation;
+    if (operationValid(operation))
+      {
+        item.operation = operation;
+      }
+    else
+      {
+        ostringstream s;
+        s << "Invalid operation \"" << item.operation
+          << "\" specified";
+        throw runtime_error(s.str());
+      }
     preferences.push_back(item);
   }
 
@@ -64,19 +75,12 @@ namespace nxsum {
     addItem(preferences, "/entry/start_time", "START TIME");
     addItem(preferences, "/entry/end_time", "END TIME");
     addItem(preferences, "/entry/duration", "DURATION");
-    addItem(preferences, "/entry/proton_charge", "PROTON CHARGE");
+    addItem(preferences, "/entry/proton_charge", "PROTON CHARGE", "UNITS:picoColumb");
+    addItem(preferences, "/entry/monitor/data", "TOTAL MONITOR", "SUM");
     addItem(preferences, "/entry/sample/name", "SAMPLE NAME");
     addItem(preferences, "/entry/sample/nature", "SAMPLE NATURE");
     addItem(preferences, "/entry/sample/type", "SAMPLE TYPE");
     addItem(preferences, "/entry/sample/identifier", "SAMPLE IDENTIFIER");
-  /*
-total counts in detector /entry/instrument/bank1/data SUM
-total counts in entry ???
-total monitor counts /entry/monitor/data SUM
-principle investigator ???
-change units of proton charge /entry/proton_charge UNITS:picoColumb
-change units of duration /entry/duration UNITS:hour
-  */
   }
 
 #if defined(LIBXML_TREE_ENABLED)
@@ -139,6 +143,14 @@ change units of duration /entry/duration UNITS:hour
     if (xmlHasProp(item_node, operation_name))
       {
         item.operation = (char *)xmlGetProp(item_node, operation_name);
+        if (! operationValid(item.operation))
+          {
+            ostringstream s;
+            s << "Invalid operation \"" << item.operation
+              << "\" specified in configuration file (line "
+              << xmlGetLineNo(item_node) << ")";
+            throw runtime_error(s.str());
+          }
       }
 
     preferences.push_back(item);
@@ -256,6 +268,11 @@ change units of duration /entry/duration UNITS:hour
     xmlNodePtr node = xmlNewChild(parent, NULL, item_name, NULL);
     xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
     xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
+    if (preference.operation.size() > 0)
+      {
+        xmlNewProp(node, operation_name,
+                   BAD_CAST preference.operation.c_str());
+      }
   }
 
   void writePreferences(const string &filename,

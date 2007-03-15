@@ -4,10 +4,11 @@
 #include <string>
 
 namespace nxsum {
+  template <typename NumT> std::string toString(const NumT thing);
   std::string toString(const void *data, const int dims[], const int rank,
-                       const int type, const Config &config);
-  std::string toString(const void *data, const int length, const int type,
-                       const Config &config);
+                       const int type);
+  std::string toString(const void *data, const int length, const int type);
+
   std::string toUpperCase(const std::string &orig);
 }
 #endif

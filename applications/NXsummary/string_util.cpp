@@ -33,6 +33,19 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "nxconfig.h"
+
+// use STDINT if possible, otherwise define the types here
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#else
+typedef signed char             int8_t;
+typedef short int               int16_t;
+typedef int                     int32_t;
+typedef unsigned char           uint8_t;
+typedef unsigned short int      uint16_t;
+typedef unsigned int            uint32_t;
+#endif
 
 using std::runtime_error;
 using std::string;
@@ -47,9 +60,11 @@ namespace nxsum {
     return s.str();
   }
 
+  // explicit instantiations so they get compiled in
+  template string toString<uint32_t>(const uint32_t thing);
+
   template <typename NumT>
-  string toString(const NumT *data, const int dims[], const int rank,
-                  const Config &config) {
+  string toString(const NumT *data, const int dims[], const int rank) {
     int num_ele = 1;
     for (size_t i = 0; i < rank; ++i ) {
       num_ele *= dims[i];
@@ -66,14 +81,18 @@ namespace nxsum {
   }
 
   string toString(const void *data, const int dims[], const int rank,
-                  const int type, const Config &config) {
+                  const int type) {
     if (type == NX_CHAR)
       {
         return (char *) data;
       }
     else if (type == NX_FLOAT32)
       {
-        return toString((float *)data, dims, rank, config);
+        return toString((float *)data, dims, rank);
+      }
+    else if (type == NX_FLOAT64)
+      {
+        return toString((double *)data, dims, rank);
       }
     else
       {
@@ -81,10 +100,9 @@ namespace nxsum {
       }
   }
 
-  string toString(const void *data, const int length, const int type,
-                  const Config &config) {
+  string toString(const void *data, const int length, const int type) {
     int dims[1]  = {length};
-    return toString(data, dims, 1, type, config);
+    return toString(data, dims, 1, type);
   }
 
   string toUpperCase(const string &orig) {
