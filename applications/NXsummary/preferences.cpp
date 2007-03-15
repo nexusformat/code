@@ -1,8 +1,10 @@
+#include <fstream>
 #include <iostream>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <sstream>
 #include <stdexcept>
+#include <stdlib.h>
 #include "preferences.hpp"
 
 using std::cout;
@@ -20,6 +22,24 @@ static const xmlChar *label_name = xmlCharStrdup("label");
 static const xmlChar *operation_name = xmlCharStrdup("operation");
 
 namespace nxsum {
+  static bool canRead(const string &filename) {
+    if (filename.size() <= 0)
+    {
+      return false;
+    }
+    std::ifstream temp(filename.c_str(), std::ifstream::in);
+    temp.close();
+    if (temp.fail())
+      {
+        temp.clear(std::ifstream::failbit);
+        return false;
+      }
+    else
+      {
+        return true;
+      }
+  }
+
   void addItem(vector<Item> &preferences, const string &path,
                const string &label) {
     Item item;
@@ -59,7 +79,7 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
   }
 
 #if defined(LIBXML_TREE_ENABLED)
-  void loadPreferences(std::string &filename, xmlDocPtr &doc) {
+  void loadPreferences(const string &filename, xmlDocPtr &doc) {
     xmlLineNumbersDefault(1);
     doc = xmlReadFile(filename.c_str(), NULL, 0);
     if (doc == NULL)
@@ -137,19 +157,49 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
     }
   }
 
-  void loadPreferences(std::string &filename, std::vector<Item> &preferences) {
-    if (filename.size() <= 0)
+  void privateLoadPreferences(const string &filename,
+                              vector<Item> &preferences) {
+    xmlDocPtr doc = NULL; // document pointer
+    loadPreferences(filename, doc);
+    xmlNodePtr root_node = xmlDocGetRootElement(doc);
+    loadPreferences(root_node, preferences);
+    cleanupXml(doc);
+  }
+
+  void loadPreferences(const string &filename, vector<Item> &preferences) {
+    // work with supplied configuration
+    if (filename.size() > 0)
       {
-        setDefaultPreferences(preferences);
+        if (canRead(filename))
+          {
+            privateLoadPreferences(filename, preferences);
+            return;
+          }
+        else
+          {
+            cout << "Cannot read configuration file \"" << filename << "\""
+                 << endl;
+          }
       }
-    else
+
+    // user's configuration
+    string user_config = string(getenv("HOME")) + string("/.nxsummary.conf");
+    if (canRead(user_config))
       {
-        xmlDocPtr doc = NULL; // document pointer
-        loadPreferences(filename, doc);
-        xmlNodePtr root_node = xmlDocGetRootElement(doc);
-        loadPreferences(root_node, preferences);
-        cleanupXml(doc);
+        privateLoadPreferences(user_config, preferences);
+        return;
       }
+
+    // system wide configuration
+    string sys_config("/etc/nxsummary.conf");
+    if (canRead(sys_config))
+      {
+        privateLoadPreferences(sys_config, preferences);
+        return;
+      }
+
+    // default configuration compiled in
+    setDefaultPreferences(preferences);
   }
 #else
   void loadPreferences(std::string &filename, std::vector<Item> &preferences) {
@@ -165,7 +215,8 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
     xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
   }
 
-  void writePreferences(string &filename, vector<Item> &preferences) {
+  void writePreferences(const string &filename,
+                        const vector<Item> &preferences) {
 #if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
     // set up variables for creating the document
     xmlDocPtr doc = NULL;        // document pointer
