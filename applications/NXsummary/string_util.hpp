@@ -8,5 +8,6 @@ namespace nxsum {
                        const int type, const Config &config);
   std::string toString(const void *data, const int length, const int type,
                        const Config &config);
+  std::string toUpperCase(const std::string &orig);
 }
 #endif

@@ -45,6 +45,7 @@ struct Item{
 struct Config{
   bool verbose;
   bool multifile;
+  bool show_label;
   std::vector<Item> preferences;
 };
 #endif

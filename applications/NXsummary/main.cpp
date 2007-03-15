@@ -143,13 +143,17 @@ static void printInfo(NXhandle handle, const Item &item, const Config &config) {
   try {
     string value = readAsString(handle, item.path, config);
     string units = readAttrAsString(handle, "units", config);
-    cout << item.label << ':' << value << ' ' << units << endl;
+    if (config.show_label)
+      {
+        cout << item.label << ':';
+      }
+    cout << value << ' ' << units << endl;
   } catch(runtime_error &e) {
     // let it drop on the floor
   }
 }
 
-static void printSummary(const string &file, Config &config) {
+static void printSummary(const string &file, const Config &config) {
   if (config.multifile)
     {
       cout << "********** " << file << endl;
@@ -166,6 +170,28 @@ static void printSummary(const string &file, Config &config) {
   for (int i = 0 ; i < length ; ++i ) {
     printInfo(handle, config.preferences[i], config);
   }
+
+  if(NXclose(&handle)!=NX_OK)
+    {
+      throw runtime_error("Could not close file");
+    }
+}
+
+static void printValue(const string &file, const Item &item,
+                       const Config &config) {
+  NXhandle handle;
+  char filename[GROUP_STRING_LEN];
+  strcpy(filename, file.c_str());
+  if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
+    {
+      throw runtime_error("Could not open file");
+    }
+
+  if (config.multifile)
+    {
+      cout << file << ";";
+    }
+  printInfo(handle, item, config);
 
   if(NXclose(&handle)!=NX_OK)
     {
@@ -190,6 +216,9 @@ int main(int argc, char *argv[]) {
       ValueArg<string> writeConfigArg("", "writeconfig",
                               "Write the default configuration out to a file",
                                       false, "", "config", cmd);
+      ValueArg<string> valueArg("", "value",
+                               "Get value of the item pointed to by the label",
+                                false, "", "label", cmd);
 
       // parse the arguments
       cmd.parse(argc, argv);
@@ -197,6 +226,7 @@ int main(int argc, char *argv[]) {
       // fill in the config object
       struct Config config;
       config.verbose = verboseArg.getValue();
+      config.show_label = true;
 
       // load in the preferences
       loadPreferences(configArg.getValue(), config.preferences);
@@ -222,11 +252,34 @@ int main(int argc, char *argv[]) {
         }
       config.multifile = (files.size()>1);
 
+      // are we looking for a particular value
+      Item item;
+      bool getValue = (valueArg.getValue().size()>0);
+      if (getValue)
+        {
+          item = getPreference(valueArg.getValue(), config.preferences);
+          config.show_label = false;
+        }
+
       // go through the list of files
       for (vector<string>::const_iterator file = files.begin() ;
            file != files.end() ; file++ )
         {
-          printSummary(*file, config);
+          try
+            {
+              if (getValue)
+                {
+                  printValue(*file, item, config);
+                }
+              else
+                {
+                  printSummary(*file, config);
+                }
+            }
+          catch(runtime_error &e)
+            {
+              std::cerr << "RUNTIME ERROR:" << e.what() <<endl;
+            }
         }
     }
   catch(ArgException &e)

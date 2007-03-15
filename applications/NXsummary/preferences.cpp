@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <stdlib.h>
 #include "preferences.hpp"
+#include "string_util.hpp"
 
 using std::cout;
 using std::endl;
@@ -149,7 +150,8 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
     for (cur_node = root_node; cur_node; cur_node = cur_node->next) {
       if ((cur_node->type == XML_ELEMENT_NODE)
                                 && xmlStrEqual(cur_node->name, root_name)) {
-        for (cur_node = cur_node->children; cur_node; cur_node = cur_node->next) {
+        for (cur_node = cur_node->children; cur_node;
+             cur_node = cur_node->next) {
           loadPreference(cur_node, preferences);
         }
         return;
@@ -209,6 +211,54 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
   }
 #endif    
 
+  Item getPreference(const string &label, const vector<Item> &preferences) {
+    string my_label = toUpperCase(label);
+
+    string it_label;
+    vector<Item> possible_items;
+    for (vector<Item>::const_iterator it = preferences.begin() ;
+         it != preferences.end() ; it++ ) {
+      it_label = toUpperCase(it->label);
+      if (it_label.compare(my_label)==0) {
+        return *it;
+      }
+      else if (it_label.find(my_label)!=string::npos) {
+        cout << it_label << " is possible" << endl;
+        possible_items.push_back(*it);
+      }
+    }
+
+    for (vector<Item>::const_iterator it = possible_items.begin() ;
+         it != possible_items.end() ; it++ ) {
+      cout << it->label << ' ';
+    }
+    cout << endl;
+
+    size_t num_possible = possible_items.size();
+    if (num_possible == 1)
+      {
+        return *(possible_items.begin());
+      }
+    else if(num_possible == 0)
+      {
+        ostringstream s;
+        s << "Could not find label \"" << label << "\" in configuration";
+        throw runtime_error(s.str());
+      }
+    else
+      {
+        ostringstream s;
+        s << "Label identifier \"" << label << "\" is not unique. Found "
+          << num_possible << " matches:";
+        for (vector<Item>::const_iterator it = possible_items.begin() ;
+             it != possible_items.end() ; it++ ) {
+          s << "\"" << it->label << "\" ";
+        }
+        throw runtime_error(s.str());
+      }
+  }
+
+#if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
   void writePreference(xmlNodePtr &parent, const Item &preference) {
     xmlNodePtr node = xmlNewChild(parent, NULL, item_name, NULL);
     xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
@@ -217,7 +267,6 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
 
   void writePreferences(const string &filename,
                         const vector<Item> &preferences) {
-#if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
     // set up variables for creating the document
     xmlDocPtr doc = NULL;        // document pointer
     xmlNodePtr root_node = NULL; // node pointers
@@ -230,16 +279,20 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
     root_node = xmlNewNode(NULL, root_name);
     xmlDocSetRootElement(doc, root_node);
 
-    for (vector<Item>::const_iterator it = preferences.begin() ; it != preferences.end() ; it++ ) {
+    for (vector<Item>::const_iterator it = preferences.begin() ;
+         it != preferences.end() ; it++ ) {
       writePreference(root_node, *it);
     }
 
     // write out to file
     xmlSaveFormatFileEnc(filename.c_str(), doc, "UTF-8", 1);
     cleanupXml(doc);
+  }
 #else
+  void writePreferences(const string &filename,
+                        const vector<Item> &preferences) {
     throw runtime_error(
                       "LIBXML2 tree support not present. Cannot write config");
-#endif
   }
+#endif
 }
