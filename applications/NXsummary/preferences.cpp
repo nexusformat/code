@@ -70,12 +70,12 @@ namespace nxsum {
     addItem(preferences, "/entry/sample/type", "SAMPLE TYPE");
     addItem(preferences, "/entry/sample/identifier", "SAMPLE IDENTIFIER");
   /*
-static const char*  TOTAL_COUNTS_PATH = "";
-static const string TOTAL_COUNTS_LABEL = "TOTAL COUNTS";
-static const char*  TOTAL_MON_COUNTS_PATH = "";
-static const string TOTAL_MON_COUNTS_LABEL = "MONITOR COUNTS";
-static const char*  PI_PATH = "";
-static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
+total counts in detector /entry/instrument/bank1/data SUM
+total counts in entry ???
+total monitor counts /entry/monitor/data SUM
+principle investigator ???
+change units of proton charge /entry/proton_charge UNITS:picoColumb
+change units of duration /entry/duration UNITS:hour
   */
   }
 
@@ -223,16 +223,9 @@ static const string PI_LABEL = "PRICINPLE INVESTIGATOR";
         return *it;
       }
       else if (it_label.find(my_label)!=string::npos) {
-        cout << it_label << " is possible" << endl;
         possible_items.push_back(*it);
       }
     }
-
-    for (vector<Item>::const_iterator it = possible_items.begin() ;
-         it != possible_items.end() ; it++ ) {
-      cout << it->label << ' ';
-    }
-    cout << endl;
 
     size_t num_possible = possible_items.size();
     if (num_possible == 1)

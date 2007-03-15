@@ -145,10 +145,15 @@ static void printInfo(NXhandle handle, const Item &item, const Config &config) {
     string units = readAttrAsString(handle, "units", config);
     if (config.show_label)
       {
-        cout << item.label << ':';
+        cout << item.label << ';';
       }
     cout << value << ' ' << units << endl;
   } catch(runtime_error &e) {
+    if (config.verbose)
+      {
+        cout << NOT_FOUND << "\"" << item.label << "\" at \"" << item.path
+             << "\"" << endl;
+      }
     // let it drop on the floor
   }
 }
@@ -258,7 +263,7 @@ int main(int argc, char *argv[]) {
       if (getValue)
         {
           item = getPreference(valueArg.getValue(), config.preferences);
-          config.show_label = false;
+          config.show_label = config.verbose;
         }
 
       // go through the list of files

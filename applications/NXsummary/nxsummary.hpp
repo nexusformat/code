@@ -32,7 +32,7 @@
 // useful constants
 static const size_t BLOCK_SIZE = 2048;
 static const size_t GROUP_STRING_LEN = 512;
-static const std::string NOT_FOUND = "NOT FOUND";
+static const std::string NOT_FOUND = "NOT FOUND:";
 static const std::string UNKNOWN_TYPE = "UNKNOWN TYPE";
 
 // define the configuration object
