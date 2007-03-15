@@ -3,7 +3,6 @@
 
 #define PSZ(s) (s).c_str()
 
-//const int nFiles = 1000000;
 const int nFiles = 10;
 const int nEntry = 10;
 const int nData = 10;
@@ -12,6 +11,7 @@ short int i2_array[4] = {1000, 2000, 3000, 4000}; int iFile, iReOpen, iEntry, iD
 
 int main (int argc, char* argv[])
 {
+    printf("Running for %d iterations\n", nFiles);
     NXaccess access_mode = NXACC_CREATE5;
     char strFile[512];
         for( iFile = 0; iFile < nFiles; iFile++ )
@@ -53,9 +53,7 @@ int main (int argc, char* argv[])
                 // Delete file
                 unlink(strFile);
         }
-        printf("done ... now sleeping so you can Ctrl-C\n");
-	sleep(2000);
+	_exit(EXIT_FAILURE);
 	return 0;
-
 }
 

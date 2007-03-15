@@ -1,0 +1,9 @@
+#!/bin/sh
+comm="valgrind --leak-check=full --show-reachable=yes --leak-resolution=high --num-callers=40"
+echo ">>> Running valgrind on \"leak_test1\""
+$comm --log-file-exactly=leak_test1.log ./leak_test1
+echo ">>> Test1 done - check \"leak_test1.log\""
+echo " "
+echo ">>> Running valgrind on \"leak_test2\""
+$comm --log-file-exactly=leak_test2.log ./leak_test2
+echo ">>> Test2 done - check \"leak_test2.log\""
