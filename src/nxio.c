@@ -534,8 +534,12 @@ static int isTextData(mxml_node_t *node){
   }
 }
 /*---------------------------------------------------------------------*/
+
+/*
+ * note: not reentrant or thead safe; returns pointer to static storage
+ */
 const char *NXwhitespaceCallback(mxml_node_t *node, int where){
-  char *indent;
+  static char *indent = NULL;
   int len;  
 
   if(strstr(node->value.element.name,"?xml") != NULL){
@@ -545,6 +549,11 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
   if(isTextData(node)){
     if(where == MXML_WS_BEFORE_OPEN){
       len = countDepth(node)*2 + 2;
+      if (indent != NULL)
+      {
+	free(indent);
+	indent = NULL;
+      }
       indent = (char *)malloc(len*sizeof(char));
       if(indent != NULL){
 	memset(indent,' ',len);
@@ -558,6 +567,11 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
 
   if(where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE){
     len = countDepth(node)*2 + 2;
+    if (indent != NULL)
+    {
+	free(indent);
+	indent = NULL;
+    }
     indent = (char *)malloc(len*sizeof(char));
     if(indent != NULL){
       memset(indent,' ',len);
