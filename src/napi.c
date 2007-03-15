@@ -360,6 +360,8 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
          "ERROR: Attempt to create HDF4 file when not linked with HDF4");
       retstat = NX_ERROR;
 #endif /* HDF4 */
+      free(filename);
+      return retstat; 
     } else if (hdf_type==2) {
       /* HDF5 type */
 #ifdef HDF5
@@ -377,6 +379,8 @@ NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileS
 	 "ERROR: Attempt to create HDF5 file when not linked with HDF5");
       retstat = NX_ERROR;
 #endif /* HDF5 */
+      free(filename);
+      return retstat;
     } else if(hdf_type == 3){
       /*
 	XML type

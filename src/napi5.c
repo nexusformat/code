@@ -125,7 +125,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   char version_nr[10];
   int iRet;
   unsigned int vers_major, vers_minor, vers_release, am1 ;
-  hid_t fapl;     
+  hid_t fapl = -1;     
   int mdc_nelmts;
 #ifdef H5_WANT_H5_V1_4_COMPAT
   int rdcc_nelmts;
@@ -180,6 +180,9 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
       NXIReportError (NXpData, pBuffer);
       free (pNew);
       return NX_ERROR;
+    }
+    if(fapl != -1) {
+      H5Pclose(fapl);
     }
 
 /*
@@ -317,9 +320,9 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
 	   H5Fget_obj_count(pFile->iFID,H5F_OBJ_ALL));
     */
     iRet = H5Fclose(pFile->iFID);
-   
-    /*
-      Please leave this here, it helps debugging HDF5 resource leakages
+
+    /* 
+      leave this here: it helps in debugging leakage problems   
     printf("HDF5 object count after close: %d\n",
 	   H5Fget_obj_count(H5F_OBJ_ALL,H5F_OBJ_ALL));
     printf("HDF5 dataset count after close: %d\n",
