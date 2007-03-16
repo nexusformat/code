@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include "nxconfig.h"
+#include "data_util.hpp"
 
 // use STDINT if possible, otherwise define the types here
 #ifdef HAVE_STDINT_H
@@ -96,7 +97,9 @@ namespace nxsum {
       }
     else
       {
-        return UNKNOWN_TYPE;
+        std::ostringstream s;
+        s << "Do not know how to work with type=" << nxtypeAsString(type);
+        throw runtime_error(s.str());
       }
   }
 
