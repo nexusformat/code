@@ -76,7 +76,7 @@ namespace nxsum {
     addItem(preferences, "/entry/start_time", "START TIME");
     addItem(preferences, "/entry/end_time", "END TIME");
     addItem(preferences, "/entry/duration", "DURATION");
-    addItem(preferences, "/entry/proton_charge", "PROTON CHARGE", "UNITS:picoCoulumb");
+    addItem(preferences, "/entry/proton_charge", "PROTON CHARGE", "UNITS:picoCoulomb");
     addItem(preferences, "/entry/monitor/data", "TOTAL MONITOR", "SUM");
     addItem(preferences, "", "SAMPLE");
     addItem(preferences, "/entry/sample/name", "  NAME");

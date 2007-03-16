@@ -31,7 +31,7 @@ static const string SECOND("second");
 static const string MINUTE("minute");
 static const string HOUR("hour");
 static const string DAY("day");
-static const string PICOCOULUMB("picoCoulumb");
+static const string PICOCOULOMB("picoCoulomb");
 static const string MICROAMPHOUR("microAmp*hour");
 
 // list of allowed operations
@@ -239,12 +239,12 @@ namespace nxsum {
       }
     else if(old_units.compare(MICROAMPHOUR) == 0)
       {
-        if(new_units.compare(PICOCOULUMB) == 0)
+        if(new_units.compare(PICOCOULOMB) == 0)
           {
             return data * static_cast<NumT>(36.E8);
           }
       }
-    else if(old_units.compare(PICOCOULUMB) == 0)
+    else if(old_units.compare(PICOCOULOMB) == 0)
       {
         if (new_units.compare(MICROAMPHOUR) == 0)
           {
