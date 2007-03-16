@@ -89,7 +89,9 @@ static void printSummary(const string &file, const Config &config) {
   strcpy(filename, file.c_str());
   if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
     {
-      throw runtime_error("Could not open file");
+      ostringstream s;
+      s << "Could not open file \"" << filename << "\"";
+      throw runtime_error(s.str());
     }
 
   int length = config.preferences.size();
@@ -99,7 +101,9 @@ static void printSummary(const string &file, const Config &config) {
 
   if(NXclose(&handle)!=NX_OK)
     {
-      throw runtime_error("Could not close file");
+      ostringstream s;
+      s << "Could not close file \"" << filename << "\"";
+      throw runtime_error(s.str());
     }
 }
 
@@ -110,7 +114,9 @@ static void printValue(const string &file, const Item &item,
   strcpy(filename, file.c_str());
   if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
     {
-      throw runtime_error("Could not open file");
+      ostringstream s;
+      s << "Could not open file \"" << filename << "\"";
+      throw runtime_error(s.str());
     }
 
   if (config.multifile)
@@ -121,7 +127,9 @@ static void printValue(const string &file, const Item &item,
 
   if(NXclose(&handle)!=NX_OK)
     {
-      throw runtime_error("Could not close file");
+      ostringstream s;
+      s << "Could not close file \"" << filename << "\"";
+      throw runtime_error(s.str());
     }
 }
 
@@ -206,6 +214,14 @@ int main(int argc, char *argv[]) {
       for (vector<string>::const_iterator file = files.begin() ;
            file != files.end() ; file++ )
         {
+          if (!canRead(*file))
+            {
+              if (config.verbose)
+                {
+                  cout << "Cannot open \"" << *file << "\"" << endl;
+                }
+              continue;
+            }
           try
             {
               if (getValue)
@@ -219,7 +235,10 @@ int main(int argc, char *argv[]) {
             }
           catch(runtime_error &e)
             {
-              std::cerr << "RUNTIME ERROR:" << e.what() <<endl;
+              if ((!config.multifile) || (config.verbose))
+                {
+                  std::cerr << "RUNTIME ERROR:" << e.what() <<endl;
+                }
             }
         }
     }

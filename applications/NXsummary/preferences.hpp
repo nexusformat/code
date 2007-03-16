@@ -10,6 +10,13 @@
 
 namespace nxsum {
   /**
+   * \param filename The name of the file to check.
+   *
+   * \return True if the file can be read.
+   */
+  bool canRead(const std::string &filename);
+
+  /**
    * Load the preferences from the supplied file. This will search in
    * other locations if the supplied filename is not readable.
    *

@@ -25,7 +25,7 @@ static const xmlChar *label_name = xmlCharStrdup("label");
 static const xmlChar *operation_name = xmlCharStrdup("operation");
 
 namespace nxsum {
-  static bool canRead(const string &filename) {
+  bool canRead(const string &filename) {
     if (filename.size() <= 0)
     {
       return false;
