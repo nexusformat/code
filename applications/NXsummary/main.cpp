@@ -26,6 +26,7 @@
 #include <iostream>
 #include <napi.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <vector>
 #include "data_util.hpp"
@@ -37,6 +38,7 @@
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::ostringstream;
 using std::runtime_error;
 using std::string;
 using std::vector;
@@ -117,8 +119,23 @@ static void printValue(const string &file, const Item &item,
 int main(int argc, char *argv[]) {
   try
     {
+      // set up the long documentation
+      ostringstream descr;
+      descr << "Generate summary of a NeXus file";
+      descr << "\n";
+      descr << "This program relies heavily on the configuration file that is located in \"${HOME}/.nxsummary.conf\" or \"/etc/nxsummary.conf\". A sample configuration file can be obtained using the \"--writeconfig\" flag.";
+      descr << "Each \"item\" tag in the file describes a node to print from the NeXus file. The \"path\" attribute describes where in the NeXus file to get information from. The \"label\" attributes is what will be printed when showing the value of the specified field. The optional \"operation\" attribute provides for certain operations to be performed on the data before printing out the result. Valid operations are:";
+      descr << "\n";
+      descr << "\"COUNT\" - The number of elements in the requested field.";
+      descr << "\n";
+      descr << "\"DIMS\" - The dimensions of the requested field.";
+      descr << "\n";
+      descr << "\"SUM\" - Add together all of the array elements and print the result.";
+      descr << "\n";
+      descr << "\"UNITS:<new units>\" - Specify the units to print the result in.";
+
       // set up the parser
-      CmdLine cmd("Generate summary of a NeXus file", ' ', NXSUM_VERSION);
+      CmdLine cmd(descr.str(), ' ', NXSUM_VERSION);
 
       // configure the arguments
       SwitchArg verboseArg("", "verbose", "Turn on verbose printing", 
