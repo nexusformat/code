@@ -50,19 +50,22 @@ typedef unsigned int            uint32_t;
 
 using std::runtime_error;
 using std::string;
-using std::stringstream;
+using std::ostringstream;
 using std::vector;
+
+static const size_t NX_MAX_RANK = 25;
 
 namespace nxsum {
   template <typename NumT>
   string toString(const NumT thing) {
-    stringstream s;
+    ostringstream s;
     s << thing;
     return s.str();
   }
 
   // explicit instantiations so they get compiled in
   template string toString<uint32_t>(const uint32_t thing);
+  template string toString<int>(const int thing);
 
   template <typename NumT>
   string toString(const NumT *data, const int dims[], const int rank) {
@@ -74,6 +77,22 @@ namespace nxsum {
     if (num_ele == 1)
       {
         return toString(data[0]);
+      }
+
+    if ((rank == 1) && (num_ele < NX_MAX_RANK))
+      {
+        ostringstream s;
+        s << '[';
+        size_t length = dims[0];
+        for (size_t i = 0; i < length; ++i) {
+          s << toString(data[i]);
+          if (i+1 < length)
+            {
+              s << ',';
+            }
+        }
+        s << ']';
+        return s.str();
       }
     else
       {
@@ -95,9 +114,13 @@ namespace nxsum {
       {
         return toString((double *)data, dims, rank);
       }
+    else if (type == NX_INT32)
+      {
+        return toString((int32_t *)data, dims, rank);
+      }
     else
       {
-        std::ostringstream s;
+        ostringstream s;
         s << "Do not know how to work with type=" << nxtypeAsString(type);
         throw runtime_error(s.str());
       }
