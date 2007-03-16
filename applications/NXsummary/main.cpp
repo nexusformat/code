@@ -48,6 +48,15 @@ using namespace nxsum;
 static const string NXSUM_VERSION = "0.1.0";
 
 static void printInfo(NXhandle handle, const Item &item, const Config &config) {
+  if (item.path.size() <= 0)
+    {
+      if (config.show_label)
+        {
+          cout << item.label << endl;
+        }
+      return;
+    }
+
   try {
     string value = readAsString(handle, item.path, item.operation);
     //    string units = readAttrAsString(handle, "units", config);

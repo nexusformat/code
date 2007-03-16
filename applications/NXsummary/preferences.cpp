@@ -17,6 +17,7 @@ using std::ostringstream;
 using std::vector;
 
 static const int BUFFER_SIZE = 256;
+static const string EMPTY_STRING("");
 static const xmlChar *root_name = xmlCharStrdup("nxsummary");
 static const xmlChar *item_name = xmlCharStrdup("item");
 static const xmlChar *path_name = xmlCharStrdup("path");
@@ -77,10 +78,11 @@ namespace nxsum {
     addItem(preferences, "/entry/duration", "DURATION");
     addItem(preferences, "/entry/proton_charge", "PROTON CHARGE", "UNITS:picoCoulumb");
     addItem(preferences, "/entry/monitor/data", "TOTAL MONITOR", "SUM");
-    addItem(preferences, "/entry/sample/name", "SAMPLE NAME");
-    addItem(preferences, "/entry/sample/nature", "SAMPLE NATURE");
-    addItem(preferences, "/entry/sample/type", "SAMPLE TYPE");
-    addItem(preferences, "/entry/sample/identifier", "SAMPLE IDENTIFIER");
+    addItem(preferences, "", "SAMPLE");
+    addItem(preferences, "/entry/sample/name", "  NAME");
+    addItem(preferences, "/entry/sample/nature", "  NATURE");
+    addItem(preferences, "/entry/sample/type", "  TYPE");
+    addItem(preferences, "/entry/sample/identifier", "  IDENTIFIER");
   }
 
 #if defined(LIBXML_TREE_ENABLED)
@@ -113,15 +115,18 @@ namespace nxsum {
       {
         return;
       }
+    /*
     if (item_node->properties == NULL)
       {
         return;
       }
+    */
     Item item;
     if (xmlHasProp(item_node, path_name))
       {
         item.path = (char *) xmlGetProp(item_node, path_name);
       }
+    /*
     else
       {
         ostringstream s;
@@ -129,10 +134,12 @@ namespace nxsum {
         s << xmlGetLineNo(item_node) << ")";
         throw runtime_error(s.str());
       }
+    */
     if (xmlHasProp(item_node, label_name))
       {
         item.label = (char *) xmlGetProp(item_node, label_name);
       }
+    /*
     else
       {
         ostringstream s;
@@ -140,6 +147,7 @@ namespace nxsum {
         s << xmlGetLineNo(item_node) << ")";
         throw runtime_error(s.str());
       }
+    */
     if (xmlHasProp(item_node, operation_name))
       {
         item.operation = (char *)xmlGetProp(item_node, operation_name);
@@ -230,6 +238,10 @@ namespace nxsum {
     vector<Item> possible_items;
     for (vector<Item>::const_iterator it = preferences.begin() ;
          it != preferences.end() ; it++ ) {
+      if (it->path.size() <= 0)
+        {
+          continue;
+        }
       it_label = toUpperCase(it->label);
       if (it_label.compare(my_label)==0) {
         return *it;
@@ -266,8 +278,14 @@ namespace nxsum {
 #if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
   void writePreference(xmlNodePtr &parent, const Item &preference) {
     xmlNodePtr node = xmlNewChild(parent, NULL, item_name, NULL);
-    xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
-    xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
+    if (preference.path.size() > 0)
+      {
+        xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
+      }
+    if (preference.label.size() > 0)
+      {
+        xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
+      }
     if (preference.operation.size() > 0)
       {
         xmlNewProp(node, operation_name,
