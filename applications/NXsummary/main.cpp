@@ -26,8 +26,10 @@
 #include <iostream>
 #include <napi.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <vector>
+#include "data_util.hpp"
 #include "nxsummary.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
@@ -36,6 +38,7 @@
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::ostringstream;
 using std::runtime_error;
 using std::string;
 using std::vector;
@@ -44,112 +47,39 @@ using namespace nxsum;
 
 static const string NXSUM_VERSION = "0.1.0";
 
-static string readAsString(NXhandle handle, const string &path, 
-                           const Config &config) {
-  // convert the path to something c-friendly
-  char c_path[GROUP_STRING_LEN];
-  strcpy(c_path, path.c_str());
-
-  // open the path
-  if(NXopenpath(handle, c_path)!=NX_OK)
-    {
-      throw runtime_error("COULD NOT OPEN PATH");
-      return "";
-    }
-
-  // determine rank and dimension
-  int rank = 0;
-  int type = 0;
-  int dims[NX_MAXRANK];
-  if (NXgetinfo(handle, &rank, dims, &type)!=NX_OK)
-    {
-      throw runtime_error("COULD NOT GET NODE INFORMATION");
-    }
-
-  // confirm dimension isn't too high
-  if (rank > NX_MAXRANK)
-    {
-      throw runtime_error("DIMENSIONALITY IS TOO HIGH");
-    }
-
-  // allocate space for data
-  void *data;
-  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
-    {
-      throw runtime_error("NXmalloc falied");
-    }
-
-  // retrieve data from the file
-  if(NXgetdata(handle,data)!=NX_OK)
-    {
-      throw runtime_error("NXgetdata failed");
-    }
-
-  // convert result to string
-  string result = toString(data, dims, rank, type, config);
-
-  //free up the pointer
-  if(NXfree(&data)!=NX_OK)
-    {
-      throw runtime_error("NXfree failed");
-    }
-
-  return result;
-}
-
-static string readAttrAsString(NXhandle handle, const string label, const Config &config) {
-  if (NXinitattrdir(handle)!=NX_OK)
-    {
-      throw runtime_error("NXinitattrdir failed");
-    }
-  int num_attr;
-  if (NXgetattrinfo(handle, &num_attr)!=NX_OK)
-    {
-      throw runtime_error("NXgetattrinfo failed");
-    }
-  char name[GROUP_STRING_LEN];
-  int length;
-  int type;
-  for (int i = 0 ; i < num_attr ; ++i) {
-    if (NXgetnextattr(handle, name, &length, &type)!=NX_OK)
-      {
-        throw runtime_error("NXgetnextattr failed");
-      }
-    if (label == name)
-      {
-        void *data;
-        if (NXmalloc(&data, 1, &length, type)!=NX_OK)
-          {
-            throw runtime_error("NXmalloc failed");
-          }
-        int dims[1]  = {length};
-        if (NXgetattr(handle, name, data, dims, &type)!=NX_OK)
-          {
-            throw runtime_error("NXgetattr failed");
-          }
-        string result = toString(data, length, type, config);
-        if (NXfree(&data)!=NX_OK)
-          {
-            throw runtime_error("NXfree failed");
-          }
-        return result;
-      }
-  }
-
-  return "";
-}
-
 static void printInfo(NXhandle handle, const Item &item, const Config &config) {
+  if (item.path.size() <= 0)
+    {
+      if (config.show_label)
+        {
+          cout << item.label << endl;
+        }
+      return;
+    }
+
   try {
-    string value = readAsString(handle, item.path, config);
-    string units = readAttrAsString(handle, "units", config);
-    cout << item.label << ':' << value << ' ' << units << endl;
+    string value = readAsString(handle, item.path, item.operation);
+    //    string units = readAttrAsString(handle, "units", config);
+    if (config.show_label)
+      {
+        cout << item.label << ':';
+      }
+    cout << value << endl;
   } catch(runtime_error &e) {
+    if (config.verbose)
+      {
+        cout << '[' << item.label << ',' << item.path;
+        if (item.operation.size() > 0)
+          {
+            cout << ',' << item.operation;
+          }
+        cout << "] ERROR: " << e.what() << endl;
+      }
     // let it drop on the floor
   }
 }
 
-static void printSummary(const string &file, Config &config) {
+static void printSummary(const string &file, const Config &config) {
   if (config.multifile)
     {
       cout << "********** " << file << endl;
@@ -159,7 +89,9 @@ static void printSummary(const string &file, Config &config) {
   strcpy(filename, file.c_str());
   if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
     {
-      throw runtime_error("Could not open file");
+      ostringstream s;
+      s << "Could not open file \"" << filename << "\"";
+      throw runtime_error(s.str());
     }
 
   int length = config.preferences.size();
@@ -169,15 +101,58 @@ static void printSummary(const string &file, Config &config) {
 
   if(NXclose(&handle)!=NX_OK)
     {
-      throw runtime_error("Could not close file");
+      ostringstream s;
+      s << "Could not close file \"" << filename << "\"";
+      throw runtime_error(s.str());
+    }
+}
+
+static void printValue(const string &file, const Item &item,
+                       const Config &config) {
+  NXhandle handle;
+  char filename[GROUP_STRING_LEN];
+  strcpy(filename, file.c_str());
+  if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
+    {
+      ostringstream s;
+      s << "Could not open file \"" << filename << "\"";
+      throw runtime_error(s.str());
+    }
+
+  if (config.multifile)
+    {
+      cout << file << ";";
+    }
+  printInfo(handle, item, config);
+
+  if(NXclose(&handle)!=NX_OK)
+    {
+      ostringstream s;
+      s << "Could not close file \"" << filename << "\"";
+      throw runtime_error(s.str());
     }
 }
 
 int main(int argc, char *argv[]) {
   try
     {
+      // set up the long documentation
+      ostringstream descr;
+      descr << "Generate summary of a NeXus file";
+      descr << "\n";
+      descr << "This program relies heavily on the configuration file that is located in \"${HOME}/.nxsummary.conf\" or \"/etc/nxsummary.conf\". A sample configuration file can be obtained using the \"--writeconfig\" flag.";
+      descr << "Each \"item\" tag in the file describes a node to print from the NeXus file. The \"path\" attribute describes where in the NeXus file to get information from. The \"label\" attributes is what will be printed when showing the value of the specified field. The optional \"operation\" attribute provides for certain operations to be performed on the data before printing out the result. Valid operations are:";
+      descr << "\n";
+      descr << "\"COUNT\" - The number of elements in the requested field.";
+      descr << "\n";
+      descr << "\"DIMS\" - The dimensions of the requested field.";
+      descr << "\n";
+      descr << "\"SUM\" - Add together all of the array elements and print the result.";
+      descr << "\n";
+      descr << "\"UNITS:<new units>\" - Specify the units to print the result in.";
+
       // set up the parser
-      CmdLine cmd("Generate summary of a NeXus file", ' ', NXSUM_VERSION);
+      CmdLine cmd(descr.str(), ' ', NXSUM_VERSION);
 
       // configure the arguments
       SwitchArg verboseArg("", "verbose", "Turn on verbose printing", 
@@ -190,6 +165,9 @@ int main(int argc, char *argv[]) {
       ValueArg<string> writeConfigArg("", "writeconfig",
                               "Write the default configuration out to a file",
                                       false, "", "config", cmd);
+      ValueArg<string> valueArg("", "value",
+                               "Get value of the item pointed to by the label",
+                                false, "", "label", cmd);
 
       // parse the arguments
       cmd.parse(argc, argv);
@@ -197,6 +175,7 @@ int main(int argc, char *argv[]) {
       // fill in the config object
       struct Config config;
       config.verbose = verboseArg.getValue();
+      config.show_label = true;
 
       // load in the preferences
       loadPreferences(configArg.getValue(), config.preferences);
@@ -222,11 +201,45 @@ int main(int argc, char *argv[]) {
         }
       config.multifile = (files.size()>1);
 
+      // are we looking for a particular value
+      Item item;
+      bool getValue = (valueArg.getValue().size()>0);
+      if (getValue)
+        {
+          item = getPreference(valueArg.getValue(), config.preferences);
+          config.show_label = config.verbose;
+        }
+
       // go through the list of files
       for (vector<string>::const_iterator file = files.begin() ;
            file != files.end() ; file++ )
         {
-          printSummary(*file, config);
+          if (!canRead(*file))
+            {
+              if (config.verbose)
+                {
+                  cout << "Cannot open \"" << *file << "\"" << endl;
+                }
+              continue;
+            }
+          try
+            {
+              if (getValue)
+                {
+                  printValue(*file, item, config);
+                }
+              else
+                {
+                  printSummary(*file, config);
+                }
+            }
+          catch(runtime_error &e)
+            {
+              if ((!config.multifile) || (config.verbose))
+                {
+                  std::cerr << "RUNTIME ERROR:" << e.what() <<endl;
+                }
+            }
         }
     }
   catch(ArgException &e)

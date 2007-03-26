@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+/**
+ * \file nxsummary.hpp
+ */
 #ifndef __NXSUMMARY_H_GUARD__
 #define __NXSUMMARY_H_GUARD__
 
@@ -30,21 +33,32 @@
 #include <vector>
 
 // useful constants
-static const size_t BLOCK_SIZE = 2048;
+/**
+ * Size of buffer for character arrays used in node names.
+ */
 static const size_t GROUP_STRING_LEN = 512;
-static const std::string NOT_FOUND = "NOT FOUND";
-static const std::string UNKNOWN_TYPE = "UNKNOWN TYPE";
 
-// define the configuration object
+/**
+ * String to return when path is not found in the file.
+ */
+static const std::string NOT_FOUND = "NOT FOUND:";
+
+/**
+ * Object used to define a thing to print from the file.
+ */
 struct Item{
   std::string path;
   std::string label;
   std::string operation;
 };
 
+/**
+ * Run time configuration of the process.
+ */
 struct Config{
   bool verbose;
   bool multifile;
+  bool show_label;
   std::vector<Item> preferences;
 };
 #endif

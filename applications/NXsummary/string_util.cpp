@@ -25,29 +25,50 @@
 
 #include "nxsummary.hpp"
 #include "string_util.hpp"
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <sstream>
 #include <napi.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "nxconfig.h"
+#include "data_util.hpp"
+
+// use STDINT if possible, otherwise define the types here
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#else
+typedef signed char             int8_t;
+typedef short int               int16_t;
+typedef int                     int32_t;
+typedef unsigned char           uint8_t;
+typedef unsigned short int      uint16_t;
+typedef unsigned int            uint32_t;
+#endif
 
 using std::runtime_error;
 using std::string;
-using std::stringstream;
+using std::ostringstream;
 using std::vector;
+
+static const size_t NX_MAX_RANK = 25;
 
 namespace nxsum {
   template <typename NumT>
   string toString(const NumT thing) {
-    stringstream s;
+    ostringstream s;
     s << thing;
     return s.str();
   }
 
+  // explicit instantiations so they get compiled in
+  template string toString<uint32_t>(const uint32_t thing);
+  template string toString<int>(const int thing);
+
   template <typename NumT>
-  string toString(const NumT *data, const int dims[], const int rank,
-                  const Config &config) {
+  string toString(const NumT *data, const int dims[], const int rank) {
     int num_ele = 1;
     for (size_t i = 0; i < rank; ++i ) {
       num_ele *= dims[i];
@@ -57,6 +78,22 @@ namespace nxsum {
       {
         return toString(data[0]);
       }
+
+    if ((rank == 1) && (num_ele < NX_MAX_RANK))
+      {
+        ostringstream s;
+        s << '[';
+        size_t length = dims[0];
+        for (size_t i = 0; i < length; ++i) {
+          s << toString(data[i]);
+          if (i+1 < length)
+            {
+              s << ',';
+            }
+        }
+        s << ']';
+        return s.str();
+      }
     else
       {
         throw runtime_error("Do not know how to work with arrays");
@@ -64,123 +101,39 @@ namespace nxsum {
   }
 
   string toString(const void *data, const int dims[], const int rank,
-                  const int type, const Config &config) {
+                  const int type) {
     if (type == NX_CHAR)
       {
         return (char *) data;
       }
     else if (type == NX_FLOAT32)
       {
-        return toString((float *)data, dims, rank, config);
+        return toString((float *)data, dims, rank);
+      }
+    else if (type == NX_FLOAT64)
+      {
+        return toString((double *)data, dims, rank);
+      }
+    else if (type == NX_INT32)
+      {
+        return toString((int32_t *)data, dims, rank);
       }
     else
       {
-        return UNKNOWN_TYPE;
+        ostringstream s;
+        s << "Do not know how to work with type=" << nxtypeAsString(type);
+        throw runtime_error(s.str());
       }
   }
 
-  string toString(const void *data, const int length, const int type,
-                  const Config &config) {
+  string toString(const void *data, const int length, const int type) {
     int dims[1]  = {length};
-    return toString(data, dims, 1, type, config);
+    return toString(data, dims, 1, type);
   }
 
-/*
-static string readAsString(NXhandle handle, const string &path, 
-                           const Config &config) {
-  // convert the path to something c-friendly
-  char c_path[GROUP_STRING_LEN];
-  strcpy(c_path, path.c_str());
-
-  // open the path
-  if(NXopenpath(handle, c_path)!=NX_OK)
-    {
-      throw runtime_error("COULD NOT OPEN PATH");
-      return "";
-    }
-
-  // determine rank and dimension
-  int rank = 0;
-  int type = 0;
-  int dims[NX_MAXRANK];
-  if (NXgetinfo(handle, &rank, dims, &type)!=NX_OK)
-    {
-      throw runtime_error("COULD NOT GET NODE INFORMATION");
-    }
-
-  // confirm dimension isn't too high
-  if (rank > NX_MAXRANK)
-    {
-      throw runtime_error("DIMENSIONALITY IS TOO HIGH");
-    }
-
-  // allocate space for data
-  void *data;
-  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
-    {
-      throw runtime_error("NXmalloc falied");
-    }
-
-  // retrieve data from the file
-  if(NXgetdata(handle,data)!=NX_OK)
-    {
-      throw runtime_error("NXgetdata failed");
-    }
-
-  // convert result to string
-  string result = toString(data, dims, rank, type, config);
-
-  //free up the pointer
-  if(NXfree(&data)!=NX_OK)
-    {
-      throw runtime_error("NXfree failed");
-    }
-
-  return result;
-}
-*/
-
-/*
-static string readAttrAsString(NXhandle handle, const string label, const Config &config) {
-  if (NXinitattrdir(handle)!=NX_OK)
-    {
-      throw runtime_error("NXinitattrdir failed");
-    }
-  int num_attr;
-  if (NXgetattrinfo(handle, &num_attr)!=NX_OK)
-    {
-      throw runtime_error("NXgetattrinfo failed");
-    }
-  char name[GROUP_STRING_LEN];
-  int length;
-  int type;
-  for (int i = 0 ; i < num_attr ; ++i) {
-    if (NXgetnextattr(handle, name, &length, &type)!=NX_OK)
-      {
-        throw runtime_error("NXgetnextattr failed");
-      }
-    if (label == name)
-      {
-        void *data;
-        int dims[1]  = {length};
-        if (NXmalloc(&data, 1, dims, type)!=NX_OK)
-          {
-            throw runtime_error("NXmalloc failed");
-          }
-        if (NXgetattr(handle, name, data, dims, &type)!=NX_OK)
-          {
-            throw runtime_error("NXgetattr failed");
-          }
-        string result = toString(data, dims, 1, type, config);
-        if (NXfree(&data)!=NX_OK)
-          {
-            throw runtime_error("NXfree failed");
-          }
-        return result;
-      }
+  string toUpperCase(const string &orig) {
+    string result = orig;
+    std::transform(orig.begin(), orig.end(), result.begin(), (int(*)(int))std::toupper);
+    return result;
   }
-
-  return "";
-}
-*/
 }
