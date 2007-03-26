@@ -75,6 +75,10 @@ nxconvert:
 	rm -f $@
 	ln -s ../applications/$@$(EXEEXT) $@
 
+nxsummary:
+	rm -f $@
+	ln -s ../applications/NXsummary/$@$(EXEEXT) $@
+
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
 ## TESTS = $(test_PROGRAMS)		# what to run
@@ -183,9 +187,7 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	} > $(srcdir)/package.m4
 
-check-local:	atconfig atlocal $(TESTSUITE) 
-	rm -f nxconvert
-	ln -s ../applications/nxconvert$(EXEEXT) nxconvert
+check-local:	atconfig atlocal nxconvert nxsummary $(TESTSUITE) 
 	$(TESTS_ENVIRONMENT) $(SHELL) $(TESTSUITE)
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
@@ -199,4 +201,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig nxconvert data/dmc*
+DISTCLEANFILES = atconfig nxconvert nxsummary data/dmc*

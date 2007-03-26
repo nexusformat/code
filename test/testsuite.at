@@ -462,3 +462,20 @@ AT_CHECK([$HAVE_XML && nxconvert -x NXtest.xml a.a | sed -e 's/\r$//' ],[],
 Convertion successful.
 ]])
 AT_CLEANUP
+
+AT_BANNER([[Testing the NeXus File Summary Tool.]])
+AT_SETUP([Checking HDF4 test file])
+AT_CHECK([$HAVE_HDF4 && nxsummary NXtest.hdf | sed -e 's/\r$//' ],[], 
+[[SAMPLE
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF5 test file])
+AT_CHECK([$HAVE_HDF5 && nxsummary NXtest.h5 | sed -e 's/\r$//' ],[], 
+[[SAMPLE
+]])
+AT_CLEANUP
+AT_SETUP([Checking XML test file])
+AT_CHECK([$HAVE_XML && nxsummary NXtest.xml | sed -e 's/\r$//' ],[], 
+[[SAMPLE
+]])
+AT_CLEANUP
