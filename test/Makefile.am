@@ -54,7 +54,8 @@ F90_TARGETS = NXtest
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
 			NXtest.f90 napif_test.f README.tests \
 			napi_test.c napif4_test.f napif5_test.f \
-			setup_test $(srcdir)/data/dmc*
+			setup_test $(srcdir)/data/dmc* \
+			nxbrowse.txt
 
 TESTSUITE	= $(srcdir)/testsuite
 
@@ -71,13 +72,33 @@ nxtest_DATA = README.tests
 nxexampledir=$(NXEXAMPLEDIR)
 nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
 
+nxsummary: skip_test
+	rm -f $@
+	if test -r ../applications/NXsummary/$@$(EXEEXT); then \
+	    ln -s ../applications/NXsummary/$@$(EXEEXT) $@; \
+	else \
+	    ln -s ./skip_test $@; \
+	fi
+
 nxconvert:
 	rm -f $@
 	ln -s ../applications/$@$(EXEEXT) $@
 
-nxsummary:
+nxbrowse:
 	rm -f $@
-	ln -s ../applications/NXsummary/$@$(EXEEXT) $@
+	ln -s ../applications/$@$(EXEEXT) $@
+
+nxdir:
+	rm -f $@
+	ln -s ../applications/NXdir/$@$(EXEEXT) $@
+
+nxtranslate: skip_test
+	rm -f $@
+	if test -r ../applications/NXtranslate/$@$(EXEEXT); then \
+	    ln -s ../applications/NXtranslate/$@$(EXEEXT) $@; \
+	else \
+	    ln -s ./skip_test $@; \
+	fi
 
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
@@ -187,7 +208,7 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	} > $(srcdir)/package.m4
 
-check-local:	atconfig atlocal nxconvert nxsummary $(TESTSUITE) 
+check-local: atconfig atlocal nxconvert nxsummary nxdir nxbrowse nxtranslate $(TESTSUITE) 
 	$(TESTS_ENVIRONMENT) $(SHELL) $(TESTSUITE)
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
