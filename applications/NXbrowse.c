@@ -87,7 +87,11 @@ int main(int argc, char *argv[])
    strcpy (path, "NX");
    do {
       printf ("%s> ", path);
-      fgets (inputText, sizeof(inputText), stdin);
+      if (fgets(inputText, sizeof(inputText), stdin) == NULL)
+      {
+         return NX_OK;
+      }
+
       if ((stringPtr = strchr(inputText, '\n')) != NULL) 
          *stringPtr = '\0';
       command = strtok(inputText," ");
