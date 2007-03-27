@@ -197,6 +197,11 @@ namespace nxsum {
             privateLoadPreferences(filename, preferences);
             return;
           }
+        else if (filename == "NONE")
+          {
+            setDefaultPreferences(preferences);
+            return;
+          }
         else
           {
             cout << "Cannot read configuration file \"" << filename << "\""
@@ -298,9 +303,6 @@ namespace nxsum {
     // set up variables for creating the document
     xmlDocPtr doc = NULL;        // document pointer
     xmlNodePtr root_node = NULL; // node pointers
-    xmlNodePtr node = NULL;      // node pointers
-    char buff[256];
-    int i, j;
 
     // create the document and the root node
     doc = xmlNewDoc(BAD_CAST "1.0");
