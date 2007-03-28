@@ -35,7 +35,7 @@ SUBDIRS=include src bindings applications test scripts examples doc contrib
 
 EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autoversion.sh \
 		build_rpm.in README.cygwin README.WIN32 README.macosx \
-		ReleaseNotes README.MinGW make_mingw_links
+		README.MinGW make_mingw_links
 
 
 # Add any flags here that you want passed to configure when you do 
