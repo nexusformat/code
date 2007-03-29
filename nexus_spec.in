@@ -51,7 +51,7 @@ make
 # as automake supports it; configure --prefix is OK for now though
 make install
 %files
-%doc README NEWS ChangeLog AUTHORS COPYING INSTALL ReleaseNotes
+%doc README NEWS ChangeLog AUTHORS COPYING INSTALL
 # %docdir /usr/local/doc
 /usr/local/lib
 /usr/local/bin
