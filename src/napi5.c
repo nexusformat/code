@@ -595,7 +595,7 @@ static int nxToHDF5Type(int datatype)
 					  int compress_type, int chunk_size[])
   {
     hid_t datatype1, dataspace, iNew, iRet;
-    hid_t type,cparms;
+    hid_t type, cparms = -1;
     pNexusFile5 pFile;
     char pBuffer[256];
     int i, byte_zahl;
@@ -716,6 +716,9 @@ static int nxToHDF5Type(int datatype)
         NXIReportError (NXpData, pBuffer);
         return NX_ERROR;
       }
+    }
+    if (cparms != -1) {
+	iRet = H5Pclose(cparms);
     }
     iRet = H5Sclose(dataspace);
     iRet = H5Tclose(datatype1);
