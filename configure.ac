@@ -115,15 +115,16 @@ else
 	F77=
 fi
 
-AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [with_swig=$withval], [with_swig=no])
-if test x$with_swig != xno; then
-    if test x$with_swig != xyes; then
-	SWIG=$with_swig
+AC_ARG_WITH([python], AC_HELP_STRING([--with-python=python interpreter], [Specify path of python interpreter]), [with_python=$withval], [with_python=no])
+if test x$with_python != xno; then
+    if test x$with_python != xyes; then
+	PYTHON=$with_python
     fi
-    AC_CHECK_PROGS(SWIG,[swig])
+    AC_CHECK_PROGS(PYTHON,[python])
 else
-    SWIG=
+    PYTHON=
 fi
+
 
 java_host="linux"
 javaroot=""
@@ -186,13 +187,38 @@ AC_SUBST(NXEXAMPLEDIR)
 AC_SUBST(NXTESTDIR)
 
 AM_PROG_GCJ
-AM_PATH_PYTHON(,, :)
 
 AC_PROG_LIBTOOL
 dnl AC_LIBTOOL_WIN32_DLL
 
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
+if test x$with_tcl != xno; then
+    AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
+fi
+if test x$with_guile != xno; then
+    AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
+fi
+if test x$with_opengenie != xno; then
+    AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
+fi
+AC_SUBST(PYTHONROOT)
+if test x$with_python != xno; then
+    AM_PATH_PYTHON(,, :)
+    wtmp=`which $PYTHON`
+    PYTHONROOT=`dirname "$wtmp"`/..
+fi
+
+AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
+if test x$with_python != xno -o x$with_tcl != xno; then
+    if test x$with_swig != xyes; then
+	SWIG=$with_swig
+    fi
+    AC_CHECK_PROGS(SWIG,[swig])
+else
+    SWIG=
+fi
 
 AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
 AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
@@ -203,14 +229,10 @@ AC_CHECK_PROGS(PDFLATEX,[pdflatex])
 AC_CHECK_PROGS(DOXYGEN,[doxygen])
 AC_CHECK_PROGS(DOT,[dot])
 
-AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
-AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
-AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[include/python$PYTHON_VERSION/Python.h])
-AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
 
 dnl  flags for building swig guile bindings
 AC_SUBST(SWGUILEFLAGS)  
-if ! test -z "$GUILEROOT"; then
+if test x$GUILEROOT != x -a x$SWIG != x; then
     if test `$SWIG -guile -help 2>&1 | grep -i '\-linkage' | wc -l` -gt 0; then
 	SWGUILEFLAGS="-Linkage ltdlmod"
     else

@@ -132,8 +132,8 @@ AC_DEFUN(
     AC_ARG_WITH([$1],
 	AC_HELP_STRING([--with-$1=/path/to/$1/directory],
                        [Specify location of $1 install directory]),
-	[if test x$withval != xno; then $2=$withval; fi], 
-        [])
+	[if test x$withval != xno -a x$withval != xyes; then $2=$withval; fi], 
+        [with_$1=no])
     if test x$with_$1 != xno -a x[$]$2 = x; then
         AC_MSG_CHECKING(for $1 root installation directory)
         for i in $3; do
