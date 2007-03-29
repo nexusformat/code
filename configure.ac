@@ -288,6 +288,10 @@ if ! test -z "$FC"; then
 fi
 
 HDF_EXT=a # library file extent to look for with HDF libraries
+
+AC_SUBST(LIBXML2_CFLAGS)
+LIBXML2_CFLAGS='`xml2-config --cflags`'
+
 case $host in
     alpha*-dec-osf*)
 	java_host="alpha"
@@ -304,6 +308,7 @@ case $host in
 	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
+	LIBXML2_CFLAGS=-I/usr/local/include
 	java_host="win32"
 	;;
 

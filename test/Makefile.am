@@ -222,4 +222,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig nxconvert nxsummary data/dmc*
+DISTCLEANFILES = atconfig nxconvert nxsummary nxdir nxbrowse nxtranslate data/dmc*

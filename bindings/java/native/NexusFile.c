@@ -1217,11 +1217,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_debugstop
 
    while(iStop)
    {
-#if 0 /* defined(WIN32) /* we use mingw now */
-	   Sleep(2000);
-#else
-       sleep(2);
-#endif
+/*       sleep(2); */
    }
 }
 
