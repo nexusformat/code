@@ -34,7 +34,7 @@
 #define CONSTCHAR       const char
 
 #ifdef _WIN32
-//#define snprintf nxisnprintf
+#define snprintf nxisnprintf
 extern int nxisnprintf(char* buffer, int len, const char* format, ... );
 #endif /* _WIN32 */
 
