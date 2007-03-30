@@ -25,7 +25,7 @@
 #  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
 #  MA  02111-1307  USA
 #             
-#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#  For further information, see <http://www.nexusformat.org/>
 #
 # AC_CHECK_COMPILER_OPTION tests for a given compiler option; we need to egrep
 # the output as well as check the status as sometimes the compiler 
@@ -96,6 +96,7 @@ AC_DEFUN(
   FFLAGS=[$]FFLAGS_SAVE
  ]
 )
+
 AC_DEFUN([LINUX_DISTRIBUTION],
 [
 	AC_REQUIRE([AC_CANONICAL_TARGET])
@@ -120,7 +121,8 @@ AC_DEFUN([LINUX_DISTRIBUTION],
 #
 # $1 = name of arg
 # $2 = root variable name to set
-# $3 = list of root paths to try
+# $3 = list of root paths to try. If the path is a file, assume it is 
+#                                 path/bin/files and then work out path
 # $4 = file in path to locate
 #
 # e.g. AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
@@ -130,12 +132,19 @@ AC_DEFUN(
   [ $2=""
     AC_SUBST([$2])
     AC_ARG_WITH([$1],
-	AC_HELP_STRING([--with-$1=/path/to/$1/directory],
-                       [Specify location of $1 install directory]),
+	AC_HELP_STRING([--with-$1=/path/to/$1_install_directory],
+                       [Specify absolute path to root of $1 install directory.]),
 	[if test x$withval != xno -a x$withval != xyes; then $2=$withval; fi], 
         [with_$1=no])
-    if test x$with_$1 != xno -a x[$]$2 = x; then
+    if test x$with_$1 != xno; then
         AC_MSG_CHECKING(for $1 root installation directory)
+# if --with secified a file, assume it is ROOT/bin/file
+	if test x[$]$2 != x; then
+	    if test -f [$]$2; then
+		$2=`dirname [$]$2`/..
+	    fi
+	fi
+# $2 should now either be empty or a valid possible root
         for i in $3; do
 	    if test x[$]$2 = x -a -r $i/$4; then $2=$i; fi
         done

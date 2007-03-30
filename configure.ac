@@ -115,17 +115,6 @@ else
 	F77=
 fi
 
-AC_ARG_WITH([python], AC_HELP_STRING([--with-python=python interpreter], [Specify path of python interpreter]), [with_python=$withval], [with_python=no])
-if test x$with_python != xno; then
-    if test x$with_python != xyes; then
-	PYTHON=$with_python
-    fi
-    AC_CHECK_PROGS(PYTHON,[python])
-else
-    PYTHON=
-fi
-
-
 java_host="linux"
 javaroot=""
 with_java=no
@@ -203,11 +192,10 @@ fi
 if test x$with_opengenie != xno; then
     AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
 fi
-AC_SUBST(PYTHONROOT)
 if test x$with_python != xno; then
+    AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[bin/python])
+    if test x$PYTHONROOT != x; then PYTHON=$PYTHONROOT/bin/python; fi
     AM_PATH_PYTHON(,, :)
-    wtmp=`which $PYTHON`
-    PYTHONROOT=`dirname "$wtmp"`/..
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
