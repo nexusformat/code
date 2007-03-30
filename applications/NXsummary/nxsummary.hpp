@@ -59,6 +59,7 @@ struct Config{
   bool verbose;
   bool multifile;
   bool show_label;
+  bool print_xml;
   std::vector<Item> preferences;
 };
 #endif

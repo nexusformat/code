@@ -31,6 +31,7 @@
 #include <vector>
 #include "data_util.hpp"
 #include "nxsummary.hpp"
+#include "output.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
 #include "tclap/CmdLine.h"
@@ -45,79 +46,71 @@ using std::vector;
 using namespace TCLAP;
 using namespace nxsum;
 
-static const string NXSUM_VERSION = "0.1.0";
+static const string NXSUM_VERSION("0.1.0");
+static const string EMPTY("");
 
-static void printInfo(NXhandle handle, const Item &item, const Config &config) {
-  if (item.path.size() <= 0)
+static void openFile(const string &file, NXhandle &handle) {
+  char filename[GROUP_STRING_LEN];
+  strcpy(filename, file.c_str());
+  if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
     {
-      if (config.show_label)
-        {
-          cout << item.label << endl;
-        }
+      ostringstream s;
+      s << "Could not open file \"" << file << "\"";
+      throw runtime_error(s.str());
+    }
+}
+
+static void closeFile(const string &file, NXhandle &handle) {
+  if (handle == NULL)
+    {
       return;
     }
+  if(NXclose(&handle)!=NX_OK)
+    {
+      ostringstream s;
+      s << "Could not close file \"" << file << "\"";
+      throw runtime_error(s.str());
+    }
+}
 
+static void printInfo(NXhandle handle, const Item &item, const Config &config) {
   try {
     string value = readAsString(handle, item.path, item.operation);
-    //    string units = readAttrAsString(handle, "units", config);
-    if (config.show_label)
-      {
-        cout << item.label << ':';
-      }
-    cout << value << endl;
+    print(item, value, config);
   } catch(runtime_error &e) {
-    if (config.verbose)
-      {
-        cout << '[' << item.label << ',' << item.path;
-        if (item.operation.size() > 0)
-          {
-            cout << ',' << item.operation;
-          }
-        cout << "] ERROR: " << e.what() << endl;
-      }
-    // let it drop on the floor
+    printError(item, e.what(), config);
   }
 }
 
 static void printSummary(const string &file, const Config &config) {
-  if (config.multifile)
-    {
-      cout << "********** " << file << endl;
-    }
-  NXhandle handle;
-  char filename[GROUP_STRING_LEN];
-  strcpy(filename, file.c_str());
-  if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
-    {
-      ostringstream s;
-      s << "Could not open file \"" << filename << "\"";
-      throw runtime_error(s.str());
-    }
+  NXhandle handle = NULL;
+  openFile(file, handle);
 
-  int length = config.preferences.size();
-  for (int i = 0 ; i < length ; ++i ) {
-    printInfo(handle, config.preferences[i], config);
+  vector<string> values;
+  vector<bool> isError;
+
+  size_t length = config.preferences.size();
+  for (size_t i = 0 ; i < length ; ++i ) {
+    try {
+      string value = readAsString(handle, config.preferences[i].path,
+                                  config.preferences[i].operation);
+      values.push_back(value);
+      isError.push_back(false);
+    } catch(runtime_error &e) {
+      values.push_back(e.what());
+      isError.push_back(true);
+    }
   }
 
-  if(NXclose(&handle)!=NX_OK)
-    {
-      ostringstream s;
-      s << "Could not close file \"" << filename << "\"";
-      throw runtime_error(s.str());
-    }
+  print(file, config.preferences, values, isError, config);
+
+  closeFile(file, handle);
 }
 
 static void printValue(const string &file, const Item &item,
                        const Config &config) {
-  NXhandle handle;
-  char filename[GROUP_STRING_LEN];
-  strcpy(filename, file.c_str());
-  if(NXopen(filename,NXACC_READ,&handle)!=NX_OK)
-    {
-      ostringstream s;
-      s << "Could not open file \"" << filename << "\"";
-      throw runtime_error(s.str());
-    }
+  NXhandle handle = NULL;
+  openFile(file, handle);
 
   if (config.multifile)
     {
@@ -125,12 +118,7 @@ static void printValue(const string &file, const Item &item,
     }
   printInfo(handle, item, config);
 
-  if(NXclose(&handle)!=NX_OK)
-    {
-      ostringstream s;
-      s << "Could not close file \"" << filename << "\"";
-      throw runtime_error(s.str());
-    }
+  closeFile(file, handle);
 }
 
 int main(int argc, char *argv[]) {
@@ -168,6 +156,8 @@ int main(int argc, char *argv[]) {
       ValueArg<string> valueArg("", "value",
                                "Get value of the item pointed to by the label",
                                 false, "", "label", cmd);
+      SwitchArg printXmlArg("", "xml", "Print results as xml",
+                            false, cmd);
 
       // parse the arguments
       cmd.parse(argc, argv);
@@ -176,6 +166,7 @@ int main(int argc, char *argv[]) {
       struct Config config;
       config.verbose = verboseArg.getValue();
       config.show_label = true;
+      config.print_xml = printXmlArg.getValue();
 
       // load in the preferences
       loadPreferences(configArg.getValue(), config.preferences);

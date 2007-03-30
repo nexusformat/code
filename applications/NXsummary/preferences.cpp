@@ -8,6 +8,7 @@
 #include "data_util.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
+#include "xml_util.hpp"
 
 using std::cout;
 using std::endl;
@@ -16,13 +17,7 @@ using std::string;
 using std::ostringstream;
 using std::vector;
 
-static const int BUFFER_SIZE = 256;
 static const string EMPTY_STRING("");
-static const xmlChar *root_name = xmlCharStrdup("nxsummary");
-static const xmlChar *item_name = xmlCharStrdup("item");
-static const xmlChar *path_name = xmlCharStrdup("path");
-static const xmlChar *label_name = xmlCharStrdup("label");
-static const xmlChar *operation_name = xmlCharStrdup("operation");
 
 namespace nxsum {
   bool canRead(const string &filename) {
@@ -283,15 +278,15 @@ namespace nxsum {
 #if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
   void writePreference(xmlNodePtr &parent, const Item &preference) {
     xmlNodePtr node = xmlNewChild(parent, NULL, item_name, NULL);
-    if (preference.path.size() > 0)
+    if (!preference.path.empty())
       {
         xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
       }
-    if (preference.label.size() > 0)
+    if (!preference.label.empty())
       {
         xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
       }
-    if (preference.operation.size() > 0)
+    if (!preference.operation.empty())
       {
         xmlNewProp(node, operation_name,
                    BAD_CAST preference.operation.c_str());
