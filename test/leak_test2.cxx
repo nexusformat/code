@@ -1,5 +1,6 @@
 #include <sstream>
 #include <napi.h>
+#include <unistd.h>
 
 #define PSZ(s) (s).c_str()
 

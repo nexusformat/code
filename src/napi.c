@@ -241,6 +241,9 @@ static pNexusFunction handleToNexusFunc(NXhandle fid){
     return NULL;
   }
 }
+/*--------------------------------------------------------------------*/
+static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, 
+           pFileStack fileStack);
 /*----------------------------------------------------------------------*/
 NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   int status;
@@ -260,7 +263,7 @@ NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   return status;
 }
 /*-----------------------------------------------------------------------*/
-NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileStack)
+static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileStack)
   {
     int hdf_type=0;
     int iRet=0;
@@ -493,9 +496,10 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     pFileStack fileStack;    
     char nxurl[1024], exfile[512], expath[512];
     ErrFunc oldError;
+    pNexusFunction pFunc = NULL;
 
     fileStack = (pFileStack)fid;
-    pNexusFunction pFunc = handleToNexusFunc(fid);
+    pFunc = handleToNexusFunc(fid);
 
     status = pFunc->nxopengroup(pFunc->pNexusData, name, nxclass);  
     oldError = NXMGetError();
