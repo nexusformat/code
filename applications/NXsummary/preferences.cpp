@@ -229,7 +229,7 @@ namespace nxsum {
     setDefaultPreferences(preferences);
   }
 #else
-  void loadPreferences(std::string &filename, std::vector<Item> &preferences) {
+  void loadPreferences(const string &filename, vector<Item> &preferences) {
     cout << "LIBXML2 tree support not present. Using default preferences."
          << endl;
     setDefaultPreferences(preferences);
