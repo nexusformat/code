@@ -458,7 +458,7 @@ if test "$with_xml" != "no" -a -z "$MXMLROOT"; then
 fi
 if test ! -z "$MXMLROOT"; then
     XML_LDFLAGS="-lmxml"
-    LDFLAGS="-L$XMLROOT/lib $LDFLAGS"
+    LDFLAGS="-L$MXMLROOT/lib $LDFLAGS"
     XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
 fi
 AC_SUBST(XML_LDFLAGS)
