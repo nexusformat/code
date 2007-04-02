@@ -257,11 +257,11 @@ fi
 
 # enable compiler warnings if gcc
 if test "$CC" = "gcc"; then
-    CFLAGS="$CFLAGS -Wall"
+    CFLAGS="$CFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
 fi
 
 if test "$CXX" = "g++"; then
-    CXXFLAGS="$CXXFLAGS -Wall"
+    CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
 fi
 
 dnl extra FCFLAGS
