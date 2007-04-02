@@ -37,7 +37,9 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml \
-	leak_test.nxs leak_test1.nxs leak_test2_*.nxs
+	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
+	nxtranslate nxsummary nxconvert nxdir nxbrowse
+
 
 ## testdir=$(prefix)/nexus/test
 
@@ -72,12 +74,10 @@ nxtest_DATA = README.tests
 nxexampledir=$(NXEXAMPLEDIR)
 nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
 
-nxsummary: skip_test
+nxsummary:
 	rm -f $@
 	if test -r ../applications/NXsummary/$@$(EXEEXT); then \
 	    ln -s ../applications/NXsummary/$@$(EXEEXT) $@; \
-	else \
-	    ln -s ./skip_test $@; \
 	fi
 
 nxconvert:
@@ -92,12 +92,10 @@ nxdir:
 	rm -f $@
 	ln -s ../applications/NXdir/$@$(EXEEXT) $@
 
-nxtranslate: skip_test
+nxtranslate:
 	rm -f $@
 	if test -r ../applications/NXtranslate/$@$(EXEEXT); then \
 	    ln -s ../applications/NXtranslate/$@$(EXEEXT) $@; \
-	else \
-	    ln -s ./skip_test $@; \
 	fi
 
 # for running tests via   "make check"
@@ -226,4 +224,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig nxconvert nxsummary nxdir nxbrowse nxtranslate data/dmc*
+DISTCLEANFILES = atconfig data/dmc*

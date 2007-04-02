@@ -465,17 +465,17 @@ AT_CLEANUP
 
 AT_BANNER([[Testing NXsummary Tool.]])
 AT_SETUP([Checking HDF4 test file])
-AT_CHECK([$HAVE_HDF4 && nxsummary --config NONE NXtest.hdf | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF4 && $HAVE_NXSUMMARY && nxsummary --config NONE NXtest.hdf | sed -e 's/\r$//' ],[], 
 [[SAMPLE:
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 test file])
-AT_CHECK([$HAVE_HDF5 && nxsummary --config NONE NXtest.h5 | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF5 && $HAVE_NXSUMMARY && nxsummary --config NONE NXtest.h5 | sed -e 's/\r$//' ],[], 
 [[SAMPLE:
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML test file])
-AT_CHECK([$HAVE_XML && nxsummary --config NONE NXtest.xml | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_XML && $HAVE_NXSUMMARY && nxsummary --config NONE NXtest.xml | sed -e 's/\r$//' ],[], 
 [[SAMPLE:
 ]])
 AT_CLEANUP
