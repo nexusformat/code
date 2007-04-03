@@ -74,7 +74,7 @@ namespace nxsum {
       }
     if (!label.empty())
       {
-        xmlNewProp(node, path_name, BAD_CAST label.c_str());
+        xmlNewProp(node, label_name, BAD_CAST label.c_str());
       }
   }
 
