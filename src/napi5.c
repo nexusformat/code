@@ -602,7 +602,7 @@ static int nxToHDF5Type(int datatype)
     hid_t type, cparms = -1;
     pNexusFile5 pFile;
     char pBuffer[256];
-    int i, byte_zahl;
+    int i, byte_zahl = 0;
     hsize_t chunkdims[H5S_MAX_RANK];
     hsize_t mydim[H5S_MAX_RANK], mydim1[H5S_MAX_RANK];  
     hsize_t size[H5S_MAX_RANK];
@@ -1291,7 +1291,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 /*------------------------------------------------------------------------*/
 static int hdf5ToNXType(int data_id, hid_t atype)
 {
-  int iPtype;
+  int iPtype = -1;
   hid_t sign_id, size_id;
 
            if (data_id==H5T_STRING)
@@ -1341,6 +1341,10 @@ static int hdf5ToNXType(int data_id, hid_t atype)
                iPtype=NX_FLOAT64;
             }
         }
+	if (iPtype == -1)
+	{
+         NXIReportError (NXpData, "ERROR: hdf5ToNXtype: invalid type");
+	}
 
 	   return iPtype;
 }

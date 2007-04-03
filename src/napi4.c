@@ -927,7 +927,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     else 
     {
       NXIReportError (NXpData, "Unknown compression method!");
-      NX_ERROR; 
+      return NX_ERROR; 
     }
     /* link into Vgroup, if in one */
     if (pFile->iCurrentVG != 0) {
