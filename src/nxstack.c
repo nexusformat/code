@@ -21,6 +21,7 @@
   For further information, see <http://www.neutron.anl.gov/NeXus/>
 */
 #include <stdlib.h>
+#include <string.h>
 #include <napi.h>
 #include "nxstack.h"
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   if(argc<=1){
     cout << "Usage: testProg <runfile>\n";
     return 0;

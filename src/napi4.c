@@ -701,6 +701,11 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     {
         type=DFNT_FLOAT64;
     }
+    else
+    {
+      NXIReportError (NXpData, "ERROR: invalid type in NX4makedata");
+      return NX_ERROR;
+    }
       
     if (rank <= 0) {
       sprintf (pBuffer, "ERROR: invalid rank specified for SDS %s",
@@ -827,6 +832,11 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     {
         type=DFNT_FLOAT64;
     }
+    else
+    {
+      NXIReportError (NXpData, "ERROR: invalid datatype in NX4compmakedata");
+      return NX_ERROR;
+    }
       
     if (rank <= 0) {
       sprintf (pBuffer, "ERROR: invalid rank specified for SDS %s",
@@ -940,7 +950,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     pNexusFile pFile;
     int32 iRank, iAtt, iType, iRet;
     int32 iSize[MAX_VAR_DIMS];
-    int compress_typei;
+    int compress_typei = COMP_CODE_NONE;
     NXname pBuffer;
     char pError[512];
     comp_info compstruct;  
@@ -1154,6 +1164,11 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     {
         type=DFNT_FLOAT64;
     }
+    else
+    {
+      NXIReportError (NXpData, "ERROR: HDF failed to determine attribute type");
+      return NX_ERROR;
+    }
     if (pFile->iCurrentSDS != 0) {
       /* SDS attribute */
       iRet = SDsetattr (pFile->iCurrentSDS, (char*)name, (int32)type,
@@ -1341,7 +1356,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   {
     pNexusFile pFile;
     pFile = NXIassert (fid);
-     printf("HDF4 link: iTag = %d, iRef = %d, target=\"%s\"\n", sLink->iTag, sLink->iRef, sLink->targetPath);
+     printf("HDF4 link: iTag = %ld, iRef = %ld, target=\"%s\"\n", sLink->iTag, sLink->iRef, sLink->targetPath);
     return NX_OK;
   }
   
@@ -1376,6 +1391,10 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       ac = NXACC_READ;
     }else if(pFile->iAccess[0] == 'w') {
       ac = NXACC_RDWR;
+    } else {
+      NXIReportError (NXpData, 
+        "ERROR: NX4flush failed to determine file access mode");
+      return NX_ERROR;
     }
     pCopy = (char *)malloc((strlen(pFileName)+10)*sizeof(char));
     if(!pCopy) {

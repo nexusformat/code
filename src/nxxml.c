@@ -868,8 +868,8 @@ static NXstatus  NXXsetnumberformat(NXhandle fid,
 /*============================ Attributes ============================*/
 static char *formatAttributeData(void *data, int datalen, int iType){
   int intData = 0;
-  long iValue;
-  double dValue;
+  long iValue = -99999;
+  double dValue = -1e38;
   char type[20];
   char *number;
 
@@ -931,7 +931,7 @@ static char *formatAttributeData(void *data, int datalen, int iType){
     break;
   }
   if(intData){
-    snprintf(number,79,"%s%d",type,iValue);
+    snprintf(number,79,"%s%ld",type,iValue);
   } else {
     snprintf(number,79,"%s%f",type,dValue);
   }
@@ -1454,7 +1454,7 @@ NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink){
 }
   
 /*-----------------------------------------------------------------------*/
-NXstatus  NXXmakenamedlink (NXhandle fid, char *name, NXlink* sLink){
+NXstatus  NXXmakenamedlink (NXhandle fid, CONSTCHAR *name, NXlink* sLink){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL, *linkNode = NULL;
   mxml_node_t *linkedNode = NULL;

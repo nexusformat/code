@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include "org_nexusformat_NexusFile.h"
 #include <napi.h>
 #include "handle.h"

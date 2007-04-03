@@ -9,7 +9,9 @@
   Mark Koennecke, November 2002
 */
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include "nxinterhelper.h"
 #include "nxdataset.h"
 /*-----------------------------------------------------------------
@@ -598,6 +600,7 @@ void *nx_isexternalgroup(void *handle, char *name, char *nxclass){
   } else {
     return NULL;
   }
+  return NULL;/*NOTREACHED*/
 }
 /*-----------------------------------------------------------------------*/
 int nx_linkexternal(void *handle, char *name, char *nxclass, 
