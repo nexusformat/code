@@ -49,6 +49,8 @@ else
     . ./autoversion.sh
 fi
 
+FCFLAGS="$F90FLAGS $FCFLAGS" # for compatibility with nexus-3.0
+
 AM_INIT_AUTOMAKE([1.6])
 
 
