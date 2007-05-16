@@ -5,6 +5,17 @@ For the latest information see
 
     http://www.nexusformat.org/Nexus_4_Release_Notes
 
+==System Requirements==
+'''MXML XML Parsing Library'''
+
+Version 2.2.2 of mxml is required. Earlier versions have a bug and the XML API will not work. This package can be downloded in [http://www.easysw.com/~mike/mxml/software.php both source and binary rpm form] and is also available as part of [http://fedoraproject.org/wiki/Extras/UsingExtras Fedora Extras]. IMPORTANT NOTE: Debian also provides the mxml package, but it based on 2.0 and will not work properly.
+
+==Building Notes==
+===NAG F90/F95 Compiler===
+The NAG compiler needs the '''-mismatch''' flag to be specified or else it will not compile NXmodule.f90 This is achieve by running configure with the '''FCFLAGS''' environment variable set to contain the flag e.g.
+<pre>
+env FCFLAGS="-mismatch" ./configure --with-f90=f95
+</pre>  
 ==New Features==
 The following items are features added to the NeXus API to provide new
 functionality to the core library or to assist in the build process.
