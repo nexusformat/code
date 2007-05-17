@@ -266,13 +266,13 @@ if test "$CXX" = "g++"; then
     CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
 fi
 
-dnl extra FCFLAGS
-if ! test -z "$FC"; then
+dnl extra FCFLAGS for Absoft f90
+if test ! -z "$FC"; then
     fcpathlc=`which $FC 2>/dev/null | tr 'A-Z' 'a-z'`
     case "$fcpathlc" in
-	*absort*)
+	*absoft*)
 	    echo "Absoft compiler detected - adjusting FCFLAGS"
-	    FCFLAGS="$FCFLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	    FCFLAGS="$FCFLAGS -p$mytop/bindings/f90 -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	    ;;
     esac
 fi
