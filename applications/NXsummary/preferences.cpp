@@ -205,12 +205,16 @@ namespace nxsum {
       }
 
     // user's configuration
-    string user_config = string(getenv("HOME")) + string("/.nxsummary.conf");
-    if (canRead(user_config))
-      {
-        privateLoadPreferences(user_config, preferences);
-        return;
-      }
+    string user_config;
+    if (getenv("HOME") != NULL) // HOME does not exist on WIN32
+    {
+        user_config = string(getenv("HOME")) + string("/.nxsummary.conf");
+        if (canRead(user_config))
+        {
+          privateLoadPreferences(user_config, preferences);
+          return;
+        }
+    }
 
     // system wide configuration
     string sys_config("/etc/nxsummary.conf");
