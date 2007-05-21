@@ -201,7 +201,7 @@ if test x$with_python != xno; then
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
-if test x$with_python != xno -o x$with_tcl != xno; then
+if test x$with_python != xno -o x$with_tcl != xno -o x$with_guile != xno; then
     if test x$with_swig != xyes; then
 	SWIG=$with_swig
     fi
