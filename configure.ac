@@ -127,14 +127,14 @@ if test -d "$with_java_home"; then
 	javaroot="$with_java_home"
 	AC_MSG_NOTICE([Java SDK home is $javaroot])
 	JAVAINCLUDE="-I$javaroot/include"
-	AC_PATH_PROGS(JAVAC,gcj javac,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAVAC,gcj javac,,[$javaroot/bin])
 	if test `basename "$JAVAC"` = "gcj"; then
 	    JAVACFLAGS="-C"	# force creation of .class files
 	fi
+	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin])
+	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin])
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar fastjar,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin:$PATH])
 fi
 
 
@@ -613,7 +613,7 @@ build:
         bindings:
                 F77 :          ${F77BINDING} (--with-f77=${F77})
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
-                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVAC=${JAVAC}, JAVA=${JAVA})
+                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
 
 Please check whether the configuration I detected matches what you would
