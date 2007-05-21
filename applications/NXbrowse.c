@@ -49,6 +49,7 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data);
 void WriteData (FILE *fd, char *data, int dataType, int numElements);
 int FindGroup (NXhandle fileId, char *groupName, char *groupClass);
 int FindData (NXhandle fileId, char *dataName);
+static int nxTypeSize(int dataType);
 
 /* if iByteAsChar, NX_INT8 and NX_UINT8 are treated as characters */
 static int iByteAsChar = 1; /* Assume global attributes are all characters */
@@ -542,20 +543,7 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
          dimSize *= dimensions[i];
       }
       for (i = 0; i < dimensions[0]; i++) {
-#ifdef HDF4
-         dataPtr = (char *)data + i * dimSize * DFKNTsize(dataType);        
-#else
-         if ((dataType == NX_CHAR) || (dataType == NX_INT8) || (dataType == NX_UINT8)) {
-            type_size = 1;
-         } else if ((dataType == NX_INT16) || (dataType == NX_UINT16)) {
-            type_size = 2;
-         } else if ((dataType == NX_INT32) || (dataType == NX_UINT32) || (dataType == NX_FLOAT32)) {
-            type_size = 4;
-         } else if (dataType == NX_FLOAT64) {
-            type_size = 8;
-         }
-         dataPtr = (char *)data + i * dimSize * type_size;  
-#endif         
+         dataPtr = (char *)data + i * dimSize * nxTypeSize(dataType);        
          DumpData (fd, rank-1, &dimensions[1], dataType, dataPtr);
       }
       return;
@@ -573,11 +561,8 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
         WriteData (fd, dataPtr, dataType, lineSize);
         fprintf(fd,"\n");
         dataSize -= lineSize;
-#ifdef HDF4
-        dataPtr += lineSize * DFKNTsize(dataType);
-#else
-        dataPtr += lineSize * type_size;
-#endif
+        dataPtr += lineSize * nxTypeSize(dataType);
+        printf("%p\n", dataPtr);
 
       }
    }
@@ -693,4 +678,27 @@ int FindData (NXhandle fileId, char *dataName)
    } while (status != NX_EOD);
    printf ("NX_ERROR: %s does not exist\n", dataName);
    return NX_EOD;
+}
+
+static int nxTypeSize(int dataType)
+{
+#ifdef XXXHDF4
+    return DFKNTsize(dataType);        
+#else
+	int type_size = 0;
+           if ((dataType == NX_CHAR) || (dataType == NX_INT8) || (dataType == NX_UINT8)) {
+            type_size = 1;
+         } else if ((dataType == NX_INT16) || (dataType == NX_UINT16)) {
+            type_size = 2;
+         } else if ((dataType == NX_INT32) || (dataType == NX_UINT32) || (dataType == NX_FLOAT32)) {
+            type_size = 4;
+         } else if (dataType == NX_FLOAT64) {
+            type_size = 8;
+         }
+	 else
+	 {
+	    printf("error in type %d\n", dataType);
+ 	 }
+    return type_size;
+#endif
 }
