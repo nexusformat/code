@@ -84,6 +84,7 @@ if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
 		AC_CHECK_PROGS(FC, [g95 f90 f95 ifort])
 	else
+		FC="$with_f90"
 		AC_CHECK_PROGS(FC, [$with_f90])
 	fi
 	dnl f90 has a "module path" option - hard to get as you really need a
@@ -587,7 +588,7 @@ if test -n "$SWIG" ; then
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
     test -n "$GUILEROOT" && SWIGBINDING="$SWIGBINDING guile"
     test -n "$PYTHONROOT" && SWIGBINDING="$SWIGBINDING python"
-    SWIGBINDING="$SWIGBINDING )"
+    SWIGBINDING="$SWIGBINDING ) SWIG=${SWIG}"
 else
     SWIGBINDING=no
 fi
@@ -612,7 +613,7 @@ build:
         bindings:
                 F77 :          ${F77BINDING} (--with-f77=${F77})
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
-                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot})
+                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVAC=${JAVAC}, JAVA=${JAVA})
 		SWIG:	       ${SWIGBINDING}
 
 Please check whether the configuration I detected matches what you would
