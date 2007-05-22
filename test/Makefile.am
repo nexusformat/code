@@ -224,4 +224,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig data/dmc*
+DISTCLEANFILES = atconfig
