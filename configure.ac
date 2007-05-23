@@ -284,7 +284,7 @@ if test ! -z "$F77"; then
     case "$f77pathlc" in
 	*absoft*)
 	    echo "Absoft f77 compiler detected - adjusting FFLAGS"
-	    FFLAGS="$FFLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	    FFLAGS="$FFLAGS -g -f -N15"
 	    ;;
     esac
 fi
