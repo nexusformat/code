@@ -272,8 +272,19 @@ if test ! -z "$FC"; then
     fcpathlc=`which $FC 2>/dev/null | tr 'A-Z' 'a-z'`
     case "$fcpathlc" in
 	*absoft*)
-	    echo "Absoft compiler detected - adjusting FCFLAGS"
+	    echo "Absoft f90 compiler detected - adjusting FCFLAGS"
 	    FCFLAGS="$FCFLAGS -N11 -p$mytop/bindings/f90 -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	    ;;
+    esac
+fi
+
+dnl extra FFLAGS for Absoft f77
+if test ! -z "$F77"; then
+    f77pathlc=`which $F77 2>/dev/null | tr 'A-Z' 'a-z'`
+    case "$f77pathlc" in
+	*absoft*)
+	    echo "Absoft f77 compiler detected - adjusting FFLAGS"
+	    FFLAGS="$FFLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	    ;;
     esac
 fi
