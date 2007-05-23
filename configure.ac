@@ -273,7 +273,7 @@ if test ! -z "$FC"; then
     case "$fcpathlc" in
 	*absoft*)
 	    echo "Absoft compiler detected - adjusting FCFLAGS"
-	    FCFLAGS="$FCFLAGS -p$mytop/bindings/f90 -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	    FCFLAGS="$FCFLAGS -N11 -p$mytop/bindings/f90 -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 	    ;;
     esac
 fi
