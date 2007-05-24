@@ -37,6 +37,9 @@ functionality to the core library or to assist in the build process.
 The following aspects of the API have changed in a potentially non-backward compatible way
 *The JAVA API now uses org.nexusformat rather than gov.anl.neutron.nexus
 
+==Known Issues==
+* The Fortran 90 part of testsuite fails with the Absoft compiler on MacOSX (it passes with g95 and gfortran (4.2)) [http://trac.nexusformat.org/code/ticket/68 details here]
+
 ==Miscellaneous bug fixes==
 The following items are bugs reported in the 3.x releases and resolved for
 the 4.0 release.
