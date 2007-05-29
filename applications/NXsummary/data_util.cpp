@@ -341,7 +341,13 @@ namespace nxsum {
 
   string readAsString(NXhandle handle, const string &path,
                       const string &operation) {
-  // convert the path to something c-friendly
+    // return empty string if the path is empty
+    if (path.empty())
+      {
+        return string("");
+      }
+
+    // convert the path to something c-friendly
     char c_path[GROUP_STRING_LEN];
     strcpy(c_path, path.c_str());
 

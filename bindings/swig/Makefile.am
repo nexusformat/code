@@ -35,7 +35,8 @@ bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 # python wrapper
 if HAVE_SWIG
 if HAVE_PYTHON
-nodist_python_PYTHON=nxpython.py
+NXPYTHONWRAP=nxpython.py
+nodist_python_PYTHON=$(NXPYTHONWRAP)
 LIBNXPYTHON=libnxpython.la
 libnxpython_la_SOURCES=$(COMMON_SRC)
 nodist_libnxpython_la_SOURCES=$(PYTHONWRAP)
@@ -142,5 +143,5 @@ COMMON_SRC=nxinterhelper.c $(NXDATASET)
 EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
 		$(DOC_OUTPUT) $(DOC_SRC) nxpython_test.py
 
-BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) nxpython.py
-CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) nxpython.py
+BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) $(NXPYTHONWRAP)
+CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) $(NXPYTHONWRAP)

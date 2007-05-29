@@ -1,3 +1,68 @@
+Version 4.0.0
+=============
+
+For the latest information see 
+
+    http://www.nexusformat.org/Nexus_4_Release_Notes
+
+==System Requirements==
+'''MXML XML Parsing Library'''
+
+Version 2.2.2 of mxml is required. Earlier versions have a bug and the XML API will not work. This package can be downloded in [http://www.easysw.com/~mike/mxml/software.php both source and binary rpm form] and is also available as part of [http://fedoraproject.org/wiki/Extras/UsingExtras Fedora Extras]. IMPORTANT NOTE: Debian also provides the mxml package, but it based on 2.0 and will not work properly.
+
+==Building Notes==
+===NAG F90/F95 Compiler===
+The NAG compiler needs the '''-mismatch''' flag to be specified or else it will not compile NXmodule.f90 This is achieve by running configure with the '''FCFLAGS''' environment variable set to contain the flag e.g.
+<pre>
+env FCFLAGS="-mismatch" ./configure --with-f90=f95
+</pre>  
+==New Features==
+The following items are features added to the NeXus API to provide new
+functionality to the core library or to assist in the build process.
+*Extended XML-API to handle unlimited dimensions
+*Add building of Doxygen documentation
+*Add support for two dimensional character arrays (HDF4 and HDF5 only)
+*Added group attribute support to HDF4 (2006/05/02). Requires HDF4 version (???)
+*Add NXmakenamedlink (2007/01/09) to all three file formats (external linking)
+*Add NXprintlink
+*Improved link testing in test suite
+*API can now read generic HDF5 files, such as those produced by matlab
+*Add facility to enable/disable error reporting
+*New NXsummary tool for summarising contentes of a NeXus file
+*Fortran 90 API now works with gfortran 4.2 and above as well as with G95
+*PYTHON and TCL bindings provided via a [http://www.swig.org/ SWIG interface]
+*Additional NXtranslate translators: SPEC, ESRF-EDF
+
+==Changed Features==
+The following aspects of the API have changed in a potentially non-backward compatible way
+*The JAVA API now uses org.nexusformat rather than gov.anl.neutron.nexus
+
+==Known Issues==
+* The Fortran 90 part of testsuite fails with the Absoft compiler on MacOSX (it passes with g95 and gfortran (4.2)) [http://trac.nexusformat.org/code/ticket/68 details here]
+
+==Miscellaneous bug fixes==
+The following items are bugs reported in the 3.x releases and resolved for
+the 4.0 release.
+*Leading and trailing whitespace is stripped from char data on a read; this can be disabled by passing the NXACC_NOSTRIP option to NXopen
+*Fix problems with MXML (what problems?)
+*Improve test procedures when not all libraries are present
+*Correct sourcepath for javadoc
+*Updated makefiles for swig bindings (python, tcl)
+
+Changes in Version 3.0.0
+========================
+
+- GNU Autotools are now used for building the API and programs
+
+- XML files can be written by the NeXus API by specifying NXACC_XML to NXopen
+
+- The NXtoXML, NXtoNX4 and NXtoNX5 utilities have been combined into a single utility nxconvert. To make a DTD definition file use nxtodtd
+
+- New utilities nxdir and nxtranslate
+
+- g95 compiler supported by FORTRAN90 bindings. To specify another
+  compiler use the  --with-f90   option of configure
+
 Changes in Version 2.0.0
 ========================
 
@@ -206,5 +271,3 @@ Changes in Version 1.0.0
   file_time     - set on file creation, then left unchanged
 
 $Id$
-
-

@@ -29,12 +29,12 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include `xml2-config --cflags`
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include @LIBXML2_CFLAGS@
 
 bin_PROGRAMS = nxsummary
-noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp config.h \
+noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp config.h output.hpp xml_util.hpp\
    tclap/ArgException.h tclap/Arg.h tclap/CmdLine.h tclap/CmdLineInterface.h tclap/CmdLineOutput.h tclap/DocBookOutput.h tclap/HelpVisitor.h tclap/IgnoreRestVisitor.h tclap/MultiArg.h tclap/StdOutput.h tclap/SwitchArg.h tclap/UnlabeledMultiArg.h tclap/UnlabeledValueArg.h tclap/ValueArg.h tclap/VersionVisitor.h tclap/Visitor.h tclap/XorHandler.h
-nxsummary_SOURCES = data_util.cpp main.cpp string_util.cpp preferences.cpp
+nxsummary_SOURCES = data_util.cpp main.cpp string_util.cpp preferences.cpp output.cpp
 nxsummary_LDADD = $(LIBNEXUS)
 nxsummary_LDFLAGS = -static $(LDFLAGS)
 EXTRA_DIST = LICENSE tclap/AUTHORS tclap/COPYING tclap/README

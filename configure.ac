@@ -49,6 +49,8 @@ else
     . ./autoversion.sh
 fi
 
+FCFLAGS="$F90FLAGS $FCFLAGS" # for compatibility with nexus-3.0
+
 AM_INIT_AUTOMAKE([1.6])
 
 
@@ -82,6 +84,7 @@ if test x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
 		AC_CHECK_PROGS(FC, [g95 f90 f95 ifort])
 	else
+		FC="$with_f90"
 		AC_CHECK_PROGS(FC, [$with_f90])
 	fi
 	dnl f90 has a "module path" option - hard to get as you really need a
@@ -115,16 +118,6 @@ else
 	F77=
 fi
 
-AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify name of swig compiler]), [with_swig=$withval], [with_swig=no])
-if test x$with_swig != xno; then
-    if test x$with_swig != xyes; then
-	SWIG=$with_swig
-    fi
-    AC_CHECK_PROGS(SWIG,[swig])
-else
-    SWIG=
-fi
-
 java_host="linux"
 javaroot=""
 with_java=no
@@ -134,14 +127,14 @@ if test -d "$with_java_home"; then
 	javaroot="$with_java_home"
 	AC_MSG_NOTICE([Java SDK home is $javaroot])
 	JAVAINCLUDE="-I$javaroot/include"
-	AC_PATH_PROGS(JAVAC,gcj javac,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAVAC,gcj javac,,[$javaroot/bin])
 	if test `basename "$JAVAC"` = "gcj"; then
 	    JAVACFLAGS="-C"	# force creation of .class files
 	fi
+	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin])
+	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin])
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar fastjar,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin:$PATH])
 fi
 
 
@@ -186,13 +179,37 @@ AC_SUBST(NXEXAMPLEDIR)
 AC_SUBST(NXTESTDIR)
 
 AM_PROG_GCJ
-AM_PATH_PYTHON(,, :)
 
 AC_PROG_LIBTOOL
 dnl AC_LIBTOOL_WIN32_DLL
 
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
+if test x$with_tcl != xno; then
+    AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
+fi
+if test x$with_guile != xno; then
+    AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
+fi
+if test x$with_opengenie != xno; then
+    AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
+fi
+if test x$with_python != xno; then
+    AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[bin/python])
+    if test x$PYTHONROOT != x; then PYTHON=$PYTHONROOT/bin/python; fi
+    AM_PATH_PYTHON(,, :)
+fi
+
+AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
+if test x$with_python != xno -o x$with_tcl != xno -o x$with_guile != xno; then
+    if test x$with_swig != xyes; then
+	SWIG=$with_swig
+    fi
+    AC_CHECK_PROGS(SWIG,[swig])
+else
+    SWIG=
+fi
 
 AC_CHECK_PROGS(DOCBOOK2PDF,[docbook2pdf])
 AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
@@ -203,14 +220,10 @@ AC_CHECK_PROGS(PDFLATEX,[pdflatex])
 AC_CHECK_PROGS(DOXYGEN,[doxygen])
 AC_CHECK_PROGS(DOT,[dot])
 
-AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
-AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
-AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[include/python$PYTHON_VERSION/Python.h])
-AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
 
 dnl  flags for building swig guile bindings
 AC_SUBST(SWGUILEFLAGS)  
-if ! test -z "$GUILEROOT"; then
+if test x$GUILEROOT != x -a x$SWIG != x; then
     if test `$SWIG -guile -help 2>&1 | grep -i '\-linkage' | wc -l` -gt 0; then
 	SWGUILEFLAGS="-Linkage ltdlmod"
     else
@@ -247,25 +260,45 @@ fi
 
 # enable compiler warnings if gcc
 if test "$CC" = "gcc"; then
-    CFLAGS="$CFLAGS -Wall"
+    CFLAGS="$CFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
 fi
 
 if test "$CXX" = "g++"; then
-    CXXFLAGS="$CXXFLAGS -Wall"
+    CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
 fi
 
-dnl extra FCFLAGS
-if ! test -z "$FC"; then
+dnl extra FCFLAGS for Absoft f90
+if test ! -z "$FC"; then
     fcpathlc=`which $FC 2>/dev/null | tr 'A-Z' 'a-z'`
     case "$fcpathlc" in
-	*absort*)
-	    echo "Absoft compiler detected - adjusting FCFLAGS"
-	    FCFLAGS="$FCFLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	*absoft*)
+	    echo "Absoft f90 compiler detected - adjusting FCFLAGS"
+	    FCFLAGS="$FCFLAGS -p$mytop/bindings/f90 -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
+	    case "$host_cpu" in
+		*powerpc*)
+	    	    FCFLAGS="$FCFLAGS -N11"
+		    ;;
+	    esac
+	    ;;
+    esac
+fi
+
+dnl extra FFLAGS for Absoft f77
+if test ! -z "$F77"; then
+    f77pathlc=`which $F77 2>/dev/null | tr 'A-Z' 'a-z'`
+    case "$f77pathlc" in
+	*absoft*)
+	    echo "Absoft f77 compiler detected - adjusting FFLAGS"
+	    FFLAGS="$FFLAGS -g -f -N15"
 	    ;;
     esac
 fi
 
 HDF_EXT=a # library file extent to look for with HDF libraries
+
+AC_SUBST(LIBXML2_CFLAGS)
+LIBXML2_CFLAGS='`xml2-config --cflags`'
+
 case $host in
     alpha*-dec-osf*)
 	java_host="alpha"
@@ -282,6 +315,7 @@ case $host in
 	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
+	LIBXML2_CFLAGS=-I/usr/local/include
 	java_host="win32"
 	;;
 
@@ -443,7 +477,7 @@ if test "$with_xml" != "no" -a -z "$MXMLROOT"; then
 fi
 if test ! -z "$MXMLROOT"; then
     XML_LDFLAGS="-lmxml"
-    LDFLAGS="-L$XMLROOT/lib $LDFLAGS"
+    LDFLAGS="-L$MXMLROOT/lib $LDFLAGS"
     XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
 fi
 AC_SUBST(XML_LDFLAGS)
@@ -570,7 +604,7 @@ if test -n "$SWIG" ; then
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
     test -n "$GUILEROOT" && SWIGBINDING="$SWIGBINDING guile"
     test -n "$PYTHONROOT" && SWIGBINDING="$SWIGBINDING python"
-    SWIGBINDING="$SWIGBINDING )"
+    SWIGBINDING="$SWIGBINDING ) SWIG=${SWIG}"
 else
     SWIGBINDING=no
 fi
@@ -595,7 +629,7 @@ build:
         bindings:
                 F77 :          ${F77BINDING} (--with-f77=${F77})
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
-                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot})
+                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
 
 Please check whether the configuration I detected matches what you would

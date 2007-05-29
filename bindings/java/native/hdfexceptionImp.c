@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include "jni.h"
+#include "hdfexceptionImp.h"
 
 jboolean buildException( JNIEnv *env, jint HDFerr)
 {

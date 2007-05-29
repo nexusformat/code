@@ -108,7 +108,7 @@ int PrintGroup ()
          }
          else if (!strncmp(class,"SDS",3)) {
             PrintIndent ();
-            fprintf (outId, "<%s", &name);
+            fprintf (outId, "<%s", name);
             if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
             if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
             if (dataType != NX_CHAR) {
@@ -220,7 +220,7 @@ int PrintAttributes ()
             indent--;
             i = 0;
          }
-         fprintf (outId, " %s=\"", &attrName);
+         fprintf (outId, " %s=\"", attrName);
          PrintValues (attrBuffer, attrType, attrLen);
          fprintf (outId, "\"");
          if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
@@ -234,12 +234,40 @@ int PrintAttributes ()
 void PrintValues (void *data, int dataType, int numElements)
 {
    int i;
+   char c;
 
    for (i=0; i<numElements; i++) {
       switch(dataType) {
          case NX_CHAR:
-            fprintf (outId, "%c", ((char *)data)[i]);
+	    c = ((char *)data)[i];
+	    switch(c)
+	    {
+		case '<':
+		    fprintf (outId, "%s", "&lt;");
+		    break;
+
+		case '>':
+		    fprintf (outId, "%s", "&gt;");
+		    break;
+
+		case '&':
+		    fprintf (outId, "%s", "&amp;");
+		    break;
+
+		case '\'':
+		    fprintf (outId, "%s", "&apos;");
+		    break;
+
+		case '\"':
+		    fprintf (outId, "%s", "&quot;");
+		    break;
+
+		default:
+		    fprintf (outId, "%c", c);
+		    break;
+	    }
             break;
+
          case NX_INT8:
             fprintf (outId, "%d", ((char *)data)[i]);
             if (i < numElements-1) fprintf (outId, " ");

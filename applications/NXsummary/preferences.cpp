@@ -8,6 +8,7 @@
 #include "data_util.hpp"
 #include "preferences.hpp"
 #include "string_util.hpp"
+#include "xml_util.hpp"
 
 using std::cout;
 using std::endl;
@@ -16,13 +17,7 @@ using std::string;
 using std::ostringstream;
 using std::vector;
 
-static const int BUFFER_SIZE = 256;
 static const string EMPTY_STRING("");
-static const xmlChar *root_name = xmlCharStrdup("nxsummary");
-static const xmlChar *item_name = xmlCharStrdup("item");
-static const xmlChar *path_name = xmlCharStrdup("path");
-static const xmlChar *label_name = xmlCharStrdup("label");
-static const xmlChar *operation_name = xmlCharStrdup("operation");
 
 namespace nxsum {
   bool canRead(const string &filename) {
@@ -197,6 +192,11 @@ namespace nxsum {
             privateLoadPreferences(filename, preferences);
             return;
           }
+        else if (filename == "NONE")
+          {
+            setDefaultPreferences(preferences);
+            return;
+          }
         else
           {
             cout << "Cannot read configuration file \"" << filename << "\""
@@ -205,12 +205,16 @@ namespace nxsum {
       }
 
     // user's configuration
-    string user_config = string(getenv("HOME")) + string("/.nxsummary.conf");
-    if (canRead(user_config))
-      {
-        privateLoadPreferences(user_config, preferences);
-        return;
-      }
+    string user_config;
+    if (getenv("HOME") != NULL) // HOME does not exist on WIN32
+    {
+        user_config = string(getenv("HOME")) + string("/.nxsummary.conf");
+        if (canRead(user_config))
+        {
+          privateLoadPreferences(user_config, preferences);
+          return;
+        }
+    }
 
     // system wide configuration
     string sys_config("/etc/nxsummary.conf");
@@ -224,9 +228,11 @@ namespace nxsum {
     setDefaultPreferences(preferences);
   }
 #else
-  void loadPreferences(std::string &filename, std::vector<Item> &preferences) {
-    cout << "LIBXML2 tree support not present. Using default preferences."
-         << endl;
+  void loadPreferences(const string &filename, vector<Item> &preferences) {
+    if (filename != "NONE") {
+      cout << "LIBXML2 tree support not present. Using default preferences."
+           << endl;
+    }
     setDefaultPreferences(preferences);
   }
 #endif    
@@ -278,15 +284,15 @@ namespace nxsum {
 #if defined(LIBXML_TREE_ENABLED) && defined(LIBXML_OUTPUT_ENABLED)
   void writePreference(xmlNodePtr &parent, const Item &preference) {
     xmlNodePtr node = xmlNewChild(parent, NULL, item_name, NULL);
-    if (preference.path.size() > 0)
+    if (!preference.path.empty())
       {
         xmlNewProp(node, path_name, BAD_CAST preference.path.c_str());
       }
-    if (preference.label.size() > 0)
+    if (!preference.label.empty())
       {
         xmlNewProp(node, label_name, BAD_CAST preference.label.c_str());
       }
-    if (preference.operation.size() > 0)
+    if (!preference.operation.empty())
       {
         xmlNewProp(node, operation_name,
                    BAD_CAST preference.operation.c_str());
@@ -298,9 +304,6 @@ namespace nxsum {
     // set up variables for creating the document
     xmlDocPtr doc = NULL;        // document pointer
     xmlNodePtr root_node = NULL; // node pointers
-    xmlNodePtr node = NULL;      // node pointers
-    char buff[256];
-    int i, j;
 
     // create the document and the root node
     doc = xmlNewDoc(BAD_CAST "1.0");

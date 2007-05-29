@@ -29,7 +29,7 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include `xml2-config --cflags`
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include @LIBXML2_CFLAGS@
 
 noinst_LTLIBRARIES = libTextXML.la
 

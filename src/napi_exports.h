@@ -7,10 +7,12 @@ NXstatus CALL_MODE NXISETCACHE(long newVal)
     return NXsetcache(newVal);
 }
 
+/*
 void CALL_MODE NXNXNXREPORTERROR(void *pData, char *string)
 {
     NXNXNXReportError(pData, string);
 }
+*/
      
 NXstatus CALL_MODE NXIOPEN(CONSTCHAR *filename, NXaccess am, NXhandle *gHandle)
 {

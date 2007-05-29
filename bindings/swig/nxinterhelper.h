@@ -57,8 +57,12 @@ void *nx_getattr(void *handle, char *name, int type, int length);
 int nx_makelink(void *handle, void *link);
 int nx_makenamedlink(void *handle, char *name, void *link);
 int nx_opensourcgroup(void *handle);
+void *nx_isexternalgroup(void *handle, char *name, char *nxclass);
+int nx_linkexternal(void *handle, char *name, char *nxclass, char *url);
+char *nx_inquirefile(void *handle);
+int nx_opensourcegroup(void *handle);
 /*----------------- error handling -----------------------------*/
-char *nx_getlasterr(void);
+char *nx_getlasterror(void);
 
 #endif
 

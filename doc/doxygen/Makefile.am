@@ -9,12 +9,14 @@ nxdocdir	= $(NXDOCDIR)
 
 if HAVE_DOXYGEN
 if HAVE_PDFLATEX
+if HAVE_DOT
 DOXY_STUFF = refman.pdf # html
 
 refman.pdf :
 	$(DOXYGEN) Doxyfile
 	( cd latex; make pdf )
 	cp latex/refman.pdf $@
+endif
 endif
 endif
 

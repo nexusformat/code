@@ -15,12 +15,12 @@ License: LGPL
 # nexus into separate packages (libraries + apps)
 Group: Development/Libraries
 #Group: Development/Tools
-Source: ftp://ftp.neutron.anl.gov/nexus/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.gz
-URL: http://www.neutron.anl.gov/NeXus/
+Source: http://download.nexusformat.org/kits/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.gz
+URL: http://www.nexusformat.org/
 Distribution: @DISTRIBUTION@
 #Icon: nexus.xpm
 Vendor: NeXus International Advisory Committee (NIAC)
-Packager: NeXus Developers <nexus-developers@anl.gov>
+Packager: NeXus Developers <nexus-developers@nexusformat.org>
 # Prefix allows our package to be relocatable i.e. installable in 
 # other than just the /usr/local directory
 Prefix: /usr/local
@@ -51,7 +51,7 @@ make
 # as automake supports it; configure --prefix is OK for now though
 make install
 %files
-%doc README NEWS ChangeLog AUTHORS COPYING INSTALL ReleaseNotes
+%doc README NEWS ChangeLog AUTHORS COPYING INSTALL
 # %docdir /usr/local/doc
 /usr/local/lib
 /usr/local/bin
@@ -78,11 +78,19 @@ if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
+* Thu May 24 2007 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> - 4.0.0
+- Tag and build 4.0.0
+* Wed May 16 2007 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> - 4.0rc3
+- Tag and build 4.0rc3
+* Fri Mar 30 2007 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> - 4.0rc2
+- Tag and build 4.0rc2
+* Thu Mar 15 2007 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> - 4.0rc1
+- Tag and build 4.0rc1
 * Wed Jul 27 2005 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
 - Change Copyright: to License: and add PACKAGE_RELEASE
 * Mon Jun  6 2005 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
 - Add extra documentation and example files to distribution
-* Wed May 12 2004 Jens Krüger <jens.krueger@frm2.tum.de>
+* Wed May 12 2004 Jens Krueger <jens.krueger@frm2.tum.de>
 - Change the License entry to LGPL
 - remove /usr/local/nexus /usr/local/doc from the file list
 * Wed Mar 24 2004 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>

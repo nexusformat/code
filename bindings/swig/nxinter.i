@@ -88,5 +88,5 @@ extern int nx_opensourcegroup(void *handle);
 
 %section "External Linking"
 extern char *nx_inquirefile(void *handle);
-extern void *nx_isexternalgroup(void *handle, char *name);
+extern void *nx_isexternalgroup(void *handle, char *name, char* nxclass);
 extern int nx_linkexternal(void *handle, char *name, char *nxclass, char *nxurl);

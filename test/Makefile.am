@@ -37,7 +37,9 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml \
-	leak_test1.nxs leak_test2_*.nxs
+	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
+	nxtranslate nxsummary nxconvert nxdir nxbrowse
+
 
 ## testdir=$(prefix)/nexus/test
 
@@ -54,7 +56,8 @@ F90_TARGETS = NXtest
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
 			NXtest.f90 napif_test.f README.tests \
 			napi_test.c napif4_test.f napif5_test.f \
-			setup_test $(srcdir)/data/dmc*
+			setup_test $(srcdir)/data/dmc* \
+			nxbrowse.txt
 
 TESTSUITE	= $(srcdir)/testsuite
 
@@ -65,15 +68,35 @@ AUTOTEST	= $(AUTOM4TE) --language=autotest
 check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS)
 
 nxtestdir=$(NXTESTDIR)
-nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) leak_test1 leak_test2
+nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) leak_test1 leak_test2 leak_test3
 nxtest_DATA = README.tests
 
 nxexampledir=$(NXEXAMPLEDIR)
 nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
 
+nxsummary:
+	rm -f $@
+	if test -r ../applications/NXsummary/$@$(EXEEXT); then \
+	    ln -s ../applications/NXsummary/$@$(EXEEXT) $@; \
+	fi
+
 nxconvert:
 	rm -f $@
 	ln -s ../applications/$@$(EXEEXT) $@
+
+nxbrowse:
+	rm -f $@
+	ln -s ../applications/$@$(EXEEXT) $@
+
+nxdir:
+	rm -f $@
+	ln -s ../applications/NXdir/$@$(EXEEXT) $@
+
+nxtranslate:
+	rm -f $@
+	if test -r ../applications/NXtranslate/$@$(EXEEXT); then \
+	    ln -s ../applications/NXtranslate/$@$(EXEEXT) $@; \
+	fi
 
 # for running tests via   "make check"
 ## check_PROGRAMS = $(test_PROGRAMS)	# what to build
@@ -96,6 +119,10 @@ leak_test1_LDFLAGS=-static $(LDFLAGS)
 leak_test2_SOURCES=leak_test2.cxx
 leak_test2_LDADD=$(LIBNEXUS)
 leak_test2_LDFLAGS=-static $(LDFLAGS)
+
+leak_test3_SOURCES=leak_test3.cxx
+leak_test3_LDADD=$(LIBNEXUS)
+leak_test3_LDFLAGS=-static $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
@@ -183,9 +210,7 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	} > $(srcdir)/package.m4
 
-check-local:	atconfig atlocal $(TESTSUITE) 
-	rm -f nxconvert
-	ln -s ../applications/nxconvert$(EXEEXT) nxconvert
+check-local: atconfig atlocal nxconvert nxsummary nxdir nxbrowse nxtranslate $(TESTSUITE) 
 	$(TESTS_ENVIRONMENT) $(SHELL) $(TESTSUITE)
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
@@ -199,4 +224,4 @@ clean-local:
 	-$(SHELL) $(TESTSUITE) --clean
 
 
-DISTCLEANFILES = atconfig nxconvert data/dmc*
+DISTCLEANFILES = atconfig

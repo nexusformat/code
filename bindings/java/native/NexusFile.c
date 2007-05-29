@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include "org_nexusformat_NexusFile.h"
 #include <napi.h>
 #include "handle.h"
@@ -92,7 +93,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_init
 {
     NXhandle handle;
     char *fileName;
-    int iAccess, iRet;
+    int iRet;
 
 #ifdef DEBUG
     if(fd == NULL)
@@ -519,7 +520,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
     NXhandle nxhandle;
     jbyte *bdata;
     char *Name;
-    int iRet, iDataLen;
+    int iRet, iDataLen, div = 1;
 
     /* set error handler */
     NXMSetError(env,JapiError);
@@ -530,7 +531,30 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
     /* convert java types to C types*/
     bdata = (*env)->GetByteArrayElements(env,data,0);
     iDataLen = (*env)->GetArrayLength(env,data);
-    iDataLen /=  DFKNTsize(type);
+    switch(type)
+    {
+        case NX_INT8:
+        case NX_UINT8:
+        case NX_CHAR:
+             div = 1;
+             break;
+        case NX_UINT16:
+        case NX_INT16:
+             div = 2;
+             break;
+        case NX_INT32:
+        case NX_UINT32:
+        case NX_FLOAT32:
+             div = 4;
+             break;
+        case NX_FLOAT64:
+             div = 8;
+             break;
+        default:
+	  JapiError(env, "Bad data type in NXputattr");
+	  return;
+    }
+    iDataLen /=  div;
     Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
    
     iRet = NXputattr(nxhandle,Name, bdata, iDataLen, type);
@@ -1082,7 +1106,6 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextentry
     NXname pName, pClass;
     int iRet, iType;
     jstring rstring;
-    jobject o;
 
    /* set error handler */
     NXMSetError(env,JapiError);
@@ -1111,7 +1134,6 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextattr
     NXname pName;
     int iRet, iType, iLen;
     jstring rstring;
-    jobject o;
     jint *jarray;
    /* set error handler */
     NXMSetError(env,JapiError);
@@ -1136,7 +1158,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextattr
 JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxinquirefile(JNIEnv *env, 
 				      jobject obj , jint handle, jobjectArray jnames){
     NXhandle nxhandle;
-    int status, length = 1024;
+    int status;
     char filename[1024];
     jstring rstring;
 
@@ -1217,11 +1239,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_debugstop
 
    while(iStop)
    {
-#if 0 /* defined(WIN32) /* we use mingw now */
-	   Sleep(2000);
-#else
-       sleep(2);
-#endif
+/*       sleep(2); */
    }
 }
 

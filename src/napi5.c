@@ -583,7 +583,11 @@ static int nxToHDF5Type(int datatype)
     {
         type=H5T_NATIVE_DOUBLE;
     }
-
+    else
+    {
+      NXIReportError (NXpData, "ERROR: nxToHDF5Type: unknown type");
+      type = -1;
+    }
     return type;
 }
   
@@ -595,10 +599,10 @@ static int nxToHDF5Type(int datatype)
 					  int compress_type, int chunk_size[])
   {
     hid_t datatype1, dataspace, iNew, iRet;
-    hid_t type,cparms;
+    hid_t type, cparms = -1;
     pNexusFile5 pFile;
     char pBuffer[256];
-    int i, byte_zahl;
+    int i, byte_zahl = 0;
     hsize_t chunkdims[H5S_MAX_RANK];
     hsize_t mydim[H5S_MAX_RANK], mydim1[H5S_MAX_RANK];  
     hsize_t size[H5S_MAX_RANK];
@@ -716,6 +720,9 @@ static int nxToHDF5Type(int datatype)
         NXIReportError (NXpData, pBuffer);
         return NX_ERROR;
       }
+    }
+    if (cparms != -1) {
+	iRet = H5Pclose(cparms);
     }
     iRet = H5Sclose(dataspace);
     iRet = H5Tclose(datatype1);
@@ -926,7 +933,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     pNexusFile5 pFile;
     int iRet, i;
     int rank;
-    hssize_t myStart[H5S_MAX_RANK];
+    hsize_t myStart[H5S_MAX_RANK];
     hsize_t mySize[H5S_MAX_RANK];
     hsize_t size[1],maxdims[H5S_MAX_RANK];
     hid_t   filespace,dataspace; 
@@ -1083,7 +1090,7 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
     return NX_OK;
 }
 /*---------------------------------------------------------------------*/
-NXstatus NX5makenamedlink(NXhandle fid, char *name, NXlink *sLink)
+NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 {
     pNexusFile5 pFile;
     char linkTarget[1024];
@@ -1238,6 +1245,8 @@ NXstatus NX5makenamedlink(NXhandle fid, char *name, NXlink *sLink)
         self.iNX++;
         *((int*)opdata)=self.iNX;
         break;
+      default:
+	break;
     }
     return 0; 
   }
@@ -1282,7 +1291,7 @@ NXstatus NX5makenamedlink(NXhandle fid, char *name, NXlink *sLink)
 /*------------------------------------------------------------------------*/
 static int hdf5ToNXType(int data_id, hid_t atype)
 {
-  int iPtype;
+  int iPtype = -1;
   hid_t sign_id, size_id;
 
            if (data_id==H5T_STRING)
@@ -1332,13 +1341,17 @@ static int hdf5ToNXType(int data_id, hid_t atype)
                iPtype=NX_FLOAT64;
             }
         }
+	if (iPtype == -1)
+	{
+         NXIReportError (NXpData, "ERROR: hdf5ToNXtype: invalid type");
+	}
 
 	   return iPtype;
 }
 /*--------------------------------------------------------------------------*/
 static int h5MemType(hid_t atype)
 {
-  hid_t data_id, size_id, sign_id, memtype_id;
+  hid_t data_id, size_id, sign_id, memtype_id = -1;
  
   data_id = H5Tget_class(atype);
 
@@ -1383,7 +1396,11 @@ static int h5MemType(hid_t atype)
 	     memtype_id = H5T_NATIVE_DOUBLE;
 	  }
       }           
-       return memtype_id;
+      if (memtype_id == -1)
+      {
+         NXIReportError (NXpData, "ERROR: h5MemType: invalid type");
+      }
+      return memtype_id;
 }
   /*-------------------------------------------------------------------------*/
 
@@ -1594,12 +1611,12 @@ static int h5MemType(hid_t atype)
    NXstatus  NX5getslab (NXhandle fid, void *data, int iStart[], int iSize[])
    {
      pNexusFile5 pFile;
-     hssize_t myStart[H5S_MAX_RANK];
+     hsize_t myStart[H5S_MAX_RANK];
      hsize_t mySize[H5S_MAX_RANK];
-     hssize_t mStart[H5S_MAX_RANK];
+     hsize_t mStart[H5S_MAX_RANK];
      hid_t   memspace, iRet, data_id;
      hid_t   memtype_id, size_id, sign_id;
-     char *tmp_data;
+     char *tmp_data = NULL;
      char *data1;
      int i, dims, iRank, mtype = 0;
 
@@ -1775,7 +1792,7 @@ static int h5MemType(hid_t atype)
    {
      pNexusFile5 pFile;
      int iNew, iRet, vid;
-     hid_t type, atype, glob;
+     hid_t type, atype = -1, glob;
      char pBuffer[256];
 
      pFile = NXI5assert (fid);

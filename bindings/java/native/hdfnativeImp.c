@@ -35,6 +35,7 @@
 typedef int intn;
 
 #include "jni.h"
+#include "hdfexceptionImp.h"
 
 /* returns int [] */
 JNIEXPORT jintArray JNICALL Java_ncsa_hdf_hdflib_HDFNativeData_byteToInt___3B 

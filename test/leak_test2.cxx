@@ -18,7 +18,7 @@ int main (int argc, char* argv[])
         for( iFile = 0; iFile < nFiles; iFile++ )
         {
                 sprintf(strFile, "leak_test2_%03d.nxs", iFile);
-                unlink(strFile);
+                remove(strFile);
                 printf("file %s\n", strFile);
                 NXhandle fileid;
                 if (NXopen(strFile, access_mode, &fileid) != NX_OK) return 1;
@@ -52,7 +52,7 @@ int main (int argc, char* argv[])
 		fileid = NULL;
 
                 // Delete file
-                unlink(strFile);
+                remove(strFile);
         }
 	_exit(EXIT_FAILURE);
 	return 0;
