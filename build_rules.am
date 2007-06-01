@@ -41,8 +41,8 @@ FCLINK = $(LIBTOOL) --mode=link --tag=CC $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) \
 .f90.lo:
 	$(LTFCCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
-F77LINK = $(LIBTOOL) --mode=link --tag=CC $(F77LD) $(AM_FFLAGS) \
-	$(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+#F77LINK = $(LIBTOOL) --mode=link --tag=CC $(F77LD) $(AM_FFLAGS) \
+#	$(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 #
 #.java.class:
 #	$(JAVAC) $<
