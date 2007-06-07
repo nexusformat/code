@@ -875,7 +875,11 @@ static char *formatAttributeData(void *data, int datalen, int iType){
 
 
   if(iType == NX_CHAR){
-    return strdup((char *)data);
+/* data may not be NULL terminated */
+    number = (char*)malloc((datalen+1) * sizeof(char));
+    memcpy(number, data, datalen * sizeof(char));
+    number[datalen] = '\0';
+    return number;
   }
 
   number = (char *)malloc(132*sizeof(char));
