@@ -40,7 +40,7 @@ public class  NexusFile implements NeXusFileInterface {
     /**
       * constant denoting an unlimited dimension.
       */
-    public final static int NX_UNLIMITED = 0;
+    public final static int NX_UNLIMITED = -1;
 
     /**
       * constants for number types. @see #makedata, @see #putattr 
