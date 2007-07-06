@@ -4,10 +4,10 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name:NeXus
+Name:@PACKAGE_NAME@
 Description:Libraries and utilities for using NeXus format data files
-Version:@VERSION@
+Version:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
 Requires:
 Conflicts:
-Libs:	-L${libdir} -lNeXus @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@
+Libs:	-L${libdir} -lNeXus @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ @LIBS@
 Cflags:	-I${includedir} @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
