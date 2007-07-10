@@ -415,7 +415,7 @@ if test "$H4ROOT"; then
 	4.[[12]]*) 
     		HDF4_LDFLAGS="-lmfhdf -ldf";
 		for j in lib lib64; do
-		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $LDFLAGS"; fi
+		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then HDF4_LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $HDF4_LDFLAGS"; fi
 		done
 		if test -z "$H4INCSUBROOT"; then
     		    HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4"
@@ -452,7 +452,7 @@ if test "$H5ROOT"; then
 	1.[[6]]*)
     		HDF5_LDFLAGS="-lhdf5 -lz"
 		for j in lib lib64; do
-		    if test -d $H5ROOT/$j; then LDFLAGS="-L$H5ROOT/$j $LDFLAGS"; fi
+		    if test -d $H5ROOT/$j; then HDF5_LDFLAGS="-L$H5ROOT/$j $HDF5_LDFLAGS"; fi
 		done
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
@@ -477,7 +477,7 @@ if test "$with_xml" != "no" -a -z "$MXMLROOT"; then
 fi
 if test ! -z "$MXMLROOT"; then
     XML_LDFLAGS="-lmxml"
-    LDFLAGS="-L$MXMLROOT/lib $LDFLAGS"
+    XML_LDFLAGS="-L$MXMLROOT/lib $XML_LDFLAGS"
     XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
 fi
 AC_SUBST(XML_LDFLAGS)
