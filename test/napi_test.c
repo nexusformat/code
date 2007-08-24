@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "napi.h"
+#include "napiconfig.h"
 
 static void print_data (const char *prefix, void *data, int type, int num);
 static int testLoadPath();
@@ -62,9 +63,14 @@ int main (int argc, char *argv[])
   int64_t grossezahl[4];
 
   grossezahl[0] = 12;
-  grossezahl[1] = (int64_t)555555555555;
   grossezahl[2] = 23;
+#if HAVE_LONG_LONG_INT
+  grossezahl[1] = (int64_t)555555555555LL;
+  grossezahl[3] = (int64_t)777777777777LL;
+#else
+  grossezahl[1] = (int64_t)555555555555;
   grossezahl[3] = (int64_t)777777777777;
+#endif /* HAVE_LONG_LONG_INT */
 
   if(strstr(argv[0],"napi_test-hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
@@ -119,10 +125,13 @@ int main (int argc, char *argv[])
         if (NXgetdataID (fileid, &dlink) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
      dims[0] = 4;
-     if (NXmakedata (fileid, "grosse_zahl", NX_INT64, 1,dims) == NX_OK) {
-       if (NXopendata (fileid, "grosse_zahl") != NX_OK) return 1;
-       if (NXputdata (fileid, grossezahl) != NX_OK) return 1;
-       if (NXclosedata (fileid) != NX_OK) return 1;  
+     if (nx_creation_code != NXACC_CREATE)
+     {
+       if (NXmakedata (fileid, "grosse_zahl", NX_INT64, 1,dims) == NX_OK) {
+         if (NXopendata (fileid, "grosse_zahl") != NX_OK) return 1;
+         if (NXputdata (fileid, grossezahl) != NX_OK) return 1;
+         if (NXclosedata (fileid) != NX_OK) return 1;  
+       }
      }
      if (NXmakegroup (fileid, "data", "NXdata") != NX_OK) return 1;
      if (NXopengroup (fileid, "data", "NXdata") != NX_OK) return 1;

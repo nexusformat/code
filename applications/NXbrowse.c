@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "napi.h"
+#include "napiconfig.h"
 
 #define StrEq(s1, s2) (strcmp((s1), (s2)) == 0)
 

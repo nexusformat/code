@@ -577,19 +577,11 @@ static int nxToHDF5Type(int datatype)
     }
     else if (datatype == NX_INT64)
     {
-      if(sizeof(long) == 8){
-        type=H5T_NATIVE_LONG;
-      } else {
-	type = H5T_NATIVE_LLONG;
-      }
+	type = H5T_NATIVE_INT64;
     }
     else if (datatype == NX_UINT64)
     {
-      if(sizeof(long) == 8){
-        type=H5T_NATIVE_ULONG;
-      } else {
-	type = H5T_NATIVE_ULLONG;
-      }
+	type = H5T_NATIVE_UINT64;
     }
     else if (datatype == NX_FLOAT32)
     {
@@ -1415,17 +1407,9 @@ static int h5MemType(hid_t atype)
 	{
 	  if (sign_id==H5T_SGN_2)
 	  {
-	    if(sizeof(long) == 8){
-	      memtype_id = H5T_NATIVE_LONG;
-            } else {
-	      memtype_id = H5T_NATIVE_LLONG;
-            }
+	    memtype_id = H5T_NATIVE_INT64;
 	  } else {
-	    if(sizeof(long) == 8){
-	      memtype_id = H5T_NATIVE_ULONG; 
-            } else {
-	      memtype_id = H5T_NATIVE_ULLONG;
-            }
+	    memtype_id = H5T_NATIVE_UINT64;
 	  }
 	}
       } else if (data_id==H5T_FLOAT)     

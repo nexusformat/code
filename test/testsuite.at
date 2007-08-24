@@ -80,9 +80,10 @@ Number of global attributes: 4
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 8 items
+Group: entry(NXentry) contains 9 items
    ch_data(4) = NeXus data
    Subgroup: data(NXdata)
+   grosse_zahl(26) =  12 555555555555 23 777777777777
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
    i4_data(24) =  1000000 2000000 3000000 4000000
@@ -170,9 +171,10 @@ Number of global attributes: 4
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 8 items
+Group: entry(NXentry) contains 9 items
    ch_data(4) = NeXus data
    Subgroup: data(NXdata)
+   grosse_zahl(26) =  12 555555555555 23 777777777777
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
    i4_data(24) =  1000000 2000000 3000000 4000000
@@ -215,7 +217,7 @@ Number of global attributes: 3
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 8 items
+Group: entry(NXentry) contains 9 items
    ch_data(4) = NeXus data
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -237,6 +239,7 @@ Group: entry(NXentry) contains 8 items
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
+   grosse_zahl(26) =  12 555555555555 23 777777777777
    Subgroup: data(NXdata)
    Subgroup: sample(NXsample)
 Link check OK
@@ -260,7 +263,7 @@ Number of global attributes: 3
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 8 items
+Group: entry(NXentry) contains 9 items
    ch_data(4) = NeXus data
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -282,6 +285,7 @@ Group: entry(NXentry) contains 8 items
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
+   grosse_zahl(26) =  12 555555555555 23 777777777777
    Subgroup: data(NXdata)
    Subgroup: sample(NXsample)
 Link check OK
@@ -426,12 +430,12 @@ AT_CHECK([$HAVE_HDF4 && $HAVE_XML && nxconvert -x NXtest.hdf a.a | sed -e 's/\r$
 Convertion successful.
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 -> HDF4 ])
-AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert -h4 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
-[[Converting NXtest.h5 to HDF4 NeXus file a.a
-Convertion successful.
-]])
-AT_CLEANUP
+#AT_SETUP([Checking HDF5 -> HDF4 ])
+#AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert -h4 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
+#[[Converting NXtest.h5 to HDF4 NeXus file a.a
+#Convertion successful.
+#]])
+#AT_CLEANUP
 AT_SETUP([Checking HDF5 -> HDF5 ])
 AT_CHECK([$HAVE_HDF5 && nxconvert -h5 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to HDF5 NeXus file a.a
@@ -444,12 +448,12 @@ AT_CHECK([$HAVE_HDF5 && $HAVE_XML && nxconvert -x NXtest.h5 a.a | sed -e 's/\r$/
 Convertion successful.
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML -> HDF4 ])
-AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert -h4 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
-[[Converting NXtest.xml to HDF4 NeXus file a.a
-Convertion successful.
-]])
-AT_CLEANUP
+#AT_SETUP([Checking XML -> HDF4 ])
+#AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert -h4 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
+#[[Converting NXtest.xml to HDF4 NeXus file a.a
+#Convertion successful.
+#]])
+#AT_CLEANUP
 AT_SETUP([Checking XML -> HDF5 ])
 AT_CHECK([$HAVE_XML && $HAVE_HDF5 && nxconvert -h5 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to HDF5 NeXus file a.a

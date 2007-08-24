@@ -112,23 +112,6 @@ typedef struct {
 #define NX_COMP_RLE 300
 #define NX_COMP_HUF 400  
 
-/* 
-  64 bit problem. On some platforms a 64 bit int is a long, for instance on an alpha,
-  on others it is a long long (gcc on intel). Long long is only valid in C99 standard C. 
-  This is less then 50 years old, so there may be older compilers out there which do not do 
-  long long. Override the define below  with -DNX64INT= as required. Or hack the defines 
-  below to properly identify your platform and compiler. Good luck!
-*/
-#ifndef int64_t
-#ifdef __arch64__
-  #define int64_t long
-  #define uint64_t unsigned long
-#else
-  #define int64_t long long
-  #define uint64_t unsigned long long
-#endif
-#endif  
-
 typedef struct {
                 long iTag;          /* HDF4 variable */
                 long iRef;          /* HDF4 variable */

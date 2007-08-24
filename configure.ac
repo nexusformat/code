@@ -513,6 +513,10 @@ AC_CHECK_HEADERS([stdlib.h string.h])
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
+AC_TYPE_INT64_T
+AC_TYPE_UINT64_T
+AC_TYPE_LONG_LONG_INT
+AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_STRUCT_TM
 
 dnl Checks for library functions.
