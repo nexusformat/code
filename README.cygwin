@@ -1,14 +1,17 @@
-Set you PATH with
+The NeXus source code should build under cygwin, but note that
+HDF4 may not work (HDF5 and XML are fine). When building the HDF5
+library you may want to specify an explicit prefix for the 
+install location e.g.
 
-export PATH=/usr/autotools/devel/bin:$PATH
+    ./configure --prefix=/usr/local/hdf5  # for building HDF5
 
-the default "stable" autotools provided are not recent enough
-and you will get problems if you have to run autoconf/autoheader/automake
-or "autogen.sh"
+Otherwise you will need to configure NeXus with
 
-You need to install the hdf libraries - you can download a pre-compiled
-version from:
+    ./configure --with=hdf5=/path/to/where/hdf5/went  # for building NeXus
 
-http://nexus.isis.rl.ac.uk/kits/cygwin
+or it will not be able to locate the HDF5 libraries.
 
-
+Alternatively there is a native Windows kit available
+from http://download.nexusformat.org/kits/windows that supports
+HDF4/HDF5/XML and building applications under both Visual Studio
+and MinGW

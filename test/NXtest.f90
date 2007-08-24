@@ -79,7 +79,7 @@ program NXtest
          if (NXputslab(fileid, r8_buffer, (/1,1/), (/4,4/)) /= NX_OK) stop
          if (NXputattr(fileid, "ch_attribute", "NeXus") /= NX_OK) stop
          if (NXputattr(fileid, "i4_attribute", 42) /= NX_OK) stop
-         if (NXputattr(fileid, "r4_attribute", 3.14159265) /= NX_OK) stop
+         if (NXputattr(fileid, "r4_attribute", 3.141593_NXr4) /= NX_OK) stop
          if (NXgetdataID(fileid, dlink) /= NX_OK) stop
       if (NXclosedata(fileid) /= NX_OK) stop
       if (NXmakegroup(fileid, "data", "NXdata") /= NX_OK) stop
