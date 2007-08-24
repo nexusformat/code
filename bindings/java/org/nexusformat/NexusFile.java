@@ -56,6 +56,8 @@ public class  NexusFile implements NeXusFileInterface {
     public final static int NX_UINT16 = 23; 
     public final static int NX_INT32 = 24; 
     public final static int NX_UINT32 = 25; 
+    public final static int NX_INT64 = 26; 
+    public final static int NX_UINT64 = 27; 
     public final static int NX_CHAR   = 4;
 
     /**

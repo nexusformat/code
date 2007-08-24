@@ -37,6 +37,8 @@
 #define NX_UINT16   23
 #define NX_INT32    24
 #define NX_UINT32   25
+#define NX_INT64    26
+#define NX_UINT64   27
 #define NX_CHAR      4
 /*--------------------------------------------------------------------*/
 %include "nxdataset.i"

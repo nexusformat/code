@@ -1166,7 +1166,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     }
     else
     {
-      NXIReportError (NXpData, "ERROR: HDF failed to determine attribute type");
+      NXIReportError (NXpData, "ERROR: Invalid data type for HDF attribute");
       return NX_ERROR;
     }
     if (pFile->iCurrentSDS != 0) {

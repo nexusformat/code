@@ -19,6 +19,8 @@ static int getTypeSize(int typecode){
     return 4;
     break;
   case NX_FLOAT64:
+  case NX_INT64:
+  case NX_UINT64:
     return 8;
     break;
   case NX_INT16:
@@ -208,6 +210,10 @@ double getNXDatasetValueAt(pNXDS dataset, int address){
   case NX_UINT32:
     value = (double)dataset->u.iPtr[address];
     break;
+  case NX_INT64:
+  case NX_UINT64:
+    value = (double)dataset->u.lPtr[address];
+    break;
   case NX_INT16:
   case NX_UINT16:
     value = (double)dataset->u.sPtr[address];
@@ -224,10 +230,10 @@ char  *getNXDatasetText(pNXDS dataset){
   int length, status = 1;
 
   if(dataset == NULL){
-    status = 0;
+    return strdup("NULL");
   }
   if(dataset->magic != MAGIC){
-    status = 0;
+    return strdup("NULL");
   }
   if(dataset->rank > 1){
     status = 0;
@@ -236,6 +242,8 @@ char  *getNXDatasetText(pNXDS dataset){
      dataset->type == NX_FLOAT64 ||
      dataset->type == NX_INT32 ||
      dataset->type == NX_UINT32 ||
+     dataset->type == NX_INT64 ||
+     dataset->type == NX_UINT64 ||
      dataset->type == NX_INT16 ||
      dataset->type == NX_UINT16 ) {
     status = 0;
@@ -283,6 +291,10 @@ int putNXDatasetValueAt(pNXDS dataset, int address, double value){
   case NX_INT32:
   case NX_UINT32:
     dataset->u.iPtr[address] = (int)value;
+    break;
+  case NX_INT64:
+  case NX_UINT64:
+    dataset->u.lPtr[address] = (int64_t)value;
     break;
   case NX_INT16:
   case NX_UINT16:

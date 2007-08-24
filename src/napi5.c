@@ -575,6 +575,22 @@ static int nxToHDF5Type(int datatype)
     {
         type=H5T_NATIVE_UINT;
     }
+    else if (datatype == NX_INT64)
+    {
+      if(sizeof(long) == 8){
+        type=H5T_NATIVE_LONG;
+      } else {
+	type = H5T_NATIVE_LLONG;
+      }
+    }
+    else if (datatype == NX_UINT64)
+    {
+      if(sizeof(long) == 8){
+        type=H5T_NATIVE_ULONG;
+      } else {
+	type = H5T_NATIVE_ULLONG;
+      }
+    }
     else if (datatype == NX_FLOAT32)
     {
         type=H5T_NATIVE_FLOAT;
@@ -1328,6 +1344,15 @@ static int hdf5ToNXType(int data_id, hid_t atype)
                  } else {
                     iPtype=NX_UINT32;
                  }
+             } 
+             else if(size_id == 8)
+	     {
+                 if (sign_id==H5T_SGN_2)
+                 {
+                    iPtype=NX_INT64;
+                 } else {
+                    iPtype=NX_UINT64;
+                 }
              }
         } else if (data_id==H5T_FLOAT)     
             {
@@ -1384,6 +1409,23 @@ static int h5MemType(hid_t atype)
 	     memtype_id = H5T_NATIVE_INT32;
 	  } else {
 	     memtype_id = H5T_NATIVE_UINT32; 
+	  }
+	}
+	else if (size_id==8) 
+	{
+	  if (sign_id==H5T_SGN_2)
+	  {
+	    if(sizeof(long) == 8){
+	      memtype_id = H5T_NATIVE_LONG;
+            } else {
+	      memtype_id = H5T_NATIVE_LLONG;
+            }
+	  } else {
+	    if(sizeof(long) == 8){
+	      memtype_id = H5T_NATIVE_ULONG; 
+            } else {
+	      memtype_id = H5T_NATIVE_ULLONG;
+            }
 	  }
 	}
       } else if (data_id==H5T_FLOAT)     
@@ -1639,6 +1681,7 @@ static int h5MemType(hid_t atype)
 /* 
  * FAA 24/1/2007: I don't think this will work for multidimensional
  * string arrays. 
+ * MK 23/7/2007: You are right Freddie. 
 */
 	 mtype = NX_CHAR;
 	 if (mySize[0] == 1) {

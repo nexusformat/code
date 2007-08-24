@@ -59,6 +59,12 @@ int main (int argc, char *argv[])
   int nx_creation_code;
   char nxFile[80];
   char filename[256];
+  int64_t grossezahl[4];
+
+  grossezahl[0] = 12;
+  grossezahl[1] = (int64_t)555555555555;
+  grossezahl[2] = 23;
+  grossezahl[3] = (int64_t)777777777777;
 
   if(strstr(argv[0],"napi_test-hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
@@ -112,6 +118,12 @@ int main (int argc, char *argv[])
         if (NXputattr (fileid, "r4_attribute", &r, 1, NX_FLOAT32) != NX_OK) return 1;
         if (NXgetdataID (fileid, &dlink) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
+     dims[0] = 4;
+     if (NXmakedata (fileid, "grosse_zahl", NX_INT64, 1,dims) == NX_OK) {
+       if (NXopendata (fileid, "grosse_zahl") != NX_OK) return 1;
+       if (NXputdata (fileid, grossezahl) != NX_OK) return 1;
+       if (NXclosedata (fileid) != NX_OK) return 1;  
+     }
      if (NXmakegroup (fileid, "data", "NXdata") != NX_OK) return 1;
      if (NXopengroup (fileid, "data", "NXdata") != NX_OK) return 1;
         if (NXmakelink (fileid, &dlink) != NX_OK) return 1;
@@ -518,6 +530,10 @@ print_data (const char *prefix, void *data, int type, int num)
 
         case NX_INT32:
            printf (" %d", ((int *) data)[i]);
+           break;
+
+        case NX_INT64:
+           printf (" %lld", ((int64_t *) data)[i]);
            break;
 
         case NX_FLOAT32:

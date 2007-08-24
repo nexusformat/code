@@ -19,6 +19,8 @@
 
    Updated for external linking, Mark Koennecke, April 2006
 
+   Updated for 64 bit types, Mark Koennecke, August 2007
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -548,6 +550,8 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
              div = 4;
              break;
         case NX_FLOAT64:
+        case NX_INT64:
+        case NX_UINT64:
              div = 8;
              break;
         default:

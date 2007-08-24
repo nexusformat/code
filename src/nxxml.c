@@ -31,6 +31,7 @@
 
 extern  void *NXpData;
 
+char *nxitrim(char *str); /* from napi.c */
 
 /*----------------------- our data structures --------------------------
   One might wonder why a node stack is still needed even if this API
@@ -394,22 +395,22 @@ NXstatus  NXXmakedata (NXhandle fid,
   }
 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  dataNode = mxmlNewElement(current,name);
+  typestring = buildTypeString(datatype,rank,dimensions);
+  if(typestring != NULL){
+    mxmlElementSetAttr(dataNode,TYPENAME,typestring);
+    free(typestring);
+  } else {
+    NXIReportError(NXpData,"Failed to allocate typestring");
+    return NX_ERROR;
+  }
   /*
     NX_CHAR maps to MXML_OPAQUE datasets
   */
-  dataNode = mxmlNewElement(current,name);
   if(datatype == NX_CHAR){
     newData = mxmlNewOpaque(dataNode,"");
     return NX_OK;
   } else {
-    typestring = buildTypeString(datatype,rank,dimensions);
-    if(typestring != NULL){
-      mxmlElementSetAttr(dataNode,TYPENAME,typestring);
-      free(typestring);
-    } else {
-      NXIReportError(NXpData,"Failed to allocate typestring");
-      return NX_ERROR;
-    }
     newData = (mxml_node_t *)malloc(sizeof(mxml_node_t));
     if(!newData){
       NXIReportError(NXpData,"Failed to allocate space for dataset");
@@ -457,24 +458,6 @@ static mxml_node_t *searchSDSLinks(pXMLNexus xmlHandle, CONSTCHAR *name){
     }
   }
   return NULL;
-}
-/*-------------------------------------------------------------------*/
-static int strtrimcr(char *szStr, char *szSet)
-{
-      int   i, j;                                     /* Locale counters */
-
-      /*-------------------------------------------------*/
-
-      j = i = strlen(szStr) - 1;                /* Find length of string */
-
-      while (strrchr(szSet, szStr[ i ])
-                  && (0 <= i))
-      {
-            /* While string is terminated by one of the specified characters */
-            szStr[ i-- ] = '\0';          /*- Replace character with '\0' */
-      }
-
-      return(j - i);    /* Return the difference between old and new length */
 }
 /*-----------------------------------------------------------------------*/
 NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name){
@@ -547,7 +530,8 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset;
-  int length;
+  int length, type, rank, dim[NX_MAXRANK];
+  char *pPtr = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -562,8 +546,18 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
   assert(userData != NULL);
   if(userData->type == MXML_OPAQUE){
     /*
-      text data
+      Text data. We have to make sure that the text is \0 terminated. 
+      Some language bindings do not ensure that this is the case.
     */
+    if(NXXgetinfo(fid,&rank, dim, &type) == NX_OK){
+      pPtr = (char *)malloc((dim[0]+1)*sizeof(char));
+      if(pPtr != NULL){
+        memcpy(pPtr,data,dim[0]);
+        pPtr[dim[0]] = '\0';
+	mxmlSetOpaque(userData,(const char *)pPtr);
+        free(pPtr);
+      }
+    }
     mxmlSetOpaque(userData,(const char *)data);
   } else {
     dataset = (pNXDS)userData->value.custom.data;
@@ -579,7 +573,7 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset;
-  int length;
+  int length, type, rank, dim[NX_MAXRANK];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -596,7 +590,12 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
     /*
       text data
     */
-    strcpy((char *)data,userData->value.opaque);
+    if(NXXgetinfo(fid,&rank, dim, &type) == NX_OK){
+      strncpy((char *)data,userData->value.opaque,dim[0]);
+    } else {
+      strcpy((char *)data,nxitrim(userData->value.opaque));
+    }
+
   } else {
     dataset = (pNXDS)userData->value.custom.data;
     assert(dataset);
@@ -613,6 +612,7 @@ NXstatus  NXXgetinfo (NXhandle fid, int *rank,
   mxml_node_t *current = NULL;
   pNXDS dataset;
   int myRank, i;
+  const char *attr = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -629,9 +629,16 @@ NXstatus  NXXgetinfo (NXhandle fid, int *rank,
     /*
       text data
     */
-    *rank = 1;
-    *iType = NX_CHAR;
-    dimension[0]= strlen(userData->value.opaque);
+    attr = mxmlElementGetAttr(current, TYPENAME);
+    if(attr == NULL){
+      *rank = 1;
+      *iType = NX_CHAR;
+      dimension[0]= strlen(userData->value.opaque);
+    } else {
+      analyzeDim(attr,rank,dimension,iType);
+      *rank = 1;
+      *iType = NX_CHAR;
+    }
   } else { 
     dataset = (pNXDS)userData->value.custom.data;
     assert(dataset);

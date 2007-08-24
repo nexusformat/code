@@ -525,6 +525,12 @@ void PrintType (int dataType)
       case NX_UINT32:
         printf ("(NX_UINT32)");
         break;
+      case NX_INT64:
+        printf ("(NX_INT64)");
+        break;
+      case NX_UINT64:
+        printf ("(NX_UINT64)");
+        break;
       default:
         printf ("(UNKNOWN)");
         break;
@@ -605,6 +611,12 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
             break;
          case NX_UINT32:
             fprintf (fd, "%d ", ((unsigned *)data)[i]);
+            break;
+         case NX_INT64:
+            fprintf (fd, "%lld ", ((int64_t *)data)[i]);
+            break;
+         case NX_UINT64:
+            fprintf (fd, "%lld ", ((uint64_t *)data)[i]);
             break;
          case NX_FLOAT32:
             fprintf (fd, "%f ", ((float *)data)[i]);

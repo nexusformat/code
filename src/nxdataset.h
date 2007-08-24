@@ -11,6 +11,23 @@
 
 
 #define MAGIC 7776622 
+/* 
+  64 bit problem. On some platforms a 64 bit int is a long, for instance on an alpha,
+  on others it is a long long (gcc on intel). Long long is only valid in C99 standard C. 
+  This is less then 50 years old, so there may be older compilers out there which do not do 
+  long long. Override the define below  with -DNX64INT= as required. Or hack the defines 
+  below to properly identify your platform and compiler. Good luck!
+*/
+#ifndef int64_t
+#ifdef __arch64__
+  #define int64_t long
+  #define uint64_t unsigned long
+#else
+  #define int64_t long long
+  #define uint64_t unsigned long long
+#endif
+#endif  
+
 
 typedef struct {
                    int magic;
@@ -25,6 +42,7 @@ typedef struct {
 		     int    *iPtr;
 		     short int   *sPtr;
 		     char   *cPtr;
+                     int64_t *lPtr;
 		   } u;
 }*pNXDS, NXDS;
 
@@ -41,6 +59,8 @@ typedef struct {
 #define NX_UINT16   23
 #define NX_INT32    24
 #define NX_UINT32   25
+#define NX_INT64    26
+#define NX_UINT64   27
 #define NX_CHAR      4
 
 #define NX_MAXRANK 32

@@ -691,7 +691,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     if ((datatype == NX_CHAR) || (datatype == NX_INT8) 
 	|| (datatype == NX_UINT8)) {
         /* allow for terminating \0 */
-      size += 1;
+      size += 2;
       }
       else if ((datatype == NX_INT16) || (datatype == NX_UINT16)) {
       size *= 2;
@@ -699,6 +699,9 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
       else if ((datatype == NX_INT32) || (datatype == NX_UINT32) 
 	       || (datatype == NX_FLOAT32)) {
         size *= 4;
+      }    
+      else if ((datatype == NX_INT64) || (datatype == NX_UINT64)){
+        size *= 8;
       }    
       else if (datatype == NX_FLOAT64) {
         size *= 8;
@@ -746,7 +749,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 */
 #define NUL '\0'
 
-static char *nxitrim(char *str)
+char *nxitrim(char *str)
 {
       char *ibuf = str, *obuf = str;
       int i = 0, cnt = 0;
@@ -790,8 +793,8 @@ static char *nxitrim(char *str)
     /* only strip one dimensional strings */
     if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) && (rank == 1) )
     {
-	pPtr = (char*)malloc(iDim[0]+1);
-        memset(pPtr, 0, iDim[0]+1);
+	pPtr = (char*)malloc(iDim[0]+5);
+        memset(pPtr, 0, iDim[0]+5);
         status = pFunc->nxgetdata(pFunc->pNexusData, pPtr); 
 	pPtr2 = nxitrim(pPtr);
 	strncpy((char*)data, pPtr2, strlen(pPtr2)); /* not NULL terminated by default */

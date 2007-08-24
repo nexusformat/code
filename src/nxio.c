@@ -25,6 +25,7 @@
  */
 #include <mxml.h>
 #include <assert.h>
+#include "napi.h"
 #include "nxio.h"
 #include "nxdataset.h"
 
@@ -36,7 +37,8 @@ typedef struct {
   int  nx_type;
 }type_code;
 
-static type_code typecode[9];
+#define NTYPECODE 11
+static type_code typecode[NTYPECODE];
 /*-----------------------------------------------------------------------*/
 void initializeNumberFormats(){
   type_code myCode;
@@ -76,21 +78,31 @@ void initializeNumberFormats(){
   myCode.nx_type = NX_INT32;
   typecode[6] = myCode;
 
-  strcpy(myCode.name,"NX_UNIT32");
+  strcpy(myCode.name,"NX_UINT32");
   strcpy(myCode.format,"%12d");
   myCode.nx_type = NX_UINT32;
   typecode[7] = myCode;
 
+  strcpy(myCode.name,"NX_INT64");
+  strcpy(myCode.format,"%24lld");
+  myCode.nx_type = NX_INT64;
+  typecode[8] = myCode;
+
+  strcpy(myCode.name,"NX_UINT64");
+  strcpy(myCode.format,"%24lld");
+  myCode.nx_type = NX_UINT64;
+  typecode[9] = myCode;
+
   strcpy(myCode.name,"NX_CHAR");
   strcpy(myCode.format,"%c");
   myCode.nx_type = NX_CHAR;
-  typecode[8] = myCode;
+  typecode[10] = myCode;
 }
 /*----------------------------------------------------------------------*/
 void setNumberFormat(int nx_type, char *format){
   int i;
 
-  for(i = 0; i < 9; i++){
+  for(i = 0; i < NTYPECODE; i++){
     if(typecode[i].nx_type == nx_type){
       strncpy(typecode[i].format,format,29);
     }
@@ -100,7 +112,7 @@ void setNumberFormat(int nx_type, char *format){
 static void getNumberFormat(int nx_type, char format[30]){
   int i;
 
-  for(i = 0; i < 9; i++){
+  for(i = 0; i < NTYPECODE; i++){
     if(typecode[i].nx_type == nx_type){
       strncpy(format,typecode[i].format,29);
     }
@@ -110,7 +122,7 @@ static void getNumberFormat(int nx_type, char format[30]){
 void getNumberText(int nx_type, char *typestring, int typeLen){
   int i;
 
-  for(i = 0; i < 9; i++){
+  for(i = 0; i < NTYPECODE; i++){
     if(typecode[i].nx_type == nx_type){
       strncpy(typestring,typecode[i].name,typeLen);
     }
@@ -204,7 +216,7 @@ extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
 /*=====================================================================
  actual stuff for implementing the callback functions
  =====================================================================*/
-static void analyzeDim(const char *typeString, int *rank, 
+void analyzeDim(const char *typeString, int *rank, 
 			    int *iDim, int *type){
   char dimString[132];
   char dim[20];
@@ -219,6 +231,8 @@ static void analyzeDim(const char *typeString, int *rank,
     case NX_UINT16:
     case NX_INT32:
     case NX_UINT32:
+    case NX_INT64:
+    case NX_UINT64:
     case NX_FLOAT32:
     case NX_FLOAT64:
       iDim[0] = 1;
@@ -258,7 +272,7 @@ static void analyzeDim(const char *typeString, int *rank,
 int translateTypeCode(char *code){
   int i, result = -1;
   
-  for(i = 0; i < 9; i++){
+  for(i = 0; i < NTYPECODE; i++){
     if(strstr(code,typecode[i].name) != NULL){
       result = typecode[i].nx_type;
       break;
@@ -346,7 +360,11 @@ mxml_type_t nexusTypeCallback(mxml_node_t *parent){
       */
       return MXML_OPAQUE;
     } else{
-      return MXML_CUSTOM;
+      if(strstr(typeString,"NX_CHAR") != NULL){
+	return MXML_OPAQUE;
+      } else {
+	return MXML_CUSTOM;
+      }
     }
   }
 }
@@ -411,12 +429,19 @@ static void formatNumber(double value, char *txt, int txtLen,
   case NX_UINT32:
     snprintf(txt,txtLen,format,(int)value);
     break;
+  case NX_INT64:
+    snprintf(txt,txtLen,format,(int64_t)value);
+    break;
+  case NX_UINT64:
+    snprintf(txt,txtLen,format,(uint64_t)value);
+    break;
   case NX_FLOAT32:
   case NX_FLOAT64:
     snprintf(txt,txtLen,format,value);
     break;
   default:
-    assert(0); /* something is very wrong here */
+    /*assert(0);  something is very wrong here */
+    printf("Problem\n");
     break;
   }
 }
