@@ -40,8 +40,8 @@ nodist_python_PYTHON=$(NXPYTHONWRAP)
 LIBNXPYTHON=libnxpython.la
 libnxpython_la_SOURCES=$(COMMON_SRC)
 nodist_libnxpython_la_SOURCES=$(PYTHONWRAP)
-libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) $(CFLAGS)
-libnxpython_la_LDFLAGS=$(top_builddir)/src/libNeXus.la $(LDFLAGS)
+libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) -I$(PYTHONROOT)/include $(CFLAGS)
+libnxpython_la_LDFLAGS=-L$(PYTHONROOT)/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) $(top_builddir)/src/libNeXus.la @SHARED_LDFLAGS@ $(LDFLAGS)
 PYTHONWRAP=nxpython_wrap.c
 endif
 nxpython_wrap.c: nxinter.i nxdataset.i
@@ -132,8 +132,12 @@ endif
 
 include $(top_srcdir)/build_rules.am
 
-# if we have XML support, we already have nxdataset
+# if we have XML support, we already have nxdataset unless
+# we are on windows when it is hidden
 if HAVE_XML
+if MINGW_MSYS
+NXDATASET=nxdataset.c
+endif
 else
 NXDATASET=nxdataset.c
 endif
