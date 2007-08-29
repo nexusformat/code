@@ -542,7 +542,11 @@ print_data (const char *prefix, void *data, int type, int num)
            break;
 
         case NX_INT64:
-           printf (" %lld", ((int64_t *) data)[i]);
+           printf (" %" PRINTF_INT64 , ((int64_t *) data)[i]);
+           break;
+
+        case NX_UINT64:
+           printf (" %" PRINTF_UINT64 , ((uint64_t *) data)[i]);
            break;
 
         case NX_FLOAT32:

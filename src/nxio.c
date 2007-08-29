@@ -28,6 +28,7 @@
 #include "napi.h"
 #include "nxio.h"
 #include "nxdataset.h"
+#include "napiconfig.h"
 
 /* #define TESTMAIN 1 */
 /*=================== type code handling ================================= */
@@ -84,12 +85,12 @@ void initializeNumberFormats(){
   typecode[7] = myCode;
 
   strcpy(myCode.name,"NX_INT64");
-  strcpy(myCode.format,"%24lld");
+  strcpy(myCode.format,"%24" PRINTF_INT64 );
   myCode.nx_type = NX_INT64;
   typecode[8] = myCode;
 
   strcpy(myCode.name,"NX_UINT64");
-  strcpy(myCode.format,"%24lld");
+  strcpy(myCode.format,"%24" PRINTF_UINT64);
   myCode.nx_type = NX_UINT64;
   typecode[9] = myCode;
 

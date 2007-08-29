@@ -614,10 +614,10 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
             fprintf (fd, "%d ", ((unsigned *)data)[i]);
             break;
          case NX_INT64:
-            fprintf (fd, "%lld ", ((int64_t *)data)[i]);
+            fprintf (fd, "%" PRINTF_INT64 " ", ((int64_t *)data)[i]);
             break;
          case NX_UINT64:
-            fprintf (fd, "%lld ", ((uint64_t *)data)[i]);
+            fprintf (fd, "%" PRINTF_UINT64 " ", ((uint64_t *)data)[i]);
             break;
          case NX_FLOAT32:
             fprintf (fd, "%f ", ((float *)data)[i]);

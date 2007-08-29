@@ -30,7 +30,7 @@ dnl
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT([NeXus Library], [4.0.0], [nexus-developers@nexusformat.org], [nexus])
+AC_INIT([NeXus Library], [4.1.0], [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
@@ -518,6 +518,14 @@ AC_TYPE_UINT64_T
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_STRUCT_TM
+
+if test $MINGW_MSYS = yes; then
+AC_DEFINE([PRINTF_INT64],["I64d"],[Set to printf format for int64_t])
+AC_DEFINE([PRINTF_UINT64],["I64u"],[Set to printf format for uint64_t])
+else
+AC_DEFINE([PRINTF_INT64],["lld"],[Set to printf format for int64_t])
+AC_DEFINE([PRINTF_UINT64],["llu"],[Set to printf format for uint64_t])
+fi
 
 dnl Checks for library functions.
 AC_FUNC_MALLOC
