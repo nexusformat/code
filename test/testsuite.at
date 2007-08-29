@@ -30,7 +30,7 @@ AT_SETUP([Check the HDF4 binding])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.hdf
 Number of global attributes: 4
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.hdf
 Number of group attributes: 2
    hugo = namenlos
@@ -75,7 +75,7 @@ AT_SETUP([Check the HDF5 binding])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.h5
 Number of global attributes: 4
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.h5
 Number of group attributes: 2
    hugo = namenlos
@@ -121,7 +121,7 @@ AT_SETUP([Check the HDF4 binding (static library)])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.hdf
 Number of global attributes: 4
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.hdf
 Number of group attributes: 2
    hugo = namenlos
@@ -166,7 +166,7 @@ AT_SETUP([Check the HDF5 binding (static library)])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test-hdf5-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.h5
 Number of global attributes: 4
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.h5
 Number of group attributes: 2
    hugo = namenlos
@@ -212,7 +212,7 @@ AT_SETUP([Check the XML binding])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
 Number of global attributes: 3
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.xml
 Number of group attributes: 2
    hugo = namenlos
@@ -258,7 +258,7 @@ AT_SETUP([Check the XML binding (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
 Number of global attributes: 3
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.xml
 Number of group attributes: 2
    hugo = namenlos
@@ -305,7 +305,7 @@ AT_BANNER([Check the FORTRAN 77 binding.])
 AT_SETUP([Check the F77 binding using HDF4.])
 AT_CHECK([ $HAVE_F77 && $HAVE_HDF4 && $SETUP_TEST && napif_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[ Number of global attributes:  4
-    NeXus_version = 4.0.0
+    NeXus_version = 4.1.0
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
     ch_data( 4)
@@ -341,7 +341,7 @@ AT_CLEANUP
 AT_SETUP([Check the F77 binding using HDF5.])
 AT_CHECK([ $HAVE_F77 && $HAVE_HDF5 && $SETUP_TEST && napif_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[ Number of global attributes:  4
-    NeXus_version = 4.0.0
+    NeXus_version = 4.1.0
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
     ch_data( 4)
@@ -378,7 +378,7 @@ AT_SETUP([Check the F90 binding using HDF5.])
 AT_CHECK([ $HAVE_F90 && $HAVE_HDF5 && $SETUP_TEST && NXtest | sed -e 's/\r$//' ], [], 
 [[Writing character data
 Number of global attributes:        4
-   NeXus_version = 4.0.0
+   NeXus_version = 4.1.0
    file_name = NXtest.nxs
 Group: entry(NXentry) contains        8 items
    ch_data : NX_CHAR
@@ -487,8 +487,8 @@ AT_CLEANUP
 AT_BANNER([[Testing NXbrowse Tool.]])
 AT_SETUP([Checking HDF4 test file])
 AT_CHECK([$HAVE_HDF4 && nxbrowse NXtest.hdf  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF_version = ' | grep -v 'file_time = ' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.0.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
-    NeXus_version = 4.0.0
+[[NXBrowse 4.1.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
+    NeXus_version = 4.1.0
     file_name = NXtest.hdf
 NX>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
@@ -499,8 +499,8 @@ NX>
 AT_CLEANUP
 AT_SETUP([Checking HDF5 test file])
 AT_CHECK([$HAVE_HDF5 && nxbrowse NXtest.h5  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF5_Version = ' | grep -v 'file_time = ' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.0.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
-    NeXus_version = 4.0.0
+[[NXBrowse 4.1.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
+    NeXus_version = 4.1.0
     file_name = NXtest.h5
 NX>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
@@ -511,8 +511,8 @@ NX>
 AT_CLEANUP
 AT_SETUP([Checking XML test file])
 AT_CHECK([$HAVE_XML && nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep -v 'file_time = ' | grep -v 'XML_version = ' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.0.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
-    NeXus_version = 4.0.0
+[[NXBrowse 4.1.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
+    NeXus_version = 4.1.0
     file_name = NXtest.xml
 NX>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
