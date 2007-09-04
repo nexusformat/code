@@ -164,6 +164,17 @@ fi
 #	JAVAC=
 #	JAVAINCLUDE=
 #fi
+
+AC_ARG_WITH([contrib], AC_HELP_STRING([--with-contrib=names_of_apps_to_build], [Specify a list of targets from the contrib directory to build]),
+	[CONTRIB=$withval], [CONTRIB=no])
+AM_CONDITIONAL(BUILD_CONTRIB, [test "$CONTRIB" != "no"])
+AC_SUBST(CBFLIBROOT)
+AC_ARG_WITH([cbflib],
+	AC_HELP_STRING([--with-cbflib=/path/to/cbflib],
+                       [Specify location of CBFLib files]),
+	[if test $withval != no; then CBFLIBROOT=$withval; fi])
+AM_CONDITIONAL(HAVE_CBFLIB, [test "$CBFLIBROOT" != ""])
+
 AC_SUBST(FCFLAGS)
 AC_SUBST(JAVACFLAGS)
 AC_SUBST(SHARED_LDFLAGS)
@@ -598,6 +609,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/swig/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
+		contrib/applications/CBFLib/Makefile
 		contrib/bindings/Makefile
 		scripts/Makefile
 		scripts/nexus.pc:scripts/nexus_pc.in

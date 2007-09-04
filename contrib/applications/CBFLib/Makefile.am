@@ -1,10 +1,11 @@
+## Process this file with automake to produce Makefile.in
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
-#
-#  Top level Makefile for coordinating NeXus build
+#  $Id: Makefile.am 942 2007-05-29 09:01:20Z Freddie Akeroyd $
 #  
+#  Makefile for building NeXus applications
+#
 #  Copyright (C) 2004 Freddie Akeroyd
 #  
 #  This library is free software; you can redistribute it and/or
@@ -24,22 +25,14 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
-#  @configure_input@
-#
 #====================================================================
+LIBNEXUS=$(top_builddir)/src/libNeXus.la
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(CBFLIBROOT)/include
 
-# so   "make test"   is the same as   "make check"
-test: check
+bin_PROGRAMS = cbf2nx
 
-if BUILD_CONTRIB
-CONTRIB=contrib
-endif
-SUBDIRS=include src bindings applications test scripts examples doc $(CONTRIB)
+cbf2nx_SOURCES = cbf2nx.c
+cbf2nx_LDADD = $(LIBNEXUS)
+cbf2nx_LDFLAGS = -static -L$(CBFLIBROOT)/lib -lcbf -limg $(LDFLAGS)
 
-EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autoversion.sh \
-		build_rpm.in README.cygwin README.WIN32 README.macosx \
-		README.MinGW make_mingw_links
-
-# Add any flags here that you want passed to configure when you do 
-# a "make distcheck"
-# DISTCHECK_CONFIGURE_FLAGS=--without-java
+include $(top_srcdir)/build_rules.am
