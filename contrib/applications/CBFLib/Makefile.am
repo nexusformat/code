@@ -32,7 +32,7 @@ AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(CBFLIBROOT)/include
 bin_PROGRAMS = cbf2nx
 
 cbf2nx_SOURCES = cbf2nx.c
-cbf2nx_LDADD = $(LIBNEXUS)
-cbf2nx_LDFLAGS = -static -L$(CBFLIBROOT)/lib -lcbf -limg $(LDFLAGS)
+cbf2nx_LDADD = $(LIBNEXUS) -L$(CBFLIBROOT)/lib -lcbf -limg $(LDFLAGS)
+cbf2nx_LDFLAGS = -static
 
 include $(top_srcdir)/build_rules.am
