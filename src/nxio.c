@@ -30,6 +30,11 @@
 #include "nxdataset.h"
 #include "napiconfig.h"
 
+/* fix for mxml-2.3 */
+#ifndef MXML_WRAP
+#define MXML_WRAP 79
+#endif
+
 /* #define TESTMAIN 1 */
 /*=================== type code handling ================================= */
 typedef struct {
