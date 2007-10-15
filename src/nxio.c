@@ -156,9 +156,14 @@ myxml_add_char(int  ch,			/* I  - Character to add */
     */
 
     if (*bufsize < 1024)
+    {
       (*bufsize) *= 2;
+    }
     else
-      (*bufsize) += 1024;
+    {
+      (*bufsize) *= 3;
+      (*bufsize) /= 2;
+    }
 
     newbuffer = (char *)malloc(*bufsize*sizeof(char));
     if(!newbuffer){
