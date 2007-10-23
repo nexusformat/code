@@ -34,9 +34,13 @@ AM_JAVACFLAGS	= -classpath .
 
 JAVAROOT	= .
 
+nxexampledir=$(NXEXAMPLEDIR)
+nxjavadocdir=$(NXDOCDIR)/java
 # jar file definitions
-javadir		= $(prefix)/nexus/java
-java_DATA = jnexus.jar test/TestJapi.class README.JNEXUS COPYING.NCSA
+javadir		= $(datadir)/java
+java_DATA = jnexus.jar 
+nxexample_DATA = test/TestJapi.java 
+nxjavadoc_DATA = README.JNEXUS COPYING.NCSA
 jnexus_jar_ARCHIVE = jnexus.jar
 
 jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \
