@@ -30,6 +30,11 @@
 #include "nxdataset.h"
 #include "napiconfig.h"
 
+/* fix for mxml-2.3 */
+#ifndef MXML_WRAP
+#define MXML_WRAP 79
+#endif
+
 /* #define TESTMAIN 1 */
 /*=================== type code handling ================================= */
 typedef struct {
@@ -151,9 +156,14 @@ myxml_add_char(int  ch,			/* I  - Character to add */
     */
 
     if (*bufsize < 1024)
+    {
       (*bufsize) *= 2;
+    }
     else
-      (*bufsize) += 1024;
+    {
+      (*bufsize) *= 3;
+      (*bufsize) /= 2;
+    }
 
     newbuffer = (char *)malloc(*bufsize*sizeof(char));
     if(!newbuffer){
