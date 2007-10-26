@@ -36,7 +36,7 @@ static int testExternal(char *progName);
 
 int main (int argc, char *argv[])
 {
-  int i, j, NXrank, NXdims[32], NXtype, NXlen, entry_status, attr_status;
+  int i, j, k, n, NXrank, NXdims[32], NXtype, NXlen, entry_status, attr_status;
   float r;
   void *data_buffer;
   unsigned char i1_array[4] = {1, 2, 3, 4};
@@ -52,6 +52,8 @@ int main (int argc, char *argv[])
   int slab_start[2], slab_size[2];
   char name[64], char_class[64], char_buffer[128];
   char group_name[64], class_name[64];
+  char c1_array[5][4] = {{'a', 'b', 'c' ,'d'}, {'e', 'f', 'g' ,'h'}, 
+     {'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'}, {'q', 'r', 's' , 't'}};
   NXhandle fileid;
   NXlink glink, dlink, blink;
   int comp_array[100][20];
@@ -94,6 +96,10 @@ int main (int argc, char *argv[])
      if (NXmakedata (fileid, "ch_data", NX_CHAR, 1, &NXlen) != NX_OK) return 1;
      if (NXopendata (fileid, "ch_data") != NX_OK) return 1;
         if (NXputdata (fileid, "NeXus data") != NX_OK) return 1;
+     if (NXclosedata (fileid) != NX_OK) return 1;
+     if (NXmakedata (fileid, "c1_data", NX_CHAR, 2, array_dims) != NX_OK) return 1;
+     if (NXopendata (fileid, "c1_data") != NX_OK) return 1;
+        if (NXputdata (fileid, c1_array) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
      if (NXmakedata (fileid, "i1_data", NX_INT8, 1, &array_dims[1]) != NX_OK) return 1;
      if (NXopendata (fileid, "i1_data") != NX_OK) return 1;
@@ -248,12 +254,17 @@ int main (int argc, char *argv[])
               if (NXgetinfo (fileid, &NXrank, NXdims, &NXtype) != NX_OK) return 1;
                  printf ("   %s(%d)", name, NXtype);
               if (NXmalloc ((void **) &data_buffer, NXrank, NXdims, NXtype) != NX_OK) return 1;
+	      n = 1;
+              for(k=0; k<NXrank; k++)
+	      {
+                  n *= NXdims[k];
+              }
               if (NXtype == NX_CHAR) {
                  if (NXgetdata (fileid, data_buffer) != NX_OK) return 1;
-                    print_data (" = ", data_buffer, NXtype, 10);
+                    print_data (" = ", data_buffer, NXtype, n);
               } else if (NXtype != NX_FLOAT32 && NXtype != NX_FLOAT64) {
                  if (NXgetdata (fileid, data_buffer) != NX_OK) return 1;
-                    print_data (" = ", data_buffer, NXtype, 4);
+                    print_data (" = ", data_buffer, NXtype, n);
               } else {
                  slab_start[0] = 0;
                  slab_start[1] = 0;

@@ -389,10 +389,6 @@ NXstatus  NXXmakedata (NXhandle fid,
   if(dimensions[0] < 0){
     dimensions[0] = 1;
   }
-  if ((datatype == NX_CHAR) && (rank > 1)) {
-    NXIReportError(NXpData,"NeXus XML-API does not yet support multi-dimensional character arrays");
-    return NX_ERROR;
-  }
 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   dataNode = mxmlNewElement(current,name);
@@ -530,7 +526,7 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset;
-  int length, type, rank, dim[NX_MAXRANK];
+  int i, length, type, rank, dim[NX_MAXRANK];
   char *pPtr = NULL;
 
   xmlHandle = (pXMLNexus)fid;
@@ -550,15 +546,24 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
       Some language bindings do not ensure that this is the case.
     */
     if(NXXgetinfo(fid,&rank, dim, &type) == NX_OK){
-      pPtr = (char *)malloc((dim[0]+1)*sizeof(char));
+      length = 1;
+      for(i=0; i<rank; i++)
+      {
+	length *= dim[i];
+      }
+      pPtr = (char *)malloc((length+1)*sizeof(char));
       if(pPtr != NULL){
-        memcpy(pPtr,data,dim[0]);
-        pPtr[dim[0]] = '\0';
+        memcpy(pPtr,data,length);
+        pPtr[length] = '\0';
 	mxmlSetOpaque(userData,(const char *)pPtr);
         free(pPtr);
       }
     }
-    mxmlSetOpaque(userData,(const char *)data);
+    else
+    {
+        NXIReportError(NXpData,"Unable to determine size of character dataset");
+        return NX_ERROR;
+    }
   } else {
     dataset = (pNXDS)userData->value.custom.data;
     assert(dataset);
@@ -573,7 +578,7 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset;
-  int length, type, rank, dim[NX_MAXRANK];
+  int i, length, type, rank, dim[NX_MAXRANK];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -591,7 +596,12 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
       text data
     */
     if(NXXgetinfo(fid,&rank, dim, &type) == NX_OK){
-      strncpy((char *)data,userData->value.opaque,dim[0]);
+      length = 1;
+      for(i=0; i<rank; i++)
+      {
+          length *= dim[i];
+      }
+      strncpy((char *)data,userData->value.opaque,length);
     } else {
       strcpy((char *)data,nxitrim(userData->value.opaque));
     }
@@ -636,7 +646,6 @@ NXstatus  NXXgetinfo (NXhandle fid, int *rank,
       dimension[0]= strlen(userData->value.opaque);
     } else {
       analyzeDim(attr,rank,dimension,iType);
-      *rank = 1;
       *iType = NX_CHAR;
     }
   } else { 

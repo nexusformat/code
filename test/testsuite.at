@@ -35,8 +35,9 @@ Number of global attributes: 4
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 8 items
+Group: entry(NXentry) contains 9 items
    ch_data(4) = NeXus data
+   c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
    i4_data(24) =  1000000 2000000 3000000 4000000
@@ -80,7 +81,8 @@ Number of global attributes: 4
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 9 items
+Group: entry(NXentry) contains 10 items
+   c1_data(4) = abcdefghijklmnopqrst
    ch_data(4) = NeXus data
    Subgroup: data(NXdata)
    grosse_zahl(26) =  12 555555555555 23 777777777777
@@ -126,8 +128,9 @@ Number of global attributes: 4
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 8 items
+Group: entry(NXentry) contains 9 items
    ch_data(4) = NeXus data
+   c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
    i4_data(24) =  1000000 2000000 3000000 4000000
@@ -171,7 +174,8 @@ Number of global attributes: 4
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 9 items
+Group: entry(NXentry) contains 10 items
+   c1_data(4) = abcdefghijklmnopqrst
    ch_data(4) = NeXus data
    Subgroup: data(NXdata)
    grosse_zahl(26) =  12 555555555555 23 777777777777
@@ -217,8 +221,9 @@ Number of global attributes: 3
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 9 items
+Group: entry(NXentry) contains 10 items
    ch_data(4) = NeXus data
+   c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
    i4_data(24) =  1000000 2000000 3000000 4000000
@@ -263,8 +268,9 @@ Number of global attributes: 3
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
-Group: entry(NXentry) contains 9 items
+Group: entry(NXentry) contains 10 items
    ch_data(4) = NeXus data
+   c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
    i4_data(24) =  1000000 2000000 3000000 4000000
