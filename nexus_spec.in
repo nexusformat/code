@@ -56,7 +56,7 @@ make install
 /usr/local/lib
 /usr/local/bin
 /usr/local/include
-/usr/local/nexus
+/usr/local/share
 
 %clean
 # the rm line can be dangerous - build_root might be / !

@@ -182,8 +182,8 @@ AC_SUBST(JAVAINCLUDE)
 AC_SUBST(PACKAGE_RELEASE)
 test -z "$PACKAGE_RELEASE" && PACKAGE_RELEASE=1
 
-NXDOCDIR='${prefix}/nexus/doc'
-NXEXAMPLEDIR='${prefix}/nexus/examples'
+NXDOCDIR='${datadir}/nexus/doc'
+NXEXAMPLEDIR='${datadir}/nexus/examples'
 NXTESTDIR='${prefix}/nexus/tests'
 AC_SUBST(NXDOCDIR)
 AC_SUBST(NXEXAMPLEDIR)
