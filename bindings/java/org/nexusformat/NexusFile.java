@@ -36,6 +36,7 @@ public class  NexusFile implements NeXusFileInterface {
     public final static int NXACC_CREATE4 = 4;
     public final static int NXACC_CREATE5 = 5;
     public final static int NXACC_CREATEXML = 6;
+    public final static int NXACC_NOSTRIP = 128;
     
     /**
       * constant denoting an unlimited dimension.
@@ -123,6 +124,9 @@ public class  NexusFile implements NeXusFileInterface {
       * data.
       * <DT>NXACC_READ
       * <DD>For opening a file for reading.
+      * </dl>
+      * <DT>NXACC_NOSTRIP
+      * <DD>To keep leading and trailing whitespace on strings
       * </dl>
       * @exception NexusException when the file could not be found or
       * an HDF error occurred.
@@ -447,7 +451,7 @@ public class  NexusFile implements NeXusFileInterface {
     // native methods for this section
     protected native void nxputdata(int handle, byte array[]); 
     protected native void nxputslab(int handle, byte array[], 
-                                    int start[],int end[]); 
+                                    int start[],int size[]); 
     protected native void nxputattr(int handle, String name,
                                     byte array[], int type); 
 
@@ -479,11 +483,11 @@ public class  NexusFile implements NeXusFileInterface {
       * @param array The data to write.
       * @param start An integer array of dimension rank which holds the
       * startcoordinates of the data subset in the larger dataset.
-      * @param end An integer array of dimension rank which holds the
+      * @param size An integer array of dimension rank which holds the
       * size in each dimension of the data subset to write.
       * @exception NexusException when an HDF error occurs.
       */ 
-    public void putslab(Object array, int start[], int end[]) throws
+    public void putslab(Object array, int start[], int size[]) throws
                           NexusException
     {
        byte data[];
@@ -496,7 +500,7 @@ public class  NexusFile implements NeXusFileInterface {
        }catch(HDFException he) {
 	   throw new NexusException(he.getMessage());
        }
-       nxputslab(handle,data,start,end);
+       nxputslab(handle,data,start,size);
        data = null;
     }
     /**

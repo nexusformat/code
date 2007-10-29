@@ -651,18 +651,30 @@ static int nxToHDF5Type(int datatype)
     {
 /* 
  *  This assumes string lenght is in the last dimensions and
- *  the logic must be the same as used in NX5getglab and NX5getinfo
+ *  the logic must be the same as used in NX5getslab and NX5getinfo
  *
  *  search for tests on H5T_STRING
  */
       byte_zahl=dimensions[rank-1]; 
-      dimensions[rank-1]=1;
       for(i = 0; i < rank; i++)
          {
          mydim1[i] = dimensions[i];
          }
-      dimensions[rank-1] = byte_zahl;
-         dataspace=H5Screate_simple(rank,mydim1,NULL);
+       mydim1[rank-1] = 1;
+       if (dimensions[rank-1] > 1)
+       {
+           mydim[rank-1] = maxdims[rank-1] = size[rank-1] = 1;
+       }
+       if (chunkdims[rank-1] > 1) 
+       { 
+	    chunkdims[rank-1] = 1; 
+       }
+       if (dimensions[0] == NX_UNLIMITED)
+       {
+          mydim1[0] = 1;
+          maxdims[0] = H5S_UNLIMITED;
+       }
+         dataspace=H5Screate_simple(rank,mydim1,maxdims);
     } else {
       if (dimensions[0] == NX_UNLIMITED)
       {
@@ -943,7 +955,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     int rank;
     hsize_t myStart[H5S_MAX_RANK];
     hsize_t mySize[H5S_MAX_RANK];
-    hsize_t size[1],maxdims[H5S_MAX_RANK];
+    hsize_t size[H5S_MAX_RANK],maxdims[H5S_MAX_RANK];
     hid_t   filespace,dataspace; 
   
     pFile = NXI5assert (fid);
@@ -953,17 +965,29 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       return NX_ERROR;
     }
     rank = H5Sget_simple_extent_ndims(pFile->iCurrentS);    
+    iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, NULL, maxdims);
     for(i = 0; i < rank; i++)
     {
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
+       size[i] = maxdims[i];
     }
-    iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, NULL, maxdims);
+    if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
+    {
+        mySize[rank - 1] = 1;
+        myStart[rank - 1] = 0;
+    }
     dataspace = H5Screate_simple (rank, mySize, NULL);
     if (maxdims[0] == NX_UNLIMITED)
     {
        size[0]=iStart[0] + iSize[0];
        iRet = H5Dextend(pFile->iCurrentD, size);
+       if (iRet < 0) 
+       {
+           NXIReportError (NXpData, "ERROR: extend slab failed");
+           return NX_ERROR;
+       }
+
        filespace = H5Dget_space(pFile->iCurrentD);
        
        /* define slab */
@@ -978,6 +1002,10 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        /* write slab */ 
        iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, dataspace, 
                     filespace, H5P_DEFAULT,data);
+       if (iRet < 0)
+       {
+           NXIReportError (NXpData, "ERROR: writing slab failed");
+       }
        iRet = H5Sclose(filespace);             
    } else {
        /* define slab */
@@ -992,12 +1020,16 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        /* write slab */ 
        iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, dataspace, 
                     pFile->iCurrentS, H5P_DEFAULT,data);
+       if (iRet < 0)
+       {
+           NXIReportError (NXpData, "ERROR: writing slab failed");
+       }
    }
    /* deal with HDF errors */
    iRet = H5Sclose(dataspace);
    if (iRet < 0) 
    {
-      NXIReportError (NXpData, "ERROR: writing slab failed");
+      NXIReportError (NXpData, "ERROR: closing slab failed");
       return NX_ERROR;
    }
     return NX_OK;
