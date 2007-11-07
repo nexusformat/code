@@ -581,6 +581,7 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile 
 		applications/Makefile
 		applications/NXdir/Makefile
+		applications/nxingest/Makefile
 		applications/NXsummary/Makefile
 		applications/NXtranslate/Makefile
 		applications/NXtranslate/IPNS_CPP/Makefile

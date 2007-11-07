@@ -31,11 +31,14 @@ LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
+if HAVE_XML
+NXINGEST = nxingest
+endif
 if HAVE_LIBXML2
 NXTRANSLATE=NXtranslate
 NXSUMMARY=NXsummary
 endif
-SUBDIRS = NXdir $(NXTRANSLATE) $(NXSUMMARY)
+SUBDIRS = NXdir $(NXTRANSLATE) $(NXSUMMARY) $(NXINGEST)
 #if HAVE_HDF4
 #HDF4_TARGETS = NXtoNX4
 #endif
