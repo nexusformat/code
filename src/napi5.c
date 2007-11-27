@@ -970,7 +970,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     {
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
-       size[i] = maxdims[i];
+       size[i]    = iSize[i];
     }
     if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
     {
@@ -1815,8 +1815,8 @@ static int h5MemType(hid_t atype)
 	 return NX5getnextattr(fileid, pName, iLength, iType);
        }
        strcpy(pName, iname);
-       iname = NULL;
        free(iname);
+       iname = NULL;
      } else {
        strcpy(pName,"What is this?");
      }
