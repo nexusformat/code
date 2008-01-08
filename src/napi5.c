@@ -897,7 +897,8 @@ static void killAttVID(pNexusFile5 pFile, int vid){
   /* ------------------------------------------------------------------- */
 
   NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, void *data, 
-                                  int datalen, int iType)
+
+			int datalen, int iType)
   {
     pNexusFile5 pFile;
     hid_t  attr1, aid1, aid2;
@@ -921,7 +922,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       H5Aclose(iRet);
       iRet=H5Adelete(vid,name);
       if (iRet<0) {
-	NXIReportError (NXpData, "ERROR: Old attribute cannot removed! ");
+	NXIReportError (NXpData, "ERROR: Old attribute cannot be removed! ");
 	killAttVID(pFile,vid);
 	return NX_ERROR;
       }
