@@ -173,7 +173,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     int32 iNew, iRet, iTag, iRef;
     int32 i, iN, iA, iD1, iD2;
     NXname pNam;
-    int32 iDim[MAX_VAR_DIMS];
+    int32 iDim[H4_MAX_VAR_DIMS];
   
     self = NXIassert (fid);
   
@@ -291,7 +291,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   {
     int iRet;
     int32 iData, iAtt, iRank, iType;
-    int32 iDim[MAX_VAR_DIMS];
+    int32 iDim[H4_MAX_VAR_DIMS];
     NXname pNam;
   
     pFile->iAtt.iCurDir = 0;
@@ -336,7 +336,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   static void NXIbuildPath(pNexusFile pFile, char *buffer, int bufLen)
   {
     int i;
-    int32 groupID, iA, iD1, iD2, iDim[MAX_VAR_DIMS];
+    int32 groupID, iA, iD1, iD2, iDim[H4_MAX_VAR_DIMS];
     NXname pText;
 
     buffer[0] = '\0';
@@ -650,7 +650,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     int32 iNew;
     char pBuffer[256];
     int i, iRet, type;
-    int32 myDim[MAX_VAR_DIMS];  
+    int32 myDim[H4_MAX_VAR_DIMS];  
 
     pFile = NXIassert (fid);
       
@@ -780,7 +780,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     int32 iNew, iRet, type;
     char pBuffer[256];
     int i;
-    int32 myDim[MAX_VAR_DIMS];  
+    int32 myDim[H4_MAX_VAR_DIMS];  
     comp_info compstruct;
 
     pFile = NXIassert (fid);
@@ -949,7 +949,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   {
     pNexusFile pFile;
     int32 iRank, iAtt, iType, iRet;
-    int32 iSize[MAX_VAR_DIMS];
+    int32 iSize[H4_MAX_VAR_DIMS];
     int compress_typei = COMP_CODE_NONE;
     NXname pBuffer;
     char pError[512];
@@ -1088,7 +1088,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4putdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
-    int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS], iStride[MAX_VAR_DIMS];
+    int32 iStart[H4_MAX_VAR_DIMS], iSize[H4_MAX_VAR_DIMS], iStride[H4_MAX_VAR_DIMS];
     NXname pBuffer;
     int32 iRank, iAtt, iType, iRet, i;
     char pError[512];
@@ -1101,7 +1101,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       return NX_ERROR;
     }
     /* first read dimension information */
-    memset (iStart, 0, MAX_VAR_DIMS * sizeof (int32));
+    memset (iStart, 0, H4_MAX_VAR_DIMS * sizeof (int32));
     SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iSize, &iType, &iAtt);
   
     /* initialise stride to 1 */
@@ -1199,8 +1199,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   {
     pNexusFile pFile;
     int iRet;
-    int32 iStride[MAX_VAR_DIMS];
-    int32 myStart[MAX_VAR_DIMS], mySize[MAX_VAR_DIMS];
+    int32 iStride[H4_MAX_VAR_DIMS];
+    int32 myStart[H4_MAX_VAR_DIMS], mySize[H4_MAX_VAR_DIMS];
     int32 i, iRank, iType, iAtt;
     NXname pBuffer;  
   
@@ -1213,7 +1213,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       return NX_ERROR;
     }
     /* initialise stride to 1 */
-    for (i = 0; i < MAX_VAR_DIMS; i++) {
+    for (i = 0; i < H4_MAX_VAR_DIMS; i++) {
       iStride[i] = 1;
     }
 
@@ -1452,7 +1452,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     pNexusFile pFile;
     int iRet, iStackPtr, iCurDir;
     int32 iTemp, iD1, iD2, iA;
-    int32 iDim[MAX_VAR_DIMS];
+    int32 iDim[H4_MAX_VAR_DIMS];
   
     pFile = NXIassert (fid);
   
@@ -1535,7 +1535,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4getdata (NXhandle fid, void *data)
   {
     pNexusFile pFile;
-    int32 iStart[MAX_VAR_DIMS], iSize[MAX_VAR_DIMS];
+    int32 iStart[H4_MAX_VAR_DIMS], iSize[H4_MAX_VAR_DIMS];
     NXname pBuffer;
     int32 iRank, iAtt, iType;
   
@@ -1547,7 +1547,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       return NX_ERROR;
     }
     /* first read dimension information */
-    memset (iStart, 0, MAX_VAR_DIMS * sizeof (int32));
+    memset (iStart, 0, H4_MAX_VAR_DIMS * sizeof (int32));
     SDgetinfo (pFile->iCurrentSDS, pBuffer, &iRank, iSize, &iType, &iAtt);
     /* actually read */
     SDreaddata (pFile->iCurrentSDS, iStart, NULL, iSize, data);
@@ -1562,7 +1562,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   {
     pNexusFile pFile;
     NXname pBuffer;
-    int32 iAtt, myDim[MAX_VAR_DIMS], i, iRank, mType;
+    int32 iAtt, myDim[H4_MAX_VAR_DIMS], i, iRank, mType;
   
     pFile = NXIassert (fid);
   
@@ -1592,7 +1592,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4getslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
     pNexusFile pFile;
-    int32 myStart[MAX_VAR_DIMS], mySize[MAX_VAR_DIMS];
+    int32 myStart[H4_MAX_VAR_DIMS], mySize[H4_MAX_VAR_DIMS];
     int32 i, iRank, iType, iAtt;
     NXname pBuffer;  
 
@@ -1811,7 +1811,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     pNexusFile pFile;
     int iRet;
     int32 iData, iAtt, iRank, iType;
-    int32 iDim[MAX_VAR_DIMS];
+    int32 iDim[H4_MAX_VAR_DIMS];
     NXname pNam;
   
     pFile = NXIassert (fid);
