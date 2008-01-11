@@ -209,7 +209,7 @@ def _libnexus():
             ldenv = 'LD_LIBRARY_PATH'
         # Search the load library path as well as the standard locations
         ldpath = [p for p in os.environ.get(ldenv,'').split(':') if p != '']
-        stdpath = ['usr/local/lib','/usr/lib']
+        stdpath = ['/usr/local/lib','/usr/lib']
         files += [os.path.join(p,lib) for p in [filedir]+ldpath+stdpath]
 
     # Given a list of files, try loading the first one that is available.
