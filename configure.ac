@@ -175,6 +175,13 @@ AC_ARG_WITH([cbflib],
 	[if test $withval != no; then CBFLIBROOT=$withval; fi])
 AM_CONDITIONAL(HAVE_CBFLIB, [test "$CBFLIBROOT" != ""])
 
+AC_SUBST(IDLROOT)
+AC_ARG_WITH([idlroot],
+	AC_HELP_STRING([--with-idlroot=/path/to/idlroot],
+                       [Specify location of idl files]),
+	[if test $withval != no; then IDLROOT=$withval; fi])
+AM_CONDITIONAL(HAVE_IDL, [test "$IDLROOT" != ""])
+
 AC_SUBST(FCFLAGS)
 AC_SUBST(JAVACFLAGS)
 AC_SUBST(SHARED_LDFLAGS)
@@ -608,6 +615,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/f90/Makefile
 		bindings/java/Makefile
 		bindings/swig/Makefile
+		bindings/idl/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
 		contrib/applications/CBFLib/Makefile
@@ -624,6 +632,7 @@ XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
+IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
@@ -656,6 +665,7 @@ build:
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
                 JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
+		IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT})
 
 Please check whether the configuration I detected matches what you would
 like to have. If not, re-run configure adding the appropriate  --with  option

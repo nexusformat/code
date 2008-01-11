@@ -2,10 +2,10 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
-#
-#  Makefile for coordinating the generation of language bindings
+#  $Id: Makefile.am 715 2005-12-16 18:11:19Z faa59 $
 #  
+#  Makefile for NeXus FORTRAN 90 bindings
+#
 #  Copyright (C) 2004 Freddie Akeroyd
 #  
 #  This library is free software; you can redistribute it and/or
@@ -25,20 +25,40 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
+#
 #====================================================================
-if HAVE_F77
-F77SUB = f77
-endif
-if HAVE_F90
-F90SUB = f90
-endif
-if HAVE_JAVAC
-JAVASUB = java
-endif
-if HAVE_SWIG
-SWIGSUB = swig
-endif
-if HAVE_IDL
-IDLSUB = idl
-endif
-SUBDIRS = $(F77SUB) $(F90SUB) $(JAVASUB) $(SWIGSUB) $(IDLSUB)
+#
+# Unix makefile for NeXusIDL-API DLM.
+#
+# This makefile is used to build NeXusIDL-API --- an example DLM.
+# It works by determining what platform you are on and then
+# recursively invoking make with the proper options to do the build.
+#
+lib_LTLIBRARIES = libNeXusIDL-API.la
+
+libNeXusIDL_API_la_SOURCES = NeXusIDL-API.c handle.c handle.h
+libNeXusIDL_API_la_LIBADD = $(top_builddir)/src/libNeXus.la
+libNeXusIDL_API_la_LDFLAGS = @SHARED_LDFLAGS@ -Wl,--no-undefined -L$(IDLROOT)/bin/bin.linux.x86 -lidl $(LDFLAGS)
+
+AM_CPPFLAGS = -I$(IDLROOT)/external/include
+
+EXTRA_DIST = \
+ build_testmodule.pro \
+ build_win.bat \
+ data \
+ NeXusIDL-API.def \
+ NeXusIDL-API.dlm \
+ NeXusIDL-API.export \
+ nxext.h5 \
+ nxext.hdf \
+ nxext.xml \
+ NXtest.h5 \
+ NXtest.hdf \
+ NXtest.xml \
+ README.html \
+ read_test.pro \
+ recursiveread.pro \
+ recursivesearch.pro \
+ testfocus.pro \
+ write_test.pro
+include $(top_srcdir)/build_rules.am
