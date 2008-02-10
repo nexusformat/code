@@ -40,7 +40,7 @@ H5SRC = napi5.c
 endif
 
 if HAVE_XML
-XMLSRC = nxxml.c nxio.c nxio.h nxdataset.h nxdataset.c
+XMLSRC = nxxml.c nxio.c nxio.h
 endif
 ##  the LIBS variable should contain all needed libs for the HDF support
 ##  It will be filled during the configuration run
@@ -75,7 +75,7 @@ endif
 
 #SUBDIRS=nxdict
 
-libNeXus_la_SOURCES = napi.c napiu.c nxstack.c nxstack.h stptok.c $(H4SRC) $(H5SRC) $(XMLSRC) $(MINGW_SRC)
+libNeXus_la_SOURCES = napi.c napiu.c nxstack.c nxstack.h stptok.c nxdataset.c nxdataset.h $(H4SRC) $(H5SRC) $(XMLSRC) $(MINGW_SRC)
 libNeXus_la_LDFLAGS = -export-symbols nexus_symbols.sym @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 

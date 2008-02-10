@@ -1,3 +1,38 @@
+Version 4.1.0
+=============
+
+For the latest information see 
+
+    http://www.nexusformat.org/Nexus_41_Release_Notes
+
+==System Requirements==
+'''MXML XML Parsing Library'''
+
+Version 2.2.2 or higher of mxml is required. Earlier versions have a bug and the XML API will not work. This package can be downloded in [http://www.easysw.com/~mike/mxml/software.php both source and binary rpm form] and is also available as part of [http://fedoraproject.org/wiki/Extras/UsingExtras Fedora Extras]. IMPORTANT NOTE: Debian also provides the mxml package, but it based on 2.0 and will not work properly.
+
+==Building Notes==
+===NAG F90/F95 Compiler===
+The NAG compiler needs the '''-mismatch''' flag to be specified or else it will not compile NXmodule.f90 This is achieve by running configure with the '''FCFLAGS''' environment variable set to contain the flag e.g.
+<pre>
+env FCFLAGS="-mismatch" ./configure --with-f90=f95
+</pre>
+===HDF4 on Intel Macs===
+There is a problem with the include file, hdfi.h (normally in /usr/local/include).  See http://coastwatch.noaa.gov/helparc/software/msg00069.html for details of the modifications necessary to fix it.
+
+==New Features==
+* New types NX_INT64 and NX_UINT64 to suppport 64 bit integers (only available in HDF5 and XML) [http://trac.nexusformat.org/code/ticket/87 details].
+* Python bindings are now included in the Windows install kit [http://trac.nexusformat.org/code/ticket/86 details]
+
+==Miscellaneous bug fixes==
+The following items are bugs reported in previous releases and resolved in
+the 4.1 release.
+* The Fortran 90 part of testsuite failed with the Absoft compiler on MacOSX (it passed with g95 and gfortran (4.2)) [http://trac.nexusformat.org/code/ticket/68 details here]
+* NXputattr assumed NULL termination of NX_CHAR attributes, which is usually the case in C but not true for JAVA. A workaround is to add '\0' manually [http://trac.nexusformat.org/code/ticket/83 bug report]
+* pkgconfig issue [http://trac.nexusformat.org/code/ticket/84 bug report]
+* Build issue with MXML-2.3 [http://trac.nexusformat.org/code/ticket/91 bug report]
+* XML buffer resizing performance issue [http://trac.nexusformat.org/code/ticket/92 bug report]
+* Documentation is now installed to "datadir" (/usr/share) [http://trac.nexusformat.org/code/ticket/93 bug report]
+
 Version 4.0.0
 =============
 

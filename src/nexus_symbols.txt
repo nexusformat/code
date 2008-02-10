@@ -53,3 +53,16 @@ NXMGetError
 NXMDisableErrorReporting
 NXMEnableErrorReporting
 nximakenamedlink_
+createNXDataset
+createTextNXDataset
+dropNXDataset
+getNXDatasetByteLength
+getNXDatasetDim
+getNXDatasetLength
+getNXDatasetRank
+getNXDatasetText
+getNXDatasetType
+getNXDatasetValue
+getNXDatasetValueAt
+putNXDatasetValue
+putNXDatasetValueAt
