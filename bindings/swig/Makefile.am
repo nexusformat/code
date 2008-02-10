@@ -27,7 +27,7 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
-AM_CPPFLAGS=-I$(top_srcdir)/include
+AM_CPPFLAGS=-I$(top_srcdir)/include -I$(top_srcdir)/src
 lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXSCHEME) $(LIBNXGUILE) # $(LIBNXPERL)
 python_LTLIBRARIES=$(LIBNXPYTHON)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
@@ -132,19 +132,9 @@ endif
 
 include $(top_srcdir)/build_rules.am
 
-# if we have XML support, we already have nxdataset unless
-# we are on windows when it is hidden
-if HAVE_XML
-if MINGW_MSYS
-NXDATASET=nxdataset.c
-endif
-else
-NXDATASET=nxdataset.c
-endif
+COMMON_SRC=nxinterhelper.c
 
-COMMON_SRC=nxinterhelper.c $(NXDATASET)
-
-EXTRA_DIST=nxinter.i nxdataset.i nxdataset.h nxinterhelper.h \
+EXTRA_DIST=nxinter.i nxdataset.i nxinterhelper.h \
 		$(DOC_OUTPUT) $(DOC_SRC) nxpython_test.py
 
 BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) $(NXPYTHONWRAP)
