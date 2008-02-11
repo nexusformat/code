@@ -60,6 +60,9 @@ ftp://ftp.gnu.org/gnu/autoconf
 ftp://ftp.gnu.org/gnu/automake
 ftp://ftp.gnu.org/gnu/libtool
 
+Most likely it will be autoconf that will need updating - NeXus
+now requires autoconf 2.61 or above
+
 NeXus Developer Mailing Lists
 -----------------------------
 

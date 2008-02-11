@@ -26,15 +26,13 @@ echo "Using $autoconfversion"
 echo "Using $automakeversion"
 echo "Using $libtoolversion"
 case $autoconfversion in
-    *2.5[2-79])
-	;;
     *2.6*)
 	;;
     *2.7*)
 	;;
     *)
 	echo "This autoconf version is not supported by NeXus."
-	echo "NeXus only supports autoconf 2.5[2-79]."
+	echo "NeXus only supports autoconf 2.61 and above"
 	echo "You may download it from ftp://ftp.gnu.org/gnu/autoconf"
 	exit
 	;;
@@ -43,20 +41,22 @@ esac
 case $automakeversion in
     *1.[4-9]*)
 	;;
+    *1.1[0-9]*)
+	;;
     *)
 	echo "This automake version is not supported by NeXus."
-	echo "NeXus only supports automake 1.[5-8].*."
+	echo "NeXus only supports automake 1.4 and above"
 	echo "You may download it from ftp://ftp.gnu.org/gnu/automake"
 	exit
 	;;
 esac
 
 case $libtoolversion in
-    *1.[45]*)
+    *1.[456]*)
 	;;
     *)
 	echo "This libtool version is not supported by NeXus."
-	echo "NeXus only supports libtool 1.[45].*."
+	echo "NeXus only supports libtool 1.4 and above"
 	echo "You may download it from ftp://ftp.gnu.org/gnu/libtool"
 	exit
 	;;

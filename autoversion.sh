@@ -15,7 +15,7 @@ case $automake in
 		ACLOCAL="aclocal";
 esac
 	
-for autoconf in autoconf-2.59 autoconf-2.57 autoconf-2.53 autoconf-2.52 autoconf ; do 
+for autoconf in autoconf-2.61 autoconf ; do 
 	AUTOCONF=`which $autoconf 2>/dev/null | grep -v '^no'`
 	if test "$AUTOCONF" ; then
 		break;
