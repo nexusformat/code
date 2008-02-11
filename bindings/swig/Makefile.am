@@ -119,23 +119,29 @@ nxscheme_wrap.c: nxinter.i nxdataset.i
 endif
 
 DOC_SRC		= nxinter.tex
-swigdocdir 	= $(NXDOCDIR)
-swigdoc_DATA	= $(DOC_OUTPUT)
 if HAVE_LATEX
 DOC_OUTPUT=nxinter.ps nxinter.pdf
 nxinter.ps: $(DOC_SRC)
 	latex nxinter.tex
 	latex nxinter.tex
 	dvips -f nxinter.dvi > nxinter.ps
+
+nxinter.pdf : nxinter.ps
 	ps2pdf12 nxinter.ps nxinter.pdf
 endif
+swigdocdir 	= $(NXDOCDIR)/swig
+swigdoc_DATA	= $(DOC_OUTPUT)
+
+EXAMPLE_FILES = nxdstest.tcl nxexam.tcl nxpython_test.py nxintertest.tcl
+swigexampledir	= $(NXEXAMPLEDIR)/swig
+swigexample_DATA = $(EXAMPLE_FILES)
 
 include $(top_srcdir)/build_rules.am
 
 COMMON_SRC=nxinterhelper.c
 
 EXTRA_DIST=nxinter.i nxdataset.i nxinterhelper.h \
-		$(DOC_OUTPUT) $(DOC_SRC) nxpython_test.py
+		$(DOC_OUTPUT) $(DOC_SRC) $(EXAMPLE_FILES)
 
 BUILT_SOURCES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) $(NXPYTHONWRAP)
 CLEANFILES=$(TCLWRAP) $(GUILEWRAP) $(PYTHONWRAP) $(SCHEMEWRAP) $(NXPYTHONWRAP)
