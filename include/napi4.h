@@ -46,3 +46,10 @@ extern  NXstatus  NX4printlink(NXhandle handle, NXlink* pLink);
 void NX4assignFunctions(pNexusFunction fHandle);
 
   
+/*
+ *  HDF changed from MAX_VAR_DIMS to H4_MAX_VAR_DIMS aronud 9/5/2007 
+ *  to avoid potential conflicts with NetCDF-3 library
+ */
+#ifndef H4_MAX_VAR_DIMS
+#define H4_MAX_VAR_DIMS	MAX_VAR_DIMS
+#endif
