@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include $(XML_CPPFLAGS)
 
 bin_PROGRAMS = nxingest
 nxingestdocdir = $(NXDOCDIR)/nxingest
@@ -11,7 +11,7 @@ nxingest_SOURCES = nxingest_main.cpp nxingest_utils.cpp \
    nxingest_debug.h nxingest.h nxingest_main.h nxingest_nexus.h \
    nxingest_parse.h nxingest_time.h nxingest_utils.h
 nxingest_LDADD = $(LIBNEXUS)
-nxingest_LDFLAGS = -static $(LDFLAGS)
+nxingest_LDFLAGS = -static $(XML_LDFLAGS) $(LDFLAGS)
 
 EXTRA_DIST=nxingest.txt gpl.txt
 
