@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include @XML_CPPFLAGS@
 
 bin_PROGRAMS = nxingest
 nxingestdocdir = $(NXDOCDIR)/nxingest
