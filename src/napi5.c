@@ -135,6 +135,9 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   size_t rdcc_nbytes;
   double rdcc_w0;
 
+  /* mask of any options for now */
+  am = (am & NXACCMASK_REMOVEFLAGS);
+
   /* turn off the automatic HDF error handling */  
     H5Eset_auto(NULL,NULL); 
 #ifdef USE_FTIME

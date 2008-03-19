@@ -36,7 +36,7 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
-CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml \
+CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml NXtest-table.xml \
 	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
 	nxtranslate nxsummary nxconvert nxdir nxbrowse
 
@@ -47,7 +47,8 @@ HDF4_TARGETS = napi_test-hdf4 napi_test-hdf4-static
 
 HDF5_TARGETS = napi_test-hdf5 napi_test-hdf5-static
 
-XML_TARGETS = napi_test-xml napi_test-xml-static
+XML_TARGETS = napi_test-xml napi_test-xml-static \
+		napi_test-xml-table-static
 
 F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
@@ -132,6 +133,10 @@ napi_test_xml_static_SOURCES = napi_test.c
 napi_test_xml_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_static_LDFLAGS = -static $(LDFLAGS)
+
+napi_test_xml_table_static_SOURCES=
+napi_test-xml-table-static : napi_test-xml-static
+	ln -s napi_test-xml-static napi_test-xml-table-static
 else
 napi_test_xml_SOURCES = dummy.c
 napi_test_xml_static_SOURCES = dummy.c

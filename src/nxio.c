@@ -291,12 +291,34 @@ int translateTypeCode(char *code){
   }
   return result;
 }
+
+/* 
+ * This is used to locate an Idims node from the new style table data layout
+ */
+static mxml_node_t* findDimsNode(mxml_node_t *node)
+{
+    mxml_node_t *tnode = NULL;
+    const char* name = node->value.element.name;
+    if ( (node->parent != NULL) && !strcmp(node->parent->value.element.name, DATA_NODE_NAME) )
+    {
+	tnode = mxmlFindElement(node->parent->parent, node->parent->parent, DIMS_NODE_NAME, NULL, NULL, MXML_DESCEND_FIRST);
+	if (tnode != NULL)
+	{
+	    tnode = mxmlFindElement(tnode,tnode,name,NULL,NULL,MXML_DESCEND_FIRST);
+	}
+    }
+    return tnode;
+}
+
 /*---------------------------------------------------------------------*/
-static void analyzeDataType(mxml_node_t *parent, int *rank, int *type,
+/*return 1 if in table mode , 0 if not */
+static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
 			    int *iDim){
   const char *typeString;
+  mxml_node_t* tnode;
   mxml_type_t myType;
   int i, nx_type = -1;
+  int table_mode = 0;
 
   *rank = 1;
   *type = NX_CHAR;
@@ -305,9 +327,15 @@ static void analyzeDataType(mxml_node_t *parent, int *rank, int *type,
   /*
     get the type attribute. No attribute means: plain text
   */ 
+  tnode = findDimsNode(parent);
+  if (tnode != NULL)
+  {
+	table_mode = 1;
+	parent = tnode;
+  }
   typeString = mxmlElementGetAttr(parent,TYPENAME);
   if(typeString == NULL){
-    return;
+    return table_mode;
   }
 
   nx_type = translateTypeCode((char *)typeString);
@@ -320,12 +348,18 @@ static void analyzeDataType(mxml_node_t *parent, int *rank, int *type,
      "ERROR: %s is an invalid NeXus type, I try to continue but may fail",
      typeString);
     *type =NX_CHAR;
-    return;
+    return table_mode;
   }
 
   *type = nx_type;
   
   analyzeDim(typeString, rank, iDim, type);
+  if (table_mode)
+  {
+	*rank = 1;
+	iDim[0] = 1;
+  }
+  return table_mode;
 }
 /*-------------------------------------------------------------------*/
 void destroyDataset(void *data){
@@ -358,11 +392,23 @@ static char *getNextNumber(char *pStart, char pNumber[80]){
 /*--------------------------------------------------------------------*/
 mxml_type_t nexusTypeCallback(mxml_node_t *parent){
   const char *typeString;
+  mxml_node_t * tnode;
 
   if(strstr(parent->value.element.name,"?xml") != NULL ||
-     strstr(parent->value.element.name,"NX") != NULL){
+     !strncmp(parent->value.element.name,"NX",2) ||
+     !strcmp(parent->value.element.name,DATA_NODE_NAME) ||
+     !strcmp(parent->value.element.name,DIMS_NODE_NAME)){
     return MXML_ELEMENT;
   } else {
+    /* data nodes do not habe TYPENAME in table style but are always CUSTOM */
+    if (parent->parent != NULL && !strcmp(parent->parent->value.element.name, DATA_NODE_NAME))
+    {
+	return MXML_CUSTOM;
+    }
+    if (parent->parent != NULL && !strcmp(parent->parent->value.element.name, DIMS_NODE_NAME))
+    {
+	return MXML_OPAQUE;
+    }
     typeString = mxmlElementGetAttr(parent,TYPENAME);
     if(typeString == NULL){
       /*
@@ -386,11 +432,11 @@ int nexusLoadCallback(mxml_node_t *node, const char *buffer){
   char pNumber[80], *pStart;
   long address, maxAddress;
   pNXDS dataset = NULL;
-  int i;
+  int i, table_mode;
 
   parent = node->parent;
-  analyzeDataType(parent,&rank,&type,iDim);
-  if(iDim[0] == -1){
+  table_mode = analyzeDataType(parent,&rank,&type,iDim);
+  if(iDim[0] == -1 || !strcmp(parent->parent->value.element.name, DIMS_NODE_NAME)){
     iDim[0] = strlen(buffer);
     node->value.custom.data = strdup(buffer);
     node->value.custom.destroy = free;
@@ -475,8 +521,12 @@ char *nexusWriteCallback(mxml_node_t *node){
   char pNumber[80], indent[80], format[30];
   char *buffer, *bufPtr;
   pNXDS dataset;
-  int bufsize, i, length, currentLen; 
+  int bufsize, i, length, currentLen, table_style = 0; 
 
+  if (!strcmp(node->parent->parent->value.element.name, DATA_NODE_NAME))
+  {
+	table_style = 1;
+  }
   /*
     allocate output buffer
   */
@@ -514,22 +564,32 @@ char *nexusWriteCallback(mxml_node_t *node){
   /*
     actually get the data out
   */
-  currentLen = col;
-  myxml_add_char('\n',&bufPtr,&buffer,&bufsize);
-  stringIntoBuffer(&buffer,&bufPtr,&bufsize,indent);
-  for(i = 0; i < length; i++){
-    formatNumber(getNXDatasetValueAt(dataset,i),pNumber,79,format,type);
-    if(currentLen + strlen(pNumber) > MXML_WRAP){
-      /*
-	wrap line
-      */
+  if (table_style)
+  {
+      for(i = 0; i < length; i++){
+        formatNumber(getNXDatasetValueAt(dataset,i),pNumber,79,format,type);
+        stringIntoBuffer(&buffer,&bufPtr,&bufsize,pNumber);
+      }
+  }
+  else
+  {
+      currentLen = col;
       myxml_add_char('\n',&bufPtr,&buffer,&bufsize);
       stringIntoBuffer(&buffer,&bufPtr,&bufsize,indent);
-      currentLen = col;
-    }
-    stringIntoBuffer(&buffer,&bufPtr,&bufsize,pNumber);
-    myxml_add_char(' ',&bufPtr,&buffer,&bufsize);
-    currentLen += strlen(pNumber) + 1;
+      for(i = 0; i < length; i++){
+        formatNumber(getNXDatasetValueAt(dataset,i),pNumber,79,format,type);
+        if(currentLen + strlen(pNumber) > MXML_WRAP){
+          /*
+	    wrap line
+          */
+          myxml_add_char('\n',&bufPtr,&buffer,&bufsize);
+          stringIntoBuffer(&buffer,&bufPtr,&bufsize,indent);
+          currentLen = col;
+        }
+        stringIntoBuffer(&buffer,&bufPtr,&bufsize,pNumber);
+        myxml_add_char(' ',&bufPtr,&buffer,&bufsize);
+        currentLen += strlen(pNumber) + 1;
+      }
   }
   myxml_add_char('\0',&bufPtr,&buffer,&bufsize);
   return (char *)buffer;
@@ -540,6 +600,12 @@ int isDataNode(mxml_node_t *node){
     return 0;
   }
   if(strcmp(node->value.element.name,"NXroot") == 0){
+    return 0;
+  }
+  if(strcmp(node->value.element.name,DIMS_NODE_NAME) == 0){
+    return 0;
+  }
+  if(strcmp(node->value.element.name,DATA_NODE_NAME) == 0){
     return 0;
   }
   if(strcmp(node->value.element.name,"NAPIlink") == 0){
@@ -579,6 +645,14 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
   int len;  
 
   if(strstr(node->value.element.name,"?xml") != NULL){
+    return NULL;
+  }
+  if (node->parent != NULL && !strcmp(node->parent->value.element.name, DATA_NODE_NAME))
+  {
+    return NULL;
+  }
+  if (where == MXML_WS_BEFORE_CLOSE && !strcmp(node->value.element.name, DATA_NODE_NAME))
+  {
     return NULL;
   }
 

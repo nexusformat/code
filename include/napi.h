@@ -71,7 +71,7 @@ typedef char NXname[128];
  * \li NXACC_CREATEXML create a NeXus XML file.
  */
 typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, 
-	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_NOSTRIP=128} NXaccess;
+	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_TABLE=8, NXACC_NOSTRIP=128} NXaccess;
 
 typedef struct {
                 char *iname;

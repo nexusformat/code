@@ -274,6 +274,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     NXstatus retstat = NX_ERROR;
     char error[1024];
     char *filename = NULL;
+    int my_am = (am & NXACCMASK_REMOVEFLAGS);
         
     /* configure fortify 
     iFortifyScope = Fortify_EnterScope();
@@ -299,19 +300,19 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
       am -= NXACC_NOSTRIP;
     }
 
-    if (am==NXACC_CREATE) {
+    if (my_am==NXACC_CREATE) {
       /* HDF4 will be used ! */
       hdf_type=1;
       filename = strdup(userfilename);
-    } else if (am==NXACC_CREATE4) {
+    } else if (my_am==NXACC_CREATE4) {
       /* HDF4 will be used ! */
       hdf_type=1;   
       filename = strdup(userfilename);
-    } else if (am==NXACC_CREATE5) {
+    } else if (my_am==NXACC_CREATE5) {
       /* HDF5 will be used ! */
       hdf_type=2;   
       filename = strdup(userfilename);
-    } else if (am==NXACC_CREATEXML) {
+    } else if (my_am==NXACC_CREATEXML) {
       /* XML will be used ! */
       hdf_type=3;   
       filename = strdup(userfilename);

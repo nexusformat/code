@@ -373,6 +373,9 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     int32 file_id=0, an_id=0, ann_id=0;
   
     *pHandle = NULL;
+
+    /* mask off any options for now */
+    am = (am & NXACCMASK_REMOVEFLAGS);
     /* map Nexus NXaccess types to HDF4 types */
     if (am == NXACC_CREATE) {
       am1 = DFACC_CREATE;

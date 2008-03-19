@@ -49,11 +49,32 @@ typedef struct {
     mxml_node_t *current;
     mxml_node_t *currentChild;
     int currentAttribute;
+    int options; /**< additional information about the node */
 }xmlStack;
+
+/*
+ * Freddie Akeroyd, 19/03/2008
+ *
+ * Add in support for table style data writing - this is 
+ * indicated internally via the XMLSTACK_OPTION_TABLE flag
+ * and separates the dimensions and data into separate nodes contained
+ * in DIMS_NODE_NAME and DATA_NODE_NAME. This is a first commit and 
+ * involves some code duplication that will need to be cleaned up later.
+ * Also writing in table style is only enabled for 1D arrays as
+ * I haven't done slab writing yet which the nexus test program uses
+ * for writing 2D arrays. 
+ *
+ * Table output is enabled by opening a file with (NXACC_CREATEXML | NXACC_TABLE)
+ *
+ * See http://trac.nexusformat.org/code/ticket/111 for further details
+ */
+#define XMLSTACK_OPTION_TABLE 		0x1 /**< indicates table option in xmlStack */
+
 /*---------------------------------------------------------------------*/
 typedef struct {
   mxml_node_t *root;           /* root node */
   int readOnly;                /* read only flag */
+  int tableStyle;              /**< whether to output data in XML table style */
   int stackPointer;            /* stack pointer */
   char filename[1024];         /* file name, for NXflush, NXclose */
   xmlStack stack[NXMAXSTACK];  /* stack */
@@ -117,11 +138,12 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
   initializeNumberFormats();
   mxmlSetErrorCallback(errorCallbackForMxml);
 
+  xmlHandle->tableStyle = ((am & NXACC_TABLE) ? 1 : 0);
   /*
     open file
   */
   strncpy(xmlHandle->filename,filename,1023);
-  switch(am){
+  switch(am & NXACCMASK_REMOVEFLAGS){
   case NXACC_READ:
     xmlHandle->readOnly = 1;
   case NXACC_RDWR:
@@ -140,6 +162,7 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
 						  MXML_DESCEND);
     xmlHandle->stack[0].currentChild = NULL;
     xmlHandle->stack[0].currentAttribute = 0;
+    xmlHandle->stack[0].options = 0;
     fclose(fp);
     break;
   case NXACC_CREATEXML:
@@ -157,6 +180,7 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
     xmlHandle->stack[0].current = current;
     xmlHandle->stack[0].currentChild = NULL;
     xmlHandle->stack[0].currentAttribute = 0;
+    xmlHandle->stack[0].options = 0;
     break;
   default:
     NXIReportError(NXpData,"Bad access parameter specified in NXXopen");
@@ -305,6 +329,7 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
   xmlHandle->stack[xmlHandle->stackPointer].current = newGroup;
   xmlHandle->stack[xmlHandle->stackPointer].currentChild = NULL;
   xmlHandle->stack[xmlHandle->stackPointer].currentAttribute = 0;
+  xmlHandle->stack[xmlHandle->stackPointer].options = 0;
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
@@ -369,7 +394,80 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
   }
   return typestring;
 }
+
 /*------------------------------------------------------------------------*/
+NXstatus  NXXmakedatatable (NXhandle fid, 
+				    CONSTCHAR *name, int datatype, 
+				    int rank, int dimensions[]){
+  pXMLNexus xmlHandle = NULL;
+  mxml_node_t *dataNode = NULL, *dataNodeRoot = NULL, *dimsNode = NULL, *dimsNodeRoot = NULL;
+  mxml_node_t *newData = NULL;
+  mxml_node_t *current;
+  char *typestring;
+  int i, ndata; 
+  static int one = 1;
+
+  xmlHandle = (pXMLNexus)fid;
+  assert(xmlHandle);
+
+  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
+    NXIReportError(NXpData,"Close dataset before trying to create a dataset");
+    return NX_ERROR;
+  }
+  if(dimensions[0] < 0){
+    dimensions[0] = 1;
+  }
+
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
+
+  dimsNodeRoot = mxmlFindElement(current, current, DIMS_NODE_NAME, NULL, NULL, MXML_DESCEND_FIRST);
+  if (dimsNodeRoot == NULL)
+  {
+      dimsNodeRoot = mxmlNewElement(current, DIMS_NODE_NAME);
+  }
+  dimsNode = mxmlNewElement(dimsNodeRoot, name);
+  mxmlNewOpaque(dimsNode, "");
+  typestring = buildTypeString(datatype,rank,dimensions);
+  if(typestring != NULL){
+    mxmlElementSetAttr(dimsNode,TYPENAME,typestring);
+    free(typestring);
+  } else {
+    NXIReportError(NXpData,"Failed to allocate typestring");
+    return NX_ERROR;
+  }
+  ndata = 1;
+  for(i=0; i<rank; i++)
+  {
+     ndata *= dimensions[i];
+  }
+  dataNodeRoot = current;
+  for(i=0; i<ndata; i++)
+  {
+      dataNodeRoot = mxmlFindElement(dataNodeRoot, current, DATA_NODE_NAME, NULL, NULL, (i == 0 ? MXML_DESCEND_FIRST : MXML_NO_DESCEND) );
+      if (dataNodeRoot == NULL)
+      {
+          dataNodeRoot = mxmlNewElement(current, DATA_NODE_NAME);
+      }
+      dataNode = mxmlNewElement(dataNodeRoot,name);
+      newData = (mxml_node_t *)malloc(sizeof(mxml_node_t));
+      if(!newData){
+        NXIReportError(NXpData,"Failed to allocate space for dataset");
+        return NX_ERROR;
+      }
+      memset(newData,0,sizeof(mxml_node_t));
+      mxmlAdd(dataNode, MXML_ADD_AFTER, MXML_ADD_TO_PARENT, newData);
+      newData->type = MXML_CUSTOM;
+/*        newData->value.custom.data = createNXDataset(rank,datatype,dimensions); */
+      newData->value.custom.data = createNXDataset(1,datatype,&one);
+      if(!newData->value.custom.data){
+        NXIReportError(NXpData,"Failed to allocate space for dataset");
+        return NX_ERROR;
+      }
+      newData->value.custom.destroy = destroyDataset;
+  }
+  return NX_OK;
+}
+
 NXstatus  NXXmakedata (NXhandle fid, 
 				    CONSTCHAR *name, int datatype, 
 				    int rank, int dimensions[]){
@@ -379,8 +477,14 @@ NXstatus  NXXmakedata (NXhandle fid,
   mxml_node_t *current;
   char *typestring;
 
+
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+
+  if (xmlHandle->tableStyle && datatype != NX_CHAR && dimensions[0] != NX_UNLIMITED && rank == 1)
+  {
+      return NXXmakedatatable(fid,name,datatype,rank,dimensions);
+  }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXIReportError(NXpData,"Close dataset before trying to create a dataset");
@@ -456,13 +560,90 @@ static mxml_node_t *searchSDSLinks(pXMLNexus xmlHandle, CONSTCHAR *name){
   return NULL;
 }
 /*-----------------------------------------------------------------------*/
-NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name){
+NXstatus  NXXopendatatable (NXhandle fid, CONSTCHAR *name){
   pXMLNexus xmlHandle = NULL;
-  mxml_node_t *dataNode = NULL;
+  mxml_node_t *dataNode = NULL, *dimsNode = NULL;
   char error[1024];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+
+
+  if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
+    /*
+      silently fix this
+    */
+    xmlHandle->stackPointer--;
+    if(xmlHandle->stackPointer < 0){
+      xmlHandle->stackPointer = 0;
+    }
+  }
+  
+  dimsNode = mxmlFindElement(xmlHandle->stack[xmlHandle->stackPointer].current,
+			     xmlHandle->stack[xmlHandle->stackPointer].current,
+			     DIMS_NODE_NAME,
+			     NULL,
+			     NULL,
+			     MXML_DESCEND_FIRST);
+
+  if(!dimsNode){
+    snprintf(error,1023,"Failed to open dataset %s",name);
+    NXIReportError(NXpData,error);
+    return NX_ERROR;
+  }
+
+  dataNode = mxmlFindElement(dimsNode,
+			     dimsNode,
+			     name,
+			     NULL,
+			     NULL,
+			     MXML_DESCEND_FIRST);
+  if(dataNode == NULL){
+    dataNode = searchSDSLinks(xmlHandle,name);
+  }
+  if(!dataNode){
+    snprintf(error,1023,"Failed to open dataset %s",name);
+    NXIReportError(NXpData,error);
+    return NX_ERROR;
+  }
+  xmlHandle->stackPointer++;
+  xmlHandle->stack[xmlHandle->stackPointer].current = dataNode;
+  xmlHandle->stack[xmlHandle->stackPointer].currentChild = NULL;
+  xmlHandle->stack[xmlHandle->stackPointer].currentAttribute = 0;
+  xmlHandle->stack[xmlHandle->stackPointer].options = XMLSTACK_OPTION_TABLE;
+  return NX_OK;
+}
+
+
+NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name){
+  pXMLNexus xmlHandle = NULL;
+  mxml_node_t *dataNode = NULL, *current = NULL;
+  char error[1024];
+
+  xmlHandle = (pXMLNexus)fid;
+  assert(xmlHandle);
+
+  /* is this a table style node ? */
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  dataNode = mxmlFindElement(current,
+			     current,
+			     DATA_NODE_NAME,
+			     NULL,
+			     NULL,
+			     MXML_DESCEND_FIRST);
+  if (dataNode != NULL)
+  {
+      dataNode = mxmlFindElement(dataNode,
+			     dataNode,
+			     name,
+			     NULL,
+			     NULL,
+			     MXML_DESCEND_FIRST);
+  }
+  if (dataNode != NULL)
+  {
+	return NXXopendatatable(fid, name);
+  }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     /*
@@ -492,9 +673,11 @@ NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name){
   xmlHandle->stack[xmlHandle->stackPointer].current = dataNode;
   xmlHandle->stack[xmlHandle->stackPointer].currentChild = NULL;
   xmlHandle->stack[xmlHandle->stackPointer].currentAttribute = 0;
+  xmlHandle->stack[xmlHandle->stackPointer].options = 0;
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/
+
 NXstatus  NXXclosedata (NXhandle fid){
   pXMLNexus xmlHandle = NULL;
 
@@ -520,6 +703,49 @@ static mxml_node_t *findData(mxml_node_t *node){
   }
   return NULL;
 }
+
+/* we only havv to deal with non-character data here */
+NXstatus  NXXputdatatable (NXhandle fid, void *data){
+  pXMLNexus xmlHandle = NULL;
+  mxml_node_t *userData = NULL;
+  mxml_node_t *current = NULL;
+  mxml_node_t *nodeRoot = NULL;
+  mxml_node_t *dataNodeRoot = NULL;
+  mxml_node_t *dataNode = NULL;
+  const char* name;
+  pNXDS dataset;
+  int i, offset, length, type, rank, dim[NX_MAXRANK];
+  char *pPtr = NULL;
+  xmlHandle = (pXMLNexus)fid;
+  assert(xmlHandle);
+  /* current points at the Idims node as done in NXXopendatatable */
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  name = current->value.element.name;
+  /* we want to walk all Idata nodes and set name */
+  nodeRoot =  current->parent->parent;
+  dataNodeRoot = nodeRoot;
+  offset = 0;
+  for(i=0; dataNodeRoot != NULL; i++)
+  {
+      dataNodeRoot = mxmlFindElement(dataNodeRoot, nodeRoot, DATA_NODE_NAME, NULL, NULL, (i == 0 ? MXML_DESCEND_FIRST : MXML_NO_DESCEND) );
+      if (dataNodeRoot != NULL)
+      {
+	dataNode = mxmlFindElement(dataNodeRoot,dataNodeRoot,name,NULL,NULL,MXML_DESCEND_FIRST);
+	if (dataNode != NULL)
+	{
+	    userData = findData(dataNode);
+  	    assert(userData != NULL);
+            dataset = (pNXDS)userData->value.custom.data;
+            assert(dataset);
+            length = getNXDatasetByteLength(dataset);
+            memcpy(dataset->u.ptr,(char*)data + offset,length);
+	    offset += length;
+	}
+      }
+    } 
+    return NX_OK;
+}
+
 /*------------------------------------------------------------------------*/
 NXstatus  NXXputdata (NXhandle fid, void *data){
   pXMLNexus xmlHandle = NULL;
@@ -531,6 +757,11 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+
+  if (xmlHandle->stack[xmlHandle->stackPointer].options & XMLSTACK_OPTION_TABLE)
+  {
+      return NXXputdatatable(fid,data);
+  }
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXIReportError(NXpData,"No dataset open");
@@ -572,6 +803,49 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
   }
   return NX_OK;
 }
+
+NXstatus  NXXgetdatatable (NXhandle fid, void *data){
+  pXMLNexus xmlHandle = NULL;
+  mxml_node_t *userData = NULL;
+  mxml_node_t *current = NULL;
+  mxml_node_t *nodeRoot = NULL;
+  mxml_node_t *dataNodeRoot = NULL;
+  mxml_node_t *dataNode = NULL;
+  const char* name;
+  pNXDS dataset;
+  int i, offset, length, type, rank, dim[NX_MAXRANK];
+  xmlHandle = (pXMLNexus)fid;
+  assert(xmlHandle);
+
+  /* current points at the Idims node as done in NXXopendatatable */
+  current = xmlHandle->stack[xmlHandle->stackPointer].current;
+  name = current->value.element.name;
+  /* we want to walk all Idata nodes and set name */
+  nodeRoot =  current->parent->parent;
+  dataNodeRoot = nodeRoot;
+  offset = 0;
+  for(i=0; dataNodeRoot != NULL; i++)
+  {
+      dataNodeRoot = mxmlFindElement(dataNodeRoot, nodeRoot, DATA_NODE_NAME, NULL, NULL, (i == 0 ? MXML_DESCEND_FIRST : MXML_NO_DESCEND) );
+      if (dataNodeRoot != NULL)
+      {
+	dataNode = mxmlFindElement(dataNodeRoot,dataNodeRoot,name,NULL,NULL,MXML_DESCEND_FIRST);
+	if (dataNode != NULL)
+	{
+	    userData = findData(dataNode);
+  	    assert(userData != NULL);
+            dataset = (pNXDS)userData->value.custom.data;
+            assert(dataset);
+            length = getNXDatasetByteLength(dataset);
+            memcpy((char*)data + offset, dataset->u.ptr, length);
+	    offset += length;
+	}
+      }
+    } 
+    return NX_OK;
+}
+
+
 /*------------------------------------------------------------------------*/
 NXstatus  NXXgetdata (NXhandle fid, void *data){
   pXMLNexus xmlHandle = NULL;
@@ -582,6 +856,11 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+
+  if (xmlHandle->stack[xmlHandle->stackPointer].options & XMLSTACK_OPTION_TABLE)
+  {
+      return NXXgetdatatable(fid,data);
+  }
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXIReportError(NXpData,"No dataset open");
@@ -645,8 +924,8 @@ NXstatus  NXXgetinfo (NXhandle fid, int *rank,
       *iType = NX_CHAR;
       dimension[0]= strlen(userData->value.opaque);
     } else {
+      *iType = translateTypeCode(attr);
       analyzeDim(attr,rank,dimension,iType);
-      *iType = NX_CHAR;
     }
   } else { 
     dataset = (pNXDS)userData->value.custom.data;
@@ -742,6 +1021,11 @@ static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset,
   }
   return 1;
 }
+
+NXstatus  NXXputslabtable (NXhandle fid, void *data, 
+				   int iStart[], int iSize[]){
+    return NX_OK;
+}
 /*----------------------------------------------------------------------*/
 NXstatus  NXXputslab (NXhandle fid, void *data, 
 				   int iStart[], int iSize[]){
@@ -754,6 +1038,11 @@ NXstatus  NXXputslab (NXhandle fid, void *data,
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+
+  if (xmlHandle->stack[xmlHandle->stackPointer].options & XMLSTACK_OPTION_TABLE)
+  {
+      return NXXputslabtable(fid,data,iStart,iSize);
+  }
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXIReportError(NXpData,"No dataset open");
@@ -1072,11 +1361,65 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
 
   return NX_OK;
 }
+
+/* find the next node, ignoring Idata */
+static mxml_node_t* find_next_node(mxml_node_t* node)
+{
+  int done = 0;
+  mxml_node_t* parent_next = NULL; /* parent to use if we are in an Idims  search */
+   if ( (node->parent != NULL)  && !strcmp(node->parent->value.element.name, DIMS_NODE_NAME) )
+   {
+	parent_next = node->parent->next;
+   }
+   else
+   {
+	parent_next = NULL;
+   }
+   if (node->next != NULL)
+   {
+	node = node->next;
+   }
+   else
+   {
+	node = parent_next;
+   }
+   while(node != NULL && !done)
+   {
+     if ( (node->parent != NULL)  && !strcmp(node->parent->value.element.name, DIMS_NODE_NAME) )
+     {
+	parent_next = node->parent->next;
+     }
+     else
+     {
+        parent_next = NULL;
+     }
+     if ( (node->type != MXML_ELEMENT) || !strcmp(node->value.element.name, DATA_NODE_NAME) )
+     {
+	if (node->next != NULL)
+	{
+	    node = node->next;
+	}
+	else
+	{
+	    node = parent_next;
+	}
+	continue;
+     }
+     if (!strcmp(node->value.element.name, DIMS_NODE_NAME))
+     {
+	node = node->child;
+	continue;
+     }
+     done = 1;
+  }
+  return node;
+}
+
 /*====================== search functions =================================*/
 NXstatus  NXXgetnextentry (NXhandle fid,NXname name, 
 					NXname nxclass, int *datatype){
   pXMLNexus xmlHandle = NULL;
-  mxml_node_t *next = NULL, *userData;
+  mxml_node_t *next = NULL, *userData, *node = NULL;
   int stackPtr;
   const char *target = NULL, *attname = NULL;
   pNXDS dataset;
@@ -1098,16 +1441,15 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
     /*
       initialization of search
     */
-    xmlHandle->stack[stackPtr].currentChild = 
-      xmlHandle->stack[stackPtr].current->child;
+      node = xmlHandle->stack[stackPtr].current->child;
   } else {
     /*
       proceed
     */
-    xmlHandle->stack[stackPtr].currentChild = 
-      xmlHandle->stack[stackPtr].currentChild->next;
+    node = find_next_node(xmlHandle->stack[stackPtr].currentChild);
   }
-  next = xmlHandle->stack[stackPtr].currentChild;
+  xmlHandle->stack[stackPtr].currentChild = node;
+  next = node;
   if(next == NULL){
     return NX_EOD;
   }
@@ -1244,7 +1586,7 @@ extern  NXstatus  NXXinitattrdir(NXhandle fid){
 NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN, 
 					NXname pName, NXname pClass){
   pXMLNexus xmlHandle = NULL;
-  mxml_node_t *child = NULL;
+  mxml_node_t *node = NULL, *child = NULL;
   mxml_node_t *current = NULL;
   const char *nameAtt = NULL;
   int childCount;
@@ -1264,11 +1606,35 @@ NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
   }
   strcpy(pClass,current->value.element.name);
 
+/* count all child nodes, but need to ignore DATA_NODE_NAME and
+ * descend into DIMS_NODE_NAME 
+ */
   childCount = 0;
-  child = current->child;
-  while(child != NULL){
-    childCount++;
-    child = child->next;
+  node = current->child;
+  while(node != NULL)
+  {
+	if (!strcmp(node->value.element.name, DATA_NODE_NAME))
+	{
+	    ;	/* names also exist in DIMS_NODE_NAME so do nothing here */
+	}
+	else if (!strcmp(node->value.element.name, DIMS_NODE_NAME))
+	{
+	    child = node->child;
+	    while(child != NULL)
+	    {
+		/* not sure why this check is needed, but you double count otherwise */
+		if (child->type == MXML_ELEMENT) 
+		{
+		    childCount++;
+		}
+		child = child->next;
+	    }
+	}
+	else
+	{
+    	    childCount++;
+	}
+	node = node->next;
   }
   *iN = childCount;
   return NX_OK;

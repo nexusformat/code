@@ -306,6 +306,53 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
+AT_SETUP([Check the XML table binding (static library)])
+AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-table-static | sed -e 's/\r$//' ], [], 
+[[NXinquirefile found: NXtest-table.xml
+Number of global attributes: 3
+   NeXus_version = 4.1.0
+   file_name = NXtest-table.xml
+Number of group attributes: 2
+   hugo = namenlos
+   cucumber = passion
+Group: entry(NXentry) contains 10 items
+   ch_data(4) = NeXus data
+   c1_data(4) = abcdefghijklmnopqrst
+   i1_data(20) =  1 2 3 4
+   i2_data(22) =  1000 2000 3000 4000
+   i4_data(24) =  1000000 2000000 3000000 4000000
+   grosse_zahl(26) =  12 555555555555 23 777777777777
+   r4_data(5)
+       1.000000 2.000000 3.000000 4.000000
+       5.000000 6.000000 7.000000 8.000000
+       9.000000 10.000000 11.000000 12.000000
+       13.000000 14.000000 15.000000 16.000000
+       17.000000 18.000000 19.000000 20.000000
+   r8_data(6)
+       1.000000 2.000000 3.000000 4.000000
+       5.000000 6.000000 7.000000 8.000000
+       9.000000 10.000000 11.000000 12.000000
+       13.000000 14.000000 15.000000 16.000000
+       17.000000 18.000000 19.000000 20.000000
+      Number of attributes : 4
+         ch_attribute : NeXus
+         i4_attribute : 42
+         r4_attribute : 3.141593
+         target : /entry/r8_data
+   Subgroup: data(NXdata)
+   Subgroup: sample(NXsample)
+Link check OK
+NXopenpath checks OK
+First file time: 2005-05-27 05:44:13
+NXinquirefile found: data/dmc01.xml
+Second file sample: Ga0.94Mn0.04Sb_8mm
+NXinquirefile found: data/dmc02.xml
+Second file time: 2005-05-27 05:48:56
+entry1 external URL = nxfile://data/dmc01.xml#/entry1
+External File Linking tested OK
+]])
+AT_CLEANUP
+
 AT_BANNER([Check the FORTRAN 77 binding.])
 
 AT_SETUP([Check the F77 binding using HDF4.])
