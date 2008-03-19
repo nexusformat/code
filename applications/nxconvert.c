@@ -35,14 +35,14 @@ static int WriteAttributes (int write_data);
 
 static NXhandle inId, outId;
 
-#define NX_XML	0
-#define NX_HDF4	1
-#define NX_HDF5	2
-#define NX_DTD	3
+#define NX_XML		0
+#define NX_HDF4		1
+#define NX_HDF5		2
+#define NX_DTD		3
 
 static void print_usage()
 {
-    printf("Usage: nxconvert [ -x | -h4 | -h5 | -o keepws ] [ infile ] [ outfile ]\n");
+    printf("Usage: nxconvert [ -x | -h4 | -h5 | -o keepws | -o table ] [ infile ] [ outfile ]\n");
 }
 
 #define NXCONVERT_EXIT_ERROR	exit(1)
@@ -104,6 +104,10 @@ int main(int argc, char *argv[])
 	    {
 	        nx_write_access |= NXACC_NOSTRIP;
 	        nx_read_access |= NXACC_NOSTRIP;
+	    }
+	    else if (!strcmp(optarg, "table"))
+	    {
+	        nx_write_access |= NXACC_TABLE;
 	    }
 	    else
 	    {
