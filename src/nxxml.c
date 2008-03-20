@@ -1363,10 +1363,14 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
 }
 
 /* find the next node, ignoring Idata */
-static mxml_node_t* find_next_node(mxml_node_t* node)
+static mxml_node_t* find_node(mxml_node_t* node, int next)
 {
   int done = 0;
   mxml_node_t* parent_next = NULL; /* parent to use if we are in an Idims  search */
+   if (node == NULL)
+   {
+	return NULL;
+   }
    if ( (node->parent != NULL)  && !strcmp(node->parent->value.element.name, DIMS_NODE_NAME) )
    {
 	parent_next = node->parent->next;
@@ -1375,13 +1379,16 @@ static mxml_node_t* find_next_node(mxml_node_t* node)
    {
 	parent_next = NULL;
    }
-   if (node->next != NULL)
+   if (next)
    {
-	node = node->next;
-   }
-   else
-   {
-	node = parent_next;
+       if (node->next != NULL)
+       {
+	    node = node->next;
+       }
+       else
+       {
+	    node = parent_next;
+       }
    }
    while(node != NULL && !done)
    {
@@ -1441,12 +1448,12 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
     /*
       initialization of search
     */
-      node = xmlHandle->stack[stackPtr].current->child;
+      node = find_node(xmlHandle->stack[stackPtr].current->child, 0);
   } else {
     /*
       proceed
     */
-    node = find_next_node(xmlHandle->stack[stackPtr].currentChild);
+    node = find_node(xmlHandle->stack[stackPtr].currentChild, 1);
   }
   xmlHandle->stack[stackPtr].currentChild = node;
   next = node;
