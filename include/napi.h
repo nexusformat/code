@@ -616,7 +616,7 @@ extern  NXstatus  NXIprintlink(NXhandle fid, NXlink* link);
 extern  NXstatus  NXsetcache(long newVal);
 
   typedef struct {
-        NXhandle *pNexusData;   
+        NXhandle pNexusData;   
         int stripFlag;
         NXstatus ( *nxclose)(NXhandle* pHandle);
         NXstatus ( *nxflush)(NXhandle* pHandle);

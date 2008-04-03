@@ -223,17 +223,17 @@ void PrintGroupAttributes (NXhandle fileId, char *groupname)
 int NXBdir (NXhandle fileId)
 {
    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], length;
-   NXname name, class, nxurl;
+   NXname name, nxclass, nxurl;
 
    if (NXinitgroupdir (fileId) != NX_OK) return NX_ERROR;
    do {
-      status = NXgetnextentry (fileId, name, class, &dataType);
+      status = NXgetnextentry (fileId, name, nxclass, &dataType);
       if (status == NX_ERROR) break;
       if (status == NX_OK) {
-	if (strncmp(class,"CDF",3) == 0){ 
+	if (strncmp(nxclass,"CDF",3) == 0){ 
 	    ;
 	}
-	else if (strcmp(class,"SDS") == 0){ 
+	else if (strcmp(nxclass,"SDS") == 0){ 
             printf ("  NX Data  : %s", name);
             if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
             if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
@@ -244,11 +244,11 @@ int NXBdir (NXhandle fileId)
             printf ("\n");
 	} else {
 	    length = sizeof(nxurl);
-	    if(NXisexternalgroup(fileId, name,class,nxurl,length) == NX_OK){
-	      printf ("  NX external Group: %s (%s), linked to: %s \n",name,class,nxurl); 
+	    if(NXisexternalgroup(fileId, name,nxclass,nxurl,length) == NX_OK){
+	      printf ("  NX external Group: %s (%s), linked to: %s \n",name,nxclass,nxurl); 
             } else {
-	      printf ("  NX Group : %s (%s)\n", name, class);
-	      if((status = NXopengroup(fileId,name,class)) != NX_OK){
+	      printf ("  NX Group : %s (%s)\n", name, nxclass);
+	      if((status = NXopengroup(fileId,name,nxclass)) != NX_OK){
 		return status;
 	      } 
 	      PrintGroupAttributes(fileId, name);
@@ -353,7 +353,7 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
 /* this prints the first line of an array; could print more */
          for(i=0; i<total_size / dataDimensions[dataRank-1]; i++)
 	 {
-             PrintData (dataBuffer + i * dataDimensions[dataRank-1], dataType, dataDimensions[dataRank-1]);
+             PrintData ((char*)dataBuffer + i * dataDimensions[dataRank-1], dataType, dataDimensions[dataRank-1]);
 	     PrintData ("\n", NX_CHAR, 1);
          }
       }
@@ -635,21 +635,21 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
 /* Outputs data items with the requested type */
 void PrintData (void *data, int dataType, int numElements)
 {
-   WriteData (stdout, data, dataType, numElements);
+   WriteData (stdout, (char*)data, dataType, numElements);
 }
 /* Searches group for requested group and return its class */
 int FindGroup (NXhandle fileId, char *groupName, char *groupClass)
 {
    int status, dataType;
-   NXname name, class;
+   NXname name, nxclass;
 
    NXinitgroupdir (fileId);
    do {
-      status = NXgetnextentry (fileId, name, class, &dataType);
+      status = NXgetnextentry (fileId, name, nxclass, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
           if (StrEq (groupName, name)) {
-            strcpy (groupClass, class);
+            strcpy (groupClass, nxclass);
             if (!strncmp(groupClass,"NX",2)) {
                return NX_OK;
             }
@@ -671,15 +671,15 @@ int FindGroup (NXhandle fileId, char *groupName, char *groupClass)
 int FindData (NXhandle fileId, char *dataName)
 {
    int status, dataType;
-   NXname name, class;
+   NXname name, nxclass;
 
    NXinitgroupdir (fileId);
    do {
-      status = NXgetnextentry (fileId, name, class, &dataType);
+      status = NXgetnextentry (fileId, name, nxclass, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
          if (StrEq(dataName,name)) {
-            if (!strncmp(class,"SDS",3)) { /* Data has class "SDS" */
+            if (!strncmp(nxclass,"SDS",3)) { /* Data has class "SDS" */
                return NX_OK;
             }
             else {
