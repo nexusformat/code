@@ -231,7 +231,8 @@ void analyzeDim(const char *typeString, int *rank,
 			    int *iDim, int *type){
   char dimString[132];
   char dim[20];
-  char *dimStart, *dimEnd;
+  const char *dimStart, *dimEnd;
+  char* dimTemp;
   int myRank;
 
   if(strchr(typeString,(int)'[') == NULL){
@@ -269,18 +270,18 @@ void analyzeDim(const char *typeString, int *rank,
     }
     memset(dimString,0,132);
     memcpy(dimString,dimStart,(dimEnd-dimStart)*sizeof(char));
-    dimStart = stptok(dimString,dim,19,",");
+    dimTemp = stptok(dimString,dim,19,",");
     myRank = 0;
-    while(dimStart != NULL){
+    while(dimTemp != NULL){
       iDim[myRank] = atoi(dim);
-      dimStart = stptok(dimStart,dim,19,",");
+      dimTemp = stptok(dimTemp,dim,19,",");
       myRank++;
     }
     *rank = myRank;
   }
 }
 /*--------------------------------------------------------------------*/
-int translateTypeCode(char *code){
+int translateTypeCode(const char *code){
   int i, result = -1;
   
   for(i = 0; i < NTYPECODE; i++){

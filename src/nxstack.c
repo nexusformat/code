@@ -44,7 +44,7 @@ typedef struct __fileStack {
 pFileStack makeFileStack(){
   pFileStack pNew = NULL;
   
-  pNew = malloc(sizeof(fileStack));
+  pNew = (pFileStack)malloc(sizeof(fileStack));
   if(pNew == NULL){
     return NULL;
   }

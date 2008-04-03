@@ -136,7 +136,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   double rdcc_w0;
 
   /* mask of any options for now */
-  am = (am & NXACCMASK_REMOVEFLAGS);
+  am = (NXaccess)(am & NXACCMASK_REMOVEFLAGS);
 
   /* turn off the automatic HDF error handling */  
     H5Eset_auto(NULL,NULL); 
@@ -1748,7 +1748,7 @@ static int h5MemType(hid_t atype)
 	 iRet = H5Dread(pFile->iCurrentD, memtype_id, H5S_ALL, 
 		     H5S_ALL, H5P_DEFAULT,tmp_data);
 	  data1 = tmp_data + myStart[0];
-	  strncpy(data,data1,(hsize_t)iSize[0]);
+	  strncpy((char*)data,data1,(hsize_t)iSize[0]);
 	  free(tmp_data);           
       } else {    
 	 iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, 
@@ -1879,7 +1879,7 @@ static int h5MemType(hid_t atype)
 	atype=H5Tcopy(type);
 	H5Tset_size(atype,*datalen);  
 	iRet = H5Aread(pFile->iCurrentA, atype, data);
-	*datalen=strlen(data);
+	*datalen=strlen((char*)data);
      } else {
        iRet = H5Aread(pFile->iCurrentA, type, data);
        *datalen=1;
@@ -1986,7 +1986,7 @@ static int h5MemType(hid_t atype)
     pNexusFile5 pFile;
         
     pFile = NXI5assert (fid);
-    NXI5KillAttDir (fid);
+    NXI5KillAttDir (pFile);
     return NX_OK;
   }
 
@@ -1997,7 +1997,7 @@ static int h5MemType(hid_t atype)
     pNexusFile5 pFile;
         
     pFile = NXI5assert (fid);
-    NXI5KillDir (fid);
+    NXI5KillDir (pFile);
     return NX_OK;
   }
 /*------------------------------------------------------------------------*/

@@ -375,7 +375,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     *pHandle = NULL;
 
     /* mask off any options for now */
-    am = (am & NXACCMASK_REMOVEFLAGS);
+    am = (NXaccess)(am & NXACCMASK_REMOVEFLAGS);
     /* map Nexus NXaccess types to HDF4 types */
     if (am == NXACC_CREATE) {
       am1 = DFACC_CREATE;
@@ -953,7 +953,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     pNexusFile pFile;
     int32 iRank, iAtt, iType, iRet;
     int32 iSize[H4_MAX_VAR_DIMS];
-    int compress_typei = COMP_CODE_NONE;
+    comp_coder_t compress_typei = COMP_CODE_NONE;
     NXname pBuffer;
     char pError[512];
     comp_info compstruct;  
@@ -1906,7 +1906,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     int iRet;
     
     pFile = NXIassert (fid);
-    NXIKillAttDir (fid);
+    NXIKillAttDir (pFile);
     iRet = NXIInitAttDir (pFile);
     if (iRet == NX_ERROR)
       return NX_ERROR;
@@ -1923,7 +1923,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     int iRet;
     
     pFile = NXIassert (fid);
-    NXIKillDir (fid);
+    NXIKillDir (pFile);
     iRet = NXIInitDir (pFile);
     if (iRet < 0) {
       NXIReportError (NXpData,"NX_ERROR: no memory to store directory info");

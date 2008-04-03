@@ -1281,7 +1281,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
   mxml_node_t *current = NULL;
   const char *attribute = NULL;
   char error[1024];
-  char *attData = NULL;
+  const char *attData = NULL;
   int iValue, nx_type;
   float fValue;
 

@@ -92,7 +92,7 @@ static char *locateNexusFileInPath(char *startName){
   pPtr = stptok(loadPath,pathPrefix,255,LIBSEP);
   while(pPtr != NULL){
     length = strlen(pathPrefix) + strlen(startName) + strlen(PATHSEP) + 2;
-    testPath = malloc(length*sizeof(char));
+    testPath = (char*)malloc(length*sizeof(char));
     if(testPath == NULL){
       return strdup(startName);
     }
@@ -297,7 +297,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     fHandle->stripFlag = 1;
     if(am & NXACC_NOSTRIP){
       fHandle->stripFlag = 0;
-      am -= NXACC_NOSTRIP;
+      am = (NXaccess)(am & ~NXACC_NOSTRIP);
     }
 
     if (my_am==NXACC_CREATE) {
@@ -954,7 +954,7 @@ char *nxitrim(char *str)
   }
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *class, 
+NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, 
 			    char *url, int urlLen){
   int status, attStatus, length = 1023, type = NX_CHAR;
   ErrFunc oldError;
@@ -962,7 +962,7 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *class,
 
   pNexusFunction pFunc = handleToNexusFunc(fid);
 
-  status = pFunc->nxopengroup(pFunc->pNexusData, name,class);
+  status = pFunc->nxopengroup(pFunc->pNexusData, name,nxclass);
   if(status != NX_OK){
     return status;
   }
@@ -984,12 +984,12 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *class,
   }
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *class, 
+NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, 
 			 CONSTCHAR *url){
   int status, type = NX_CHAR, length;
   pNexusFunction pFunc = handleToNexusFunc(fid);
 
-  status = pFunc->nxopengroup(pFunc->pNexusData,name,class);
+  status = pFunc->nxopengroup(pFunc->pNexusData,name,nxclass);
   if(status != NX_OK){
     return status;
   }
