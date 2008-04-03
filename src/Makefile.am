@@ -92,7 +92,7 @@ libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 ## libNeXus_la_LIBADD += -lhdf5 
 ## endif
 
-EXTRA_DIST=nexus_symbols.txt nexus_symbols_win.txt
+EXTRA_DIST=nexus_symbols.txt nexus_symbols_win.txt SConscript
 CLEANFILES=libNeXus.def libNeXus.dll.lib libNeXus.dll.exp nexus_symbols.sym
 
 include $(top_srcdir)/build_rules.am

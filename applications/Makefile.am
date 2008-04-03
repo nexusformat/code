@@ -31,6 +31,8 @@ LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
+EXTRA_DIST=SConscript
+
 if HAVE_XML
 NXINGEST = nxingest
 endif
