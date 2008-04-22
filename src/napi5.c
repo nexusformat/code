@@ -618,6 +618,7 @@ static int nxToHDF5Type(int datatype)
     hsize_t mydim[H5S_MAX_RANK], mydim1[H5S_MAX_RANK];  
     hsize_t size[H5S_MAX_RANK];
     hsize_t maxdims[H5S_MAX_RANK];
+    int compress_level;
 
     pFile = NXI5assert (fid);
   
@@ -695,6 +696,12 @@ static int nxToHDF5Type(int datatype)
        H5Tset_size(datatype1, byte_zahl);
 /*       H5Tset_strpad(H5T_STR_SPACEPAD); */
     }
+    compress_level = 6;
+    if ( (compress_type / 100) ==  NX_COMP_LZW )
+    {
+	compress_level = compress_type % 100;
+	compress_type = NX_COMP_LZW;
+    }
     if(compress_type == NX_COMP_LZW)
     {
       cparms = H5Pcreate(H5P_DATASET_CREATE);
@@ -703,7 +710,7 @@ static int nxToHDF5Type(int datatype)
         NXIReportError (NXpData, "ERROR: Size of chunks could not be set!");
         return NX_ERROR;
       }
-      H5Pset_deflate(cparms,6); 
+      H5Pset_deflate(cparms,compress_level); 
       iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, 
 			dataspace, cparms);   
     } else if (compress_type == NX_COMP_NONE) {

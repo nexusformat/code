@@ -123,6 +123,18 @@ typedef struct {
 #define NX_COMP_RLE 300
 #define NX_COMP_HUF 400  
 
+/* to test for these we use ((value / 100) == NX_COMP_LZW) */
+#define NX_COMP_LZW_LVL0 (100*NX_COMP_LZW + 0)
+#define NX_COMP_LZW_LVL1 (100*NX_COMP_LZW + 1)
+#define NX_COMP_LZW_LVL2 (100*NX_COMP_LZW + 2)
+#define NX_COMP_LZW_LVL3 (100*NX_COMP_LZW + 3)
+#define NX_COMP_LZW_LVL4 (100*NX_COMP_LZW + 4)
+#define NX_COMP_LZW_LVL5 (100*NX_COMP_LZW + 5)
+#define NX_COMP_LZW_LVL6 (100*NX_COMP_LZW + 6)
+#define NX_COMP_LZW_LVL7 (100*NX_COMP_LZW + 7)
+#define NX_COMP_LZW_LVL8 (100*NX_COMP_LZW + 8)
+#define NX_COMP_LZW_LVL9 (100*NX_COMP_LZW + 9)
+
 typedef struct {
                 long iTag;          /* HDF4 variable */
                 long iRef;          /* HDF4 variable */

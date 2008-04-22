@@ -782,7 +782,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     pNexusFile pFile;
     int32 iNew, iRet, type;
     char pBuffer[256];
-    int i;
+    int i, compress_level;
     int32 myDim[H4_MAX_VAR_DIMS];  
     comp_info compstruct;
 
@@ -893,10 +893,16 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     }
      
     /* compress SD data set */
+    compress_level = 6;
+    if( (compress_type / 100) == NX_COMP_LZW )
+    {
+	compress_level = compress_type % 100;
+	compress_type = NX_COMP_LZW;
+    }
 
     if(compress_type == NX_COMP_LZW)
     {
-      compstruct.deflate.level = 6; 
+      compstruct.deflate.level = compress_level; 
       iRet = SDsetcompress(iNew, COMP_CODE_DEFLATE, &compstruct);
       if (iRet < 0) 
       {
@@ -957,6 +963,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     NXname pBuffer;
     char pError[512];
     comp_info compstruct;  
+    int compress_level = 6;
    
     pFile = NXIassert (fid);
   
@@ -973,6 +980,12 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       else if (compress_type == NX_COMP_LZW) 
       {
         compress_typei = COMP_CODE_DEFLATE;
+      }
+      else if ( (compress_type / 100) == NX_COMP_LZW )
+      {
+        compress_typei = COMP_CODE_DEFLATE;
+        compress_level = compress_type % 100;
+	compress_type = NX_COMP_LZW;
       }
       else if (compress_type == NX_COMP_RLE)
       {
@@ -993,7 +1006,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     */
     if(compress_type == NX_COMP_LZW)
     {
-         compstruct.deflate.level = 6;
+         compstruct.deflate.level = compress_level;
     }
     else if(compress_type == NX_COMP_HUF)
     {
