@@ -258,7 +258,10 @@ class NeXus(object):
         self.path = []
         status = self.lib.nxiopen_(filename,mode,_ref(self.handle))
         if status == ERROR:
-            op = 'open' if mode in [ACC_READ, ACC_RDWR] else 'create'
+            if mode in [ACC_READ, ACC_RDWR]:
+              op = 'open'
+            else:
+              op = 'create'
             raise RuntimeError, "Could not %s %s"%(op,filename)
         self.isopen = True
 
@@ -281,7 +284,10 @@ class NeXus(object):
         Opens the NeXus file handle if it is not already open.
         """
         if self.isopen: return
-        mode = ACC_READ if self.mode==ACC_READ else ACC_RDWR
+        if self.mode==ACC_READ:
+            mode = ACC_READ
+        else:
+            mode = ACC_RDWR
         status = self.lib.nxiopen_(self.filename,mode,_ref(self.handle))
         if status == ERROR:
             raise RuntimeError, "Could not open %s"%(self.filename)
@@ -366,7 +372,10 @@ class NeXus(object):
         if status == ERROR:
             raise ValueError, "Could not open %s in %s"%(path,self._loc())
         n,path,nxclass = self.getgroupinfo()
-        self.path = path.split('/') if path != 'root' else []
+        if path != 'root':
+            self.path = path.split('/')
+        else:
+            self.path = []
         
         
     lib.nxiopengrouppath_.restype = c_int
@@ -385,7 +394,10 @@ class NeXus(object):
         if status == ERROR:
             raise ValueError, "Could not open %s in %s"%(path,self.filename)
         n,path,nxclass = self.getgroupinfo()
-        self.path = path.split('/') if path != 'root' else []
+        if path != 'root':
+            self.path = path.split('/')
+        else:
+            self.path = []
         
         
     lib.nxiopengroup_.restype = c_int
@@ -504,7 +516,10 @@ class NeXus(object):
         # first, then process the entries one by one.
         n,path,_ = self.getgroupinfo()
         #print "path",path
-        path = "/"+path if not path == "root" else "/"
+        if not path == "root":
+            path = "/"+path
+        else:
+            path = "/"
         self.initgroupdir()
         L = []
         for i in range(n):
@@ -1012,7 +1027,10 @@ class NeXus(object):
             if name == "target":
                 target = self.getattr(name,length,dtype)
                 #print "target %s, path %s"%(target,pathstr)
-                return target if target != pathstr else None
+                if target != pathstr:
+                    return target
+                else:
+                    return None
         return None
 
     # ==== External linking ====
@@ -1065,7 +1083,10 @@ class NeXus(object):
         url = ctypes.create_string_buffer(maxnamelen)
         status = self.lib.nxiisexternalgroup_(self.handle,name,nxclass,
                                               url,maxnamelen)
-        return None if status == ERROR else url.value
+        if status == ERROR:
+            return None
+        else:
+            url.value
 
 
     # ==== Utility functions ====
@@ -1075,7 +1096,10 @@ class NeXus(object):
         
         This is an extension to the NeXus API.
         """
-        pathstr = "/".join(self.path) if not self.path == [] else "root"
+        if not self.path == []:
+            pathstr = "/".join(self.path)
+        else:
+            pathstr = "root"
         return "%s(%s)"%(self.filename,pathstr)
     
     def _poutput(self, dtype, shape):
@@ -1104,6 +1128,15 @@ class NeXus(object):
             pdata = data.ctypes.data
             size = data.nbytes
         return datafn,pdata,size
+
+    def _nxany(self,iter):
+        """
+        replace python 2.5 any()
+        """
+        for e in iter:
+            if e:
+                return 1
+            return 0
     
     def _pinput(self, data, dtype, shape):
         """
@@ -1126,7 +1159,10 @@ class NeXus(object):
             # array slices such as a[:,1], which only report one dimension
             input_shape = numpy.array([i for i in data.shape if i != 1])
             target_shape = numpy.array([i for i in shape if i != 1])
-            if len(input_shape) != len(target_shape) or any(input_shape != target_shape):
+            print input_shape
+            print target_shape
+#            if len(input_shape) != len(target_shape) or any(input_shape != target_shape):
+            if len(input_shape) != len(target_shape) or self._nxany(input_shape != target_shape):
                 raise ValueError,\
                     "Shape mismatch %s!=%s: %s"%(data.shape,shape,self.filename)
             if str(data.dtype) != dtype:

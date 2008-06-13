@@ -352,8 +352,15 @@ def test_mode(mode,quiet=True,external=False):
 
 def test():
     tests = 0
-    quiet = True if '-q' in sys.argv else False
-    external = True if '-x' in sys.argv else False
+    if '-q' in sys.argv:
+        quiet = True
+    else:
+        quiet = False
+    if '-x' in sys.argv:
+        external = True
+        
+    else:
+        external = False
     if 'hdf4' in sys.argv: 
         test_mode('w4',quiet,external)
         tests += 1
