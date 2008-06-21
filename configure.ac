@@ -220,7 +220,7 @@ if test x$with_python != xno; then
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
-if test x$with_python != xno -o x$with_tcl != xno -o x$with_guile != xno; then
+if test x$with_tcl != xno -o x$with_guile != xno; then
     if test x$with_swig != xyes; then
 	SWIG=$with_swig
     fi
@@ -616,6 +616,7 @@ AC_CONFIG_FILES([Makefile
 		bindings/java/Makefile
 		bindings/swig/Makefile
 		bindings/idl/Makefile
+		bindings/python/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
 		contrib/applications/CBFLib/Makefile
@@ -633,11 +634,11 @@ F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
 IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
+PYTHONBINDING=`if test -n "$PYTHONROOT" ; then echo yes ; else echo no ; fi` 
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
     test -n "$GUILEROOT" && SWIGBINDING="$SWIGBINDING guile"
-    test -n "$PYTHONROOT" && SWIGBINDING="$SWIGBINDING python"
     SWIGBINDING="$SWIGBINDING ) SWIG=${SWIG}"
 else
     SWIGBINDING=no
@@ -665,7 +666,8 @@ build:
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
                 JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
-		IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT})
+		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT})
+	      PYTHON:	       ${PYTHONBINDING}
 
 Please check whether the configuration I detected matches what you would
 like to have. If not, re-run configure adding the appropriate  --with  option

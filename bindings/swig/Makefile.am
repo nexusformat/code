@@ -29,24 +29,24 @@
 #====================================================================
 AM_CPPFLAGS=-I$(top_srcdir)/include -I$(top_srcdir)/src
 lib_LTLIBRARIES=$(LIBNXTCL) $(LIBNXSCHEME) $(LIBNXGUILE) # $(LIBNXPERL)
-python_LTLIBRARIES=$(LIBNXPYTHON)
 bin_PROGRAMS=$(NXINTER) $(NXGUILE)
 
-# python wrapper
-if HAVE_SWIG
-if HAVE_PYTHON
-NXPYTHONWRAP=nxpython.py
-nodist_python_PYTHON=$(NXPYTHONWRAP)
-LIBNXPYTHON=libnxpython.la
-libnxpython_la_SOURCES=$(COMMON_SRC)
-nodist_libnxpython_la_SOURCES=$(PYTHONWRAP)
-libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) -I$(PYTHONROOT)/include $(CFLAGS)
-libnxpython_la_LDFLAGS=-L$(PYTHONROOT)/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) $(top_builddir)/src/libNeXus.la @SHARED_LDFLAGS@ $(LDFLAGS)
-PYTHONWRAP=nxpython_wrap.c
-endif
-nxpython_wrap.c: nxinter.i nxdataset.i
-	$(SWIG) -I$(srcdir) -o $@ -python -module nxpython -interface libnxpython nxinter.i 
-endif
+# old python wrapper
+#python_LTLIBRARIES=$(LIBNXPYTHON)
+#if HAVE_SWIG
+#if HAVE_PYTHON
+#NXPYTHONWRAP=nxpython.py
+#nodist_python_PYTHON=$(NXPYTHONWRAP)
+#LIBNXPYTHON=libnxpython.la
+#libnxpython_la_SOURCES=$(COMMON_SRC)
+#nodist_libnxpython_la_SOURCES=$(PYTHONWRAP)
+#libnxpython_la_CFLAGS=-I$(PYTHONROOT)/include/python$(PYTHON_VERSION) -I$(PYTHONROOT)/include $(CFLAGS)
+#libnxpython_la_LDFLAGS=-L$(PYTHONROOT)/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) $(top_builddir)/src/libNeXus.la @SHARED_LDFLAGS@ $(LDFLAGS)
+#PYTHONWRAP=nxpython_wrap.c
+#endif
+#nxpython_wrap.c: nxinter.i nxdataset.i
+#	$(SWIG) -I$(srcdir) -o $@ -python -module nxpython -interface libnxpython nxinter.i 
+#endif
 
 # perl wrapper (not working yet)
 #if HAVE_SWIG
@@ -132,7 +132,7 @@ endif
 swigdocdir 	= $(NXDOCDIR)/swig
 swigdoc_DATA	= $(DOC_OUTPUT)
 
-EXAMPLE_FILES = nxdstest.tcl nxexam.tcl nxpython_test.py nxintertest.tcl
+EXAMPLE_FILES = nxdstest.tcl nxexam.tcl nxintertest.tcl
 swigexampledir	= $(NXEXAMPLEDIR)/swig
 swigexample_DATA = $(EXAMPLE_FILES)
 
