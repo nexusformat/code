@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <cstring>
 #include "xml_parser.h"
 #include <napi.h>
 #include "string_util.h"

@@ -2,6 +2,8 @@
 #include <libxml/parserInternals.h>
 #include <iostream>
 #include <string>
+#include <cstring>
+#include <algorithm>
 #include <stdarg.h>
 #include <stdexcept>
 #include <vector>
@@ -61,7 +63,7 @@ typedef struct{
   NXhandle *handle;       // output file handle
   int status;             // status of parsing
   bool is_link;           // whether the current node is a link
-  map<string,string> map; // store macros for replacement
+  std::map<string,string> map; // store macros for replacement
   vector<StrVector> loc_to_source; // mapping for links
   NodeVector nodes;       // vector to current node listing
   string char_data;       // character data collected for current node

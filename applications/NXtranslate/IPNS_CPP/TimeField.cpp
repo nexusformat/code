@@ -1,3 +1,4 @@
+#include <cstring>
 #include "TimeField.h"
 #include "RandomAccessRunfile.h"
 

@@ -12,6 +12,8 @@
 #include "../string_util.h"
 #include "../tree.hh"
 #include <math.h>
+#include <cstring>
+#include <cstdlib>
 
 using std::ifstream;
 using std::invalid_argument;

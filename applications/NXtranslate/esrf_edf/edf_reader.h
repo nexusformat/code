@@ -26,6 +26,8 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 
 using namespace std; 
 

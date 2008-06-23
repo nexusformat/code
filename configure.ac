@@ -313,6 +313,7 @@ if test ! -z "$F77"; then
 fi
 
 HDF_EXT=a # library file extent to look for with HDF libraries
+HDF5_EXT=so # library file extent to look for with HDF5 libraries
 
 AC_SUBST(LIBXML2_CFLAGS)
 LIBXML2_CFLAGS='`xml2-config --cflags`'
@@ -333,6 +334,7 @@ case $host in
 	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
+	HDF5_EXT=dll
 	LIBXML2_CFLAGS=-I/usr/local/include
 	java_host="win32"
 	;;
@@ -428,7 +430,10 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     fi
 fi
 if test "$H4ROOT"; then
-    H4VERSION=`grep LIBVER_STRING ${H4ROOT}/include/${H4INCSUBROOT}/hfile.h | cut -d '"' -f 2 | cut -d ' ' -f4,6 | tr ' ,' '. '`
+    H4MAJORVERSION=`grep LIBVER_MAJOR ${H4ROOT}/include/${H4INCSUBROOT}/hfile.h | awk '{ print $3}'`
+    H4MINORVERSION=`grep LIBVER_MINOR ${H4ROOT}/include/${H4INCSUBROOT}/hfile.h | awk '{ print $3}'`
+    H4RELEASE=`grep LIBVER_RELEASE ${H4ROOT}/include/${H4INCSUBROOT}/hfile.h | awk '{ print $3}'`
+    H4VERSION=$H4MAJORVERSION.$H4MINORVERSION.$H4RELEASE
     case $H4VERSION in
 	4.[[12]]*) 
     		HDF4_LDFLAGS="-lmfhdf -ldf";
@@ -455,7 +460,7 @@ if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
     for i in $HDF5SEARCH; do
 	for j in lib lib64; do
-	    if test -z "$H5ROOT" -a -r ${i}/$j/libhdf5.$HDF_EXT; then H5ROOT=$i; fi
+	    if test -z "$H5ROOT" -a -r ${i}/$j/libhdf5.$HDF5_EXT; then H5ROOT=$i; fi
         done
     done
     if test -z "$H5ROOT"; then 
@@ -467,12 +472,12 @@ fi
 if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
-	1.[[6]]*)
+	1.[[68]]*)
     		HDF5_LDFLAGS="-lhdf5 -lz"
 		for j in lib lib64; do
 		    if test -d $H5ROOT/$j; then HDF5_LDFLAGS="-L$H5ROOT/$j $HDF5_LDFLAGS"; fi
 		done
-    		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5";;
+    		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5 -DH5_USE_16_API";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
 		H5ROOT="";;
     esac
@@ -548,7 +553,8 @@ fi
 dnl Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-AC_FUNC_MKTIME
+#this hangs on FC9 at the moment
+#AC_FUNC_MKTIME
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
@@ -657,8 +663,8 @@ Configuration (NeXus):
 
 build:
         NeXus with:
-                HDF4 support:  ${HDF4SUPPORT} 
-                HDF5 support:  ${HDF5SUPPORT}
+                HDF4 support:  ${HDF4SUPPORT} ($H4VERSION)
+                HDF5 support:  ${HDF5SUPPORT} ($H5VERSION)
                 XML support:   ${XMLSUPPORT}
 
         bindings:

@@ -25,6 +25,7 @@
 #include "napi.h"
 #include <iostream>
 #include "nxdir.h"
+#include <cstring>
 #include <string>
 #include <map>
 

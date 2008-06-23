@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 #include "napiconfig.h"
 #include "binary/BinaryRetriever.hpp"
 #include "string_util.h"

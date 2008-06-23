@@ -1,3 +1,4 @@
+#include <cstring>
 #include "DetectorMap.h"
 #include "RandomAccessRunfile.h"
 

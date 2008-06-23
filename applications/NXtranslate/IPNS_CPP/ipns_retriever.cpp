@@ -1,5 +1,7 @@
 #include <stdexcept>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 #include "ipns_retriever.h"
 #include "../node.h"
 #include "../string_util.h"

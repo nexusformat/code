@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <cstring>
 #include "data_util.hpp"
 #include "nxsummary.hpp"
 #include "string_util.hpp"

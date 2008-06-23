@@ -24,6 +24,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cctype>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 

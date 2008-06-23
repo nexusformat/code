@@ -2,6 +2,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <cstring>
 #include <vector>
 #include "collist_retriever.h"
 #include "../node.h"

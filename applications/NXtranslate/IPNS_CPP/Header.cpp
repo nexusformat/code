@@ -1,3 +1,4 @@
+#include <cstring>
 #include "Header.h"
 #include "RandomAccessRunfile.h"
 #include "LpsdDetIdMap.h"

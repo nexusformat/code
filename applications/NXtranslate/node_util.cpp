@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <stdexcept>
 #include <vector>
 #include "node.h"

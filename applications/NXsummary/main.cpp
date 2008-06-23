@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include "data_util.hpp"
 #include "nxsummary.hpp"

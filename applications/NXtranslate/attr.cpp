@@ -1,5 +1,6 @@
 #include <napi.h>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include <vector>
 #include "attr.h"

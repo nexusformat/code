@@ -27,9 +27,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fstream>
-#include <stdio.h>
+#include <cstdio>
+#include <cstring>
 
 // -------------------- begin TIMING TEST stuff
 #ifdef TIMING_TEST

@@ -1,6 +1,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <cstring>
 #include "nexus_retriever.h"
 #include "nexus_util.h"
 #include "node.h"

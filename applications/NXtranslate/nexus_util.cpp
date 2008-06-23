@@ -2,6 +2,8 @@
 #include <napi.h>
 #include <stdexcept>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 #include <vector>
 #include "nexus_util.h"
 #include "string_util.h"
