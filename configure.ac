@@ -119,22 +119,21 @@ else
 fi
 
 java_host="linux"
-javaroot=""
-with_java=no
+JAVAROOT=""
 AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK i.e. where the bin, lib and include directories live]),
 	[], [with_java_home=$withval])
 if test -d "$with_java_home"; then
-	javaroot="$with_java_home"
-	AC_MSG_NOTICE([Java SDK home is $javaroot])
-	JAVAINCLUDE="-I$javaroot/include"
-	AC_PATH_PROGS(JAVAC,gcj javac,,[$javaroot/bin])
+	JAVAROOT="$with_java_home"
+	AC_MSG_NOTICE([Java SDK home is $JAVAROOT])
+	JAVAINCLUDE="-I$JAVAROOT/include"
+	AC_PATH_PROGS(JAVAC,gcj javac,,[$JAVAROOT/bin])
 	if test `basename "$JAVAC"` = "gcj"; then
 	    JAVACFLAGS="-C"	# force creation of .class files
 	fi
-	AC_PATH_PROGS(JAVA,gij java,,[$javaroot/bin])
-	AC_PATH_PROGS(JAVAH,gcjh javah,,[$javaroot/bin])
-	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
-	AC_PATH_PROGS(JAR,jar fastjar,,[$javaroot/bin:$PATH])
+	AC_PATH_PROGS(JAVA,gij java,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVAH,gcjh javah,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVADOC,javadoc,,[$JAVAROOT/bin:$PATH])
+	AC_PATH_PROGS(JAR,jar fastjar,,[$JAVAROOT/bin:$PATH])
 fi
 
 
@@ -373,8 +372,8 @@ esac
 
 if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
 # avoid adding /usr/include/linux to include path
-    if test "$javaroot" != "/usr" -a "$javaroot" != "/usr/"; then
-        JAVAINCLUDE="$JAVAINCLUDE -I$javaroot/include/$java_host"
+    if test "$JAVAROOT" != "/usr" -a "$JAVAROOT" != "/usr/"; then
+        JAVAINCLUDE="$JAVAINCLUDE -I$JAVAROOT/include/$java_host"
     fi
 fi
 
@@ -564,9 +563,9 @@ AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
-AM_CONDITIONAL(HAVE_JAVA, [test ! -z "$JAVA"])
-AM_CONDITIONAL(HAVE_JAVAC, [test ! -z "$JAVAC"])
-AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC"])
+AM_CONDITIONAL(HAVE_JAVA, [test ! -z "$JAVA" -a ! -z "$JAVAROOT"])
+AM_CONDITIONAL(HAVE_JAVAC, [test ! -z "$JAVAC" -a ! -z "$JAVAROOT"])
+AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC" -a ! -z "$JAVAROOT"])
 AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
 AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
@@ -638,7 +637,7 @@ HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "       
 XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
-JAVABINDING=`if test -n "$JAVAC" ; then echo yes ; else echo no ; fi` 
+JAVABINDING=`if test -n "$JAVAROOT" ; then echo yes ; else echo no ; fi` 
 IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
 PYTHONBINDING=`if test -n "$PYTHONROOT" ; then echo yes ; else echo no ; fi` 
 if test -n "$SWIG" ; then 
@@ -650,8 +649,8 @@ else
     SWIGBINDING=no
 fi
 
-if test -z "$javaroot"; then
-    javaroot="not specified"
+if test -z "$JAVAROOT"; then
+    JAVAROOT="not specified"
 fi
 AC_MSG_RESULT([
 
@@ -670,7 +669,7 @@ build:
         bindings:
                 F77 :          ${F77BINDING} (--with-f77=${F77})
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
-                JAVA:          ${JAVABINDING} (--with-java-home=${javaroot}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
+                JAVA:          ${JAVABINDING} (--with-java-home=${JAVAROOT}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT})
 	      PYTHON:	       ${PYTHONBINDING}
