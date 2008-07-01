@@ -30,10 +30,12 @@
 
 pydocdir 	= $(NXDOCDIR)/python
 pydoc_DATA	= README.html
-python_PYTHON = nxs.py setup.py nxstest.py
+pkgpython_PYTHON = nxs.py setup.py nxstest.py
 EXTRA_DIST	= README.html
 
-#install-data-hook :
-#	python setup.py install --root=$(DESTDIR)
+install-data-hook :
+	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs.py > $(DESTDIR)${pkgpythondir}/nxs.py
+
+# python setup.py install --root=$(DESTDIR)
 
 include $(top_srcdir)/build_rules.am

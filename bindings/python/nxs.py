@@ -184,6 +184,9 @@ def _libnexus():
     """
     Load the NeXus library whereever it may be.
     """
+    # this will get changed as part of the install process
+    # it should correspond to --prefix specified to ./configure
+    nxprefix = '/usr/local'
     # NEXUSLIB takes precedence
     if 'NEXUSLIB' in os.environ:
         file = os.environ['NEXUSLIB']
@@ -209,7 +212,7 @@ def _libnexus():
             ldenv = 'LD_LIBRARY_PATH'
         # Search the load library path as well as the standard locations
         ldpath = [p for p in os.environ.get(ldenv,'').split(':') if p != '']
-        stdpath = ['/usr/local/lib','/usr/lib']
+        stdpath = [ nxprefix+'/lib', '/usr/local/lib', '/usr/lib']
         files += [os.path.join(p,lib) for p in [filedir]+ldpath+stdpath]
 
     # Given a list of files, try loading the first one that is available.
