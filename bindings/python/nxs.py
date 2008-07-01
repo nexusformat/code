@@ -197,12 +197,18 @@ def _libnexus():
     else:
         files = []
 
+    # NEXUSDIR is set by the Windows installer for NeXus
+    if 'NEXUSDIR' in os.environ:
+        winnxdir = os.environ['NEXUSDIR']
+    else:
+        winnxdir =  'C:/Program Files/NeXus Data Format'
+
     # Default names and locations to look for the library are system dependent
     filedir = os.path.dirname(__file__)
     if sys.platform in ('win32','cygwin'):
         files += [filedir+"/libNeXus.dll",
                   filedir+"/libNeXus-0.dll",
-                  'C:/Program Files/NeXus Data Format/bin/libNeXus-0.dll']
+                  winnxdir + '/bin/libNeXus-0.dll']
     else:
         if sys.platform in ('darwin'):
             lib = 'libNeXus.dylib'
