@@ -13,15 +13,19 @@ This wrapper needs the location of the libNeXus precompiled binary. It
 looks in the following places in order:
     os.environ['NEXUSLIB']                  - All
     directory containing nxs.py             - All
-    C:\Program Files\NeXus Data Format\bin  - Windows
+    os.environ['NEXUSDIR']\bin              - Windows
     os.environ['LD_LIBRARY_PATH']           - Unix
     os.environ['DYLD_LIBRARY_PATH']         - Darwin
+    PREFIX/lib                              - Unix and Darwin
     /usr/local/lib                          - Unix and Darwin
     /usr/lib                                - Unix and Darwin
 
-On Windows it looks for libNeXus.dll and libNeXus-0.dll
+On Windows it looks for libNeXus.dll and libNeXus-0.dll; 
+NEXUSDIR defaults to r'C:\Program Files\NeXus Data Format'
 On OS X it looks for libNeXus.dylib
 On Unix it looks for libNeXus.so
+PREFIX defaults to /usr/local, but is replaced by the value of
+--prefix during configure.
 
 The import will raise an OSError exception if the library wasn't found
 or couldn't be loaded.  Note that on Windows in particular this may be
