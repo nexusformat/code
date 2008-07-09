@@ -248,7 +248,7 @@ class NexusUtil
      *                          the slab can't be written.
      */
     template <typename NumT>
-    void NexusUtil::put_data_with_slabs(std::vector<NumT> & nx_data,
+    void put_data_with_slabs(std::vector<NumT> & nx_data,
                                         int block_size);
 
     /**

@@ -250,6 +250,7 @@ NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   pFileStack fileStack = NULL;
   NXhandle hfile;
 
+  *gHandle = NULL;
   fileStack = makeFileStack();
   if(fileStack == NULL){
     NXIReportError (NXpData,"ERROR: no memory to create filestack");
@@ -422,8 +423,11 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     NXhandle hfil; 
     int status;
     pFileStack fileStack = NULL;
-   
     pNexusFunction pFunc=NULL;
+    if (*fid == NULL)
+    {
+	return NX_OK;
+    }
     fileStack = (pFileStack)*fid;
     pFunc = peekFileOnStack(fileStack);
     hfil = pFunc->pNexusData;
@@ -437,6 +441,11 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     /* 
     Fortify_CheckAllMemory();
     */
+
+    /* 
+     * Why can't we set *fid to NULL ?
+     */
+    /* *fid = NULL; */
     return status;   
   }
 

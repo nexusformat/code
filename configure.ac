@@ -557,6 +557,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
+AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
 AM_CONDITIONAL(HAVE_F90, [test ! -z "$FC"])
 AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
@@ -616,6 +617,7 @@ AC_CONFIG_FILES([Makefile
 		doc/nxdict/Makefile
 		doc/tech_ref/Makefile
 		bindings/Makefile 
+		bindings/cpp/Makefile
 		bindings/f77/Makefile
 		bindings/f90/Makefile
 		bindings/java/Makefile
@@ -635,6 +637,7 @@ AC_OUTPUT
 HDF4SUPPORT=`if test -n "$H4ROOT" ; then echo yes ; else echo no ; echo "                found version $H4VERSION"; fi`
 HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "                found version $H5VERSION"; fi`
 XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
+CPPBINDING=`if test -n "$CXX" ; then echo yes ; else echo no ; fi`
 F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAROOT" ; then echo yes ; else echo no ; fi` 
@@ -667,6 +670,7 @@ build:
                 XML support:   ${XMLSUPPORT}
 
         bindings:
+                C++ :          ${CPPBINDING} (--with-cxx=${CXX})
                 F77 :          ${F77BINDING} (--with-f77=${F77})
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
                 JAVA:          ${JAVABINDING} (--with-java-home=${JAVAROOT}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
