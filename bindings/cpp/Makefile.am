@@ -30,7 +30,7 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 lib_LTLIBRARIES=libNeXusCPP.la
 
-libNeXusCPP_la_SOURCES=NeXusFile.hpp NeXusFile.cpp nexus_util.hpp nexus_util.cpp
+libNeXusCPP_la_SOURCES=NeXusFile.hpp NeXusFile.cpp nexus_util.hpp nexus_util.cpp NeXusException.hpp NeXusException.cpp
 libNeXusCPP_la_LIBADD=$(LIBNEXUS)
 libNeXusCPP_la_LDFLAGS=@SHARED_LDFLAGS@ $(LDFLAGS)
 
