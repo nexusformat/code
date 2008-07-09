@@ -1,7 +1,9 @@
 #ifndef NEXUSFILE_HPP
 #define NEXUSFILE_HPP 1
 
+#include <map>
 #include <string>
+#include <utility>
 #include "napi.h"
 
 namespace NeXus {
@@ -38,7 +40,14 @@ namespace NeXus {
     
     ~File();
 
-    
+    void initGroupDir();
+
+    std::pair<std::string, std::string> getNextEntry();
+
+    /**
+     * Return the entries available in the current place in the file.
+     */
+    std::map<std::string, std::string> getEntries();
   };
 };
 
