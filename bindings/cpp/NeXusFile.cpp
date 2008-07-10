@@ -3,10 +3,28 @@
 #include "NeXusException.hpp"
 
 using namespace NeXus;
+using std::map;
+using std::pair;
 using std::string;
 using std::stringstream;
+using std::vector;
 
 const string NULL_STR = "NULL";
+
+template <typename NumT>
+string toString(vector<NumT> & data) {
+  stringstream result;
+  result << "[";
+  size_t size = data.size();
+  for (size_t i = 0; i < size; i++) {
+    result << data[i];
+    if (i+1 < size) {
+      result << ",";
+    }
+  }
+  result << "]";
+  return result.str();
+}
 
 File::File(const string filename, const NXaccess access) {
   if (filename.empty()) {
@@ -52,9 +70,10 @@ void File::makeGroup(const string & name, const string & class_name) {
     msg << "NXmakegroup(" << name << ", " << class_name << ") failed";
     throw Exception(msg.str(), status);
   }
+  this->openGroup(name, class_name);
 }
 
-void File::openGroup(const string name, const string class_name) {
+void File::openGroup(const string & name, const string & class_name) {
   if (name.empty()) {
     throw Exception("Supplied empty name to openGroup");
   }
@@ -70,6 +89,129 @@ void File::openGroup(const string name, const string class_name) {
   }
 }
 
+void File::openPath(const string & path) {
+  if (path.empty()) {
+    throw Exception("Supplied empty path to openPath");
+  }
+  NXstatus status = NXopenpath(this->file_id, path.c_str());
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXopenpath(" << path << ") failed";
+    throw Exception(msg.str(), status);
+  }
+}
+
+void File::openGroupPath(const string & path) {
+  if (path.empty()) {
+    throw Exception("Supplied empty path to openGroupPath");
+  }
+  NXstatus status = NXopengrouppath(this->file_id, path.c_str());
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXopengrouppath(" << path << ") failed";
+    throw Exception(msg.str(), status);
+  }
+}
+
+void File::closeGroup() {
+  NXstatus status = NXclosegroup(this->file_id);
+  if (status != NX_OK) {
+    throw Exception("NXclosegroup failed", status);
+  }
+}
+
+void File::makeData(const string & name, NXnumtype type, vector<int> & dims) {
+  // error check the parameters
+  if (name.empty()) {
+    throw Exception("Supplied empty label to makeData");
+  }
+  if (dims.empty()) {
+    throw Exception("Supplied empty dimensions to makeData");
+  }
+
+  // do the work
+  NXstatus status = NXmakedata(this->file_id, name.c_str(), (int)type,
+                               dims.size(), &(*(dims.begin())));
+  // report errors
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXmakedata(" << name << ", " << type << ", " << dims.size()
+        << ", " << toString(dims) << ") failed";
+    throw Exception(msg.str(), status);
+  }
+  this->openData(name);
+}
+
+void File::makeCompData(const string & name, NXnumtype type,
+                        vector<int> & dims, NXcompression comp,
+                        vector<int> & bufsize) {
+  // error check the parameters
+  if (name.empty()) {
+    throw Exception("Supplied empty name to makeCompData");
+  }
+  if (dims.empty()) {
+    throw Exception("Supplied empty dimensions to makeCompData");
+  }
+  if (bufsize.empty()) {
+    throw Exception("Supplied empty bufsize to makeCompData");
+  }
+  if (dims.size() != bufsize.empty()) {
+    stringstream msg;
+    msg << "Supplied dims rank=" << dims.size()
+        << " must match supplied bufsize rank=" << bufsize.size()
+        << "in makeCompData";
+    throw Exception(msg.str());
+  }
+
+  // do the work
+  NXstatus status = NXcompmakedata(this->file_id, name.c_str(), (int)type,
+                                   dims.size(), &(*(dims.begin())), (int)comp,
+                                   &(*(bufsize.begin())));
+
+  // report errors
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXcompmakedata(" << name << ", " << type << ", " << dims.size()
+        << ", " << toString(dims) << ", " << comp << ", " << toString(bufsize)
+        << ") failed";
+    throw Exception(msg.str(), status);
+  }
+  this->openData(name);
+}
+
+void File::compress(NXcompression comp) {
+  stringstream msg;
+  msg << "compress(" << comp << ") is depricated - use makeCompData()";
+  throw Exception(msg.str());
+}
+
+void File::openData(const string & name) {
+  if (name.empty()) {
+    throw Exception("Supplied empty name to openData");
+  }
+  NXstatus status = NXopendata(this->file_id, name.c_str());
+  if (status != NX_OK) {
+    throw Exception("NXopendata(" + name + ") failed", status);
+  }
+}
+
+void File::closeData() {
+  NXstatus status = NXclosedata(this->file_id);
+  if (status != NX_OK) {
+    throw Exception("NXclosedata() failed", status);
+  }
+}
+
+void File::putData(void * data) {
+  if (data == NULL) {
+    throw Exception("Data specified as null in putData");
+  }
+  NXstatus status = NXputdata(this->file_id, data);
+  if (status != NX_OK) {
+    throw Exception("NXputdata(void *) failed", status);
+  }
+}
+
 void File::initGroupDir() {
   int status = NXinitgroupdir(this->file_id);
   if (status != NX_OK) {
@@ -77,7 +219,7 @@ void File::initGroupDir() {
   }
 }
 
-std::pair<string, string> File::getNextEntry() {
+pair<string, string> File::getNextEntry() {
   // set up temporary variables to get the information
   char name[NX_MAXNAMELEN];
   char class_name[NX_MAXNAMELEN];
@@ -88,22 +230,22 @@ std::pair<string, string> File::getNextEntry() {
   if (status == NX_OK) {
     string str_name(name);
     string str_class(class_name);
-    return std::pair<string,string>(str_name, str_class);
+    return pair<string,string>(str_name, str_class);
   }
   else if (status == NX_EOD) {
-    return std::pair<string,string>(NULL_STR, NULL_STR); // TODO return the correct thing
+    return pair<string,string>(NULL_STR, NULL_STR); // TODO return the correct thing
   }
   else {
     throw Exception("NXgetnextentry failed", status);
   }
 }
 
-std::map<string, string> File::getEntries() {
+map<string, string> File::getEntries() {
   this->initGroupDir();
 
-  std::map<string, string> result;
+  map<string, string> result;
 
-  std::pair<string,string> temp;
+  pair<string,string> temp;
   while (true) {
     temp = this->getNextEntry();
     if (temp.first == NULL_STR && temp.second == NULL_STR) { // TODO this needs to be changed when getNextEntry is fixed

@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 #include "napi.h"
 
 namespace NeXus {
@@ -35,6 +36,7 @@ namespace NeXus {
   private:
     NXhandle file_id;
     std::pair<std::string, std::string> getNextEntry();
+    void compress(NXcompression comp);
 
   public:
     File(const std::string filename, const NXaccess access = NXACC_READ);
@@ -45,7 +47,26 @@ namespace NeXus {
 
     void makeGroup(const std::string & name, const std::string & class_name);
 
-    void openGroup(const std::string name, const std::string class_name);
+    void openGroup(const std::string & name, const std::string & class_name);
+
+    void openPath(const std::string & path);
+
+    void openGroupPath(const std::string & path);
+
+    void closeGroup();
+
+    void makeData(const std::string & name, NXnumtype type,
+                  std::vector<int> & dims);
+
+    void makeCompData(const std::string & name, NXnumtype type,
+                      std::vector<int> & dims, NXcompression comp,
+                      std::vector<int> & bufsize);
+
+    void openData(const std::string & name);
+
+    void closeData();
+
+    void putData(void * data);
 
     void initGroupDir();
 
