@@ -353,7 +353,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_BANNER([Check the FORTRAN 77 binding.])
+AT_BANNER([Check the FORTRAN binding.])
 
 AT_SETUP([Check the F77 binding using HDF4.])
 AT_CHECK([ $HAVE_F77 && $HAVE_HDF4 && $SETUP_TEST && napif_test-hdf4 | sed -e 's/\r$//' ], [], 
@@ -461,6 +461,14 @@ Group: entry(NXentry) contains        8 items
    target : /entry/r8_data
    Subgroup: sample(NXsample)
 Link Check OK
+]])
+AT_CLEANUP
+
+AT_BANNER([Check the C++ binding.])
+AT_SETUP([Check the C++ binding.])
+AT_CHECK([ $HAVE_CPP && $SETUP_TEST && napi_test_cpp | sed -e 's/\r$//' ], [], 
+[[Hello World
+And Again
 ]])
 AT_CLEANUP
 

@@ -33,8 +33,9 @@ test: check
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
+LIBNEXUSCPP=$(top_builddir)/bindings/cpp/libNeXusCPP.la
 
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/bindings/cpp
 AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml NXtest-table.xml \
 	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
@@ -54,6 +55,10 @@ F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
 F90_TARGETS = NXtest
 
+if HAVE_CPP
+CPP_TARGETS = napi_test_cpp leak_test2 leak_test3
+endif
+
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
 			NXtest.f90 napif_test.f README.tests \
 			napi_test.c napif4_test.f napif5_test.f \
@@ -66,7 +71,7 @@ TESTSUITE_AT	= ## dbase.at devices.at starter.at
 
 AUTOTEST	= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) leak_test1 leak_test2 leak_test3
+check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) $(CPP_TARGETS) leak_test1
 
 #nxtestdir=$(NXTESTDIR)
 #nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) leak_test1 leak_test2 leak_test3
@@ -124,6 +129,10 @@ leak_test2_LDFLAGS=-static $(LDFLAGS)
 leak_test3_SOURCES=leak_test3.cxx
 leak_test3_LDADD=$(LIBNEXUS)
 leak_test3_LDFLAGS=-static $(LDFLAGS)
+
+napi_test_cpp_SOURCES=napi_test_cpp.cxx
+napi_test_cpp_LDADD=$(LIBNEXUSCPP)
+napi_test_cpp_LDFLAGS=-static $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
