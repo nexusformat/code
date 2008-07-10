@@ -437,15 +437,13 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     popFileStack(fileStack);
     if(fileStackDepth(fileStack) < 0){
       killFileStack(fileStack);
+      *fid = NULL; 
     }
+    /* we can't set fid to NULL always as the handle points to a stack of files for external file support */
     /* 
     Fortify_CheckAllMemory();
     */
 
-    /* 
-     * Why can't we set *fid to NULL ?
-     */
-    /* *fid = NULL; */
     return status;   
   }
 
