@@ -34,6 +34,7 @@ namespace NeXus {
   {
   private:
     NXhandle file_id;
+    std::pair<std::string, std::string> getNextEntry();
 
   public:
     File(const std::string filename, const NXaccess access = NXACC_READ);
@@ -42,9 +43,11 @@ namespace NeXus {
 
     void flush();
 
-    void initGroupDir();
+    void makeGroup(const std::string & name, const std::string & class_name);
 
-    std::pair<std::string, std::string> getNextEntry();
+    void openGroup(const std::string name, const std::string class_name);
+
+    void initGroupDir();
 
     /**
      * Return the entries available in the current place in the file.

@@ -38,8 +38,40 @@ void File::flush() {
   }
 }
 
+void File::makeGroup(const string & name, const string & class_name) {
+  if (name.empty()) {
+    throw Exception("Supplied empty name to makeGroup");
+  }
+  if (class_name.empty()) {
+    throw Exception("Supplied empty class name to makeGroup");
+  }
+  NXstatus status = NXmakegroup(this->file_id, name.c_str(),
+                                class_name.c_str());
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXmakegroup(" << name << ", " << class_name << ") failed";
+    throw Exception(msg.str(), status);
+  }
+}
+
+void File::openGroup(const string name, const string class_name) {
+  if (name.empty()) {
+    throw Exception("Supplied empty name to openGroup");
+  }
+  if (class_name.empty()) {
+    throw Exception("Supplied empty class name to openGroup");
+  }
+  NXstatus status = NXopengroup(this->file_id, name.c_str(),
+                                class_name.c_str());
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXopengroup(" << name << ", " << class_name << ") failed";
+    throw Exception(msg.str(), status);
+  }
+}
+
 void File::initGroupDir() {
-  int status = NXinitgroupdir(&(this->file_id));
+  int status = NXinitgroupdir(this->file_id);
   if (status != NX_OK) {
     throw Exception("NXinitgroupdir failed", status);
   }
@@ -51,7 +83,8 @@ std::pair<string, string> File::getNextEntry() {
   char class_name[NX_MAXNAMELEN];
   int datatype;
 
-  int status = NXgetnextentry(&(this->file_id), name, class_name, &datatype);
+  NXstatus status = NXgetnextentry(this->file_id, name, class_name,
+                                   &datatype);
   if (status == NX_OK) {
     string str_name(name);
     string str_class(class_name);
@@ -60,7 +93,7 @@ std::pair<string, string> File::getNextEntry() {
   else if (status == NX_EOD) {
     return std::pair<string,string>(NULL_STR, NULL_STR); // TODO return the correct thing
   }
-  else if (status == NX_ERROR) {
+  else {
     throw Exception("NXgetnextentry failed", status);
   }
 }
