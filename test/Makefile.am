@@ -142,13 +142,14 @@ napi_test_xml_static_SOURCES = napi_test.c
 napi_test_xml_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_static_LDFLAGS = -static $(LDFLAGS)
-
-napi_test_xml_table_static_SOURCES=
-napi_test-xml-table-static : napi_test-xml-static
-	ln -s napi_test-xml-static napi_test-xml-table-static
+napi_test_xml_table_static_SOURCES = napi_test.c
+napi_test_xml_table_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
+napi_test_xml_table_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
+napi_test_xml_table_static_LDFLAGS = -static $(LDFLAGS)
 else
 napi_test_xml_SOURCES = dummy.c
 napi_test_xml_static_SOURCES = dummy.c
+napi_test_xml_table_static_SOURCES = dummy.c
 napi_test_xml_static_LDFLAGS = $(LDFLAGS)
 endif
 
