@@ -1,9 +1,10 @@
-#include <iostream>
+#include <sstream>
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
 
 using namespace NeXus;
 using std::string;
+using std::stringstream;
 
 const string NULL_STR = "NULL";
 
@@ -14,7 +15,9 @@ File::File(const string filename, const NXaccess access) {
 
   NXstatus status = NXopen(filename.c_str(), access, &(this->file_id));
   if (status != NX_OK) {
-    throw Exception("Failed to open file " + filename);
+    stringstream msg;
+    msg << "NXopen(" << filename << ", "  << access << ") failed";
+    throw Exception(msg.str(), status);
   }
 }
 
@@ -23,8 +26,15 @@ File::~File() {
     NXstatus status = NXclose(&(this->file_id));
     this->file_id = NULL;
     if (status != NX_OK) {
-      throw Exception("Failed to close file");
+      throw Exception("NXclose failed", status);
     }
+  }
+}
+
+void File::flush() {
+  NXstatus status = NXflush(&(this->file_id));
+  if (status != NX_OK) {
+    throw Exception("NXflush failed", status);
   }
 }
 
@@ -51,7 +61,7 @@ std::pair<string, string> File::getNextEntry() {
     return std::pair<string,string>(NULL_STR, NULL_STR); // TODO return the correct thing
   }
   else if (status == NX_ERROR) {
-    throw Exception("Failed NXgetnextentry", status);
+    throw Exception("NXgetnextentry failed", status);
   }
 }
 

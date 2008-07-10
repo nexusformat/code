@@ -40,6 +40,8 @@ namespace NeXus {
     
     ~File();
 
+    void flush();
+
     void initGroupDir();
 
     std::pair<std::string, std::string> getNextEntry();
