@@ -70,6 +70,14 @@ typedef struct {
  */
 #define XMLSTACK_OPTION_TABLE 		0x1 /**< indicates table option in xmlStack */
 
+/**
+ * Freddie Akeroyd 14/7/2008
+ * Add NeXus schema support - this uses BASE.xsd as the initial file
+ */
+#define NEXUS_SCHEMA_VERSION	"1.0" 	/**< version of NeXus definition schema */
+#define NEXUS_SCHEMA_NAMESPACE 	"http://definition.nexusformat.org/schema/" NEXUS_SCHEMA_VERSION 	/**< XML schema namespace specified by xmlns */
+#define NEXUS_SCHEMA_FILE 	NEXUS_SCHEMA_NAMESPACE "/BASE.xsd" /**< location of default schema file for namespace */
+
 /*---------------------------------------------------------------------*/
 typedef struct {
   mxml_node_t *root;           /* root node */
@@ -172,6 +180,10 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
     mxmlElementSetAttr(current,"NeXus_version",NEXUS_VERSION);
     mxmlElementSetAttr(current,"XML_version","mxml");
     mxmlElementSetAttr(current,"file_name",filename);
+    mxmlElementSetAttr(current,"xmlns", NEXUS_SCHEMA_NAMESPACE);
+    mxmlElementSetAttr(current,"xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    mxmlElementSetAttr(current,"xsi:schemaLocation",
+	NEXUS_SCHEMA_NAMESPACE " " NEXUS_SCHEMA_FILE);
     time_buffer = NXIformatNeXusTime();
     if(time_buffer != NULL){
       mxmlElementSetAttr(current,"file_time",time_buffer);
