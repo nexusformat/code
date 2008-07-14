@@ -1379,7 +1379,7 @@ char *NXIformatNeXusTime(){
     }
     else
     {
-        strcpy(time_buffer, "1970-01-01 00:00:00+0000");
+        strcpy(time_buffer, "1970-01-01T00:00:00+00:00");
     }
     return time_buffer;
 }
