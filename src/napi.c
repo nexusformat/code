@@ -1360,11 +1360,11 @@ char *NXIformatNeXusTime(){
     {
         if (gmt_offset < 0)
         {
-            time_format = "%04d-%02d-%02d %02d:%02d:%02d-%02d%02d";
+            time_format = "%04d-%02d-%02dT%02d:%02d:%02d-%02d:%02d";
         }
         else
         {
-            time_format = "%04d-%02d-%02d %02d:%02d:%02d+%02d%02d";
+            time_format = "%04d-%02d-%02dT%02d:%02d:%02d+%02d:%02d";
         }
         sprintf(time_buffer, time_format,
             1900 + time_info->tm_year,
