@@ -31,11 +31,23 @@ namespace NeXus {
     HUF = NX_COMP_HUF
   };
 
+  struct Info{
+    NXnumtype type;
+    std::vector<int> dims;
+  };
+
+  struct AttrInfo{
+    NXnumtype type;
+    uint length;
+    std::string name;
+  };
+
   class File
   {
   private:
     NXhandle file_id;
     std::pair<std::string, std::string> getNextEntry();
+    AttrInfo getNextAttr();
     void compress(NXcompression comp);
 
   public:
@@ -80,8 +92,7 @@ namespace NeXus {
     template <typename NumT>
     void putData(const std::vector<NumT> & data);
 
-    void putAttr(const std::string & name, const void * data, int length,
-                 NXnumtype type);
+    void putAttr(const AttrInfo & info, const void * data);
 
     template <typename NumT>
     void putAttr(const std::string & name, const NumT value);
@@ -108,13 +119,54 @@ namespace NeXus {
 
     void openSourceGroup();
 
-    void initGroupDir();
+    void getData(void * data);
+
+    template <typename NumT>
+    void getData(std::vector<NumT> & data);
+
+    Info getInfo();
 
     /**
      * Return the entries available in the current place in the file.
      */
     std::map<std::string, std::string> getEntries();
+
+    void getSlab(void * data, const std::vector<int> & start,
+                 std::vector<int> & size);
+
+    std::vector<AttrInfo> getAttrInfos();
+
+    void getAttr(AttrInfo & info, void * data);
+
+    template <typename NumT>
+    void getAttr(AttrInfo & info, NumT & value);
+
+    std::string getStrAttr(AttrInfo & info);
+
+    NXlink getGroupID();
+
+    int getGroupInfo(std::string & name, std::string & type);
+
+    bool sameID(NXlink & first, NXlink & second);
+
+    void initGroupDir();
+
+    void initAttrDir();
+
+    void setNumberFormat(NXnumtype & type, const std::string &format);
+
+    std::string inquireFile(const int buff_length = NX_MAXNAMELEN);
+
+    std::string isExternalGroup(const std::string &name,
+                                const std::string & type,
+                                 const uint buff_length = NX_MAXNAMELEN);
+    void linkExternal(const std::string & name, const std::string & type,
+                      const std::string & url);
   };
+
+  void malloc(void ** data, std::vector<int> & dims, NXnumtype type);
+
+  void free(void **data);
 };
 
 #endif
