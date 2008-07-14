@@ -56,7 +56,16 @@ namespace NeXus {
     void closeGroup();
 
     void makeData(const std::string & name, NXnumtype type,
-                  std::vector<int> & dims);
+                  const std::vector<int> & dims);
+
+    void writeData(const std::string & name, const std::string & value);
+
+    template <typename NumT>
+    void writeData(const std::string & name, const std::vector<NumT> & value);
+
+    template <typename NumT>
+    void writeData(const std::string & name, const std::vector<NumT> & value,
+                   const std::vector<int> & dims);
 
     void makeCompData(const std::string & name, NXnumtype type,
                       std::vector<int> & dims, NXcompression comp,
@@ -66,7 +75,38 @@ namespace NeXus {
 
     void closeData();
 
-    void putData(void * data);
+    void putData(const void * data);
+
+    template <typename NumT>
+    void putData(const std::vector<NumT> & data);
+
+    void putAttr(const std::string & name, const void * data, int length,
+                 NXnumtype type);
+
+    template <typename NumT>
+    void putAttr(const std::string & name, const NumT value);
+
+    void putAttr(const char * name, const char * value);
+
+    void putAttr(const std::string & name, const std::string value);
+
+    void putSlab(void * data, std::vector<int> & start,
+                 std::vector<int> & size);
+
+    template <typename NumT>
+    void putSlab(std::vector<NumT> & data, std::vector<int> & start,
+                 std::vector<int> & size);
+
+    template <typename NumT>
+    void putSlab(std::vector<NumT> & data, int start, int size);
+
+    NXlink getDataID();
+
+    void makeLink(NXlink & link);
+
+    void makeNamedLink(const std::string & name, NXlink & link);
+
+    void openSourceGroup();
 
     void initGroupDir();
 
