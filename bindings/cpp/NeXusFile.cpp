@@ -452,6 +452,13 @@ void File::getData(void* data) {
 template <typename NumT>
 void File::getData(vector<NumT>& data) {
   Info info = this->getInfo();
+// data may not be of the correct type so need to check
+  if (info.type != getType(NumT()))
+  {
+    stringstream msg;
+    msg << "NXgetdata failed - cannot convert from type " << info.type << " to type " << getType(NumT());
+    throw Exception(msg.str());
+  }
   int length = 1;
   int rank = info.dims.size();
   for (int i = 0; i < rank; i++ ){
