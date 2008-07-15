@@ -30,6 +30,7 @@ LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
+AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 
 EXTRA_DIST=SConscript
 

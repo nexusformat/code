@@ -560,7 +560,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
-AM_CONDITIONAL(HAVE_F90, [test ! -z "$FC"])
+AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
 AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])

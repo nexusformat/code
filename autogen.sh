@@ -54,6 +54,8 @@ esac
 case $libtoolversion in
     *1.[456]*)
 	;;
+    *[2-9].*)
+	;;
     *)
 	echo "This libtool version is not supported by NeXus."
 	echo "NeXus only supports libtool 1.4 and above"
