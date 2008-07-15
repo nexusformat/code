@@ -80,9 +80,15 @@ namespace NeXus {
     void writeData(const std::string& name, const std::vector<NumT>& value,
                    const std::vector<int>& dims);
 
-    void makeCompData(const std::string& name, NXnumtype type,
-                      std::vector<int>& dims, NXcompression comp,
-                      std::vector<int>& bufsize);
+    void makeCompData(const std::string& name, const NXnumtype type,
+                      const std::vector<int>& dims, const NXcompression comp,
+                      const std::vector<int>& bufsize);
+
+    template <typename NumT>
+    void writeCompData(const std::string & name,
+                       const std::vector<NumT> & value,
+                       const std::vector<int> & dims, const NXcompression comp,
+                       const std::vector<int> & bufsize);
 
     void openData(const std::string& name);
 
@@ -168,6 +174,25 @@ namespace NeXus {
   void malloc(void** data, std::vector<int>& dims, NXnumtype type);
 
   void free(void** data);
+
+  /**
+   * This function returns the NXnumtype given a concrete number. The
+   * template is present to cover cases that are not otherwised
+   * explicitly implemented.
+   */
+  template <typename NumT>
+  NXnumtype getType(NumT number);
+  NXnumtype getType(float number);
+  NXnumtype getType(double number);
+  NXnumtype getType(int8_t number);
+  NXnumtype getType(uint8_t number);
+  NXnumtype getType(int16_t number);
+  NXnumtype getType(uint16_t number);
+  NXnumtype getType(int32_t number);
+  NXnumtype getType(uint32_t number);
+  NXnumtype getType(int64_t number);
+  NXnumtype getType(uint64_t number);
+  NXnumtype getType(char number);
 };
 
 #endif

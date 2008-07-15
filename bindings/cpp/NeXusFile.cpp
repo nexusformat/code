@@ -27,60 +27,58 @@ string toString(const vector<NumT>& data) {
   return result.str();
 }
 
-/**
- * This function returns the NXnumtype given a concrete number. The
- * template is present to cover cases that are not otherwised
- * explicitly implemented.
- */
-template <typename NumT>
-NXnumtype getType(NumT number) {
-  stringstream msg;
-  msg << "NeXus::getType() does not know type of " << number;
-  throw Exception(msg.str());
-}
+namespace NeXus {
 
-NXnumtype getType(float number) {
-  return FLOAT32;
-}
+  template <typename NumT>
+  NXnumtype getType(NumT number) {
+    stringstream msg;
+    msg << "NeXus::getType() does not know type of " << number;
+    throw Exception(msg.str());
+  }
 
-NXnumtype getType(double number) {
-  return FLOAT64;
-}
+  NXnumtype getType(float number) {
+    return FLOAT32;
+  }
 
-NXnumtype getType(int8_t number) {
-  return INT8;
-}
+  NXnumtype getType(double number) {
+    return FLOAT64;
+  }
 
-NXnumtype getType(uint8_t number) {
-  return UINT8;
-}
+  NXnumtype getType(int8_t number) {
+    return INT8;
+  }
 
-NXnumtype getType(int16_t number) {
-  return INT16;
-}
+  NXnumtype getType(uint8_t number) {
+    return UINT8;
+  }
 
-NXnumtype getType(uint16_t number) {
-  return UINT16;
-}
+  NXnumtype getType(int16_t number) {
+    return INT16;
+  }
 
-NXnumtype getType(int32_t number) {
-  return INT32;
-}
+  NXnumtype getType(uint16_t number) {
+    return UINT16;
+  }
 
-NXnumtype getType(uint32_t number) {
-  return UINT32;
-}
+  NXnumtype getType(int32_t number) {
+    return INT32;
+  }
 
-NXnumtype getType(int64_t number) {
-  return INT64;
-}
+  NXnumtype getType(uint32_t number) {
+    return UINT32;
+  }
 
-NXnumtype getType(uint64_t number) {
-  return UINT64;
-}
+  NXnumtype getType(int64_t number) {
+    return INT64;
+  }
 
-NXnumtype getType(char number) {
-  return CHAR;
+  NXnumtype getType(uint64_t number) {
+    return UINT64;
+  }
+
+  NXnumtype getType(char number) {
+    return CHAR;
+  }
 }
 
 File::File(const string& filename, const NXaccess access) {
@@ -230,9 +228,9 @@ void File::writeData(const string& name, const vector<NumT>& value,
 }
 
 
-void File::makeCompData(const string& name, NXnumtype type,
-                        vector<int>& dims, NXcompression comp,
-                        vector<int>& bufsize) {
+void File::makeCompData(const string& name, const NXnumtype type,
+                        const vector<int>& dims, const NXcompression comp,
+                        const vector<int>& bufsize) {
   // error check the parameters
   if (name.empty()) {
     throw Exception("Supplied empty name to makeCompData");
@@ -243,7 +241,7 @@ void File::makeCompData(const string& name, NXnumtype type,
   if (bufsize.empty()) {
     throw Exception("Supplied empty bufsize to makeCompData");
   }
-  if (dims.size() != bufsize.empty()) {
+  if (dims.size() != bufsize.size()) {
     stringstream msg;
     msg << "Supplied dims rank=" << dims.size()
         << " must match supplied bufsize rank=" << bufsize.size()
@@ -252,9 +250,12 @@ void File::makeCompData(const string& name, NXnumtype type,
   }
 
   // do the work
-  NXstatus status = NXcompmakedata(this->m_file_id, name.c_str(), (int)type,
-                                   dims.size(), &(*(dims.begin())), (int)comp,
-                                   &(*(bufsize.begin())));
+  int i_type = static_cast<int>(type);
+  int i_comp = static_cast<int>(comp);
+  NXstatus status = NXcompmakedata(this->m_file_id, name.c_str(), i_type,
+                                   dims.size(),
+                                   const_cast<int *>(&(dims[0])), i_comp,
+                                   const_cast<int *>(&(bufsize[0])));
 
   // report errors
   if (status != NX_OK) {
@@ -265,6 +266,15 @@ void File::makeCompData(const string& name, NXnumtype type,
     throw Exception(msg.str(), status);
   }
   this->openData(name);
+}
+
+template <typename NumT>
+void File::writeCompData(const string & name, const vector<NumT> & value,
+                       const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize) {
+  this->makeCompData(name, getType(value[0]), dims, comp, bufsize);
+  this->putData(value);
+  this->closeData();
 }
 
 void File::compress(NXcompression comp) {
@@ -734,20 +744,22 @@ void File::linkExternal(const string& name, const string& type,
   }
 }
 
-void malloc(void** data, std::vector<int>& dims, NXnumtype type) {
-  int rank = dims.size();
-  int c_dims[rank];
-  NXstatus status = NXmalloc(data, rank, c_dims, type);
-  if (status != NX_OK) {
-    throw Exception("NXmalloc failed", status);
+namespace NeXus {
+  void malloc(void** data, std::vector<int>& dims, NXnumtype type) {
+    int rank = dims.size();
+    int c_dims[rank];
+    NXstatus status = NXmalloc(data, rank, c_dims, type);
+    if (status != NX_OK) {
+      throw Exception("NXmalloc failed", status);
+    }
   }
-}
 
 
-void free(void** data) {
-  NXstatus status = NXfree(data);
-  if (status != NX_OK) {
-    throw Exception("NXfree failed", status);
+  void free(void** data) {
+    NXstatus status = NXfree(data);
+    if (status != NX_OK) {
+      throw Exception("NXfree failed", status);
+    }
   }
 }
 
@@ -816,6 +828,47 @@ template
 void File::writeData(const string& name, const vector<int64_t>& value);
 template
 void File::writeData(const string& name, const vector<uint64_t>& value);
+
+template
+void File::writeCompData(const string & name, const vector<float> & value,
+                       const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<double> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<int8_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<uint8_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<int16_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<uint16_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<int32_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<uint32_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<int64_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
+template
+void File::writeCompData(const string & name, const vector<uint64_t> & value,
+                         const vector<int> & dims, const NXcompression comp,
+                         const vector<int> & bufsize);
 
 template
 void File::getData(std::vector<float>& data);
