@@ -71,6 +71,9 @@ namespace NeXus {
     void makeData(const std::string& name, NXnumtype type,
                   const std::vector<int>& dims);
 
+    void makeData(const std::string & name, const NXnumtype type,
+                  const int length);
+
     void writeData(const std::string& name, const std::string& value);
 
     template <typename NumT>

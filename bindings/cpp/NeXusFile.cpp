@@ -198,6 +198,14 @@ void File::makeData(const string& name, NXnumtype type,
   this->openData(name);
 }
 
+void File::makeData(const string & name, const NXnumtype type,
+                    const int length) {
+  vector<int> dims;
+  dims.push_back(length);
+  this->makeData(name, type, dims);
+}
+
+
 void File::writeData(const string& name, const string& value) {
   if (value.empty()) {
     throw Exception("Supplied empty value to makeData");
@@ -402,9 +410,9 @@ template <typename NumT>
 void File::putSlab(vector<NumT>& data, vector<int>& start,
                    vector<int>& size) {
   if (data.empty()) {
-    throw Exception("Supplied empty data");
+    throw Exception("Supplied empty data to putSlab");
   }
-  this->putSlab(&(*(data.begin())), start, size);
+  this->putSlab(&(data[0]), start, size);
 }
 
 template <typename NumT>
