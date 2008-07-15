@@ -112,6 +112,20 @@ int main(int argc, char** argv)
   // create a link
   file.makeLink(link);
 
+  // compressed data
+  array_dims[0] = 100;
+  array_dims[1] = 20;
+  vector<int> comp_array;
+  for (int i = 0; i < array_dims[0]; i++) {
+    for (int j = 0; j < array_dims[1]; j++) {
+      comp_array.push_back(i);
+    }
+  }
+  vector<int> cdims;
+  cdims.push_back(20);
+  cdims.push_back(20);
+  file.writeCompData("comp_data", comp_array, array_dims, NeXus::LZW, cdims);
+
   return 0;
 }
 
