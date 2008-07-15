@@ -8,7 +8,7 @@
 #include "napi.h"
 
 namespace NeXus {
-  typedef enum NXnumtype {
+  enum NXnumtype {
     FLOAT32 = NX_FLOAT32,
     FLOAT64 = NX_FLOAT64,
     INT8 = NX_INT8,
@@ -24,7 +24,7 @@ namespace NeXus {
     BINARY = NX_BINARY
   };
 
-  typedef enum NXcompression {
+  enum NXcompression {
     NONE = NX_COMP_NONE,
     LZW = NX_COMP_LZW,
     RLE = NX_COMP_RLE,
@@ -38,91 +38,92 @@ namespace NeXus {
 
   struct AttrInfo{
     NXnumtype type;
-    uint length;
+    unsigned length;
     std::string name;
   };
 
   class File
   {
   private:
-    NXhandle file_id;
+    NXhandle m_file_id;
     std::pair<std::string, std::string> getNextEntry();
     AttrInfo getNextAttr();
     void compress(NXcompression comp);
+    void status2exception(int status);
 
   public:
-    File(const std::string filename, const NXaccess access = NXACC_READ);
+    File(const std::string& filename, const NXaccess access = NXACC_READ);
     
     ~File();
 
     void flush();
 
-    void makeGroup(const std::string & name, const std::string & class_name);
+    void makeGroup(const std::string& name, const std::string& class_name);
 
-    void openGroup(const std::string & name, const std::string & class_name);
+    void openGroup(const std::string& name, const std::string& class_name);
 
-    void openPath(const std::string & path);
+    void openPath(const std::string& path);
 
-    void openGroupPath(const std::string & path);
+    void openGroupPath(const std::string& path);
 
     void closeGroup();
 
-    void makeData(const std::string & name, NXnumtype type,
-                  const std::vector<int> & dims);
+    void makeData(const std::string& name, NXnumtype type,
+                  const std::vector<int>& dims);
 
-    void writeData(const std::string & name, const std::string & value);
-
-    template <typename NumT>
-    void writeData(const std::string & name, const std::vector<NumT> & value);
+    void writeData(const std::string& name, const std::string& value);
 
     template <typename NumT>
-    void writeData(const std::string & name, const std::vector<NumT> & value,
-                   const std::vector<int> & dims);
+    void writeData(const std::string& name, const std::vector<NumT>& value);
 
-    void makeCompData(const std::string & name, NXnumtype type,
-                      std::vector<int> & dims, NXcompression comp,
-                      std::vector<int> & bufsize);
+    template <typename NumT>
+    void writeData(const std::string& name, const std::vector<NumT>& value,
+                   const std::vector<int>& dims);
 
-    void openData(const std::string & name);
+    void makeCompData(const std::string& name, NXnumtype type,
+                      std::vector<int>& dims, NXcompression comp,
+                      std::vector<int>& bufsize);
+
+    void openData(const std::string& name);
 
     void closeData();
 
-    void putData(const void * data);
+    void putData(const void* data);
 
     template <typename NumT>
-    void putData(const std::vector<NumT> & data);
+    void putData(const std::vector<NumT>& data);
 
-    void putAttr(const AttrInfo & info, const void * data);
-
-    template <typename NumT>
-    void putAttr(const std::string & name, const NumT value);
-
-    void putAttr(const char * name, const char * value);
-
-    void putAttr(const std::string & name, const std::string value);
-
-    void putSlab(void * data, std::vector<int> & start,
-                 std::vector<int> & size);
+    void putAttr(const AttrInfo & info, const void* data);
 
     template <typename NumT>
-    void putSlab(std::vector<NumT> & data, std::vector<int> & start,
-                 std::vector<int> & size);
+    void putAttr(const std::string& name, const NumT value);
+
+    void putAttr(const char* name, const char* value);
+
+    void putAttr(const std::string& name, const std::string value);
+
+    void putSlab(void* data, std::vector<int>& start,
+                 std::vector<int>& size);
 
     template <typename NumT>
-    void putSlab(std::vector<NumT> & data, int start, int size);
+    void putSlab(std::vector<NumT>& data, std::vector<int>& start,
+                 std::vector<int>& size);
+
+    template <typename NumT>
+    void putSlab(std::vector<NumT>& data, int start, int size);
 
     NXlink getDataID();
 
-    void makeLink(NXlink & link);
+    void makeLink(NXlink& link);
 
-    void makeNamedLink(const std::string & name, NXlink & link);
+    void makeNamedLink(const std::string& name, NXlink& link);
 
     void openSourceGroup();
 
-    void getData(void * data);
+    void getData(void* data);
 
     template <typename NumT>
-    void getData(std::vector<NumT> & data);
+    void getData(std::vector<NumT>& data);
 
     Info getInfo();
 
@@ -131,42 +132,42 @@ namespace NeXus {
      */
     std::map<std::string, std::string> getEntries();
 
-    void getSlab(void * data, const std::vector<int> & start,
-                 std::vector<int> & size);
+    void getSlab(void* data, const std::vector<int>& start,
+                 std::vector<int>& size);
 
     std::vector<AttrInfo> getAttrInfos();
 
-    void getAttr(AttrInfo & info, void * data);
+    void getAttr(AttrInfo& info, void* data);
 
     template <typename NumT>
-    void getAttr(AttrInfo & info, NumT & value);
+    void getAttr(AttrInfo& info, NumT& value);
 
-    std::string getStrAttr(AttrInfo & info);
+    std::string getStrAttr(AttrInfo& info);
 
     NXlink getGroupID();
 
-    int getGroupInfo(std::string & name, std::string & type);
+    int getGroupInfo(std::string& name, std::string& type);
 
-    bool sameID(NXlink & first, NXlink & second);
+    bool sameID(NXlink& first, NXlink& second);
 
     void initGroupDir();
 
     void initAttrDir();
 
-    void setNumberFormat(NXnumtype & type, const std::string &format);
+    void setNumberFormat(NXnumtype& type, const std::string& format);
 
     std::string inquireFile(const int buff_length = NX_MAXNAMELEN);
 
-    std::string isExternalGroup(const std::string &name,
-                                const std::string & type,
-                                 const uint buff_length = NX_MAXNAMELEN);
-    void linkExternal(const std::string & name, const std::string & type,
-                      const std::string & url);
+    std::string isExternalGroup(const std::string& name,
+                                const std::string& type,
+                                const unsigned buff_length = NX_MAXNAMELEN);
+    void linkExternal(const std::string& name, const std::string& type,
+                      const std::string& url);
   };
 
-  void malloc(void ** data, std::vector<int> & dims, NXnumtype type);
+  void malloc(void** data, std::vector<int>& dims, NXnumtype type);
 
-  void free(void **data);
+  void free(void** data);
 };
 
 #endif

@@ -13,8 +13,8 @@ namespace NeXus{
     int status() throw();
     virtual ~Exception() throw();
   private:
-    std::string __what;
-    int __status;
+    std::string m_what;
+    int m_status;
   };
 };
 

@@ -1,3 +1,4 @@
+#include <cstring>
 #include <sstream>
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
@@ -12,7 +13,7 @@ using std::vector;
 const string NULL_STR = "NULL";
 
 template <typename NumT>
-string toString(const vector<NumT> & data) {
+string toString(const vector<NumT>& data) {
   stringstream result;
   result << "[";
   size_t size = data.size();
@@ -34,7 +35,7 @@ string toString(const vector<NumT> & data) {
 template <typename NumT>
 NXnumtype getType(NumT number) {
   stringstream msg;
-  msg << "Do not know type of " << number;
+  msg << "NeXus::getType() does not know type of " << number;
   throw Exception(msg.str());
 }
 
@@ -82,12 +83,12 @@ NXnumtype getType(char number) {
   return CHAR;
 }
 
-File::File(const string filename, const NXaccess access) {
+File::File(const string& filename, const NXaccess access) {
   if (filename.empty()) {
     throw Exception("Filename specified is empty constructor");
   }
 
-  NXstatus status = NXopen(filename.c_str(), access, &(this->file_id));
+  NXstatus status = NXopen(filename.c_str(), access, &(this->m_file_id));
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXopen(" << filename << ", "  << access << ") failed";
@@ -96,9 +97,9 @@ File::File(const string filename, const NXaccess access) {
 }
 
 File::~File() {
-  if (this->file_id != NULL) {
-    NXstatus status = NXclose(&(this->file_id));
-    this->file_id = NULL;
+  if (this->m_file_id != NULL) {
+    NXstatus status = NXclose(&(this->m_file_id));
+    this->m_file_id = NULL;
     if (status != NX_OK) {
       throw Exception("NXclose failed", status);
     }
@@ -106,20 +107,20 @@ File::~File() {
 }
 
 void File::flush() {
-  NXstatus status = NXflush(&(this->file_id));
+  NXstatus status = NXflush(&(this->m_file_id));
   if (status != NX_OK) {
     throw Exception("NXflush failed", status);
   }
 }
 
-void File::makeGroup(const string & name, const string & class_name) {
+void File::makeGroup(const string& name, const string& class_name) {
   if (name.empty()) {
     throw Exception("Supplied empty name to makeGroup");
   }
   if (class_name.empty()) {
     throw Exception("Supplied empty class name to makeGroup");
   }
-  NXstatus status = NXmakegroup(this->file_id, name.c_str(),
+  NXstatus status = NXmakegroup(this->m_file_id, name.c_str(),
                                 class_name.c_str());
   if (status != NX_OK) {
     stringstream msg;
@@ -129,14 +130,14 @@ void File::makeGroup(const string & name, const string & class_name) {
   this->openGroup(name, class_name);
 }
 
-void File::openGroup(const string & name, const string & class_name) {
+void File::openGroup(const string& name, const string& class_name) {
   if (name.empty()) {
     throw Exception("Supplied empty name to openGroup");
   }
   if (class_name.empty()) {
     throw Exception("Supplied empty class name to openGroup");
   }
-  NXstatus status = NXopengroup(this->file_id, name.c_str(),
+  NXstatus status = NXopengroup(this->m_file_id, name.c_str(),
                                 class_name.c_str());
   if (status != NX_OK) {
     stringstream msg;
@@ -145,11 +146,11 @@ void File::openGroup(const string & name, const string & class_name) {
   }
 }
 
-void File::openPath(const string & path) {
+void File::openPath(const string& path) {
   if (path.empty()) {
     throw Exception("Supplied empty path to openPath");
   }
-  NXstatus status = NXopenpath(this->file_id, path.c_str());
+  NXstatus status = NXopenpath(this->m_file_id, path.c_str());
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXopenpath(" << path << ") failed";
@@ -157,11 +158,11 @@ void File::openPath(const string & path) {
   }
 }
 
-void File::openGroupPath(const string & path) {
+void File::openGroupPath(const string& path) {
   if (path.empty()) {
     throw Exception("Supplied empty path to openGroupPath");
   }
-  NXstatus status = NXopengrouppath(this->file_id, path.c_str());
+  NXstatus status = NXopengrouppath(this->m_file_id, path.c_str());
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXopengrouppath(" << path << ") failed";
@@ -170,14 +171,14 @@ void File::openGroupPath(const string & path) {
 }
 
 void File::closeGroup() {
-  NXstatus status = NXclosegroup(this->file_id);
+  NXstatus status = NXclosegroup(this->m_file_id);
   if (status != NX_OK) {
     throw Exception("NXclosegroup failed", status);
   }
 }
 
-void File::makeData(const string & name, NXnumtype type,
-                    const vector<int> & dims) {
+void File::makeData(const string& name, NXnumtype type,
+                    const vector<int>& dims) {
   // error check the parameters
   if (name.empty()) {
     throw Exception("Supplied empty label to makeData");
@@ -187,8 +188,8 @@ void File::makeData(const string & name, NXnumtype type,
   }
 
   // do the work
-  NXstatus status = NXmakedata(this->file_id, name.c_str(), (int)type,
-                               dims.size(), const_cast<int *>(&(dims[0])));
+  NXstatus status = NXmakedata(this->m_file_id, name.c_str(), (int)type,
+                               dims.size(), const_cast<int*>(&(dims[0])));
   // report errors
   if (status != NX_OK) {
     stringstream msg;
@@ -199,7 +200,7 @@ void File::makeData(const string & name, NXnumtype type,
   this->openData(name);
 }
 
-void File::writeData(const string & name, const string & value) {
+void File::writeData(const string& name, const string& value) {
   if (value.empty()) {
     throw Exception("Supplied empty value to makeData");
   }
@@ -214,24 +215,24 @@ void File::writeData(const string & name, const string & value) {
 }
 
 template <typename NumT>
-void File::writeData(const string & name, const vector<NumT> & value) {
+void File::writeData(const string& name, const vector<NumT>& value) {
   vector<int> dims;
   dims.push_back(value.size());
   this->writeData(name, value, dims);
 }
 
 template <typename NumT>
-void File::writeData(const string & name, const vector<NumT> & value,
-                     const vector<int> & dims) {
+void File::writeData(const string& name, const vector<NumT>& value,
+                     const vector<int>& dims) {
   this->makeData(name, getType(value[0]), dims);
   this->putData(value);
   this->closeData();
 }
 
 
-void File::makeCompData(const string & name, NXnumtype type,
-                        vector<int> & dims, NXcompression comp,
-                        vector<int> & bufsize) {
+void File::makeCompData(const string& name, NXnumtype type,
+                        vector<int>& dims, NXcompression comp,
+                        vector<int>& bufsize) {
   // error check the parameters
   if (name.empty()) {
     throw Exception("Supplied empty name to makeCompData");
@@ -251,7 +252,7 @@ void File::makeCompData(const string & name, NXnumtype type,
   }
 
   // do the work
-  NXstatus status = NXcompmakedata(this->file_id, name.c_str(), (int)type,
+  NXstatus status = NXcompmakedata(this->m_file_id, name.c_str(), (int)type,
                                    dims.size(), &(*(dims.begin())), (int)comp,
                                    &(*(bufsize.begin())));
 
@@ -276,24 +277,24 @@ void File::openData(const string & name) {
   if (name.empty()) {
     throw Exception("Supplied empty name to openData");
   }
-  NXstatus status = NXopendata(this->file_id, name.c_str());
+  NXstatus status = NXopendata(this->m_file_id, name.c_str());
   if (status != NX_OK) {
     throw Exception("NXopendata(" + name + ") failed", status);
   }
 }
 
 void File::closeData() {
-  NXstatus status = NXclosedata(this->file_id);
+  NXstatus status = NXclosedata(this->m_file_id);
   if (status != NX_OK) {
     throw Exception("NXclosedata() failed", status);
   }
 }
 
-void File::putData(const void * data) {
+void File::putData(const void* data) {
   if (data == NULL) {
     throw Exception("Data specified as null in putData");
   }
-  NXstatus status = NXputdata(this->file_id, const_cast<void *>(data));
+  NXstatus status = NXputdata(this->m_file_id, const_cast<void *>(data));
   if (status != NX_OK) {
     throw Exception("NXputdata(void *) failed", status);
   }
@@ -307,14 +308,14 @@ void File::putData(const vector<NumT> & data) {
   this->putData(&(data[0]));
 }
 
-void File::putAttr(const AttrInfo &info, const void * data) {
+void File::putAttr(const AttrInfo& info, const void* data) {
   if (info.name == NULL_STR) {
     throw Exception("Supplied bad attribute name \"" + NULL_STR + "\"");
   }
   if (info.name.empty()) {
     throw Exception("Supplied empty name to putAttr");
   }
-  NXstatus status = NXputattr(this->file_id, info.name.c_str(),
+  NXstatus status = NXputattr(this->m_file_id, info.name.c_str(),
                               const_cast<void *>(data), info.length,
                               (int)(info.type));
   if (status != NX_OK) {
@@ -326,7 +327,7 @@ void File::putAttr(const AttrInfo &info, const void * data) {
 }
 
 template <typename NumT>
-void File::putAttr(const std::string & name, const NumT value) {
+void File::putAttr(const std::string& name, const NumT value) {
   NumT data[1];
   data[0] = value;
   AttrInfo info;
@@ -336,7 +337,7 @@ void File::putAttr(const std::string & name, const NumT value) {
   this->putAttr(info, &value);
 }
 
-void File::putAttr(const char * name, const char * value) {
+void File::putAttr(const char* name, const char* value) {
   if (name == NULL) {
     throw Exception("Specified name as null to putAttr");
   }
@@ -348,7 +349,7 @@ void File::putAttr(const char * name, const char * value) {
   this->putAttr(s_name, s_value);
 }
 
-void File::putAttr(const std::string & name, const std::string value) {
+void File::putAttr(const std::string& name, const std::string value) {
   if (value.empty()) {
     throw Exception("Supplied empty value to putAttr");
   }
@@ -360,7 +361,7 @@ void File::putAttr(const std::string & name, const std::string value) {
   this->putAttr(info, &(my_value[0]));
 }
 
-void File::putSlab(void * data, vector<int> & start,vector<int> & size) {
+void File::putSlab(void* data, vector<int>& start,vector<int>& size) {
   if (data == NULL) {
     throw Exception("Data specified as null in putSlab");
   }
@@ -377,7 +378,7 @@ void File::putSlab(void * data, vector<int> & start,vector<int> & size) {
         << "in putSlab";
     throw Exception(msg.str());
   }
-  NXstatus status = NXputslab(this->file_id, data, &(*(start.begin())),
+  NXstatus status = NXputslab(this->m_file_id, data, &(*(start.begin())),
                               &(*(size.begin())));
   if (status != NX_OK) {
     stringstream msg;
@@ -388,8 +389,8 @@ void File::putSlab(void * data, vector<int> & start,vector<int> & size) {
 }
 
 template <typename NumT>
-void File::putSlab(vector<NumT> & data, vector<int> & start,
-                   vector<int> & size) {
+void File::putSlab(vector<NumT>& data, vector<int>& start,
+                   vector<int>& size) {
   if (data.empty()) {
     throw Exception("Supplied empty data");
   }
@@ -397,7 +398,7 @@ void File::putSlab(vector<NumT> & data, vector<int> & start,
 }
 
 template <typename NumT>
-void File::putSlab(vector<NumT> & data, int start, int size) {
+void File::putSlab(vector<NumT>& data, int start, int size) {
   vector<int> start_v;
   start_v.push_back(start);
   vector<int> size_v;
@@ -407,49 +408,49 @@ void File::putSlab(vector<NumT> & data, int start, int size) {
 
 NXlink File::getDataID() {
   NXlink link;
-  NXstatus status = NXgetdataID(this->file_id, &link);
+  NXstatus status = NXgetdataID(this->m_file_id, &link);
   if (status != NX_OK) {
     throw Exception("NXgetdataID failed", status);
   }
   return link;
 }
 
-void File::makeLink(NXlink & link) {
-  NXstatus status = NXmakelink(this->file_id, &link);
+void File::makeLink(NXlink& link) {
+  NXstatus status = NXmakelink(this->m_file_id, &link);
   if (status != NX_OK) {
     throw Exception("NXmakelink failed", status);
   }
 }
 
-void File::makeNamedLink(const string & name, NXlink & link) {
+void File::makeNamedLink(const string& name, NXlink& link) {
   if (name.empty()) {
     throw Exception("Supplied empty name to makeNamedLink");
   }
-  NXstatus status = NXmakenamedlink(this->file_id, name.c_str(), &link);
+  NXstatus status = NXmakenamedlink(this->m_file_id, name.c_str(), &link);
   if (status != NX_OK) {
     throw Exception("NXmakenamedlink(" + name + ", link)", status);
   }
 }
 
 void File::openSourceGroup() {
-  NXstatus status = NXopensourcegroup(this->file_id);
+  NXstatus status = NXopensourcegroup(this->m_file_id);
   if (status != NX_OK) {
     throw Exception("NXopensourcegroup failed");
   }
 }
 
-void File::getData(void * data) {
+void File::getData(void* data) {
   if (data == NULL) {
     throw Exception("Supplied null pointer to getData");
   }
-  NXstatus status = NXgetdata(this->file_id, data);
+  NXstatus status = NXgetdata(this->m_file_id, data);
   if (status != NX_OK) {
     throw Exception("NXgetdata failed", status);
   }
 }
 
 template <typename NumT>
-void File::getData(vector<NumT> & data) {
+void File::getData(vector<NumT>& data) {
   Info info = this->getInfo();
   int length = 1;
   int rank = info.dims.size();
@@ -465,7 +466,7 @@ Info File::getInfo() {
   int dims[NX_MAXRANK];
   int type;
   int rank;
-  NXstatus status = NXgetinfo(this->file_id, &rank, dims, &type);
+  NXstatus status = NXgetinfo(this->m_file_id, &rank, dims, &type);
   if (status != NX_OK) {
     throw Exception("NXgetinfo failed", status);
   }
@@ -483,7 +484,7 @@ pair<string, string> File::getNextEntry() {
   char class_name[NX_MAXNAMELEN];
   int datatype;
 
-  NXstatus status = NXgetnextentry(this->file_id, name, class_name,
+  NXstatus status = NXgetnextentry(this->m_file_id, name, class_name,
                                    &datatype);
   if (status == NX_OK) {
     string str_name(name);
@@ -517,8 +518,8 @@ map<string, string> File::getEntries() {
   return result;
 }
 
-void File::getSlab(void * data, const vector<int> & start,
-                   vector<int> & size) {
+void File::getSlab(void* data, const vector<int>& start,
+                   vector<int>& size) {
   if (data == NULL) {
     throw Exception("Supplied null pointer to getSlab");
   }
@@ -545,7 +546,7 @@ void File::getSlab(void * data, const vector<int> & start,
     i_size[i] = size[i];
   }
 
-  NXstatus status = NXgetslab(this->file_id, data, i_start, i_size);
+  NXstatus status = NXgetslab(this->m_file_id, data, i_start, i_size);
   if (status != NX_OK) {
     throw Exception("NXgetslab failed", status);
   }
@@ -556,7 +557,7 @@ AttrInfo File::getNextAttr() {
   char name[NX_MAXNAMELEN];
   int type;
   int length;
-  NXstatus status = NXgetnextattr(this->file_id, name, &length, &type);
+  NXstatus status = NXgetnextattr(this->m_file_id, name, &length, &type);
   if (status == NX_OK) {
     AttrInfo info;
     info.type = static_cast<NXnumtype>(type);
@@ -575,12 +576,12 @@ AttrInfo File::getNextAttr() {
   }
 }
 
-void File::getAttr(AttrInfo & info, void * data) {
+void File::getAttr(AttrInfo& info, void* data) {
   char name[NX_MAXNAMELEN];
   strcpy(name, info.name.c_str());
   int type;
   int length;
-  NXstatus status = NXgetattr(this->file_id, name, data, &length,
+  NXstatus status = NXgetattr(this->m_file_id, name, data, &length,
                               &type);
   if (status != NX_OK) {
     throw Exception("NXgetattr(" + info.name + ") failed", status);
@@ -595,7 +596,7 @@ void File::getAttr(AttrInfo & info, NumT & value) {
   this->getAttr(info, &value);
 }
 
-string File::getStrAttr(AttrInfo & info) {
+string File::getStrAttr(AttrInfo& info) {
   if (info.type != CHAR) {
     stringstream msg;
     msg << "Data type must be CHAR (" << CHAR << ") found " << info.type;
@@ -622,52 +623,52 @@ vector<AttrInfo> File::getAttrInfos() {
 
 NXlink File::getGroupID() {
   NXlink link;
-  NXstatus status = NXgetgroupID(this->file_id, &link);
+  NXstatus status = NXgetgroupID(this->m_file_id, &link);
   if (status != NX_OK) {
     throw Exception("NXgetgroupID failed", status);
   }
   return link;
 }
 
-int File::getGroupInfo(string & name, string & type) {
+int File::getGroupInfo(string& name, string& type) {
   int length;
   char c_name[NX_MAXNAMELEN];
   strcpy(c_name, name.c_str());
   char c_type[NX_MAXNAMELEN];
   strcpy(c_type, type.c_str());
-  NXstatus status = NXgetgroupinfo(this->file_id, &length, c_name, c_type);
+  NXstatus status = NXgetgroupinfo(this->m_file_id, &length, c_name, c_type);
   if (status != NX_OK) {
     throw Exception("NXgetgroupinfo failed", status);
   }
   return length;
 }
 
-bool File::sameID(NXlink & first, NXlink & second) {
-  NXstatus status = NXsameID(this->file_id, &first, &second);
+bool File::sameID(NXlink& first, NXlink& second) {
+  NXstatus status = NXsameID(this->m_file_id, &first, &second);
   return (status == NX_OK);
 }
 
 void File::initGroupDir() {
-  int status = NXinitgroupdir(this->file_id);
+  int status = NXinitgroupdir(this->m_file_id);
   if (status != NX_OK) {
     throw Exception("NXinitgroupdir failed", status);
   }
 }
 
 void File::initAttrDir() {
-  int status = NXinitattrdir(this->file_id);
+  int status = NXinitattrdir(this->m_file_id);
   if (status != NX_OK) {
     throw Exception("NXinitattrdir failed", status);
   }
 }
 
-void File::setNumberFormat(NXnumtype & type, const string &format) {
+void File::setNumberFormat(NXnumtype& type, const string& format) {
   if (format.empty()) {
     throw Exception("Supplied empty format to setNumberFormat");
   }
   char c_format[NX_MAXNAMELEN];
   strcpy(c_format, format.c_str());
-  NXstatus status = NXsetnumberformat(this->file_id, type, c_format);
+  NXstatus status = NXsetnumberformat(this->m_file_id, type, c_format);
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXsetnumberformat(" << format << ") failed";
@@ -677,7 +678,7 @@ void File::setNumberFormat(NXnumtype & type, const string &format) {
 
 string File::inquireFile(const int buff_length) {
   char c_filename[buff_length];
-  NXstatus status = NXinquirefile(this->file_id, c_filename, buff_length);
+  NXstatus status = NXinquirefile(this->m_file_id, c_filename, buff_length);
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXinquirefile(" << buff_length << ") failed";
@@ -686,8 +687,8 @@ string File::inquireFile(const int buff_length) {
   return string(c_filename);
 }
 
-string File::isExternalGroup(const string & name, const string & type,
-                             const uint buff_length) {
+string File::isExternalGroup(const string& name, const string& type,
+                             const unsigned buff_length) {
   if (name.empty()) {
     throw Exception("Supplied empty name to isExternalGroup");
   }
@@ -695,7 +696,7 @@ string File::isExternalGroup(const string & name, const string & type,
     throw Exception("Supplied empty type to isExternalGroup");
   }
   char url[buff_length];
-  NXstatus status = NXisexternalgroup(this->file_id, name.c_str(),
+  NXstatus status = NXisexternalgroup(this->m_file_id, name.c_str(),
                                       type.c_str(), url, buff_length);
   if (status != NX_OK) {
     stringstream msg;
@@ -705,8 +706,8 @@ string File::isExternalGroup(const string & name, const string & type,
   return string(url);
 }
 
-void File::linkExternal(const string & name, const string & type,
-                        const string & url) {
+void File::linkExternal(const string& name, const string& type,
+                        const string& url) {
   if (name.empty()) {
     throw Exception("Supplied empty name to linkExternal");
   }
@@ -716,7 +717,7 @@ void File::linkExternal(const string & name, const string & type,
   if (url.empty()) {
     throw Exception("Supplied empty url to linkExternal");
   }
-  NXstatus status = NXlinkexternal(this->file_id, name.c_str(), type.c_str(),
+  NXstatus status = NXlinkexternal(this->m_file_id, name.c_str(), type.c_str(),
                                    url.c_str());
   if (status != NX_OK) {
     stringstream msg;
@@ -726,7 +727,7 @@ void File::linkExternal(const string & name, const string & type,
   }
 }
 
-void malloc(void ** data, std::vector<int> & dims, NXnumtype type) {
+void malloc(void** data, std::vector<int>& dims, NXnumtype type) {
   int rank = dims.size();
   int c_dims[rank];
   NXstatus status = NXmalloc(data, rank, c_dims, type);
@@ -736,7 +737,7 @@ void malloc(void ** data, std::vector<int> & dims, NXnumtype type) {
 }
 
 
-void free(void **data) {
+void free(void** data) {
   NXstatus status = NXfree(data);
   if (status != NX_OK) {
     throw Exception("NXfree failed", status);
@@ -747,85 +748,85 @@ void free(void **data) {
 /* Concrete instantiations of template definitions.                 */
 /* ---------------------------------------------------------------- */
 template
-void File::putAttr(const string & name, const float value);
+void File::putAttr(const string& name, const float value);
 template
-void File::putAttr(const string & name, const double value);
+void File::putAttr(const string& name, const double value);
 template
-void File::putAttr(const string & name, const int8_t value);
+void File::putAttr(const string& name, const int8_t value);
 template
-void File::putAttr(const string & name, const uint8_t value);
+void File::putAttr(const string& name, const uint8_t value);
 template
-void File::putAttr(const string & name, const int16_t value);
+void File::putAttr(const string& name, const int16_t value);
 template
-void File::putAttr(const string & name, const uint16_t value);
+void File::putAttr(const string& name, const uint16_t value);
 template
-void File::putAttr(const string & name, const int32_t value);
+void File::putAttr(const string& name, const int32_t value);
 template
-void File::putAttr(const string & name, const uint32_t value);
+void File::putAttr(const string& name, const uint32_t value);
 template
-void File::putAttr(const string & name, const int64_t value);
+void File::putAttr(const string& name, const int64_t value);
 template
-void File::putAttr(const string & name, const uint64_t value);
+void File::putAttr(const string& name, const uint64_t value);
 
 template
-void File::getAttr(AttrInfo & info, float & value);
+void File::getAttr(AttrInfo& info, float& value);
 template
-void File::getAttr(AttrInfo & info, double & value);
+void File::getAttr(AttrInfo& info, double& value);
 template
-void File::getAttr(AttrInfo & info, int8_t & value);
+void File::getAttr(AttrInfo& info, int8_t& value);
 template
-void File::getAttr(AttrInfo & info, uint8_t & value);
+void File::getAttr(AttrInfo& info, uint8_t& value);
 template
-void File::getAttr(AttrInfo & info, int16_t & value);
+void File::getAttr(AttrInfo& info, int16_t& value);
 template
-void File::getAttr(AttrInfo & info, uint16_t & value);
+void File::getAttr(AttrInfo& info, uint16_t& value);
 template
-void File::getAttr(AttrInfo & info, int32_t & value);
+void File::getAttr(AttrInfo& info, int32_t& value);
 template
-void File::getAttr(AttrInfo & info, uint32_t & value);
+void File::getAttr(AttrInfo& info, uint32_t& value);
 template
-void File::getAttr(AttrInfo & info, int64_t & value);
+void File::getAttr(AttrInfo& info, int64_t& value);
 template
-void File::getAttr(AttrInfo & info, uint64_t & value);
+void File::getAttr(AttrInfo& info, uint64_t& value);
 
 template
-void File::writeData(const string & name, const vector<float> & value);
+void File::writeData(const string& name, const vector<float>& value);
 template
-void File::writeData(const string & name, const vector<double> & value);
+void File::writeData(const string& name, const vector<double>& value);
 template
-void File::writeData(const string & name, const vector<int8_t> & value);
+void File::writeData(const string& name, const vector<int8_t>& value);
 template
-void File::writeData(const string & name, const vector<uint8_t> & value);
+void File::writeData(const string& name, const vector<uint8_t>& value);
 template
-void File::writeData(const string & name, const vector<int16_t> & value);
+void File::writeData(const string& name, const vector<int16_t>& value);
 template
-void File::writeData(const string & name, const vector<uint16_t> & value);
+void File::writeData(const string& name, const vector<uint16_t>& value);
 template
-void File::writeData(const string & name, const vector<int32_t> & value);
+void File::writeData(const string& name, const vector<int32_t>& value);
 template
-void File::writeData(const string & name, const vector<uint32_t> & value);
+void File::writeData(const string& name, const vector<uint32_t>& value);
 template
-void File::writeData(const string & name, const vector<int64_t> & value);
+void File::writeData(const string& name, const vector<int64_t>& value);
 template
-void File::writeData(const string & name, const vector<uint64_t> & value);
+void File::writeData(const string& name, const vector<uint64_t>& value);
 
 template
-void File::getData(std::vector<float> & data);
+void File::getData(std::vector<float>& data);
 template
-void File::getData(std::vector<double> & data);
+void File::getData(std::vector<double>& data);
 template
-void File::getData(std::vector<int8_t> & data);
+void File::getData(std::vector<int8_t>& data);
 template
-void File::getData(std::vector<uint8_t> & data);
+void File::getData(std::vector<uint8_t>& data);
 template
-void File::getData(std::vector<int16_t> & data);
+void File::getData(std::vector<int16_t>& data);
 template
-void File::getData(std::vector<uint16_t> & data);
+void File::getData(std::vector<uint16_t>& data);
 template
-void File::getData(std::vector<int32_t> & data);
+void File::getData(std::vector<int32_t>& data);
 template
-void File::getData(std::vector<uint32_t> & data);
+void File::getData(std::vector<uint32_t>& data);
 template
-void File::getData(std::vector<int64_t> & data);
+void File::getData(std::vector<int64_t>& data);
 template
-void File::getData(std::vector<uint64_t> & data);
+void File::getData(std::vector<uint64_t>& data);

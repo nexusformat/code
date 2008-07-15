@@ -4,16 +4,16 @@ using namespace NeXus;
 
 Exception::Exception(const std::string& msg, const int status) :
   std::runtime_error(msg) {
- this->__what = msg;
- this->__status = status;
+ this->m_what = msg;
+ this->m_status = status;
 }
 
 const char* Exception::what() const throw() {
-  return this->__what.c_str();
+  return this->m_what.c_str();
 }
 
 int Exception::status() throw() {
-  return this->__status;
+  return this->m_status;
 }
 
 Exception::~Exception() throw() {
