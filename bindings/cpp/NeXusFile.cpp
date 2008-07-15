@@ -890,3 +890,24 @@ template
 void File::getData(std::vector<int64_t>& data);
 template
 void File::getData(std::vector<uint64_t>& data);
+
+template
+void File::putSlab(std::vector<float>& data, int start, int size);
+template
+void File::putSlab(std::vector<double>& data, int start, int size);
+template
+void File::putSlab(std::vector<int8_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<uint8_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<int16_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<uint16_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<int32_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<uint32_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<int64_t>& data, int start, int size);
+template
+void File::putSlab(std::vector<uint64_t>& data, int start, int size);
