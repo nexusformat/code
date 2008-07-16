@@ -9,8 +9,7 @@ using std::endl;
 using std::string;
 using std::vector;
 
-int main(int argc, char** argv)
-{
+void writeTest(const string & filename) {
   NXaccess create_code = NXACC_CREATE;
 #ifdef HDF5
   create_code = NXACC_CREATE5;
@@ -20,7 +19,7 @@ int main(int argc, char** argv)
   create_code = NXACC_CREATEXML;
 #endif
   create_code = NXACC_CREATEXML; // TODO remove this line
-  NeXus::File file("napi_cpp.nxs", create_code);
+  NeXus::File file(filename, create_code);
   // create group
   file.makeGroup("entry", "NXentry");
   // group attributes
@@ -152,24 +151,31 @@ int main(int argc, char** argv)
   file.makeLink(link);
   file.makeNamedLink("renLinkGroup", glink);
   file.makeNamedLink("renLinkData", link);
-
-  return 0;
 }
 
-/*
-  int unlimited_dims[1] = {NX_UNLIMITED};
-  int chunk_size[2]={5,4};
-  int slab_start[2], slab_size[2];
-  char name[64], char_class[64], char_buffer[128];
-  char group_name[64], class_name[64];
-  char c1_array[5][4] = {{'a', 'b', 'c' ,'d'}, {'e', 'f', 'g' ,'h'}, 
-     {'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'}, {'q', 'r', 's' , 't'}};
-  NXhandle fileid;
-  NXlink glink, dlink, blink;
-  int comp_array[100][20];
-  int dims[2];
-  int cdims[2];
-  int nx_creation_code;
-  char nxFile[80];
-  char filename[256];
-*/
+void readTest(const string & filename) {
+  // top level file information
+  NeXus::File file(filename);
+  cout << "NXinquirefile found: " << file.inquireFile() << endl;
+  vector<NeXus::AttrInfo> attr_infos = file.getAttrInfos();
+  for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
+       it != attr_infos.end(); it++) {
+    cout << "   " << it->name << " = ";
+    if (it->type == NeXus::CHAR) {
+      cout << file.getStrAttr(*it);
+    }
+    cout << endl;
+  }
+}
+
+int main(int argc, char** argv)
+{
+  string filename("napi_cpp.nxs");
+  writeTest(filename);
+  if ( (argc >= 2) && !strcmp(argv[1], "-q") )
+  {
+     return 0;	/* create only */
+  }
+  readTest(filename);
+  return 0;
+}
