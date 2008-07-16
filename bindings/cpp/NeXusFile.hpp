@@ -146,12 +146,12 @@ namespace NeXus {
 
     std::vector<AttrInfo> getAttrInfos();
 
-    void getAttr(AttrInfo& info, void* data);
+    void getAttr(const AttrInfo& info, void* data);
 
     template <typename NumT>
-    void getAttr(AttrInfo& info, NumT& value);
+    void getAttr(const AttrInfo& info, NumT& value);
 
-    std::string getStrAttr(AttrInfo& info);
+    std::string getStrAttr(const AttrInfo& info);
 
     NXlink getGroupID();
 

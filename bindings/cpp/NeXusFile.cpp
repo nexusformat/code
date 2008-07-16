@@ -1,4 +1,6 @@
 #include <cstring>
+// REMOVE
+#include <iostream>
 #include <sstream>
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
@@ -601,35 +603,44 @@ AttrInfo File::getNextAttr() {
   }
 }
 
-void File::getAttr(AttrInfo& info, void* data) {
+void File::getAttr(const AttrInfo& info, void* data) {
   char name[NX_MAXNAMELEN];
   strcpy(name, info.name.c_str());
-  int type;
-  int length;
+  int type = info.type;
+  int length = info.length;
   NXstatus status = NXgetattr(this->m_file_id, name, data, &length,
                               &type);
   if (status != NX_OK) {
     throw Exception("NXgetattr(" + info.name + ") failed", status);
   }
-  info.name = string(name);
-  info.type = static_cast<NXnumtype>(type);
-  info.length = length;
+  if (type != info.type) {
+    stringstream msg;
+    msg << "NXgetattr(" << info.name << ") changed type [" << info.type
+        << "->" << type << "]";
+    throw Exception(msg.str());
+  }
+  if (length != info.length) {
+    stringstream msg;
+    msg << "NXgetattr(" << info.name << ") change length [" << info.length
+        << "->" << length << "]";
+    throw Exception(msg.str());
+  }
 }
 
 template <typename NumT>
-void File::getAttr(AttrInfo & info, NumT & value) {
+void File::getAttr(const AttrInfo & info, NumT & value) {
   this->getAttr(info, &value);
 }
 
-string File::getStrAttr(AttrInfo& info) {
+string File::getStrAttr(const AttrInfo& info) {
   if (info.type != CHAR) {
     stringstream msg;
     msg << "Data type must be CHAR (" << CHAR << ") found " << info.type;
     throw Exception(msg.str());
   }
-  char value[NX_MAXNAMELEN];
-  this->getAttr(info, value);
-  return string(value);
+  char value[info.length];
+  this->getAttr(info, &value);
+  return string(value, info.length);
 }
 
 vector<AttrInfo> File::getAttrInfos() {
@@ -796,25 +807,25 @@ template
 void File::putAttr(const string& name, const uint64_t value);
 
 template
-void File::getAttr(AttrInfo& info, float& value);
+void File::getAttr(const AttrInfo& info, float& value);
 template
-void File::getAttr(AttrInfo& info, double& value);
+void File::getAttr(const AttrInfo& info, double& value);
 template
-void File::getAttr(AttrInfo& info, int8_t& value);
+void File::getAttr(const AttrInfo& info, int8_t& value);
 template
-void File::getAttr(AttrInfo& info, uint8_t& value);
+void File::getAttr(const AttrInfo& info, uint8_t& value);
 template
-void File::getAttr(AttrInfo& info, int16_t& value);
+void File::getAttr(const AttrInfo& info, int16_t& value);
 template
-void File::getAttr(AttrInfo& info, uint16_t& value);
+void File::getAttr(const AttrInfo& info, uint16_t& value);
 template
-void File::getAttr(AttrInfo& info, int32_t& value);
+void File::getAttr(const AttrInfo& info, int32_t& value);
 template
-void File::getAttr(AttrInfo& info, uint32_t& value);
+void File::getAttr(const AttrInfo& info, uint32_t& value);
 template
-void File::getAttr(AttrInfo& info, int64_t& value);
+void File::getAttr(const AttrInfo& info, int64_t& value);
 template
-void File::getAttr(AttrInfo& info, uint64_t& value);
+void File::getAttr(const AttrInfo& info, uint64_t& value);
 
 template
 void File::writeData(const string& name, const vector<float>& value);
