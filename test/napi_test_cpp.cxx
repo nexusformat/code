@@ -126,6 +126,33 @@ int main(int argc, char** argv)
   cdims.push_back(20);
   file.writeCompData("comp_data", comp_array, array_dims, NeXus::LZW, cdims);
 
+  // simple flush test
+  file.flush();
+
+  // real flush test
+  file.makeData("flush_data", NeXus::getType(static_cast<int>(0)),
+                NX_UNLIMITED);
+  vector<int> slab_array;
+  slab_array.push_back(0);
+  for (int i = 0 ; i < 7; i++) {
+    slab_array[0] = i;
+    file.putSlab(slab_array, i, 1);
+    file.flush();
+  }
+  file.closeData();
+
+  // create a sample
+  file.makeGroup("sample", "NXsample");
+  file.writeData("ch_data", "NeXus sample");
+
+  // make more links
+  NXlink glink = file.getGroupID();
+  file.openPath("/");
+  file.makeGroup("link", "NXentry");
+  file.makeLink(link);
+  file.makeNamedLink("renLinkGroup", glink);
+  file.makeNamedLink("renLinkData", link);
+
   return 0;
 }
 
