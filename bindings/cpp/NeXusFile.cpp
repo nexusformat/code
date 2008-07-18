@@ -731,6 +731,13 @@ bool File::sameID(NXlink& first, NXlink& second) {
   return (status == NX_OK);
 }
 
+void File::printLink(NXlink & link) {
+  NXstatus status = NXIprintlink(this->m_file_id, &link);
+  if (status != NX_OK) {
+    throw Exception("NXprintlink failed");
+  }
+}
+
 void File::initGroupDir() {
   int status = NXinitgroupdir(this->m_file_id);
   if (status != NX_OK) {

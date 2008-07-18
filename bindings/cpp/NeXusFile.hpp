@@ -162,6 +162,8 @@ namespace NeXus {
 
     bool sameID(NXlink& first, NXlink& second);
 
+    void printLink(NXlink & link);
+
     void initGroupDir();
 
     void initAttrDir();
