@@ -81,6 +81,27 @@ namespace NeXus {
   NXnumtype getType(char number) {
     return CHAR;
   }
+
+}
+
+void inner_malloc(void* & data, std::vector<int>& dims, NXnumtype type) {
+  int rank = dims.size();
+  int c_dims[rank];
+  for (int i = 0; i < rank; i++) {
+    c_dims[i] = dims[i];
+  }
+  NXstatus status = NXmalloc(&data, rank, c_dims, type);
+  if (status != NX_OK) {
+    throw Exception("NXmalloc failed", status);
+  }
+}
+
+
+void inner_free(void* & data) {
+  NXstatus status = NXfree(&data);
+  if (status != NX_OK) {
+    throw Exception("NXfree failed", status);
+  }
 }
 
 File::File(const string& filename, const NXaccess access) {
@@ -470,22 +491,48 @@ void File::getData(void* data) {
 }
 
 template <typename NumT>
-void File::getData(vector<NumT>& data) {
+vector<NumT> * File::getData() {
   Info info = this->getInfo();
-// data may not be of the correct type so need to check
-  if (info.type != getType(NumT()))
-  {
+
+  // determine the number of elements
+  int length=1;
+  for (vector<int>::const_iterator it = info.dims.begin();
+       it != info.dims.end(); it++) {
+    length *= *it;
+  }
+
+  // allocate memory to put the data into
+  void * temp;
+  inner_malloc(temp, info.dims, info.type);
+
+  // fetch the data
+  this->getData(temp);
+  // put it in the vector
+  vector<NumT> * result = new vector<NumT>(static_cast<NumT *>(temp),
+                                           static_cast<NumT *>(temp)
+                                                + static_cast<size_t>(length));
+  // free the memory
+  inner_free(temp);
+  return result;
+}
+
+string File::getStrData() {
+  Info info = this->getInfo();
+  if (info.type != NX_CHAR) {
     stringstream msg;
-    msg << "NXgetdata failed - cannot convert from type " << info.type << " to type " << getType(NumT());
+    msg << "Cannot use getStrData() on non-character data. Found type="
+        << info.type;
     throw Exception(msg.str());
   }
-  int length = 1;
-  int rank = info.dims.size();
-  for (int i = 0; i < rank; i++ ){
-    length *= info.dims[i];
+  if (info.dims.size() != 1) {
+    stringstream msg;
+    msg << "getStrData() only understand rank=1 data. Found rank="
+        << info.dims.size();
+    throw Exception(msg.str());
   }
-  data.reserve(length);
-  this->getData(&(data[0]));
+  char value[info.dims[0]];
+  this->getData(value);
+  return string(value, info.dims[0]);
 }
 
 Info File::getInfo() {
@@ -763,25 +810,6 @@ void File::linkExternal(const string& name, const string& type,
   }
 }
 
-namespace NeXus {
-  void malloc(void** data, std::vector<int>& dims, NXnumtype type) {
-    int rank = dims.size();
-    int c_dims[rank];
-    NXstatus status = NXmalloc(data, rank, c_dims, type);
-    if (status != NX_OK) {
-      throw Exception("NXmalloc failed", status);
-    }
-  }
-
-
-  void free(void** data) {
-    NXstatus status = NXfree(data);
-    if (status != NX_OK) {
-      throw Exception("NXfree failed", status);
-    }
-  }
-}
-
 /* ---------------------------------------------------------------- */
 /* Concrete instantiations of template definitions.                 */
 /* ---------------------------------------------------------------- */
@@ -890,25 +918,25 @@ void File::writeCompData(const string & name, const vector<uint64_t> & value,
                          const vector<int> & bufsize);
 
 template
-void File::getData(std::vector<float>& data);
+vector<float> * File::getData();
 template
-void File::getData(std::vector<double>& data);
+vector<double> * File::getData();
 template
-void File::getData(std::vector<int8_t>& data);
+vector<int8_t> * File::getData();
 template
-void File::getData(std::vector<uint8_t>& data);
+vector<uint8_t> * File::getData();
 template
-void File::getData(std::vector<int16_t>& data);
+vector<int16_t> * File::getData();
 template
-void File::getData(std::vector<uint16_t>& data);
+vector<uint16_t> * File::getData();
 template
-void File::getData(std::vector<int32_t>& data);
+vector<int32_t> * File::getData();
 template
-void File::getData(std::vector<uint32_t>& data);
+vector<uint32_t> * File::getData();
 template
-void File::getData(std::vector<int64_t>& data);
+vector<int64_t> * File::getData();
 template
-void File::getData(std::vector<uint64_t>& data);
+vector<uint64_t> * File::getData();
 
 template
 void File::putSlab(std::vector<float>& data, int start, int size);

@@ -131,8 +131,11 @@ namespace NeXus {
 
     void getData(void* data);
 
+    // caller needs to free the memory allocated
     template <typename NumT>
-    void getData(std::vector<NumT>& data);
+    std::vector<NumT> * getData();
+
+    std::string getStrData();
 
     Info getInfo();
 
@@ -173,10 +176,6 @@ namespace NeXus {
     void linkExternal(const std::string& name, const std::string& type,
                       const std::string& url);
   };
-
-  void malloc(void** data, std::vector<int>& dims, NXnumtype type);
-
-  void free(void** data);
 
   /**
    * This function returns the NXnumtype given a concrete number. The
