@@ -234,6 +234,7 @@ AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
+# for doxygen
 AC_CHECK_PROGS(PDFLATEX,[pdflatex])
 AC_CHECK_PROGS(DOXYGEN,[doxygen])
 AC_CHECK_PROGS(DOT,[dot])
@@ -635,6 +636,23 @@ AC_CONFIG_FILES([Makefile
 dnl src/nxdict/Makefile
 AC_OUTPUT
 
+if test ! -z "$DOXYGEN" -a ! -z "$PDFLATEX" -a ! -z "$DOT"; then
+    DOXYGENDOCS="yes"
+else
+    DOXYGENDOCS="no  - missing "
+    if test -z "$DOXYGEN"; then DOXYGENDOCS="$DOXYGENDOCS doxygen"; fi
+    if test -z "$PDFLATEX"; then DOXYGENDOCS="$DOXYGENDOCS pdflatex"; fi
+    if test -z "$DOT"; then DOXYGENDOCS="$DOXYGENDOCS graphviz"; fi
+fi
+
+if test ! -z "$DOCBOOK2TXT" -a ! -z "$DOCBOOK2PDF"; then
+    DOCBOOKDOCS="yes"
+else
+    DOCBOOKDOCS="no  - missing "
+    if test -z "$DOCBOOK2TXT"; then DOCBOOKDOCS="$DOCBOOKDOCS docbook2txt"; fi
+    if test -z "$DOCBOOK2PDF"; then DOCBOOKDOCS="$DOCBOOKDOCS docbook2pdf"; fi
+fi
+
 HDF4SUPPORT=`if test -n "$H4ROOT" ; then echo yes ; else echo no ; echo "                found version $H4VERSION"; fi`
 HDF5SUPPORT=`if test -n "$H5ROOT" ; then echo yes ; else echo no ; echo "                found version $H5VERSION"; fi`
 XMLSUPPORT=`if test -n "$MXMLROOT" ; then echo yes ; else echo no ; fi`
@@ -678,6 +696,10 @@ build:
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT})
 	      PYTHON:	       ${PYTHONBINDING}
+
+	documentation:
+	     Doxygen:	       ${DOXYGENDOCS}
+	     Docbook:	       ${DOCBOOKDOCS}
 
 Please check whether the configuration I detected matches what you would
 like to have. If not, re-run configure adding the appropriate  --with  option
