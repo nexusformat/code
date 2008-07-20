@@ -45,26 +45,27 @@ CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml NXtest-table.xml \
 
 ## testdir=$(prefix)/nexus/test
 
-HDF4_TARGETS = napi_test-hdf4 napi_test-hdf4-static 
+HDF4_TARGETS = napi_test-hdf4 napi_test-hdf4-static napi_test_cpp-hdf4
 
-HDF5_TARGETS = napi_test-hdf5 napi_test-hdf5-static
+HDF5_TARGETS = napi_test-hdf5 napi_test-hdf5-static napi_test_cpp-hdf5
 
 XML_TARGETS = napi_test-xml napi_test-xml-static \
-		napi_test-xml-table-static
+		napi_test-xml-table-static \
+		napi_test_cpp-xml napi_test_cpp-xml-table
 
 F77_TARGETS = napif_test-hdf4 napif_test-hdf5
 
 F90_TARGETS = NXtest
 
 if HAVE_CPP
-CPP_TARGETS = napi_test_cpp leak_test2 leak_test3
+CPP_TARGETS = leak_test2 leak_test3
 endif
 
 EXTRA_DIST	= testsuite.at $(TESTSUITE_AT) testsuite package.m4 \
 			NXtest.f90 napif_test.f README.tests \
 			napi_test.c napif4_test.f napif5_test.f \
 			setup_test $(srcdir)/data/dmc* \
-			nxbrowse.txt
+			nxbrowse.txt napi_test_cpp.cxx
 
 TESTSUITE	= $(srcdir)/testsuite
 
@@ -79,7 +80,8 @@ check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGET
 #nxtest_DATA = README.tests
 
 nxexampledir=$(NXEXAMPLEDIR)
-nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f NXtest.f90
+nxexample_DATA = napi_test.c napif4_test.f napif5_test.f napif_test.f \
+	NXtest.f90 napi_test_cpp.cxx
 
 nxsummary:
 	rm -f $@
@@ -131,9 +133,6 @@ leak_test3_SOURCES=leak_test3.cxx
 leak_test3_LDADD=$(LIBNEXUS)
 leak_test3_LDFLAGS=-static $(LDFLAGS)
 
-napi_test_cpp_SOURCES=napi_test_cpp.cxx
-napi_test_cpp_LDADD=$(LIBNEXUSCPP)
-napi_test_cpp_LDFLAGS=-static $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
@@ -147,11 +146,17 @@ napi_test_xml_table_static_SOURCES = napi_test.c
 napi_test_xml_table_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_table_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_table_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_cpp_xml_SOURCES = napi_test_cpp.cxx
+napi_test_cpp_xml_LDADD = $(LIBNEXUSCPP)
+napi_test_cpp_xml_table_SOURCES = napi_test_cpp.cxx
+napi_test_cpp_xml_table_LDADD = $(LIBNEXUSCPP)
 else
 napi_test_xml_SOURCES = dummy.c
 napi_test_xml_static_SOURCES = dummy.c
 napi_test_xml_table_static_SOURCES = dummy.c
 napi_test_xml_static_LDFLAGS = $(LDFLAGS)
+napi_test_cpp_xml_SOURCES = dummy.c
+napi_test_cpp_xml_table_SOURCES = dummy.c
 endif
 
 if HAVE_HDF4
@@ -162,6 +167,8 @@ napi_test_hdf4_static_SOURCES = napi_test.c
 napi_test_hdf4_static_CPPFLAGS = -I$(top_srcdir)/include @HDF4_CPPFLAGS@
 napi_test_hdf4_static_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 napi_test_hdf4_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_cpp_hdf4_SOURCES = napi_test_cpp.cxx
+napi_test_cpp_hdf4_LDADD = $(LIBNEXUSCPP)
 if HAVE_F77
 napif_test_hdf4_SOURCES = napif4_test.f
 napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
@@ -177,6 +184,7 @@ napi_test_hdf4_static_SOURCES = dummy.c
 napi_test_hdf4_static_LDFLAGS = $(LDFLAGS)
 napif_test_hdf4_SOURCES = dummy.c
 napif_test_hdf4_LINK = $(LINK)
+napi_test_cpp_hdf4_SOURCES = dummy.c
 endif
 
 if HAVE_HDF5
@@ -187,6 +195,8 @@ napi_test_hdf5_static_SOURCES = napi_test.c
 napi_test_hdf5_static_CPPFLAGS = -I$(top_srcdir)/include @HDF5_CPPFLAGS@
 napi_test_hdf5_static_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 napi_test_hdf5_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_cpp_hdf5_SOURCES = napi_test_cpp.cxx
+napi_test_cpp_hdf5_LDADD=$(LIBNEXUSCPP)
 if HAVE_F77
 napif_test_hdf5_SOURCES = napif5_test.f
 napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
@@ -202,6 +212,7 @@ napi_test_hdf5_static_SOURCES = dummy.c
 napi_test_hdf5_static_LDFLAGS = $(LDFLAGS)
 napif_test_hdf5_SOURCES = dummy.c
 napif_test_hdf5_LINK = $(LINK)
+napi_test_cpp_hdf5_SOURCES = dummy.c
 endif
 
 if HAVE_F90

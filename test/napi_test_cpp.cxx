@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include "napiconfig.h"
 #include "NeXusFile.hpp"
@@ -9,16 +10,7 @@ using std::endl;
 using std::string;
 using std::vector;
 
-void writeTest(const string & filename) {
-  NXaccess create_code = NXACC_CREATE;
-#ifdef HDF5
-  create_code = NXACC_CREATE5;
-#elif HDF4
-  create_code = NXACC_CREATE4;
-#elif NXXML
-  create_code = NXACC_CREATEXML;
-#endif
-  create_code = NXACC_CREATEXML; // TODO remove this line
+void writeTest(const string& filename, int create_code) {
   NeXus::File file(filename, create_code);
   // create group
   file.makeGroup("entry", "NXentry");
@@ -95,15 +87,22 @@ void writeTest(const string & filename) {
   NXlink link = file.getDataID();
   file.closeData();
 
-  // int64 tests - TODO this does not put anything into the file
-#ifdef HAVE_LONG_LONG_INT
+  // int64 tests
   vector<int64_t> grossezahl;
+#if HAVE_LONG_LONG_INT
   grossezahl.push_back(12);
   grossezahl.push_back(555555555555LL);
   grossezahl.push_back(23);
   grossezahl.push_back(777777777777LL);
-  file.writeData("grosszahl", grossezahl);
+#else
+  grossezahl.push_back(12);
+  grossezahl.push_back(555555555555);
+  grossezahl.push_back(23);
+  grossezahl.push_back(777777777777);
 #endif
+  if (create_code != NXACC_CREATE) {
+    file.writeData("grosszahl", grossezahl);
+  }
 
   // create a new group inside this one
   file.makeGroup("data", "NXdata");
@@ -137,6 +136,7 @@ void writeTest(const string & filename) {
     slab_array[0] = i;
     file.putSlab(slab_array, i, 1);
     file.flush();
+    file.openData("flush_data");
   }
   file.closeData();
 
@@ -153,25 +153,43 @@ void writeTest(const string & filename) {
   file.makeNamedLink("renLinkData", link);
 }
 
-void readTest(const string & filename) {
+void readTest(const string& filename) {
   // top level file information
   NeXus::File file(filename);
+  std::string str;
   cout << "NXinquirefile found: " << file.inquireFile() << endl;
   vector<NeXus::AttrInfo> attr_infos = file.getAttrInfos();
   for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
        it != attr_infos.end(); it++) {
-    cout << "   " << it->name << " = ";
-    if (it->type == NeXus::CHAR) {
-      cout << file.getStrAttr(*it);
+    if (it->name != "file_time" && it->name != "HDF_version" && it->name !=  "HDF5_Version" && it->name != "XML_version") {
+        cout << "   " << it->name << " = ";
+        if (it->type == NeXus::CHAR) {
+          file.getAttr(*it, str);
+          cout << str;
+        }
+        cout << endl;
     }
-    cout << endl;
   }
 }
 
 int main(int argc, char** argv)
 {
-  string filename("napi_cpp.nxs");
-  writeTest(filename);
+  int nx_creation_code;
+  string filename;
+  if(strstr(argv[0],"napi_test_cpp-hdf5") != NULL){
+    nx_creation_code = NXACC_CREATE5;
+    filename = "napi_test_cpp.h5";
+  }else if(strstr(argv[0],"napi_test_cpp-xml-table") != NULL){
+    nx_creation_code = NXACC_CREATEXML | NXACC_TABLE;
+    filename = "napi_test_cpp-table.xml";
+  }else if(strstr(argv[0],"napi_test_cpp-xml") != NULL){
+    nx_creation_code = NXACC_CREATEXML;
+    filename = "napi_test_cpp.xml";
+  } else {
+    nx_creation_code = NXACC_CREATE;
+    filename = "napi_test_cpp.hdf";
+  }
+  writeTest(filename, nx_creation_code);
   if ( (argc >= 2) && !strcmp(argv[1], "-q") )
   {
      return 0;	/* create only */

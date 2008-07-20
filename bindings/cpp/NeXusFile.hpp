@@ -71,7 +71,7 @@ namespace NeXus {
     void makeData(const std::string& name, NXnumtype type,
                   const std::vector<int>& dims);
 
-    void makeData(const std::string & name, const NXnumtype type,
+    void makeData(const std::string& name, const NXnumtype type,
                   const int length);
 
     void writeData(const std::string& name, const std::string& value);
@@ -102,7 +102,7 @@ namespace NeXus {
     template <typename NumT>
     void putData(const std::vector<NumT>& data);
 
-    void putAttr(const AttrInfo & info, const void* data);
+    void putAttr(const AttrInfo& info, const void* data);
 
     template <typename NumT>
     void putAttr(const std::string& name, const NumT value);
@@ -154,7 +154,7 @@ namespace NeXus {
     template <typename NumT>
     void getAttr(const AttrInfo& info, NumT& value);
 
-    std::string getStrAttr(const AttrInfo& info);
+    void getAttr(const AttrInfo& info, std::string& value);
 
     NXlink getGroupID();
 

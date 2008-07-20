@@ -402,7 +402,7 @@ void File::putAttr(const std::string& name, const std::string value) {
   this->putAttr(info, &(my_value[0]));
 }
 
-void File::putSlab(void* data, vector<int>& start,vector<int>& size) {
+void File::putSlab(void* data, vector<int>& start, vector<int>& size) {
   if (data == NULL) {
     throw Exception("Data specified as null in putSlab");
   }
@@ -419,8 +419,7 @@ void File::putSlab(void* data, vector<int>& start,vector<int>& size) {
         << "in putSlab";
     throw Exception(msg.str());
   }
-  NXstatus status = NXputslab(this->m_file_id, data, &(*(start.begin())),
-                              &(*(size.begin())));
+  NXstatus status = NXputslab(this->m_file_id, data, &(start[0]), &(size[0]));
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXputslab(data, " << toString(start) << ", " << toString(size)
@@ -675,19 +674,19 @@ void File::getAttr(const AttrInfo& info, void* data) {
 }
 
 template <typename NumT>
-void File::getAttr(const AttrInfo & info, NumT & value) {
+void File::getAttr(const AttrInfo& info, NumT& value) {
   this->getAttr(info, &value);
 }
 
-string File::getStrAttr(const AttrInfo& info) {
+void File::getAttr(const AttrInfo& info, std::string& value) {
   if (info.type != CHAR) {
     stringstream msg;
     msg << "Data type must be CHAR (" << CHAR << ") found " << info.type;
     throw Exception(msg.str());
   }
-  char value[info.length];
-  this->getAttr(info, &value);
-  return string(value, info.length);
+  char cvalue[info.length+1];
+  this->getAttr(info, cvalue);
+  value = string(cvalue, info.length);
 }
 
 vector<AttrInfo> File::getAttrInfos() {
@@ -882,6 +881,27 @@ template
 void File::writeData(const string& name, const vector<int64_t>& value);
 template
 void File::writeData(const string& name, const vector<uint64_t>& value);
+
+template
+void File::writeData(const string& name, const vector<float>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<double>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<int8_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<uint8_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<int16_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<uint16_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<int32_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<uint32_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<int64_t>& value, const std::vector<int>& dims);
+template
+void File::writeData(const string& name, const vector<uint64_t>& value, const std::vector<int>& dims);
 
 template
 void File::writeCompData(const string & name, const vector<float> & value,
