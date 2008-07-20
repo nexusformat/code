@@ -28,7 +28,7 @@ Prefix: /usr/local
 # this value will not usually be used, but something must
 # be specified here to allow   rpm --buildroot   to be used later
 # (it will get used for a   rpmbuild --recompile  of the the src.rpm)
-BuildRoot: /tmp/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
+BuildRoot: %{_tmppath}/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 
 %description
 NeXus is an international standard for exchanging data files
@@ -37,32 +37,34 @@ data is stored using the HDF format from NCSA. This package provides
 access routines, documentation, examples and a basic NeXus file browser.
 
 %prep
-%setup
+%setup -q
+
 %build
-# RPM_BUILD_ROOT - where to install software
-if ! test -z "$RPM_BUILD_ROOT"; then
-    ./configure --prefix=$RPM_BUILD_ROOT/usr/local $NEXUS_CONFIG_OPTIONS
+# RPM_INSTALL_PREFIX - where to install software
+if ! test -z "$RPM_INSTALL_PREFIX"; then
+    ./configure --prefix="$RPM_INSTALL_PREFIX" $NEXUS_CONFIG_OPTIONS
 else
-    ./configure $NEXUS_CONFIG_OPTIONS
+    ./configure --prefix=/usr/local $NEXUS_CONFIG_OPTIONS
 fi
 make
+
 %install
-# may want to consider   make DESTDIR=$RPM_BUILD_ROOT install    sometime
-# as automake supports it; configure --prefix is OK for now though
-make install
+# RPM_BUILD_ROOT is where to install software to
+if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
+make DESTDIR="$RPM_BUILD_ROOT" install
+
 %files
+%defattr(-,root,root)
 %doc README NEWS ChangeLog AUTHORS COPYING INSTALL
 # %docdir /usr/local/doc
 /usr/local/lib
 /usr/local/bin
 /usr/local/include
-/usr/local/share
+/usr/local/share/nexus
 
 %clean
-# the rm line can be dangerous - build_root might be / !
-# leave commented out for moment, but we need to implement
-# some cleaning mechanism if we use alternative build roots
-###rm -fr $RPM_BUILD_ROOT
+if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
+
 %post
 if [ "$RPM_INSTALL_PREFIX" != "" ]; then
     INSTALL_PREFIX=$RPM_INSTALL_PREFIX
@@ -70,11 +72,12 @@ else
     INSTALL_PREFIX=/usr/local
 fi
 ( cd $INSTALL_PREFIX/bin; for i in nxbuild; do \
-  sed -e "s|^prefix=.*|prefix=$INSTALL_PREFIX|" $i > /tmp/nexus.$$; \
-  mv /tmp/nexus.$$ $i; chmod 0755 $i; done )
+  sed -i -e "s|^prefix=.*|prefix=$INSTALL_PREFIX|" $i; done )
 if test `whoami` = root; then ldconfig; fi
+
 %postun
 if test `whoami` = root; then ldconfig; fi
+#
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
