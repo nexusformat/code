@@ -58,7 +58,7 @@ namespace NeXus {
 
     void flush();
 
-    void makeGroup(const std::string& name, const std::string& class_name);
+    void makeGroup(const std::string& name, const std::string& class_name, bool open_group = false);
 
     void openGroup(const std::string& name, const std::string& class_name);
 
@@ -69,10 +69,10 @@ namespace NeXus {
     void closeGroup();
 
     void makeData(const std::string& name, NXnumtype type,
-                  const std::vector<int>& dims);
+                  const std::vector<int>& dims, bool open_data = false);
 
     void makeData(const std::string& name, const NXnumtype type,
-                  const int length);
+                  const int length, bool open_data = false);
 
     void writeData(const std::string& name, const std::string& value);
 
@@ -85,7 +85,7 @@ namespace NeXus {
 
     void makeCompData(const std::string& name, const NXnumtype type,
                       const std::vector<int>& dims, const NXcompression comp,
-                      const std::vector<int>& bufsize);
+                      const std::vector<int>& bufsize, bool open_data = false);
 
     template <typename NumT>
     void writeCompData(const std::string & name,

@@ -134,7 +134,7 @@ void File::flush() {
   }
 }
 
-void File::makeGroup(const string& name, const string& class_name) {
+void File::makeGroup(const string& name, const string& class_name, bool open_group) {
   if (name.empty()) {
     throw Exception("Supplied empty name to makeGroup");
   }
@@ -148,7 +148,9 @@ void File::makeGroup(const string& name, const string& class_name) {
     msg << "NXmakegroup(" << name << ", " << class_name << ") failed";
     throw Exception(msg.str(), status);
   }
-  this->openGroup(name, class_name);
+  if (open_group) {
+      this->openGroup(name, class_name);
+  }
 }
 
 void File::openGroup(const string& name, const string& class_name) {
@@ -199,7 +201,7 @@ void File::closeGroup() {
 }
 
 void File::makeData(const string& name, NXnumtype type,
-                    const vector<int>& dims) {
+                    const vector<int>& dims, bool open_data) {
   // error check the parameters
   if (name.empty()) {
     throw Exception("Supplied empty label to makeData");
@@ -218,14 +220,16 @@ void File::makeData(const string& name, NXnumtype type,
         << ", " << toString(dims) << ") failed";
     throw Exception(msg.str(), status);
   }
-  this->openData(name);
+  if (open_data) {
+      this->openData(name);
+  }
 }
 
 void File::makeData(const string & name, const NXnumtype type,
-                    const int length) {
+                    const int length, bool open_data) {
   vector<int> dims;
   dims.push_back(length);
-  this->makeData(name, type, dims);
+  this->makeData(name, type, dims, open_data);
 }
 
 
@@ -235,7 +239,7 @@ void File::writeData(const string& name, const string& value) {
   }
   vector<int> dims;
   dims.push_back(value.size());
-  this->makeData(name, CHAR, dims);
+  this->makeData(name, CHAR, dims, true);
 
   string my_value(value);
   this->putData(&(my_value[0]));
@@ -253,7 +257,7 @@ void File::writeData(const string& name, const vector<NumT>& value) {
 template <typename NumT>
 void File::writeData(const string& name, const vector<NumT>& value,
                      const vector<int>& dims) {
-  this->makeData(name, getType(value[0]), dims);
+  this->makeData(name, getType(value[0]), dims, true);
   this->putData(value);
   this->closeData();
 }
@@ -261,7 +265,7 @@ void File::writeData(const string& name, const vector<NumT>& value,
 
 void File::makeCompData(const string& name, const NXnumtype type,
                         const vector<int>& dims, const NXcompression comp,
-                        const vector<int>& bufsize) {
+                        const vector<int>& bufsize, bool open_data) {
   // error check the parameters
   if (name.empty()) {
     throw Exception("Supplied empty name to makeCompData");
@@ -296,14 +300,16 @@ void File::makeCompData(const string& name, const NXnumtype type,
         << ") failed";
     throw Exception(msg.str(), status);
   }
-  this->openData(name);
+  if (open_data) {
+	this->openData(name);
+  }
 }
 
 template <typename NumT>
 void File::writeCompData(const string & name, const vector<NumT> & value,
                        const vector<int> & dims, const NXcompression comp,
                          const vector<int> & bufsize) {
-  this->makeCompData(name, getType(value[0]), dims, comp, bufsize);
+  this->makeCompData(name, getType(value[0]), dims, comp, bufsize, true);
   this->putData(value);
   this->closeData();
 }

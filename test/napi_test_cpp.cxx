@@ -13,7 +13,7 @@ using std::vector;
 void writeTest(const string& filename, int create_code) {
   NeXus::File file(filename, create_code);
   // create group
-  file.makeGroup("entry", "NXentry");
+  file.makeGroup("entry", "NXentry", true);
   // group attributes
   file.putAttr("hugo", "namenlos");
   file.putAttr("cucumber", "passion");
@@ -27,7 +27,7 @@ void writeTest(const string& filename, int create_code) {
   char c1_array[5][4] = {{'a', 'b', 'c' ,'d'}, {'e', 'f', 'g' ,'h'}, 
                          {'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'},
                          {'q', 'r', 's' , 't'}};
-  file.makeData("c1_data", NeXus::CHAR, array_dims);
+  file.makeData("c1_data", NeXus::CHAR, array_dims, true);
   file.putData(c1_array);
   file.closeData();
 
@@ -64,7 +64,7 @@ void writeTest(const string& filename, int create_code) {
   for (size_t i = 0; i < 5*4; i++) {
     r8_array.push_back(static_cast<double>(i));
   }
-  file.makeData("r8_data", NeXus::FLOAT64, array_dims);
+  file.makeData("r8_data", NeXus::FLOAT64, array_dims, true);
   vector<int> slab_start;
   slab_start.push_back(4);
   slab_start.push_back(0);
@@ -105,7 +105,7 @@ void writeTest(const string& filename, int create_code) {
   }
 
   // create a new group inside this one
-  file.makeGroup("data", "NXdata");
+  file.makeGroup("data", "NXdata", true);
 
   // create a link
   file.makeLink(link);
@@ -129,7 +129,7 @@ void writeTest(const string& filename, int create_code) {
 
   // real flush test
   file.makeData("flush_data", NeXus::getType(static_cast<int>(0)),
-                NX_UNLIMITED);
+                NX_UNLIMITED, true);
   vector<int> slab_array;
   slab_array.push_back(0);
   for (int i = 0 ; i < 7; i++) {
@@ -141,13 +141,13 @@ void writeTest(const string& filename, int create_code) {
   file.closeData();
 
   // create a sample
-  file.makeGroup("sample", "NXsample");
+  file.makeGroup("sample", "NXsample", true);
   file.writeData("ch_data", "NeXus sample");
 
   // make more links
   NXlink glink = file.getGroupID();
   file.openPath("/");
-  file.makeGroup("link", "NXentry");
+  file.makeGroup("link", "NXentry", true);
   file.makeLink(link);
   file.makeNamedLink("renLinkGroup", glink);
   file.makeNamedLink("renLinkData", link);
