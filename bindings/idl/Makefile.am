@@ -61,4 +61,8 @@ EXTRA_DIST = \
  recursivesearch.pro \
  testfocus.pro \
  write_test.pro
+
+dist-hook :
+	find $(distdir)/data -depth -type d -name '.svn' -exec rm -fr {} \;
+
 include $(top_srcdir)/build_rules.am
