@@ -47,7 +47,7 @@ typedef int NXstatus;
 typedef char NXname[128];
 
 /* 
- * Any new NXaccess options should be numbered in 2^n format 
+ * Any new NXaccess_mode options should be numbered in 2^n format 
  * (8, 16, 32, etc) so that they can be bit masked and tested easily.
  *
  * To test older non bit masked options (values below 8) use e.g.
@@ -61,7 +61,7 @@ typedef char NXname[128];
  */
 #define NXACCMASK_REMOVEFLAGS (0x7) /* bit mask to remove higher flag options */
 
-/** \enum NXaccess 
+/** \enum NXaccess_mode 
  * NeXus file access codes.
  * \li NXACC_READ read-only
  * \li NXACC_RDWR open an existing file for reading and writing.
@@ -71,7 +71,12 @@ typedef char NXname[128];
  * \li NXACC_CREATEXML create a NeXus XML file.
  */
 typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, 
-	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_TABLE=8, NXACC_NOSTRIP=128} NXaccess;
+	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_TABLE=8, NXACC_NOSTRIP=128} NXaccess_mode;
+
+/**
+ * A combination of options from #NXaccess_mode
+ */
+typedef int NXaccess;
 
 typedef struct {
                 char *iname;
@@ -233,6 +238,7 @@ extern "C" {
    * \li NXACC_CREATE, NXACC_CREATE4 create a new HDF-4 NeXus file
    * \li NXACC_CREATE5 create a new HDF-5 NeXus file
    * \li NXACC_CREATEXML create an XML NeXus file. 
+   * see #NXaccess_mode
    * Support for HDF-4 is deprecated.
    * \param pHandle A file handle which will be initialized upon successfull completeion of NXopen.
    * \return NX_OK on success, NX_ERROR in the case of an error.   
