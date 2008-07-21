@@ -141,6 +141,7 @@ int writeTest(const string& filename, NXaccess create_code) {
     file.openData("flush_data");
   }
   file.closeData();
+  file.closeGroup();
 
   // create a sample
   file.makeGroup("sample", "NXsample", true);
@@ -458,18 +459,23 @@ int main(int argc, char** argv)
 {
   NXaccess nx_creation_code;
   string filename;
+  string extfilename;
   if(strstr(argv[0],"napi_test_cpp-hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
     filename = "napi_test_cpp.h5";
+    extfilename = "nxext_cpp.h5";
   }else if(strstr(argv[0],"napi_test_cpp-xml-table") != NULL){
     nx_creation_code = NXACC_CREATEXML | NXACC_TABLE;
     filename = "napi_test_cpp-table.xml";
+    extfilename = "nxext_cpp-table.xml";
   }else if(strstr(argv[0],"napi_test_cpp-xml") != NULL){
     nx_creation_code = NXACC_CREATEXML;
     filename = "napi_test_cpp.xml";
+    extfilename = "nxext_cpp.xml";
   } else {
     nx_creation_code = NXACC_CREATE;
     filename = "napi_test_cpp.hdf";
+    extfilename = "nxext_cpp.hdf";
   }
 
   int result;
@@ -498,7 +504,7 @@ int main(int argc, char** argv)
   }
 
   // try external linking
-  result = testExternal("napi_cpp_ext.nxs", nx_creation_code);
+  result = testExternal(extfilename, nx_creation_code);
   if (result) {
     cout << "testExternal failed" << endl;
     return result;
