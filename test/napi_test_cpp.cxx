@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <cstdlib>
 #include <vector>
 #include "napiconfig.h"
 #include "NeXusFile.hpp"
@@ -130,8 +131,7 @@ int writeTest(const string& filename, NXaccess create_code) {
   file.flush();
 
   // real flush test
-  file.makeData("flush_data", NeXus::getType(static_cast<int>(0)),
-                NX_UNLIMITED, true);
+  file.makeData("flush_data", NeXus::getType<int>(), NX_UNLIMITED, true);
   vector<int> slab_array;
   slab_array.push_back(0);
   for (int i = 0 ; i < 7; i++) {

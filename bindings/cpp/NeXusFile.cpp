@@ -31,6 +31,7 @@ string toString(const vector<NumT>& data) {
 
 namespace NeXus {
 
+  // catch for undefined types
   template <typename NumT>
   NXnumtype getType(NumT number) {
     stringstream msg;
@@ -38,48 +39,78 @@ namespace NeXus {
     throw Exception(msg.str());
   }
 
+  // template specialisations for types we know 
+  template<>
   NXnumtype getType(float number) {
-    return FLOAT32;
+    if (sizeof(float) == 4) {
+        return FLOAT32;
+    } else {
+    	stringstream msg;
+    	msg << "NeXus::getType() cannt do float of size " << sizeof(float);
+    	throw Exception(msg.str());
+    } 
   }
 
+  template<>
   NXnumtype getType(double number) {
-    return FLOAT64;
+    if (sizeof(double) == 8) {
+        return FLOAT64;
+    } else {
+    	stringstream msg;
+    	msg << "NeXus::getType() cannt do double of size " << sizeof(double);
+    	throw Exception(msg.str());
+    } 
   }
 
+  template<>
   NXnumtype getType(int8_t number) {
     return INT8;
   }
 
+  template<>
   NXnumtype getType(uint8_t number) {
     return UINT8;
   }
 
+  template<>
   NXnumtype getType(int16_t number) {
     return INT16;
   }
 
+  template<>
   NXnumtype getType(uint16_t number) {
     return UINT16;
   }
 
+  template<>
   NXnumtype getType(int32_t number) {
     return INT32;
   }
 
+  template<>
   NXnumtype getType(uint32_t number) {
     return UINT32;
   }
 
+  template<>
   NXnumtype getType(int64_t number) {
     return INT64;
   }
 
+  template<>
   NXnumtype getType(uint64_t number) {
     return UINT64;
   }
 
+  template<>
   NXnumtype getType(char number) {
-    return CHAR;
+    if (sizeof(char) == 1) {
+        return CHAR;
+    } else {
+    	stringstream msg;
+    	msg << "NeXus::getType() cannt do char of size " << sizeof(char);
+    	throw Exception(msg.str());
+    } 
   }
 
 }
@@ -655,11 +686,14 @@ AttrInfo File::getNextAttr() {
   }
 }
 
-void File::getAttr(const AttrInfo& info, void* data) {
+void File::getAttr(const AttrInfo& info, void* data, int length) {
   char name[NX_MAXNAMELEN];
   strcpy(name, info.name.c_str());
   int type = info.type;
-  int length = info.length;
+  if (length < 0)
+  {
+      length = info.length;
+  }
   NXstatus status = NXgetattr(this->m_file_id, name, data, &length,
                               &type);
   if (status != NX_OK) {
@@ -671,7 +705,8 @@ void File::getAttr(const AttrInfo& info, void* data) {
         << "->" << type << "]";
     throw Exception(msg.str());
   }
-  if (length != info.length) {
+  // char attributes are always NULL terminated and so may change length
+  if (length != info.length && type != NX_CHAR) {
     stringstream msg;
     msg << "NXgetattr(" << info.name << ") change length [" << info.length
         << "->" << length << "]";
@@ -679,22 +714,12 @@ void File::getAttr(const AttrInfo& info, void* data) {
   }
 }
 
+
 template <typename NumT>
 void File::getAttr(const AttrInfo& info, NumT& value) {
   this->getAttr(info, &value);
 }
 
-string File::getStrAttr(const AttrInfo & info) {
-  if (info.type != CHAR) {
-    stringstream msg;
-    msg << "Cannot use getStrAttr with non-character attribute. Found type = "
-        << info.type;
-    throw Exception(msg.str());
-  }
-  char value[info.length];
-  this->getAttr(info, value);
-  return string(value, info.length);
-}
 
 void File::getAttr(const AttrInfo& info, std::string& value) {
   if (info.type != CHAR) {
@@ -702,9 +727,15 @@ void File::getAttr(const AttrInfo& info, std::string& value) {
     msg << "Data type must be CHAR (" << CHAR << ") found " << info.type;
     throw Exception(msg.str());
   }
-  char cvalue[info.length+1];
-  this->getAttr(info, cvalue);
+  char cvalue[info.length+1]; // +1 for NULL termination
+  this->getAttr(info, cvalue, sizeof(cvalue));
   value = string(cvalue, info.length);
+}
+
+string File::getStrAttr(const AttrInfo & info) {
+  string value;
+  this->getAttr(info, value);
+  return value;
 }
 
 vector<AttrInfo> File::getAttrInfos() {

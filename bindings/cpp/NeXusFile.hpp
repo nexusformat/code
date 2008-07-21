@@ -74,6 +74,14 @@ namespace NeXus {
     void makeData(const std::string& name, const NXnumtype type,
                   const int length, bool open_data = false);
 
+    template <typename NumT>
+    void makeData(const std::string& name,
+                  const std::vector<int>& dims, bool open_data = false);
+
+    template <typename NumT>
+    void makeData(const std::string& name, 
+                  const int length, bool open_data = false);
+
     void writeData(const std::string& name, const std::string& value);
 
     template <typename NumT>
@@ -149,7 +157,7 @@ namespace NeXus {
 
     std::vector<AttrInfo> getAttrInfos();
 
-    void getAttr(const AttrInfo& info, void* data);
+    void getAttr(const AttrInfo& info, void* data, int length = -1);
 
     template <typename NumT>
     void getAttr(const AttrInfo& info, NumT& value);
@@ -182,23 +190,11 @@ namespace NeXus {
   };
 
   /**
-   * This function returns the NXnumtype given a concrete number. The
-   * template is present to cover cases that are not otherwised
-   * explicitly implemented.
+   * This function returns the NXnumtype given a concrete number.
    */
   template <typename NumT>
-  NXnumtype getType(NumT number);
-  NXnumtype getType(float number);
-  NXnumtype getType(double number);
-  NXnumtype getType(int8_t number);
-  NXnumtype getType(uint8_t number);
-  NXnumtype getType(int16_t number);
-  NXnumtype getType(uint16_t number);
-  NXnumtype getType(int32_t number);
-  NXnumtype getType(uint32_t number);
-  NXnumtype getType(int64_t number);
-  NXnumtype getType(uint64_t number);
-  NXnumtype getType(char number);
+  NXnumtype getType(NumT number = NumT());
+
 };
 
 #endif
