@@ -42,24 +42,12 @@ namespace NeXus {
   // template specialisations for types we know 
   template<>
   NXnumtype getType(float number) {
-    if (sizeof(float) == 4) {
-        return FLOAT32;
-    } else {
-    	stringstream msg;
-    	msg << "NeXus::getType() cannt do float of size " << sizeof(float);
-    	throw Exception(msg.str());
-    } 
+    return FLOAT32;
   }
 
   template<>
   NXnumtype getType(double number) {
-    if (sizeof(double) == 8) {
-        return FLOAT64;
-    } else {
-    	stringstream msg;
-    	msg << "NeXus::getType() cannt do double of size " << sizeof(double);
-    	throw Exception(msg.str());
-    } 
+    return FLOAT64;
   }
 
   template<>
@@ -104,16 +92,18 @@ namespace NeXus {
 
   template<>
   NXnumtype getType(char number) {
-    if (sizeof(char) == 1) {
-        return CHAR;
-    } else {
-    	stringstream msg;
-    	msg << "NeXus::getType() cannt do char of size " << sizeof(char);
-    	throw Exception(msg.str());
-    } 
+    return CHAR;
   }
 
 }
+
+// check type sizes - uses a trick that you cannot allocate an 
+// array of negative length
+static int check_float_too_big[4 - sizeof(float)]; // error if float > 4 bytes
+static int check_float_too_small[sizeof(float) - 4]; // error if float < 4 bytes
+static int check_double_too_big[8 - sizeof(double)]; // error if double > 8 bytes
+static int check_double_too_small[sizeof(double) - 8]; // error if double < 8 bytes
+static int check_char_too_big[1 - sizeof(char)]; // error if char > 1 byte
 
 void inner_malloc(void* & data, std::vector<int>& dims, NXnumtype type) {
   int rank = dims.size();
@@ -288,7 +278,7 @@ void File::writeData(const string& name, const vector<NumT>& value) {
 template <typename NumT>
 void File::writeData(const string& name, const vector<NumT>& value,
                      const vector<int>& dims) {
-  this->makeData(name, getType(value[0]), dims, true);
+  this->makeData(name, getType<NumT>(), dims, true);
   this->putData(value);
   this->closeData();
 }
@@ -340,7 +330,7 @@ template <typename NumT>
 void File::writeCompData(const string & name, const vector<NumT> & value,
                        const vector<int> & dims, const NXcompression comp,
                          const vector<int> & bufsize) {
-  this->makeCompData(name, getType(value[0]), dims, comp, bufsize, true);
+  this->makeCompData(name, getType<NumT>(), dims, comp, bufsize, true);
   this->putData(value);
   this->closeData();
 }
@@ -411,7 +401,7 @@ void File::putAttr(const std::string& name, const NumT value) {
   AttrInfo info;
   info.name = name;
   info.length = 1;
-  info.type = getType(value);
+  info.type = getType<NumT>();
   this->putAttr(info, &value);
 }
 
