@@ -355,103 +355,33 @@ int testLoadPath(const string & filename) {
   return 0;
 }
 
-int testExternal(const string & filename, NXaccess create_code){
-  NeXus::File file(filename, create_code);
-  file.makeGroup("entry1", "NXentry");
+int testExternal(const string & fileext, NXaccess create_code){
+  string filename("nxext_cpp" + fileext);
+  string exturl1("nxfile://data/dmc01" + fileext+"#entry1");
+  string exturl2("nxfile://data/dmc02" + fileext+"#entry1");
 
-/*
-  char nxfile[255], ext[5], testFile[80], time[132], filename[256];
-  int create;
-  NXhandle hfil;
+  // create the external link
+  NeXus::File fileout(filename, create_code);
+  fileout.makeGroup("entry1", "NXentry");
+  fileout.linkExternal("entry1", "NXentry", exturl1);
+  fileout.makeGroup("entry2", "NXentry");
+  fileout.linkExternal("entry2", "NXentry", exturl2);
+  fileout.close();
 
-  if(strstr(progName,"hdf4") != NULL){
-    strcpy(ext,"hdf");
-    create = NXACC_CREATE;
-  } else if(strstr(progName,"hdf5") != NULL){
-    strcpy(ext,"h5");
-    create = NXACC_CREATE5;
-  } else if(strstr(progName,"xml") != NULL){
-    strcpy(ext,"xml");
-    create = NXACC_CREATEXML;
-  } else {
-    printf("Failed to recognise napi_test program in testExternal\n");
-    return 1;
-  }
+  // read the file to make sure things worked
+  NeXus::File filein(filename);
+  filein.openPath("/entry1/start_time");
+  cout << "First file time: " << filein.getStrData() << endl;
+  cout << "NXinquirefile found: " << filein.inquireFile() << endl;
+  filein.openPath("/entry2/sample/sample_name");
+  cout << "Second file sample: " << filein.getStrData() << endl;
+  cout << "NXinquirefile found: " << filein.inquireFile() << endl;
+  filein.openPath("/entry2/start_time");
+  cout << "Second file time: " << filein.getStrData() << endl;
+  filein.openPath("/");
+  cout << "entry1 external URL = "
+       << filein.isExternalGroup("entry1", "NXentry") << endl;
 
-  sprintf(testFile,"nxext.%s", ext);
-
-  // create the test file
-  if(NXopen(testFile,create,&hfil) != NX_OK){
-    return 1;
-  }
-  if(NXmakegroup(hfil,"entry1","NXentry") != NX_OK){
-    return 1;
-  }
-  sprintf(nxfile,"nxfile://data/dmc01.%s#/entry1",ext);
-  if(NXlinkexternal(hfil,"entry1","NXentry",nxfile) != NX_OK){
-    return 1;
-  }
-  if(NXmakegroup(hfil,"entry2","NXentry") != NX_OK){
-    return 1;
-  }
-  sprintf(nxfile,"nxfile://data/dmc02.%s#/entry1",ext);
-  if(NXlinkexternal(hfil,"entry2","NXentry",nxfile) != NX_OK){
-    return 1;
-  }
-  if(NXclose(&hfil) != NX_OK){
-    return 1;
-  }
-
-  //
-  if(NXopen(testFile,NXACC_RDWR,&hfil) != NX_OK){
-    return 1;
-  }
-
-  if(NXopenpath(hfil,"/entry1/start_time") != NX_OK){
-    return 1;
-  }
-  memset(time,0,132);
-  if(NXgetdata(hfil,time) != NX_OK){
-    return 1;
-  }
-  printf("First file time: %s\n", time);
-
-  if(NXinquirefile(hfil,filename,256) != NX_OK){
-    return 1;
-  }
-  printf("NXinquirefile found: %s\n", filename);
-
-  if(NXopenpath(hfil,"/entry2/sample/sample_name") != NX_OK){
-    return 1;
-  }
-  memset(time,0,132);
-  if(NXgetdata(hfil,time) != NX_OK){
-    return 1;
-  }
-  printf("Second file sample: %s\n", time);
-  if(NXinquirefile(hfil,filename,256) != NX_OK){
-    return 1;
-  }
-  printf("NXinquirefile found: %s\n", filename);
-
-  if(NXopenpath(hfil,"/entry2/start_time") != NX_OK){
-    return 1;
-  }
-  memset(time,0,132);
-  if(NXgetdata(hfil,time) != NX_OK){
-    return 1;
-  }
-  printf("Second file time: %s\n", time);
-  NXopenpath(hfil,"/");
-  if(NXisexternalgroup(hfil,"entry1","NXentry",filename,255) != NX_OK){
-    return 1;
-  } else {
-    printf("entry1 external URL = %s\n", filename);
-  }
-
-  NXclose(&hfil);
-  printf("External File Linking tested OK\n");
-*/
   return 0;
 }
 
@@ -459,23 +389,23 @@ int main(int argc, char** argv)
 {
   NXaccess nx_creation_code;
   string filename;
-  string extfilename;
+  string extfile_ext;
   if(strstr(argv[0],"napi_test_cpp-hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
     filename = "napi_test_cpp.h5";
-    extfilename = "nxext_cpp.h5";
+    extfile_ext = ".h5";
   }else if(strstr(argv[0],"napi_test_cpp-xml-table") != NULL){
     nx_creation_code = NXACC_CREATEXML | NXACC_TABLE;
     filename = "napi_test_cpp-table.xml";
-    extfilename = "nxext_cpp-table.xml";
+    extfile_ext = "-table.xml";
   }else if(strstr(argv[0],"napi_test_cpp-xml") != NULL){
     nx_creation_code = NXACC_CREATEXML;
     filename = "napi_test_cpp.xml";
-    extfilename = "nxext_cpp.xml";
+    extfile_ext = ".xml";
   } else {
     nx_creation_code = NXACC_CREATE;
     filename = "napi_test_cpp.hdf";
-    extfilename = "nxext_cpp.hdf";
+    extfile_ext = ".hdf";
   }
 
   int result;
@@ -504,7 +434,7 @@ int main(int argc, char** argv)
   }
 
   // try external linking
-  result = testExternal(extfilename, nx_creation_code);
+  result = testExternal(extfile_ext, nx_creation_code);
   if (result) {
     cout << "testExternal failed" << endl;
     return result;
