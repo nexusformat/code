@@ -148,6 +148,16 @@ File::~File() {
   }
 }
 
+void File::close() {
+  if (this->m_file_id != NULL) {
+    NXstatus status = NXclose(&(this->m_file_id));
+    this->m_file_id = NULL;
+    if (status != NX_OK) {
+      throw Exception("NXclose failed", status);
+    }
+  }
+}
+
 void File::flush() {
   NXstatus status = NXflush(&(this->m_file_id));
   if (status != NX_OK) {
@@ -194,7 +204,9 @@ void File::openPath(const string& path) {
   if (path.empty()) {
     throw Exception("Supplied empty path to openPath");
   }
-  NXstatus status = NXopenpath(this->m_file_id, path.c_str());
+  char c_path[path.size() + 1];
+  strcpy(c_path, path.c_str());
+  NXstatus status = NXopenpath(this->m_file_id, c_path);
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXopenpath(" << path << ") failed";

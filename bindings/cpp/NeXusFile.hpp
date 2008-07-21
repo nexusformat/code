@@ -56,6 +56,8 @@ namespace NeXus {
     
     ~File();
 
+    void close();
+
     void flush();
 
     void makeGroup(const std::string& name, const std::string& class_name, bool open_group = false);
