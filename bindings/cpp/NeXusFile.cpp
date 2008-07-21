@@ -684,6 +684,18 @@ void File::getAttr(const AttrInfo& info, NumT& value) {
   this->getAttr(info, &value);
 }
 
+string File::getStrAttr(const AttrInfo & info) {
+  if (info.type != CHAR) {
+    stringstream msg;
+    msg << "Cannot use getStrAttr with non-character attribute. Found type = "
+        << info.type;
+    throw Exception(msg.str());
+  }
+  char value[info.length];
+  this->getAttr(info, value);
+  return string(value, info.length);
+}
+
 void File::getAttr(const AttrInfo& info, std::string& value) {
   if (info.type != CHAR) {
     stringstream msg;

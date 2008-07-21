@@ -156,6 +156,8 @@ namespace NeXus {
 
     void getAttr(const AttrInfo& info, std::string& value);
 
+    std::string getStrAttr(const AttrInfo & info);
+
     NXlink getGroupID();
 
     int getGroupInfo(std::string& name, std::string& type);
