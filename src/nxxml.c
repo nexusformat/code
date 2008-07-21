@@ -1333,8 +1333,11 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
   *iType = nx_type;
   switch(nx_type){
   case NX_CHAR:
-    strncpy((char *)data, attribute, *datalen);
-    *datalen = strlen(attribute);
+    /* enforce NULL termination regardless of length of datalen */
+    strncpy((char *)data, attribute, *datalen-1);
+    ((char*)data)[*datalen-1] = '\0';
+    /* *datalen = strlen(attribute); */
+    *datalen = strlen(data);
     *iType = NX_CHAR;
     break;
   case NX_INT32:

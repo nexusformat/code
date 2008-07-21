@@ -462,7 +462,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
               return NX_ERROR; 
         }
         atype=H5Tcopy(H5T_C_S1);
-        H5Tset_size(atype,128);  
+        H5Tset_size(atype,sizeof(data));  
         iRet = H5Aread(attr1, atype, data);
         if (strcmp(data, nxclass) == 0) {
               /* test OK */
@@ -1327,7 +1327,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
          strcpy(pClass, NX_UNKNOWN_GROUP);
       } else {
         atype=H5Tcopy(H5T_C_S1);
-        H5Tset_size(atype,64);  
+        H5Tset_size(atype,sizeof(data));  
         H5Aread(attr_id, atype, data);
         strcpy(pClass,data);
         pFile->iNX=0;
@@ -1548,7 +1548,7 @@ static int h5MemType(hid_t atype)
            } else {
                type=H5T_C_S1;
                atype=H5Tcopy(type);
-               H5Tset_size(atype,128);  
+               H5Tset_size(atype,sizeof(data));  
                iRet = H5Aread(attr1, atype, data);
                strcpy(nxclass,data);
                H5Tclose(atype);
@@ -1861,7 +1861,7 @@ static int h5MemType(hid_t atype)
 			 void *data, int* datalen, int* iType)
    {
      pNexusFile5 pFile;
-     int iNew, iRet, vid;
+     int iNew, iRet, vid, asize;
      hid_t type, atype = -1, glob;
      char pBuffer[256];
 
@@ -1883,10 +1883,16 @@ static int h5MemType(hid_t atype)
      /* finally read the data */
      if (type==H5T_C_S1)
      {
+	atype = H5Aget_type(pFile->iCurrentA);
+	asize = H5Tget_size(atype);
+	H5Tclose(atype);
 	atype=H5Tcopy(type);
 	H5Tset_size(atype,*datalen);  
+	// use these two lines and remove the strlen one to not force NULL termination
+	// H5Tset_strpad(atype, H5T_STR_NULLPAD);
+	// *datalen = asize;
 	iRet = H5Aread(pFile->iCurrentA, atype, data);
-	*datalen=strlen((char*)data);
+	*datalen = strlen((char*)data);
      } else {
        iRet = H5Aread(pFile->iCurrentA, type, data);
        *datalen=1;

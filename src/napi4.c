@@ -1811,7 +1811,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     memset (data, 0, *datalen);
     if ((*datalen <= iLen) && 
      (*iType == DFNT_UINT8 || *iType == DFNT_CHAR8 || *iType == DFNT_UCHAR8)) {
-      iLen = *datalen - 1;
+      iLen = *datalen - 1; /* this enforces NULL termination regardless of size of datalen */
     }
     memcpy (data, pData, iLen);
     *datalen = iLen / DFKNTsize(*iType);
