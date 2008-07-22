@@ -751,9 +751,15 @@ void File::getAttr(const AttrInfo& info, NumT& value) {
 
 
 string File::getStrAttr(const AttrInfo & info) {
-  string value;
-  this->getAttr(info, value);
-  return value;
+  if (info.type != CHAR) {
+    stringstream msg;
+    msg << "getStrAttr only works with strings (type=" << CHAR
+        << ") found type=" << info.type;
+    throw Exception(msg.str());
+  }
+  char value[info.length + 1];
+  this->getAttr(info, value, info.length+1);
+  return string(value, info.length);
 }
 
 vector<AttrInfo> File::getAttrInfos() {
