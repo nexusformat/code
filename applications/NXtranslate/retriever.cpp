@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <map>
 #include "retriever.h"
 #include "nexus_retriever.h"
 
@@ -36,14 +37,17 @@
 #include "loopy/retriever.h"
 #endif
 
+using std::map;
 using std::string;
 using std::invalid_argument;
 
-// Implementation of a pure virtual destructor. This makes the compiler happy.
-Retriever::~Retriever(){}
+typedef Ptr<Retriever> RetrieverPtr;
 
-// factory method
-Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string &source){
+// hold a map of retrievers that have been instantiated so it can be cached
+map<string, RetrieverPtr> retrievers;
+
+RetrieverPtr getNewInstance(const string & type,
+                            const string & source) {
   // return appropriate retriever based on type
   if(type==NexusRetriever::MIME_TYPE){
     RetrieverPtr ptr(new NexusRetriever(source));
@@ -107,4 +111,21 @@ Retriever::RetrieverPtr Retriever::getInstance(const string & type, const string
 
   // if it gets this far the type is not understood
   throw invalid_argument("do not understand mime_type ("+type+") in retriever_factory");
+}
+
+// Implementation of a pure virtual destructor. This makes the compiler happy.
+Retriever::~Retriever(){}
+
+// factory method
+Retriever::RetrieverPtr Retriever::getInstance(const string & type,
+                                               const string &source){
+  map<string, RetrieverPtr>::iterator existing = retrievers.find(source);
+  if (existing != retrievers.end()) {
+    return (existing->second);
+  }
+  else {
+    RetrieverPtr retriever = getNewInstance(type, source);
+    retrievers.insert(make_pair(source, retriever));
+    return retriever;
+  }
 }
