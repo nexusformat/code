@@ -99,6 +99,16 @@ namespace NeXus {
      */
     void compress(NXcompression comp);
 
+    /**
+     * Initialize the pending group search to start again.
+     */
+    void initGroupDir();
+
+    /**
+     * Initialize the pending attribute search to start again.
+     */
+    void initAttrDir();
+
   public:
     /**
      * Create a new File.
@@ -441,21 +451,61 @@ namespace NeXus {
      */
     NXlink getGroupID();
 
+    /**
+     * Determine whether or not two links refer to the same data or group.
+     *
+     * \param first The first link information to compare.
+     * \param second The second link information to compare.
+     *
+     * \return True if the two point at the same data or group.
+     */
     bool sameID(NXlink& first, NXlink& second);
 
+    /**
+     * Diagnostic print of the link information.
+     *
+     * \param The link to print to stdout.
+     */
     void printLink(NXlink & link);
 
-    void initGroupDir();
-
-    void initAttrDir();
-
+    /**
+     * Set the number format used for a particular type when using the
+     * xml base. This is ignore in the other bases.
+     *
+     * \param type The primitive type to set the format for.
+     * \param format The format to use.
+     */
     void setNumberFormat(NXnumtype& type, const std::string& format);
 
+    /**
+     * Find out the name of the file this object is holding onto.
+     *
+     * \param The size of the buffer to use for reading the name.
+     *
+     * \return The name of the file.
+     */
     std::string inquireFile(const int buff_length = NX_MAXNAMELEN);
 
+    /**
+     * Determine Whether or not a supplied group is external.
+     *
+     * \param name The name of the group to check.
+     * \param type The type of the group to check.
+     * \param buff_length The size of the buffer to use for reading the url.
+     *
+     * \return The url to the external group.
+     */
     std::string isExternalGroup(const std::string& name,
                                 const std::string& type,
                                 const unsigned buff_length = NX_MAXNAMELEN);
+
+    /**
+     * Create a link to a group in an external file.
+     *
+     * \param name The name for the group in this file.
+     * \param type The type for the group in this file.
+     * \param url The url to the group in the external file.
+     */
     void linkExternal(const std::string& name, const std::string& type,
                       const std::string& url);
   };
