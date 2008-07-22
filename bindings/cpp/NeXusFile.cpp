@@ -745,8 +745,10 @@ void File::getAttr(const AttrInfo& info, void* data, int length) {
 
 
 template <typename NumT>
-void File::getAttr(const AttrInfo& info, NumT& value) {
+NumT File::getAttr(const AttrInfo& info) {
+  NumT value;
   this->getAttr(info, &value);
+  return value;
 }
 
 
@@ -901,25 +903,25 @@ template
 void File::putAttr(const string& name, const uint64_t value);
 
 template
-void File::getAttr(const AttrInfo& info, float& value);
+float File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, double& value);
+double File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, int8_t& value);
+int8_t File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, uint8_t& value);
+uint8_t  File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, int16_t& value);
+int16_t File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, uint16_t& value);
+uint16_t  File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, int32_t& value);
+int32_t File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, uint32_t& value);
+uint32_t  File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, int64_t& value);
+int64_t File::getAttr(const AttrInfo& info);
 template
-void File::getAttr(const AttrInfo& info, uint64_t& value);
+uint64_t  File::getAttr(const AttrInfo& info);
 
 template
 void File::writeData(const string& name, const vector<float>& value);

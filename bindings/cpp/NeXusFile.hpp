@@ -432,10 +432,11 @@ namespace NeXus {
      * Get the value of an attribute that is a scalar number.
      *
      * \param info Designation of which attribute to read.
-     * \param value Where to put the attribute value.
+     *
+     * \return The attribute value.
      */
     template <typename NumT>
-    void getAttr(const AttrInfo& info, NumT& value);
+    NumT getAttr(const AttrInfo& info);
 
     /**
      * Get the value of a string attribute.
