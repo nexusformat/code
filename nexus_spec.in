@@ -60,7 +60,7 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 /usr/local/lib
 /usr/local/bin
 /usr/local/include
-/usr/local/share/nexus
+/usr/local/share
 
 %clean
 if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
