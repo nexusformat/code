@@ -427,11 +427,19 @@ namespace NeXus {
     template <typename NumT>
     void getAttr(const AttrInfo& info, NumT& value);
 
+    /**
+     * Get the value of a string attribute.
+     *
+     * \param info Which attribute to read.
+     *
+     * \return The value of the attribute.
+     */
     std::string getStrAttr(const AttrInfo & info);
 
+    /**
+     * \return The id of the group used for linking.
+     */
     NXlink getGroupID();
-
-    int getGroupInfo(std::string& name, std::string& type);
 
     bool sameID(NXlink& first, NXlink& second);
 

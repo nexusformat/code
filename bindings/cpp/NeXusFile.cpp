@@ -779,19 +779,6 @@ NXlink File::getGroupID() {
   return link;
 }
 
-int File::getGroupInfo(string& name, string& type) {
-  int length;
-  char c_name[NX_MAXNAMELEN];
-  strcpy(c_name, name.c_str());
-  char c_type[NX_MAXNAMELEN];
-  strcpy(c_type, type.c_str());
-  NXstatus status = NXgetgroupinfo(this->m_file_id, &length, c_name, c_type);
-  if (status != NX_OK) {
-    throw Exception("NXgetgroupinfo failed", status);
-  }
-  return length;
-}
-
 bool File::sameID(NXlink& first, NXlink& second) {
   NXstatus status = NXsameID(this->m_file_id, &first, &second);
   return (status == NX_OK);
