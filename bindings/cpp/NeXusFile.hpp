@@ -240,6 +240,9 @@ namespace NeXus {
 
     // caller needs to free the memory allocated
     template <typename NumT>
+    std::vector<NumT> * getData();
+
+    template <typename NumT>
     void getData(std::vector<NumT>& data);
 
     std::string getStrData();

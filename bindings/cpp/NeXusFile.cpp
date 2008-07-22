@@ -529,6 +529,36 @@ void File::getData(void* data) {
 }
 
 template <typename NumT>
+std::vector<NumT> * File::getData() {
+  Info info = this->getInfo();
+  if (info.type != getType<NumT>()) {
+    throw Exception("NXgetdata failed - invalid vector type");
+  }
+
+  // determine the number of elements
+  int length=1;
+  for (vector<int>::const_iterator it = info.dims.begin();
+       it != info.dims.end(); it++) {
+    length *= *it;
+  }
+
+  // allocata memory to put the data into
+  void * temp;
+  inner_malloc(temp, info.dims, info.type);
+
+  // fetch the data
+  this->getData(temp);
+
+  // put it in the vector
+  vector<NumT> * result = new vector<NumT>(static_cast<NumT *>(temp),
+                                           static_cast<NumT *>(temp)
+                                           + static_cast<size_t>(length));
+
+  inner_free(temp);
+  return result;
+}
+
+template <typename NumT>
 void File::getData(vector<NumT>& data) {
   Info info = this->getInfo();
 
@@ -991,6 +1021,27 @@ template
 void File::writeCompData(const string & name, const vector<uint64_t> & value,
                          const vector<int> & dims, const NXcompression comp,
                          const vector<int> & bufsize);
+
+template
+vector<float> * File::getData();
+template
+vector<double> * File::getData();
+template
+vector<int8_t> * File::getData();
+template
+vector<uint8_t> * File::getData();
+template
+vector<int16_t> * File::getData();
+template
+vector<uint16_t> * File::getData();
+template
+vector<int32_t> * File::getData();
+template
+vector<uint32_t> * File::getData();
+template
+vector<int64_t> * File::getData();
+template
+vector<uint64_t> * File::getData();
 
 template
 void File::getData(vector<float>& data);
