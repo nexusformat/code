@@ -542,7 +542,7 @@ std::vector<NumT> * File::getData() {
     length *= *it;
   }
 
-  // allocata memory to put the data into
+  // allocate memory to put the data into
   void * temp;
   inner_malloc(temp, info.dims, info.type);
 
