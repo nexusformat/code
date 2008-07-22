@@ -750,17 +750,6 @@ void File::getAttr(const AttrInfo& info, NumT& value) {
 }
 
 
-void File::getAttr(const AttrInfo& info, std::string& value) {
-  if (info.type != CHAR) {
-    stringstream msg;
-    msg << "Data type must be CHAR (" << CHAR << ") found " << info.type;
-    throw Exception(msg.str());
-  }
-  char cvalue[info.length+1]; // +1 for NULL termination
-  this->getAttr(info, cvalue, sizeof(cvalue));
-  value = string(cvalue, info.length);
-}
-
 string File::getStrAttr(const AttrInfo & info) {
   string value;
   this->getAttr(info, value);

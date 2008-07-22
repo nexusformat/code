@@ -181,72 +181,209 @@ namespace NeXus {
     void makeData(const std::string& name, const NXnumtype type,
                   const int length, bool open_data = false);
 
+    /**
+     * Create a string field, insert the data, and close the data.
+     *
+     * \param name The name of the field to create.
+     * \param value The string to put into the file.
+     */
     void writeData(const std::string& name, const std::string& value);
 
+    /**
+     * Create a 1D data field, insert the data, and close the data.
+     *
+     * \param name The name of the field to create.
+     * \param value The vector to put into the file.
+     */
     template <typename NumT>
     void writeData(const std::string& name, const std::vector<NumT>& value);
 
+    /**
+     * Create a n-dimension data field, insert the data, and close the data.
+     *
+     * \param name The name of the field to create.
+     * \param value The data to put into the file.
+     * \param dims The dimensions of the data.
+     */
     template <typename NumT>
     void writeData(const std::string& name, const std::vector<NumT>& value,
                    const std::vector<int>& dims);
 
+    /**
+     * Create a field with compression.
+     *
+     * \param name The name of the data to create.
+     * \param type The primitive type for the data.
+     * \param dims The dimensions of the data.
+     * \param comp The compression algorithm to use.
+     * \param bufsize The size of the compression buffer to use.
+     * \param open_data Whether or not to open the data after creating it.
+     */
     void makeCompData(const std::string& name, const NXnumtype type,
                       const std::vector<int>& dims, const NXcompression comp,
                       const std::vector<int>& bufsize, bool open_data = false);
 
+    /**
+     * Create a compressed data, insert the data, and close it.
+     *
+     * \param name The name of the data to create.
+     * \param value The vector to put into the file.
+     * \param dims The dimensions of the data.
+     * \param comp The compression algorithm to use.
+     * \param bufsize The size of the compression buffer to use.
+     */
     template <typename NumT>
     void writeCompData(const std::string & name,
                        const std::vector<NumT> & value,
                        const std::vector<int> & dims, const NXcompression comp,
                        const std::vector<int> & bufsize);
 
+    /**
+     * \param The name of the data to open.
+     */
     void openData(const std::string& name);
 
+    /**
+     * Close the currently open data.
+     */
     void closeData();
 
+    /**
+     * \param data The data to put in the file.
+     */
     void putData(const void* data);
 
+    /**
+     * \param data The data to put in the file.
+     */
     template <typename NumT>
     void putData(const std::vector<NumT>& data);
 
+    /**
+     * Put the supplied data as an attribute into the currently open data.
+     *
+     * \param info Description of the attribute to add.
+     * \param data The attribute value.
+     */
     void putAttr(const AttrInfo& info, const void* data);
 
+    /**
+     * Put the supplied data as an attribute into the currently open data.
+     *
+     * \param name Name of the attribute to add.
+     * \param data The attribute value.
+     */
     template <typename NumT>
     void putAttr(const std::string& name, const NumT value);
 
+    /**
+     * Put a string as an attribute in the file.
+     *
+     * \param name Name of the attribute to add.
+     * \param data The attribute value.
+     */
     void putAttr(const char* name, const char* value);
 
+    /**
+     * Put a string as an attribute in the file.
+     *
+     * \param name Name of the attribute to add.
+     * \param data The attribute value.
+     */
     void putAttr(const std::string& name, const std::string value);
 
+    /**
+     * Insert an array as part of a data in the final file.
+     *
+     * \param data The array to put in the file.
+     * \param start The starting index to insert the data.
+     * \param size The size of the array to put in the file.
+     */
     void putSlab(void* data, std::vector<int>& start,
                  std::vector<int>& size);
 
+    /**
+     * Insert an array as part of a data in the final file.
+     *
+     * \param data The array to put in the file.
+     * \param start The starting index to insert the data.
+     * \param size The size of the array to put in the file.
+     */
     template <typename NumT>
     void putSlab(std::vector<NumT>& data, std::vector<int>& start,
                  std::vector<int>& size);
 
+    /**
+     * Insert a number as part of a data in the final file.
+     *
+     * \param data The array to put in the file.
+     * \param start The starting index to insert the data.
+     * \param size The size of the array to put in the file.
+     */
     template <typename NumT>
     void putSlab(std::vector<NumT>& data, int start, int size);
 
+    /**
+     * \return The id of the data used for linking.
+     */
     NXlink getDataID();
 
+    /**
+     * Create a link in the current location to the supplied id.
+     *
+     * \param link The object (group or data) in the file to link to.
+     */
     void makeLink(NXlink& link);
 
+    /**
+     * Create a link with a new name.
+     *
+     * \param name The name of this copy of the link.
+     * \param link The object (group or data) in the file to link to.
+     */
     void makeNamedLink(const std::string& name, NXlink& link);
 
+    /**
+     * Open the original copy of this group or data as declared by the
+     * "target" attribute.
+     */
     void openSourceGroup();
 
+    /**
+     * Put the currently open data in the supplied pointer.
+     *
+     * \param data The pointer to copy the data to.
+     */
     void getData(void* data);
 
-    // caller needs to free the memory allocated
+    /**
+     * Allocate memory and return the data as a vector. Since this
+     * does call "new vector<NumT>" the caller is responsible for
+     * calling "delete".
+     *
+     * \return The data as a vector.
+     */
     template <typename NumT>
     std::vector<NumT> * getData();
 
+    /**
+     * Put data into the supplied vector. The vector does not need to
+     * be the correct size, just the correct type as it is resized to
+     * the appropriate value.
+     *
+     * \param data Where to put the data.
+     */
     template <typename NumT>
     void getData(std::vector<NumT>& data);
 
+    /**
+     * \return String data from the file.
+     */
     std::string getStrData();
 
+    /**
+     * \return The Info structure that describes the currently open data.
+     */
     Info getInfo();
 
     /**
@@ -254,17 +391,41 @@ namespace NeXus {
      */
     std::map<std::string, std::string> getEntries();
 
+    /**
+     * Get a section of data from the file.
+     *
+     * \param data The pointer to insert that data into.
+     * \param start The offset into the file's data block to start the read 
+     * from.
+     * \param size The size of the block to read from the file.
+     */
     void getSlab(void* data, const std::vector<int>& start,
                  std::vector<int>& size);
 
+    /**
+     * \return Information about all attributes on the data that is
+     * currently open.
+     */
     std::vector<AttrInfo> getAttrInfos();
 
+    /**
+     * Get the value of the attribute specified by the AttrInfo supplied.
+     *
+     * \param info Designation of which attribute to read.
+     * \param data The pointer to put the attribute value in.
+     * \param length The length of the attribute. If this is "-1" then the 
+     * information in the supplied AttrInfo object will be used.
+     */
     void getAttr(const AttrInfo& info, void* data, int length = -1);
 
+    /**
+     * Get the value of an attribute that is a scalar number.
+     *
+     * \param info Designation of which attribute to read.
+     * \param value Where to put the attribute value.
+     */
     template <typename NumT>
     void getAttr(const AttrInfo& info, NumT& value);
-
-    void getAttr(const AttrInfo& info, std::string& value);
 
     std::string getStrAttr(const AttrInfo & info);
 
