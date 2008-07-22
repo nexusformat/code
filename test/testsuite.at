@@ -477,35 +477,93 @@ AT_BANNER([Check the C++ binding.])
 AT_SETUP([Check the C++ binding with HDF4.])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test_cpp-hdf4 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.hdf
+Number of global attributes: 4
    NeXus_version = 4.1.0
    file_name = napi_test_cpp.hdf
+Number of group attributes: 2
+   hugo = namenlos
+   cucumber = passion
+Group contains 9 items
+   c1_data[5,4] = 2d character array
+   ch_data[10] = NeXus_data
+   data:NXdata
+   i1_data[4] = [,,,]
+   i2_data[4] = [1000,2000,3000,4000]
+   i4_data[4] = [1000000,2000000,3000000,4000000]
+   r4_data[5,4] = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+   r8_data[5,4] = [20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]
+   sample:NXsample
+Link check OK
+NXopenpath checks OK
+First file time: 2005-05-27 05:44:13
+NXinquirefile found: data/dmc01.hdf
+Second file sample: Ga0.94Mn0.04Sb_8mm
+NXinquirefile found: data/dmc02.hdf
+Second file time: 2005-05-27 05:48:56
+entry1 external URL = nxfile://data/dmc01.hdf#entry1
 ]])
 AT_CLEANUP
 AT_SETUP([Check the C++ binding with HDF5.])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test_cpp-hdf5 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.h5
+Number of global attributes: 4
    NeXus_version = 4.1.0
    file_name = napi_test_cpp.h5
+Number of group attributes: 2
+   hugo = namenlos
+   cucumber = passion
+Group contains 10 items
+   c1_data[5,4] = 2d character array
+   ch_data[10] = NeXus_data
+   data:NXdata
+   grosszahl[4] = [12,555555555555,23,777777777777]
+   i1_data[4] = [,,,]
+   i2_data[4] = [1000,2000,3000,4000]
+   i4_data[4] = [1000000,2000000,3000000,4000000]
+   r4_data[5,4] = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+   r8_data[5,4] = [20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]
+   sample:NXsample
+Link check OK
+NXopenpath checks OK
+First file time: 2005-05-27 05:44:13
+NXinquirefile found: data/dmc01.h5
+Second file sample: Ga0.94Mn0.04Sb_8mm
+NXinquirefile found: data/dmc02.h5
+Second file time: 2005-05-27 05:48:56
+entry1 external URL = nxfile://data/dmc01.h5#entry1
 ]])
 AT_CLEANUP
 AT_SETUP([Check the C++ binding with xml.])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test_cpp-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.xml
+Number of global attributes: 7
    NeXus_version = 4.1.0
    file_name = napi_test_cpp.xml
    xmlns = http://definition.nexusformat.org/schema/1.0
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
    xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
-]])
-AT_CLEANUP
-AT_SETUP([Check the C++ binding with xml tables.])
-AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test_cpp-xml-table | sed -e 's/\r$//' ], [], 
-[[NXinquirefile found: napi_test_cpp-table.xml
-   NeXus_version = 4.1.0
-   file_name = napi_test_cpp-table.xml
-   xmlns = http://definition.nexusformat.org/schema/1.0
-   xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-   xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
+Number of group attributes: 2
+   hugo = namenlos
+   cucumber = passion
+Group contains 10 items
+   c1_data[5,4] = 2d character array
+   ch_data[10] = NeXus_data
+   data:NXdata
+   grosszahl[4] = [12,555555555555,23,777777777777]
+   i1_data[4] = [,,,]
+   i2_data[4] = [1000,2000,3000,4000]
+   i4_data[4] = [1000000,2000000,3000000,4000000]
+   r4_data[5,4] = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+   r8_data[5,4] = [20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]
+   sample:NXsample
+Link check OK
+NXopenpath checks OK
+First file time: 2005-05-27 05:44:13
+NXinquirefile found: data/dmc01.xml
+Second file sample: Ga0.94Mn0.04Sb_8mm
+NXinquirefile found: data/dmc02.xml
+Second file time: 2005-05-27 05:48:56
+entry1 external URL = nxfile://data/dmc01.xml#entry1
 ]])
 AT_CLEANUP
 

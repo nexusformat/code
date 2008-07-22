@@ -151,7 +151,7 @@ int writeTest(const string& filename, NXaccess create_code) {
   NXlink glink = file.getGroupID();
   file.openPath("/");
   file.makeGroup("link", "NXentry", true);
-  file.makeLink(link);
+  file.makeLink(glink);
   file.makeNamedLink("renLinkGroup", glink);
   file.makeNamedLink("renLinkData", link);
 
@@ -226,44 +226,54 @@ int readTest(const string & filename) {
         }
       }
       else if (info.type == NeXus::FLOAT32) {
-        vector<float> * result = file.getData<float>();
-        cout << toString(*result);
+        vector<float> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::FLOAT64) {
-        vector<double> * result = file.getData<double>();
-        cout << toString(*result);
+        vector<double>  result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::INT8) {
-        vector<int8_t> * result = file.getData<int8_t>();
-        cout << toString(*result);
+        vector<int8_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::UINT8) {
-        vector<uint8_t> * result = file.getData<uint8_t>();
-        cout << toString(*result);
+        vector<uint8_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::INT16) {
-        vector<int16_t> * result = file.getData<int16_t>();
-        cout << toString(*result);
+        vector<int16_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::UINT16) {
-        vector<uint16_t> * result = file.getData<uint16_t>();
-        cout << toString(*result);
+        vector<uint16_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::INT32) {
-        vector<int32_t> * result = file.getData<int32_t>();
-        cout << toString(*result);
+        vector<int32_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::UINT32) {
-        vector<uint32_t> * result = file.getData<uint32_t>();
-        cout << toString(*result);
+        vector<uint32_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::INT64) {
-        vector<int64_t> * result = file.getData<int64_t>();
-        cout << toString(*result);
+        vector<int64_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
       else if (info.type == NeXus::UINT64) {
-        vector<uint64_t> * result = file.getData<uint64_t>();
-        cout << toString(*result);
+        vector<uint64_t> result;
+	file.getData(result);
+        cout << toString(result);
       }
     }
     else {

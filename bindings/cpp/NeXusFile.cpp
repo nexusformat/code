@@ -529,9 +529,13 @@ void File::getData(void* data) {
 }
 
 template <typename NumT>
-vector<NumT> * File::getData() {
+void File::getData(vector<NumT>& data) {
   Info info = this->getInfo();
 
+  if (info.type != getType<NumT>())
+  {
+    throw Exception("NXgetdata failed - invalid vector type");
+  }
   // determine the number of elements
   int length=1;
   for (vector<int>::const_iterator it = info.dims.begin();
@@ -540,18 +544,11 @@ vector<NumT> * File::getData() {
   }
 
   // allocate memory to put the data into
-  void * temp;
-  inner_malloc(temp, info.dims, info.type);
+  // need to use resize() rather than reserve() so vector length gets set
+  data.resize(length);
 
   // fetch the data
-  this->getData(temp);
-  // put it in the vector
-  vector<NumT> * result = new vector<NumT>(static_cast<NumT *>(temp),
-                                           static_cast<NumT *>(temp)
-                                                + static_cast<size_t>(length));
-  // free the memory
-  inner_free(temp);
-  return result;
+  this->getData(&(data[0]));
 }
 
 string File::getStrData() {
@@ -568,7 +565,7 @@ string File::getStrData() {
         << info.dims.size();
     throw Exception(msg.str());
   }
-  char value[info.dims[0]];
+  char value[info.dims[0]+1]; // probably do not need +1, but being safe
   this->getData(value);
   return string(value, info.dims[0]);
 }
@@ -996,25 +993,25 @@ void File::writeCompData(const string & name, const vector<uint64_t> & value,
                          const vector<int> & bufsize);
 
 template
-vector<float> * File::getData();
+void File::getData(vector<float>& data);
 template
-vector<double> * File::getData();
+void File::getData(vector<double>& data);
 template
-vector<int8_t> * File::getData();
+void File::getData(vector<int8_t>& data);
 template
-vector<uint8_t> * File::getData();
+void File::getData(vector<uint8_t>& data);
 template
-vector<int16_t> * File::getData();
+void File::getData(vector<int16_t>& data);
 template
-vector<uint16_t> * File::getData();
+void File::getData(vector<uint16_t>& data);
 template
-vector<int32_t> * File::getData();
+void File::getData(vector<int32_t>& data);
 template
-vector<uint32_t> * File::getData();
+void File::getData(vector<uint32_t>& data);
 template
-vector<int64_t> * File::getData();
+void File::getData(vector<int64_t>& data);
 template
-vector<uint64_t> * File::getData();
+void File::getData(vector<uint64_t>& data);
 
 template
 void File::putSlab(std::vector<float>& data, int start, int size);
