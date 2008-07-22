@@ -177,7 +177,6 @@ int readTest(const string & filename) {
   const string SDS("SDS");
   // top level file information
   NeXus::File file(filename);
-  std::string str;
   cout << "NXinquirefile found: " << file.inquireFile() << endl;
   vector<NeXus::AttrInfo> attr_infos = file.getAttrInfos();
   cout << "Number of global attributes: " << attr_infos.size() << endl;
@@ -186,8 +185,7 @@ int readTest(const string & filename) {
     if (it->name != "file_time" && it->name != "HDF_version" && it->name !=  "HDF5_Version" && it->name != "XML_version") {
         cout << "   " << it->name << " = ";
         if (it->type == NeXus::CHAR) {
-          file.getAttr(*it, str);
-          cout << str;
+          cout << file.getStrAttr(*it);
         }
         cout << endl;
     }
