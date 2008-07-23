@@ -23,6 +23,7 @@ typedef struct{
   string outfile;
   NXaccess base;
   bool append;
+  bool timing;
   std::map<string,string> map;
 }Options;
 
@@ -100,12 +101,19 @@ static void print_help(const string &progname, int level){
 #endif
   cout << "  -D <macro>   Specify a macro. The macro should be in the form of\n"
        << "               \"FILE=old_nexus.nxs\". The \"=\" is required." << endl;
+#ifdef USE_TIMING
+  cout << "  --timing     Print out timing information for the execution of the program." << endl;
+#endif
 }
 
 int main(int argc, char *argv[]){
+#ifdef USE_TIMING
+  time_t start_time = time(NULL);
+#endif
   Options options;
   options.base=NXACC_CREATE;
   options.append=false;
+  options.timing=false;
 
   // parse the command line options (i=0 is the program name
   for( int i=1 ; i<argc ; i++ ){
@@ -152,6 +160,8 @@ int main(int argc, char *argv[]){
       }
       string key=split(arg1);
       options.map.insert(make_pair(key,arg1));
+    }else if(starts_with(arg1, "--timing")) {
+      options.timing = true;
 #ifdef HDF4
     }else if(starts_with(arg1,"--hdf4")){
       options.base=NXACC_CREATE4;
@@ -212,7 +222,8 @@ int main(int argc, char *argv[]){
   }
 
   // parse the file
-  bool result=xml_parser::parse_xml_file(options.map,options.infile,&handle);
+  bool result=xml_parser::parse_xml_file(options.map,options.infile,&handle,
+                                         options.timing);
 
   // close the output file
   NXclose(&handle);
@@ -222,6 +233,11 @@ int main(int argc, char *argv[]){
     if(std::remove(options.outfile.c_str()))
       std::perror("ERROR DELETING FILE");
   }
-
+  
+#ifdef USE_TIMING
+  if (options.timing) {
+    cout << print_time(start_time) << " total time" << endl;
+  }
+#endif
   return result;
 }

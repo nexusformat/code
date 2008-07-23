@@ -17,6 +17,9 @@
 #include "Ptr.h"
 #include "tree.hh"
 #include "nxtranslate_debug.h"
+#ifdef USE_TIMING
+#include <sstream>
+#endif
 
 // ----- start of declaring debug levels
 #ifdef DEBUG3_XML_PARSER
@@ -71,6 +74,20 @@ typedef struct{
   vector<string> mime_types; // vector of mime_types (for nesting)
   vector<RetrieverPtr> retrievers; // vector of retrievers (for nesting)
 }UserData;
+
+#ifdef USE_TIMING
+static time_t start_time = time(NULL);
+static time_t intermediate_time = time(NULL);
+extern string print_time(const time_t & start,
+                         const  time_t & stop) {
+  double seconds = difftime(stop, start);
+  long minutes = static_cast<long>(seconds/60.);
+  seconds = seconds - 60. * static_cast<double>(minutes);
+  std::stringstream result;
+  result << minutes << "m" << seconds  << "s";
+  return result.str();
+}
+#endif
 
 // variable so the line and column numbers can be accessed
 static xmlParserCtxtPtr context;
@@ -526,7 +543,8 @@ static bool resolve_links(UserData *user_data){
 
 extern bool xml_parser::parse_xml_file(const std::map<string,string> &map,
                                        const string &filename,
-                                       NXhandle *handle){
+                                       NXhandle *handle,
+                                       const bool timing){
 #ifdef DEBUG3_XML_PARSER
   std::cout << "xml_parser::parse_xml_file" << std::endl;
 #endif
@@ -552,6 +570,13 @@ extern bool xml_parser::parse_xml_file(const std::map<string,string> &map,
   else if(result<0)
     return true; // return generic error
 
+#ifdef USE_TIMING
+  if (timing) {
+    cout << print_time(intermediate_time) << " to add new information" << endl;
+    intermediate_time = time(NULL);
+  }
+#endif
+
   // work on links
   try{
     resolve_links(&user_data);
@@ -560,6 +585,13 @@ extern bool xml_parser::parse_xml_file(const std::map<string,string> &map,
     return true;
   }
   
+#ifdef USE_TIMING
+  if (timing) {
+    cout << print_time(intermediate_time) << " to create links" << endl;
+    intermediate_time = time(NULL);
+  }
+#endif
+
   // return that everything went well
   return false;
 }
