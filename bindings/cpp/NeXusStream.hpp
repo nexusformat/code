@@ -3,7 +3,7 @@
 //
 //  NeXus - Neutron & X-ray Common Data Format
 //  
-//  Stream interface to NeXus C++ Bindings
+//  IOStream like interface to NeXus C++ Bindings
 //
 //  Copyright (C) 2008 Freddie Akeroyd, STFC ISIS facility
 //  
@@ -34,8 +34,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * \file
- * Stream interface for use with NeXus C++ Bindings
+ * \file NeXusStream.hpp
+ * Header for IOStream like interface to NeXus files
  * \version $LastChangedRevision$
  * \date    $LastChangedDate$
  */
@@ -46,6 +46,8 @@
 
 namespace NeXus
 {
+namespace Stream
+{
     // interface implemented by all serialisable NeXus components
     class ISerialisable
     {
@@ -53,6 +55,8 @@ namespace NeXus
 	virtual void readFromFile(File& nf) const = 0;
 	virtual void writeToFile(File& nf) const = 0;
     };
+
+    enum StreamModifier { Close=0 };
 
     class HolderBase : public ISerialisable
     {
@@ -234,8 +238,13 @@ namespace NeXus
     };
 
    File& operator<<(File& nf, const ISerialisable& obj);
-
    File& operator>>(File& nf, const ISerialisable& obj);
-}
+
+
+   File& operator<<(File& nf, const StreamModifier sm);
+   File& operator>>(File& nf, const StreamModifier sm);
+
+  } // Stream
+} // NeXus
 
 #endif /* NEXUS_STREAM_HPP */

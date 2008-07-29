@@ -494,6 +494,20 @@ NXlink File::getDataID() {
   return link;
 }
 
+bool File::isDataSetOpen()
+{
+  NXlink id;
+  if(NXgetdataID(this->m_file_id,&id) == NX_ERROR)
+  {
+    return false;
+  }
+  else 
+  {
+    return true;
+  }
+}
+/*----------------------------------------------------------------------*/
+
 void File::makeLink(NXlink& link) {
   NXstatus status = NXmakelink(this->m_file_id, &link);
   if (status != NX_OK) {

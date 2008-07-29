@@ -3,7 +3,7 @@
 //  
 //  $Id: Makefile.am 598 2005-08-19 16:19:15Z faa59 $
 //  
-//  Stream interface to NeXus C++ Bindings
+//  IOStream like interface to NeXus C++ Bindings
 //
 //  Copyright (C) 2008 Freddie Akeroyd, STFC ISIS facility
 //  
@@ -33,8 +33,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * \file
- * Stream interface for use with NeXus C++ Bindings
+ * \file NeXusStream.cpp
+ * Implementation of IOStream like interface to NeXus files
  * \version $LastChangedRevision$
  * \date    $LastChangedDate$
  */
@@ -43,6 +43,7 @@
 #include "NeXusStream.hpp"
 #include "NeXusException.hpp"
 namespace NeXus {
+namespace Stream {
 
 HolderBase::HolderBase(const std::string& name) : m_name(name)
 {
@@ -211,4 +212,47 @@ File& operator>>(File& nf, const ISerialisable& obj)
     return nf;
 }
 
+File& operator<<(File& nf, const StreamModifier sm)
+{
+    switch(sm)
+    {
+	case Close:
+	    if (nf.isDataSetOpen())
+	    {
+		nf.closeData();
+	    }
+	    else
+ 	    {	
+		nf.closeGroup();
+	    }
+	    break;
+
+	default:
+	    break;
+    }
+    return nf;
 }
+
+File& operator>>(File& nf, const StreamModifier sm)
+{
+    switch(sm)
+    {
+	case Close:
+	    if (nf.isDataSetOpen())
+	    {
+		nf.closeData();
+	    }
+	    else
+ 	    {	
+		nf.closeGroup();
+	    }
+	    break;
+
+	default:
+	    break;
+    }
+    return nf;
+}
+
+} // Stream
+} // NeXus

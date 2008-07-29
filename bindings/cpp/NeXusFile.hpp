@@ -521,6 +521,11 @@ namespace NeXus {
      */
     void linkExternal(const std::string& name, const std::string& type,
                       const std::string& url);
+    /**
+     * This function checksi if we are in an open dataset
+     * \returns true if we are currently in an open dataset else false
+     */
+    bool isDataSetOpen();
   };
 
   /**
@@ -528,6 +533,7 @@ namespace NeXus {
    */
   template <typename NumT>
   NXnumtype getType(NumT number = NumT());
+
 
 };
 

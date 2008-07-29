@@ -396,6 +396,7 @@ int testExternal(const string & fileext, NXaccess create_code){
 static int streamTest(const std::string& fname, NXaccess create_mode)
 {
     using namespace NeXus;
+    using namespace NeXus::Stream;
     std::vector<double> w;
     std::vector<double> w1;
     w.push_back(1.0);
@@ -407,7 +408,7 @@ static int streamTest(const std::string& fname, NXaccess create_mode)
     nf.close();
     File nf1(fname, NXACC_RDWR);
     // add a double_attr to an existing setup
-    nf1 >> Group("entry1", "NXentry") >> Data("dat1") << Attr("double_attr", 6.0);
+    nf1 >> Group("entry1", "NXentry") >> Data("dat1") << Attr("double_attr", 6.0) << Close;
     nf1.close();
     // read back data items
     File nf2(fname, NXACC_READ);
