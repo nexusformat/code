@@ -393,6 +393,35 @@ int testExternal(const string & fileext, NXaccess create_code){
   return 0;
 }
 
+static int streamTest(const std::string& fname, NXaccess create_mode)
+{
+    using namespace NeXus;
+    std::vector<double> w;
+    std::vector<double> w1;
+    w.push_back(1.0);
+    double d, d1;
+    int i;
+    // create an entry and a data item
+    File nf(fname, create_mode);
+    nf << Group("entry1", "NXentry") << Data("dat1", w, "int_attr", 3);
+    nf.close();
+    File nf1(fname, NXACC_RDWR);
+    // add a double_attr to an existing setup
+    nf1 >> Group("entry1", "NXentry") >> Data("dat1") << Attr("double_attr", 6.0);
+    nf1.close();
+    // read back data items
+    File nf2(fname, NXACC_READ);
+    nf2 >> Group("entry1", "NXentry") >> Data("dat1", w1, "int_attr", i, "double_attr", d);
+    // alternative way to read d1
+    nf2 >> Data("dat1") >> Attr("double_attr", d1);
+    nf2.close();
+    if (i != 3 || w != w1 || d != 6.0 || d1 != 6.0)
+    {
+	return 1;
+    }
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
   NXaccess nx_creation_code;
@@ -448,6 +477,16 @@ int main(int argc, char** argv)
     return result;
   }
 
+
+  // quick test of stream interface
+  std::string fname = string("stream_test") + extfile_ext;
+  result = streamTest(fname, nx_creation_code);
+  remove(fname.c_str());
+  if (result) {
+    cout << "streamTest failed" << endl;
+    return result;
+  }
+    
   // everything went ok
   return 0;
 }

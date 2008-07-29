@@ -23,14 +23,14 @@
 #  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
 #  MA  02111-1307  USA
 #             
-#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#  For further information, see http://www.nexusformat.org/
 #
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 lib_LTLIBRARIES=libNeXusCPP.la
 
-libNeXusCPP_la_SOURCES=NeXusFile.hpp NeXusFile.cpp NeXusException.hpp NeXusException.cpp
+libNeXusCPP_la_SOURCES=NeXusFile.hpp NeXusFile.cpp NeXusException.hpp NeXusException.cpp NeXusStream.hpp NeXusStream.cpp
 libNeXusCPP_la_LIBADD=$(LIBNEXUS)
 libNeXusCPP_la_LDFLAGS=@SHARED_LDFLAGS@ $(LDFLAGS)
 

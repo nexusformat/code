@@ -438,6 +438,18 @@ namespace NeXus {
     template <typename NumT>
     NumT getAttr(const AttrInfo& info);
 
+
+    /**
+     * Get the value of an attribute that is a scalar number.
+     *
+     * \param[in] name Name of attribute to read
+     *
+     * \param[out] value The read attribute value.
+     */
+    template <typename NumT>
+        void getAttr(const std::string& name, NumT& value);
+
+
     /**
      * Get the value of a string attribute.
      *
@@ -518,5 +530,7 @@ namespace NeXus {
   NXnumtype getType(NumT number = NumT());
 
 };
+
+#include "NeXusStream.hpp"
 
 #endif

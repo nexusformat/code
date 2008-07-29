@@ -751,6 +751,16 @@ NumT File::getAttr(const AttrInfo& info) {
   return value;
 }
 
+template <typename NumT>
+void File::getAttr(const std::string& name, NumT& value)
+{
+    AttrInfo info;
+    info.type = getType<NumT>();
+    info.length = 1;
+    info.name = name;
+    value = this->getAttr<NumT>(info);
+}
+ 
 
 string File::getStrAttr(const AttrInfo & info) {
   if (info.type != CHAR) {
@@ -1068,3 +1078,8 @@ template
 void File::putSlab(std::vector<int64_t>& data, int start, int size);
 template
 void File::putSlab(std::vector<uint64_t>& data, int start, int size);
+
+template 
+void File::getAttr(const std::string& name, double& value);
+template 
+void File::getAttr(const std::string& name, int& value);
