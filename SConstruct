@@ -24,7 +24,12 @@
 #             
 #  For further information, see <http://www.nexusformat.org/>
 #
-#====================================================================
+######################## Subversion Reposity details ########################
+# Repository Location     $HeadURL$
+# Revision of last commit $LastChangedRevision$ 
+# Date of last commit     $LastChangedDate$
+# Author of last commit   $LastChangedBy$
+############################################################################
 
 import os
 import platform
@@ -76,13 +81,13 @@ if os.name == 'nt':
 	libDirList.append('c:\\')
 
 	if int(mingw) :
-		cflags = ['-g', '-O2', '-DPOCO_DLL']
+		cflags = ['-g', '-O2']
 		env.Append(LINKFLAGS=['-g','-Wl,--export-all-symbols'])
 	else :
 		if int(debug) :
-			cflags = [ '/W3', '/Od', '/FD', '/EHsc', '/MDd', '/TP', '/D_DEBUG', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DPOCO_DLL', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275', '/wd4996' ]
+			cflags = [ '/W3', '/Od', '/FD', '/EHsc', '/MDd', '/TP', '/D_DEBUG', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275', '/wd4996' ]
 		else :
-			cflags = ['/Ox', '/Ot', '/W3','/EHsc', '/MD', '/TP', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DPOCO_DLL', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275']
+			cflags = ['/Ox', '/Ot', '/W3','/EHsc', '/MD', '/TP', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275']
 
 else :
 	print "* COMMENCING LINUX BUILD *"
@@ -95,7 +100,7 @@ else :
 
 	env.Append(LINKFLAGS=['-g'])
 	libList.append(['hdf5','mfhdf','df','mxml','jpeg','z'])
-	libDirList.append(['/usr/lib/hdf'])
+	libDirList.append(['/usr/lib64/hdf','/usr/lib/hdf'])
 
 #Export for SConscripts
 env.Append(CFLAGS=cflags)
@@ -110,6 +115,7 @@ Export('env')
 subProjs = []
 
 subProjs.append('src')
+subProjs.append('bindings/cpp')
 
 # we want to link libraries in the reverse order we build them
 shared_libraries = []

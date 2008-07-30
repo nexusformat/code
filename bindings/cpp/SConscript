@@ -39,29 +39,19 @@ import re
 import os
 import nexus_scons_utils
 
-source_files = Split("""napi4.c
-                        napi5.c
-                        napi.c
-                        napiu.c
-                        nxdataset.c
-                        nxio.c
-                        nxstack.c
-                        nxxml.c
-                        stptok.c""")
-# for windows
-#                        napi_exports2.c
-#                        napi_exports.c
+source_files = Split("""NeXusFile.cpp
+                        NeXusException.cpp
+                        NeXusStream.cpp""")
 
 #Import environment
 Import('env')
 myenv = env.Clone()
-myenv.Append(CPPDEFINES=[('IN_NEXUS_LIBRARY',1),('H5_USE_16_API',1)])
 myenv.Append(CPPPATH=['#/include'])
 
 shared_objects = nexus_scons_utils.getSharedObjects(source_files, myenv)
 
 #BUILD CODE
-shared = myenv.SharedLibrary('lib/NeXus', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='lib/NeXus.pdb')
-static = myenv.StaticLibrary('libstatic/NeXus', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='libstatic/NeXus.pdb')
-retval = { 'shared': shared, 'static': static, 'sharedobjs' : shared_objects, 'libs': [ 'NeXus' ] }
+shared = myenv.SharedLibrary('lib/NeXusCPP', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='lib/NeXusCPP.pdb')
+static = myenv.StaticLibrary('libstatic/NeXusCPP', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='libstatic/NeXusCPP.pdb')
+retval = { 'shared': shared, 'static': static, 'sharedobjs' : shared_objects, 'libs': [ 'NeXusCPP' ] }
 Return('retval')
