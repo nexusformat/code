@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include "napi.h"
+#include "napiconfig.h"
 
 /**
  * \file
