@@ -70,6 +70,7 @@ namespace Stream
 	std::string getName() { return m_name; }
 	virtual NXnumtype getType() = 0;
 	virtual HolderBase* clone() = 0;
+	virtual ~HolderBase() {}
     };
 
     template<typename NumT>
@@ -90,6 +91,7 @@ namespace Stream
 	virtual void readFromFile(File& nf) const;
 	virtual void writeToFile(File& nf) const;
 	AttrHolder* clone() { return new AttrHolder(m_name, m_c_value, m_value); }
+	virtual ~AttrHolder() { m_value = NULL; m_c_value = NULL; }
     };
 
     class Attr : public ISerialisable
@@ -109,12 +111,12 @@ namespace Stream
 	  Attr(const std::string& name, const NumT& d) { m_holder = new AttrHolder<NumT>(name, d); }
 	Attr(const std::string& name, Attr& d) { m_holder = d.m_holder->clone(); setName(name); }
 	Attr(const std::string& name, const Attr& d) { m_holder = d.m_holder->clone(); setName(name); }
-	~Attr() { delete m_holder; }
         Attr(const Attr& a) : m_holder(NULL) {  m_holder = a.m_holder->clone(); }
 	Attr& operator=(const Attr& a) { if (this != &a) { delete m_holder; m_holder = a.m_holder->clone(); return *this; } }
 	void setName(const std::string& name) { m_holder->setName(name); }
 	virtual void readFromFile(File& nf) const { m_holder->readFromFile(nf); }
 	virtual void writeToFile(File& nf) const { m_holder->writeToFile(nf); }
+	virtual ~Attr() { delete m_holder; m_holder = NULL; }
     };
 
     
@@ -157,6 +159,8 @@ namespace Stream
 		it->writeToFile(nf);
    	    }
   	}
+
+	virtual ~ObjectWithAttr() { }
     };
     
     class Group : public ObjectWithAttr
@@ -183,6 +187,8 @@ namespace Stream
     	    nf.makeGroup(m_name, m_class, true);
 	    ObjectWithAttr::writeToFile(nf);
   	}
+
+	virtual ~Group() {}
     };
 
     template<typename NumT>
@@ -204,6 +210,7 @@ namespace Stream
 	virtual void readFromFile(File& nf) const;
 	virtual void writeToFile(File& nf) const;
 	DataHolder* clone() { return new DataHolder(m_name, m_c_value, m_value); }
+	virtual ~DataHolder() {}
     };
 
     class Data : public ObjectWithAttr
@@ -234,7 +241,7 @@ namespace Stream
 	Data& operator=(const Data& d) { if (this != &d) { delete m_holder; m_holder = d.m_holder->clone(); return *this; } }
 	virtual void readFromFile(File& nf) const;
 	virtual void writeToFile(File& nf) const;
-	~Data() { delete m_holder; }
+	virtual ~Data() { delete m_holder; }
     };
 
    File& operator<<(File& nf, const ISerialisable& obj);

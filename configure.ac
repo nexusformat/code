@@ -28,10 +28,10 @@ dnl                       -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_PREREQ(2.52)
+AC_PREREQ(2.61)
 AC_REVISION($Revision$)
 AC_INIT([NeXus Library], [4.1.0], [nexus-developers@nexusformat.org], [nexus])
-AC_COPYRIGHT([Copyright (C) 2004 Freddie Akeroyd 
+AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
