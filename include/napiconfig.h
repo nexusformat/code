@@ -4,19 +4,13 @@
 #include <nxconfig.h>
 
 /*
- * Type definitions
+ * Integer type definitions
+ * 
+ * int32_t etc will be defined by configure in nxconfig.h 
+ * if they exist; otherwise include an appropriate header
  */
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
-#else
-typedef signed char             int8_t;
-typedef short int               int16_t;
-typedef int                     int32_t;
-typedef long                    int64_t;
-typedef unsigned char           uint8_t;
-typedef unsigned short int      uint16_t;
-typedef unsigned int            uint32_t;
-typedef unsigned long           uint64_t;
-
 #endif /* HAVE_STDINT_H */
+
 #endif /* NAPICONFIG_H */
