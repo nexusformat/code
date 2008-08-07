@@ -340,18 +340,32 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     NXname pText;
 
     buffer[0] = '\0';
-    for(i = 0; i < pFile->iStackPtr; i++){
+    for(i = 1; i <= pFile->iStackPtr; i++){
       strncat(buffer,"/",bufLen-strlen(buffer));
-      groupID = Vattach(pFile->iVID,pFile->iStack[pFile->iStackPtr].iVref,
-			 "r");
-      Vgetname(groupID, pText);
-      strncat(buffer,pText,bufLen-strlen(buffer));
-      Vdetach(groupID);
+      groupID = Vattach(pFile->iVID,pFile->iStack[i].iVref, "r");
+      if (groupID != -1)
+      {
+          if (Vgetname(groupID, pText) != -1) {
+              strncat(buffer,pText,bufLen-strlen(buffer));
+          } else {
+              NXIReportError (NXpData, "ERROR: NXIbuildPath cannot get vgroup name");
+          }
+          Vdetach(groupID);
+      }
+      else
+      {
+          NXIReportError (NXpData, "ERROR: NXIbuildPath cannot attach to vgroup");
+      }
     }
     if(pFile->iCurrentSDS != 0){
-      strncat(buffer,"/",bufLen-strlen(buffer));
-      SDgetinfo(pFile->iCurrentSDS,pText,&iA,iDim,&iD1,&iD2);
-      strncat(buffer,pText,bufLen-strlen(buffer));
+      if (SDgetinfo(pFile->iCurrentSDS,pText,&iA,iDim,&iD1,&iD2) != -1) {
+          strncat(buffer,"/",bufLen-strlen(buffer));
+          strncat(buffer,pText,bufLen-strlen(buffer));
+      }
+      else
+      {
+          NXIReportError (NXpData, "ERROR: NXIbuildPath cannot read SDS");
+      }
     }
   } 
   /* ---------------------------------------------------------------------- 
