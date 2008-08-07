@@ -53,11 +53,15 @@ F90_TARGETS = NXdump NXbrowse90
 ## F90_TARGETS =
 endif
 
-bin_PROGRAMS = nxbrowse nx2dtd nxconvert $(F90_TARGETS)
+bin_PROGRAMS = nxbrowse nx2dtd nxconvert nxvalidate $(F90_TARGETS)
 
-nxconvert_SOURCES = nxconvert.c
+nxconvert_SOURCES = nxconvert.c nxconvert_common.c nxconvert_common.h
 nxconvert_LDADD = $(LIBNEXUS)
 nxconvert_LDFLAGS = -static $(LDFLAGS)
+
+nxvalidate_SOURCES = nxvalidate.c nxconvert_common.c nxconvert_common.h
+nxvalidate_LDADD = $(LIBNEXUS)
+nxvalidate_LDFLAGS = -static $(LDFLAGS)
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
