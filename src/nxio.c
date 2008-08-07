@@ -523,6 +523,9 @@ char *nexusWriteCallback(mxml_node_t *node){
   char *buffer, *bufPtr;
   pNXDS dataset;
   int bufsize, i, length, currentLen, table_style = 0; 
+  int is_definition = 0;
+  /* this is set by nxconvert when making a definiton */
+  is_definition = (getenv("NX_IS_DEFINITION") != NULL);
 
   if (!strcmp(node->parent->parent->value.element.name, DATA_NODE_NAME))
   {
@@ -555,7 +558,11 @@ char *nexusWriteCallback(mxml_node_t *node){
     get dataset info
   */
   type = getNXDatasetType(dataset);
-  length = getNXDatasetLength(dataset);
+  if (is_definition) {
+    length = 1;
+  } else {
+    length = getNXDatasetLength(dataset);
+  }
   if(dataset->format != NULL){
     strcpy(format,dataset->format);
   } else {
