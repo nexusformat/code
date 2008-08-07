@@ -218,9 +218,9 @@ AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml | sed -e 's/\r$//' ], [],
 Number of global attributes: 6
    NeXus_version = 4.1.0
    file_name = NXtest.xml
-   xmlns = http://definition.nexusformat.org/schema/1.0
+   xmlns = http://definition.nexusformat.org/schema/3.0
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-   xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
+   xsi:schemaLocation = http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
@@ -268,9 +268,9 @@ AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-static | sed -e 's/\r$//' ]
 Number of global attributes: 6
    NeXus_version = 4.1.0
    file_name = NXtest.xml
-   xmlns = http://definition.nexusformat.org/schema/1.0
+   xmlns = http://definition.nexusformat.org/schema/3.0
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-   xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
+   xsi:schemaLocation = http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
@@ -318,9 +318,9 @@ AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-table-static | sed -e 's/\r
 Number of global attributes: 6
    NeXus_version = 4.1.0
    file_name = NXtest-table.xml
-   xmlns = http://definition.nexusformat.org/schema/1.0
+   xmlns = http://definition.nexusformat.org/schema/3.0
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-   xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
+   xsi:schemaLocation = http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
@@ -539,9 +539,9 @@ AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test_cpp-xml | sed -e 's/\r$//' ], [
 Number of global attributes: 7
    NeXus_version = 4.1.0
    file_name = napi_test_cpp.xml
-   xmlns = http://definition.nexusformat.org/schema/1.0
+   xmlns = http://definition.nexusformat.org/schema/3.0
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-   xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
+   xsi:schemaLocation = http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
 Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
@@ -670,9 +670,9 @@ AT_CHECK([$HAVE_XML && nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep 
 [[NXBrowse 4.1.0 Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski
     NeXus_version = 4.1.0
     file_name = NXtest.xml
-    xmlns = http://definition.nexusformat.org/schema/1.0
+    xmlns = http://definition.nexusformat.org/schema/3.0
     xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-    xsi:schemaLocation = http://definition.nexusformat.org/schema/1.0 http://definition.nexusformat.org/schema/1.0/BASE.xsd
+    xsi:schemaLocation = http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
 NX>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
              entry attribute: cucumber = passion
