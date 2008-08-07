@@ -2,6 +2,7 @@
 // REMOVE
 #include <iostream>
 #include <sstream>
+#include "napiconfig.h"
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
 
