@@ -29,31 +29,21 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "napi.h"
-
-static int WriteGroup (int write_data);
-static int WriteAttributes (int write_data);
-
-static NXhandle inId, outId;
-
-#define NX_XML		0
-#define NX_HDF4		1
-#define NX_HDF5		2
-#define NX_DTD		3
+#include "nxconvert_common.h"
 
 static void print_usage()
 {
-    printf("Usage: nxconvert [ -x | -h4 | -h5 | -o keepws | -o table ] [ infile ] [ outfile ]\n");
+    printf("Usage: nxconvert [ -x | -h4 | -h5 | -d | -o keepws | -o table ] [ infile ] [ outfile ]\n");
 }
 
 #define NXCONVERT_EXIT_ERROR	exit(1)
 
-static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DTD", NULL };
+static const char* definition_name = "BASE";
 
 int main(int argc, char *argv[])
 {
    char inFile[256], outFile[256], *stringPtr;
    int opt, nx_format = -1, nx_write_access = 0;
-   int nx_write_data = 1;
    int nx_read_access = NXACC_READ;
 
    while( (opt = getopt(argc, argv, "h:xdo:")) != -1 )
@@ -72,13 +62,14 @@ int main(int argc, char *argv[])
 	    nx_write_access |= NXACC_CREATEXML;
 	    break;
 
-/*
 	  case 'd':
-	    nx_format = NX_DTD;
+	    nx_format = NX_DEFINITION;
 	    nx_write_access |= NXACC_CREATEXML;
-	    nx_write_data = 0; 
+	    if (optarg != NULL && *optarg != '\0')
+	    {
+		definition_name = optarg;
+	    }
 	    break;
-*/
 
 	  case 'h':
 	    if (!strcmp(optarg, "4") || !strcmp(optarg, "df4"))
@@ -152,113 +143,10 @@ int main(int argc, char *argv[])
    }
    printf("Converting %s to %s NeXus file %s\n", inFile, nx_formats[nx_format], outFile);
 
-/* Open NeXus input file and NeXus output file */
-   if (NXopen (inFile, nx_read_access, &inId) != NX_OK) {
-      printf ("NX_ERROR: Can't open %s\n", inFile);
+   if (convert_file(nx_format, inFile, nx_read_access, outFile, nx_write_access) != NX_OK) {
       NXCONVERT_EXIT_ERROR;
-   }
-
-   if (NXopen (outFile, nx_write_access, &outId) != NX_OK) {
-      printf ("NX_ERROR: Can't open %s\n", outFile);
-      NXCONVERT_EXIT_ERROR;
-   }
-   
-/* Output global attributes */
-   if (WriteAttributes (nx_write_data) != NX_OK)
-   {
-	NXCONVERT_EXIT_ERROR;
-   }
-/* Recursively cycle through the groups printing the contents */
-   if (WriteGroup (nx_write_data) != NX_OK)
-   {
-	NXCONVERT_EXIT_ERROR;
-   }
-/* Close the input and output files */
-   if (NXclose (&outId) != NX_OK)
-   {
-	NXCONVERT_EXIT_ERROR;
-   }
-   if (NXclose (&inId) != NX_OK)
-   {
-	NXCONVERT_EXIT_ERROR;
    }
    printf("Convertion successful.\n");
    return 0;
-}
-
-/* Prints the contents of each group as XML tags and values */
-int WriteGroup (int write_data)
-{ 
-   int status, dataType, dataRank, dataDimensions[NX_MAXRANK], dataLen;     
-   NXname name, class;
-   void *dataBuffer;
-
-   do {
-      status = NXgetnextentry (inId, name, class, &dataType);
-      if (status == NX_ERROR) return NX_ERROR;
-      if (status == NX_OK) {
-         if (!strncmp(class,"NX",2)) {
-            if (NXopengroup (inId, name, class) != NX_OK) return NX_ERROR;
-            if (NXmakegroup (outId, name, class) != NX_OK) return NX_ERROR;
-            if (NXopengroup (outId, name, class) != NX_OK) return NX_ERROR;
-            if (WriteGroup (write_data) != NX_OK) return NX_ERROR;
-         }
-         else if (!strncmp(class,"SDS",3)) {
-            if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
-            if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
-            if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
-            if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
-            if (WriteAttributes (write_data) != NX_OK) return NX_ERROR;
-	    if (write_data == 1)
-	    {
-                if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
-                if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
-                if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
-                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
-	    }
-            if (NXclosedata (inId) != NX_OK) return NX_ERROR;
-            if (NXclosedata (outId) != NX_OK) return NX_ERROR;
-         }
-      }
-      else if (status == NX_EOD) {
-         if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
-         if (NXclosegroup (outId) != NX_OK) return NX_ERROR;
-         return NX_OK;
-      }
-   } while (status == NX_OK);
-   return NX_OK;
-}
-
-int WriteAttributes (int write_data)
-{
-   int status, i, attrLen, attrType;
-   NXname attrName;
-   void *attrBuffer;
-
-   i = 0;
-   do {
-      status = NXgetnextattr (inId, attrName, &attrLen, &attrType);
-      if (status == NX_ERROR) return NX_ERROR;
-      if (status == NX_OK) {
-         if (strcmp(attrName, "NeXus_version") && strcmp(attrName, "XML_version") &&
-             strcmp(attrName, "HDF_version") && strcmp(attrName, "HDF5_Version") && 
-             strcmp(attrName, "file_name") && strcmp(attrName, "file_time")) {
-            attrLen++; /* Add space for string termination */
-            if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return NX_ERROR;
-            if (NXgetattr (inId, attrName, attrBuffer, &attrLen , &attrType) != NX_OK) return NX_ERROR;
-	    if (write_data == 1)
-	    {
-                if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
-	    }
-	    else
-   	    {
-                if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
-	    }
-            if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
-         }
-         i++;
-      }
-   } while (status != NX_EOD);
-   return NX_OK;
 }
 
