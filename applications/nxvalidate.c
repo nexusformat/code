@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 	NXVALIDATE_ERROR_EXIT;
    }
 
-   if (WIFEXITED(ret) && (WEXITSTATUS(ret) == 0))
+   if (WIFEXITED(ret) && (WEXITSTATUS(ret) != 0))
    {
 	printf("* Validation via http://definition.nexusformat.org/ of %s failed\n", inFile);
 	printf("* If \"wget\" was unable to load the schema files from the web, check your \"http_proxy\" environment variable\n");
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
    }
    else
    {
-	printf("* Validation via http://definition.nexusformat.org/ of %s OK", inFile);
+	printf("* Validation via http://definition.nexusformat.org/ of %s OK\n", inFile);
    }
    return 0;
 }
