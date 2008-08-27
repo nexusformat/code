@@ -52,7 +52,9 @@ extern	void *NXpData;
     int iStackPtr;
     char iAccess[2];
   } NexusFile, *pNexusFile;
-
+   /*-------------------------------------------------------------------*/
+   static void ignoreError(void *data, char *text){
+   }
    /*--------------------------------------------------------------------*/
 
   static pNexusFile NXIassert(NXhandle fid)
@@ -1285,7 +1287,9 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4getdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile pFile;
-  
+    ErrFunc oldErr;
+    int datalen, type = NX_CHAR;
+
     pFile = NXIassert (fid);
   
     if (pFile->iCurrentSDS == 0) {
@@ -1294,7 +1298,15 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     } else {
       sRes->iTag = DFTAG_NDG;
       sRes->iRef = SDidtoref (pFile->iCurrentSDS);
-      NXIbuildPath(pFile,sRes->targetPath,1024);
+      oldErr = NXMGetError();
+      NXMSetError(NXpData, ignoreError);
+      datalen = 1024;
+      memset(&sRes->targetPath,0,1024);
+      if(NX4getattr(fid,"target",&sRes->targetPath,&datalen,&type) != NX_OK)
+      {
+	NXIbuildPath(pFile,sRes->targetPath,1024);
+      }
+      NXMSetError(NXpData,oldErr);
       return NX_OK;
     }
     sRes->iTag = NX_ERROR;

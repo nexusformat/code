@@ -99,9 +99,9 @@ int writeTest(const string& filename, NXaccess create_code) {
   grossezahl.push_back(777777777777LL);
 #else
   grossezahl.push_back(12);
-  grossezahl.push_back(555555555555);
+  grossezahl.push_back(555555);
   grossezahl.push_back(23);
-  grossezahl.push_back(777777777777);
+  grossezahl.push_back(77777);
 #endif
   if (create_code != NXACC_CREATE) {
     file.writeData("grosszahl", grossezahl);
