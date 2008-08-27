@@ -522,6 +522,7 @@ case $host in
 esac
 AC_CHECK_LIB(rpc, xdr_float)
 AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_LIB(pthread, pthread_create)
 AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(jpeg, jpeg_CreateCompress)
 AC_CHECK_LIB(sz, SZ_Compress)
