@@ -181,6 +181,19 @@ AC_ARG_WITH([idlroot],
 	[if test $withval != no; then IDLROOT=$withval; fi])
 AM_CONDITIONAL(HAVE_IDL, [test "$IDLROOT" != ""])
 
+AC_ARG_WITH([doxygen], AC_HELP_STRING([--with-doxygen=/path/to/doxygen], [Specify path to doxygen]), [with_doxygen=$withval], [with_doxygen=no])
+if test x"$with_doxygen" != x"no" ; then
+	if test x"$with_doxygen" != x"yes" ; then DOXYGEN="$with_doxygen"; fi
+	AC_CHECK_PROGS(DOXYGEN,[doxygen])
+	AC_CHECK_PROGS(DOT,[dot])
+	AC_CHECK_PROGS(PDFLATEX,[pdflatex])
+	AC_PROG_CXX
+else
+	DOXYGEN=
+	PDFLATEX=
+	DOT=
+fi
+
 AC_SUBST(FCFLAGS)
 AC_SUBST(JAVACFLAGS)
 AC_SUBST(SHARED_LDFLAGS)
@@ -234,10 +247,6 @@ AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
-# for doxygen
-AC_CHECK_PROGS(PDFLATEX,[pdflatex])
-AC_CHECK_PROGS(DOXYGEN,[doxygen])
-AC_CHECK_PROGS(DOT,[dot])
 
 
 dnl  flags for building swig guile bindings
@@ -649,10 +658,14 @@ AC_OUTPUT
 if test ! -z "$DOXYGEN" -a ! -z "$PDFLATEX" -a ! -z "$DOT"; then
     DOXYGENDOCS="yes"
 else
-    DOXYGENDOCS="no  - missing "
-    if test -z "$DOXYGEN"; then DOXYGENDOCS="$DOXYGENDOCS doxygen"; fi
-    if test -z "$PDFLATEX"; then DOXYGENDOCS="$DOXYGENDOCS pdflatex"; fi
-    if test -z "$DOT"; then DOXYGENDOCS="$DOXYGENDOCS graphviz"; fi
+    if test x"$with_doxygen" != x"no" ; then
+        DOXYGENDOCS="no  - missing "
+        if test -z "$DOXYGEN"; then DOXYGENDOCS="$DOXYGENDOCS doxygen"; fi
+        if test -z "$PDFLATEX"; then DOXYGENDOCS="$DOXYGENDOCS pdflatex"; fi
+        if test -z "$DOT"; then DOXYGENDOCS="$DOXYGENDOCS graphviz"; fi
+    else
+        DOXYGENDOCS="no    --with-doxygen  not specified"
+    fi
 fi
 
 if test ! -z "$DOCBOOK2TXT" -a ! -z "$DOCBOOK2PDF"; then
