@@ -78,6 +78,22 @@ else
 	CXX=
 fi
 
+AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
+	[with_f77=$withval], [with_f77=no])
+if test x"$with_f77" != x"no" ; then
+	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
+	AC_PROG_F77
+	dnl Check FORTRAN compiler options
+	dnl 	AC_CHECK_F77_OPTION([-Wno-globals])
+	dnl 	AC_CHECK_F77_OPTION([-fno-common])  # use with caution
+	mytop=`pwd`
+	dnl get right F77 include option
+	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
+	AC_F77_LIBRARY_LDFLAGS
+else
+	F77=
+fi
+
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
 	[with_f90=$withval], [with_f90=no])
 if test x"$with_f90" != x"no" ; then
@@ -100,22 +116,6 @@ if test x"$with_f90" != x"no" ; then
 #        if test x$with_f77=xno; then with_f77=yes; fi
 else
 	FC=
-fi
-
-AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[with_f77=$withval], [with_f77=no])
-if test x"$with_f77" != x"no" ; then
-	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
-	AC_PROG_F77
-	dnl Check FORTRAN compiler options
-	dnl 	AC_CHECK_F77_OPTION([-Wno-globals])
-	dnl 	AC_CHECK_F77_OPTION([-fno-common])  # use with caution
-	mytop=`pwd`
-	dnl get right F77 include option
-	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
-	AC_F77_LIBRARY_LDFLAGS
-else
-	F77=
 fi
 
 java_host="linux"
@@ -579,7 +579,7 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
-AM_CONDITIONAL(HAVE_F77, [test ! -z "$F77"])
+AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
 AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
