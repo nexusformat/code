@@ -562,6 +562,8 @@ AC_CHECK_SIZEOF([long int])
 AC_CHECK_SIZEOF([long long int])
 AC_STRUCT_TM
 
+AC_SYS_LARGEFILE
+
 if test $MINGW_MSYS = yes; then
 AC_DEFINE([PRINTF_INT64],["I64d"],[Set to printf format for int64_t])
 AC_DEFINE([PRINTF_UINT64],["I64u"],[Set to printf format for uint64_t])
