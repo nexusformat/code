@@ -40,7 +40,7 @@ AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml NXtest-table.xml \
 	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
-	nxtranslate nxsummary nxconvert nxdir nxbrowse
+	nxtranslate nxsummary nxconvert nxvalidate nxdir nxbrowse
 
 
 ## testdir=$(prefix)/nexus/test
@@ -90,6 +90,10 @@ nxsummary:
 	fi
 
 nxconvert:
+	rm -f $@
+	ln -s ../applications/$@$(EXEEXT) $@
+
+nxvalidate:
 	rm -f $@
 	ln -s ../applications/$@$(EXEEXT) $@
 
@@ -237,7 +241,7 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	} > $(srcdir)/package.m4
 
-check-local: atconfig atlocal nxconvert nxsummary nxdir nxbrowse nxtranslate $(TESTSUITE) 
+check-local: atconfig atlocal nxconvert nxvalidate nxsummary nxdir nxbrowse nxtranslate $(TESTSUITE) 
 	$(TESTS_ENVIRONMENT) $(SHELL) $(TESTSUITE)
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4

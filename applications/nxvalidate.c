@@ -40,6 +40,7 @@ static void print_usage()
     printf("      (default: try to run \"xmllint\" program locally\n");
     printf("-d    Use specified definiton (default: BASE)\n");
     printf("-k    keep temporary files\n");
+    printf("-q    quiet (only report errors)\n");
 }
 
 static int url_encode(char c, FILE* f)
@@ -72,6 +73,8 @@ static int url_encode(char c, FILE* f)
 
 static const char* definition_name = "BASE";
 
+static int quiet = 0;
+
 int main(int argc, char *argv[])
 {
    char inFile[256], outFile[256], command[512], outFile2[256], *strPtr;
@@ -79,7 +82,7 @@ int main(int argc, char *argv[])
    FILE *fIn, *fOut2;
    int keep_temps = 0;
 
-   while( (opt = getopt(argc, argv, "wkhd:")) != -1 )
+   while( (opt = getopt(argc, argv, "wqkhd:")) != -1 )
    {
 /* use with "-:" in getopt	
 	if (opt == '-')
@@ -102,6 +105,10 @@ int main(int argc, char *argv[])
 	    print_usage();
 	    return 0;
 
+	  case 'q':
+            quiet = 1;
+            break;
+	
 	  case 'w':
 	    use_web = 1;
 	    break;
@@ -128,7 +135,9 @@ int main(int argc, char *argv[])
    {
      strcpy (inFile, argv[optind]);
    }
-   printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
+   if (!quiet) {
+      printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
+   }
 
    sprintf(outFile, "%s/%s.XXXXXX", P_tmpdir, inFile);
    if ( (fd = mkstemp(outFile)) == -1 )
@@ -144,8 +153,10 @@ int main(int argc, char *argv[])
    }
    if (use_web == 0)
    {
-       printf("* Validating using locally installed \"xmllint\" program\n");
-       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/3.0/%s.xsd \"%s\"", definition_name, outFile);
+       if (!quiet) {
+           printf("* Validating using locally installed \"xmllint\" program\n");
+       }
+       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/3.0/%s.xsd \"%s\" %s", definition_name, outFile, (quiet ? "> /dev/null 2>&1" : ""));
        ret = system(command);
        if (ret != -1 && WIFEXITED(ret))
        {
@@ -161,7 +172,9 @@ int main(int argc, char *argv[])
 	    }
 	    else
 	    {
-	        printf("* Validation with \"xmllint\" of %s OK\n", inFile);
+	        if (!quiet) {
+                    printf("* Validation with \"xmllint\" of %s OK\n", inFile);
+                }
 	        return 0;
 	    }
        }
@@ -189,8 +202,10 @@ int main(int argc, char *argv[])
    }
    fclose(fIn);
    fclose(fOut2);
-   printf("* Validating via http://definition.nexusformat.org using \"wget\"\n");
-   sprintf(command, "wget --quiet -O - --post-file=\"%s\" http://definition.nexusformat.org/validate/run", outFile2);
+   if (!quiet) {
+       printf("* Validating via http://definition.nexusformat.org using \"wget\"\n");
+   }
+   sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/validate/run", (quiet ? "/dev/null" : "-"), outFile2);
    ret = system(command);
    if (!keep_temps)
    {
@@ -209,7 +224,7 @@ int main(int argc, char *argv[])
 	printf("* If \"wget\" was unable to load the schema files from the web, check your \"http_proxy\" environment variable\n");
 	NXVALIDATE_ERROR_EXIT;
    }
-   else
+   else if (!quiet)
    {
 	printf("* Validation via http://definition.nexusformat.org/ of %s OK\n", inFile);
    }
