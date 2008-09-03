@@ -563,8 +563,8 @@ AC_CHECK_SIZEOF([long long int])
 AC_STRUCT_TM
 
 AC_SYS_LARGEFILE
-case $ac_cv_sys_file_offset_bits in
-  no | unknown) 
+case "$ac_cv_sys_file_offset_bits" in
+  "no" | "unknown" | "") 
     ;;
   *)
     CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=$ac_cv_sys_file_offset_bits"
