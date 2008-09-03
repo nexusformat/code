@@ -563,6 +563,14 @@ AC_CHECK_SIZEOF([long long int])
 AC_STRUCT_TM
 
 AC_SYS_LARGEFILE
+case $ac_cv_sys_file_offset_bits in
+  no | unknown) 
+    ;;
+  *)
+    CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=$ac_cv_sys_file_offset_bits"
+    CXXFLAGS="$CXXFLAGS -D_FILE_OFFSET_BITS=$ac_cv_sys_file_offset_bits"
+    ;;
+esac
 
 if test $MINGW_MSYS = yes; then
 AC_DEFINE([PRINTF_INT64],["I64d"],[Set to printf format for int64_t])
