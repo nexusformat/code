@@ -54,6 +54,7 @@ int main (int argc, char *argv[])
   char group_name[64], class_name[64];
   char c1_array[5][4] = {{'a', 'b', 'c' ,'d'}, {'e', 'f', 'g' ,'h'}, 
      {'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'}, {'q', 'r', 's' , 't'}};
+  int unlimited_cdims[2] = {NX_UNLIMITED, 4};
   NXhandle fileid;
   NXlink glink, dlink, blink;
   int comp_array[100][20];
@@ -179,6 +180,19 @@ int main (int argc, char *argv[])
            if (NXputdata (fileid, "NeXus sample") != NX_OK) return 1;
         if (NXclosedata (fileid) != NX_OK) return 1;
         if (NXgetgroupID (fileid, &glink) != NX_OK) return 1;
+        if (nx_creation_code & NXACC_CREATEXML == 0) {
+            if (NXmakedata (fileid, "cdata_unlimited", NX_CHAR, 2, unlimited_cdims) != NX_OK) return 1;
+	    if (NXopendata (fileid, "cdata_unlimited") != NX_OK) return 1;
+	    slab_size[0] = 1;
+	    slab_size[1] = 4;
+	    slab_start[1] = 0;
+            for (i = 0; i < 5; i++)
+            {
+	       slab_start[0] = i;
+               if (NXputslab (fileid, &(c1_array[i][0]), slab_start, slab_size) != NX_OK) return 1;
+            }
+            if (NXclosedata (fileid) != NX_OK) return 1;
+        }
      if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXclosegroup (fileid) != NX_OK) return 1;
   if (NXmakegroup (fileid, "link", "NXentry") != NX_OK) return 1;

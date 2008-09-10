@@ -986,6 +986,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
     {
         mySize[rank - 1] = 1;
+        size[rank - 1] = 1;
         myStart[rank - 1] = 0;
     }
     dataspace = H5Screate_simple (rank, mySize, NULL);
