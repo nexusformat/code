@@ -581,11 +581,15 @@ AC_DEFINE([PRINTF_UINT64],["llu"],[Set to printf format for uint64_t])
 fi
 
 dnl Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_MEMCMP
+#this can cause link errors with rpl_malloc undefined
+#AC_FUNC_MALLOC
+#this no needed
+#AC_FUNC_MEMCMP
 #this hangs on FC9 at the moment
 #AC_FUNC_MKTIME
-AC_FUNC_STRFTIME
+
+#AC_FUNC_STRFTIME
+
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
 
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
