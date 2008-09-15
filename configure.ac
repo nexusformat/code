@@ -359,6 +359,7 @@ case $host in
 	CPPFLAGS="$CPPFLAGS -D__unix"
 	CFLAGS="$CFLAGS -g"
 	FFLAGS="$FFLAGS -g"
+	HDF5_EXT=dylib
 dnl This is a hack for libtool - for some reason the F77 tag
 dnl does not get set with the commands to create a shared library
 	AC_MSG_NOTICE([Patching libtool for F77 shared linking])
@@ -404,15 +405,15 @@ AC_SUBST(MXMLROOT)
 AC_ARG_WITH([hdf4],
 	AC_HELP_STRING([--with-hdf4=/path/to/hdf4],
                        [Specify location of HDF4 files]),
-	[if test $withval != no; then H4ROOT=$withval; fi])
+	[if test $withval != no -a $withval != yes; then H4ROOT=$withval; fi])
 AC_ARG_WITH([hdf5],
 	AC_HELP_STRING([--with-hdf5=/path/to/hdf5],
                        [Specify location of HDF5 files]),
-	[if test $withval != no; then H5ROOT=$withval; fi])
+	[if test $withval != no -a $withval != yes; then H5ROOT=$withval; fi])
 AC_ARG_WITH([xml],
 	AC_HELP_STRING([--with-xml=/path/to/mxml],
                        [Specify location of MXML library files]),
-	[if test $withval != no; then MXMLROOT=$withval; fi])
+	[if test $withval != no -a $withval != yes; then MXMLROOT=$withval; fi])
 dnl otherwise try and find HDF path, but not if
 dnl e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
 dnl first HDF4

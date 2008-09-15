@@ -39,9 +39,9 @@ case $autoconfversion in
 esac
 
 case $automakeversion in
-    *1.[4-9].*)
+    *1.[4-9]*)
 	;;
-    *1.1[0-9].*)
+    *1.1[0-9]*)
 	;;
     *)
 	echo "This automake version is not supported by NeXus."

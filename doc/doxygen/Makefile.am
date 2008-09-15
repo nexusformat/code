@@ -24,9 +24,9 @@ endif
 endif
 	touch doxy.remove_me_to_remake
 
-clean-local :
-	rm -fr html latex refman.pdf
-
+if HAVE_DOXYGEN
+if HAVE_PDFLATEX
+if HAVE_DOT
 dist-hook :
 	test -f $(srcdir)/refman.pdf && cp $(srcdir)/refman.pdf $(distdir)
 	if test -d $(srcdir)/html; then \
@@ -42,6 +42,12 @@ install-data-local :
 		find $(DESTDIR)$(nxdoxydir) -type f -exec chmod 0644 {} \; ;\
 		find $(DESTDIR)$(nxdoxydir) -type d -exec chmod 0755 {} \; ;\
 	fi
+endif
+endif
+endif
+
+clean-local :
+	rm -fr html latex refman.pdf
 
 uninstall-local :
 	rm -fr $(DESTDIR)$(nxdoxydir)

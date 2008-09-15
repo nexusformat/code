@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <wait.h>
+#include <sys/wait.h>
 #include "napi.h"
 #include "nxconvert_common.h"
 
