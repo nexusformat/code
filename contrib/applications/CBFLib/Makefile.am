@@ -27,7 +27,7 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(CBFLIBROOT)/include
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(CBFLIBROOT)/include/cbflib -I$(CBFLIBROOT)/include
 
 bin_PROGRAMS = cbf2nx
 
