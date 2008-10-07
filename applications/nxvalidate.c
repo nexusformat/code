@@ -56,6 +56,12 @@ static int mkstemp(char* template)
 }
 #endif
 
+#ifdef _WIN32
+#define NULL_DEVICE "NL:"
+#else
+#define NULL_DEVICE "/dev/null"
+#endif
+
 static void print_usage()
 {
     printf("Usage: nxvalidate [-w] [ -d definition ] [ infile ]\n\n");
@@ -179,7 +185,7 @@ int main(int argc, char *argv[])
        if (!quiet) {
            printf("* Validating using locally installed \"xmllint\" program\n");
        }
-       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/3.0/%s.xsd \"%s\" %s", definition_name, outFile, (quiet ? "> /dev/null 2>&1" : ""));
+       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/3.0/%s.xsd \"%s\" %s", definition_name, outFile, (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
        ret = system(command);
        if (ret != -1 && WIFEXITED(ret))
        {
@@ -228,7 +234,7 @@ int main(int argc, char *argv[])
    if (!quiet) {
        printf("* Validating via http://definition.nexusformat.org using \"wget\"\n");
    }
-   sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/validate/run", (quiet ? "/dev/null" : "-"), outFile2);
+   sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/validate/run", (quiet ? NULL_DEVICE : "-"), outFile2);
    ret = system(command);
    if (!keep_temps)
    {
