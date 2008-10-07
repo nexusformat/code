@@ -29,9 +29,32 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/wait.h>
 #include "napi.h"
+#include "napiconfig.h"
 #include "nxconvert_common.h"
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
+#endif
+#ifndef WIFEXITED
+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif
+#if HAVE_MKSTEMP
+#else
+static int mkstemp(char* template)
+{
+    if (mktemp(template) != NULL)
+    {
+	return open(template, O_RDWR | O_CREAT, 0600);
+    }
+    else
+    {
+	return -1;
+    }
+}
+#endif
 
 static void print_usage()
 {

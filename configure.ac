@@ -543,6 +543,7 @@ AC_CHECK_LIB(xml2, xmlParseDocument)
 
 dnl Checks for header files.
 AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([stdlib.h string.h stdint.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -591,7 +592,7 @@ dnl Checks for library functions.
 
 #AC_FUNC_STRFTIME
 
-AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset])
+AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
