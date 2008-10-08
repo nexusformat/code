@@ -91,24 +91,25 @@ namespace NeXus {
     return UINT64;
   }
 
-  template<>
-  NXnumtype getType(char number) {
-    return CHAR;
-  }
-
 }
 
 // check type sizes - uses a trick that you cannot allocate an 
 // array of negative length
-static int check_float_too_big[4 - sizeof(float)]; // error if float > 4 bytes
-static int check_float_too_small[sizeof(float) - 4]; // error if float < 4 bytes
-static int check_double_too_big[8 - sizeof(double)]; // error if double > 8 bytes
-static int check_double_too_small[sizeof(double) - 8]; // error if double < 8 bytes
-static int check_char_too_big[1 - sizeof(char)]; // error if char > 1 byte
+#ifdef _MSC_VER
+#define ARRAY_OFFSET	1	/* cannot dimension an array with zero elements */
+#else
+#define ARRAY_OFFSET	0	/* can dimension an array with zero elements */
+#endif /* _MSC_VER */
+
+static int check_float_too_big[4 - sizeof(float) + ARRAY_OFFSET]; // error if float > 4 bytes
+static int check_float_too_small[sizeof(float) - 4 + ARRAY_OFFSET]; // error if float < 4 bytes
+static int check_double_too_big[8 - sizeof(double) + ARRAY_OFFSET]; // error if double > 8 bytes
+static int check_double_too_small[sizeof(double) - 8 + ARRAY_OFFSET]; // error if double < 8 bytes
+static int check_char_too_big[1 - sizeof(char) + ARRAY_OFFSET]; // error if char > 1 byte
 
 void inner_malloc(void* & data, std::vector<int>& dims, NXnumtype type) {
   int rank = dims.size();
-  int c_dims[rank];
+  int c_dims[NX_MAXRANK];
   for (int i = 0; i < rank; i++) {
     c_dims[i] = dims[i];
   }
@@ -205,9 +206,7 @@ void File::openPath(const string& path) {
   if (path.empty()) {
     throw Exception("Supplied empty path to openPath");
   }
-  char c_path[path.size() + 1];
-  strcpy(c_path, path.c_str());
-  NXstatus status = NXopenpath(this->m_file_id, c_path);
+  NXstatus status = NXopenpath(this->m_file_id, path.c_str());
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXopenpath(" << path << ") failed";
@@ -610,8 +609,9 @@ string File::getStrData() {
         << info.dims.size();
     throw Exception(msg.str());
   }
-  char value[info.dims[0]+1]; // probably do not need +1, but being safe
+  char* value = new char[info.dims[0]+1]; // probably do not need +1, but being safe
   this->getData(value);
+  delete[] value;
   return string(value, info.dims[0]);
 }
 
@@ -691,11 +691,11 @@ void File::getSlab(void* data, const vector<int>& start,
   }
 
   int rank = start.size();
-  int i_start[rank];
+  int i_start[NX_MAXRANK];
   for (int i = 0; i < rank; i++) {
     i_start[i] = start[i];
   }
-  int i_size[rank];
+  int i_size[NX_MAXRANK];
   for (int i = 0; i < rank; i++) {
     i_size[i] = size[i];
   }
@@ -784,8 +784,9 @@ string File::getStrAttr(const AttrInfo & info) {
         << ") found type=" << info.type;
     throw Exception(msg.str());
   }
-  char value[info.length + 1];
+  char* value = new char[info.length + 1];
   this->getAttr(info, value, info.length+1);
+  delete[] value;
   return string(value, info.length);
 }
 
@@ -853,33 +854,41 @@ void File::setNumberFormat(NXnumtype& type, const string& format) {
 }
 
 string File::inquireFile(const int buff_length) {
-  char c_filename[buff_length];
+  string filename;
+  char* c_filename = new char[buff_length];
   NXstatus status = NXinquirefile(this->m_file_id, c_filename, buff_length);
   if (status != NX_OK) {
+    delete[] c_filename;
     stringstream msg;
     msg << "NXinquirefile(" << buff_length << ") failed";
     throw Exception(msg.str(), status);
   }
-  return string(c_filename);
+  filename = c_filename;
+  delete[] c_filename;
+  return filename;
 }
 
 string File::isExternalGroup(const string& name, const string& type,
                              const unsigned buff_length) {
+  string url; 
   if (name.empty()) {
     throw Exception("Supplied empty name to isExternalGroup");
   }
   if (type.empty()) {
     throw Exception("Supplied empty type to isExternalGroup");
   }
-  char url[buff_length];
+  char* c_url = new char[buff_length];
   NXstatus status = NXisexternalgroup(this->m_file_id, name.c_str(),
-                                      type.c_str(), url, buff_length);
+                                      type.c_str(), c_url, buff_length);
   if (status != NX_OK) {
+    delete[] c_url;
     stringstream msg;
     msg << "NXisexternalgroup(" <<  type << ", " << buff_length << ")";
     throw Exception(msg.str(), buff_length);
   }
-  return string(url);
+  url = c_url;
+  delete[] c_url;
+  return url;
 }
 
 void File::linkExternal(const string& name, const string& type,

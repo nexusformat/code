@@ -1,3 +1,6 @@
+#ifndef NAPI4_H
+#define NAPI4_H
+
 #define NXSIGNATURE 959697
 
 #include "mfhdf.h"
@@ -53,3 +56,5 @@ void NX4assignFunctions(pNexusFunction fHandle);
 #ifndef H4_MAX_VAR_DIMS
 #define H4_MAX_VAR_DIMS	MAX_VAR_DIMS
 #endif
+
+#endif /* NAPI4_H */

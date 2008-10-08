@@ -53,7 +53,9 @@ static int iFortifyScope;
 #define LIBSEP ":"
 #define PATHSEP "/"
 #endif
-extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
+
+#include "nx_stptok.h"
+
 /*---------------------------------------------------------------------
  wrapper for getenv. This is a future proofing thing for porting to OS
  which have different ways of accessing environment variables

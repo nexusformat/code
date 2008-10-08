@@ -46,12 +46,15 @@ source_files = Split("""NeXusFile.cpp
 #Import environment
 Import('env')
 myenv = env.Clone()
-myenv.Append(CPPPATH=['#/include'])
+myenv.Append(CPPPATH=['#include'])
+myenv_static=myenv.Clone()
+myenv_dynamic=myenv.Clone()
+
 
 shared_objects = nexus_scons_utils.getSharedObjects(source_files, myenv)
 
 #BUILD CODE
-shared = myenv.SharedLibrary('lib/NeXusCPP', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='lib/NeXusCPP.pdb')
-static = myenv.StaticLibrary('libstatic/NeXusCPP', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='libstatic/NeXusCPP.pdb')
+shared = myenv_dynamic.SharedLibrary('lib/NeXusCPP', source_files, LIBS=env['MYSHLIBLIST'], LIBPATH=env['MYSHLIBDIRLIST'], PDB='lib/NeXusCPP.pdb')
+static = myenv_static.StaticLibrary('libstatic/NeXusCPP', source_files, LIBS=env['MYLIBLIST'], LIBPATH=env['MYLIBDIRLIST'], PDB='libstatic/NeXusCPP.pdb')
 retval = { 'shared': shared, 'static': static, 'sharedobjs' : shared_objects, 'libs': [ 'NeXusCPP' ] }
 Return('retval')

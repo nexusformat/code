@@ -7,6 +7,8 @@
 #include <vector>
 #include "napi.h"
 
+#define DLL_EXPORT __declspec(dllexport)
+
 /**
  * \file
  * Documentation for the NeXus C++ API.
@@ -80,7 +82,7 @@ namespace NeXus {
   /**
    * The Object that allows access to the information in the file.
    */
-  class File
+  class DLL_EXPORT File
   {
   private:
     /** The handle for the C-API. */

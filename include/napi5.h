@@ -1,3 +1,6 @@
+#ifndef NAPI5_H
+#define NAPI5_H
+
 #define NX5SIGNATURE 959695
 
 #include <hdf5.h>
@@ -46,3 +49,4 @@ herr_t nxgroup_info(hid_t loc_id, const char *name, void *op_data);
 herr_t attr_info(hid_t loc_id, const char *name, void *opdata);
 herr_t group_info(hid_t loc_id, const char *name, void *opdata);
 
+#endif /* NAPI5_H */

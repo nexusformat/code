@@ -12,6 +12,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include "nx_stptok.h"
 
 char *stptok(const char *s, char *tok, size_t toklen, char *brk)
 {
@@ -37,7 +38,7 @@ char *stptok(const char *s, char *tok, size_t toklen, char *brk)
       return (char *)s;
 }
 /*---------------------------------------------------------------------------*/
- char *SkipSpace(char *pText)
+ static char *SkipSpace(char *pText)
  {
    char *pRes;
    

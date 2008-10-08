@@ -1337,7 +1337,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
     strncpy((char *)data, attribute, *datalen-1);
     ((char*)data)[*datalen-1] = '\0';
     /* *datalen = strlen(attribute); */
-    *datalen = strlen(data);
+    *datalen = strlen((char*)data);
     *iType = NX_CHAR;
     break;
   case NX_INT32:

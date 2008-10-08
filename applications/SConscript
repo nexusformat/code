@@ -42,10 +42,12 @@ shared_list = env['SHARED_LIST']
 static_list = env['STATIC_LIST']
 libList = env['MYLIBLIST']
 libDirList = env['MYLIBDIRLIST']
+shlibList = env['MYSHLIBLIST']
+shlibDirList = env['MYSHLIBDIRLIST']
 
 myenv_dynamic = myenv.Clone()
-myenv_dynamic.Append(LIBS=libList)
-myenv_dynamic.Append(LIBPATH=libDirList)
+myenv_dynamic.Append(LIBS=shlibList)
+myenv_dynamic.Append(LIBPATH=shlibDirList)
 myenv_dynamic.Append(LIBPATH='#Bin/Shared')
 shared = myenv_dynamic.Program('nxbrowse',['NXbrowse.c'],PDB='nxbrowse.pdb')
 

@@ -61,38 +61,73 @@ print 'Current path == ',os.getcwd()
 cwdpath=os.getcwd()
 uppath=os.path.abspath('../')
 
+shlibList = []
 libList = []
 if not env.GetOption('clean'): # do not re-rerun checking on a "scons -c"
 	conf = Configure(env)
 #	if conf.CheckLib()
 	env = conf.Finish()
 
+shlibDirList = []
 libDirList = []
 cflags = []
+shcflags = []
+cxxflags = []
+shcxxflags = []
+ccflags = []
+shccflags = []
 dirList = []
 cppPaths = []
-cppDefines = [ ('HDF4',1), ('HDF5',1), ('NXXML',1) ]
-
+cppDefines = [ ('HDF5',1), ('NXXML',1), ('HDF4',1) ]
 #Get paths
 if os.name == 'nt': 
 	print "* COMMENCING WINDOWS BUILD *"
 
 	libList.append('hdf5')
-	libDirList.append('c:\\')
+	libList.append('szlib')
+	libList.append('zlib')
+	libList.append('hd423.lib')
+	libList.append('hm423.lib')
+	libList.append('xdr.lib')
+	libList.append('libjpeg.lib')
+	libList.append('ws2_32.lib')
+	libList.append('mxml_libcmt.lib')
+	shlibList.append('hdf5dll')
+	shlibList.append('hd423m.lib')
+	shlibList.append('hm423m.lib')
+	shlibList.append('mxml_msvcrt.lib')
+	libDirList.append('C:/Program Files/hdf/jpeg6-vs2005/lib')
+	libDirList.append('c:/program files/hdf/5-167-win-vs2005/lib') 
+	libDirList.append('c:/program files/hdf/42r3-win-vs2005/lib')
+	shlibDirList.append('c:/program files/hdf/5-167-win-vs2005/dll')
+	shlibDirList.append('c:/program files/hdf/42r3-win-vs2005/dll')
+	shlibDirList.append('c:/msys/1.0/local/lib')
+#	libDirList.append('C:/Program Files/hdf/zlib123-vs2005/lib')
+	libDirList.append('C:/Install Kits/zlib-1.2.3')
+	libDirList.append('C:/Program Files/hdf/szip21-vs2005-noenc/lib')
+	libDirList.append('c:/msys/1.0/local/lib')
+	cppPaths.append(['c:/msys/1.0/local/include','c:/program files/hdf/5-167-win-vs2005/include','c:/program files/hdf/42r3-win-vs2005/include'])
 
 	if int(mingw) :
 		cflags = ['-g', '-O2']
 		env.Append(LINKFLAGS=['-g','-Wl,--export-all-symbols'])
+		shcflags.append(['-D_HDF5USEDLL_=1'])
 	else :
 		if int(debug) :
-			cflags = [ '/W3', '/Od', '/FD', '/EHsc', '/MDd', '/TP', '/D_DEBUG', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275', '/wd4996' ]
+			ccflags = [ '/W3', '/Od', '/FD', '/EHsc', '/MTd', '/TP', '/D_DEBUG', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275', '/wd4996' ]
+			shccflags = [ '/W3', '/Od', '/FD', '/EHsc', '/MDd', '/TP', '/D_DEBUG', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275', '/wd4996' ]
 		else :
-			cflags = ['/Ox', '/Ot', '/W3','/EHsc', '/MD', '/TP', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275']
-
+			cflags = [ '/TC' ]
+			shcflags = cflags
+			cxxflags = [ '/TP' ]
+			shcxxflags = cxxflags
+			ccflags = ['/Ox', '/Ot', '/W3','/EHsc', '/MT', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275']
+			shccflags = ['/Ox', '/Ot', '/W3','/EHsc', '/MD', '/DMS_VISUAL_STUDIO=1', '/DWIN32', '/D_WINDOWS', '/DWINVER=0x0500', '/D_USE_MATH_DEFINES', '/D_SCL_SECURE_NO_WARNINGS', '/D_CRT_SECURE_NO_WARNINGS', '/wd4275']
+		cppPaths.append(['#Windows_extra/include'])
+		shccflags.append(['/D_HDF5USEDLL_=1'])
 else :
 	print "* COMMENCING LINUX BUILD *"
 	cflags.append(['-Wall','-Wno-unused-variable','-Wno-sign-compare','-Wno-comment'])
-	cppPaths.append(['/usr/include/hdf'])
 	if int(debug) :
 	    cflags.append(['-g','-O0'])
 	else :
@@ -102,12 +137,23 @@ else :
 	libList.append(['hdf5','mfhdf','df','mxml','jpeg','z'])
 	libDirList.append(['/usr/lib64/hdf','/usr/lib/hdf'])
 
+libDirList.append('#Bin/Static')
+shlibDirList.append('#Bin/Shared')
+
 #Export for SConscripts
-env.Append(CFLAGS=cflags)
+env.Replace(SHOBJSUFFIX='.sob') # force separate shared and static objects
+env.Replace(CFLAGS=cflags)
+env.Replace(SHCFLAGS=shcflags)
+env.Append(CXXFLAGS=cxxflags)
+env.Append(SHCXXFLAGS=shcxxflags)
+env.Replace(CCFLAGS=ccflags)
+env.Replace(SHCCFLAGS=shccflags)
 env.Append(CPPPATH=cppPaths)
 env.Append(CPPDEFINES=cppDefines)
 env.Replace(MYLIBLIST=libList)
 env.Replace(MYLIBDIRLIST=libDirList)
+env.Replace(MYSHLIBLIST=shlibList)
+env.Replace(MYSHLIBDIRLIST=shlibDirList)
 
 Export('env')
 
@@ -123,6 +169,7 @@ static_libraries = []
 shared_objects = []
 lib_list = []
 orig_libs = env['MYLIBLIST']
+shorig_libs = env['MYSHLIBLIST']
 
 for subproj in subProjs:
 	ret = SConscript([subproj+'/SConscript'])
@@ -133,6 +180,7 @@ for subproj in subProjs:
 	shared_objects = shared_objects + ret['sharedobjs']
 	lib_list.insert(0,ret['libs'])
 	env.Replace(MYLIBLIST=lib_list + orig_libs)
+	env.Replace(MYSHLIBLIST=lib_list + shorig_libs)
 
 env.Replace(SHARED_LIST=shared_libraries)
 env.Replace(STATIC_LIST=static_libraries)
