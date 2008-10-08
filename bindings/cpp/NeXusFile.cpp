@@ -596,6 +596,7 @@ void File::getData(vector<NumT>& data) {
 }
 
 string File::getStrData() {
+  string res;
   Info info = this->getInfo();
   if (info.type != NX_CHAR) {
     stringstream msg;
@@ -611,8 +612,9 @@ string File::getStrData() {
   }
   char* value = new char[info.dims[0]+1]; // probably do not need +1, but being safe
   this->getData(value);
+  res = string(value, info.dims[0]);
   delete[] value;
-  return string(value, info.dims[0]);
+  return res;
 }
 
 Info File::getInfo() {
@@ -778,6 +780,7 @@ void File::getAttr(const std::string& name, NumT& value)
  
 
 string File::getStrAttr(const AttrInfo & info) {
+  string res;
   if (info.type != CHAR) {
     stringstream msg;
     msg << "getStrAttr only works with strings (type=" << CHAR
@@ -786,8 +789,9 @@ string File::getStrAttr(const AttrInfo & info) {
   }
   char* value = new char[info.length + 1];
   this->getAttr(info, value, info.length+1);
+  res = string(value, info.length);
   delete[] value;
-  return string(value, info.length);
+  return res;
 }
 
 vector<AttrInfo> File::getAttrInfos() {

@@ -47,21 +47,20 @@ source_files = Split("""napi4.c
                         napiu.c
                         nxdataset.c
                         nxstack.c
-                        napi_exports.c
-                        napi_exports2.c
                         stptok.c""")
 
-# 
-#                        
 
 #Import environment
 Import('env')
 myenv = env.Clone()
 myenv.Append(CPPDEFINES=[('IN_NEXUS_LIBRARY',1),('H5_USE_16_API',1)])
 myenv.Append(CPPPATH=['#/include'])
-mydef=File('#/Windows_extra/libNeXus-0.def')
-myenv.Append(SHLINKFLAGS=['/DEF:'+str(mydef)])
 #print myenv.Dump()
+
+if os.name == 'nt': 
+    source_files.append(['napi_exports.c','napi_exports2.c'])
+    mydef=File('#/Windows_extra/libNeXus-0.def')
+    myenv.Append(SHLINKFLAGS=['/DEF:'+str(mydef)])
 
 shared_objects = nexus_scons_utils.getSharedObjects(source_files, myenv)
 

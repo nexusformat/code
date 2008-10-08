@@ -25,8 +25,13 @@
 #             
 #  For further information, see http://www.nexusformat.org/
 #
-#
 #====================================================================
+####################### Subversion Reposity details ########################
+# Repository Location     $HeadURL$
+# Revision of last commit $LastChangedRevision$ 
+# Date of last commit     $LastChangedDate$
+# Author of last commit   $LastChangedBy$
+############################################################################
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 lib_LTLIBRARIES=libNeXusCPP.la
 

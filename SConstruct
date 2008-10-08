@@ -127,15 +127,20 @@ if os.name == 'nt':
 		shccflags.append(['/D_HDF5USEDLL_=1'])
 else :
 	print "* COMMENCING LINUX BUILD *"
-	cflags.append(['-Wall','-Wno-unused-variable','-Wno-sign-compare','-Wno-comment'])
+	ccflags.append(['-Wall','-Wno-unused-variable','-Wno-sign-compare','-Wno-comment'])
 	if int(debug) :
-	    cflags.append(['-g','-O0'])
+	    ccflags.append(['-g','-O0'])
 	else :
-	    cflags.append(['-g','-O3'])
+	    ccflags.append(['-g','-O3'])
+	ccflags.append(['-fPIC'])
+	shccflags = ccflags
 
 	env.Append(LINKFLAGS=['-g'])
 	libList.append(['hdf5','mfhdf','df','mxml','jpeg','z'])
 	libDirList.append(['/usr/lib64/hdf','/usr/lib/hdf'])
+	shlibList.append(['hdf5','mfhdf','df','mxml','jpeg','z'])
+	shlibDirList.append(['/usr/lib64/hdf','/usr/lib/hdf'])
+	cppPaths.append(['/usr/include/hdf'])
 
 libDirList.append('#Bin/Static')
 shlibDirList.append('#Bin/Shared')

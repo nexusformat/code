@@ -30,7 +30,7 @@
 // Repository Location     $HeadURL$
 // Revision of last commit $LastChangedRevision$ 
 // Date of last commit     $LastChangedDate$
-// Author of last commit   $Author$
+// Author of last commit   $LastChangedBy$
 //////////////////////////////////////////////////////////////////////////
 
 /**
