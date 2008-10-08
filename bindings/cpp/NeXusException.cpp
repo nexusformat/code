@@ -1,6 +1,7 @@
 #include "NeXusException.hpp"
 
-using namespace NeXus;
+namespace NeXus
+{
 
 Exception::Exception(const std::string& msg, const int status) :
   std::runtime_error(msg) {
@@ -17,4 +18,6 @@ int Exception::status() throw() {
 }
 
 Exception::~Exception() throw() {
+}
+
 }
