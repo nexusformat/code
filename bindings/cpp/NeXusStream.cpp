@@ -29,7 +29,7 @@
 // Repository Location     $HeadURL$
 // Revision of last commit $LastChangedRevision$ 
 // Date of last commit     $LastChangedDate$
-// Author of last commit   $Author$
+// Author of last commit   $LastChangedBy$
 //////////////////////////////////////////////////////////////////////////
 
 /**
@@ -40,6 +40,7 @@
  */
 
 #include <iostream>
+#include "napiconfig.h"
 #include "NeXusStream.hpp"
 #include "NeXusException.hpp"
 namespace NeXus {
