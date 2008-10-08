@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
    if (!quiet) {
        printf("* Validating via http://definition.nexusformat.org using \"wget\"\n");
    }
-   sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/validate/run", (quiet ? NULL_DEVICE : "-"), outFile2);
+   sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/dovalidate/run", (quiet ? NULL_DEVICE : "-"), outFile2);
    ret = system(command);
    if (!keep_temps)
    {
