@@ -620,7 +620,15 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
                                   int datalen, int iType)
   {
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    return pFunc->nxputattr(pFunc->pNexusData, name, data, datalen, iType);
+    if (datalen > 1 && iType != NX_CHAR)
+    {
+	NXIReportError(NXpData,"NXputattr: numeric arrays are not allowed as attributes - only character strings and single numbers");
+	return NX_ERROR;
+    }
+    else
+    {
+        return pFunc->nxputattr(pFunc->pNexusData, name, data, datalen, iType);
+    }
   }
 
   /* ------------------------------------------------------------------- */
