@@ -58,7 +58,7 @@ myenv.Append(CPPPATH=['#/include'])
 #print myenv.Dump()
 
 if os.name == 'nt': 
-    source_files.append(['napi_exports.c','napi_exports2.c'])
+    source_files.extend(['napi_exports.c','napi_exports2.c'])
     mydef=File('#/Windows_extra/libNeXus-0.def')
     myenv.Append(SHLINKFLAGS=['/DEF:'+str(mydef)])
 
