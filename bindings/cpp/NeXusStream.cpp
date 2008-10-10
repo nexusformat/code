@@ -173,11 +173,11 @@ DataHolder<NumT>::DataHolder(const std::vector<NumT>& value) : HolderBase(""), m
 {
 }
 
-template class DLL_EXPORT AttrHolder<double>;
-template class DLL_EXPORT AttrHolder<int>;
+template class NXDLL_EXPORT AttrHolder<double>;
+template class NXDLL_EXPORT AttrHolder<int>;
 
-template class DLL_EXPORT DataHolder<double>;
-template class DLL_EXPORT DataHolder<int>;
+template class NXDLL_EXPORT DataHolder<double>;
+template class NXDLL_EXPORT DataHolder<int>;
 
 void Data::readFromFile(File& nf) const
 {

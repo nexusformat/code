@@ -9,12 +9,12 @@
 
 #ifdef _WIN32
 #  if IN_NEXUS_CPP_LIBRARY
-#    define DLL_EXPORT __declspec(dllexport)
+#    define NXDLL_EXPORT __declspec(dllexport)
 #  else
-#    define DLL_EXPORT __declspec(dllimport)
+#    define NXDLL_EXPORT __declspec(dllimport)
 #  endif
 #else
-#  define DLL_EXPORT 
+#  define NXDLL_EXPORT 
 #endif /* _WIN32 */
 
 /**
@@ -90,7 +90,7 @@ namespace NeXus {
   /**
    * The Object that allows access to the information in the file.
    */
-  class DLL_EXPORT File
+  class NXDLL_EXPORT File
   {
   private:
     /** The handle for the C-API. */
@@ -542,7 +542,7 @@ namespace NeXus {
    * This function returns the NXnumtype given a concrete number.
    */
    template <typename NumT>
-     DLL_EXPORT NXnumtype getType(NumT number = NumT());
+     NXDLL_EXPORT NXnumtype getType(NumT number = NumT());
 
 
 };
