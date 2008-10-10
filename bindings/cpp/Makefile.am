@@ -39,6 +39,6 @@ libNeXusCPP_la_SOURCES=NeXusFile.hpp NeXusFile.cpp NeXusException.hpp NeXusExcep
 libNeXusCPP_la_LIBADD=$(LIBNEXUS)
 libNeXusCPP_la_LDFLAGS=@SHARED_LDFLAGS@ $(LDFLAGS)
 
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -DIN_NEXUS_CPP_LIBRARY=1
 
 include $(top_srcdir)/build_rules.am

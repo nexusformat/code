@@ -8,9 +8,13 @@
 #include "napi.h"
 
 #ifdef _WIN32
-#define DLL_EXPORT __declspec(dllexport)
+#  if IN_NEXUS_CPP_LIBRARY
+#    define DLL_EXPORT __declspec(dllexport)
+#  else
+#    define DLL_EXPORT __declspec(dllimport)
+#  endif
 #else
-#define DLL_EXPORT 
+#  define DLL_EXPORT 
 #endif /* _WIN32 */
 
 /**
@@ -537,8 +541,8 @@ namespace NeXus {
   /**
    * This function returns the NXnumtype given a concrete number.
    */
-  template <typename NumT>
-  NXnumtype getType(NumT number = NumT());
+   template <typename NumT>
+     DLL_EXPORT NXnumtype getType(NumT number = NumT());
 
 
 };

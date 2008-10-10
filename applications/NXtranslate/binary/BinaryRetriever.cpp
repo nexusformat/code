@@ -15,15 +15,15 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-static const string INT8("INT8");
-static const string INT16("INT16");
-static const string INT32("INT32");
-static const string UINT8("UINT8");
-static const string UINT16("UINT16");
-static const string UINT32("UINT32");
-static const string FLOAT32("FLOAT32");
-static const string FLOAT64("FLOAT64");
-static const string BYTE("BYTE");
+static const string myINT8("INT8");
+static const string myINT16("INT16");
+static const string myINT32("INT32");
+static const string myUINT8("UINT8");
+static const string myUINT16("UINT16");
+static const string myUINT32("UINT32");
+static const string myFLOAT32("FLOAT32");
+static const string myFLOAT64("FLOAT64");
+static const string myBYTE("BYTE");
 
 static const int DEFAULT_TYPE=NX_UINT32;
 
@@ -96,23 +96,23 @@ static bool increment_position(const vector<int> &offset,
 static int getDataType(const string &str_type){
   if(str_type.empty()){
     return DEFAULT_TYPE;
-  }else if(str_type==INT8){
+  }else if(str_type==myINT8){
     return NX_INT8;
-  }else if(str_type==INT16){
+  }else if(str_type==myINT16){
     return NX_INT16;
-  }else if(str_type==INT32){
+  }else if(str_type==myINT32){
     return NX_INT32;
-  }else if(str_type==UINT8){
+  }else if(str_type==myUINT8){
     return NX_UINT8;
-  }else if(str_type==UINT16){
+  }else if(str_type==myUINT16){
     return NX_UINT16;
-  }else if(str_type==UINT32){
+  }else if(str_type==myUINT32){
     return NX_UINT32;
-  }else if(str_type==FLOAT32){
+  }else if(str_type==myFLOAT32){
     return NX_FLOAT32;
-  }else if(str_type==FLOAT64){
+  }else if(str_type==myFLOAT64){
     return NX_FLOAT64;
-  }else if(str_type==BYTE){
+  }else if(str_type==myBYTE){
     return NX_CHAR;
   }else{
     throw invalid_argument("Invalid type: "+str_type);

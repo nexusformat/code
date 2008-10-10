@@ -200,3 +200,7 @@ for i in range(len(shared_objects)) :
 ret = SConscript(['applications/SConscript'])
 env.Install('Bin/Shared', ret['shared'])
 env.Install('Bin/Static', ret['static'])
+
+ret = SConscript(['test/SConscript'])
+env.Install('Bin/Shared', ret['shared'])
+env.Install('Bin/Static', ret['static'])

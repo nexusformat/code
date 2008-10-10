@@ -49,7 +49,7 @@ namespace NeXus
 namespace Stream
 {
     // interface implemented by all serialisable NeXus components
-    class ISerialisable
+    class DLL_EXPORT ISerialisable
     {
       public:
 	virtual void readFromFile(File& nf) const = 0;
@@ -58,7 +58,7 @@ namespace Stream
 
     enum StreamModifier { Close=0 };
 
-    class HolderBase : public ISerialisable
+    class DLL_EXPORT HolderBase : public ISerialisable
     {
       protected:
 	std::string m_name;
@@ -74,7 +74,7 @@ namespace Stream
     };
 
     template<typename NumT>
-    class AttrHolder : public HolderBase
+    class DLL_EXPORT AttrHolder : public HolderBase
     {
       protected:
 	const NumT* m_c_value;
@@ -94,7 +94,7 @@ namespace Stream
 	virtual ~AttrHolder() { m_value = NULL; m_c_value = NULL; }
     };
 
-    class Attr : public ISerialisable
+    class DLL_EXPORT Attr : public ISerialisable
     {
       protected:
 	HolderBase* m_holder;
@@ -120,7 +120,7 @@ namespace Stream
     };
 
     
-    class ObjectWithAttr : public ISerialisable
+    class DLL_EXPORT ObjectWithAttr : public ISerialisable
     {
        protected:
 	std::list<Attr> m_attr;
@@ -163,7 +163,7 @@ namespace Stream
 	virtual ~ObjectWithAttr() { }
     };
     
-    class Group : public ObjectWithAttr
+    class DLL_EXPORT Group : public ObjectWithAttr
     {
       protected:
         std::string m_name;
@@ -192,7 +192,7 @@ namespace Stream
     };
 
     template<typename NumT>
-    class DataHolder : public HolderBase
+    class DLL_EXPORT DataHolder : public HolderBase
     {
       protected:
 	const std::vector<NumT>* m_c_value;
@@ -213,7 +213,7 @@ namespace Stream
 	virtual ~DataHolder() {}
     };
 
-    class Data : public ObjectWithAttr
+    class DLL_EXPORT Data : public ObjectWithAttr
     {
 	HolderBase* m_holder;
 	
@@ -244,12 +244,11 @@ namespace Stream
 	virtual ~Data() { delete m_holder; }
     };
 
-   File& operator<<(File& nf, const ISerialisable& obj);
-   File& operator>>(File& nf, const ISerialisable& obj);
+   DLL_EXPORT File& operator<<(File& nf, const ISerialisable& obj);
+   DLL_EXPORT File& operator>>(File& nf, const ISerialisable& obj);
 
-
-   File& operator<<(File& nf, const StreamModifier sm);
-   File& operator>>(File& nf, const StreamModifier sm);
+   DLL_EXPORT File& operator<<(File& nf, const StreamModifier sm);
+   DLL_EXPORT File& operator>>(File& nf, const StreamModifier sm);
 
   } // Stream
 } // NeXus
