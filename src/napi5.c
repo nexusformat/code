@@ -380,7 +380,6 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
       return NX_ERROR;
     }
     iVID = iRet;
-    strncpy(pFile->name_ref,pBuffer,1023);
     aid2 = H5Screate(H5S_SCALAR);
     aid1 = H5Tcopy(H5T_C_S1);
     H5Tset_size(aid1, strlen(nxclass));
