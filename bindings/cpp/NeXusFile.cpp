@@ -13,7 +13,7 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
-const string NULL_STR = "NULL";
+static const string NULL_STR = "NULL";
 
 template <typename NumT>
 static string toString(const vector<NumT>& data) {

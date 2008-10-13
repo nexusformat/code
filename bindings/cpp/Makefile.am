@@ -41,4 +41,22 @@ libNeXusCPP_la_LDFLAGS=@SHARED_LDFLAGS@ $(LDFLAGS)
 
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include -DIN_NEXUS_CPP_LIBRARY=1
 
+if MINGW_MSYS
+MINGW_CXXFLAGS=-Wl,--export-all-symbols
+msimplibdir = ${libdir}
+libNeXusCPP.def: libNeXusCPP.la
+	pexports .libs/libNeXusCPP-0.dll > libNeXusCPP.def
+if HAVE_MS_LIB
+msimplib_DATA = libNeXusCPP.dll.lib libNeXusCPP.dll.exp libNeXusCPP.def
+libNeXusCPP.dll.exp: libNeXusCPP.dll.lib
+libNeXusCPP.dll.lib: libNeXusCPP.def
+	rm -f libNeXusCPP.dll.lib libNeXusCPP.dll.exp
+	$(MS_LIB) /MACHINE:I386 /DEF:libNeXusCPP.def /OUT:libNeXusCPP.dll.lib
+else
+msimplib_DATA = libNeXusCPP.def
+endif
+endif
+
+AM_CXXFLAGS=-prefer-pic $(MINGW_CXXFLAGS)
+
 include $(top_srcdir)/build_rules.am
