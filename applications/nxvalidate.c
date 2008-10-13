@@ -57,10 +57,14 @@ static int mkstemp(char* template)
 #endif
 
 #ifdef _WIN32
-#define NULL_DEVICE "NL:"
+#define NULL_DEVICE "NUL"
+#define DIR_SEPARATOR "\\"
+#define TMP_DIR getenv("TEMP")
 #else
 #define NULL_DEVICE "/dev/null"
-#endif
+#define DIR_SEPARATOR "/"
+#define TMP_DIR P_tmpdir
+#endif /* _WIN32 */
 
 static void print_usage()
 {
@@ -168,7 +172,7 @@ int main(int argc, char *argv[])
       printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
    }
 
-   sprintf(outFile, "%s/%s.XXXXXX", P_tmpdir, inFile);
+   sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
    if ( (fd = mkstemp(outFile)) == -1 )
    {
 	printf("error\n");
@@ -210,7 +214,7 @@ int main(int argc, char *argv[])
        printf("* Unable to find \"xmllint\" to validate file - will try web validation\n");
        printf("* \"xmllint\" is installed as part of libxml2 from xmlsoft.org\n");
    }
-   sprintf(outFile2, "%s/%s.XXXXXX", P_tmpdir, inFile);
+   sprintf(outFile2, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
    if ( (fd = mkstemp(outFile2)) == -1 )
    {
 	printf("error\n");
