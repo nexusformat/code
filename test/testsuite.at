@@ -702,15 +702,15 @@ AT_CHECK([$HAVE_XML && nxdir NXtest.xml | sed -e 's/\r$//' ],[],
 AT_CLEANUP
 
 AT_BANNER([[Testing validating files with the nxvalidate tool.]])
-AT_SETUP([Checking HDF4 test file])
-AT_CHECK([$HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4 -q && nxvalidate -q -w NXtest.hdf | sed -e 's/\r$//' ],[], 
+AT_SETUP([Checking HDF4 test file via web (wget)])
+AT_CHECK([$HAVE_HDF4 && $HAVE_WGET && $SETUP_TEST && napi_test-hdf4 -q && nxvalidate -q -w NXtest.hdf | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 test file])
-AT_CHECK([$HAVE_HDF4 && $SETUP_TEST && napi_test-hdf5 -q && nxvalidate -q -w NXtest.h5 | sed -e 's/\r$//' ],[], 
+AT_SETUP([Checking HDF5 test file via web (wget)])
+AT_CHECK([$HAVE_HDF4 && $HAVE_WGET && $SETUP_TEST && napi_test-hdf5 -q && nxvalidate -q -w NXtest.h5 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
-AT_SETUP([Checking XML test file])
-AT_CHECK([$HAVE_HDF4 && $SETUP_TEST && napi_test-xml -q && nxvalidate -q -w NXtest.xml | sed -e 's/\r$//' ],[], 
+AT_SETUP([Checking XML test file via web (wget)])
+AT_CHECK([$HAVE_HDF4 && $HAVE_WGET && $SETUP_TEST && napi_test-xml -q && nxvalidate -q -w NXtest.xml | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP

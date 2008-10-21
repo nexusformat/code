@@ -247,6 +247,8 @@ AC_CHECK_PROGS(DOCBOOK2TXT,[docbook2txt])
 AC_CHECK_PROGS(TCLSH,[tclsh])
 AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
+AC_CHECK_PROGS(WGET,[wget])
+AC_CHECK_PROGS(XMLLINT,[xmllint])
 
 
 dnl  flags for building swig guile bindings
@@ -617,6 +619,9 @@ AM_CONDITIONAL(HAVE_OPENGENIE, [test ! -z "$OPENGENIEROOT"])
 AM_CONDITIONAL(HAVE_DOXYGEN, [test ! -z "$DOXYGEN"])
 AM_CONDITIONAL(HAVE_PDFLATEX, [test ! -z "$PDFLATEX"])
 AM_CONDITIONAL(HAVE_DOT, [test ! -z "$DOT"])
+
+AM_CONDITIONAL(HAVE_WGET, [test ! -z "$WGET"])
+AM_CONDITIONAL(HAVE_XMLLINT, [test ! -z "$XMLLINT"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)

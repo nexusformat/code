@@ -56,3 +56,17 @@ else
 fi
 export HAVE_NXTRANSLATE
 #
+if test ! -z "@WGET@"; then
+    HAVE_WGET=run_test
+else
+    HAVE_WGET=skip_test
+fi
+export HAVE_WGET
+#
+if test ! -z "@XMLLINT@"; then
+    HAVE_XMLLINT=run_test
+else
+    HAVE_XMLLINT=skip_test
+fi
+export HAVE_XMLLINT
+#
