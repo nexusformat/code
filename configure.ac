@@ -419,6 +419,7 @@ AC_ARG_WITH([xml],
 dnl otherwise try and find HDF path, but not if
 dnl e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
 dnl first HDF4
+EXTRA_LDPATH=""
 HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
@@ -449,10 +450,12 @@ if test "$H4ROOT"; then
     H4VERSION=$H4MAJORVERSION.$H4MINORVERSION.$H4RELEASE
     case $H4VERSION in
 	4.[[12]]*) 
-    		HDF4_LDFLAGS="-lmfhdf -ldf";
+    		HDF4_LDFLAGS="";
 		for j in lib lib64; do
 		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then HDF4_LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $HDF4_LDFLAGS"; fi
 		done
+		EXTRA_LDPATH="$EXTRA_LDPATH $HDF4_LDFLAGS"
+    		HDF4_LDFLAGS="$HDF4_LDFLAGS -lmfhdf -ldf";
 		if test -z "$H4INCSUBROOT"; then
     		    HDF4_CPPFLAGS="-I$H4ROOT/include -DHDF4"
 		else
@@ -486,10 +489,12 @@ if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
 	1.[[68]]*)
-    		HDF5_LDFLAGS="-lhdf5 -lz"
+    		HDF5_LDFLAGS=""
 		for j in lib lib64; do
 		    if test -d $H5ROOT/$j; then HDF5_LDFLAGS="-L$H5ROOT/$j $HDF5_LDFLAGS"; fi
 		done
+		EXTRA_LDPATH="$EXTRA_LDPATH $HDF5_LDFLAGS"
+    		HDF5_LDFLAGS="$HDF5_LDFLAGS -lhdf5 -lz"
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5 -DH5_USE_16_API";;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
 		H5ROOT="";;
@@ -518,6 +523,9 @@ if test ! -z "$MXMLROOT"; then
 fi
 AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
+if ! test -z "$EXTRA_LDPATH"; then
+    LDFLAGS="$LDFLAGS $EXTRA_LDPATH"
+fi
 if test -d /usr/local/lib; then
     LDFLAGS="$LDFLAGS -L/usr/local/lib"
 fi
