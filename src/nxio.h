@@ -29,8 +29,8 @@
 
 #define TYPENAME "NAPItype"
 
-#define DIMS_NODE_NAME "Idims"
-#define DATA_NODE_NAME "Idata"
+#define DIMS_NODE_NAME "columns"
+#define DATA_NODE_NAME "row"
 
 mxml_type_t nexusTypeCallback(mxml_node_t *parent);
 const char *NXwhitespaceCallback(mxml_node_t *node, int where);
