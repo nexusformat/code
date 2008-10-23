@@ -529,6 +529,10 @@ fi
 if test -d /usr/local/lib; then
     LDFLAGS="$LDFLAGS -L/usr/local/lib"
 fi
+# for Mac/fink when hdf and hdf5 are not taken from fink, but jpeg is
+if test -d /sw/lib; then
+    LDFLAGS="$LDFLAGS -L/sw/lib"
+fi
 AC_SUBST(LIBG2C)
 
 dnl finally set LIBS variable if we 
