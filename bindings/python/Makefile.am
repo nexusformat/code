@@ -30,7 +30,7 @@
 
 pydocdir 	= $(NXDOCDIR)/python
 pydoc_DATA	= README.html
-pkgpython_PYTHON = nxs.py setup.py nxstest.py
+pkgpython_PYTHON = nxs.py setup.py nxstest.py nexus.py nxsunit.py
 EXTRA_DIST	= README.html
 
 install-data-hook :
