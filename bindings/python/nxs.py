@@ -5,12 +5,15 @@
 """
 Wrapper for the NeXus shared library.
 
+Use this interface when converting code from other languages which
+do not support the natural view of the hierarchy.
 
 Library Location
 ================
 
 This wrapper needs the location of the libNeXus precompiled binary. It
-looks in the following places in order:
+looks in the following places in order::
+
     os.environ['NEXUSLIB']                  - All
     directory containing nxs.py             - All
     os.environ['NEXUSDIR']\bin              - Windows
@@ -20,10 +23,10 @@ looks in the following places in order:
     /usr/local/lib                          - Unix and Darwin
     /usr/lib                                - Unix and Darwin
 
-On Windows it looks for libNeXus.dll and libNeXus-0.dll;
-NEXUSDIR defaults to r'C:\Program Files\NeXus Data Format'
+On Windows it looks for one of libNeXus.dll or libNeXus-0.dll.
 On OS X it looks for libNeXus.dylib
 On Unix it looks for libNeXus.so
+NEXUSDIR defaults to r'C:\Program Files\NeXus Data Format'.
 PREFIX defaults to /usr/local, but is replaced by the value of
 --prefix during configure.
 
@@ -35,22 +38,8 @@ If you are extracting the nexus library from a bundle at runtime, set
 os.environ['NEXUSLIB'] to the path where it is extracted before the
 first import of nxs.
 
-Interface
-=========
-
-Full documentation of the NeXus API is available at nexusformat.org.
-
-This wrapper differs from napi in several respects:
-  - Data values are loaded/stored directly from numpy arrays.
-  - Return codes are turned into exceptions.
-  - The file handle is stored in a file object
-  - Constants are handled somewhat differently (see below)
-  - Type checking on data/parameter storage
-  - Adds iterators file.entries() and file.attrs()
-  - Adds link() function to return the name of the linked to group, if any
-  - NXmalloc/NXfree are not needed.
-
-Example:
+Example
+=======
 
   import nxs
   file = nxs.open('filename.nxs','rw')
@@ -61,7 +50,26 @@ Example:
 
   See nxstest.py for a more complete example.
 
-File open modes can be constants or strings:
+Interface
+=========
+
+When converting code to python from other languages you do not
+necessarily want to redo the file handling code.  The nxs
+provides an interface which more closely follows the
+NeXus application programming interface (NAPI_).
+
+This wrapper differs from NAPI in several respects::
+
+  - Data values are loaded/stored directly from numpy arrays.
+  - Return codes are turned into exceptions.
+  - The file handle is stored in a file object
+  - Constants are handled somewhat differently (see below)
+  - Type checking on data/parameter storage
+  - Adds iterators file.entries() and file.attrs()
+  - Adds link() function to return the name of the linked to group, if any
+  - NXmalloc/NXfree are not needed.
+
+File open modes can be constants or strings::
 
   nxs.ACC_READ      'r'
   nxs.ACC_RDWR      'rw'
@@ -70,30 +78,31 @@ File open modes can be constants or strings:
   nxs.ACC_CREATE5   'w5'
   nxs.ACC_CREATEXML 'wx'
 
-Dimension constants:
+Dimension constants::
 
   nxs.UNLIMITED  - for the extensible data dimension
   nxs.MAXRANK    - for the number of possible dimensions
 
-Data types are strings corresponding to the numpy data types:
+Data types are strings corresponding to the numpy data types::
 
   'float32' 'float64'
   'int8' 'int16' 'int32' 'int64'
   'uint8' 'uint16' 'uint32' 'uint64'
 
-  Use 'char' for strings.  You can use the numpy dtype attribute for the
-  data type.
+  Use 'char' for string data.  
+
+You can use the numpy A.dtype attribute for the type of array A.
 
 Dimensions are lists of integers or numpy arrays.  You can use the
-numpy shape attribute for the dimensions.
+numpy A.shape attribute for the dimensions of array A.
 
-Compression codes are:
+Compression codes are::
 
  'none' 'lzw' 'rle' 'huffman'
 
   As of this writing NeXus only supports 'none' and 'lzw'.
 
-Miscellaneous constants:
+Miscellaneous constants::
 
   nxs.MAXNAMELEN  - names must be shorter than this
   nxs.MAXPATHLEN  - total path length must be shorter than this
@@ -111,7 +120,10 @@ This is an eigenbug:
    - if I use the leak_test1 code in the nexus distribution it doesn't leak
    - if I remove the open/close call in the wrapper it doesn't leak.
 
+.. _NAPI:  http://www.nexusformat.org/Application_Program_Interface
 """
+__all__ = ['MAXNAMELEN','MAXPATHLEN','NeXus','open']
+
 import sys, os, numpy, ctypes
 
 # Defined ctypes

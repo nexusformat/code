@@ -18,7 +18,8 @@ function for transforming values.
 
 Usage example:
 
-    u = nxsunit.Converter('mili*metre')  # Units stored in mm
+    import nxs.unit
+    u = nxs.unit.Converter('mili*metre')  # Units stored in mm
     v = u(3000,'m')  # Convert the value 3000 mm into meters
 
 NeXus example:
@@ -29,7 +30,7 @@ NeXus example:
     # 2. scan the attributes, retrieving 'units'
     units = [for attr,value in file.attrs() if attr == 'units']
     # 3. set up the converter (assumes that units actually exists)
-    u = nxsunit.Converter(units[0])
+    u = nxs.unit.Converter(units[0])
     # 4. read the data and convert to the correct units
     v = u(file.read(),'radians')
 
@@ -42,6 +43,8 @@ about the fields themselves.  If this becomes an issue, we will need to
 allow the application to set the dimension for the units rather than
 getting the dimension from the units as we are currently doing.
 """
+
+__all__ = ['Converter']
 
 # TODO: Add udunits to NAPI rather than reimplementing it in python
 # TODO: Alternatively, parse the udunits database directly

@@ -2,19 +2,21 @@
 # This program is public domain
 
 """
-High level interface to NeXus files.
+Tree view for NeXus files.
 
-Unlike the nxs routines which implement the NeXus API directly, the
-nexus routines preload the entire file structure into memory and use
+Unlike the `nxs.napi` routines which implement the NeXus API directly, the
+`nxs.tree` routines preload the entire file structure into memory and use
 a natural syntax for navigating the data hierarchy.  Large datasets
 are not read until they are needed, and may be read or written one
 slab at a time.
 
 There are a number of functions which operate on files::
 
-  * tree = read(file)   loads a structure from a file
-  * write(file, tree)   saves a structure to a file
-  * dir(file)           display the contents of a file
+    import nxs
+    tree = nxs.read('file.nxs')   # loads a structure from a file
+    nxs.write('copy.nxs', tree)   # saves a structure to a file
+    nxs.dir('copy.nxs')           # display the contents of a file
+
 
 The tree returned from read() has an entry for each group, field and
 attribute.  You can traverse the hierarchy using the names of the
@@ -109,40 +111,41 @@ The read() and write() functions are implemented within a specialized
 NeXus class which allows all the usual API functions.  You can subclass
 this with your own definitions for NXgroup(), NXattr(), SDS() and NXlink()
 if you want to change the nature of the tree.  The properties of these
-classes are closely coupled to the behaviour of read/write so refer to
-the source if you need to do this.
+classes are closely coupled to the behaviour of readfile/writefile so 
+refer to the source if you need to do this.
 """
-__all__ = ['read', 'write', 'dir']
+__all__ = ['read', 'write', 'dir', 'NeXusTree']
 
 from copy import copy, deepcopy
 import numpy
-import nxs
-import nxsunit
+import nxs.napi
+import nxs.unit
 
 
-class NeXus(nxs.NeXus):
+class NeXusTree(nxs.napi.NeXus):
     """
     Structure-based interface to the NeXus file API.
 
-    Usage:
+    Usage::
 
-    file = NeXus(filename, ['r','rw','w'])
-    root = file.read()
-      - read the structure of the NeXus file.  This returns a NeXus tree.
-    file.write(root)
-      - write a NeXus tree to the file.
-    data = file.readpath(path)
-      - read data from a particular path
+      file = NeXusTree(filename, ['r','rw','w'])
+        - open the NeXus file
+      root = file.readfile()
+        - read the structure of the NeXus file.  This returns a NeXus tree.
+      file.writefile(root)
+        - write a NeXus tree to the file.
+      data = file.readpath(path)
+        - read data from a particular path
 
 
     Example::
 
-      nx = NeXus('REF_L_1346.nxs','r')
-      tree = nx.read()
+      nx = NeXusTree('REF_L_1346.nxs','r')
+      tree = nx.readfile()
       for entry in tree.NXentry:
           process(entry)
-      copy = NeXus('modified.nxs','w')
-      copy.write(tree)
+      copy = NeXusTree('modified.nxs','w')
+      copy.writefile(tree)
 
     Note that the large datasets are not loaded immediately.  Instead, the
     when the data set is requested, the file is reopened, the data read, and
@@ -151,7 +154,7 @@ class NeXus(nxs.NeXus):
     The NXdata nodes in the returned tree hold the node values.
 
     """
-    def read(self):
+    def readfile(self):
         """
         Read the nexus file structure from the file.  Reading of large datasets
         will be postponed.  Returns a tree of NXgroup, NXattr, SDS and
@@ -171,7 +174,7 @@ class NeXus(nxs.NeXus):
         self._readlinks(root)
         return root
 
-    def write(self, tree):
+    def writefile(self, tree):
         """
         Write the nexus file structure to the file.  The file is assumed to
         start empty.
@@ -832,23 +835,23 @@ def read(filename, mode='r'):
     """
     Read a NeXus file, returning a tree of nodes
     """
-    file = NeXus(filename,mode)
-    tree = file.read()
+    file = NeXusTree(filename,mode)
+    tree = file.readfile()
     file.close()
     return tree
 
-def write(filename, tree):
+def write(filename, tree, format='w5'):
     """
     Write a NeXus file from a tree of nodes
     """
-    file = NeXus(filename,'w5')
-    file.write(tree)
+    file = NeXusTree(filename, format)
+    file.writefile(tree)
 
 def dir(file):
     """
     Read and summarize the named nexus file.
     """
-    tree = read(file)
+    tree = readfile(file)
     tree.nxtree()
 
 def demo(argv):
@@ -887,3 +890,4 @@ usage: %s cmd [args]
 if __name__ == "__main__":
     import sys
     demo(sys.argv)
+
