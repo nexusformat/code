@@ -122,7 +122,7 @@ This is an eigenbug:
 
 .. _NAPI:  http://www.nexusformat.org/Application_Program_Interface
 """
-__all__ = ['MAXNAMELEN','MAXPATHLEN','NeXus','open']
+__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','NeXus','open']
 
 import sys, os, numpy, ctypes
 

@@ -13,12 +13,12 @@ slab at a time.
 There are a number of functions which operate on files::
 
     import nxs
-    tree = nxs.read('file.nxs')   # loads a structure from a file
-    nxs.write('copy.nxs', tree)   # saves a structure to a file
+    tree = nxs.load('file.nxs')   # loads a structure from a file
+    nxs.save('copy.nxs', tree)    # saves a structure to a file
     nxs.dir('copy.nxs')           # display the contents of a file
 
 
-The tree returned from read() has an entry for each group, field and
+The tree returned from load() has an entry for each group, field and
 attribute.  You can traverse the hierarchy using the names of the
 groups.  For example, tree.Histogram1.instrument.detector.distance
 is a field containing the distance to each pixel in the detector.
@@ -67,7 +67,7 @@ retrieve data from the file in particular units.  For example, if
 detector distance is stored in the file using millimeters you can 
 retrieve them in meters using::
     entry.instrument.detector.distance.nxdata_as('m')
-See help for nxsunit for more details on the unit formats supported.
+See `nxs.unit` for more details on the unit formats supported.
 
 The slab interface to field data works by opening the file handle
 and keeping it open as long as the slab interface is needed.  This
@@ -107,12 +107,18 @@ where signal is the field containing the data, axes are the fields
 listing the signal sample points, entry is file/path within the file
 to the data group and title is the title of the NXentry, if available.
 
-The read() and write() functions are implemented within a specialized
-NeXus class which allows all the usual API functions.  You can subclass
-this with your own definitions for NXgroup(), NXattr(), SDS() and NXlink()
-if you want to change the nature of the tree.  The properties of these
-classes are closely coupled to the behaviour of readfile/writefile so 
-refer to the source if you need to do this.
+The load() and save() functions are implemented within 
+`nxs.tree.NeXusTree`, a subclass of `nxs.napi.NeXus` which allows 
+all the usual API functions.  You can subclass NeXusTree with your
+own version that defines, e.g., a NXmonitor() method to return an
+NXmonitor object when an NXmonitor class is read.  Your NXmonitor
+class should probably be a subclass of NXgroup.
+
+You can also specialize the definitions for the basic types 
+NXgroup(), NXattr(), SDS() and NXlink() if you want to make
+radical changes to the returned structure.  The properties of 
+these classes are closely coupled to the behaviour of the readfile
+and writefile methods so refer to the source if you need to do this.
 """
 __all__ = ['read', 'write', 'dir', 'NeXusTree']
 
@@ -613,7 +619,7 @@ class SDS(NXnode):
             units = attrs['units'].nxdata
         else:
             units = None
-        self._converter = nxsunit.Converter(units)
+        self._converter = nxs.unit.Converter(units)
         self.nxslab = NXslab_context(file, path, self._converter)
 
     def __str__(self):

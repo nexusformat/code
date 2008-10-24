@@ -7,5 +7,4 @@ setup(name='NeXus',
       description='Python Bindings to libNeXus',
       author='Paul Kienzle',
       packages = ['nxs'],
-      package_dir = {'nxs': ''},
       )

@@ -44,8 +44,6 @@ allow the application to set the dimension for the units rather than
 getting the dimension from the units as we are currently doing.
 """
 
-__all__ = ['Converter']
-
 # TODO: Add udunits to NAPI rather than reimplementing it in python
 # TODO: Alternatively, parse the udunits database directly
 # UDUnits:
@@ -54,6 +52,9 @@ __all__ = ['Converter']
 # TODO: Allow application to impose the map on the units
 
 from __future__ import division
+
+__all__ = ['Converter']
+
 import math
 
 
