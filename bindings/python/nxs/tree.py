@@ -4,11 +4,12 @@
 """
 Tree view for NeXus files.
 
-Unlike the `nxs.napi` routines which implement the NeXus API directly, the
-`nxs.tree` routines preload the entire file structure into memory and use
-a natural syntax for navigating the data hierarchy.  Large datasets
-are not read until they are needed, and may be read or written one
-slab at a time.
+The `nxs.tree` routines provide a natural interface to NeXus datasets.
+Entries in a group are referenced much like fields in a class are
+referenced in python.  Rather than following the directory model of
+the `nxs.napi` interface, users are free to reference separate fields
+in the dataset at the same time.  Large datasets are not read until 
+they are needed, and may be read or written one slab at a time.
 
 There are a number of functions which operate on files::
 
@@ -24,9 +25,12 @@ groups.  For example, tree.Histogram1.instrument.detector.distance
 is a field containing the distance to each pixel in the detector.
 NeXus attribute names are tagged with a leading 'A', so for example,
 tree.Histogram1.instrument.detector.distance.Aunits contains the
-units attribute for the detector distances.
+units attribute for the detector distances.  Entries can also
+be referenced by NXclass name, such as tree.NXentry[0].instrument.
+Since there may be multiple entries of the same NXclass, the
+NXclass attribute returns a possibly empty list.
 
-Properties of the nodes in the tree are referenced by nx attributes.
+Properties of the entry in the tree are referenced by nx attributes.
 Depending on the node type, different nx attributes may be available.
 
 Nodes (class NXnode) have attributes shared by both groups and fields::
@@ -53,7 +57,7 @@ Linked fields (class NXlink) have attributes for accessing the link::
     * nxlink     reference to the linked field
 
 Unknown fields (class Unknown) are groups with a name that doesn't
-start with 'NX'.  These groups are not read or written.
+start with 'NX'.  These groups are not loaded or saved.
 
 NeXus attributes (class NXattr) have a type and a value only::
     * nxtype     attribute type
@@ -62,8 +66,8 @@ NeXus attributes (class NXattr) have a type and a value only::
 Data can be stored in the NeXus file in a variety of units, depending
 on which facility is storing the file.  This makes life difficult
 for reduction and analysis programs which must know the units they
-are working with.  Our solution to this problem is to allow you to
-retrieve data from the file in particular units.  For example, if
+are working with.  Our solution to this problem is to allow the reader
+to retrieve data from the file in particular units.  For example, if
 detector distance is stored in the file using millimeters you can 
 retrieve them in meters using::
     entry.instrument.detector.distance.nxdata_as('m')
@@ -76,18 +80,19 @@ is entered, get() and put() methods on the node allow you to read
 and write data a slab at a time.  For example::
 
     # Read a Ni x Nj x Nk array one vector at a time
-    with node.nxslab:
-        size = [1,1,node.nxdims[2]]
-        for i in range(node.nxdims[0]):
-            for j in range(node.nxdims[1]):
-                value = node.nxslab.get([i,j,0],size) # Read counts
+    with root.NXentry[0].data.data as slab:
+        Ni,Nj,Nk = slab.nxdims
+        size = [1,1,Nk]
+        for i in range(Ni):
+            for j in range(Nj):
+                value = slab.get([i,j,0],size)
 
 The equivalent can be done in Python 2.4 and lower using the context
 functions __enter__ and __exit__::
 
-    node.nxslab.__enter__()
+    slab = data.nxslab.__enter__()
     ... do the slab functions ...
-    node.nxslab.__exit__()
+    data.nxslab.__exit__()
 
 You can traverse the tree by component class instead of component name.  
 Since there may be multiple components of the same class in one group
@@ -107,20 +112,14 @@ where signal is the field containing the data, axes are the fields
 listing the signal sample points, entry is file/path within the file
 to the data group and title is the title of the NXentry, if available.
 
-The load() and save() functions are implemented within 
+The load() and save() functions are implemented using the class
 `nxs.tree.NeXusTree`, a subclass of `nxs.napi.NeXus` which allows 
 all the usual API functions.  You can subclass NeXusTree with your
 own version that defines, e.g., a NXmonitor() method to return an
 NXmonitor object when an NXmonitor class is read.  Your NXmonitor
 class should probably be a subclass of NXgroup.
-
-You can also specialize the definitions for the basic types 
-NXgroup(), NXattr(), SDS() and NXlink() if you want to make
-radical changes to the returned structure.  The properties of 
-these classes are closely coupled to the behaviour of the readfile
-and writefile methods so refer to the source if you need to do this.
 """
-__all__ = ['read', 'write', 'dir', 'NeXusTree']
+__all__ = ['load', 'save', 'dir', 'NeXusTree']
 
 from copy import copy, deepcopy
 import numpy
@@ -159,16 +158,16 @@ class NeXusTree(nxs.napi.NeXus):
     read/write slabs without the overhead of moving the file cursor each time.
     The NXdata nodes in the returned tree hold the node values.
 
+    Subclasses can provide methods for individual NeXus classes such
+    as NXbeam or NXdata.  Brave users can also specialize NXgroup, 
+    NXattr, SDS and NXlink methods.
     """
     def readfile(self):
         """
-        Read the nexus file structure from the file.  Reading of large datasets
-        will be postponed.  Returns a tree of NXgroup, NXattr, SDS and
-        NXlink nodes.
-        
-        Subclasses can provide methods for individual NeXus classes such
-        as NXbeam or NXdata.  Brave users can also specialize NXgroup, 
-        NXattr, SDS and NXlink methods.  
+        Read the nexus file structure from the file.  Large datasets
+        are not read until they are needed.  
+
+        Returns a tree of NXgroup, NXattr, SDS and NXlink nodes.
         """
         self.open()
         self.openpath("/")
@@ -509,66 +508,6 @@ class NXnode(object):
         """Print directory tree"""
         print self._str_tree(attrs=attrs,recursive=True)
 
-class NXslab_context(object):
-    """
-    Context manager for NeXus fields.
-    
-    The context manager opens the file and positions the cursor to the
-    correct field.  Data can then be read or written using the get() and
-    put() methods.  See SDS for details on how to use this class.
-    """
-    
-    def __init__(self, file, path, unit_converter):
-        self._file = file
-        self._path = path
-        self._converter = unit_converter
-
-    def __enter__(self):
-        """
-        Open the datapath for reading slab by slab.
-        """
-        self._close_on_exit = not self._file.isopen
-        self._file.open() # Force file open even if closed
-        self._file.openpath(self._path)
-        return self
-
-    def __exit__(self, *args):
-        """
-        Close the file associated the data after reading.
-        """
-        if self._close_on_exit:
-            self._file.close()
-
-    def get(self, offset, size, units=""):
-        """
-        Get a slab from the data array.
-
-        Offsets are 0-origin.  Shape can be inferred from the data.
-        Offset and shape must each have one entry per dimension.
-        
-        If units are specified, convert the values to the given units
-        before returning them.
-
-        Raises ValueError if this fails.
-
-        Corresponds to NXgetslab(handle,data,offset,shape)
-        """
-        value = self._file.getslab(offset,size)
-        return self._converter(value,units)
-
-    def put(self, data, offset):
-        """
-        Put a slab into the data array.
-
-        Offsets are 0-origin.  Shape can be inferred from the data.
-        Offset and shape must each have one entry per dimension.
-
-        Raises ValueError if this fails.
-
-        Corresponds to NXputslab(handle,data,offset,shape)
-        """
-        self._file.putslab(data, offset, data.shape)
-        
 class SDS(NXnode):
     """
     NeXus data node SDS.
@@ -595,11 +534,12 @@ class SDS(NXnode):
     node.nxdata_as(units="mm")    # read the entire dataset as millimeters
 
     # Read a Ni x Nj x Nk array one vector at a time
-    with node.nxslab:
-        size = [1,1,node.nxdims[2]]
-        for i in range(node.nxdims[0]):
-            for j in range(node.nxdims[1]):
-                value = node.nxslab.get([i,j,0],size) # Read counts
+    with root.NXentry[0].data.data as slab:
+        Ni,Nj,Nk = slab.nxdims
+        size = [1,1,Nk]
+        for i in range(Ni):
+            for j in range(Nj):
+                value = slab.get([i,j,0],size)
 
 
     """
@@ -620,8 +560,70 @@ class SDS(NXnode):
         else:
             units = None
         self._converter = nxs.unit.Converter(units)
-        self.nxslab = NXslab_context(file, path, self._converter)
+        self._incontext = False
 
+    def __enter__(self):
+        """
+        Open the datapath for reading slab by slab.
+
+        Note: the results are undefined if you try accessing
+        more than one slab at a time.  Don't nest your 
+        "with data" statements!
+        """
+        # TODO: provide a file lock to prevent movement of the
+        # file cursor when in the slab context.
+        # TODO: if HDF allows multiple cursors, extend napi to support them
+        self._close_on_exit = not self._file.isopen
+        self._file.open() # Force file open even if closed
+        self._file.openpath(self._path)
+        self._incontext = True
+        return self
+
+    def __exit__(self, *args):
+        """
+        Close the file associated the data after reading.
+        """
+        self._incontext = False
+        if self._close_on_exit:
+            self._file.close()
+
+    def get(self, offset, size, units=""):
+        """
+        Get a slab from the data array.
+
+        Offsets are 0-origin.  Shape can be inferred from the data.
+        Offset and shape must each have one entry per dimension.
+        
+        If units are specified, convert the values to the given units
+        before returning them.
+
+        This operation should be performed in a "with group.data"
+        conext.
+
+        Raises ValueError cannot convert units.
+
+        Corresponds to NXgetslab(handle,data,offset,shape)
+        """
+        value = self._file.getslab(offset,size)
+        return self._converter(value,units)
+
+    def put(self, data, offset):
+        """
+        Put a slab into the data array.
+
+        Offsets are 0-origin.  Shape can be inferred from the data.
+        Offset and shape must each have one entry per dimension.
+
+        This operation should be performed in a "with group.data"
+        conext.
+
+        Raises ValueError if this fails.  No error is raised when
+        writing to a file which is open read-only.
+
+        Corresponds to NXputslab(handle,data,offset,shape)
+        """
+        self._file.putslab(data, offset, data.shape)
+        
     def __str__(self):
         """
         If value is loaded, return the value as a string.  If value is
@@ -837,7 +839,7 @@ class Unknown(NXnode):
         return "Unknown('%s','%s')"%(self.nxname,self.nxclass)
 
 # File level operations
-def read(filename, mode='r'):
+def load(filename, mode='r'):
     """
     Read a NeXus file, returning a tree of nodes
     """
@@ -846,7 +848,7 @@ def read(filename, mode='r'):
     file.close()
     return tree
 
-def write(filename, tree, format='w5'):
+def save(filename, tree, format='w5'):
     """
     Write a NeXus file from a tree of nodes
     """

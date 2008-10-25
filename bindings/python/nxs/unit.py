@@ -12,17 +12,17 @@ need now.  It does not support the complete dimensional analysis provided
 by the package udunits on which NeXus is based, or even the units used
 in the NeXus definition files.
 
-Unlike other units packages, such as that in DANSE, this package does
-not carry the units along with the value, but merely provides a conversion
-function for transforming values.
+Unlike other units modules, this module does not carry the units along 
+with the value, but merely provides a conversion function for 
+transforming values.
 
-Usage example:
+Usage example::
 
     import nxs.unit
     u = nxs.unit.Converter('mili*metre')  # Units stored in mm
     v = u(3000,'m')  # Convert the value 3000 mm into meters
 
-NeXus example:
+NeXus example::
 
     # Load sample orientation in radians regardless of how it is stored.
     # 1. Open the path
