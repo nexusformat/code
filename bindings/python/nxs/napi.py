@@ -122,7 +122,8 @@ This is an eigenbug:
 
 .. _NAPI:  http://www.nexusformat.org/Application_Program_Interface
 """
-__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','NeXus','open']
+__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN',
+           'NeXus','NeXusError','open']
 
 import sys, os, numpy, ctypes
 
@@ -262,6 +263,10 @@ def open(filename, mode='r'):
     """
     return NeXus(filename, mode)
 
+class NeXusError(Exception):
+    """NeXus Error"""
+    pass
+
 class NeXus(object):
 
     # ==== File ====
@@ -281,7 +286,7 @@ class NeXus(object):
 
         Raises ValueError if the open mode is invalid.
 
-        Raises RuntimeError if the file could not be opened, with the
+        Raises NeXusError if the file could not be opened, with the
         filename as part of the error message.
 
         Corresponds to NXopen(filename,mode,&handle)
@@ -302,7 +307,7 @@ class NeXus(object):
                 op = 'open'
             else:
                 op = 'create'
-            raise RuntimeError, "Could not %s %s"%(op,filename)
+            raise NeXusError, "Could not %s %s"%(op,filename)
         self.isopen = True
 
     def __del__(self):
@@ -323,7 +328,7 @@ class NeXus(object):
         """
         Opens the NeXus file handle if it is not already open.
 
-        Raises RuntimeError if the file could not be opened.
+        Raises NeXusError if the file could not be opened.
 
         Corresponds to NXopen(filename,mode,&handle)
         """
@@ -334,7 +339,7 @@ class NeXus(object):
             mode = ACC_RDWR
         status = nxlib.nxiopen_(self.filename,mode,_ref(self.handle))
         if status == ERROR:
-            raise RuntimeError, "Could not open %s"%(self.filename)
+            raise NeXusError, "Could not open %s"%(self.filename)
         self.path = []
 
     nxlib.nxiclose_.restype = c_int
@@ -343,7 +348,7 @@ class NeXus(object):
         """
         Close the NeXus file associated with handle.
 
-        Raises RuntimeError if file could not be closed.
+        Raises NeXusError if file could not be closed.
 
         Corresponds to NXclose(&handle)
         """
@@ -351,7 +356,7 @@ class NeXus(object):
             self.isopen = False
             status = nxlib.nxiclose_(_ref(self.handle))
             if status == ERROR:
-                raise RuntimeError, "Could not close NeXus file %s"%(self.filename)
+                raise NeXusError, "Could not close NeXus file %s"%(self.filename)
         self.path = []
 
     nxlib.nxiflush_.restype = c_int
@@ -360,13 +365,13 @@ class NeXus(object):
         """
         Flush all data to the NeXus file.
 
-        Raises RuntimeError if this fails.
+        Raises NeXusError if this fails.
 
         Corresponds to NXflush(&handle)
         """
         status = nxlib.nxiflush_(_ref(self.handle))
         if status == ERROR:
-            raise RuntimeError, "Could not flush NeXus file %s"%(self.filename)
+            raise NeXusError, "Could not flush NeXus file %s"%(self.filename)
 
     nxlib.nxisetnumberformat_.restype = c_int
     nxlib.nxisetnumberformat_.argtypes = [c_void_p, c_int, c_char_p]
@@ -392,13 +397,13 @@ class NeXus(object):
         """
         Create the group nxclass:name.
 
-        Raises RuntimeError if the group could not be created.
+        Raises NeXusError if the group could not be created.
 
         Corresponds to NXmakegroup(handle, name, nxclass)
         """
         status = nxlib.nximakegroup_(self.handle, name, nxclass)
         if status == ERROR:
-            raise RuntimeError,\
+            raise NeXusError,\
                 "Could not create %s:%s in %s"%(nxclass,name,self._loc())
 
     nxlib.nxiopenpath_.restype = c_int
@@ -467,7 +472,7 @@ class NeXus(object):
         """
         Close the currently open group.
 
-        Raises RuntimeError if the group could not be closed.
+        Raises NeXusError if the group could not be closed.
 
         Corresponds to NXclosegroup(handle)
         """
@@ -475,7 +480,7 @@ class NeXus(object):
         status = nxlib.nxiclosegroup_(self.handle)
         group = self.path.pop()
         if status == ERROR:
-            raise RuntimeError, "Could not close %s:"%(group,self._loc())
+            raise NeXusError, "Could not close %s:"%(group,self._loc())
 
     nxlib.nxigetinfo_.restype = c_int
     nxlib.nxigetinfo_.argtypes = [c_void_p, c_int_p, c_char_p, c_char_p]
@@ -505,13 +510,13 @@ class NeXus(object):
         """
         Reset getnextentry to return the first entry in the group.
 
-        Raises RuntimeError if this fails.
+        Raises NeXusError if this fails.
 
         Corresponds to NXinitgroupdir(handle)
         """
         status = nxlib.nxiinitgroupdir_(self.handle)
         if status == ERROR:
-            raise RuntimeError, \
+            raise NeXusError, \
                 "Could not reset group scan: %s"%(self._loc())
 
     nxlib.nxigetnextentry_.restype = c_int
@@ -520,7 +525,7 @@ class NeXus(object):
         """
         Return the next entry in the group as name,nxclass tuple.
 
-        Raises RuntimeError if this fails, or if there is no next entry.
+        Raises NeXusError if this fails, or if there is no next entry.
 
         Corresponds to NXgetnextentry(handle,name,nxclass,&storage).
 
@@ -533,7 +538,7 @@ class NeXus(object):
         storage = c_int(0)
         status = nxlib.nxigetnextentry_(self.handle,name,nxclass,_ref(storage))
         if status == ERROR or status == EOD:
-            raise RuntimeError, \
+            raise NeXusError, \
                 "Could not get next entry: %s"%(self._loc())
         ## Note: ignoring storage --- it is useless without dimensions
         #if nxclass == 'SDS':
@@ -593,7 +598,7 @@ class NeXus(object):
         'float[32|64]' for floating point values.  No support for
         complex values.
 
-        Raises RuntimeError if this fails.
+        Raises NeXusError if this fails.
 
         Note that this is the recommended way to establish if you have
         a dataset open.
@@ -608,7 +613,7 @@ class NeXus(object):
         status = nxlib.nxigetinfo_(self.handle, _ref(rank), shape.ctypes.data,
                                      _ref(storage))
         if status == ERROR:
-            raise RuntimeError, "Could not get data info: %s"%(self._loc())
+            raise NeXusError, "Could not get data info: %s"%(self._loc())
         shape = shape[:rank.value]+0
         dtype = _pytype_code[storage.value]
         #print "data info",shape,dtype
@@ -636,7 +641,7 @@ class NeXus(object):
         """
         Close the currently open data set.
 
-        Raises RuntimeError if this fails (e.g., because no
+        Raises NeXusError if this fails (e.g., because no
         dataset is open).
 
         Corresponds to NXclosedata(handle)
@@ -645,7 +650,7 @@ class NeXus(object):
         status = nxlib.nxiclosedata_(self.handle)
         name = self.path.pop()
         if status == ERROR:
-            raise RuntimeError,\
+            raise NeXusError,\
                 "Could not close data %s: %s"%(name,self._loc())
 
     nxlib.nximakedata_.restype = c_int
@@ -806,13 +811,13 @@ class NeXus(object):
         """
         Reset the getnextattr list to the first attribute.
 
-        Raises RuntimeError if this fails.
+        Raises NeXusError if this fails.
 
         Corresponds to NXinitattrdir(handle)
         """
         status = nxlib.nxiinitattrdir_(self.handle)
         if status == ERROR:
-            raise RuntimeError, \
+            raise NeXusError, \
                 "Could not reset attribute list: %s"%(self._loc())
 
     nxlib.nxigetattrinfo_.restype = c_int
@@ -823,14 +828,14 @@ class NeXus(object):
         group/data object.  Do not call getnextattr() more than
         this number of times.
 
-        Raises RuntimeError if this fails.
+        Raises NeXusError if this fails.
 
         Corresponds to NXgetattrinfo(handl, &n)
         """
         n = c_int(0)
         status = nxlib.nxigetattrinfo_(self.handle,_ref(n))
         if status == ERROR:
-            raise RuntimeError, "Could not get attr info: %s"%(self._loc())
+            raise NeXusError, "Could not get attr info: %s"%(self._loc())
         #print "num attrs",n.value
         return n.value
 
@@ -844,7 +849,7 @@ class NeXus(object):
         getinfo for details.  Length is the number of elements in the
         attribute.
 
-        Raises RuntimeError if NeXus returns ERROR or EOD.
+        Raises NeXusError if NeXus returns ERROR or EOD.
 
         Corresponds to NXgetnextattr(handle,name,&length,&storage)
         but with storage converted from HDF values to numpy compatible
@@ -858,7 +863,7 @@ class NeXus(object):
         storage = c_int(0)
         status = nxlib.nxigetnextattr_(self.handle,name,_ref(length),_ref(storage))
         if status == ERROR or status == EOD:
-            raise RuntimeError, "Could not get next attr: %s"%(self._loc())
+            raise NeXusError, "Could not get next attr: %s"%(self._loc())
         dtype = _pytype_code[storage.value]
         #print "next attr",name.value,length.value,dtype
         return name.value, length.value, dtype
@@ -893,7 +898,7 @@ class NeXus(object):
         or a scalar.
 
         Raises TypeError if the value type is incorrect.
-        Raises RuntimeError if the attribute could not be saved.
+        Raises NeXusError if the attribute could not be saved.
 
         Corresponds to NXputattr(handle,name,data,length,storage)
 
@@ -933,7 +938,7 @@ class NeXus(object):
         storage = c_int(_nxtype_code[dtype])
         status = nxlib.nxiputattr_(self.handle,name,data,length,storage)
         if status == ERROR:
-            raise RuntimeError, "Could not write attr %s: %s"%(name,self._loc())
+            raise NeXusError, "Could not write attr %s: %s"%(name,self._loc())
 
     def attrs(self):
         """
@@ -962,14 +967,14 @@ class NeXus(object):
         """
         Return the id of the current group so we can link to it later.
 
-        Raises RuntimeError
+        Raises NeXusError
 
         Corresponds to NXgetgroupID(handle, &ID)
         """
         ID = _NXlink()
         status = nxlib.nxigetgroupid_(self.handle,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not link to group: %s"%(self._loc())
+            raise NeXusError, "Could not link to group: %s"%(self._loc())
         return ID
 
     nxlib.nxigetdataid_.restype = c_int
@@ -978,14 +983,14 @@ class NeXus(object):
         """
         Return the id of the current data so we can link to it later.
 
-        Raises RuntimeError
+        Raises NeXusError
 
         Corresponds to NXgetdataID(handle, &ID)
         """
         ID = _NXlink()
         status = nxlib.nxigetdataid_(self.handle,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not link to data: %s"%(self._loc())
+            raise NeXusError, "Could not link to data: %s"%(self._loc())
         return ID
 
     nxlib.nximakelink_.restype = c_int
@@ -995,13 +1000,13 @@ class NeXus(object):
         Link the previously captured group/data ID into the currently
         open group.
 
-        Raises RuntimeError
+        Raises NeXusError
 
         Corresponds to NXmakelink(handle, &ID)
         """
         status = nxlib.nximakelink_(self.handle,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not make link: %s"%(self._loc())
+            raise NeXusError, "Could not make link: %s"%(self._loc())
 
     nxlib.nximakenamedlink_.restype = c_int
     nxlib.nximakenamedlink_.argtypes = [c_void_p, c_char_p, c_NXlink_p]
@@ -1010,13 +1015,13 @@ class NeXus(object):
         Link the previously captured group/data ID into the currently
         open group, but under a different name.
 
-        Raises RuntimeError
+        Raises NeXusError
 
         Corresponds to NXmakenamedlink(handle,name,&ID)
         """
         status = nxlib.nximakenamedlink_(self.handle,name,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not make link %s: %s"%(name,self._loc())
+            raise NeXusError, "Could not make link %s: %s"%(name,self._loc())
 
     nxlib.nxisameid_.restype = c_int
     nxlib.nxisameid_.argtypes = [c_void_p, c_NXlink_p, c_NXlink_p]
@@ -1041,13 +1046,13 @@ class NeXus(object):
         Note: it is unclear how can we tell if we are linked, other than
         perhaps the existence of a 'target' attribute in the current item.
 
-        Raises RuntimeError.
+        Raises NeXusError.
 
         Corresponds to NXopensourcegroup(handle)
         """
         status = nxlib.nxiopensourcegroup_(self.handle)
         if status == ERROR:
-            raise RuntimeError, "Could not open source group: %s"%(self._loc())
+            raise NeXusError, "Could not open source group: %s"%(self._loc())
 
     def link(self):
         """
@@ -1085,14 +1090,14 @@ class NeXus(object):
         from the file that was opened (file.filename) if the current
         group is an external link to another file.
 
-        Raises RuntimeError if this fails.
+        Raises NeXusError if this fails.
 
         Corresponds to NXinquirefile(&handle,file,len)
         """
         filename = ctypes.create_string_buffer(maxnamelen)
         status = nxlib.nxiinquirefile_(self.handle,filename,maxnamelen)
         if status == ERROR:
-            raise RuntimeError,\
+            raise NeXusError,\
                 "Could not determine filename: %s"%(self._loc())
         return filename.value
 
@@ -1104,13 +1109,13 @@ class NeXus(object):
         Return the filename for the external link if there is one,
         otherwise return None.
 
-        Raises RuntimeError if link fails.
+        Raises NeXusError if link fails.
 
         Corresponds to NXisexternalgroup(&handle,name,nxclass,file,len)
         """
         status = nxlib.nxilinkexternal_(self.handle,name,nxclass,url)
         if status == ERROR:
-            raise RuntimeError,\
+            raise NeXusError,\
                 "Could not link %s to %s: %s"%(name,url,self._loc())
 
 

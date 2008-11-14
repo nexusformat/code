@@ -125,6 +125,7 @@ from copy import copy, deepcopy
 import numpy
 import nxs.napi
 import nxs.unit
+from nxs.napi import NeXusError
 
 
 class NeXusTree(nxs.napi.NeXus):
@@ -402,7 +403,7 @@ class NeXusTree(nxs.napi.NeXus):
             # an error if we are not within a group.
             try:
                 gid[target] = self.getdataID()
-            except RuntimeError:
+            except NeXusError:
                 gid[target] = self.getgroupID()
 
         # link sources to targets
@@ -717,6 +718,11 @@ class PylabPlotter(object):
     Matplotlib plotter object for NeXus data nodes.
     """
     def plot(self, signal, axes, entry, title, **opts):
+        """
+        Plot the data entry.
+        
+        Raises NeXusError if the data cannot be plotted.
+        """
         import pylab
         pylab.cla()
 
@@ -754,7 +760,7 @@ class PylabPlotter(object):
 
         # No support for higher dimensions yet
         else:
-            raise RuntimeError, "Cannot plot a dataset of rank 3 or greater."
+            raise NeXusError, "Cannot plot a dataset of rank 3 or greater."
     @staticmethod
     def show():
         import pylab
@@ -797,6 +803,8 @@ class NXgroup(NXnode):
     def nxplot(self, **opts):
         """
         Plot data contained within the group.
+        
+        Raises NeXusError if the data could not be plotted.
         """
         
         # Find a plottable signal
@@ -805,13 +813,13 @@ class NXgroup(NXnode):
                 signal = node
                 break
         else:
-            raise RuntimeError('No plottable signal')
+            raise NeXusError('No plottable signal')
         
         # Find the associated axes
         if hasattr(signal,'Aaxes'):
             axes = [getattr(self,a) for a in signal.Aaxes.nxdata.split(':')]
         else:
-            raise RuntimeError('Axes attribute missing from signal')
+            raise NeXusError('Axes attribute missing from signal')
 
         # Construct title
         path = []

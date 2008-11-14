@@ -10,7 +10,7 @@ used as well as the data measured.
 
 The NeXus file interface requires compiled libraries to read the
 underlying HDF_ files.  Binary packages are available for some
-platforms from the NeXus site.  Details of where the nxs package 
+platforms from the NeXus site.  Details of where the nxs package
 searches for the libraries are recorded in `nxs.napi`.
 
 Example
@@ -43,8 +43,8 @@ NeXus API
 
 When converting code to python from other languages you do not
 necessarily want to rewrite the file handling code using the
-tree view.  The `nxs.napi` module provides an interface which 
-more closely follows the NeXus application programming 
+tree view.  The `nxs.napi` module provides an interface which
+more closely follows the NeXus application programming
 interface (NAPI_).
 
 .. _Nexus: http://www.nexusformat.org/Introduction
@@ -54,4 +54,3 @@ interface (NAPI_).
 
 from nxs.napi import *
 from nxs.tree import *
-
