@@ -682,6 +682,7 @@ AC_CONFIG_FILES([Makefile
 		contrib/applications/Makefile
 		contrib/applications/CBFLib/Makefile
 		contrib/bindings/Makefile
+		contrib/bindings/python/Makefile
 		scripts/Makefile
 		scripts/nexus.pc:scripts/nexus_pc.in
 		scripts/nxbuild])
