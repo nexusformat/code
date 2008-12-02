@@ -66,14 +66,18 @@ static int mkstemp(char* template)
 #define TMP_DIR P_tmpdir
 #endif /* _WIN32 */
 
+static const char* definition_name = "BASE";
+static const char* definition_version = "3.0";
+
 static void print_usage()
 {
     printf("Usage: nxvalidate [-w] [ -d definition ] [ infile ]\n\n");
     printf("-w    Send file to NeXus web site (using wget) for validation\n");
     printf("      (default: try to run \"xmllint\" program locally\n");
-    printf("-d    Use specified definiton (default: BASE)\n");
+    printf("-d    Use specified definiton (default: %s)\n", definition_name);
     printf("-k    keep temporary files\n");
     printf("-q    quiet (only report errors)\n");
+    printf("-v    specify schema version (default: %s)\n", definition_version);
 }
 
 static int url_encode(char c, FILE* f)
@@ -104,7 +108,6 @@ static int url_encode(char c, FILE* f)
 
 #define NXVALIDATE_ERROR_EXIT	exit(1)
 
-static const char* definition_name = "BASE";
 
 static int quiet = 0;
 
@@ -115,7 +118,7 @@ int main(int argc, char *argv[])
    FILE *fIn, *fOut2;
    int keep_temps = 0;
 
-   while( (opt = getopt(argc, argv, "wqkhd:")) != -1 )
+   while( (opt = getopt(argc, argv, "wqkhd:v:")) != -1 )
    {
 /* use with "-:" in getopt	
 	if (opt == '-')
@@ -129,7 +132,6 @@ int main(int argc, char *argv[])
 	  case 'd':
 	    if (optarg != NULL && *optarg != '\0')
 	    {
-		printf("Warning: -d option is not implemented yet\n");
 		definition_name = optarg;
 	    }
 	    break;
@@ -148,6 +150,13 @@ int main(int argc, char *argv[])
 
 	  case 'k':
 	    keep_temps = 1;
+	    break;
+
+	  case 'v':
+	    if (optarg != NULL && *optarg != '\0')
+	    {
+	        definition_version = optarg;
+	    }
 	    break;
 
 	  default:
@@ -189,7 +198,7 @@ int main(int argc, char *argv[])
        if (!quiet) {
            printf("* Validating using locally installed \"xmllint\" program\n");
        }
-       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/3.0/%s.xsd \"%s\" %s", definition_name, outFile, (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
+       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/%s/%s.xsd \"%s\" %s", definition_version, definition_name, outFile, (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
        ret = system(command);
        if (ret != -1 && WIFEXITED(ret))
        {
@@ -225,6 +234,16 @@ int main(int argc, char *argv[])
    fIn = fopen(outFile, "rt");
    fprintf(fOut2, "file_name=");
    for(strPtr = inFile; *strPtr != '\0'; ++strPtr)
+   {
+	url_encode(*strPtr, fOut2);
+   }
+   fprintf(fOut2, "&definition_name=");
+   for(strPtr = definition_name; *strPtr != '\0'; ++strPtr)
+   {
+	url_encode(*strPtr, fOut2);
+   }
+   fprintf(fOut2, "&definition_version=");
+   for(strPtr = definition_version; *strPtr != '\0'; ++strPtr)
    {
 	url_encode(*strPtr, fOut2);
    }
