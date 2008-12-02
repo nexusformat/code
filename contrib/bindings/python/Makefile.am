@@ -29,12 +29,12 @@
 #====================================================================
 
 pydocdir 	= $(NXDOCDIR)/python
-pydoc_DATA	= README.html
-pkgpython_PYTHON = nxs.py setup.py nxstest.py nexus.py nxsunit.py
-EXTRA_DIST	= README.html
+### pydoc_DATA	= README.html
+### pkgpython_PYTHON = nxs.py setup.py nxstest.py nexus.py nxsunit.py
+### EXTRA_DIST	= README.html
 
-install-data-hook :
-	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs.py > $(DESTDIR)${pkgpythondir}/nxs.py
+### install-data-hook :
+### 	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs.py > $(DESTDIR)${pkgpythondir}/nxs.py
 
 # python setup.py install --root=$(DESTDIR)
 
