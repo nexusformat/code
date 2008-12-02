@@ -114,6 +114,7 @@ static int quiet = 0;
 int main(int argc, char *argv[])
 {
    char inFile[256], outFile[256], command[512], outFile2[256], *strPtr;
+   const char* cStrPtr;
    int ret, opt, c, i, fd, use_web = 0;
    FILE *fIn, *fOut2;
    int keep_temps = 0;
@@ -233,19 +234,19 @@ int main(int argc, char *argv[])
    fOut2 = fopen(outFile2, "wt");
    fIn = fopen(outFile, "rt");
    fprintf(fOut2, "file_name=");
-   for(strPtr = inFile; *strPtr != '\0'; ++strPtr)
+   for(cStrPtr = inFile; *cStrPtr != '\0'; ++cStrPtr)
    {
-	url_encode(*strPtr, fOut2);
+	url_encode(*cStrPtr, fOut2);
    }
    fprintf(fOut2, "&definition_name=");
-   for(strPtr = definition_name; *strPtr != '\0'; ++strPtr)
+   for(cStrPtr = definition_name; *cStrPtr != '\0'; ++cStrPtr)
    {
-	url_encode(*strPtr, fOut2);
+	url_encode(*cStrPtr, fOut2);
    }
    fprintf(fOut2, "&definition_version=");
-   for(strPtr = definition_version; *strPtr != '\0'; ++strPtr)
+   for(cStrPtr = definition_version; *cStrPtr != '\0'; ++cStrPtr)
    {
-	url_encode(*strPtr, fOut2);
+	url_encode(*cStrPtr, fOut2);
    }
    fprintf(fOut2, "&file_data=");
    while( (c = fgetc(fIn)) != EOF )
