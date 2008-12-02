@@ -12,16 +12,17 @@ need now.  It does not support the complete dimensional analysis provided
 by the package udunits on which NeXus is based, or even the units used
 in the NeXus definition files.
 
-Unlike other units packages, such as that in DANSE, this package does
-not carry the units along with the value, but merely provides a conversion
-function for transforming values.
+Unlike other units modules, this module does not carry the units along 
+with the value, but merely provides a conversion function for 
+transforming values.
 
-Usage example:
+Usage example::
 
-    u = nxsunit.Converter('mili*metre')  # Units stored in mm
+    import nxs.unit
+    u = nxs.unit.Converter('mili*metre')  # Units stored in mm
     v = u(3000,'m')  # Convert the value 3000 mm into meters
 
-NeXus example:
+NeXus example::
 
     # Load sample orientation in radians regardless of how it is stored.
     # 1. Open the path
@@ -29,7 +30,7 @@ NeXus example:
     # 2. scan the attributes, retrieving 'units'
     units = [for attr,value in file.attrs() if attr == 'units']
     # 3. set up the converter (assumes that units actually exists)
-    u = nxsunit.Converter(units[0])
+    u = nxs.unit.Converter(units[0])
     # 4. read the data and convert to the correct units
     v = u(file.read(),'radians')
 
@@ -51,6 +52,9 @@ getting the dimension from the units as we are currently doing.
 # TODO: Allow application to impose the map on the units
 
 from __future__ import division
+
+__all__ = ['Converter']
+
 import math
 
 

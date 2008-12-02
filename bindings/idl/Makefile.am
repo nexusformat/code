@@ -2,7 +2,7 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id: Makefile.am 715 2005-12-16 18:11:19Z faa59 $
+#  $Id$
 #  
 #  Makefile for NeXus FORTRAN 90 bindings
 #
@@ -38,7 +38,7 @@ lib_LTLIBRARIES = libNeXusIDL-API.la
 
 libNeXusIDL_API_la_SOURCES = NeXusIDL-API.c handle.c handle.h
 libNeXusIDL_API_la_LIBADD = $(top_builddir)/src/libNeXus.la
-libNeXusIDL_API_la_LDFLAGS = @SHARED_LDFLAGS@ -Wl,--no-undefined -L$(IDLROOT)/bin/bin.linux.x86 -lidl $(LDFLAGS)
+libNeXusIDL_API_la_LDFLAGS = @SHARED_LDFLAGS@ -Wl,--no-undefined -L$(IDLROOT)/bin/bin.linux.$(build_cpu) -lidl $(LDFLAGS)
 
 AM_CPPFLAGS = -I$(IDLROOT)/external/include
 
