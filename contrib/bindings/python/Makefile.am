@@ -2,11 +2,11 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
-#
-#  Makefile for coordinating the generation of language bindings
+#  $Id: Makefile.am 715 2005-12-16 18:11:19Z faa59 $
 #  
-#  Copyright (C) 2004 Freddie Akeroyd
+#  Makefile for NeXus python bindings
+#
+#  Copyright (C) 2008 Freddie Akeroyd
 #  
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -25,12 +25,17 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
+#
 #====================================================================
 
-#if HAVE_JAVAC
-#JAVASUB = java
-#endif
-if HAVE_PYTHON
-PYSUB = python
-endif
-SUBDIRS = $(JAVASUB) $(PYSUB)
+pydocdir 	= $(NXDOCDIR)/python
+### pydoc_DATA	= README.html
+### pkgpython_PYTHON = nxs.py setup.py nxstest.py nexus.py nxsunit.py
+### EXTRA_DIST	= README.html
+
+### install-data-hook :
+### 	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs.py > $(DESTDIR)${pkgpythondir}/nxs.py
+
+# python setup.py install --root=$(DESTDIR)
+
+include $(top_srcdir)/build_rules.am
