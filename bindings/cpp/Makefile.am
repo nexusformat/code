@@ -58,5 +58,6 @@ endif
 endif
 
 AM_CXXFLAGS=-prefer-pic $(MINGW_CXXFLAGS)
+CLEANFILES=libNeXusCPP.def libNeXusCPP.dll.lib libNeXusCPP.dll.exp
 
 include $(top_srcdir)/build_rules.am
