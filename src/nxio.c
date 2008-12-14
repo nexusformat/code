@@ -236,6 +236,7 @@ void analyzeDim(const char *typeString, int *rank,
   int myRank;
 
   if(strchr(typeString,(int)'[') == NULL){
+    *rank = 1;
     switch(*type){
     case NX_INT8:
     case NX_UINT8:
@@ -251,6 +252,9 @@ void analyzeDim(const char *typeString, int *rank,
       break;
     case NX_CHAR:
       iDim[0] = -1;
+      break;
+    default:
+      mxml_error("ERROR: (analyzeDim) unknown type code %d for typeString %s", *type, typeString);
       break;
     }
   } else {
