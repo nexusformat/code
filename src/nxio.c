@@ -628,7 +628,6 @@ int isDataNode(mxml_node_t *node){
 /*--------------------------------------------------------------------*/
 static int isTextData(mxml_node_t *node){
   const char *attr = NULL;
-  int rank, type = 0, iDim[NX_MAXRANK];
 
   if(!isDataNode(node)){
     return 0;
@@ -640,8 +639,7 @@ static int isTextData(mxml_node_t *node){
   if(attr == NULL){
     return 1;
   }
-  analyzeDim(attr,&rank,iDim,&type);
-  if(type == NX_CHAR){
+  if(strstr(attr,"NX_CHAR") != NULL){
     return 1;
   } else {
     return 0;
