@@ -38,6 +38,7 @@ see file COPYING for further information])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
 AC_CANONICAL_TARGET
+AC_CANONICAL_BUILD
 
 dnl $EGREP is used in macros included from acinclude.m4
 AC_PROG_EGREP
@@ -180,6 +181,12 @@ AC_ARG_WITH([idlroot],
                        [Specify location of idl files]),
 	[if test $withval != no; then IDLROOT=$withval; fi])
 AM_CONDITIONAL(HAVE_IDL, [test "$IDLROOT" != ""])
+
+dnl Work out the architecture for IDL
+if test -n "IDLROOT" ; then
+    AS_CASE([$build_cpu], [x86|i386|i686], [IDLARCH=x86], [IDLARCH=$build_cpu])
+    AC_SUBST(IDLARCH)
+fi
 
 AC_ARG_WITH([doxygen], AC_HELP_STRING([--with-doxygen=/path/to/doxygen], [Specify path to doxygen]), [with_doxygen=$withval], [with_doxygen=no])
 if test x"$with_doxygen" != x"no" ; then
