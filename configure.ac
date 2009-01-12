@@ -463,7 +463,7 @@ if test "$H4ROOT"; then
 		for j in lib lib64; do
 		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then 
 			HDF4_LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $HDF4_LDFLAGS"
-		        EXTRA_LD_LIBRARY_PATH=$H4ROOT/$j/$H4LIBSUBROOT:$EXTRA_LD_LIBRARY_PATH
+		        EXTRA_LD_LIBRARY_PATH=$EXTRA_LD_LIBRARY_PATH:$H4ROOT/$j/$H4LIBSUBROOT
 		    fi
 		done
 		EXTRA_LDPATH="$EXTRA_LDPATH $HDF4_LDFLAGS"
@@ -505,7 +505,7 @@ if test "$H5ROOT"; then
 		for j in lib lib64; do
 		    if test -d $H5ROOT/$j; then 
 			HDF5_LDFLAGS="-L$H5ROOT/$j $HDF5_LDFLAGS"
-		    	EXTRA_LD_LIBRARY_PATH=$H5ROOT/$j:$EXTRA_LD_LIBRARY_PATH
+		    	EXTRA_LD_LIBRARY_PATH=$EXTRA_LD_LIBRARY_PATH:$H5ROOT/$j
 		    fi
 		done
 		EXTRA_LDPATH="$EXTRA_LDPATH $HDF5_LDFLAGS"
@@ -542,7 +542,7 @@ fi
 AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
 
-if ! test -z "$EXTRA_LDPATH"; then
+if test ! -z "$EXTRA_LDPATH"; then
     LDFLAGS="$LDFLAGS $EXTRA_LDPATH"
 fi
 if test -d /usr/local/lib; then
@@ -553,7 +553,11 @@ if test -d /sw/lib; then
     LDFLAGS="$LDFLAGS -L/sw/lib"
 fi
 
-if ! test -z "$LD_LIBRARY_PATH"; then
+# remove initial :
+if test ! -z "$EXTRA_LD_LIBRARY_PATH"; then
+    EXTRA_LD_LIBRARY_PATH=`expr substr "$EXTRA_LD_LIBRARY_PATH" 2 1024`
+fi
+if test ! -z "$LD_LIBRARY_PATH"; then
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${EXTRA_LD_LIBRARY_PATH}
 else
     export LD_LIBRARY_PATH=${EXTRA_LD_LIBRARY_PATH}
