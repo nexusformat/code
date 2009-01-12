@@ -4,6 +4,12 @@
 #
 # @configure_input@
 #
+if ! test -z "$LD_LIBRARY_PATH"; then
+    export LD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:${LD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@
+else
+    export LD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:@EXTRA_LD_LIBRARY_PATH@
+fi
+#
 SETUP_TEST="sh $abs_srcdir/setup_test $abs_srcdir"
 export SETUP_TEST
 #

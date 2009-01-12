@@ -427,6 +427,8 @@ dnl otherwise try and find HDF path, but not if
 dnl e.g. --without-hdf4 has been specified (hence check on $with_hdf4 != no )
 dnl first HDF4
 EXTRA_LDPATH=""
+EXTRA_LD_LIBRARY_PATH=""
+AC_SUBST(EXTRA_LD_LIBRARY_PATH)
 HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
@@ -459,7 +461,10 @@ if test "$H4ROOT"; then
 	4.[[12]]*) 
     		HDF4_LDFLAGS="";
 		for j in lib lib64; do
-		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then HDF4_LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $HDF4_LDFLAGS"; fi
+		    if test -d $H4ROOT/$j/$H4LIBSUBROOT; then 
+			HDF4_LDFLAGS="-L$H4ROOT/$j/$H4LIBSUBROOT $HDF4_LDFLAGS"
+		        EXTRA_LD_LIBRARY_PATH=$H4ROOT/$j/$H4LIBSUBROOT:$EXTRA_LD_LIBRARY_PATH
+		    fi
 		done
 		EXTRA_LDPATH="$EXTRA_LDPATH $HDF4_LDFLAGS"
     		HDF4_LDFLAGS="$HDF4_LDFLAGS -lmfhdf -ldf";
@@ -498,7 +503,10 @@ if test "$H5ROOT"; then
 	1.[[68]]*)
     		HDF5_LDFLAGS=""
 		for j in lib lib64; do
-		    if test -d $H5ROOT/$j; then HDF5_LDFLAGS="-L$H5ROOT/$j $HDF5_LDFLAGS"; fi
+		    if test -d $H5ROOT/$j; then 
+			HDF5_LDFLAGS="-L$H5ROOT/$j $HDF5_LDFLAGS"
+		    	EXTRA_LD_LIBRARY_PATH=$H5ROOT/$j:$EXTRA_LD_LIBRARY_PATH
+		    fi
 		done
 		EXTRA_LDPATH="$EXTRA_LDPATH $HDF5_LDFLAGS"
     		HDF5_LDFLAGS="$HDF5_LDFLAGS -lhdf5 -lz"
@@ -527,9 +535,13 @@ if test ! -z "$MXMLROOT"; then
     XML_LDFLAGS="-lmxml"
     XML_LDFLAGS="-L$MXMLROOT/lib $XML_LDFLAGS"
     XML_CPPFLAGS="-I$MXMLROOT/include -DNXXML"
+# meed to allow for lib64
+#    EXTRA_LDPATH="$EXTRA_LDPATH $XML_LDFLAGS"
+#    export LD_LIBRARY_PATH=$MXMLROOT/lib:$LD_LIBRARY_PATH
 fi
 AC_SUBST(XML_LDFLAGS)
 AC_SUBST(XML_CPPFLAGS)
+
 if ! test -z "$EXTRA_LDPATH"; then
     LDFLAGS="$LDFLAGS $EXTRA_LDPATH"
 fi
@@ -540,6 +552,13 @@ fi
 if test -d /sw/lib; then
     LDFLAGS="$LDFLAGS -L/sw/lib"
 fi
+
+if ! test -z "$LD_LIBRARY_PATH"; then
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${EXTRA_LD_LIBRARY_PATH}
+else
+    export LD_LIBRARY_PATH=${EXTRA_LD_LIBRARY_PATH}
+fi
+
 AC_SUBST(LIBG2C)
 
 dnl finally set LIBS variable if we 
