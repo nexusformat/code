@@ -30,13 +30,19 @@
 
 pydocdir 	= $(NXDOCDIR)/python
 pydoc_DATA	= README.html
-nxspythondir	= $(pkgpythondir)/nxs
-pkgpython_PYTHON = nxstest.py
-nxspython_PYTHON = nxs
-EXTRA_DIST	= README.html
+#nxspythondir	= $(pkgpythondir)/nxs
+nxspythondir	= $(pythondir)/nxs
+#pkgpython_PYTHON = nxstest.py
+nxspython_PYTHON = nxs/__init__.py nxs/napi.py
+EXTRA_DIST	= README.html nxstest.py
 
 install-data-hook :
 	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs/napi.py > $(DESTDIR)${nxspythondir}/napi.py
+	if test -z "$(DESTDIR)"; then \
+	    $(py_compile) --basedir "$(nxspythondir)" napi.py; \
+	else \
+	    $(py_compile) --destdir "$(DESTDIR)" --basedir "$(nxspythondir)" napi.py; \
+	fi
 
 # python setup.py install --root=$(DESTDIR)
 
