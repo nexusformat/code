@@ -40,7 +40,8 @@ AM_FFLAGS=-I$(top_srcdir)/bindings/f77
 AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml NXtest-table.xml \
 	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
-	nxtranslate nxsummary nxconvert nxvalidate nxdir nxbrowse
+	nxtranslate nxsummary nxconvert nxvalidate nxdir nxbrowse \
+	NXtest.h4 NXtest.h5
 
 
 ## testdir=$(prefix)/nexus/test
