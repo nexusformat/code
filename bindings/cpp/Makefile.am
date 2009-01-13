@@ -35,6 +35,10 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 lib_LTLIBRARIES=libNeXusCPP.la
 
+# nxincludedir=$(includedir)/nexus
+nxincludedir=$(pkgincludedir)
+nxinclude_HEADERS=NeXusFile.hpp NeXusException.hpp NeXusStream.hpp
+
 libNeXusCPP_la_SOURCES=NeXusFile.hpp NeXusFile.cpp NeXusException.hpp NeXusException.cpp NeXusStream.hpp NeXusStream.cpp
 libNeXusCPP_la_LIBADD=$(LIBNEXUS)
 libNeXusCPP_la_LDFLAGS=@SHARED_LDFLAGS@ $(LDFLAGS)
