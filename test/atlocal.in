@@ -70,3 +70,10 @@ else
 fi
 export HAVE_XMLLINT
 #
+if test ! -z "@PYTHONROOT@"; then
+    HAVE_PYTHON=run_test
+else
+    HAVE_PYTHON=skip_test
+fi
+export HAVE_PYTHON
+#
