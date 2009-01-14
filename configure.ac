@@ -405,7 +405,7 @@ dnl	fi
 	if test $enable_32bit = yes; then
 	    IDL_HOST="bin.darwin.i386" # force 32bit build
 	else
-	    IDL_HOST="bin.darwin.i386"
+	    IDL_HOST="bin.darwin.x86_64"
 	fi
 	;;
 esac
