@@ -448,7 +448,7 @@ dnl first HDF4
 EXTRA_LDPATH=""
 EXTRA_LD_LIBRARY_PATH=""
 AC_SUBST(EXTRA_LD_LIBRARY_PATH)
-HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /usr"
+HDF4SEARCH="/usr/local/hdf4 /usr/local/hdf /usr/local /sw /opt/local /usr"
 if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     AC_MSG_CHECKING(for location of HDF4 libraries)
     for i in $HDF4SEARCH; do
@@ -502,7 +502,7 @@ AC_SUBST(HDF4_LDFLAGS)
 AC_SUBST(HDF4_CPPFLAGS)
 
 dnl HDF5
-HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /usr"
+HDF5SEARCH="/usr/local/hdf5 /usr/local/hdf /usr/local /sw /opt/local /usr"
 if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
     AC_MSG_CHECKING(for location of HDF5 libraries)
     for i in $HDF5SEARCH; do
@@ -570,6 +570,10 @@ fi
 # for Mac/fink when hdf and hdf5 are not taken from fink, but jpeg is
 if test -d /sw/lib; then
     LDFLAGS="$LDFLAGS -L/sw/lib"
+fi
+# for Mac/Macports when you are not using fink at all.
+if test -d /opt/local/lib; then
+    LDFLAGS="$LDFLAGS -L/opt/local/lib"
 fi
 
 # remove initial :
