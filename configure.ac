@@ -344,10 +344,11 @@ AC_SUBST(LIBXML2_CFLAGS)
 LIBXML2_CFLAGS='`xml2-config --cflags`'
 
 # set up for linux here - mac is covered in the case $host statement
+AS_CASE([$build_cpu], [x86|i386|i686], [IDLCPU=x86], [IDLCPU=$build_cpu])
 if test $enable_32bit = yes; then
     IDL_HOST="bin.linux.x86"	# force 32 bit on a 64 bit machine
 else
-    IDL_HOST="bin.linux.$build_cpu"
+    IDL_HOST="bin.linux.$IDLCPU"
 fi
 AC_SUBST(IDL_HOST)
 
