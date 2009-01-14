@@ -22,9 +22,10 @@
   For further information, see <http://www.nexusformat.org>
 */
 #include <stdio.h>
-
+#include <stdlib.h>
 #include "idl_export.h"
 #include "../../include/napi.h" 
+#include "handle.h"
 
 /* Windows path: */
 /* #include "C:\Program Files\NeXus Data Format\include\napi.h" */
@@ -139,7 +140,7 @@ static IDL_VPTR NXopen_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXopenpath_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   char* path;
@@ -152,7 +153,7 @@ static IDL_VPTR NXopenpath_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[0]);
   IDL_ENSURE_STRING(argv[1]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
   path = IDL_VarGetString(argv[1]);
 
 
@@ -161,7 +162,7 @@ static IDL_VPTR NXopenpath_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
   NXMSetError(NULL,idlError);
 
   status = NXopenpath (hHandle, path);
@@ -182,7 +183,7 @@ static IDL_VPTR NXopenpath_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXopengrouppath_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   char* path;
@@ -195,7 +196,7 @@ static IDL_VPTR NXopengrouppath_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[0]);
   IDL_ENSURE_STRING(argv[1]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
   path = IDL_VarGetString(argv[1]);
 
 
@@ -204,7 +205,7 @@ static IDL_VPTR NXopengrouppath_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
   NXMSetError(NULL,idlError);
 
   status = NXopengrouppath (hHandle, path);
@@ -223,7 +224,7 @@ static IDL_VPTR NXopengrouppath_this(int argc, IDL_VPTR *argv)
  *=======================================================================*/
 static IDL_VPTR  NXclose_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -235,7 +236,7 @@ static IDL_VPTR  NXclose_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
   /* Convert IDL variables from arguments to C-land */
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
 
   if( HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
@@ -324,7 +325,7 @@ else {
 
 static IDL_VPTR NXsetnumberformat_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int data_type;
@@ -388,7 +389,7 @@ else {
 	}
   }*/
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int ) IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
@@ -413,7 +414,7 @@ else {
 
 static IDL_VPTR NXmakegroup_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   char* group_name;
@@ -427,7 +428,7 @@ static IDL_VPTR NXmakegroup_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_STRING(argv[1]);
   IDL_ENSURE_STRING(argv[2]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
 
   group_name = IDL_VarGetString(argv[1]);
   group_class = IDL_VarGetString(argv[2]);
@@ -436,7 +437,7 @@ static IDL_VPTR NXmakegroup_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -456,7 +457,7 @@ static IDL_VPTR NXmakegroup_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXopengroup_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   char* group_name;
@@ -471,7 +472,7 @@ static IDL_VPTR NXopengroup_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_STRING(argv[1]);
   IDL_ENSURE_STRING(argv[2]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
   group_name = IDL_VarGetString(argv[1]);
   group_class = IDL_VarGetString(argv[2]);
 
@@ -481,7 +482,7 @@ static IDL_VPTR NXopengroup_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -503,7 +504,7 @@ static IDL_VPTR NXopengroup_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXclosegroup_this(int argc, IDL_VPTR *argv)
 {
 
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -514,14 +515,14 @@ static IDL_VPTR NXclosegroup_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int )IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
   	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 
   NXMSetError(NULL,idlError);
@@ -543,7 +544,7 @@ static IDL_VPTR NXclosegroup_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXopendata_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   char* data_name;
@@ -556,7 +557,7 @@ static IDL_VPTR NXopendata_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[0]);
   IDL_ENSURE_STRING(argv[1]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int )IDL_LongScalar(argv[0]);
   data_name = IDL_VarGetString(argv[1]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
@@ -564,7 +565,7 @@ static IDL_VPTR NXopendata_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -586,7 +587,7 @@ static IDL_VPTR NXopendata_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR  NXclosedata_this(int argc, IDL_VPTR *argv)
 {
 
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   NXlink data_id;
@@ -600,14 +601,14 @@ static IDL_VPTR  NXclosedata_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int ) IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
   	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
  /* status = NXgetdataID (hHandle, &data_id);
   if(status == NX_ERROR) {
@@ -634,7 +635,7 @@ static IDL_VPTR  NXclosedata_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXcompress_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int compresstype;
@@ -647,7 +648,7 @@ static IDL_VPTR NXcompress_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[0]);
   IDL_ENSURE_STRING(argv[1]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int )IDL_LongScalar(argv[0]);
   compress_type = IDL_VarGetString(argv[1]);
 
    if (strcmp(compress_type,"NX_COMP_LZW") == 0) {;
@@ -665,7 +666,7 @@ static IDL_VPTR NXcompress_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
   NXMSetError(NULL,idlError);
 
   status = NXcompress (hHandle, (int) &compresstype);
@@ -686,11 +687,12 @@ static IDL_VPTR NXcompress_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXmakedata_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
-  int *ipRank, dimension[NX_MAXRANK], trueDimension[NX_MAXRANK], n, datatype;
+  int dimension[NX_MAXRANK], trueDimension[NX_MAXRANK], n, datatype;
   int rank;
+  IDL_LONG *dim;
   char* data_name;
   char* data_type;
   //IDL_LONG dims[IDL_MAX_ARRAY_DIM];
@@ -712,9 +714,8 @@ static IDL_VPTR NXmakedata_this(int argc, IDL_VPTR *argv)
   datatype = datatypecheck(argv[2]);
   if(datatype == -1) return IDL_GettmpInt(NX_ERROR);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
-  ipRank = (int *) IDL_LongScalar(argv[3]);
-  rank = *ipRank;
+  fileid = (int) IDL_LongScalar(argv[0]);
+  rank = (int ) IDL_LongScalar(argv[3]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
@@ -737,8 +738,9 @@ static IDL_VPTR NXmakedata_this(int argc, IDL_VPTR *argv)
   else if(argv[4]->type == IDL_TYP_LONG) {
   	  IDL_ENSURE_ARRAY(argv[4]);
 	  /* dimensions have to be swapped for Fortran C storage order */
+	  dim = (IDL_LONG *)argv[4]->value.arr->data;
 	  for(n = 0; n < rank; n++){
-	    trueDimension[n] = argv[4]->value.arr->data[rank - 1 -n];
+	    trueDimension[n] = dim[rank - 1 -n];
           }
   	  status = NXmakedata(hHandle, data_name, datatype, rank, 
 			      trueDimension);
@@ -763,11 +765,12 @@ static IDL_VPTR NXmakedata_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXcompmakedata_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
-  int *rank, dimension[NX_MAXRANK], trueDimension[NX_MAXRANK], n,  datatype;
-  /*IDL_LONG dims[IDL_MAX_ARRAY_DIM]; */
+  int rank, dimension[NX_MAXRANK], trueDimension[NX_MAXRANK], 
+    trueChunk[NX_MAXRANK], n,  datatype;
+  IDL_LONG *dim;
   int comptype;
   char* data_type;
   char* data_name;
@@ -832,24 +835,35 @@ else {
 	return IDL_GettmpInt(NX_ERROR);
   }
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
-  rank = (int *) IDL_LongScalar(argv[3]);
+  fileid = (int ) IDL_LongScalar(argv[0]);
+  rank = (int ) IDL_LongScalar(argv[3]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
- hHandle = (int *)HHGetPointer(fileid);
+ hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
   /* dimensions have to be swapped for Fortran C storage order */
-  for(n = 0; n < *rank; n++){
-    trueDimension[n] = argv[4]->value.arr->data[*rank - 1 -n];
+  dim = (IDL_LONG *)argv[4]->value.arr->data;
+  for(n = 0; n < rank; n++){
+    trueDimension[n] = dim[rank - 1 -n];
+  }
+  dim = (IDL_LONG *)argv[6]->value.arr->data;
+  if(dim != NULL){
+    for(n = 0; n < rank; n++){
+      trueChunk[n] = dim[rank - 1 -n];
+    }
+  } else {
+    for(n = 0; n < rank; n++){
+      trueChunk[n] = trueDimension[n];
+    }
   }
 
   status = NXcompmakedata(hHandle, data_name, datatype, (int)rank, 
 			  trueDimension, comptype, 
-			  (void *) argv[6]->value.arr->data);
+			  trueChunk);
 
   if(status == NX_ERROR){
  	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, nexusError);
@@ -866,14 +880,14 @@ else {
 
 static IDL_VPTR NXputdata_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int rank, datatype;
   int dimension[IDL_MAX_ARRAY_DIM];
   NXlink data_id;
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
   	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
@@ -881,7 +895,7 @@ static IDL_VPTR NXputdata_this(int argc, IDL_VPTR *argv)
 	}
 
   IDL_ENSURE_SCALAR(argv[0]);
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   if (argc != 2) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Two arguments expected");
@@ -954,11 +968,12 @@ static IDL_VPTR NXputdata_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXputslab_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int rank, datatype, n;
   int start[NX_MAXRANK], size[NX_MAXRANK];
+  IDL_LONG *stDim, *szDim;
   int dimension[IDL_MAX_ARRAY_DIM];
   NXlink data_id;
 
@@ -968,7 +983,7 @@ static IDL_VPTR NXputslab_this(int argc, IDL_VPTR *argv)
 	}
 
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
   	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
@@ -989,7 +1004,7 @@ static IDL_VPTR NXputslab_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
   }
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   status = NXgetdataID (hHandle, &data_id);
 /* if(status == NX_ERROR) {
@@ -1020,7 +1035,8 @@ static IDL_VPTR NXputslab_this(int argc, IDL_VPTR *argv)
     } else {
 		char statusBuffer[100];
 		/* Maybe print more information to the user about which datatypes match OR do conversions */
-		sprintf(statusBuffer,"IDL and NeXus types don't match!: %i & ", datatype, argv[1]->type);
+		sprintf(statusBuffer,"IDL and NeXus types don't match!: %i & %i ", 
+			datatype, argv[1]->type);
 		IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, statusBuffer);
 		return IDL_GettmpInt(NX_ERROR);
     }
@@ -1037,9 +1053,11 @@ static IDL_VPTR NXputslab_this(int argc, IDL_VPTR *argv)
 
   }
   else {
+    stDim = (IDL_LONG *) argv[2]->value.arr->data;
+    szDim = (IDL_LONG *) argv[3]->value.arr->data;
     for(n = 0; n < rank; n++){
-      start[n] = argv[2]->value.arr->data[rank -n -1];
-      size[n] = argv[3]->value.arr->data[rank -n -1];
+      start[n] = stDim[rank -n -1];
+      size[n] = szDim[rank -n -1];
     }
 		status = NXputslab (hHandle, argv[1]->value.arr->data, 
 				    start, size);
@@ -1060,7 +1078,7 @@ static IDL_VPTR NXputslab_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXputattr_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int length, attr_type;
@@ -1082,14 +1100,14 @@ static IDL_VPTR NXputattr_this(int argc, IDL_VPTR *argv)
    attr_name = IDL_VarGetString(argv[1]);
    length = IDL_LongScalar(argv[3]);
 
-   fileid = (int *) IDL_LongScalar(argv[0]);
+   fileid = (int) IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-   hHandle = (int *)HHGetPointer(fileid);
+   hHandle = HHGetPointer(fileid);
 
 
   attr_type = datatypecheck(argv[4]);
@@ -1183,12 +1201,12 @@ static IDL_VPTR NXputattr_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXgetattr_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
-  int iHandle, status;
+  int iHandle, status = 1;
   int length, attr_type;
   IDL_LONG dims[IDL_MAX_ARRAY_DIM];
-  IDL_VPTR r_value, r_lenght;
+  IDL_VPTR r_value = 0, r_lenght;
   char* attr_name;
   char* attrtype;
   char* value_str;
@@ -1219,7 +1237,7 @@ static IDL_VPTR NXgetattr_this(int argc, IDL_VPTR *argv)
 
   if(attr_type == -1) return IDL_GettmpInt(NX_ERROR);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   length = (int ) IDL_LongScalar(argv[3]);
 
 
@@ -1227,7 +1245,7 @@ static IDL_VPTR NXgetattr_this(int argc, IDL_VPTR *argv)
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -1351,7 +1369,7 @@ void releaseMemory( UCHAR * memPtr)
 static IDL_VPTR NXgetinfo_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR r_rank, r_datatype, array;
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status, n;
   int rank,  datatype;
@@ -1368,13 +1386,13 @@ static IDL_VPTR NXgetinfo_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 /*  status = NXgetdataID (hHandle, &data_id);
   if(status == NX_ERROR) {
@@ -1426,7 +1444,7 @@ static IDL_VPTR NXgetinfo_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXgetgroupinfo_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR IDL_group_name, IDL_group_class, IDL_item_number;
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
   int item_number;
@@ -1442,12 +1460,12 @@ static IDL_VPTR NXgetgroupinfo_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -1477,7 +1495,7 @@ static IDL_VPTR NXgetgroupinfo_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXinitgroupdir_this(int argc, IDL_VPTR *argv)
 {
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -1488,12 +1506,12 @@ static IDL_VPTR NXinitgroupdir_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -1515,7 +1533,7 @@ static IDL_VPTR NXinitgroupdir_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXgetnextentry_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR IDL_group_name, IDL_group_class, IDL_data_type;
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -1531,12 +1549,12 @@ static IDL_VPTR NXgetnextentry_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 
   NXMSetError(NULL,idlError);
@@ -1568,7 +1586,7 @@ static IDL_VPTR NXgetnextentry_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXgetattrinfo_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR IDL_attr_number;
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
   int attr_number = 0;
@@ -1580,12 +1598,12 @@ static IDL_VPTR NXgetattrinfo_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -1609,7 +1627,7 @@ static IDL_VPTR NXgetattrinfo_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXinitattrdir_this(int argc, IDL_VPTR *argv)
 {
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -1620,12 +1638,12 @@ static IDL_VPTR NXinitattrdir_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 
   NXMSetError(NULL,idlError);
@@ -1647,8 +1665,8 @@ static IDL_VPTR NXinitattrdir_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXgetnextattr_this(int argc, IDL_VPTR *argv)
 {
-  IDL_VPTR IDL_attr_name, IDL_length, IDL_attr_type;
-  IDL_INT *fileid;
+  IDL_VPTR IDL_attr_name = NULL, IDL_length= NULL, IDL_attr_type = NULL;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -1664,12 +1682,12 @@ static IDL_VPTR NXgetnextattr_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -1709,7 +1727,7 @@ static IDL_VPTR NXgetgroupID_this(int argc, IDL_VPTR *argv)
   IDL_VPTR result;
   int status, iHandle, iLink;
   NXaccess am;
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   NXlink *group_id = NULL;
 
@@ -1721,13 +1739,13 @@ static IDL_VPTR NXgetgroupID_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   group_id = (NXlink *)malloc(sizeof(NXlink));
   if(group_id == NULL){
@@ -1768,7 +1786,7 @@ static IDL_VPTR NXgetdataID_this(int argc, IDL_VPTR *argv)
   IDL_VPTR result;
   int status, iHandle, iLink;
   NXaccess am;
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   NXlink *data_id = NULL;
 
@@ -1780,13 +1798,13 @@ static IDL_VPTR NXgetdataID_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   data_id = (NXlink *)malloc(sizeof(NXlink));
   if(data_id == NULL){
@@ -1826,7 +1844,7 @@ static IDL_VPTR NXgetdataID_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXgetdata_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR data_array;
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int rank,  datatype, n;
@@ -1834,7 +1852,7 @@ static IDL_VPTR NXgetdata_this(int argc, IDL_VPTR *argv)
 /*  int dimension[8]; */
   IDL_ARRAY_DIM dimension;
   int data_area_pointer[NX_MAXRANK];
-  void *data_buffer;
+  void *data_buffer = NULL;
   char *char_buffer;
   NXlink data_id;
 
@@ -1846,14 +1864,14 @@ static IDL_VPTR NXgetdata_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int ) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 /*  status = NXgetdataID (hHandle, &data_id);
   if(status == NX_ERROR) {
@@ -1871,7 +1889,7 @@ static IDL_VPTR NXgetdata_this(int argc, IDL_VPTR *argv)
 	}
   /* Dimensions are reversed to switch from C's Column major order to IDL row major order */
   for(n = 0; n < rank; n++) {
-	dimension[n] = data_area_pointer[(rank-1)-n];
+	dimension[n] = data_area_pointer[rank - 1 -n];
 	}
 
 /* Check data type and prepare a Array or a String for NeXuS API nxgetdata function*/
@@ -1923,7 +1941,8 @@ static IDL_VPTR NXgetdata_this(int argc, IDL_VPTR *argv)
   NXMSetError(NULL,idlError);
 
 if(datatype == NX_CHAR) {
- 	status =  NXmalloc ((void **) &char_buffer, rank, dimension, datatype);
+ 	status =  NXmalloc ((void **) &char_buffer, rank, data_area_pointer, 
+			    datatype);
         if(status == NX_ERROR){
  		IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, nexusError);
 		return IDL_GettmpInt(NX_ERROR);
@@ -1973,13 +1992,14 @@ else {
 static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR data_array;
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int rank,  datatype, n;
-  int start[NX_MAXRANK], size[NX_MAXRANK];
+  int start[NX_MAXRANK], size[NX_MAXRANK], dim[NX_MAXRANK];
+  IDL_LONG *stDim, *szDim;
   IDL_ARRAY_DIM dimension;
-  void *data_buffer;
+  void *data_buffer = NULL;
 
 
   if (argc != 4) {
@@ -2003,26 +2023,34 @@ static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
   }
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 /*  status = NXgetdataID (hHandle, &data_id);
   if(status == NX_ERROR) {
 		IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Dataset must be opened before nxputdata");
 		return IDL_GettmpInt(NX_ERROR);
-		} */
+	      } */
 
   /* First get the rank, dimension and datatype */
-  status = NXgetinfo (hHandle, &rank, dimension, &datatype);
+  status = NXgetinfo (hHandle, &rank, dim, &datatype);
   if(status == NX_ERROR) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, nexusError);
 	return IDL_GettmpInt(NX_ERROR);
 	}
+
+  /* swap dimensions again */
+  stDim = (IDL_LONG *)argv[2]->value.arr->data;
+  szDim = (IDL_LONG *)argv[3]->value.arr->data;
+  for(n = 0; n < rank; n++){
+    start[n] = stDim[rank -n  -1];
+    size[n] = szDim[rank -n  -1];
+  }
 
 
 /* Check data type and prepare a Array or a String for NeXuS API nxgetdata function*/
@@ -2033,36 +2061,36 @@ static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
 	break;
 	case NX_FLOAT32:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXFLOAT32"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_FLOAT, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_FLOAT, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	case NX_FLOAT64:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXFLOAT64"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_DOUBLE, rank, (void *) argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_DOUBLE, rank, (void *) size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	case NX_INT8:
 		/* This data type is not supported in IDL, A dangerous conversion to IDL_TYP_INT? */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_BYTE, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_BYTE, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	case NX_UINT8:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXUINT8"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_BYTE, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_BYTE, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	case NX_INT16:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXINT16"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_INT, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_INT, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	case NX_UINT16:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXUINT16"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_UINT, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_UINT, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	case NX_INT32:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXINT32"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_LONG, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_LONG, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 
 	break;
 	case NX_UINT32:
 		/* IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "NXUINT32"); */
-		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_ULONG, rank, (void *)argv[3]->value.arr->data, IDL_ARR_INI_ZERO, &data_array);
+		data_buffer = (void *)IDL_MakeTempArray(IDL_TYP_ULONG, rank, (void *)size, IDL_ARR_INI_ZERO, &data_array);
 	break;
 	default:
 		IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Data in the NeXus file is of an unknown datatype");
@@ -2108,11 +2136,6 @@ static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
      }
 
   else {
-    /* swap dimensions again */
-    for(n = 0; n < rank; n++){
-      start[n] = argv[2]->value.arr->data[n - rank -1];
-      size[n] = argv[3]->value.arr->data[n - rank -1];
-    }
 	  status = NXgetslab (hHandle, data_buffer, start,size);
 	  if(status == NX_ERROR)
 		{
@@ -2134,7 +2157,7 @@ static IDL_VPTR NXflush_this(int argc, IDL_VPTR *argv)
   IDL_VPTR result;
   int status, iHandle;
   NXaccess am;
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
 
   /* If number of arguments is not 1 return status NX_ERROR */
@@ -2145,13 +2168,13 @@ static IDL_VPTR NXflush_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 
   NXMSetError(NULL,idlError);
@@ -2182,7 +2205,7 @@ static IDL_VPTR NXflush_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXinquirefile_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR IDL_filename;
-  IDL_INT *fileid;
+  IDL_INT fileid;
   NXhandle hHandle;
   int iHandle, status;
 
@@ -2198,14 +2221,14 @@ static IDL_VPTR NXinquirefile_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[0]);
   IDL_ENSURE_SCALAR(argv[2]);
 
-  fileid = (IDL_INT *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   filenameLength =  IDL_LongScalar(argv[2]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -2232,7 +2255,7 @@ static IDL_VPTR NXmakelink_this(int argc, IDL_VPTR *argv)
 {
   int status, iHandle, iLink;
   NXaccess am;
-  int *fileid, *linkid;
+  int fileid, linkid;
   NXhandle hHandle;
   NXlink *link;
 
@@ -2244,15 +2267,15 @@ static IDL_VPTR NXmakelink_this(int argc, IDL_VPTR *argv)
 
   IDL_ENSURE_SCALAR(argv[0]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
-  linkid = (int *) IDL_LongScalar(argv[1]);
+  linkid = (int) IDL_LongScalar(argv[1]);
 
   if(HHCheckIfHandleExists(linkid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown link id");
@@ -2290,7 +2313,7 @@ static IDL_VPTR NXmakenamedlink_this(int argc, IDL_VPTR *argv)
 
   int status, iHandle, iLink;
   NXaccess am;
-  int *fileid, *linkid;
+  int fileid, linkid;
   NXhandle hHandle;
   NXlink *link;
   char* nameoflink;
@@ -2304,15 +2327,15 @@ static IDL_VPTR NXmakenamedlink_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[0]);
   IDL_ENSURE_STRING(argv[1]);
   IDL_ENSURE_SCALAR(argv[2]);
-  fileid = (int *) IDL_LongScalar(argv[0]);
+  fileid = (int) IDL_LongScalar(argv[0]);
   nameoflink = IDL_VarGetString(argv[1]);
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
-  linkid = (int *) IDL_LongScalar(argv[2]);
+  linkid = (int) IDL_LongScalar(argv[2]);
 
   if(HHCheckIfHandleExists(linkid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown link id");
@@ -2338,7 +2361,7 @@ static IDL_VPTR NXmakenamedlink_this(int argc, IDL_VPTR *argv)
 
 static IDL_VPTR NXlinkexternal_this(int argc, IDL_VPTR *argv)
 {
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   char* name;
@@ -2355,7 +2378,7 @@ static IDL_VPTR NXlinkexternal_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_STRING(argv[2]);
   IDL_ENSURE_STRING(argv[3]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int)IDL_LongScalar(argv[0]);
   name = IDL_VarGetString(argv[1]);
   nxclass = IDL_VarGetString(argv[2]);
   nxurl = IDL_VarGetString(argv[3]);
@@ -2366,7 +2389,7 @@ static IDL_VPTR NXlinkexternal_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -2389,7 +2412,7 @@ static IDL_VPTR NXlinkexternal_this(int argc, IDL_VPTR *argv)
 static IDL_VPTR NXisexternalgroup_this(int argc, IDL_VPTR *argv)
 {
   IDL_VPTR IDL_NXurl;
-  int *fileid;
+  int fileid;
   NXhandle hHandle;
   int iHandle, status;
   int nxurllen;
@@ -2406,7 +2429,7 @@ static IDL_VPTR NXisexternalgroup_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_STRING(argv[2]);
   IDL_ENSURE_SCALAR(argv[4]);
 
-  fileid = (int *)IDL_LongScalar(argv[0]);
+  fileid = (int )IDL_LongScalar(argv[0]);
   name = IDL_VarGetString(argv[1]);
   nxclass = IDL_VarGetString(argv[2]);
   nxurllen =  IDL_LongScalar(argv[4]);
@@ -2426,7 +2449,7 @@ static IDL_VPTR NXisexternalgroup_this(int argc, IDL_VPTR *argv)
 	return IDL_GettmpInt(NX_ERROR);
 	}
 
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
   NXMSetError(NULL,idlError);
 
@@ -2459,7 +2482,7 @@ static IDL_VPTR NXsameID_this(int argc, IDL_VPTR *argv)
 
   int status, iHandle, iLink;
   NXaccess am;
-  int *fileid, *linkid_one, *linkid_two;
+  int fileid, linkid_one, linkid_two;
   NXhandle hHandle;
   NXlink *link_one, *link_two;
 
@@ -2472,15 +2495,15 @@ static IDL_VPTR NXsameID_this(int argc, IDL_VPTR *argv)
   IDL_ENSURE_SCALAR(argv[1]);
   IDL_ENSURE_SCALAR(argv[2]);
 
-  fileid = (int *) IDL_LongScalar(argv[0]);
-  linkid_one = (int *) IDL_LongScalar(argv[1]);
-  linkid_two = (int *) IDL_LongScalar(argv[2]);
+  fileid = (int ) IDL_LongScalar(argv[0]);
+  linkid_one = (int ) IDL_LongScalar(argv[1]);
+  linkid_two = (int ) IDL_LongScalar(argv[2]);
 
   if(HHCheckIfHandleExists(fileid) == -1) {
 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
 	return IDL_GettmpInt(NX_ERROR);
 	}
-  hHandle = (int *)HHGetPointer(fileid);
+  hHandle = HHGetPointer(fileid);
 
 
   if(HHCheckIfHandleExists(linkid_one) == -1) {
@@ -2552,10 +2575,10 @@ int IDL_Load(void)
     { NXmakenamedlink_this, "NXMAKENAMEDLINK", 0, IDL_MAXPARAMS, 0, 0},
     { NXlinkexternal_this, "NXLINKEXTERNAL", 0, IDL_MAXPARAMS, 0, 0},
     { NXisexternalgroup_this, "NXISEXTERNALGROUP", 0, IDL_MAXPARAMS, 0, 0},
-    { NXsameID_this, "NXSAMEID", 0, IDL_MAXPARAMS, 0, 0},
+    { NXsameID_this, "NXSAMEID", 0, IDL_MAXPARAMS, 0, 0}
   };
 
-  /*
+  /* 
    * Create a message block to hold our messages. Save its handle where
    * the other routines can access it.
    */

@@ -328,7 +328,7 @@ pro read_test, argument
 	print, 'Openpath on a relative path  (../r8_data) succesfull'
 	endif else begin
 		print, 'Openpath on a relative path FAILED (../r8_data)'
-        end else
+        endelse
 
 	S = nxclose(fileid)
 	print, 'nxclose status: ',S

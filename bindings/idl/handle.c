@@ -8,6 +8,7 @@
   Mark Koennecke, October 2000
 */
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "handle.h"
 
