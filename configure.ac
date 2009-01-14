@@ -59,6 +59,8 @@ AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
 
 AC_ARG_ENABLE([debug], AC_HELP_STRING([--enable-debug],[Turn off optimisation]), [enable_debug=$enableval],[enable_debug=no])
 
+AC_ARG_ENABLE([32bit], AC_HELP_STRING([--enable-32bit],[build 32bit binary on 64 bit computer]), [enable_32bit=$enableval],[enable_32bit=no])
+
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[with_cc=$withval], [with_cc=yes])
@@ -182,11 +184,6 @@ AC_ARG_WITH([idlroot],
 	[if test $withval != no; then IDLROOT=$withval; fi])
 AM_CONDITIONAL(HAVE_IDL, [test "$IDLROOT" != ""])
 
-dnl Work out the architecture for IDL
-if test -n "IDLROOT" ; then
-    AS_CASE([$build_cpu], [x86|i386|i686], [IDLARCH=x86], [IDLARCH=$build_cpu])
-    AC_SUBST(IDLARCH)
-fi
 
 AC_ARG_WITH([doxygen], AC_HELP_STRING([--with-doxygen=/path/to/doxygen], [Specify path to doxygen]), [with_doxygen=$withval], [with_doxygen=no])
 if test x"$with_doxygen" != x"no" ; then
@@ -289,10 +286,19 @@ dnl microsoft LIB command (used in MinGW makefile to create .LIB file)
 AC_CHECK_PROGS(MS_LIB, [LIB])
 AM_CONDITIONAL(HAVE_MS_LIB, [test ! -z "$MS_LIB"])
 
+# strict aliasing causes issues with casts from NXmalloc()
+CFLAGS="-fno-strict-aliasing"
+CXXFLAGS="-fno-strict-aliasing"
+
 # check for debug
 if test "$enable_debug" = "yes"; then
-    CFLAGS="-O0 -g"
-    CXXFLAGS="-O0 -g"
+    CFLAGS="$CFLAGS -O0 -g"
+    CXXFLAGS="$CXXFLAGS -O0 -g"
+fi
+
+if test "$enable_32bit" = "yes"; then
+    CFLAGS="$CFLAGS -m32"
+    CXXFLAGS="$CXXFLAGS -m32"
 fi
 
 # enable compiler warnings if gcc
@@ -336,6 +342,14 @@ HDF5_EXT=so # library file extent to look for with HDF5 libraries
 
 AC_SUBST(LIBXML2_CFLAGS)
 LIBXML2_CFLAGS='`xml2-config --cflags`'
+
+# set up for linux here - mac is covered in the case $host statement
+if test $enable_32bit = yes; then
+    IDL_HOST="bin.linux.x86"	# force 32 bit on a 64 bit machine
+else
+    IDL_HOST="bin.linux.$build_cpu"
+fi
+AC_SUBST(IDL_HOST)
 
 case $host in
     alpha*-dec-osf*)
@@ -388,6 +402,11 @@ dnl     fi
 dnl     if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
 dnl           archive_cmds='$CC -dynamiclib -single_module'
 dnl	fi
+	if test $enable_32bit = yes; then
+	    IDL_HOST="bin.darwin.i386" # force 32bit build
+	else
+	    IDL_HOST="bin.darwin.i386"
+	fi
 	;;
 esac
 
