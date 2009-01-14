@@ -1,6 +1,6 @@
 pro write_test, argument
 
-	new_dlm_file = '/home/scratch/lns/kauppila/temp/IDLNeXus-API/NeXusIDL-API.dlm'
+	new_dlm_file = 'NeXusIDL-API.dlm'
 	DLM_REGISTER, new_dlm_file
 
 	print, 'NeXus IDL Api Write test'
