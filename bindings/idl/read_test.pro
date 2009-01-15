@@ -125,7 +125,7 @@ pro read_test, argument
 			if(datatype EQ nx_char) then begin
 				S = nxgetdata(fileid, data)
 				print, 'nxget data status: ', S
-				print, 'data : '
+				print, 'data :'
 				print,  data;				
 				print, ''
 			endif else begin;				
@@ -318,7 +318,7 @@ pro read_test, argument
 
 	S = nxopenpath(fileid, '/entry/data/comp_data')
 	if(S EQ 1) then begin
-	print, 'Openpath succesfull (/entry/data/comp_data) '
+	print, 'Openpath succesfull (/entry/data/comp_data)'
 	endif else begin
 		print, 'Openpath FAILED (/entry/data/comp_data)'
 	endelse

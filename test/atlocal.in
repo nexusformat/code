@@ -77,3 +77,10 @@ else
 fi
 export HAVE_PYTHON
 #
+if test ! -z "@IDLROOT@"; then
+    HAVE_IDL=run_test
+else
+    HAVE_IDL=skip_test
+fi
+export HAVE_IDL
+#
