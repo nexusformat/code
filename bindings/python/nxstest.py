@@ -93,6 +93,7 @@ def populate(filename,mode):
     
     # Write numeric data
     for var in ['i1','i2','i4','i8','r4']:
+        if mode is 'w4' and var is 'i8': continue
         name = var+'_data'
         val = locals()[var]
         file.makedata(name,val.dtype,val.shape)
@@ -182,7 +183,7 @@ def dicteq(a,b):
             return False
     return True
 
-def check(filename):
+def check(filename, mode):
     global failures
     failures = 0
     file = nxs.open(filename,'rw')
@@ -212,6 +213,7 @@ def check(filename):
          ('r4','float32',(5,4),1),
          ('r8','float64',(5,4),1)
          ]:
+        if mode is 'w4' and name is 'i8': continue
         n = numpy.prod(shape)
         expected = numpy.arange(n,dtype=dtype).reshape(shape)*scale
         file.opendata(name+'_data')
@@ -346,7 +348,7 @@ def test_mode(mode,quiet=True,external=False):
         show_structure('dmc01'+ext)
     if not quiet:
         show_structure(filename)
-    failures = check(filename)
+    failures = check(filename,mode)
     if external: failures += test_external(mode,quiet)
     return failures
 
