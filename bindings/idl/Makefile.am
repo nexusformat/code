@@ -42,8 +42,11 @@ libNeXusIDL_API_la_LDFLAGS = @SHARED_LDFLAGS@ -Wl,--no-undefined -L$(IDLROOT)/bi
 
 AM_CPPFLAGS = -I$(IDLROOT)/external/include
 
+all : all-am NeXusIDL-API.so
+
 install-exec-hook :
 	( cd $(DESTDIR)$(libdir); ln -s libNeXusIDL-API.so NeXusIDL-API.so )
+
 
 NeXusIDL-API.so : libNeXusIDL-API.la
 	ln -sf .libs/libNeXusIDL-API.so $@
