@@ -1,0 +1,7 @@
+#!/bin/bash
+test=$1
+echo $test
+idl << EOF
+write_test, $test
+read_test, $test
+EOF
