@@ -569,15 +569,15 @@ AT_CLEANUP
 
 AT_BANNER([[Testing the Python bindings.]])
 AT_SETUP([Checking HDF4 test file])
-AT_CHECK([$HAVE_HDF4 && $HAVE_PYTHON && python $abs_srcdir/../bindings/python/nxstest.py -q hdf4 | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF4 && $HAVE_PYTHON && ( cd $abs_srcdir/../bindings/python; $PYTHON nxstest.py -q hdf4 | sed -e 's/\r$//' ) ],[], 
 [[]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 test file])
-AT_CHECK([$HAVE_HDF5 && $HAVE_PYTHON && python $abs_srcdir/../bindings/python/nxstest.py -q hdf5 | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF5 && $HAVE_PYTHON && ( cd $abs_srcdir/../bindings/python; $PYTHON nxstest.py -q hdf5 | sed -e 's/\r$//' ) ],[], 
 [[]])
 AT_CLEANUP
 AT_SETUP([Checking XML test file])
-AT_CHECK([$HAVE_XML && $HAVE_PYTHON && python $abs_srcdir/../bindings/python/nxstest.py -q xml | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_XML && $HAVE_PYTHON && ( cd $abs_srcdir/../bindings/python; $PYTHON nxstest.py -q xml | sed -e 's/\r$//' ) ],[], 
 [[]])
 AT_CLEANUP
 
