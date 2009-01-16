@@ -1665,7 +1665,7 @@ NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
 NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
-  int stackPtr, currentAtt;
+  int stackPtr, currentAtt, skip;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1677,15 +1677,15 @@ NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
   /*
     hide type and group name attributes
   */
-  if(!isDataNode(current)) {
-    *iN = current->value.element.num_attrs -1;
-    return NX_OK;
-  }
-  if(mxmlElementGetAttr(current,TYPENAME) != NULL){
-    *iN = current->value.element.num_attrs -1;
+  skip=0;
+  if(isDataNode(current)) {
+    /* data nodes may have type */
+    if(mxmlElementGetAttr(current,TYPENAME) != NULL) skip=1;
   } else {
-    *iN = current->value.element.num_attrs;
+    /* group nodes (except root) have name */
+    if(mxmlElementGetAttr(current,"name") != NULL) skip=1;
   }
+  *iN = current->value.element.num_attrs - skip;
   return NX_OK;
 }
 /*================= Linking functions =================================*/

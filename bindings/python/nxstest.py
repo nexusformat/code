@@ -44,6 +44,7 @@ def _show(file, indent=0):
     for attr,value in file.attrs():
         print "%(prefix)s@%(attr)s: %(value)s" % locals()
     for name,nxclass in file.entries():
+        if nxclass.startswith("CDF"): continue # Root has an extra CDF class
         if nxclass == "SDS":
             shape,dtype = file.getinfo()
             dims = "x".join([str(x) for x in shape])
@@ -188,13 +189,21 @@ def check(filename, mode):
     failures = 0
     file = nxs.open(filename,'rw')
     if filename != file.inquirefile(): fail("Files don't match")
-    attrs = file.getattrinfo()
-    if attrs != 4: fail("Expected 4 root attributes but got %d", attrs)
-    for i in range(attrs):
+
+    # check headers
+    num_attrs = file.getattrinfo()
+    wxattrs = ['xmlns','xmlns:xsi','xsi:schemaLocation', 'XML_version']
+    w4attrs = ['HDF_version']
+    w5attrs = ['HDF5_Version']
+    extras = dict(wx=wxattrs,w4=w4attrs,w5=w5attrs)
+    expected_attrs = ['NeXus_version','file_name','file_time']+extras[mode]
+    for i in range(num_attrs):
         name,dims,type = file.getnextattr()
-        if name not in ['file_time','HDF_version','HDF5_Version','XML_version',
-                        'NeXus_version','file_name']:
+        if name not in expected_attrs:
             fail("attribute %s unexpected"%(name))
+    if num_attrs != len(expected_attrs): 
+        fail("Expected %d root attributes but got %d"
+             % (len(expected_attrs),num_attrs))
     
     file.opengroup('entry','NXentry')
     
@@ -229,7 +238,9 @@ def check(filename, mode):
     get = file.getattr("i4_attribute",1,'int32')
     if not get == numpy.int32(42): fail("i4_attribute retrieved %s"%(get))
     get = file.getattr("r4_attribute",1,'float32')
-    if not get == numpy.float32(3.14159265): fail("r4_attribute retrieved %s"%(get))
+    if ((mode=='wx' and not abs(get-3.14159265) < 1e-6) or
+        (mode!='wx' and not get == numpy.float32(3.14159265))):
+        fail("r4_attribute retrieved %s"%(get))
     ## Oops... NAPI doesn't support array attributes
     #expect = numpy.array([3,2],dtype='int32')
     #get = file.getattr("i4_array",2,'int32')
