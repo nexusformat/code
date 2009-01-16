@@ -93,7 +93,7 @@ def populate(filename,mode):
     
     # Write numeric data
     for var in ['i1','i2','i4','i8','r4']:
-        if mode is 'w4' and var is 'i8': continue
+        if mode == 'w4' and var == 'i8': continue
         name = var+'_data'
         val = locals()[var]
         file.makedata(name,val.dtype,val.shape)
@@ -213,7 +213,7 @@ def check(filename, mode):
          ('r4','float32',(5,4),1),
          ('r8','float64',(5,4),1)
          ]:
-        if mode is 'w4' and name is 'i8': continue
+        if mode == 'w4' and name == 'i8': continue
         n = numpy.prod(shape)
         expected = numpy.arange(n,dtype=dtype).reshape(shape)*scale
         file.opendata(name+'_data')
