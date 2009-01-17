@@ -1,5 +1,4 @@
-# This program is public domain
-
+# This program is public domain 
 # Author: Paul Kienzle
 
 """
@@ -106,7 +105,7 @@ Miscellaneous constants::
 
   nxs.MAXNAMELEN  - names must be shorter than this
   nxs.MAXPATHLEN  - total path length must be shorter than this
-
+  nxs.H4SKIP - class names that may appear in HDF4 files but can be ignored
 
 Caveats
 =======
@@ -122,7 +121,7 @@ This is an eigenbug:
 
 .. _NAPI:  http://www.nexusformat.org/Application_Program_Interface
 """
-__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN',
+__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','H4SKIP',
            'NeXus','NeXusError','open']
 
 import sys, os, numpy, ctypes
@@ -155,6 +154,10 @@ UNLIMITED=-1
 MAXRANK=32
 MAXNAMELEN=64
 MAXPATHLEN=1024 # inferred from code
+
+# bogus groups; these groups are ignored in HDFView from NCSA.
+H4SKIP = ['CDF0.0','_HDF_CHK_TBL_','Attr0.0',
+          'RIG0.0','RI0.0', 'RIATTR0.0N','RIATTR0.0C']
 
 # HDF data types from numpy types
 _nxtype_code=dict(
@@ -601,6 +604,12 @@ class NeXus(object):
         This function doesn't return the storage class for data entries
         since getinfo returns shape and storage, both of which are required
         to read the data.
+
+        Note that HDF4 files can have entries in the file with classes
+        that don't need to be processed.  If the file follows the standard
+        NeXus DTDs then skip any entry for which nxclass.startswith('NX') 
+        is False.  For non-conforming files, skip those entries with 
+        nxclass in nxs.H4SKIP.
         """
         name = ctypes.create_string_buffer(MAXNAMELEN)
         nxclass = ctypes.create_string_buffer(MAXNAMELEN)
@@ -629,7 +638,8 @@ class NeXus(object):
 
         This does not correspond to an existing NeXus API function,
         but instead combines the work of initgroupdir/getnextentry
-        and open/close on data and group.
+        and open/close on data and group.  Entries in nxs.H4SKIP are
+        ignored.
         """
         # To preserve the semantics we must read in the whole list
         # first, then process the entries one by one.  Keep track
@@ -641,7 +651,9 @@ class NeXus(object):
         n,_,_ = self.getgroupinfo()
         L = []
         for i in range(n):
-            L.append(self.getnextentry())
+            name,nxclass = self.getnextentry()
+            if nxclass not in H4SKIP:
+                L.append((name,nxclass))
         for name,nxclass in L:
             self.openpath(path)  # Reset the file cursor
             if nxclass == "SDS":

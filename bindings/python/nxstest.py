@@ -44,7 +44,6 @@ def _show(file, indent=0):
     for attr,value in file.attrs():
         print "%(prefix)s@%(attr)s: %(value)s" % locals()
     for name,nxclass in file.entries():
-        if nxclass.startswith("CDF"): continue # Root has an extra CDF class
         if nxclass == "SDS":
             shape,dtype = file.getinfo()
             dims = "x".join([str(x) for x in shape])
