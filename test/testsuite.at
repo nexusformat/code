@@ -1547,7 +1547,7 @@ nxopen status:        1
 nxinquirefile status:        1
 nxinquirefile found: NXtest.xml
 nxgetattrinfo status:       1
-Number of global attributes:        6
+Number of global attributes:        7
 
 NXgetnextattr status:        1
 
