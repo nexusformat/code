@@ -215,7 +215,7 @@ AT_CLEANUP
 AT_SETUP([Check the XML binding])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
-Number of global attributes: 6
+Number of global attributes: 7
    NeXus_version = 4.1.0
    file_name = NXtest.xml
    xmlns = http://definition.nexusformat.org/schema/3.0
@@ -265,7 +265,7 @@ AT_CLEANUP
 AT_SETUP([Check the XML binding (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
-Number of global attributes: 6
+Number of global attributes: 7
    NeXus_version = 4.1.0
    file_name = NXtest.xml
    xmlns = http://definition.nexusformat.org/schema/3.0
@@ -315,7 +315,7 @@ AT_CLEANUP
 AT_SETUP([Check the XML table binding (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-table-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest-table.xml
-Number of global attributes: 6
+Number of global attributes: 7
    NeXus_version = 4.1.0
    file_name = NXtest-table.xml
    xmlns = http://definition.nexusformat.org/schema/3.0
