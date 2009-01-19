@@ -238,7 +238,10 @@ if test x$with_opengenie != xno; then
 fi
 if test x$with_python != xno; then
     AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[bin/python])
-    if test x$PYTHONROOT != x; then PYTHON=$PYTHONROOT/bin/python; fi
+    if test x$PYTHONROOT != x; then
+	if test -r "$PYTHONROOT/bin/python"; then PYTHON="$PYTHONROOT/bin/python"; fi
+	if test -r "$PYTHONROOT/python"; then PYTHON="$PYTHONROOT/python"; fi
+    fi
     AM_PATH_PYTHON(,, :)
 fi
 
