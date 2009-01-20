@@ -1577,8 +1577,7 @@ attribute value: http://www.w3.org/2001/XMLSchema-instance
 NXgetnextattr status:        1
 
 attribute name: xsi:schemaLocation
-attribute value:
-http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
+attribute value: http://definition.nexusformat.org/schema/3.0 http://definition.nexusformat.org/schema/3.0/BASE.xsd
 
 NXgetnextattr status:        1
 
