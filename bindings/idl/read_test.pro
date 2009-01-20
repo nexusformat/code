@@ -66,7 +66,7 @@ pro read_test, argument
 			print, 'attribute name: ', attrname
 			;print, 'attrubute lenght: ', lenght
 			;print, 'attribute type: ', attr_type
-			print, 'attribute value: ', value
+			print, format='("attribute value: ",A)', value
 		endif
 	endrep until (attr_status NE 1)
 
