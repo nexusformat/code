@@ -36,7 +36,7 @@ Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
 Group: entry(NXentry) contains 9 items
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -54,7 +54,7 @@ Group: entry(NXentry) contains 9 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
@@ -83,7 +83,7 @@ Number of group attributes: 2
    cucumber = passion
 Group: entry(NXentry) contains 10 items
    c1_data(4) = abcdefghijklmnopqrst
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    Subgroup: data(NXdata)
    grosse_zahl(26) =  12 555555555555 23 777777777777
    i1_data(20) =  1 2 3 4
@@ -102,7 +102,7 @@ Group: entry(NXentry) contains 10 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
@@ -129,7 +129,7 @@ Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
 Group: entry(NXentry) contains 9 items
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -147,7 +147,7 @@ Group: entry(NXentry) contains 9 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
@@ -176,7 +176,7 @@ Number of group attributes: 2
    cucumber = passion
 Group: entry(NXentry) contains 10 items
    c1_data(4) = abcdefghijklmnopqrst
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    Subgroup: data(NXdata)
    grosse_zahl(26) =  12 555555555555 23 777777777777
    i1_data(20) =  1 2 3 4
@@ -195,7 +195,7 @@ Group: entry(NXentry) contains 10 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
@@ -225,7 +225,7 @@ Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
 Group: entry(NXentry) contains 10 items
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -243,7 +243,7 @@ Group: entry(NXentry) contains 10 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
@@ -275,7 +275,7 @@ Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
 Group: entry(NXentry) contains 10 items
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -293,7 +293,7 @@ Group: entry(NXentry) contains 10 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
@@ -325,7 +325,7 @@ Number of group attributes: 2
    hugo = namenlos
    cucumber = passion
 Group: entry(NXentry) contains 10 items
-   ch_data(4) = NeXus data
+   ch_data(4) = NeXus ><}&{'\&" Data
    c1_data(4) = abcdefghijklmnopqrst
    i1_data(20) =  1 2 3 4
    i2_data(22) =  1000 2000 3000 4000
@@ -344,7 +344,7 @@ Group: entry(NXentry) contains 10 items
        13.000000 14.000000 15.000000 16.000000
        17.000000 18.000000 19.000000 20.000000
       Number of attributes : 4
-         ch_attribute : NeXus
+         ch_attribute : NeXus ><}&{'\&" Data
          i4_attribute : 42
          r4_attribute : 3.141593
          target : /entry/r8_data
