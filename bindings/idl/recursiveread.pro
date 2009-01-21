@@ -68,7 +68,7 @@ pro opendata, fileid
 	print, ''
 	S = nxgetdata(fileid, data)
         print, 'nxgetdata status: ', S
-        print, 'data : '
+        print, 'data :'
         print,  data
 	print, ''
         S = nxgetattrinfo(fileid, numberofattr)

@@ -341,7 +341,7 @@ pro write_test, argument
 
 	S = nxgetdata(fileid, data)
 		print, 'nxget data status: ', S
-		print, 'First file time : '
+		print, 'First file time :'
 		print,  data
 		print, ''
 
@@ -353,7 +353,7 @@ pro write_test, argument
 	print, 'nxopenpath status', S
 	S = nxgetdata(fileid, data)
 		print, 'nxget data status: ', S
-		print, 'Second file sample : '
+		print, 'Second file sample :'
 		print,  data
 		print, ''
 
@@ -365,14 +365,14 @@ pro write_test, argument
 	print, 'nxopenpath status', S
 	S = nxgetdata(fileid, data)
 		print, 'nxget data status: ', S
-		print, 'Second file time : '
+		print, 'Second file time :'
 		print,  data
 		print, ''
 
 	S = nxopenpath(fileid, '/')
 	S = nxisexternalgroup(fileid, 'entry1', 'NXentry', filename, 255)
 	print, 'nxisexternalgroup status', S
-	print, 'entry1 external URL = ', filename
+	print, 'entry1 external URL =', filename
 
 	S = nxclose(fileid)
 	print, 'nxclose status: ', S

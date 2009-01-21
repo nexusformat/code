@@ -118,7 +118,7 @@ nxtranslate:
 
 # this sets the test running environment - in case we
 # have got built with shared HDF libraries we need to set LD_LIBRARY_PATH
-TESTS_ENVIRONMENT=env LD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:$${LD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@:/usr/local/lib DYLD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:$${DYLD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@:/usr/local/lib
+TESTS_ENVIRONMENT=env PYTHON=$(PYTHON) IDL_PATH="@abs_top_srcdir@/bindings/idl:<IDL_DEFAULT>" IDL_DLM_PATH="@abs_top_builddir@/bindings/idl:<IDL_DEFAULT>" LD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:@abs_top_builddir@/bindings/idl:$${LD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@:/usr/local/lib DYLD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:@abs_top_builddir@/bindings/idl:$${DYLD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@:/usr/local/lib
 
 run_test_SOURCES=run_test.c
 run_test_LDFLAGS=-static $(LDFLAGS)

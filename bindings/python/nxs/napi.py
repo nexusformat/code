@@ -1,5 +1,4 @@
-# This program is public domain
-
+# This program is public domain 
 # Author: Paul Kienzle
 
 """
@@ -106,7 +105,7 @@ Miscellaneous constants::
 
   nxs.MAXNAMELEN  - names must be shorter than this
   nxs.MAXPATHLEN  - total path length must be shorter than this
-
+  nxs.H4SKIP - class names that may appear in HDF4 files but can be ignored
 
 Caveats
 =======
@@ -122,7 +121,7 @@ This is an eigenbug:
 
 .. _NAPI:  http://www.nexusformat.org/Application_Program_Interface
 """
-__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN',
+__all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','H4SKIP',
            'NeXus','NeXusError','open']
 
 import sys, os, numpy, ctypes
@@ -155,6 +154,10 @@ UNLIMITED=-1
 MAXRANK=32
 MAXNAMELEN=64
 MAXPATHLEN=1024 # inferred from code
+
+# bogus groups; these groups are ignored in HDFView from NCSA.
+H4SKIP = ['CDF0.0','_HDF_CHK_TBL_','Attr0.0',
+          'RIG0.0','RI0.0', 'RIATTR0.0N','RIATTR0.0C']
 
 # HDF data types from numpy types
 _nxtype_code=dict(
@@ -300,7 +303,8 @@ class NeXus(object):
 
         self.filename, self.mode = filename, mode
         self.handle = c_void_p(None)
-        self.path = []
+        self._path = []
+        self._indata = False
         status = nxlib.nxiopen_(filename,mode,_ref(self.handle))
         if status == ERROR:
             if mode in [ACC_READ, ACC_RDWR]:
@@ -309,6 +313,10 @@ class NeXus(object):
                 op = 'create'
             raise NeXusError, "Could not %s %s"%(op,filename)
         self.isopen = True
+
+    def _getpath(self): 
+        return '/'+'/'.join(self._path)
+    path = property(_getpath,doc="Unix-style path to node")
 
     def __del__(self):
         """
@@ -340,7 +348,8 @@ class NeXus(object):
         status = nxlib.nxiopen_(self.filename,mode,_ref(self.handle))
         if status == ERROR:
             raise NeXusError, "Could not open %s"%(self.filename)
-        self.path = []
+        self._path = []
+        self._indata = False
 
     nxlib.nxiclose_.restype = c_int
     nxlib.nxiclose_.argtypes = [c_void_pp]
@@ -357,7 +366,8 @@ class NeXus(object):
             status = nxlib.nxiclose_(_ref(self.handle))
             if status == ERROR:
                 raise NeXusError, "Could not close NeXus file %s"%(self.filename)
-        self.path = []
+        self._path = []
+        self._indata = False
 
     nxlib.nxiflush_.restype = c_int
     nxlib.nxiflush_.argtypes = [c_void_pp]
@@ -411,21 +421,87 @@ class NeXus(object):
     def openpath(self, path):
         """
         Open a particular group '/path/to/group'.  Paths can
-        be relative to the currently open group.
+        be absolute or relative to the currently open group.
+        If openpath fails, then currently open path may not
+        be different from the starting path.
 
         Raises ValueError.
 
         Corresponds to NXopenpath(handle, path)
         """
-        status = nxlib.nxiopenpath_(self.handle, path)
-        if status == ERROR:
-            raise ValueError, "Could not open %s in %s"%(path,self._loc())
-        n,path,nxclass = self.getgroupinfo()
-        if path != 'root':
-            self.path = path.split('/')
-        else:
-            self.path = []
+        self._openpath(path, opendata=True)
 
+    def _openpath(self, path, opendata=True):
+        """helper function: open relative path and maybe data"""
+        # Determine target node as sequence of group names
+        if path == '/':
+            target = []
+        elif path.startswith('/'):
+            target = path[1:].split('/')
+        else:
+            target = self._path + path.split('/')
+
+        # Remove relative path indicators from target
+        L = []
+        for t in target:
+            if t == '.': 
+                # Skip current node
+                pass
+            elif t == '..':
+                if L == []:
+                    raise ValueError("too many '..' in path")
+                L.pop()
+            else:
+                L.append(t)
+        target = L
+        #print "current path",self._path
+        #print "%s"%path,target
+
+        # Find which groups need to be closed and opened
+        up = []
+        down = []
+        for i,name in enumerate(target):
+            if i == len(self._path):
+                #print "target longer than current"
+                up = []
+                down = target[i:]
+                break
+            elif self._path[i] != name:
+                #print "target and current differ at",name
+                up = self._path[i:]
+		down = target[i:]
+                break
+        else:
+            #print "target shorter than current"
+            up = self._path[len(target):]
+            down = []
+        up.reverse()
+        #print "close,open",up,down
+
+        # Close groups on the way up
+        if self._indata and up != []:
+            self.closedata()
+            up.pop()
+        for target in up:
+            self.closegroup()
+        
+        # Open groups on the way down
+        for target in down:
+            # Find target name in current group.  We need to do this because
+            # we can't open the group without knowing the class.  We also
+            # need the class so that we can handle SDS specially.
+            n,_,_ = self.getgroupinfo()
+            self.initgroupdir()
+            for i in range(n):
+                name,nxclass = self.getnextentry()
+                if name != target: continue
+                if nxclass != 'SDS':
+                    self.opengroup(name,nxclass)
+                elif opendata: 
+                    self.opendata(name)
+                break
+            else:
+                raise ValueError("node %s not in %s"%(name,self.path))
 
     nxlib.nxiopengrouppath_.restype = c_int
     nxlib.nxiopengrouppath_.argtypes = [c_void_p, c_char_p]
@@ -439,15 +515,7 @@ class NeXus(object):
 
         Corresponds to NXopengrouppath(handle, path)
         """
-        status = nxlib.nxiopengrouppath_(self.handle, path)
-        if status == ERROR:
-            raise ValueError, "Could not open %s in %s"%(path,self.filename)
-        n,path,nxclass = self.getgroupinfo()
-        if path != 'root':
-            self.path = path.split('/')
-        else:
-            self.path = []
-
+        self._openpath(path,opendata=False)
 
     nxlib.nxiopengroup_.restype = c_int
     nxlib.nxiopengroup_.argtypes = [c_void_p, c_char_p, c_char_p]
@@ -464,7 +532,7 @@ class NeXus(object):
         if status == ERROR:
             raise ValueError,\
                 "Could not open %s:%s in %s"%(nxclass,name,self._loc())
-        self.path.append(name)
+        self._path.append(name)
 
     nxlib.nxiclosegroup_.restype = c_int
     nxlib.nxiclosegroup_.argtypes = [c_void_p]
@@ -478,21 +546,24 @@ class NeXus(object):
         """
         #print "close group"
         status = nxlib.nxiclosegroup_(self.handle)
-        group = self.path.pop()
         if status == ERROR:
-            raise NeXusError, "Could not close %s:"%(group,self._loc())
+            raise NeXusError, "Could not close group at %s"%(name,self._loc())
+        self._path.pop()
 
-    nxlib.nxigetinfo_.restype = c_int
-    nxlib.nxigetinfo_.argtypes = [c_void_p, c_int_p, c_char_p, c_char_p]
+    nxlib.nxigetgroupinfo_.restype = c_int
+    nxlib.nxigetgroupinfo_.argtypes = [c_void_p, c_int_p, c_char_p, c_char_p]
     def getgroupinfo(self):
         """
         Query the currently open group returning the tuple
-        numentries, path, nxclass.  The path consists of names
-        of subgroups starting at the root separated by "/".
+        numentries, name, nxclass.
 
         Raises ValueError if the group could not be opened.
 
         Corresponds to NXgetgroupinfo(handle)
+
+        Note: corrects error in HDF5 where getgroupinfo returns the entire
+        path rather than the group name.  Use the path attribute to get
+        a sensible value of path.
         """
         # Space for the returned strings
         path = ctypes.create_string_buffer(MAXPATHLEN)
@@ -502,7 +573,8 @@ class NeXus(object):
         if status == ERROR:
             raise ValueError, "Could not get group info: %s"%(self._loc())
         #print "group info",nxclass.value,name.value,n.value
-        return n.value,path.value,nxclass.value
+        name = path.value.split('/')[-1]  # Protect against HDF5 returning path
+        return n.value,name,nxclass.value
 
     nxlib.nxiinitgroupdir_.restype = c_int
     nxlib.nxiinitgroupdir_.argtypes = [c_void_p]
@@ -532,6 +604,12 @@ class NeXus(object):
         This function doesn't return the storage class for data entries
         since getinfo returns shape and storage, both of which are required
         to read the data.
+
+        Note that HDF4 files can have entries in the file with classes
+        that don't need to be processed.  If the file follows the standard
+        NeXus DTDs then skip any entry for which nxclass.startswith('NX') 
+        is False.  For non-conforming files, skip those entries with 
+        nxclass in nxs.H4SKIP.
         """
         name = ctypes.create_string_buffer(MAXNAMELEN)
         nxclass = ctypes.create_string_buffer(MAXNAMELEN)
@@ -560,23 +638,22 @@ class NeXus(object):
 
         This does not correspond to an existing NeXus API function,
         but instead combines the work of initgroupdir/getnextentry
-        and open/close on data and group.
+        and open/close on data and group.  Entries in nxs.H4SKIP are
+        ignored.
         """
         # To preserve the semantics we must read in the whole list
         # first, then process the entries one by one.  Keep track
         # of the path so we can restore it between entries.
-        n,path,_ = self.getgroupinfo()
-        #print "path",path
-        if not path == "root":
-            path = "/"+path
-        else:
-            path = "/"
+        path = self.path
 
         # Read list of entries
         self.initgroupdir()
+        n,_,_ = self.getgroupinfo()
         L = []
         for i in range(n):
-            L.append(self.getnextentry())
+            name,nxclass = self.getnextentry()
+            if nxclass not in H4SKIP:
+                L.append((name,nxclass))
         for name,nxclass in L:
             self.openpath(path)  # Reset the file cursor
             if nxclass == "SDS":
@@ -633,7 +710,8 @@ class NeXus(object):
         status = nxlib.nxiopendata_(self.handle, name)
         if status == ERROR:
             raise ValueError, "Could not open data %s: %s"%(name, self._loc())
-        self.path.append(name)
+        self._path.append(name)
+        self._indata = True
 
     nxlib.nxiclosedata_.restype = c_int
     nxlib.nxiclosedata_.argtypes = [c_void_p]
@@ -648,10 +726,11 @@ class NeXus(object):
         """
         #print "closing data"
         status = nxlib.nxiclosedata_(self.handle)
-        name = self.path.pop()
         if status == ERROR:
             raise NeXusError,\
-                "Could not close data %s: %s"%(name,self._loc())
+                "Could not close data at %s"%(name,self._loc())
+        self._path.pop()
+        self._indata = False
 
     nxlib.nximakedata_.restype = c_int
     nxlib.nximakedata_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int_p]
@@ -880,6 +959,7 @@ class NeXus(object):
 
         Corresponds to NXgetattr(handle,name,data,&length,&storage)
         """
+        if dtype is 'char': length += 1  # HDF4 needs zero-terminator
         datafn,pdata,size = self._poutput(str(dtype),[length])
         storage = c_int(_nxtype_code[str(dtype)])
         #print "retrieving",name,length,dtype,size
@@ -1064,18 +1144,14 @@ class NeXus(object):
         This does not correspond to an existing NeXus API function, but
         combines the work of attrinfo/initattrdir/getnextattr/getattr.
         """
-        # To preserve the semantics we must read in the whole list
-        # first, then process the entries one by one.
-        pathstr = "/"+"/".join(self.path)
-        #print "checking for links from",pathstr
         n = self.getattrinfo()
         self.initattrdir()
         for i in range(n):
             name,length,dtype = self.getnextattr()
             if name == "target":
                 target = self.getattr(name,length,dtype)
-                #print "target %s, path %s"%(target,pathstr)
-                if target != pathstr:
+                #print "target %s, path %s"%(target,self.path)
+                if target != self.path:
                     return target
                 else:
                     return None
@@ -1141,15 +1217,11 @@ class NeXus(object):
     # ==== Utility functions ====
     def _loc(self):
         """
-        Return file location as string filename:path
+        Return file location as string filename(path)
 
         This is an extension to the NeXus API.
         """
-        if not self.path == []:
-            pathstr = "/".join(self.path)
-        else:
-            pathstr = "root"
-        return "%s(%s)"%(self.filename,pathstr)
+        return "%s(%s)"%(self.filename,self.path)
 
     def _poutput(self, dtype, shape):
         """
@@ -1223,8 +1295,7 @@ class NeXus(object):
 
         TODO: Break this into a tree walker and a visitor.
         """
-        oldpath = "/"+"/".join(self.path)
-        if not path: path = oldpath
+        oldpath = self.path
         self.openpath(path)
 
         print "=== File",self.inquirefile(),path

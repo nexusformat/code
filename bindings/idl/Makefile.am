@@ -34,7 +34,9 @@
 # It works by determining what platform you are on and then
 # recursively invoking make with the proper options to do the build.
 #
-lib_LTLIBRARIES = libNeXusIDL-API.la
+idldlmdir = @IDLDLM@
+idldlm_LTLIBRARIES = libNeXusIDL-API.la
+idldlm_DATA = NeXusIDL-API.dlm
 
 libNeXusIDL_API_la_SOURCES = NeXusIDL-API.c handle.c handle.h
 libNeXusIDL_API_la_LIBADD = $(top_builddir)/src/libNeXus.la
@@ -45,11 +47,12 @@ AM_CPPFLAGS = -I$(IDLROOT)/external/include
 all : all-am NeXusIDL-API.so
 
 install-exec-hook :
-	( cd $(DESTDIR)$(libdir); ln -s libNeXusIDL-API.so NeXusIDL-API.so )
+	( cd $(DESTDIR)$(idldlmdir); ln -s libNeXusIDL-API.so NeXusIDL-API.so )
 
 
 NeXusIDL-API.so : libNeXusIDL-API.la
 	ln -sf .libs/libNeXusIDL-API.so $@
+	if test ! -r NeXusIDL-API.dlm; then ln -s $(srcdir)/NeXusIDL-API.dlm .; fi
 
 CLEANFILES = NeXusIDL-API.so
 
@@ -71,7 +74,8 @@ EXTRA_DIST = \
  recursiveread.pro \
  recursivesearch.pro \
  testfocus.pro \
- write_test.pro
+ write_test.pro \
+ testidlnapi
 
 dist-hook :
 	find $(distdir)/data -depth -type d -name '.svn' -exec rm -fr {} \;

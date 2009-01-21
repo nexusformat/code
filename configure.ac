@@ -180,10 +180,16 @@ AM_CONDITIONAL(HAVE_CBFLIB, [test "$CBFLIBROOT" != ""])
 AC_SUBST(IDLROOT)
 AC_ARG_WITH([idlroot],
 	AC_HELP_STRING([--with-idlroot=/path/to/idlroot],
-                       [Specify location of idl files]),
+                       [Specify root directory of system idl installation]),
 	[if test $withval != no; then IDLROOT=$withval; fi])
 AM_CONDITIONAL(HAVE_IDL, [test "$IDLROOT" != ""])
 
+IDLDLM="\${prefix}/lib"
+AC_SUBST(IDLDLM)
+AC_ARG_WITH([idldlm],
+	AC_HELP_STRING([--with-idldlm=/path/to/idldlm],
+                       [Specify location ito install idl dlm files to]),
+	[if test $withval != no; then IDLDLM=$withval; fi])
 
 AC_ARG_WITH([doxygen], AC_HELP_STRING([--with-doxygen=/path/to/doxygen], [Specify path to doxygen]), [with_doxygen=$withval], [with_doxygen=no])
 if test x"$with_doxygen" != x"no" ; then
@@ -232,7 +238,10 @@ if test x$with_opengenie != xno; then
 fi
 if test x$with_python != xno; then
     AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[bin/python])
-    if test x$PYTHONROOT != x; then PYTHON=$PYTHONROOT/bin/python; fi
+    if test x$PYTHONROOT != x; then
+	if test -r "$PYTHONROOT/bin/python"; then PYTHON="$PYTHONROOT/bin/python"; fi
+	if test -r "$PYTHONROOT/python"; then PYTHON="$PYTHONROOT/python"; fi
+    fi
     AM_PATH_PYTHON(,, :)
 fi
 
@@ -772,7 +781,7 @@ F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAROOT" ; then echo yes ; else echo no ; fi` 
 IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
-PYTHONBINDING=`if test -n "$PYTHONROOT" ; then echo yes ; else echo no ; fi` 
+PYTHONBINDING=`if test -n "$PYTHONROOT" ; then echo yes; else echo no ; fi` 
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
@@ -789,6 +798,7 @@ AC_MSG_RESULT([
 
 Configuration (NeXus):
 
+	Install prefix:        ${prefix}
         Source code location:  ${srcdir}
         Version:               ${VERSION}
         Compiler:              ${CC},${CXX},${F77},${FC}
@@ -805,8 +815,8 @@ build:
             F90/F95 :          ${F90BINDING} (--with-f90=${FC})
                 JAVA:          ${JAVABINDING} (--with-java-home=${JAVAROOT}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
-		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT})
-	      PYTHON:	       ${PYTHONBINDING}
+		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
+	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT})
 
 	documentation:
 	     Doxygen:	       ${DOXYGENDOCS}

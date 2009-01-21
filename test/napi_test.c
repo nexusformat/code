@@ -64,6 +64,7 @@ int main (int argc, char *argv[])
   char nxFile[80];
   char filename[256];
   int64_t grossezahl[4];
+  const char* ch_test_data = "NeXus ><}&{'\\&\" Data";
 
   grossezahl[0] = 12;
   grossezahl[2] = 23;
@@ -96,10 +97,10 @@ int main (int argc, char *argv[])
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   if(NXputattr(fileid,"hugo","namenlos",strlen("namenlos"), NX_CHAR) != NX_OK) return 1;
   if(NXputattr(fileid,"cucumber","passion",strlen("passion"), NX_CHAR) != NX_OK) return 1;
-     NXlen = 10;
+     NXlen = strlen(ch_test_data);
      if (NXmakedata (fileid, "ch_data", NX_CHAR, 1, &NXlen) != NX_OK) return 1;
      if (NXopendata (fileid, "ch_data") != NX_OK) return 1;
-        if (NXputdata (fileid, "NeXus data") != NX_OK) return 1;
+        if (NXputdata (fileid, ch_test_data) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
      if (NXmakedata (fileid, "c1_data", NX_CHAR, 2, array_dims) != NX_OK) return 1;
      if (NXopendata (fileid, "c1_data") != NX_OK) return 1;
@@ -127,7 +128,7 @@ int main (int argc, char *argv[])
         if (NXputslab (fileid, (double*)r8_array + 16, slab_start, slab_size) != NX_OK) return 1;
         slab_start[0] = 0; slab_start[1] = 0; slab_size[0] = 4; slab_size[1] = 4;
         if (NXputslab (fileid, r8_array, slab_start, slab_size) != NX_OK) return 1;
-        if (NXputattr (fileid, "ch_attribute", "NeXus", strlen ("NeXus"), NX_CHAR) != NX_OK) return 1;
+        if (NXputattr (fileid, "ch_attribute", ch_test_data, strlen (ch_test_data), NX_CHAR) != NX_OK) return 1;
         i = 42;
         if (NXputattr (fileid, "i4_attribute", &i, 1, NX_INT32) != NX_OK) return 1;
         r = 3.14159265;
