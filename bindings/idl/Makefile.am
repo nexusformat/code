@@ -51,6 +51,7 @@ install-exec-hook :
 
 NeXusIDL-API.so : libNeXusIDL-API.la
 	ln -sf .libs/libNeXusIDL-API.so $@
+	if test ! -r NeXusIDL-API.dlm; then ln -s $(srcdir)/NeXusIDL-API.dlm .; fi
 
 CLEANFILES = NeXusIDL-API.so
 
@@ -72,7 +73,8 @@ EXTRA_DIST = \
  recursiveread.pro \
  recursivesearch.pro \
  testfocus.pro \
- write_test.pro
+ write_test.pro \
+ testidlnapi
 
 dist-hook :
 	find $(distdir)/data -depth -type d -name '.svn' -exec rm -fr {} \;

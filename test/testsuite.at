@@ -569,24 +569,22 @@ AT_CLEANUP
 
 AT_BANNER([[Testing the Python bindings.]])
 AT_SETUP([Checking HDF4 test file])
-AT_CHECK([$HAVE_HDF4 && $HAVE_PYTHON && ( cd $abs_srcdir/../bindings/python; $PYTHON nxstest.py -q hdf4 | sed -e 's/\r$//' ) ],[], 
+AT_CHECK([skip_test && $HAVE_HDF4 && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q hdf4 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 test file])
-AT_CHECK([$HAVE_HDF5 && $HAVE_PYTHON && ( cd $abs_srcdir/../bindings/python; $PYTHON nxstest.py -q hdf5 | sed -e 's/\r$//' ) ],[], 
+AT_CHECK([$HAVE_HDF5 && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q hdf5 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
 AT_SETUP([Checking XML test file])
-AT_CHECK([$HAVE_XML && $HAVE_PYTHON && ( cd $abs_srcdir/../bindings/python; $PYTHON nxstest.py -q xml | sed -e 's/\r$//' ) ],[], 
+AT_CHECK([$HAVE_XML && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q xml | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
 
 AT_BANNER([[Testing the IDL bindings.]])
 AT_SETUP([Checking HDF4 test file])
-AT_CHECK([$HAVE_HDF4 && $HAVE_IDL && ( cd $abs_srcdir/../bindings/idl; $SHELL testidlnapi "'hdf4'" | sed -e 's/\r$//' ) ],[], 
+AT_CHECK([skip_test && $HAVE_HDF4 && $HAVE_IDL && $SETUP_TEST && $SHELL $abs_srcdir/../bindings/idl/testidlnapi "'hdf4'" | sed -e 's/\r$//' ],[], 
 [['hdf4'
-starting napi test
-% Compiled module: WRITE_TEST.
 NeXus IDL Api Write test
 Using HDF4
 % Loaded DLM: NEXUSIDL-API.
@@ -1002,10 +1000,8 @@ finished napi test
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 test file])
-AT_CHECK([$HAVE_HDF5 && $HAVE_IDL && ( cd $abs_srcdir/../bindings/idl; $SHELL testidlnapi "'hdf5'" | sed -e 's/\r$//' ) ],[], 
+AT_CHECK([$HAVE_HDF5 && $HAVE_IDL && $SETUP_TEST && $SHELL $abs_srcdir/../bindings/idl/testidlnapi "'hdf5'" | sed -e 's/\r$//' ],[], 
 [['hdf5'
-starting napi test
-% Compiled module: WRITE_TEST.
 NeXus IDL Api Write test
 Using HDF5
 % Loaded DLM: NEXUSIDL-API.
@@ -1421,10 +1417,8 @@ finished napi test
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML test file])
-AT_CHECK([$HAVE_XML && $HAVE_IDL && ( cd $abs_srcdir/../bindings/idl; $SHELL testidlnapi "'xml'" | sed -e 's/\r$//' ) ],[], 
+AT_CHECK([$HAVE_XML && $HAVE_IDL && $SETUP_TEST && $SHELL $abs_srcdir/../bindings/idl/testidlnapi "'xml'" | sed -e 's/\r$//' ],[], 
 [['xml'
-starting napi test
-% Compiled module: WRITE_TEST.
 NeXus IDL Api Write test
 Using XML
 % Loaded DLM: NEXUSIDL-API.

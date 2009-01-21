@@ -10,5 +10,5 @@ print, 'finished napi test'
 EOF
 # need to remove IDL startup infomation as this is different on each machine
 # also remove file_time as it will be different every time
-sed -n -e '/^starting napi test/,/^finished napi test/ p' < $IDLTMP | sed -e '/file_time/,/attribute value/ d'
+sed -n -e '/^NeXus IDL Api Write test/,/^finished napi test/ p' < $IDLTMP | sed -e '/file_time/,/attribute value/ d'
 rm -f $IDLTMP
