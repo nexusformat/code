@@ -40,7 +40,7 @@ idldlm_DATA = NeXusIDL-API.dlm
 
 libNeXusIDL_API_la_SOURCES = NeXusIDL-API.c handle.c handle.h
 libNeXusIDL_API_la_LIBADD = $(top_builddir)/src/libNeXus.la
-libNeXusIDL_API_la_LDFLAGS = @SHARED_LDFLAGS@ -Wl,--no-undefined -L$(IDLROOT)/bin/$(IDL_HOST) -lidl $(LDFLAGS)
+libNeXusIDL_API_la_LDFLAGS = @SHARED_LDFLAGS@ -L$(IDLROOT)/bin/$(IDL_HOST) -lidl $(LDFLAGS)
 
 AM_CPPFLAGS = -I$(IDLROOT)/external/include
 
