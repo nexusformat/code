@@ -968,6 +968,8 @@ class NeXus(object):
         length = c_int(0)
         storage = c_int(0)
         status = nxlib.nxigetnextattr_(self.handle,name,_ref(length),_ref(storage))
+        if status == EOD:
+            return (None, None, None)
         if status == ERROR or status == EOD:
             raise NeXusError, "Could not get next attr: %s"%(self._loc())
         dtype = _pytype_code[storage.value]
@@ -1046,6 +1048,17 @@ class NeXus(object):
         status = nxlib.nxiputattr_(self.handle,name,data,length,storage)
         if status == ERROR:
             raise NeXusError, "Could not write attr %s: %s"%(name,self._loc())
+
+    def getattrs(self):
+        """
+        Returns a dicitonary of the attributes on the current node.
+
+        This is a second form of attrs(self).
+        """
+        result = {}
+        for (name, value) in self.attrs():
+            result[name] = value
+        return result
 
     def attrs(self):
         """
