@@ -595,9 +595,10 @@ class NeXus(object):
     nxlib.nxigetnextentry_.argtypes = [c_void_p, c_char_p, c_char_p, c_int_p]
     def getnextentry(self):
         """
-        Return the next entry in the group as name,nxclass tuple.
+        Return the next entry in the group as name,nxclass tuple. If
+        end of data is reached this returns the tuple (None, None)
 
-        Raises NeXusError if this fails, or if there is no next entry.
+        Raises NeXusError if this fails.
 
         Corresponds to NXgetnextentry(handle,name,nxclass,&storage).
 
@@ -615,7 +616,9 @@ class NeXus(object):
         nxclass = ctypes.create_string_buffer(MAXNAMELEN)
         storage = c_int(0)
         status = nxlib.nxigetnextentry_(self.handle,name,nxclass,_ref(storage))
-        if status == ERROR or status == EOD:
+        if status == EOD:
+            return (None, None)
+        if status == ERROR:
             raise NeXusError, \
                 "Could not get next entry: %s"%(self._loc())
         ## Note: ignoring storage --- it is useless without dimensions
@@ -623,6 +626,23 @@ class NeXus(object):
         #    dtype = _pytype_code(storage.value)
         #print "group next",nxclass.value, name.value, storage.value
         return name.value,nxclass.value
+
+    def getentries(self):
+        """
+        Return a dictionary of the groups[name]=type below the
+        existing open one.
+
+        Raises NeXusError if this fails.
+        """
+        self.initgroupdir()
+        result = {}
+        (name, nxclass) = self.getnextentry()
+        if (name, nxclass) != (None, None):
+            result[name] = nxclass
+        while (name, nxclass) != (None, None):
+            result[name] = nxclass
+            (name, nxclass) = self.getnextentry()
+        return result
 
     def entries(self):
         """
