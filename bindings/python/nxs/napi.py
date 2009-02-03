@@ -516,11 +516,10 @@ class NeXus(object):
         for target in down:
             (name, nxclass) = target
             if nxclass is None:
-                entries = self.getentries()
-                if not entries.has_key(name):
+                nxclass = self.__getnxclass(name)
+                if nxclass is None:
                     raise KeyError("Failed to find entry with name \"%s\"" \
                                    % name)
-                nxclass = entries[name]
             if nxclass != "SDS":
                 self.opengroup(name, nxclass)
             elif opendata:
@@ -555,11 +554,10 @@ class NeXus(object):
         """
         #print "open group",nxclass,name
         if nxclass is None:
-            listing = self.getentries()
-            if not listing.has_key(name):
+            nxclass = self.__getnxclass(name)
+            if nxclass is None:
                 raise KeyError("file does not have \"%s\" at this level" \
                                % name)
-            nxclass = listing[name]
         status = nxlib.nxiopengroup_(self.handle, name, nxclass)
         if status == ERROR:
             raise ValueError,\
@@ -675,6 +673,21 @@ class NeXus(object):
             result[name] = nxclass
             (name, nxclass) = self.getnextentry()
         return result
+
+    def __getnxclass(self, name):
+        """
+        Return the nxclass of the supplied name.
+        """
+        self.initgroupdir()
+        (myname, nxclass) = self.getnextentry()
+        if (myname, nxclass) != (None, None):
+            if myname == name:
+                return nxclass
+        while (myname, nxclass) != (None, None):
+            (myname, nxclass) = self.getnextentry()
+            if myname == name:
+                return nxclass
+        return None
 
     def entries(self):
         """
