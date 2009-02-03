@@ -519,15 +519,22 @@ class NeXus(object):
 
     nxlib.nxiopengroup_.restype = c_int
     nxlib.nxiopengroup_.argtypes = [c_void_p, c_char_p, c_char_p]
-    def opengroup(self, name, nxclass):
+    def opengroup(self, name, nxclass=None):
         """
-        Open the group nxclass:name.
+        Open the group nxclass:name. If the nxclass is not specified
+        this will search for it.
 
         Raises ValueError if the group could not be opened.
 
         Corresponds to NXopengroup(handle, name, nxclass)
         """
         #print "open group",nxclass,name
+        if nxclass is None:
+            listing = self.getentries()
+            if not listing.has_key(name):
+                raise KeyError("file does not have \"%s\" at this level" \
+                               % name)
+            nxclass = listing[name]
         status = nxlib.nxiopengroup_(self.handle, name, nxclass)
         if status == ERROR:
             raise ValueError,\
