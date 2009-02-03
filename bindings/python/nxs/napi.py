@@ -471,10 +471,10 @@ class NeXus(object):
                 up = self._path[i:]
 		down = target[i:]
                 break
-            else:
-                #print "target shorter than current"
-                up = self._path[len(target):]
-                down = []
+        else:
+            #print "target shorter than current"
+            up = self._path[len(target):]
+            down = []
         up.reverse()
         #print "close,open",up,down
 
