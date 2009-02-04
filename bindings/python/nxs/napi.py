@@ -319,6 +319,12 @@ class NeXus(object):
         return '/'+'/'.join(mypath)
     path = property(_getpath,doc="Unix-style path to node")
 
+    def _getlongpath(self):
+        mypath = [':'.join(level) for level in self._path]
+        return '/' + '/'.join(mypath)
+    longpath = property(_getlongpath, doc="Unix-style path including " \
+                        + "nxclass to the node")
+
     def __del__(self):
         """
         Be sure to close the file before deleting the last reference.
