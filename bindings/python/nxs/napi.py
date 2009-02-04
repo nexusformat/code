@@ -487,7 +487,7 @@ class NeXus(object):
         # Find which groups need to be closed and opened
         up = []
         down = []
-        for i,name in enumerate(target):
+        for (i, (name, nxclass)) in enumerate(target):
             if i == len(self._path):
                 #print "target longer than current"
                 up = []
