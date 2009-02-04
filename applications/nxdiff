@@ -133,8 +133,13 @@ class Diff:
             return
         else:
             diffs = getPercentDiff(left.data, right.data)
-            if numpy.nanmax(diffs) <= 0.:
-                return
+            try:
+                if numpy.nanmax(diffs) <= 0.:
+                    return
+            except IndexError:
+                if diffs <= 0.:
+                    return
+                diffs = [diffs]
             stats = getStats(diffs)
             self.details.append("MISMATCH [min%s,max%s,med%s,avg%s,dev%s]" \
                                 % (stats[0], stats[1], stats[2], stats[3],
@@ -271,10 +276,15 @@ def removeNaN(array):
     if len(indices) <= 0:
         return array
     return numpy.delete(array, indices.tolist())
+    try:
+        len(myarray)
+        return myarray
+    except TypeError:
+        return [myarray]
 
 def getStats(array):
     myarray = numpy.copy(array)
-    myarray.ravel()
+    myarray = myarray.ravel()
     origLength = myarray.size
     myarray = removeNaN(myarray)
     myarray.sort()
@@ -282,9 +292,10 @@ def getStats(array):
     avg = numpy.average(myarray)
     minimum = numpy.nanmin(myarray)
     maximum = numpy.nanmax(myarray)
+    median = myarray[(length/2)-1]
     stddev = myarray.std()
     result = map(lambda x: "%.2f%%" % x,
-               (minimum, maximum, myarray[(length/2)-1], avg, stddev))
+                 (minimum, maximum, median, avg, stddev))
     result.append(origLength) # add the number of elements
     result.append(origLength - length) # number of NaNs found
     return result
