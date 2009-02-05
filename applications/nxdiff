@@ -85,8 +85,14 @@ class Diff:
         else:
             self.summary = Diff.SAME
 
+    def __shortPath(self):
+        mypath= self.path.split("/")
+        mypath = [item.split(":")[0] for item in mypath]
+        return '/'.join(mypath)
+
     def __str__(self):
-        result = "%s %s" % (getDiffSym(self.summary, self.__format), self.path)
+        result = "%s %s" % (getDiffSym(self.summary, self.__format), \
+                            self.__shortPath())
         if self.summary == Diff.DIFF:
             result += " " + " ".join(self.details)
         return result
