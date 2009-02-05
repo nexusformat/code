@@ -15,17 +15,8 @@ class NXSdata:
         (self.dims, self.type) = nxs.getinfo()
         if len(self.dims) == 1:
             self.dims=self.dims[0]
-        self.attrs = getAttrs(nxs)
+        self.attrs = nxs.getattrs()
         self.data = nxs.getdata()
-
-def getAttrs(nxs):
-    attrs = {}
-    nxs.initattrdir
-    attr = nxs.getnextattr()
-    while attr[0] is not None and attr[1] is not None:
-        attrs[attr[0]] = attr[1]
-        attr = nxs.getnextattr()
-    return attrs
 
 def getDiffSym(diffType, format):
     sumMap = {Diff.SAME:Diff.SAME, Diff.NEWLEFT:'-', Diff.NEWRIGHT:'+',
