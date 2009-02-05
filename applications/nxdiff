@@ -38,20 +38,6 @@ def getDiffSym(diffType, format):
 def getPercentDiff(left, right, nandiff=float("nan")):
     return 100. * numpy.fabs((left-right)/left)
 
-    if isNaN(left):
-        if isNaN(right):
-            return 0.
-        else:
-            return nandiff
-    else:
-        if isNaN(right):
-            return nandiff
-        else:
-            try:
-                return 100. * math.fabs((left - right)/left)
-            except ZeroDivisionError:
-                return NAN
-
 class Diff:
     SAME     = " "
     NEWLEFT  = "<"
@@ -172,42 +158,36 @@ class NXSfile:
         self.__nxs = nxs.open(self.name)
         self.__paths = self.__getPaths()
         self.__paths.sort()
+        while '/' in self.__paths:
+            del self.__paths[self.__paths.index('/')]
 
-    def __getPaths(self, path="", **kwargs):
-        try:
-            parenttype = kwargs["parenttype"]
-        except KeyError:
-            parenttype = None
+    def __getPaths(self, **kwargs):
         result = []
-        self.__nxs.initgroupdir()
-        entry = self.__nxs.getnextentry()
-        while entry[0] is not None and entry[1] is not None:
-            myPath = "%s/%s" % (path, entry[0])
-            if entry[1] == "SDS":
-                if self.__ignorenotes and parenttype == "NXnote":
-                    if entry[0] == "author" or entry[0] == "date":
-                        pass
-                    else:
-                        result.append(myPath)
-                elif self.__ignorets and entry[0] == "SNStranslation_service":
-                    pass
-                elif self.__ignorelinks:
-                    self.__nxs.opendata(entry[0])
-                    attrs = getAttrs(self.__nxs)
-                    self.__nxs.closedata()
-                    try:
-                        target = attrs["target"]
-                        if myPath == target:
-                            result.append(myPath)
-                    except KeyError:
-                        result.append(myPath)
-                else:
-                    result.append(myPath)
+        #result.append(self.__nxs.longpath) # add the groups to the tree
+        parent = self.__nxs.longpath.split('/')[-1]
+        listing = self.__nxs.getentries()
+        for name in listing.keys():
+            nxclass = listing[name]
+            if nxclass == "SDS":
+                if self.__ignorenotes and parent.endswith("NXnote"):
+                    if name == "author" or name == "date":
+                        continue
+                elif self.__ignorets and name == "SNStranslation_service":
+                    continue
+                self.__nxs.opendata(name)
+                attrs = self.__nxs.getattrs()
+                longpath = self.__nxs.longpath
+                shortpath = self.__nxs.path
+                self.__nxs.closedata()
+                if self.__ignorelinks and attrs.has_key("target"):
+                    target = attrs["target"]
+                    if target != shortpath:
+                        continue
+                result.append(longpath)
             else:
-                self.__nxs.opengroup(entry[0], entry[1])
-                result.extend(self.__getPaths(myPath, parenttype=entry[1]))
+                self.__nxs.opengroup(name,nxclass)
+                result.extend(self.__getPaths())
                 self.__nxs.closegroup()
-            entry = self.__nxs.getnextentry()
         return result
 
     def __str__(self):
