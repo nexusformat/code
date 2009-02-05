@@ -524,8 +524,8 @@ class NeXus(object):
             if nxclass is None:
                 nxclass = self.__getnxclass(name)
                 if nxclass is None:
-                    raise KeyError("Failed to find entry with name \"%s\"" \
-                                   % name)
+                    raise NeXusError("Failed to find entry with name \"%s\" "\
+                                     + "at %s" % (name, self.path))
             if nxclass != "SDS":
                 self.opengroup(name, nxclass)
             elif opendata:
