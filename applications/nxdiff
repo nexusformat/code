@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 VERSION = "1.4.0"
 
 import nxs
