@@ -341,11 +341,11 @@ def printDataDiff(left, right, diff, **kwargs):
     except TypeError:
         rightLength *= right.dims
 
-    # the threashold for printing values
+    # the threshold for printing values
     try:
-        threashold = kwargs["threashold"]
+        threshold = kwargs["threshold"]
     except KeyError:
-        threashold = None
+        threshold = None
 
     try:
         shownandiffs = kwargs["shownandiffs"]
@@ -353,7 +353,7 @@ def printDataDiff(left, right, diff, **kwargs):
         shownandiffs = False
 
     # how many items to show
-    if not threashold:
+    if not threshold:
         try:
             numItems = kwargs["numitems"]
         except KeyError:
@@ -381,7 +381,7 @@ def printDataDiff(left, right, diff, **kwargs):
         print leftSym, left.attrs
         print rightSym, right.attrs
 
-    if threashold is None:
+    if threshold is None:
         try:
             print leftSym, left.data.__str__(last=leftLength)
         except TypeError:
@@ -400,11 +400,11 @@ def printDataDiff(left, right, diff, **kwargs):
             index = delinearIndex(i, left.dims)
             if isNaN(myDiff):
                 nanIndices.append(index)
-            elif myDiff > threashold:
+            elif myDiff > threshold:
                 changeInfo.append((index, myDiff, left.data[i], right.data[i]))
         print "%d values changed between number and NaN" % len(nanIndices)
         print "%d values changed more than %.2f%%" % (len(changeInfo),
-                                                    threashold)
+                                                    threshold)
         if shownandiffs and len(nanIndices) > 0:
             print "Indices changed between number and NaN:", nanIndices
         if len(changeInfo) > 0:
@@ -448,8 +448,8 @@ if __name__ == "__main__":
                       + "\"--show-values\" mode. If not specified the default "
                       + "is ten (10). To show all values specify minus one "
                       + "(-1).")
-    parser.add_option("", "--show-percent", dest="threashold",
-                      help="Set a threashold for the minimum percentage "
+    parser.add_option("", "--show-percent", dest="threshold",
+                      help="Set a threshold for the minimum percentage "
                       + "difference shown in values. This turns on "
                       + "\"--show-values\" mode and overrides "
                       + "\"--num-values\".")
@@ -469,7 +469,7 @@ if __name__ == "__main__":
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignorelinks=False)
     parser.set_defaults(numvalues=None)
-    parser.set_defaults(threashold=None)
+    parser.set_defaults(threshold=None)
     parser.set_defaults(shownandiffs=False)
     parser.set_defaults(ignorenotes=False)
     parser.set_defaults(ignorets=False)
@@ -487,9 +487,9 @@ if __name__ == "__main__":
         options.numvalues = int(options.numvalues)
     else:
         options.numvalues = 0
-    if options.threashold is not None:
+    if options.threshold is not None:
         options.showvalues = True
-        options.threashold = float(options.threashold)
+        options.threshold = float(options.threshold)
     if len(args) != 2:
         parser.error("Must compare two files")
     else:
@@ -542,5 +542,5 @@ if __name__ == "__main__":
         if options.showvalues and diff.summary == Diff.DIFF:
             printDataDiff(left, right, diff, format=format,
                           numitems=options.numvalues,
-                          threashold=options.threashold,
+                          threshold=options.threshold,
                           shownandiffs=options.shownandiffs)
