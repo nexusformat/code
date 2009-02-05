@@ -36,7 +36,12 @@ def getDiffSym(diffType, format):
         return diffType
 
 def getPercentDiff(left, right, nandiff=float("nan")):
-    return 100. * numpy.fabs((left-right)/left)
+    diffs = 100. * numpy.fabs((left-right)/left)
+    try:
+        diffs[0]
+        return diffs
+    except IndexError:
+        return [diffs]
 
 class Diff:
     SAME     = " "
@@ -119,13 +124,8 @@ class Diff:
             return
         else:
             diffs = getPercentDiff(left.data, right.data)
-            try:
-                if numpy.nanmax(diffs) <= 0.:
-                    return
-            except IndexError:
-                if diffs <= 0.:
-                    return
-                diffs = [diffs]
+            if numpy.nanmax(diffs) <= 0.:
+                return
             stats = getStats(diffs)
             self.details.append("MISMATCH [min%s,max%s,med%s,avg%s,dev%s]" \
                                 % (stats[0], stats[1], stats[2], stats[3],
@@ -262,7 +262,7 @@ def removeNaN(array):
     except TypeError:
         return [myarray]
 
-def getStats(array):
+def getStats(array, **kwargs):
     myarray = numpy.copy(array)
     myarray = myarray.ravel()
     origLength = myarray.size
