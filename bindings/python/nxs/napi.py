@@ -314,9 +314,16 @@ class NeXus(object):
             raise NeXusError, "Could not %s %s"%(op,filename)
         self.isopen = True
 
-    def _getpath(self): 
-        return '/'+'/'.join(self._path)
+    def _getpath(self):
+        mypath = [level[0] for level in self._path]
+        return '/'+'/'.join(mypath)
     path = property(_getpath,doc="Unix-style path to node")
+
+    def _getlongpath(self):
+        mypath = [':'.join(level) for level in self._path]
+        return '/' + '/'.join(mypath)
+    longpath = property(_getlongpath, doc="Unix-style path including " \
+                        + "nxclass to the node")
 
     def __del__(self):
         """
@@ -420,10 +427,13 @@ class NeXus(object):
     nxlib.nxiopenpath_.argtypes = [c_void_p, c_char_p]
     def openpath(self, path):
         """
-        Open a particular group '/path/to/group'.  Paths can
-        be absolute or relative to the currently open group.
-        If openpath fails, then currently open path may not
-        be different from the starting path.
+        Open a particular group '/path/to/group'.  Paths can be
+        absolute or relative to the currently open group.  If openpath
+        fails, then currently open path may not be different from the
+        starting path. For better performation the types can be
+        specified as well using '/path:type1/to:type2/group:type3'
+        which will prevent searching the file for the types associated
+        with the supplied names.
 
         Raises ValueError.
 
@@ -436,10 +446,13 @@ class NeXus(object):
         # Determine target node as sequence of group names
         if path == '/':
             target = []
-        elif path.startswith('/'):
-            target = path[1:].split('/')
         else:
-            target = self._path + path.split('/')
+            if path.endswith("/"):
+                path = path[:-1]
+            if path.startswith('/'):
+                target = path[1:].split('/')
+            else:
+                target = self._path + path.split('/')
 
         # Remove relative path indicators from target
         L = []
@@ -454,13 +467,27 @@ class NeXus(object):
             else:
                 L.append(t)
         target = L
+
+        # split out nxclass from each level if available
+        L = []
+        for t in target:
+            try:
+                item = t.split(":")
+                if len(item) == 1:
+                    L.append((item[0], None))
+                else:
+                    L.append(tuple(item))
+            except AttributeError:
+                L.append(t)
+        target = L
+
         #print "current path",self._path
         #print "%s"%path,target
 
         # Find which groups need to be closed and opened
         up = []
         down = []
-        for i,name in enumerate(target):
+        for (i, (name, nxclass)) in enumerate(target):
             if i == len(self._path):
                 #print "target longer than current"
                 up = []
@@ -475,7 +502,13 @@ class NeXus(object):
             #print "target shorter than current"
             up = self._path[len(target):]
             down = []
-        up.reverse()
+
+        # add more information to the down path
+        for i in xrange(len(down)):
+            try:
+                (name, nxclass) = down[i]
+            except ValueError:
+                down[i] = (down[i], None)
         #print "close,open",up,down
 
         # Close groups on the way up
@@ -487,19 +520,13 @@ class NeXus(object):
         
         # Open groups on the way down
         for target in down:
-            # Find target name in current group.  We need to do this because
-            # we can't open the group without knowing the class.  We also
-            # need the class so that we can handle SDS specially.
-            n,_,_ = self.getgroupinfo()
-            self.initgroupdir()
-            for i in range(n):
-                name,nxclass = self.getnextentry()
-                if name != target: continue
-                if nxclass != 'SDS':
-                    self.opengroup(name,nxclass)
-                elif opendata: 
-                    self.opendata(name)
-                break
+            (name, nxclass) = target
+            if nxclass is None:
+                nxclass = self.__getnxclass(name)
+            if nxclass != "SDS":
+                self.opengroup(name, nxclass)
+            elif opendata:
+                self.opendata(name)
             else:
                 raise ValueError("node %s not in %s"%(name,self.path))
 
@@ -519,20 +546,23 @@ class NeXus(object):
 
     nxlib.nxiopengroup_.restype = c_int
     nxlib.nxiopengroup_.argtypes = [c_void_p, c_char_p, c_char_p]
-    def opengroup(self, name, nxclass):
+    def opengroup(self, name, nxclass=None):
         """
-        Open the group nxclass:name.
+        Open the group nxclass:name. If the nxclass is not specified
+        this will search for it.
 
         Raises ValueError if the group could not be opened.
 
         Corresponds to NXopengroup(handle, name, nxclass)
         """
         #print "open group",nxclass,name
+        if nxclass is None:
+            nxclass = self.__getnxclass(name)
         status = nxlib.nxiopengroup_(self.handle, name, nxclass)
         if status == ERROR:
             raise ValueError,\
                 "Could not open %s:%s in %s"%(nxclass,name,self._loc())
-        self._path.append(name)
+        self._path.append((name,nxclass))
 
     nxlib.nxiclosegroup_.restype = c_int
     nxlib.nxiclosegroup_.argtypes = [c_void_p]
@@ -595,9 +625,10 @@ class NeXus(object):
     nxlib.nxigetnextentry_.argtypes = [c_void_p, c_char_p, c_char_p, c_int_p]
     def getnextentry(self):
         """
-        Return the next entry in the group as name,nxclass tuple.
+        Return the next entry in the group as name,nxclass tuple. If
+        end of data is reached this returns the tuple (None, None)
 
-        Raises NeXusError if this fails, or if there is no next entry.
+        Raises NeXusError if this fails.
 
         Corresponds to NXgetnextentry(handle,name,nxclass,&storage).
 
@@ -615,7 +646,9 @@ class NeXus(object):
         nxclass = ctypes.create_string_buffer(MAXNAMELEN)
         storage = c_int(0)
         status = nxlib.nxigetnextentry_(self.handle,name,nxclass,_ref(storage))
-        if status == ERROR or status == EOD:
+        if status == EOD:
+            return (None, None)
+        if status == ERROR:
             raise NeXusError, \
                 "Could not get next entry: %s"%(self._loc())
         ## Note: ignoring storage --- it is useless without dimensions
@@ -623,6 +656,37 @@ class NeXus(object):
         #    dtype = _pytype_code(storage.value)
         #print "group next",nxclass.value, name.value, storage.value
         return name.value,nxclass.value
+
+    def getentries(self):
+        """
+        Return a dictionary of the groups[name]=type below the
+        existing open one.
+
+        Raises NeXusError if this fails.
+        """
+        self.initgroupdir()
+        result = {}
+        (name, nxclass) = self.getnextentry()
+        if (name, nxclass) != (None, None):
+            result[name] = nxclass
+        while (name, nxclass) != (None, None):
+            result[name] = nxclass
+            (name, nxclass) = self.getnextentry()
+        return result
+
+    def __getnxclass(self, target):
+        """
+        Return the nxclass of the supplied name.
+        """
+        self.initgroupdir()
+        while True:
+            (nxname, nxclass) = self.getnextentry()
+            if nxname == target:
+                return nxclass
+            if nxname is None:
+                break
+        raise NeXusError("Failed to find entry with name \"%s\" " \
+                         + "at %s" % (target, self.path))
 
     def entries(self):
         """
@@ -710,7 +774,7 @@ class NeXus(object):
         status = nxlib.nxiopendata_(self.handle, name)
         if status == ERROR:
             raise ValueError, "Could not open data %s: %s"%(name, self._loc())
-        self._path.append(name)
+        self._path.append((name,"SDS"))
         self._indata = True
 
     nxlib.nxiclosedata_.restype = c_int
@@ -941,6 +1005,8 @@ class NeXus(object):
         length = c_int(0)
         storage = c_int(0)
         status = nxlib.nxigetnextattr_(self.handle,name,_ref(length),_ref(storage))
+        if status == EOD:
+            return (None, None, None)
         if status == ERROR or status == EOD:
             raise NeXusError, "Could not get next attr: %s"%(self._loc())
         dtype = _pytype_code[storage.value]
@@ -1019,6 +1085,17 @@ class NeXus(object):
         status = nxlib.nxiputattr_(self.handle,name,data,length,storage)
         if status == ERROR:
             raise NeXusError, "Could not write attr %s: %s"%(name,self._loc())
+
+    def getattrs(self):
+        """
+        Returns a dicitonary of the attributes on the current node.
+
+        This is a second form of attrs(self).
+        """
+        result = {}
+        for (name, value) in self.attrs():
+            result[name] = value
+        return result
 
     def attrs(self):
         """
