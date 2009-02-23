@@ -34,7 +34,7 @@ pydoc_DATA	= README.html
 nxspythondir	= $(pythondir)/nxs
 #pkgpython_PYTHON = nxstest.py
 nxspython_PYTHON = nxs/__init__.py nxs/napi.py
-EXTRA_DIST	= README.html nxstest.py
+EXTRA_DIST	= README.html nxstest.py run_nxstest
 
 install-data-hook :
 	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs/napi.py > $(DESTDIR)${nxspythondir}/napi.py
