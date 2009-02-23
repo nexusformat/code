@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# this script allows nxstest to be run again the built, rather than installed,
+# version of nexus
+#
+env LD_LIBRARY_PATH=../../src/.libs python nxstest.py $*
