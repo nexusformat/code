@@ -1797,6 +1797,7 @@ static int h5MemType(hid_t atype)
 
      vid = getAttVID(pFile);
 
+     pName[0] = '\0';
      idx=pFile->iAtt5.iCurrentIDX;
      iRet=0;
      intern_idx=H5Aget_num_attrs(vid);
