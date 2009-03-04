@@ -37,7 +37,8 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 
 /**
  * \mainpage NeXus API documentation
- * This is the documentation of the NeXus API
+ * This is the documentation for the NeXus API.
+ * To see a list of functions broken down into groups visit the Modules tab
  */
 
 
