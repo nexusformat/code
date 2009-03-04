@@ -35,6 +35,13 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 #include "napi.h"
 #include "nxstack.h"
 
+/**
+ * \mainpage NeXus API documentation
+ * This is the documentation of the NeXus API
+ */
+
+
+
 /*---------------------------------------------------------------------
  Recognized and handled napimount URLS
  -----------------------------------------------------------------------*/
