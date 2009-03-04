@@ -30,14 +30,17 @@
 // Repository Location     $HeadURL$
 // Revision of last commit $LastChangedRevision$ 
 // Date of last commit     $LastChangedDate$
-// Author of last commit   $LastChangedBy$
+// Last changed by         $LastChangedBy$
 //////////////////////////////////////////////////////////////////////////
 
 /**
  * \file NeXusStream.hpp
  * Header for IOStream like interface to NeXus files
+ * \author Freddie Akeroyd, STFC ISIS Facility, GB
  * \version $LastChangedRevision$
  * \date    $LastChangedDate$
+ * \defgroup cpp_stream IOstream like interface
+ * \ingroup cpp_main
  */
 
 #include <list>
@@ -56,6 +59,7 @@ namespace Stream
 	virtual void writeToFile(File& nf) const = 0;
     };
 
+    /// \ingroup cpp_stream
     enum StreamModifier { Close=0 };
 
     class NXDLL_EXPORT HolderBase : public ISerialisable
@@ -94,6 +98,7 @@ namespace Stream
 	virtual ~AttrHolder() { m_value = NULL; m_c_value = NULL; }
     };
 
+    /// \ingroup cpp_stream
     class NXDLL_EXPORT Attr : public ISerialisable
     {
       protected:
@@ -163,6 +168,7 @@ namespace Stream
 	virtual ~ObjectWithAttr() { }
     };
     
+    /// \ingroup cpp_stream
     class NXDLL_EXPORT Group : public ObjectWithAttr
     {
       protected:
@@ -213,6 +219,7 @@ namespace Stream
 	virtual ~DataHolder() {}
     };
 
+    /// \ingroup cpp_stream
     class NXDLL_EXPORT Data : public ObjectWithAttr
     {
 	HolderBase* m_holder;
@@ -244,10 +251,16 @@ namespace Stream
 	virtual ~Data() { delete m_holder; }
     };
 
+    /// \ingroup cpp_stream
    NXDLL_EXPORT File& operator<<(File& nf, const ISerialisable& obj);
+    
+    /// \ingroup cpp_stream
    NXDLL_EXPORT File& operator>>(File& nf, const ISerialisable& obj);
 
+    /// \ingroup cpp_stream
    NXDLL_EXPORT File& operator<<(File& nf, const StreamModifier sm);
+ 
+    /// \ingroup cpp_stream
    NXDLL_EXPORT File& operator>>(File& nf, const StreamModifier sm);
 
   } // Stream
