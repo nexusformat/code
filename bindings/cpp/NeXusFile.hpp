@@ -26,7 +26,6 @@
  * \defgroup cpp_core C++ Core
  * \ingroup cpp_main
  */
- */
 
 namespace NeXus {
   /**
