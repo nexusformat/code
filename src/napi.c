@@ -856,7 +856,17 @@ char *nxitrim(char *str)
     }
     return status;
   }
-    
+/*---------------------------------------------------------------------------*/
+  NXstatus  NXgetrawinfo (NXhandle fid, int *rank, 
+				    int dimension[], int *iType)
+  {
+    int status;
+    char *pPtr = NULL;
+
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    status = pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
+    return status;
+  }
   /*-------------------------------------------------------------------------*/
  
   NXstatus  NXgetinfo (NXhandle fid, int *rank, 

@@ -198,6 +198,7 @@ typedef struct {
 #    define NXflush             MANGLE(nxiflush)
 
 #    define NXgetinfo           MANGLE(nxigetinfo)
+#    define NXgetrawinfo        MANGLE(nxigetrawinfo)
 #    define NXgetnextentry      MANGLE(nxigetnextentry)
 #    define NXgetdata           MANGLE(nxigetdata)
 
@@ -683,6 +684,20 @@ extern  NXstatus  NXfree(void** data);
 /*-----------------------------------------------------------------------
     NAPI internals 
 ------------------------------------------------------------------------*/
+  /**
+   * Retrieve information about the currently open dataset. In contrast to the main function below, 
+   * this function does not try to find out about the size of strings properly. 
+   * \param handle A NeXus file handle as initialized by NXopen.
+   * \param rank A pointer to an integer which will be filled with the rank of 
+   * the dataset.
+   * \param dimension An array which will be initialized with the size of the dataset in any of its 
+   * dimensions. The array must have at least the size of rank.
+   * \param datatype A pointer to an integer which be set to the NeXus data type code for this dataset.
+   * \return NX_OK on success, NX_ERROR in the case of an error.   
+   * \ingroup c_metadata
+   */
+extern  NXstatus  NXgetrawinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
+
 /** \typedef void (*ErrFunc)(void *data, char *text)
  * All NeXus error reporting happens through this special function, the 
  * ErrFunc. The NeXus-API allows to replace this error reporting function
