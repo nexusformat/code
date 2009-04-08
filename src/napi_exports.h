@@ -255,3 +255,9 @@ NXstatus CALL_MODE NXIMAKENAMEDLINK(NXhandle fid, CONSTCHAR *newname, NXlink* pL
 {
     return NXmakenamedlink(fid, newname, pLink);
 }
+
+NXstatus CALL_MODE NXIGETRAWINFO(NXhandle handle, int* rank, int dimension[], int* datatype)
+{
+    return NXgetrawinfo(handle, rank, dimension, datatype);
+}
+

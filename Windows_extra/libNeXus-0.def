@@ -21,6 +21,7 @@ _NXIGETDATAID@8
 _NXIGETGROUPID@8
 _NXIGETGROUPINFO@16
 _NXIGETINFO@16
+_NXIGETRAWINFO@16
 _NXIGETNEXTATTR@16
 _NXIGETNEXTENTRY@16
 _NXIGETSLAB@16
@@ -80,6 +81,7 @@ nxigetdata_
 nxigetdataid_
 nxigetgroupid_
 nxigetgroupinfo_
+nxigetrawinfo_
 nxigetinfo_
 nxigetnextattr_
 nxigetnextentry_
