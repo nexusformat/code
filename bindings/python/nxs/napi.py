@@ -576,9 +576,11 @@ class NeXus(object):
         Corresponds to NXclosegroup(handle)
         """
         #print "closegroup"
+        if self._indata:
+            raise NeXusError, "Close data before group at %s"%(self._loc())
         status = nxlib.nxiclosegroup_(self.handle)
         if status == ERROR:
-            raise NeXusError, "Could not close group at %s"%(name,self._loc())
+            raise NeXusError, "Could not close group at %s"%(self._loc())
         self._path.pop()
 
     nxlib.nxigetgroupinfo_.restype = c_int
@@ -808,7 +810,10 @@ class NeXus(object):
         Corresponds to NXopendata(handle, name)
         """
         #print "opendata",self._loc(),name
-        status = nxlib.nxiopendata_(self.handle, name)
+        if self._indata:
+            status = ERROR
+        else:
+            status = nxlib.nxiopendata_(self.handle, name)
         if status == ERROR:
             raise ValueError, "Could not open data %s: %s"%(name, self._loc())
         self._path.append((name,"SDS"))
@@ -829,7 +834,7 @@ class NeXus(object):
         status = nxlib.nxiclosedata_(self.handle)
         if status == ERROR:
             raise NeXusError,\
-                "Could not close data at %s"%(name,self._loc())
+                "Could not close data at %s"%(self._loc())
         self._path.pop()
         self._indata = False
 

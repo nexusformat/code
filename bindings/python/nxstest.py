@@ -131,11 +131,11 @@ def populate(filename,mode):
 
     # .. demonstrate extensible data
     file.makedata('flush_data','int32',[nxs.UNLIMITED])
+    file.opendata('flush_data')
     for i in range(7):
-        file.opendata('flush_data')
         file.putslab(i,[i],[1])
-        file.flush()
-        # Oops... why isn't there a closedata()?
+    file.closedata()
+    file.flush()
     file.closegroup()
 
     # Create NXsample group
