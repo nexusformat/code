@@ -1996,7 +1996,8 @@ static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
   NXhandle hHandle;
   int iHandle, status;
   int rank,  datatype, n;
-  int start[NX_MAXRANK], size[NX_MAXRANK], dim[NX_MAXRANK];
+  IDL_MEMINT start[NX_MAXRANK], size[NX_MAXRANK], dim[NX_MAXRANK];
+  int istart[NX_MAXRANK], isize[NX_MAXRANK];
   IDL_LONG *stDim, *szDim;
   IDL_ARRAY_DIM dimension;
   void *data_buffer = NULL;
@@ -2049,7 +2050,9 @@ static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
   szDim = (IDL_LONG *)argv[3]->value.arr->data;
   for(n = 0; n < rank; n++){
     start[n] = stDim[rank -n  -1];
+    istart[n] = stDim[rank -n  -1];
     size[n] = szDim[rank -n  -1];
+    isize[n] = szDim[rank -n  -1];
   }
 
 
@@ -2136,7 +2139,7 @@ static IDL_VPTR NXgetslab_this(int argc, IDL_VPTR *argv)
      }
 
   else {
-	  status = NXgetslab (hHandle, data_buffer, start,size);
+	  status = NXgetslab (hHandle, data_buffer, istart, isize);
 	  if(status == NX_ERROR)
 		{
 		IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, nexusError);
