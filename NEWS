@@ -1,3 +1,74 @@
+Version 4.2.0
+=============
+
+For the latest information see 
+
+    http://www.nexusformat.org/Nexus_42_Release_Notes
+
+==System Requirements==
+'''MXML XML Parsing Library'''
+
+Version 2.2.2 or higher of mxml is required. Earlier versions have a bug and the XML API will not work. This package can be downloded in [http://www.easysw.com/~mike/mxml/software.php both source and binary rpm form] and is also available as part of [http://fedoraproject.org/wiki/Extras/UsingExtras Fedora Extras]. IMPORTANT NOTE: Debian also provides the mxml package, but it based on 2.0 and will not work properly.
+
+'''Python Interface'''
+You will need both the numpy and ctypes modules to be available.  These are provided in both the Fedora and EPEL repositories.
+
+==Building Notes==
+===NAG F90/F95 Compiler===
+The NAG compiler needs the '''-mismatch''' flag to be specified or else it will not compile NXmodule.f90 This is achieve by running configure with the '''FCFLAGS''' environment variable set to contain the flag e.g.
+<pre>
+env FCFLAGS="-mismatch" ./configure --with-f90=f95
+</pre>
+===HDF4 on Intel Macs===
+There is a problem with the include file, hdfi.h (normally in /usr/local/include).  See http://coastwatch.noaa.gov/helparc/software/msg00069.html for details of the modifications necessary to fix it.
+
+==New Features==
+===C++ Interface===
+See the [http://download.nexusformat.org/doxygen/html/classNeXus_1_1File.html doxygen documentation] and
+[http://svn.nexusformat.org/code/branches/4.2/test/napi_test_cpp.cxx NeXus API test program]
+
+===C++ Stream Like interface===
+The idea is to provide an IOSteam like interface and allow you to type 
+<pre>
+    // create an entry and a data item
+    File nf(fname, NXACC_CREATE);
+    nf << Group("entry1", "NXentry") << Data("dat1", w, "int_attr", 3);
+    nf.close();
+
+    File nf1(fname, NXACC_RDWR);
+    // add a double_attr to an existing setup
+    nf1 >> Group("entry1", "NXentry") >> Data("dat1") << Attr("double_attr", 6.0);
+    nf1.close();
+
+    // read back data items
+    File nf2(fname, NXACC_READ);
+    nf2 >> Group("entry1", "NXentry") >> Data("dat1", w1, "int_attr", i, "double_attr", d);
+    // alternative way to read d1
+    nf2 >> Data("dat1") >> Attr("double_attr", d1);
+</pre>
+See also the [http://svn.nexusformat.org/code/branches/4.2/test/napi_test_cpp.cxx NeXus API test program]
+
+===IDL Interface===
+There is a new interface to RSI's Interactive Data Language, IDL for NeXus. This 
+interface has to be considered beta. Nevertheless it is working most of the time. 
+Known issues include:
+* Compressed reading and writing do not work for HDF-4 files, probably because of a library version conflict on libz. 
+* There is an issue using NXgetslab on 64 bit operating systems; expect a fix for this pretty soon.
+
+===Python Interface===
+There is now, thanks to David Kienzle, a supported interface for the python scripting language. Arrays are stored in numpy arrays and thus allow for efficient data manipulations.
+
+==Changed Features==
+
+==Known Issues==
+See the comments on the IDL interface.
+
+==Miscellaneous bug fixes==
+The following items are bugs reported in previous releases and resolved in
+the 4.2 release.
+
+==Upcoming Features==
+
 Version 4.1.0
 =============
 
