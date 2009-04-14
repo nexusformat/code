@@ -46,7 +46,8 @@ pNXDS createNXDataset(int rank, int typecode, int dim[]){
   for(i = 0, length = 1; i < rank; i++){
     length *= dim[i];
   }
-  pNew->u.ptr = malloc(length*getTypeSize(typecode));
+  /* add +1 in case of string NULL termination */
+  pNew->u.ptr = malloc(length*getTypeSize(typecode)+1);
 
   if(pNew->dim == NULL || pNew->u.ptr == NULL){
     free(pNew);
@@ -59,7 +60,8 @@ pNXDS createNXDataset(int rank, int typecode, int dim[]){
     pNew->dim[i] = dim[i];
   }
   pNew->magic = MAGIC;
-  memset(pNew->u.ptr,0,length*getTypeSize(typecode));
+  /* add +1 in case of string NULL termination  - see above */
+  memset(pNew->u.ptr,0,length*getTypeSize(typecode)+1);
   return pNew;
 }
 /*---------------------------------------------------------------------*/

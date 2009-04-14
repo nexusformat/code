@@ -186,9 +186,6 @@ static int WriteGroup (int is_definition)
                 if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
                 if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
                 if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
-                if (dataType == NX_CHAR) {
-                   dataDimensions[0] = strlen((char*)dataBuffer)+1;
-                }
                 if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
                 if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
                 if (WriteAttributes (is_definition) != NX_OK) return NX_ERROR;
