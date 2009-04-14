@@ -29,12 +29,13 @@
 // Repository Location     $HeadURL$
 // Revision of last commit $LastChangedRevision$ 
 // Date of last commit     $LastChangedDate$
-// Author of last commit   $LastChangedBy$
+// Last changed by         $LastChangedBy$
 //////////////////////////////////////////////////////////////////////////
 
 /**
  * \file NeXusStream.cpp
  * Implementation of IOStream like interface to NeXus files
+ * \author Freddie Akeroyd, STFC ISIS Facility, GB
  * \version $LastChangedRevision$
  * \date    $LastChangedDate$
  */

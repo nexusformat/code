@@ -35,6 +35,38 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 #include "napi.h"
 #include "nxstack.h"
 
+/**
+ * \mainpage NeXus API documentation
+ * \section sec_purpose Purpose of API
+ * The NeXus Application Program Interface is a suite of subroutines, written in C but with wrappers in Fortran 77 and 90. 
+ *  The subroutines call HDF routines to read and write the NeXus files with the correct structure. 
+ * An API serves a number of useful purposes: 
+ * - It simplifies the reading and writing of NeXus files. 
+ * - It ensures a certain degree of compliance with the NeXus standard. 
+ * - It allows the development of sophisticated input/output features such as automatic unit conversion. This has not been implemented yet. 
+ * - It hides the implementation details of the format. In particular, the API can read and write HDF4, 
+     HDF5 (and shortly XML) files using the same routines. 
+ * For these reasons, we request that all NeXus files are written using the supplied API. We cannot be 
+ * sure that anything written using the underlying HDF API will be recognized by NeXus-aware utilities. 
+ *
+ * \section sec_core Core API
+ * The core API provides the basic routines for reading, writing and navigating NeXus files. It is designed to be modal; 
+ * there is a hidden state that determines which groups and data sets are open at any given moment, and 
+ * subsequent operations are implicitly performed on these entities. This cuts down the number of parameters 
+ * to pass around in API calls, at the cost of forcing a certain pre-approved mode d'emploi. This mode d'emploi 
+ * will be familiar to most: it is very similar to navigating a directory hierarchy; in our case, NeXus groups are the 
+ * directories, which contain data sets and/or other directories. 
+ *
+ * The core API comprises several functional groups which are listed on the \b Modules tab 
+ *
+ * C programs that call the above routines should include the following header file: 
+ * \code
+ * #include "napi.h"
+ * \endcode
+ */
+
+
+
 /*---------------------------------------------------------------------
  Recognized and handled napimount URLS
  -----------------------------------------------------------------------*/
@@ -824,7 +856,17 @@ char *nxitrim(char *str)
     }
     return status;
   }
-    
+/*---------------------------------------------------------------------------*/
+  NXstatus  NXgetrawinfo (NXhandle fid, int *rank, 
+				    int dimension[], int *iType)
+  {
+    int status;
+    char *pPtr = NULL;
+
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    status = pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType);
+    return status;
+  }
   /*-------------------------------------------------------------------------*/
  
   NXstatus  NXgetinfo (NXhandle fid, int *rank, 

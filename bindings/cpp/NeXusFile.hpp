@@ -21,6 +21,10 @@
  * \file
  * Documentation for the NeXus C++ API.
  * 2000-2008 the NeXus group.
+ * \defgroup cpp_types C++ Types
+ * \ingroup cpp_main
+ * \defgroup cpp_core C++ Core
+ * \ingroup cpp_main
  */
 
 namespace NeXus {
@@ -36,6 +40,7 @@ namespace NeXus {
    * \li UINT32 uint32_t
    * \li INT64 int8_t if available on the machine
    * \li UINT64 uint8_t if available on the machine
+   * \ingroup cpp_types
    */
   enum NXnumtype {
     FLOAT32 = NX_FLOAT32,
@@ -59,6 +64,7 @@ namespace NeXus {
    * \li LZW Lossless Lempel Ziv Welch compression (recommended)
    * \li RLE Run length encoding (only HDF-4)
    * \li HUF Huffmann encoding (only HDF-4)
+   * \ingroup cpp_types
    */
   enum NXcompression {
     NONE = NX_COMP_NONE,
@@ -89,6 +95,7 @@ namespace NeXus {
 
   /**
    * The Object that allows access to the information in the file.
+   * \ingroup cpp_core
    */
   class NXDLL_EXPORT File
   {

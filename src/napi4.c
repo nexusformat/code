@@ -1144,6 +1144,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     /* actually write */
     iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iSize, data);
     if (iRet < 0) {
+      /* HEprint(stdout,0); */
       sprintf (pError, "ERROR: failure to write data to %s", pBuffer);
       NXIReportError (NXpData, pError);
       return NX_ERROR;
