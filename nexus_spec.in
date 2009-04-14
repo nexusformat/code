@@ -23,7 +23,7 @@ Vendor: NeXus International Advisory Committee (NIAC)
 Packager: NeXus Developers <nexus-developers@nexusformat.org>
 # Prefix allows our package to be relocatable i.e. installable in 
 # other than just the /usr/local directory
-Prefix: /usr/local
+#Prefix: /usr
 # BuildRoot is the root for software installation
 # this value will not usually be used, but something must
 # be specified here to allow   rpm --buildroot   to be used later
@@ -36,6 +36,15 @@ among Neutron, Muon and X-ray science facilities. The underlying
 data is stored using the HDF format from NCSA. This package provides
 access routines, documentation, examples and a basic NeXus file browser.
 
+#%package devel
+#Summary: Libraries and utilities for using NeXus format data files
+#Group: Development/Libraries
+#
+#%description devel
+#NeXus is an international standard for exchanging data files
+#among Neutron, Muon and X-ray science facilities. The underlying
+#data is stored using the HDF format from NCSA. This package provides
+
 %prep
 %setup -q
 
@@ -44,7 +53,7 @@ access routines, documentation, examples and a basic NeXus file browser.
 if ! test -z "$RPM_INSTALL_PREFIX"; then
     ./configure --prefix="$RPM_INSTALL_PREFIX" $NEXUS_CONFIG_OPTIONS
 else
-    ./configure --prefix=/usr/local $NEXUS_CONFIG_OPTIONS
+    ./configure --prefix=%{_prefix} --libdir=%{_libdir} $NEXUS_CONFIG_OPTIONS
 fi
 make
 
@@ -57,10 +66,13 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %defattr(-,root,root)
 %doc README NEWS ChangeLog AUTHORS COPYING INSTALL
 # %docdir /usr/local/doc
-/usr/local/lib
-/usr/local/bin
-/usr/local/include
-/usr/local/share
+%{_libdir}/*
+%{_bindir}/*
+%{_datadir}/*
+%{_includedir}/*
+#%files devel
+#%{_libdir}/*.a
+#%{_libdir}/*.so*
 
 %clean
 if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
@@ -69,7 +81,7 @@ if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
 if [ "$RPM_INSTALL_PREFIX" != "" ]; then
     INSTALL_PREFIX=$RPM_INSTALL_PREFIX
 else
-    INSTALL_PREFIX=/usr/local
+    INSTALL_PREFIX=%{_prefix}
 fi
 ( cd $INSTALL_PREFIX/bin; for i in nxbuild; do \
   sed -i -e "s|^prefix=.*|prefix=$INSTALL_PREFIX|" $i; done )

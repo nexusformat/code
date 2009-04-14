@@ -25,7 +25,7 @@ static const string myFLOAT32("FLOAT32");
 static const string myFLOAT64("FLOAT64");
 static const string myBYTE("BYTE");
 
-static const int DEFAULT_TYPE=NX_UINT32;
+static const int NX_DEFAULT_TYPE=NX_UINT32;
 
 /**
  * \file NXtranslate/binary/BinaryRetriever.cpp
@@ -95,7 +95,7 @@ static bool increment_position(const vector<int> &offset,
  */
 static int getDataType(const string &str_type){
   if(str_type.empty()){
-    return DEFAULT_TYPE;
+    return NX_DEFAULT_TYPE;
   }else if(str_type==myINT8){
     return NX_INT8;
   }else if(str_type==myINT16){
