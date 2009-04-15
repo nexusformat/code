@@ -66,3 +66,4 @@ getNXDatasetValue
 getNXDatasetValueAt
 putNXDatasetValue
 putNXDatasetValueAt
+nxigetrawinfo_
