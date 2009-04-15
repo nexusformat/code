@@ -65,7 +65,7 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	spec/libSpec.la \
 	esrf_edf/libEdf.la
 
-nxtranslate_LDFLAGS = -static $(LDFLAGS)
+nxtranslate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 #EXTRA_DIST = CHANGES LICENSE README TODO
 

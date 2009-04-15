@@ -11,7 +11,7 @@ nxingest_SOURCES = nxingest_main.cpp nxingest_utils.cpp \
    nxingest_debug.h nxingest.h nxingest_main.h nxingest_nexus.h \
    nxingest_parse.h nxingest_time.h nxingest_utils.h
 nxingest_LDADD = $(LIBNEXUS)
-nxingest_LDFLAGS = -static $(XML_LDFLAGS) $(LDFLAGS)
+nxingest_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 EXTRA_DIST=nxingest.txt gpl.txt
 
