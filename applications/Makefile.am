@@ -57,15 +57,15 @@ bin_PROGRAMS = nxbrowse nx2dtd nxconvert nxvalidate $(F90_TARGETS)
 
 nxconvert_SOURCES = nxconvert.c nxconvert_common.c nxconvert_common.h
 nxconvert_LDADD = $(LIBNEXUS)
-nxconvert_LDFLAGS = -static $(LDFLAGS)
+nxconvert_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 nxvalidate_SOURCES = nxvalidate.c nxconvert_common.c nxconvert_common.h
 nxvalidate_LDADD = $(LIBNEXUS)
-nxvalidate_LDFLAGS = -static $(LDFLAGS)
+nxvalidate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
-nxbrowse_LDFLAGS = -static $(LDFLAGS)
+nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 #NXtoXML_SOURCES = NXtoXML.c 
 #NXtoXML_LDADD = $(LIBNEXUS)
@@ -73,7 +73,7 @@ nxbrowse_LDFLAGS = -static $(LDFLAGS)
 
 nx2dtd_SOURCES = NXtoDTD.c 
 nx2dtd_LDADD = $(LIBNEXUS)
-nx2dtd_LDFLAGS = -static $(LDFLAGS)
+nx2dtd_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 #NXtoNX4_SOURCES = NXtoNX4.c 
 #NXtoNX4_LDADD = $(LIBNEXUS)
@@ -84,11 +84,11 @@ nx2dtd_LDFLAGS = -static $(LDFLAGS)
 NXdump_SOURCES = NXdump.f90
 NXdump_LDADD = $(LIBNEXUS90)
 NXdump_LINK = $(FCLINK)
-NXdump_LDFLAGS = -static $(LDFLAGS)
+NXdump_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 NXbrowse90_SOURCES = NXbrowse90.f90
 NXbrowse90_LDADD = $(LIBNEXUS90)
 NXbrowse90_LINK = $(FCLINK)
-NXbrowse90_LDFLAGS = -static $(LDFLAGS)
+NXbrowse90_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 include $(top_srcdir)/build_rules.am
