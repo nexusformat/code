@@ -93,7 +93,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
       printf ("NX_ERROR: Can't open %s\n", outFile);
       return NX_ERROR;
    }
-   
+
 /* Output global attributes */
    if (WriteAttributes (nx_is_definition) != NX_OK)
    {
@@ -104,7 +104,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    {
 	return NX_ERROR;
    }
-/* clos einput */
+/* close input */
    if (NXclose (&inId) != NX_OK)
    {
 	return NX_ERROR;
