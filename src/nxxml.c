@@ -938,6 +938,11 @@ NXstatus  NXXgetinfo (NXhandle fid, int *rank,
     } else {
       *iType = translateTypeCode(attr);
       analyzeDim(attr,rank,dimension,iType);
+      if (dimension[0] == -1) /* 1D strings are NX_CHAR not NX_CHAR[] so length will not be correct */
+      {
+        dimension[0] = strlen(userData->value.opaque);
+      }
+      
     }
   } else { 
     dataset = (pNXDS)userData->value.custom.data;

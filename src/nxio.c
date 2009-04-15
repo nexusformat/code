@@ -227,6 +227,11 @@ extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
 /*=====================================================================
  actual stuff for implementing the callback functions
  =====================================================================*/
+
+/*
+ * if passed NX_CHAR, then returns dimension of -1 and the caller
+ * needs to do a strlen() or equivalent 
+ */
 void analyzeDim(const char *typeString, int *rank, 
 			    int *iDim, int *type){
   char dimString[132];
@@ -251,7 +256,7 @@ void analyzeDim(const char *typeString, int *rank,
       iDim[0] = 1;
       break;
     case NX_CHAR:
-      iDim[0] = -1;
+      iDim[0] = -1;	/* length unknown, caller needs to determine later */
       break;
     default:
       mxml_error("ERROR: (analyzeDim) unknown type code %d for typeString %s", *type, typeString);
