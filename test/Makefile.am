@@ -121,22 +121,22 @@ nxtranslate:
 TESTS_ENVIRONMENT=env PYTHON=$(PYTHON) IDL_PATH="@abs_top_srcdir@/bindings/idl:<IDL_DEFAULT>" IDL_DLM_PATH="@abs_top_builddir@/bindings/idl:<IDL_DEFAULT>" LD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:@abs_top_builddir@/bindings/idl:$${LD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@:/usr/local/lib DYLD_LIBRARY_PATH=@abs_top_builddir@/src/.libs:@abs_top_builddir@/bindings/cpp/.libs:@abs_top_builddir@/bindings/idl:$${DYLD_LIBRARY_PATH}:@EXTRA_LD_LIBRARY_PATH@:/usr/local/lib
 
 run_test_SOURCES=run_test.c
-run_test_LDFLAGS=-static $(LDFLAGS)
+run_test_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 skip_test_SOURCES=skip_test.c
-skip_test_LDFLAGS=-static $(LDFLAGS)
+skip_test_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 leak_test1_SOURCES=leak_test1.c
 leak_test1_LDADD=$(LIBNEXUS)
-leak_test1_LDFLAGS=-static $(LDFLAGS)
+leak_test1_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 leak_test2_SOURCES=leak_test2.cxx
 leak_test2_LDADD=$(LIBNEXUS)
-leak_test2_LDFLAGS=-static $(LDFLAGS)
+leak_test2_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 leak_test3_SOURCES=leak_test3.cxx
 leak_test3_LDADD=$(LIBNEXUS)
-leak_test3_LDFLAGS=-static $(LDFLAGS)
+leak_test3_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 
 if HAVE_XML
@@ -146,11 +146,11 @@ napi_test_xml_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
 napi_test_xml_static_SOURCES = napi_test.c
 napi_test_xml_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
-napi_test_xml_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_xml_static_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 napi_test_xml_table_static_SOURCES = napi_test.c
 napi_test_xml_table_static_CPPFLAGS = -I$(top_srcdir)/include @XML_CPPFLAGS@
 napi_test_xml_table_static_LDADD = $(LIBNEXUS) @XML_LDFLAGS@
-napi_test_xml_table_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_xml_table_static_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 napi_test_cpp_xml_SOURCES = napi_test_cpp.cxx
 napi_test_cpp_xml_LDADD = $(LIBNEXUSCPP)
 napi_test_cpp_xml_table_SOURCES = napi_test_cpp.cxx
@@ -171,14 +171,14 @@ napi_test_hdf4_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
 napi_test_hdf4_static_SOURCES = napi_test.c
 napi_test_hdf4_static_CPPFLAGS = -I$(top_srcdir)/include @HDF4_CPPFLAGS@
 napi_test_hdf4_static_LDADD = $(LIBNEXUS) @HDF4_LDFLAGS@
-napi_test_hdf4_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_hdf4_static_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 napi_test_cpp_hdf4_SOURCES = napi_test_cpp.cxx
 napi_test_cpp_hdf4_LDADD = $(LIBNEXUSCPP)
 if HAVE_F77
 napif_test_hdf4_SOURCES = napif4_test.f
 napif_test_hdf4_LDADD = $(LIBNEXUS77) # $(FLIBS)
 napif_test_hdf4_LINK = $(F77LINK)
-napif_test_hdf4_LDFLAGS = -static $(LDFLAGS)
+napif_test_hdf4_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 else
 napif_test_hdf4_SOURCES = dummy.c
 napif_test_hdf4_LINK = $(LINK)
@@ -199,14 +199,14 @@ napi_test_hdf5_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
 napi_test_hdf5_static_SOURCES = napi_test.c
 napi_test_hdf5_static_CPPFLAGS = -I$(top_srcdir)/include @HDF5_CPPFLAGS@
 napi_test_hdf5_static_LDADD = $(LIBNEXUS) @HDF5_LDFLAGS@
-napi_test_hdf5_static_LDFLAGS = -static $(LDFLAGS)
+napi_test_hdf5_static_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 napi_test_cpp_hdf5_SOURCES = napi_test_cpp.cxx
 napi_test_cpp_hdf5_LDADD=$(LIBNEXUSCPP)
 if HAVE_F77
 napif_test_hdf5_SOURCES = napif5_test.f
 napif_test_hdf5_LDADD = $(LIBNEXUS77) # $(FLIBS)
 napif_test_hdf5_LINK = $(F77LINK)
-napif_test_hdf5_LDFLAGS = -static $(LDFLAGS)
+napif_test_hdf5_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 else
 napif_test_hdf5_SOURCES = dummy.c
 napif_test_hdf5_LINK = $(LINK)
@@ -224,7 +224,7 @@ if HAVE_F90
 NXtest_SOURCES = NXtest.f90
 NXtest_LDADD = $(LIBNEXUS90)
 NXtest_LINK = $(FCLINK)
-NXtest_LDFLAGS = -static $(LDFLAGS)
+NXtest_LDFLAGS = -static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 else
 NXtest_SOURCES = dummy.c
 NXtest_LINK = $(LINK)

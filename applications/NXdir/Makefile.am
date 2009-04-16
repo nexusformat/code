@@ -35,7 +35,7 @@ bin_PROGRAMS = nxdir
 nxdir_SOURCES = main.cpp string_util.cpp tree.cpp data.cpp data_writer.cpp \
 		nxdir.h nxdir_help.h
 nxdir_LDADD = $(LIBNEXUS)
-nxdir_LDFLAGS = -static $(LDFLAGS)
+nxdir_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 EXTRA_DIST = CHANGES LICENSE README TODO
 
 ## extra dependencies (don;t thing needed now)
