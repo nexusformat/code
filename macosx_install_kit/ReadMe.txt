@@ -2,6 +2,10 @@ NeXus is a common data format for neutron, x-ray, and muon science. It is being 
 
 This package provides libraries for interacting with NeXus files, with bindings for C, C++, Fortran, Python, Java and IDL.
 
-For more information see http://www.nexusformat.org/
+NeXus is distributed under the LGPL licence; this binary is linked to 
+other packages that have different, but compatible, licences. For more
+information see the files in /usr/local/share/nexus
+  
+For futher information on NeXus see http://www.nexusformat.org/
 
 To begin the install, just double click on NeXus.pkg

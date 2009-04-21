@@ -26,13 +26,21 @@ Optional Keys
   YEAR="start-stop"    Use "2001-`date +%Y`" to go from 2001 to this year
   InfoString="$VERSION$RELEASE, (C) $YEAR $COPYRIGHT"
                        Package info
-  BackgroundAlignment="center left right top bottom (top|bottom)(left|right)"
-  BackgroundScaling="none proportional tofit"
-                       Backround picture details if Resource/background exists
-  AuthorizationAction="(Admin|Root|No)Authorization"
-                       Required authorization
-  RestartAction="NoRestart RecommendedRestart RequiredRestart Shutdown RequiredLogout"
-                       Require restart?
+  MajorVersion="VERSION up to the first dot"
+  MinorVersion="VERSION after the last dot"
+                       Major.Minor version number integers
+  BackgroundAlignment="center"
+                       Alignment of background picture, which should be one of
+                       center left right top bottom (top|bottom)(left|right)
+  BackgroundScaling="tofit"
+                       Scaling of background picture, which should be one of
+                       none proportional tofit
+  AuthorizationAction="NoAuthorization"
+                       Required authorization, which should be one of
+                       (Admin|Root|No)Authorization
+  RestartAction="NoRestart"
+                       Require restart?  Should be one of NoRestart Shutdown
+                       RecommendedRestart RequiredRestart RequiredLogout
   DefaultLocation="/"  Default location
   Relocatable=false    true if package is relocatable
   FollowLinks=true     false if links should be replaced with file content
@@ -44,6 +52,7 @@ Optional Keys
                        true if you need to install on the root volume
   UpdateInstalledLanguages=false
                        true if only install resources for the current languages
+  AllowBackRev=false   true if old versions can replace new
 
 === Installed Files ===
 
@@ -140,6 +149,8 @@ target="$PACKAGE.pkg/Contents"
 echo "creating $target"
 mkdir -p "$target"
 cp -Rpv $RESOURCES "$target/Resources"
+echo "Purging .svn directories from $target"
+find -d "$target" -type d -name ".svn" -exec rm -fr "{}" \; -print
 
 # Purge .DS_STORE; protect against spaces if filename
 echo "Purging .DS_Store files from install files (requires root) ..."
