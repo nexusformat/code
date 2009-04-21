@@ -1,3 +1,14 @@
+License Information
+-------------------
+
+The NeXus library and utilities are distributed under the terms on the GNU Lesser General Public License (LGPL) - see the enclosed COPYING_NeXus.txt file or http://www.opensource.org/licenses/lgpl-license.php for further details. The NeXus library is linked statically against several other libraries and these are detailed below. All licence files are installed in /usr/local/share/nexus
+
+* Michael Sweet's Mini-XML parsing library (http://www.easysw.com/~mike/mxml/) which is also governed by the LGPL.
+
+* HDF4 libraries developed at the National Center for Supercomputing Applications (NCSA) at the University of Illinois at Urbana-Champaign (http://hdf.ncsa.uiuc.edu/). Their distribution is covered by the license detailed in the enclosed COPYING_hdf4.txt file and at ftp://ftp.ncsa.uiuc.edu/HDF/HDF/HDF_Current/src/unpacked/COPYING 
+
+* HDF5 library developed at the National Center for Supercomputing Applications (NCSA) at the University of Illinois at Urbana-Champaign (http://hdf.ncsa.uiuc.edu/). Distribution is covered by the license detailed in the enclosed COPYING_hdf5.txt file and at ftp://ftp.ncsa.uiuc.edu/HDF/HDF5/current/src/unpacked/COPYING 
+
 
 		  GNU LESSER GENERAL PUBLIC LICENSE
 		       Version 2.1, February 1999

@@ -20,6 +20,7 @@ env CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk $arch_flags" \
     --disable-dependency-tracking
 make
 make install DESTDIR=`pwd`/macosx_install_kit/package_root
+cp InstallerBits/Licences/*.txt macosx_install_kit/package_root/usr/local/share/nexus
 
 cd macosx_install_kit
 

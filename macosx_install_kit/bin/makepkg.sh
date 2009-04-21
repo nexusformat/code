@@ -149,6 +149,8 @@ target="$PACKAGE.pkg/Contents"
 echo "creating $target"
 mkdir -p "$target"
 cp -Rpv $RESOURCES "$target/Resources"
+echo "Purging .svn directories from $target"
+find -d "$target" -type d -name ".svn" -exec rm -fr "{}" \; -print
 
 # Purge .DS_STORE; protect against spaces if filename
 echo "Purging .DS_Store files from install files (requires root) ..."
