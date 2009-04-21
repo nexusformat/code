@@ -296,8 +296,8 @@ AC_CHECK_PROGS(MS_LIB, [LIB])
 AM_CONDITIONAL(HAVE_MS_LIB, [test ! -z "$MS_LIB"])
 
 # strict aliasing causes issues with casts from NXmalloc()
-CFLAGS="-fno-strict-aliasing"
-CXXFLAGS="-fno-strict-aliasing"
+CFLAGS="$CFLAGS -fno-strict-aliasing"
+CXXFLAGS="$CXXFLAGS -fno-strict-aliasing"
 
 # check for debug
 if test "$enable_debug" = "yes"; then
@@ -746,6 +746,7 @@ AC_CONFIG_FILES([Makefile
 		contrib/applications/CBFLib/Makefile
 		contrib/bindings/Makefile
 		contrib/bindings/python/Makefile
+		macosx_install_kit/pkg.config
 		scripts/Makefile
 		scripts/nexus.pc:scripts/nexus_pc.in
 		scripts/nxbuild])
