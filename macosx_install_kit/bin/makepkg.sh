@@ -162,7 +162,7 @@ set +x
 
 # Build the archives and bill of materials
 echo "building archives"
-pax -w $ROOT | gzip -9 -c > "$target/Archive.pax.gz" || err "Could not create pax"
+( cd $ROOT; pax -w . | gzip -9 -c ) > "$target/Archive.pax.gz"  || err "Could not create pax"
 mkbom $ROOT "$target/Archive.bom" || err "Could not create bom"
 
 SIZE=`du -sk $ROOT | sed -e"s,^\([0-9]*\)[^0-9].*$,\1,"`
