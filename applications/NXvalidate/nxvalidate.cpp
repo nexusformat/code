@@ -107,11 +107,13 @@ static int url_encode(char c, FILE* f)
 
 static int quiet = 0;
 
-static int validate(const char * inFile, const char * definition_name, const char * definition_version, const int keep_temps) {
+static int validate(const string nxsfile, const char * definition_name, const char * definition_version, const int keep_temps) {
    char outFile[256], command[512], outFile2[256], *strPtr;
    const char* cStrPtr;
    int ret, opt, c, i, fd, use_web = 0;
    FILE *fIn, *fOut2;
+
+   const char *inFile = nxsfile.c_str();
 
    if (!quiet) {
       printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
@@ -274,13 +276,10 @@ int main(int argc, char *argv[])
    }
 
    // do the work
-   if (infiles.size() == 1) {
-     strcpy(inFile, (infiles[0]).c_str());
-   } else {
-     cerr << "ERROR: Can only validate one file at a time" << endl;
-     cmd.getOutput()->usage(cmd);
-     NXVALIDATE_ERROR_EXIT;
+   int result = 0;
+   for (size_t i = 0; i < infiles.size(); i++) {
+     result += validate(infiles[i], definition_name, definition_version,
+                        keep_temps);
    }
-
-   return validate(inFile, definition_name, definition_version, keep_temps);
+   return result;
 }
