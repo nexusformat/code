@@ -32,6 +32,10 @@
 #include "napi.h"
 #include "napiconfig.h"
 #include "nxconvert_common.h"
+
+#include <sstream>
+#include "tclap/CmdLine.h"
+
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
