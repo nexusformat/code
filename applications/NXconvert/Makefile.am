@@ -2,7 +2,7 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
+#  $Id: Makefile.am 1239 2009-04-15 14:37:08Z Freddie Akeroyd $
 #  
 #  Makefile for building NeXus applications
 #
@@ -34,17 +34,15 @@ AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 
 EXTRA_DIST=SConscript
 
-if HAVE_F90
-NXDUMP = NXdump
-endif
-if HAVE_XML
-NXINGEST = nxingest
-endif
-if HAVE_LIBXML2
-NXTRANSLATE=NXtranslate
-NXSUMMARY=NXsummary
-endif
-SUBDIRS = NXbrowse NXdir NXconvert NXvalidate \
-	$(NXDUMP) $(NXTRANSLATE) $(NXSUMMARY) $(NXINGEST)
+lib_LTLIBRARIES = libnxconvert.la
+bin_PROGRAMS = nxconvert
+
+libnxconvert_la_SOURCES = nxconvert_common.c nxconvert_common.h
+libnxconvert_la_LIBADD = $(LIBNEXUS)
+libnxconvert_la_LDFLAGS = @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+
+nxconvert_SOURCES = nxconvert.c nxconvert_common.h
+nxconvert_LDADD = libnxconvert.la $(LIBNEXUS)
+nxconvert_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 include $(top_srcdir)/build_rules.am

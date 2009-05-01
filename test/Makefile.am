@@ -92,15 +92,15 @@ nxsummary:
 
 nxconvert:
 	rm -f $@
-	ln -s ../applications/$@$(EXEEXT) $@
+	ln -s ../applications/NXconvert/$@$(EXEEXT) $@
 
 nxvalidate:
 	rm -f $@
-	ln -s ../applications/$@$(EXEEXT) $@
+	ln -s ../applications/NXvalidate/$@$(EXEEXT) $@
 
 nxbrowse:
 	rm -f $@
-	ln -s ../applications/$@$(EXEEXT) $@
+	ln -s ../applications/NXbrowse/$@$(EXEEXT) $@
 
 nxdir:
 	rm -f $@

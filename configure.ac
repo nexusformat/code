@@ -711,6 +711,10 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile 
 		applications/Makefile
 		applications/NXdir/Makefile
+		applications/NXbrowse/Makefile
+		applications/NXconvert/Makefile
+		applications/NXvalidate/Makefile
+		applications/NXdump/Makefile
 		applications/nxingest/Makefile
 		applications/NXsummary/Makefile
 		applications/NXtranslate/Makefile
@@ -741,6 +745,8 @@ AC_CONFIG_FILES([Makefile
 		bindings/swig/Makefile
 		bindings/idl/Makefile
 		bindings/python/Makefile
+		third_party/Makefile
+		third_party/tclap/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
 		contrib/applications/CBFLib/Makefile

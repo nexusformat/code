@@ -1,11 +1,10 @@
-## Process this file with automake to produce Makefile.in
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
-#  
-#  Makefile for building NeXus applications
+#  $Id: Makefile.am 1247 2009-04-21 18:14:24Z Freddie Akeroyd $
 #
+#  Top level Makefile for coordinating NeXus build
+#  
 #  Copyright (C) 2004 Freddie Akeroyd
 #  
 #  This library is free software; you can redistribute it and/or
@@ -25,26 +24,12 @@
 #             
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
+#  @configure_input@
+#
 #====================================================================
-LIBNEXUS=$(top_builddir)/src/libNeXus.la
-LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
-LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include
-AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 
-EXTRA_DIST=SConscript
-
-if HAVE_F90
-NXDUMP = NXdump
-endif
-if HAVE_XML
-NXINGEST = nxingest
-endif
-if HAVE_LIBXML2
-NXTRANSLATE=NXtranslate
-NXSUMMARY=NXsummary
-endif
-SUBDIRS = NXbrowse NXdir NXconvert NXvalidate \
-	$(NXDUMP) $(NXTRANSLATE) $(NXSUMMARY) $(NXINGEST)
-
-include $(top_srcdir)/build_rules.am
+EXTRA_DIST=README AUTHORS COPYING
+noinst_HEADERS = Arg.h ArgException.h CmdLine.h CmdLineInterface.h \
+    CmdLineOutput.h DocBookOutput.h HelpVisitor.h IgnoreRestVisitor.h \
+    MultiArg.h StdOutput.h SwitchArg.h UnlabeledMultiArg.h \
+    UnlabeledValueArg.h ValueArg.h VersionVisitor.h Visitor.h XorHandler.h

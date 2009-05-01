@@ -29,13 +29,13 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include @LIBXML2_CFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/third_party @LIBXML2_CFLAGS@
 
 bin_PROGRAMS = nxsummary
-noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp config.h output.hpp xml_util.hpp\
-   tclap/ArgException.h tclap/Arg.h tclap/CmdLine.h tclap/CmdLineInterface.h tclap/CmdLineOutput.h tclap/DocBookOutput.h tclap/HelpVisitor.h tclap/IgnoreRestVisitor.h tclap/MultiArg.h tclap/StdOutput.h tclap/SwitchArg.h tclap/UnlabeledMultiArg.h tclap/UnlabeledValueArg.h tclap/ValueArg.h tclap/VersionVisitor.h tclap/Visitor.h tclap/XorHandler.h
+noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp config.h output.hpp xml_util.hpp
+   
 nxsummary_SOURCES = data_util.cpp main.cpp string_util.cpp preferences.cpp output.cpp
 nxsummary_LDADD = $(LIBNEXUS)
 nxsummary_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
-EXTRA_DIST = LICENSE tclap/AUTHORS tclap/COPYING tclap/README
+EXTRA_DIST = LICENSE
 include $(top_srcdir)/build_rules.am
