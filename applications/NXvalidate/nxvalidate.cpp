@@ -107,66 +107,11 @@ static int url_encode(char c, FILE* f)
 
 static int quiet = 0;
 
-int main(int argc, char *argv[])
-{
-   char inFile[256], outFile[256], command[512], outFile2[256], *strPtr;
+static int validate(const char * inFile, const char * definition_name, const char * definition_version, const int keep_temps) {
+   char outFile[256], command[512], outFile2[256], *strPtr;
    const char* cStrPtr;
    int ret, opt, c, i, fd, use_web = 0;
    FILE *fIn, *fOut2;
-   int keep_temps = 0;
-
-   // set up the command line arguments
-   CmdLine cmd("Validate a NeXus file", ' ', "1.1.0");
-   ostringstream temp;
-   temp << "Use specified definiton (default: " << definition_name << ")";
-   ValueArg<string> definition_name_arg("d", "def", temp.str(), false, 
-                                        definition_name, "definition", cmd);
-   temp.str("");
-   temp << "specify schema version (default: " << definition_version << ")";
-   ValueArg<string> definition_version_arg("", "defver", temp.str(), false, 
-                                           definition_version, "version", cmd);
-   SwitchArg quiet_arg("q", "quiet", "Turn on quiet mode(only report errors)",
-                       false, cmd);
-   SwitchArg keep_arg("k", "keep", "Keep temporary files",
-                       false, cmd);
-   temp.str("");
-   temp << "Send file to NeXus web site (using wget) for validation "
-        << "(default: try to run \"xmllint\" program locally";
-   SwitchArg send_arg("w", "web", temp.str(), false, cmd);
-   string sinfile;
-   UnlabeledMultiArg<string> infiles_arg("filename",
-                                         "Name of a file to be viewed",
-                                         "filename",cmd);
-
-   // parse the command line and turn it into variables
-   cmd.parse(argc, argv);
-   definition_name = definition_name_arg.getValue().c_str();
-   if (quiet_arg.getValue()) {
-     quiet = 1;
-   }
-   if (send_arg.getValue()) {
-     use_web = 1;
-   }
-   if (keep_arg.getValue()) {
-     keep_temps = 1;
-   }
-   definition_version = definition_version_arg.getValue().c_str();
-   vector<string> infiles = infiles_arg.getValue();
-   if (infiles.empty()) {
-      printf ("Give name of input NeXus file : ");
-      fgets (inFile, sizeof(inFile), stdin);
-      if ((strPtr = strchr(inFile, '\n')) != NULL) { *strPtr = '\0'; }
-      infiles.push_back(string(inFile));
-   }
-
-   // do the work
-   if (infiles.size() == 1) {
-     strcpy(inFile, (infiles[0]).c_str());
-   } else {
-     cerr << "ERROR: Can only validate one file at a time" << endl;
-     cmd.getOutput()->usage(cmd);
-     NXVALIDATE_ERROR_EXIT;
-   }
 
    if (!quiet) {
       printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
@@ -277,3 +222,65 @@ int main(int argc, char *argv[])
    return 0;
 }
 
+int main(int argc, char *argv[])
+{
+   char inFile[256];
+   char *strPtr;
+   int use_web = 0;
+   int keep_temps = 0;
+
+   // set up the command line arguments
+   CmdLine cmd("Validate a NeXus file", ' ', "1.1.0");
+   ostringstream temp;
+   temp << "Use specified definiton (default: " << definition_name << ")";
+   ValueArg<string> definition_name_arg("d", "def", temp.str(), false, 
+                                        definition_name, "definition", cmd);
+   temp.str("");
+   temp << "specify schema version (default: " << definition_version << ")";
+   ValueArg<string> definition_version_arg("", "defver", temp.str(), false, 
+                                           definition_version, "version", cmd);
+   SwitchArg quiet_arg("q", "quiet", "Turn on quiet mode(only report errors)",
+                       false, cmd);
+   SwitchArg keep_arg("k", "keep", "Keep temporary files",
+                       false, cmd);
+   temp.str("");
+   temp << "Send file to NeXus web site (using wget) for validation "
+        << "(default: try to run \"xmllint\" program locally";
+   SwitchArg send_arg("w", "web", temp.str(), false, cmd);
+   string sinfile;
+   UnlabeledMultiArg<string> infiles_arg("filename",
+                                         "Name of a file to be viewed",
+                                         "filename",cmd);
+
+   // parse the command line and turn it into variables
+   cmd.parse(argc, argv);
+   definition_name = definition_name_arg.getValue().c_str();
+   if (quiet_arg.getValue()) {
+     quiet = 1;
+   }
+   if (send_arg.getValue()) {
+     use_web = 1;
+   }
+   if (keep_arg.getValue()) {
+     keep_temps = 1;
+   }
+   definition_version = definition_version_arg.getValue().c_str();
+   vector<string> infiles = infiles_arg.getValue();
+   if (infiles.empty()) {
+      printf ("Give name of input NeXus file : ");
+      fgets (inFile, sizeof(inFile), stdin);
+      if ((strPtr = strchr(inFile, '\n')) != NULL) { *strPtr = '\0'; }
+      infiles.push_back(string(inFile));
+   }
+
+   // do the work
+   if (infiles.size() == 1) {
+     strcpy(inFile, (infiles[0]).c_str());
+   } else {
+     cerr << "ERROR: Can only validate one file at a time" << endl;
+     cmd.getOutput()->usage(cmd);
+     NXVALIDATE_ERROR_EXIT;
+   }
+
+   return validate(inFile, definition_name, definition_version, keep_temps);
+}
