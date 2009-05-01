@@ -107,17 +107,10 @@ static int url_encode(char c, FILE* f)
 
 static int quiet = 0;
 
-static int validate(const string nxsfile, const char * definition_name, const char * definition_version, const int keep_temps) {
-   char outFile[256], command[512], outFile2[256], *strPtr;
-   const char* cStrPtr;
-   int ret, opt, c, i, fd, use_web = 0;
-   FILE *fIn, *fOut2;
-
+static int convertNXS(const string nxsfile) {
    const char *inFile = nxsfile.c_str();
-
-   if (!quiet) {
-      printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
-   }
+   char outFile[256];
+   int fd;
 
    sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
    if (!quiet) {
@@ -125,15 +118,35 @@ static int validate(const string nxsfile, const char * definition_name, const ch
    }
    if ( (fd = mkstemp(outFile)) == -1 )
    {
-	printf("error making temporary directory\n");
-	NXVALIDATE_ERROR_EXIT;
+     cerr << "error making temporary directory\n" << endl;
+        return 1;
    }
    close(fd);
-   if (convert_file(NX_DEFINITION, inFile, NXACC_READ, outFile, NXACC_CREATEXML) != NX_OK)
+   if (convert_file(NX_DEFINITION, inFile, NXACC_READ, outFile,
+                    NXACC_CREATEXML) != NX_OK)
    {
-	printf("* Error converting file %s to definiton XML format", inFile);
-	NXVALIDATE_ERROR_EXIT;
+     cerr << "* Error converting file " << nxsfile
+          << " to definiton XML format";
+     return 1;
    }
+   return 0;
+}
+
+static int validate(const string nxsfile, const char * definition_name, const char * definition_version, const int keep_temps) {
+   char outFile[256], command[512], outFile2[256], *strPtr;
+   const char* cStrPtr;
+   int ret, opt, c, i, fd, use_web = 0;
+   FILE *fIn, *fOut2;
+
+   if (!quiet) {
+     printf("* Validating %s using definition %s.xsd\n", nxsfile.c_str(),
+            definition_name);
+   }
+
+   if (convertNXS(nxsfile) != 0) {
+     return 1;
+   }
+
    if (use_web == 0)
    {
        if (!quiet) {
@@ -149,14 +162,16 @@ static int validate(const string nxsfile, const char * definition_name, const ch
 	    }
 	    if (WEXITSTATUS(ret) != 0)
 	    {
-	        printf("* Validation with \"xmllint\" of %s failed\n", inFile);
+              printf("* Validation with \"xmllint\" of %s failed\n",
+                     nxsfile.c_str());
 		printf("* If the program was unable to find all the required schema from the web, check your \"http_proxy\" environment variable\n");
 	        NXVALIDATE_ERROR_EXIT;
 	    }
 	    else
 	    {
 	        if (!quiet) {
-                    printf("* Validation with \"xmllint\" of %s OK\n", inFile);
+                    printf("* Validation with \"xmllint\" of %s OK\n",
+                           nxsfile.c_str());
                 }
 	        return 0;
 	    }
@@ -164,7 +179,7 @@ static int validate(const string nxsfile, const char * definition_name, const ch
        printf("* Unable to find \"xmllint\" to validate file - will try web validation\n");
        printf("* \"xmllint\" is installed as part of libxml2 from xmlsoft.org\n");
    }
-   sprintf(outFile2, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
+   sprintf(outFile2, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, nxsfile.c_str());
    if ( (fd = mkstemp(outFile2)) == -1 )
    {
 	printf("error\n");
@@ -174,7 +189,7 @@ static int validate(const string nxsfile, const char * definition_name, const ch
    fOut2 = fopen(outFile2, "wt");
    fIn = fopen(outFile, "rt");
    fprintf(fOut2, "file_name=");
-   for(cStrPtr = inFile; *cStrPtr != '\0'; ++cStrPtr)
+   for(cStrPtr = nxsfile.c_str(); *cStrPtr != '\0'; ++cStrPtr)
    {
 	url_encode(*cStrPtr, fOut2);
    }
@@ -207,19 +222,20 @@ static int validate(const string nxsfile, const char * definition_name, const ch
    }
    if (ret == -1)
    {
-	printf("* Unable to find \"wget\" to validate the file %s over the web\n", inFile);
+     printf("* Unable to find \"wget\" to validate the file %s over the web\n", nxsfile.c_str());
 	NXVALIDATE_ERROR_EXIT;
    }
 
    if (WIFEXITED(ret) && (WEXITSTATUS(ret) != 0))
    {
-	printf("* Validation via http://definition.nexusformat.org/ of %s failed\n", inFile);
+     printf("* Validation via http://definition.nexusformat.org/ of %s failed\n", nxsfile.c_str());
 	printf("* If \"wget\" was unable to load the schema files from the web, check your \"http_proxy\" environment variable\n");
 	NXVALIDATE_ERROR_EXIT;
    }
    else if (!quiet)
    {
-	printf("* Validation via http://definition.nexusformat.org/ of %s OK\n", inFile);
+     printf("* Validation via http://definition.nexusformat.org/ of %s OK\n",
+            nxsfile.c_str());
    }
    return 0;
 }
