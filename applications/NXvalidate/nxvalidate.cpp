@@ -32,9 +32,12 @@
 #include "napi.h"
 #include "napiconfig.h"
 #include "nxconvert_common.h"
-
+#include <vector>
+#include <string>
 #include <sstream>
 #include "tclap/CmdLine.h"
+using namespace TCLAP;
+using namespace std;
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -72,17 +75,6 @@ static int mkstemp(char* template)
 
 static const char* definition_name = "BASE";
 static const char* definition_version = "3.0";
-
-static void print_usage()
-{
-    printf("Usage: nxvalidate [-w] [ -d definition ] [ infile ]\n\n");
-    printf("-w    Send file to NeXus web site (using wget) for validation\n");
-    printf("      (default: try to run \"xmllint\" program locally\n");
-    printf("-d    Use specified definiton (default: %s)\n", definition_name);
-    printf("-k    keep temporary files\n");
-    printf("-q    quiet (only report errors)\n");
-    printf("-v    specify schema version (default: %s)\n", definition_version);
-}
 
 static int url_encode(char c, FILE* f)
 {
@@ -123,73 +115,70 @@ int main(int argc, char *argv[])
    FILE *fIn, *fOut2;
    int keep_temps = 0;
 
-   while( (opt = getopt(argc, argv, "wqkhd:v:")) != -1 )
-   {
-/* use with "-:" in getopt	
-	if (opt == '-')
-	{
-	    opt = optarg[0];
-	    optarg++;
-	} 
-*/
-	switch(opt)
-	{
-	  case 'd':
-	    if (optarg != NULL && *optarg != '\0')
-	    {
-		definition_name = optarg;
-	    }
-	    break;
+   // set up the command line arguments
+   CmdLine cmd("Validate a NeXus file", ' ', "1.1.0");
+   ostringstream temp;
+   temp << "Use specified definiton (default: " << definition_name << ")";
+   ValueArg<string> definition_name_arg("d", "def", temp.str(), false, 
+                                        definition_name, "definition", cmd);
+   temp.str("");
+   temp << "specify schema version (default: " << definition_version << ")";
+   ValueArg<string> definition_version_arg("", "defver", temp.str(), false, 
+                                           definition_version, "version", cmd);
+   SwitchArg quiet_arg("q", "quiet", "Turn on quiet mode(only report errors)",
+                       false, cmd);
+   SwitchArg keep_arg("k", "keep", "Keep temporary files",
+                       false, cmd);
+   temp.str("");
+   temp << "Send file to NeXus web site (using wget) for validation "
+        << "(default: try to run \"xmllint\" program locally";
+   SwitchArg send_arg("w", "web", temp.str(), false, cmd);
+   string sinfile;
+   UnlabeledMultiArg<string> infiles_arg("filename",
+                                         "Name of a file to be viewed",
+                                         "filename",cmd);
 
-	  case 'h':
-	    print_usage();
-	    return 0;
-
-	  case 'q':
-            quiet = 1;
-            break;
-	
-	  case 'w':
-	    use_web = 1;
-	    break;
-
-	  case 'k':
-	    keep_temps = 1;
-	    break;
-
-	  case 'v':
-	    if (optarg != NULL && *optarg != '\0')
-	    {
-	        definition_version = optarg;
-	    }
-	    break;
-
-	  default:
-/*	    printf("Invalid option -%c\n", opt); */
-	    print_usage();
-	    NXVALIDATE_ERROR_EXIT;
-	    break;
-	}
+   // parse the command line and turn it into variables
+   cmd.parse(argc, argv);
+   definition_name = definition_name_arg.getValue().c_str();
+   if (quiet_arg.getValue()) {
+     quiet = 1;
    }
-   if ((argc - optind) <  1)
-   {
-/* use command line arguments for input and output filenames if given */
+   if (send_arg.getValue()) {
+     use_web = 1;
+   }
+   if (keep_arg.getValue()) {
+     keep_temps = 1;
+   }
+   definition_version = definition_version_arg.getValue().c_str();
+   vector<string> infiles = infiles_arg.getValue();
+   if (infiles.empty()) {
       printf ("Give name of input NeXus file : ");
       fgets (inFile, sizeof(inFile), stdin);
       if ((strPtr = strchr(inFile, '\n')) != NULL) { *strPtr = '\0'; }
+      infiles.push_back(string(inFile));
    }
-   else 
-   {
-     strcpy (inFile, argv[optind]);
+
+   // do the work
+   if (infiles.size() == 1) {
+     strcpy(inFile, (infiles[0]).c_str());
+   } else {
+     cerr << "ERROR: Can only validate one file at a time" << endl;
+     cmd.getOutput()->usage(cmd);
+     NXVALIDATE_ERROR_EXIT;
    }
+
    if (!quiet) {
       printf("* Validating %s using definition %s.xsd\n", inFile, definition_name);
    }
 
    sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
+   if (!quiet) {
+     cout << "* Writing tempfile " << outFile << endl;
+   }
    if ( (fd = mkstemp(outFile)) == -1 )
    {
-	printf("error\n");
+	printf("error making temporary directory\n");
 	NXVALIDATE_ERROR_EXIT;
    }
    close(fd);
