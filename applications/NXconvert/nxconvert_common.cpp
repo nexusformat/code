@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "napi.h"
+#include "NeXusFile.hpp"
+#include "NeXusStream.hpp"
 #include "nxconvert_common.h"
 
 static int WriteGroup (int is_definition);
@@ -147,24 +149,41 @@ static int WriteGroup (int is_definition)
 { 
    int i;
    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], dataLen;     
-   NXname name, class;
+   NXname name, nxclass;
    void *dataBuffer;
    NXlink link;
+   std::vector<char> definition;
+   using namespace NeXus;
+   using namespace NeXus::Stream;
+   File nfile_in(inId), nfile_out(outId);
 
    do {
-      status = NXgetnextentry (inId, name, class, &dataType);
+      status = NXgetnextentry (inId, name, nxclass, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
-         if (!strncmp(class,"NX",2)) {
-            if (NXopengroup (inId, name, class) != NX_OK) return NX_ERROR;
+         if (!strncmp(nxclass,"NX",2)) {
+            if (NXopengroup (inId, name, nxclass) != NX_OK) return NX_ERROR;
 	    add_path(name);
 	    if (NXgetgroupID(inId, &link) != NX_OK) return NX_ERROR;
 	    if (!strcmp(current_path, link.targetPath))
 	    {
-                if (NXmakegroup (outId, name, class) != NX_OK) return NX_ERROR;
-                if (NXopengroup (outId, name, class) != NX_OK) return NX_ERROR;
+                if (NXmakegroup (outId, name, nxclass) != NX_OK) return NX_ERROR;
+                if (NXopengroup (outId, name, nxclass) != NX_OK) return NX_ERROR;
                 if (WriteAttributes (is_definition) != NX_OK) return NX_ERROR;
                 if (WriteGroup (is_definition) != NX_OK) return NX_ERROR;
+		if (is_definition && !strcmp(nxclass, "NXentry"))
+		{
+		    try {
+		        nfile_in >> Data("definition", definition) >> Close;
+			definition.push_back('\0');
+		        nfile_out << Attr("xsi:type",
+					std::string(&(definition.front())));
+		    }
+		    catch(std::exception& ex)
+		    {
+			; // definition not found
+                    }
+		}
 	        remove_path(name);
 	    }
 	    else
@@ -177,7 +196,7 @@ static int WriteGroup (int is_definition)
          	if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
 	    }
          }
-         else if (!strncmp(class,"SDS",3)) {
+         else if (!strncmp(nxclass,"SDS",3)) {
 	    add_path(name);
             if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
 	    if (NXgetdataID(inId, &link) != NX_OK) return NX_ERROR;

@@ -27,15 +27,16 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
+LIBNEXUSCPP=$(top_builddir)/bindings/cpp/libNeXusCPP.la
 LIBNXCONVERT=../NXconvert/libnxconvert.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/third_party -I$(top_srcdir)/applications/NXconvert
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/bindings/cpp -I$(top_srcdir)/third_party -I$(top_srcdir)/applications/NXconvert
 
 EXTRA_DIST=SConscript
 
 bin_PROGRAMS = nxvalidate
 
 nxvalidate_SOURCES = nxvalidate.cpp config.h
-nxvalidate_LDADD = $(LIBNXCONVERT) $(LIBNEXUS)
+nxvalidate_LDADD = $(LIBNXCONVERT) $(LIBNEXUSCPP) $(LIBNEXUS)
 nxvalidate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 include $(top_srcdir)/build_rules.am

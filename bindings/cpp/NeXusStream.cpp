@@ -82,6 +82,25 @@ NXnumtype AttrHolder<NumT>::getType()
     return NeXus::getType<NumT>();
 }
 
+template<>
+NXnumtype AttrHolder<std::string>::getType()
+{
+    return NeXus::getType<char>();
+}
+
+template<>
+void AttrHolder<std::string>::readFromFile(File& nf) const
+{
+    if (m_value != NULL)
+    {
+        nf.getAttr(m_name, *m_value);
+    }
+    else
+    {
+	throw Exception("AttrHolder<NumT>::readFromFile - not able to read into a constant");
+    }
+}
+
 template<typename NumT>
 void AttrHolder<NumT>::readFromFile(File& nf) const
 {
@@ -176,9 +195,11 @@ DataHolder<NumT>::DataHolder(const std::vector<NumT>& value) : HolderBase(""), m
 
 template class NXDLL_EXPORT AttrHolder<double>;
 template class NXDLL_EXPORT AttrHolder<int>;
+template class NXDLL_EXPORT AttrHolder<std::string>;
 
 template class NXDLL_EXPORT DataHolder<double>;
 template class NXDLL_EXPORT DataHolder<int>;
+template class NXDLL_EXPORT DataHolder<char>;
 
 void Data::readFromFile(File& nf) const
 {

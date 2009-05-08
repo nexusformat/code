@@ -27,21 +27,19 @@
 #
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
-LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
-LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include
-AM_FCFLAGS=-I$(top_builddir)/bindings/f90
+LIBNEXUSCPP=$(top_builddir)/bindings/cpp/libNeXusCPP.la
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/bindings/cpp -I$(top_srcdir)/third_party
 
 EXTRA_DIST=SConscript
 
 lib_LTLIBRARIES = libnxconvert.la
 bin_PROGRAMS = nxconvert
 
-libnxconvert_la_SOURCES = nxconvert_common.c nxconvert_common.h
-libnxconvert_la_LIBADD = $(LIBNEXUS)
+libnxconvert_la_SOURCES = nxconvert_common.cpp nxconvert_common.h
+libnxconvert_la_LIBADD = $(LIBNEXUSCPP) $(LIBNEXUS)
 libnxconvert_la_LDFLAGS = @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
-nxconvert_SOURCES = nxconvert.c nxconvert_common.h
+nxconvert_SOURCES = nxconvert.cpp nxconvert_common.h
 nxconvert_LDADD = libnxconvert.la $(LIBNEXUS)
 nxconvert_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 

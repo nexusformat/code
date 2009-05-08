@@ -127,6 +127,7 @@ static void inner_free(void* & data) {
   }
 }
 
+namespace NeXus {
 File::File(NXhandle handle, bool close_handle) : m_file_id(handle), m_close_handle(close_handle) {
 
 }
@@ -772,6 +773,16 @@ NumT File::getAttr(const AttrInfo& info) {
   return value;
 }
 
+template <>
+void File::getAttr(const std::string& name, std::string& value)
+{
+    AttrInfo info;
+    info.type = getType<char>();
+    info.length = 2000; ///< @todo need to find correct length of attribute
+    info.name = name;
+    value = this->getStrAttr(info);
+}
+
 template <typename NumT>
 void File::getAttr(const std::string& name, NumT& value)
 {
@@ -919,6 +930,7 @@ void File::linkExternal(const string& name, const string& type,
     throw Exception(msg.str(), status);
   }
 }
+}
 
 /* ---------------------------------------------------------------- */
 /* Concrete instantiations of template definitions.                 */
@@ -943,6 +955,8 @@ template
 NXDLL_EXPORT void File::putAttr(const string& name, const int64_t value);
 template
 NXDLL_EXPORT void File::putAttr(const string& name, const uint64_t value);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const char value);
 
 template
 NXDLL_EXPORT float File::getAttr(const AttrInfo& info);
@@ -964,6 +978,8 @@ template
 NXDLL_EXPORT int64_t File::getAttr(const AttrInfo& info);
 template
 NXDLL_EXPORT uint64_t  File::getAttr(const AttrInfo& info);
+template
+NXDLL_EXPORT char File::getAttr(const AttrInfo& info);
 
 template
 NXDLL_EXPORT void File::writeData(const string& name, const vector<float>& value);
@@ -985,6 +1001,8 @@ template
 NXDLL_EXPORT void File::writeData(const string& name, const vector<int64_t>& value);
 template
 NXDLL_EXPORT void File::writeData(const string& name, const vector<uint64_t>& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const vector<char>& value);
 
 template
 NXDLL_EXPORT void File::writeData(const string& name, const vector<float>& value, const std::vector<int>& dims);
@@ -1068,6 +1086,8 @@ template
 NXDLL_EXPORT vector<int64_t> * File::getData();
 template
 NXDLL_EXPORT vector<uint64_t> * File::getData();
+template
+NXDLL_EXPORT vector<char> * File::getData();
 
 template
 NXDLL_EXPORT void File::getData(vector<float>& data);
@@ -1089,6 +1109,8 @@ template
 NXDLL_EXPORT void File::getData(vector<int64_t>& data);
 template
 NXDLL_EXPORT void File::getData(vector<uint64_t>& data);
+template
+NXDLL_EXPORT void File::getData(vector<char>& data);
 
 template
 NXDLL_EXPORT void File::putSlab(std::vector<float>& data, int start, int size);
@@ -1115,3 +1137,5 @@ template
 NXDLL_EXPORT void File::getAttr(const std::string& name, double& value);
 template 
 NXDLL_EXPORT void File::getAttr(const std::string& name, int& value);
+template 
+NXDLL_EXPORT void File::getAttr(const std::string& name, std::string& value);
