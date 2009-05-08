@@ -127,7 +127,11 @@ static void inner_free(void* & data) {
   }
 }
 
-File::File(const string& filename, const NXaccess access) {
+File::File(NXhandle handle, bool close_handle) : m_file_id(handle), m_close_handle(close_handle) {
+
+}
+
+File::File(const string& filename, const NXaccess access) : m_close_handle (true) {
   if (filename.empty()) {
     throw Exception("Filename specified is empty constructor");
   }
@@ -141,7 +145,7 @@ File::File(const string& filename, const NXaccess access) {
 }
 
 File::~File() {
-  if (this->m_file_id != NULL) {
+  if (m_close_handle && m_file_id != NULL) {
     NXstatus status = NXclose(&(this->m_file_id));
     this->m_file_id = NULL;
     if (status != NX_OK) {

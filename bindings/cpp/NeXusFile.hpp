@@ -102,6 +102,8 @@ namespace NeXus {
   private:
     /** The handle for the C-API. */
     NXhandle m_file_id;
+    /** should be close handle on exit */
+    bool m_close_handle;
     /**
      * \return A pair of the next entry available in a listing.
      */
@@ -134,6 +136,14 @@ namespace NeXus {
      * \param access How to access the file.
      */
     File(const std::string& filename, const NXaccess access = NXACC_READ);
+
+    /**
+     * Use an existing handle returned from NXopen()
+     *
+     * \param handle Handle to connect to
+     * \param close_handle Should the handle be closed on destruction
+     */
+    File(NXhandle handle, bool close_handle = false);
 
     /** Destructor. This does close the file. */
     ~File();
