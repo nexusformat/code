@@ -41,7 +41,7 @@ AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 CLEANFILES=NXtest.nx4 NXtest.nx5 NXtest.nxs NXtest.xml NXtest-table.xml \
 	leak_test.nxs leak_test1.nxs leak_test2_*.nxs \
 	nxtranslate nxsummary nxconvert nxvalidate nxdir nxbrowse \
-	NXtest.h4 NXtest.h5
+	NXtest.h4 NXtest.h5 test_unlimited.*
 
 
 ## testdir=$(prefix)/nexus/test
@@ -74,7 +74,7 @@ TESTSUITE_AT	= ## dbase.at devices.at starter.at
 
 AUTOTEST	= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) $(CPP_TARGETS) leak_test1
+check_PROGRAMS = run_test skip_test $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) $(CPP_TARGETS) leak_test1 test_nxunlimited
 
 #nxtestdir=$(NXTESTDIR)
 #nxtest_PROGRAMS = $(HDF4_TARGETS) $(HDF5_TARGETS) $(F77_TARGETS) $(F90_TARGETS) $(XML_TARGETS) leak_test1 leak_test2 leak_test3
@@ -138,6 +138,9 @@ leak_test3_SOURCES=leak_test3.cxx
 leak_test3_LDADD=$(LIBNEXUS)
 leak_test3_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
+test_nxunlimited_SOURCES=test_nxunlimited.c
+test_nxunlimited_LDADD=$(LIBNEXUS)
+test_nxunlimited_LDFLAGS=-static $(HDF4_LDFLAGS) $(HDF5_LDFLAGS) $(XML_LDFLAGS) $(LDFLAGS)
 
 if HAVE_XML
 napi_test_xml_SOURCES = napi_test.c
