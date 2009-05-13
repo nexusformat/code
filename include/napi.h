@@ -801,4 +801,3 @@ extern  NXstatus  NXsetcache(long newVal);
 #endif /* __cplusplus */
 
 #endif /*NEXUSAPI*/
-

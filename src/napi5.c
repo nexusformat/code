@@ -776,13 +776,10 @@ static int nxToHDF5Type(int datatype)
   
   pFile = NXI5assert (fid);
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int));
-  if (dimensions[0] == NX_UNLIMITED)
-     {
-     for (i = 0; i < H5S_MAX_RANK; i++)
-       {
-         chunk_size[i]= 1;
-       } 
-     }    
+  memcpy(chunk_size,dimensions,rank*sizeof(int));
+  if (dimensions[0] == NX_UNLIMITED){
+         chunk_size[0]= 1;
+  }    
   return NX5compmakedata (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
     
   return NX_OK;
