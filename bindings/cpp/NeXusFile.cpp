@@ -1169,5 +1169,3 @@ template
 NXDLL_EXPORT void File::getAttr(const std::string& name, double& value);
 template 
 NXDLL_EXPORT void File::getAttr(const std::string& name, int& value);
-template 
-NXDLL_EXPORT void File::getAttr(const std::string& name, std::string& value);
