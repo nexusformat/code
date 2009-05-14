@@ -219,7 +219,7 @@ namespace NeXus {
                   const int length, bool open_data = false);
 
     /**
-     * Create a string field, insert the data, and close the data.
+     * Create a 1D data field, insert the data, and close the data.
      *
      * \param name The name of the field to create.
      * \param value The string to put into the file.
@@ -230,10 +230,27 @@ namespace NeXus {
      * Create a 1D data field, insert the data, and close the data.
      *
      * \param name The name of the field to create.
+     * \param value The string to put into the file.
+     */
+    void writeData(const std::string& name, const char* value);
+
+    /**
+     * Create a 1D data field, insert the data, and close the data.
+     *
+     * \param name The name of the field to create.
      * \param value The vector to put into the file.
      */
     template <typename NumT>
     void writeData(const std::string& name, const std::vector<NumT>& value);
+
+    /**
+     * Create a 1D data field, insert the data, and close the data.
+     *
+     * \param name The name of the field to create.
+     * \param value The value to put into the file.
+     */
+    template <typename NumT>
+    void writeData(const std::string& name, const NumT& value);
 
     /**
      * Create a n-dimension data field, insert the data, and close the data.

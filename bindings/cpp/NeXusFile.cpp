@@ -270,6 +270,15 @@ void File::makeData(const string & name, const NXnumtype type,
   this->makeData(name, type, dims, open_data);
 }
 
+template <typename NumT>
+void File::writeData(const string& name, const NumT& value) {
+  std::vector<NumT> v(1, value);
+  this->writeData(name, v);
+}
+
+void File::writeData(const string& name, const char* value) {
+  this->writeData(name, std::string(value));
+}
 
 void File::writeData(const string& name, const string& value) {
   if (value.empty()) {
@@ -285,10 +294,10 @@ void File::writeData(const string& name, const string& value) {
   this->closeData();
 }
 
+
 template <typename NumT>
 void File::writeData(const string& name, const vector<NumT>& value) {
-  vector<int> dims;
-  dims.push_back(value.size());
+  vector<int> dims(1, value.size());
   this->writeData(name, value, dims);
 }
 
@@ -980,6 +989,29 @@ template
 NXDLL_EXPORT uint64_t  File::getAttr(const AttrInfo& info);
 template
 NXDLL_EXPORT char File::getAttr(const AttrInfo& info);
+
+template
+NXDLL_EXPORT void File::writeData(const string& name, const float& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const double& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const int8_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const uint8_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const int16_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const uint16_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const int32_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const uint32_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const int64_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const uint64_t& value);
+template
+NXDLL_EXPORT void File::writeData(const string& name, const char& value);
 
 template
 NXDLL_EXPORT void File::writeData(const string& name, const vector<float>& value);
