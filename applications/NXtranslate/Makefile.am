@@ -67,7 +67,7 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 
 nxtranslate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
-#EXTRA_DIST = CHANGES LICENSE README TODO
+EXTRA_DIST = *.xml *.nxt *.dat *.run
 
 include $(top_srcdir)/build_rules.am
 

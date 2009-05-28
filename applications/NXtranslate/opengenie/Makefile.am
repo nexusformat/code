@@ -38,6 +38,6 @@ libnxgenie_la_SOURCES = \
 libnxgenie_la_LIBADD = -lgenie
 libnxgenie_la_LDFLAGS = -no-undefined -export-dynamic -module $(LDFLAGS)
 
-EXTRA_DIST = README
+EXTRA_DIST = README nxgenie.gcl
 
 include $(top_srcdir)/build_rules.am
