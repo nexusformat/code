@@ -1,5 +1,6 @@
 #include <sstream>
 #include <cstdlib>
+#include <cstdio>
 #include <napi.h>
 #include <unistd.h>
 
