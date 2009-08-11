@@ -24,9 +24,9 @@
  $Id: nxconvert.c 991 2008-03-19 19:30:03Z Freddie Akeroyd $
 -----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include <unistd.h>
 #include <fcntl.h>
 #include "napi.h"
@@ -37,7 +37,6 @@
 #include <sstream>
 #include "tclap/CmdLine.h"
 using namespace TCLAP;
-using namespace std;
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -73,8 +72,8 @@ static int mkstemp(char* template)
 #define TMP_DIR P_tmpdir
 #endif /* _WIN32 */
 
-static const char* definition_name = "BASE";
-static const char* definition_version = "3.0";
+static const char* definition_name = NEXUS_SCHEMA_BASE;
+static const char* definition_version = NEXUS_SCHEMA_VERSION;
 
 static int url_encode(char c, FILE* f)
 {
@@ -107,94 +106,99 @@ static int url_encode(char c, FILE* f)
 
 static int quiet = 0;
 
-static int convertNXS(const string nxsfile) {
-   const char *inFile = nxsfile.c_str();
+static int convertNXS(const std::string& nxsfile_in, std::string& nxsfile_out) 
+{
+   const char *inFile = nxsfile_in.c_str();
    char outFile[256];
    int fd;
 
    sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
-   if (!quiet) {
-     cout << "* Writing tempfile " << outFile << endl;
-   }
    if ( (fd = mkstemp(outFile)) == -1 )
    {
-     cerr << "error making temporary directory\n" << endl;
+     std::cerr << "error making temporary directory\n" << std::endl;
         return 1;
    }
    close(fd);
+   if (!quiet) {
+     std::cout << "* Writing tempfile " << outFile << std::endl;
+   }
+   nxsfile_out = outFile;
    if (convert_file(NX_DEFINITION, inFile, NXACC_READ, outFile,
                     NXACC_CREATEXML) != NX_OK)
    {
-     cerr << "* Error converting file " << nxsfile
+     std::cerr << "* Error converting file " << nxsfile_in
           << " to definiton XML format";
      return 1;
    }
    return 0;
 }
 
-static int validate(const string nxsfile, const char * definition_name, const char * definition_version, const int keep_temps) {
-   char outFile[256], command[512], outFile2[256], *strPtr;
+static int validate(const std::string& nxsfile, const char* definition_name, const char* definition_version, const int keep_temps, int use_web) 
+{
+   char command[512], outFile2[512], *strPtr;
    const char* cStrPtr;
-   int ret, opt, c, i, fd, use_web = 0;
+   int ret, opt, c, i, fd;
    FILE *fIn, *fOut2;
 
    if (!quiet) {
-     cout << "* Validating " << nxsfile << " using definition "
-          << definition_name << ".xsd" << endl;
+     std::cout << "* Validating " << nxsfile << " using definition "
+          << definition_name << ".xsd" << std::endl;
    }
-
-   if (convertNXS(nxsfile) != 0) {
+   std::string nxsfile_xml;
+   if (convertNXS(nxsfile, nxsfile_xml) != 0) {
      return 1;
    }
 
    if (use_web == 0)
    {
+       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/%s/%s.xsd \"%s\" %s", definition_version, definition_name, nxsfile_xml.c_str(), (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
        if (!quiet) {
-         cout << "* Validating using locally installed \"xmllint\" program"
-              << endl;
+         std::cout << "* Validating using locally installed \"xmllint\" program"
+              << std::endl;
+         std::cout << command << std::endl;
        }
-       sprintf(command, "xmllint --noout --schema http://definition.nexusformat.org/schema/%s/%s.xsd \"%s\" %s", definition_version, definition_name, outFile, (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
        ret = system(command);
        if (ret != -1 && WIFEXITED(ret))
        {
 	    if (!keep_temps)
 	    {
-		remove(outFile);
+		remove(nxsfile_xml.c_str());
 	    }
 	    if (WEXITSTATUS(ret) != 0)
 	    {
-              cout << "* Validation with \"xmllint\" of " << nxsfile
-                   << " failed" << endl;
-              cout << "* If the program was unable to find all the required "
+              std::cout << "* Validation with \"xmllint\" of " << nxsfile
+                   << " failed" << std::endl;
+              std::cout << "* If the program was unable to find all the required "
                    << "schema from the web, check your \"http_proxy\" "
-                   << "environment variable" << endl;
+                   << "environment variable" << std::endl;
               NXVALIDATE_ERROR_EXIT;
 	    }
 	    else
 	    {
 	        if (!quiet) {
-                  cout << "* Validation with \"xmllint\" of " << nxsfile 
-                       << " OK" << endl;
+                  std::cout << "* Validation with \"xmllint\" of " << nxsfile 
+                       << " OK" << std::endl;
                 }
 	        return 0;
 	    }
        }
-       cout << "* Unable to find \"xmllint\" to validate file - will try "
-            << "web validation" << endl;
-       cout << "* \"xmllint\" is installed as part of libxml2 from "
-            << "xmlsoft.org" << endl;
+       std::cout << "* Unable to find \"xmllint\" to validate file - will try "
+            << "web validation" << std::endl;
+       std::cout << "* \"xmllint\" is installed as part of libxml2 from "
+            << "xmlsoft.org" << std::endl;
+       NXVALIDATE_ERROR_EXIT;
    }
    sprintf(outFile2, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, nxsfile.c_str());
    if ( (fd = mkstemp(outFile2)) == -1 )
    {
-     cerr << "Failed to make the temporary file " << outFile2 << endl;
+     std::cerr << "Failed to make the temporary file " << outFile2 << std::endl;
      NXVALIDATE_ERROR_EXIT;
    }
    close(fd);
    fOut2 = fopen(outFile2, "wt");
-   fIn = fopen(outFile, "rt");
+   fIn = fopen(nxsfile_xml.c_str(), "rt");
    fprintf(fOut2, "file_name=");
-   for(cStrPtr = nxsfile.c_str(); *cStrPtr != '\0'; ++cStrPtr)
+   for(cStrPtr = nxsfile_xml.c_str(); *cStrPtr != '\0'; ++cStrPtr)
    {
 	url_encode(*cStrPtr, fOut2);
    }
@@ -216,35 +220,35 @@ static int validate(const string nxsfile, const char * definition_name, const ch
    fclose(fIn);
    fclose(fOut2);
    if (!quiet) {
-     cout << "* Validating via http://definition.nexusformat.org using "
-          << "\"wget\"" << endl;
+     std::cout << "* Validating via http://definition.nexusformat.org using "
+          << "\"wget\"" << std::endl;
    }
    sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/dovalidate/run", (quiet ? NULL_DEVICE : "-"), outFile2);
    ret = system(command);
    if (!keep_temps)
    {
-	remove(outFile);
+	remove(nxsfile_xml.c_str());
 	remove(outFile2);
    }
    if (ret == -1)
    {
-     cout << "* Unable to find \"wget\" to validate the file " << nxsfile
-          << " over the web" << endl;
+        std::cout << "* Unable to find \"wget\" to validate the file " << nxsfile
+          << " over the web" << std::endl;
 	NXVALIDATE_ERROR_EXIT;
    }
 
    if (WIFEXITED(ret) && (WEXITSTATUS(ret) != 0))
    {
-     cerr << "* Validation via http://definition.nexusformat.org/ of "
-          << nxsfile << " failed" << endl;
-     cerr << "* If \"wget\" was unable to load the schema files from the "
-          << "web, check your \"http_proxy\" environment variable" << endl;
+        std::cerr << "* Validation via http://definition.nexusformat.org/ of "
+          << nxsfile << " failed" << std::endl;
+        std::cerr << "* If \"wget\" was unable to load the schema files from the "
+          << "web, check your \"http_proxy\" environment variable" << std::endl;
 	NXVALIDATE_ERROR_EXIT;
    }
    else if (!quiet)
    {
-     cout << "* Validation via http://definition.nexusformat.org/ of "
-          << nxsfile << " OK" << endl;
+        std::cout << "* Validation via http://definition.nexusformat.org/ of "
+          << nxsfile << " OK" << std::endl;
    }
    return 0;
 }
@@ -258,13 +262,13 @@ int main(int argc, char *argv[])
 
    // set up the command line arguments
    CmdLine cmd("Validate a NeXus file", ' ', "1.1.0");
-   ostringstream temp;
+   std::ostringstream temp;
    temp << "Use specified definiton (default: " << definition_name << ")";
-   ValueArg<string> definition_name_arg("d", "def", temp.str(), false, 
+   ValueArg<std::string> definition_name_arg("d", "def", temp.str(), false, 
                                         definition_name, "definition", cmd);
    temp.str("");
    temp << "specify schema version (default: " << definition_version << ")";
-   ValueArg<string> definition_version_arg("", "defver", temp.str(), false, 
+   ValueArg<std::string> definition_version_arg("", "defver", temp.str(), false, 
                                            definition_version, "version", cmd);
    SwitchArg quiet_arg("q", "quiet", "Turn on quiet mode(only report errors)",
                        false, cmd);
@@ -274,8 +278,8 @@ int main(int argc, char *argv[])
    temp << "Send file to NeXus web site (using wget) for validation "
         << "(default: try to run \"xmllint\" program locally";
    SwitchArg send_arg("w", "web", temp.str(), false, cmd);
-   string sinfile;
-   UnlabeledMultiArg<string> infiles_arg("filename",
+   std::string sinfile;
+   UnlabeledMultiArg<std::string> infiles_arg("filename",
                                          "Name of a file to be viewed",
                                          "filename",cmd);
 
@@ -292,19 +296,19 @@ int main(int argc, char *argv[])
      keep_temps = 1;
    }
    definition_version = definition_version_arg.getValue().c_str();
-   vector<string> infiles = infiles_arg.getValue();
+   std::vector<std::string> infiles = infiles_arg.getValue();
    if (infiles.empty()) {
       printf ("Give name of input NeXus file : ");
       fgets (inFile, sizeof(inFile), stdin);
       if ((strPtr = strchr(inFile, '\n')) != NULL) { *strPtr = '\0'; }
-      infiles.push_back(string(inFile));
+      infiles.push_back(std::string(inFile));
    }
 
    // do the work
    int result = 0;
    for (size_t i = 0; i < infiles.size(); i++) {
      result += validate(infiles[i], definition_name, definition_version,
-                        keep_temps);
+                        keep_temps, use_web);
    }
    return result;
 }
