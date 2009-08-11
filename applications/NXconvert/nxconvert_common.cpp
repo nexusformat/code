@@ -152,7 +152,7 @@ static int WriteGroup (int is_definition)
    NXname name, nxclass;
    void *dataBuffer;
    NXlink link;
-   std::vector<char> definition;
+   std::string definition;
    using namespace NeXus;
    using namespace NeXus::Stream;
    File nfile_in(inId), nfile_out(outId);
@@ -170,20 +170,20 @@ static int WriteGroup (int is_definition)
                 if (NXmakegroup (outId, name, nxclass) != NX_OK) return NX_ERROR;
                 if (NXopengroup (outId, name, nxclass) != NX_OK) return NX_ERROR;
                 if (WriteAttributes (is_definition) != NX_OK) return NX_ERROR;
-                if (WriteGroup (is_definition) != NX_OK) return NX_ERROR;
 		if (is_definition && !strcmp(nxclass, "NXentry"))
 		{
 		    try {
-		        nfile_in >> Data("definition", definition) >> Close;
-			definition.push_back('\0');
-		        nfile_out << Attr("xsi:type",
-					std::string(&(definition.front())));
+			nfile_in.openData("definition");
+		        definition = nfile_in.getStrData();
+		        nfile_in.closeData();
+		        nfile_out.putAttr("xsi:type", definition);
 		    }
 		    catch(std::exception& ex)
 		    {
 			; // definition not found
                     }
 		}
+                if (WriteGroup (is_definition) != NX_OK) return NX_ERROR;
 	        remove_path(name);
 	    }
 	    else

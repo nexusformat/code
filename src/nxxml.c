@@ -74,9 +74,9 @@ typedef struct {
  * Freddie Akeroyd 14/7/2008
  * Add NeXus schema support - this uses BASE.xsd as the initial file
  */
-#define NEXUS_SCHEMA_VERSION	"3.0" 	/**< version of NeXus definition schema */
+#define NEXUS_SCHEMA_VERSION	"3.1" 	/**< version of NeXus definition schema */
 #define NEXUS_SCHEMA_NAMESPACE 	"http://definition.nexusformat.org/schema/" NEXUS_SCHEMA_VERSION 	/**< XML schema namespace specified by xmlns */
-#define NEXUS_SCHEMA_FILE 	NEXUS_SCHEMA_NAMESPACE "/BASE.xsd" /**< location of default schema file for namespace */
+#define NEXUS_SCHEMA_FILE 	NEXUS_SCHEMA_NAMESPACE "/NXroot.xsd" /**< location of default schema file for namespace */
 
 /*---------------------------------------------------------------------*/
 typedef struct {
@@ -394,7 +394,7 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
   memset(typestring,0,132*sizeof(char));
 
   getNumberText(datatype,typestring,130);
-  if(rank > 1 || dimensions[0] > 1) {
+  if(rank > 1 || datatype == NX_CHAR || dimensions[0] > 1) {
     strcat(typestring,"[");
     snprintf(pNumber,19,"%d",dimensions[0]);
     strncat(typestring,pNumber,130-strlen(typestring));

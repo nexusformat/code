@@ -38,7 +38,7 @@ static void print_usage()
 
 #define NXCONVERT_EXIT_ERROR	exit(1)
 
-static const char* definition_name = "BASE";
+static const char* definition_name = "NXroot";
 
 int main(int argc, char *argv[])
 {
