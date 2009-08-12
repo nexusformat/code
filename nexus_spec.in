@@ -50,10 +50,13 @@ access routines, documentation, examples and a basic NeXus file browser.
 
 %build
 # RPM_INSTALL_PREFIX - where to install software
+if test "%_target_cpu" = "i386"; then
+    EXTRA_CONFIG_OPTS="--enable-32bit"
+fi
 if ! test -z "$RPM_INSTALL_PREFIX"; then
-    ./configure --prefix="$RPM_INSTALL_PREFIX" $NEXUS_CONFIG_OPTIONS
+    ./configure --prefix="$RPM_INSTALL_PREFIX" $NEXUS_CONFIG_OPTIONS $EXTRA_CONFIG_OPTS
 else
-    ./configure --prefix=%{_prefix} --libdir=%{_libdir} $NEXUS_CONFIG_OPTIONS
+    ./configure --prefix=%{_prefix} --libdir=%{_libdir} $NEXUS_CONFIG_OPTIONS $EXTRA_CONFIG_OPTS
 fi
 make
 
@@ -70,6 +73,7 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %{_bindir}/*
 %{_datadir}/*
 %{_includedir}/*
+%{_prefix}/lib/python*/site-packages/*
 #%files devel
 #%{_libdir}/*.a
 #%{_libdir}/*.so*

@@ -61,6 +61,11 @@ AC_ARG_ENABLE([debug], AC_HELP_STRING([--enable-debug],[Turn off optimisation]),
 
 AC_ARG_ENABLE([32bit], AC_HELP_STRING([--enable-32bit],[build 32bit binary on 64 bit computer]), [enable_32bit=$enableval],[enable_32bit=no])
 
+if test "$enable_32bit" = "yes"; then
+    CFLAGS="$CFLAGS -m32"
+    CXXFLAGS="$CXXFLAGS -m32"
+fi
+
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[with_cc=$withval], [with_cc=yes])
@@ -305,10 +310,6 @@ if test "$enable_debug" = "yes"; then
     CXXFLAGS="$CXXFLAGS -O0 -g"
 fi
 
-if test "$enable_32bit" = "yes"; then
-    CFLAGS="$CFLAGS -m32"
-    CXXFLAGS="$CXXFLAGS -m32"
-fi
 
 # enable compiler warnings if gcc
 if test "$CC" = "gcc"; then
