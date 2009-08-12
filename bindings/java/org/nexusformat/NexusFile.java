@@ -695,15 +695,17 @@ public class  NexusFile implements NeXusFileInterface {
     private void checkType(int type) throws NexusException
     {
 	switch(type) {
+	case NexusFile.NX_FLOAT32:
+	case NexusFile.NX_FLOAT64:
 	case NexusFile.NX_INT8:
 	case NexusFile.NX_UINT8:
-        case NexusFile.NX_CHAR:
 	case NexusFile.NX_INT16:
 	case NexusFile.NX_UINT16:
 	case NexusFile.NX_INT32:
 	case NexusFile.NX_UINT32:
-	case NexusFile.NX_FLOAT32:
-	case NexusFile.NX_FLOAT64:
+	case NexusFile.NX_INT64:
+	case NexusFile.NX_UINT64:
+	case NexusFile.NX_CHAR:
 	    break;
         default:
 	    throw new NexusException("Illegal number type requested");
