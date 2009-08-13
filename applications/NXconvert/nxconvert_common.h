@@ -34,6 +34,6 @@
 
 static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DEFINITION", NULL };
 
-extern int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access);
+extern int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_);
 
 #endif /* NXCONVERT_COMMON */

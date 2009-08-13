@@ -72,10 +72,12 @@ static int remove_path(const char* path)
 }
 
 static NXhandle inId, outId;
+static const char* definition_name = NULL;
 
-int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access)
+int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_)
 {
    int i, nx_is_definition = 0;
+   definition_name = definition_name_;
    char* tstr;
    links_count = 0;
    current_path[0] = '\0';
@@ -172,16 +174,23 @@ static int WriteGroup (int is_definition)
                 if (WriteAttributes (is_definition) != NX_OK) return NX_ERROR;
 		if (is_definition && !strcmp(nxclass, "NXentry"))
 		{
-		    try {
-			nfile_in.openData("definition");
-		        definition = nfile_in.getStrData();
-		        nfile_in.closeData();
-		        nfile_out.putAttr("xsi:type", definition);
-		    }
-		    catch(std::exception& ex)
+		    if (definition_name != NULL)
 		    {
-			; // definition not found
-                    }
+		        nfile_out.putAttr("xsi:type", definition_name);
+		    }
+  		    else
+		    {
+		        try {
+			    nfile_in.openData("definition");
+		            definition = nfile_in.getStrData();
+		            nfile_in.closeData();
+		            nfile_out.putAttr("xsi:type", definition);
+		        }
+		        catch(std::exception& ex)
+		        {
+			    ; // definition not found
+                        }
+		    }
 		}
                 if (WriteGroup (is_definition) != NX_OK) return NX_ERROR;
 	        remove_path(name);

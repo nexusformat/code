@@ -800,4 +800,14 @@ extern  NXstatus  NXsetcache(long newVal);
 }
 #endif /* __cplusplus */
 
+/**
+ * Freddie Akeroyd 11/8/2009
+ * Add NeXus schema support - this uses BASE.xsd as the initial file
+ */
+#define NEXUS_SCHEMA_VERSION	"3.1" 	/**< version of NeXus definition schema */
+#define NEXUS_SCHEMA_NAMESPACE 	"http://definition.nexusformat.org/schema/" NEXUS_SCHEMA_VERSION 	/**< XML schema namespace specified by xmlns */
+#define NEXUS_SCHEMA_BASE 	"BASE"
+#define NEXUS_SCHEMA_FILE 	NEXUS_SCHEMA_BASE ".xsd" /**< default schema file for namespace */
+#define NEXUS_SCHEMA_URL 	NEXUS_SCHEMA_NAMESPACE "/" NEXUS_SCHEMA_FILE /**< location of default schema file for namespace */
+
 #endif /*NEXUSAPI*/

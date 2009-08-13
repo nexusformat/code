@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
    }
    printf("Converting %s to %s NeXus file %s\n", inFile, nx_formats[nx_format], outFile);
 
-   if (convert_file(nx_format, inFile, nx_read_access, outFile, nx_write_access) != NX_OK) {
+   if (convert_file(nx_format, inFile, nx_read_access, outFile, nx_write_access, NULL) != NX_OK) {
       NXCONVERT_EXIT_ERROR;
    }
    printf("Convertion successful.\n");

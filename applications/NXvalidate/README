@@ -1,0 +1,20 @@
+To validate a NeXus hdf/xml file against a "default schema" use e.g.
+
+    nxvalidate --path /home/faa59/nexus-definitions/schema  NXmonopd.hdf
+
+--path specifies the location of the generated NeXus xsd schema files
+
+To instead validate a file via the web with "default schema" use
+
+    nxvalidate -w NXmonopd.hdf
+
+If an NXentry has a <definition> field, this will be used to validate it, otherwise the generic NXentry.xsd will be used
+
+If you wish to only use the generic NXentry.xsd instead of and <definition> specified one, use the  -n option
+
+    nxvalidate -w -n NXmonopd.hdf
+
+To validate all NXentry in a file against a specific definition use the -d option e.g.
+
+    nxvalidate -w -d NXmonopd NXmonopd.hdf      # force NXmonopd.xsd
+
