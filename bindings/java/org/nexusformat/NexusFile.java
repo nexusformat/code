@@ -110,7 +110,7 @@ public class  NexusFile implements NeXusFileInterface {
     protected native int  init(String filename, int access);
     protected native void close(int handle);
     protected native int  nxflush(int handle);
-
+    
     /**
       * constructs a new NexusFile Object.
       * @param filename The name of the NeXus file to access.
@@ -133,6 +133,7 @@ public class  NexusFile implements NeXusFileInterface {
       */
     public NexusFile(String filename, int access) throws NexusException 
     {
+	 checkForNull(filename);
          handle = init(filename,access);
          if(handle < 0){
 	    throw new NexusException("Failed to open " + filename);
@@ -192,6 +193,7 @@ public class  NexusFile implements NeXusFileInterface {
     public void makegroup(String name, String nxclass) throws 
                             NexusException
     {
+    	checkForNull(name, nxclass);
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
 	nxmakegroup(handle, name, nxclass);
     }
@@ -207,6 +209,7 @@ public class  NexusFile implements NeXusFileInterface {
                              NexusException
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+        checkForNull(name, nxclass);
 	nxopengroup(handle, name, nxclass);
     }
     /**
@@ -221,7 +224,8 @@ public class  NexusFile implements NeXusFileInterface {
                          NexusException
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-	nxopenpath(handle,path);
+        checkForNull(path);
+	nxopenpath(handle, path);
     }
     /**
       * opengrouppath opens groups and datsets accroding to the path string
@@ -235,6 +239,7 @@ public class  NexusFile implements NeXusFileInterface {
                          NexusException
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+    	checkForNull(path);
 	nxopengrouppath(handle,path);
     }
 
@@ -282,7 +287,8 @@ public class  NexusFile implements NeXusFileInterface {
                              int compression_type, int iChunk[]) throws
 			     NexusException {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-        checkType(type);
+        checkType(type);    
+        checkForNull(name);
         switch(compression_type) {
 	case NexusFile.NX_COMP_NONE:
 	case NexusFile.NX_COMP_LZW:
@@ -306,11 +312,12 @@ public class  NexusFile implements NeXusFileInterface {
       * means it is an unlimited dimension.
       * @exception NexusException when the dataset could not be created.
       */ 
-    public void makedata(String name, int type, int rank, int dim[]) throws
+    public void makedata(String name, int type, int rank, int[] dim) throws
 	                   NexusException
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
         checkType(type);
+        checkForNull(name, dim);
 	nxmakedata(handle,name,type,rank,dim);
     }
     /**
@@ -324,6 +331,7 @@ public class  NexusFile implements NeXusFileInterface {
                            NexusException
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+    	checkForNull(name);
 	nxopendata(handle,name);
     }
     /**
@@ -385,6 +393,7 @@ public class  NexusFile implements NeXusFileInterface {
     {
         byte bdata[];
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+    	checkForNull(array);
         try{
 	    HDFArray ha = new HDFArray(array);
             bdata = ha.emptyBytes();
@@ -405,15 +414,16 @@ public class  NexusFile implements NeXusFileInterface {
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
-    public void getslab(int start[], int size[],Object array)throws
+    public void getslab(int[] start, int[] size, Object array) throws
                           NexusException
     {
         byte bdata[];
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+    	checkForNull(start, size, array);
         try{
 	    HDFArray ha = new HDFArray(array);
             bdata = ha.emptyBytes();
-            nxgetslab(handle,start,size,bdata);
+            nxgetslab(handle, start, size, bdata);
             array = ha.arrayify(bdata);
 	 }catch(HDFException he) {
            throw new NexusException(he.getMessage());
@@ -431,11 +441,12 @@ public class  NexusFile implements NeXusFileInterface {
       * @exception NexusException when either an HDF error occurs or 
       * the attribute could not be found.
       */
-    public void getattr(String name,Object array, int args[])throws
+    public void getattr(String name, Object array, int[] args)throws
                           NexusException
     {
         byte bdata[];
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+    	checkForNull(name, array, args);
         checkType(args[1]);
         try{
 	    HDFArray ha = new HDFArray(array);
@@ -467,6 +478,8 @@ public class  NexusFile implements NeXusFileInterface {
        byte data[];
 
        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+   	   checkForNull(array);
+
        try{
            HDFArray ha =  new HDFArray(array);
            data = ha.byteify();
@@ -487,12 +500,13 @@ public class  NexusFile implements NeXusFileInterface {
       * size in each dimension of the data subset to write.
       * @exception NexusException when an HDF error occurs.
       */ 
-    public void putslab(Object array, int start[], int size[]) throws
+    public void putslab(Object array, int[] start, int[] size) throws
                           NexusException
     {
        byte data[];
 
        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+       checkForNull(array, start, size);
        try{
            HDFArray ha =  new HDFArray(array);
            data = ha.byteify();
@@ -500,7 +514,7 @@ public class  NexusFile implements NeXusFileInterface {
        }catch(HDFException he) {
 	   throw new NexusException(he.getMessage());
        }
-       nxputslab(handle,data,start,size);
+       nxputslab(handle, data, start, size);
        data = null;
     }
     /**
@@ -518,6 +532,7 @@ public class  NexusFile implements NeXusFileInterface {
 
        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
        checkType(iType);
+       checkForNull(name, array);
        try{
            HDFArray ha =  new HDFArray(array);
            data = ha.byteify();
@@ -548,6 +563,8 @@ public class  NexusFile implements NeXusFileInterface {
     public void setnumberformat(int type, String format) 
 	throws NexusException{
        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+       checkType(type);
+       checkForNull(format);
        nxsetnumberformat(handle,type,format);
     }
     /**
@@ -653,11 +670,12 @@ public class  NexusFile implements NeXusFileInterface {
       * @param target The Object to link into the current group.
       * @exception NexusException if an error occurs.
       */
-    public void   makelink(NXlink target)throws
+    public void makelink(NXlink target) throws
                           NexusException
     {
       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-      nxmakelink(handle,target);
+      checkForNull(target);
+      nxmakelink(handle, target);
     }
     /**
       * makenamedlink links the object described by target into the current
@@ -667,10 +685,11 @@ public class  NexusFile implements NeXusFileInterface {
       * @param name The name of this object in the current group
       * @exception NexusException if an error occurs.
       */
-    public void   makenamedlink(String name, NXlink target)throws
+    public void makenamedlink(String name, NXlink target) throws
 	NexusException {
       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-      nxmakenamedlink(handle,name, target);
+      checkForNull(name, target);
+      nxmakenamedlink(handle, name, target);
     }     
 
     /**
@@ -678,14 +697,22 @@ public class  NexusFile implements NeXusFileInterface {
       * Returns an error if the current item is not linked.
       * @exception NexusException if an error occurs.
       */
-    public void   opensourcepath()throws
+    public void opensourcepath() throws
                           NexusException
     {
       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
       nxopensourcepath(handle);
     }
 	
-
+    /**
+     * checks if any of the arguments is null, 
+     * throws appropriate runtime exception if so
+     */
+    private void checkForNull(Object... args) {
+    	for (Object o : args)
+    		if (o==null) throw new NullPointerException();
+    }
+    
     /**
       * checkType verifies if a parameter is a valid NeXus type code. 
       * If not an exception is thrown.
@@ -736,9 +763,10 @@ public class  NexusFile implements NeXusFileInterface {
      * @param nxurl The URL to the linked external file
      * @throws NexusException if things are wrong
      */
-    public void linkexternal(String name, String nxclass, String nxurl) throws NexusException{
+    public void linkexternal(String name, String nxclass, String nxurl) throws NexusException {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-	nxlinkexternal(handle,name,nxclass,nxurl);
+    	checkForNull(name, nxclass, nxurl);
+	nxlinkexternal(handle, name, nxclass, nxurl);
     }
     /**
      * nxisexternalgroup test the group name, nxclass if it is linked externally.
@@ -750,6 +778,7 @@ public class  NexusFile implements NeXusFileInterface {
      */
     public String isexternalgroup(String name, String nxclass) throws NexusException{
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+    	checkForNull(name, nxclass);
 	String nxurl[] = new String[1];
 
 	int status = nxisexternalgroup(handle,name,nxclass,nxurl);
@@ -771,12 +800,3 @@ public class  NexusFile implements NeXusFileInterface {
       */
     public native void debugstop();
 }
-  
-
-
-
-
-
-
-
-
