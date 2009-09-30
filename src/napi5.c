@@ -1736,7 +1736,7 @@ static int h5MemType(hid_t atype)
 	  return NX_ERROR;
 	}
        /* map datatypes of other plateforms */
-       if (data_id==H5T_STRING)
+       if (data_id == H5T_STRING)
        {
 	 dims = H5Tget_size(pFile->iCurrentT);
 	 memtype_id = H5Tcopy(H5T_C_S1);
@@ -1758,6 +1758,10 @@ static int h5MemType(hid_t atype)
 	 iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, 
 		     pFile->iCurrentS, H5P_DEFAULT,data);
       }    
+      /* cleanup */
+      if (data_id == H5T_STRING) { /* we used H5Tcopy */
+         H5Tclose(memtype_id);
+      }
       H5Sclose(memspace);
 
       if (iRet < 0) 
