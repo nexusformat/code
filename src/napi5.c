@@ -1758,8 +1758,10 @@ static int h5MemType(hid_t atype)
 	 iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, 
 		     pFile->iCurrentS, H5P_DEFAULT,data);
       }    
+      H5Sclose(memspace);
 
       if (iRet < 0) 
+
 	{
 	  NXIReportError (NXpData, "ERROR: Reading slab failed");
 	  return NX_ERROR;
