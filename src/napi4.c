@@ -1812,6 +1812,9 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     }
     *iType = (int)iType32;
     iLen = iLen * DFKNTsize (*iType);
+    if(*iType == NX_CHAR){
+      iLen += 1;
+    }
     pData = (void *) malloc (iLen);
     if (!pData) {
       NXIReportError (NXpData, "ERROR: allocating memory in NXgetattr");

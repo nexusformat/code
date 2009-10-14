@@ -21,6 +21,8 @@
 
    Updated for 64 bit types, Mark Koennecke, August 2007
 
+   Added NXinitattrdir and NXinitgroupdir, Mark Koennecke, October 2009
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -1231,6 +1233,37 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
       rstring = (*env)->NewStringUTF(env,nxurl);
       (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
     }
+}
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initattrdir
+(JNIEnv *env, jobject obj, jint handle)
+{
+    NXhandle nxhandle;
+    int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXinitattrdir(nxhandle);
+
+}
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
+(JNIEnv *env, jobject obj, jint handle)
+{
+    NXhandle nxhandle;
+    int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXinitgroupdir(nxhandle);
 }
 /*------------------------------------------------------------------------
                                debugstop

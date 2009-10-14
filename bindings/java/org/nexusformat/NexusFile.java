@@ -15,6 +15,8 @@
   * Updated: Mark Koennecke, April 2006
   *
   * copyright: see accompanying COPYRIGHT file
+  *
+  * added nxinitattrdir: Mark Koennecke, October 2009 
   */
 package org.nexusformat;
 
@@ -552,6 +554,8 @@ public class  NexusFile implements NeXusFileInterface {
 					    String format);
     protected native int nextentry(int handle, String names[]);
     protected native int nextattr(int handle, String names[], int args[]);
+    protected native void initattrdir(int handle);
+    protected native void initgroupdir(int handle);
     /**
      * setnumberformat sets the number format for printing number when
      * using the XML-NeXus format. For HDF4 and HDF5 this is ignored.
@@ -598,6 +602,8 @@ public class  NexusFile implements NeXusFileInterface {
         Hashtable h = new Hashtable();
         String names[] = new String[2];
         int i;
+
+        initgroupdir(handle);
         while(nextentry(handle,names) != -1)
 	{
            h.put(names[0],names[1]);
@@ -620,6 +626,7 @@ public class  NexusFile implements NeXusFileInterface {
 
         Hashtable h = new Hashtable();
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	initattrdir(handle);
         while(nextattr(handle,names,args) != -1)
 	{
           at = new AttributeEntry();
