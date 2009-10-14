@@ -617,6 +617,9 @@ AC_CHECK_LIB(df, Hopen)
 AC_CHECK_LIB(mfhdf, SDcreate)
 AC_CHECK_LIB(hdf5, H5open)
 AC_CHECK_LIB(xml2, xmlParseDocument)
+dnl AC_LANG_PUSH([C++])
+dnl AC_CHECK_LIB(mxmlplus, _ZN4MXML4NodeD2Ev)
+dnl AC_LANG_POP([C++])
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -685,6 +688,7 @@ AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
 AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
 AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
+dnl AM_CONDITIONAL(HAVE_LIBMXMLPLUS, [ test "$ac_cv_lib_mxmlplus__ZN4MXML4NodeD2Ev" = "yes" ])
 AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT" -a ! -z "$DOCBOOK2PDF"])
 AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
 #AM_CONDITIONAL(INSTALL_NXPYTHON, [test ! -z "$INSTALL_NXPYTHON"])
@@ -749,6 +753,8 @@ AC_CONFIG_FILES([Makefile
 		third_party/tclap/Makefile
 		contrib/Makefile
 		contrib/applications/Makefile
+		contrib/applications/NXextract/Makefile
+		contrib/applications/NXextract/src/Makefile
 		contrib/applications/CBFLib/Makefile
 		contrib/bindings/Makefile
 		contrib/bindings/python/Makefile
