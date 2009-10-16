@@ -267,7 +267,6 @@ static int validate(const string& nxsfile, const char* definition_name, const ch
 
 int main(int argc, char *argv[])
 {
-   char inFile[256];
    char *strPtr;
    int use_web = 0;
    int keep_temps = 0;
@@ -333,10 +332,8 @@ int main(int argc, char *argv[])
    schema_path = schema_path_arg.getValue().c_str();
    vector<string> infiles = infiles_arg.getValue();
    if (infiles.empty()) {
-      printf ("Give name of input NeXus file : ");
-      fgets (inFile, sizeof(inFile), stdin);
-      if ((strPtr = strchr(inFile, '\n')) != NULL) { *strPtr = '\0'; }
-      infiles.push_back(string(inFile));
+     cerr << "Must supply at least one data file" << endl;
+     NXVALIDATE_ERROR_EXIT;
    }
 
    // do the work
