@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Mountaingumsys Plug-in
+Bundle-SymbolicName: mountaingumsys;singleton:=true
+Bundle-Version: 0.1
+Bundle-Vendor: Mark.Koennecke@psi.ch
+Bundle-Localization: plugin
+Export-Package: ch.psi.num.mountaingum.batch,
+ ch.psi.num.mountaingum.func,
+ ch.psi.num.mountaingum.sys,
+ ch.psi.num.mountaingum.tree,
+ ch.psi.num.mountaingum.ui,
+ ch.psi.num.mountaingum.util

@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jnexus Plug-in
+Bundle-SymbolicName: jnexus
+Bundle-Version: 4.2.0
+Bundle-Vendor: The NeXus Group
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: ncsa.hdf.hdflib,
+ org.nexusformat

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+    st7 Assembly mode by Helge Böhme (h.boehme@tu-bs.de)
+-->
+
+<MODE>
+
+    <PROPS>
+        <PROPERTY NAME="lineComment" VALUE=";" />
+    </PROPS>
+
+    <RULES HIGHLIGHT_DIGITS="TRUE">
+        <WHITESPACE> </WHITESPACE>
+        <WHITESPACE>	</WHITESPACE>
+
+        <EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
+
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+
+        <MARK_PREVIOUS TYPE="LABEL" EXCLUDE_MATCH="FALSE"
+            AT_LINE_START="FALSE">:</MARK_PREVIOUS>
+
+        <MARK_FOLLOWING TYPE="DIGIT" EXCLUDE_MATCH="FALSE"
+            AT_LINE_START="FALSE">$</MARK_FOLLOWING>
+
+        <MARK_FOLLOWING TYPE="DIGIT" EXCLUDE_MATCH="FALSE"
+            AT_LINE_START="FALSE">%</MARK_FOLLOWING>
+
+        <SEQ TYPE="LITERAL2">.B</SEQ>
+        <SEQ TYPE="LITERAL2">.W</SEQ>
+        <SEQ TYPE="LITERAL2">.L</SEQ>
+        <SEQ TYPE="KEYWORD1">\</SEQ>
+        <SEQ TYPE="KEYWORD1">@</SEQ>
+
+        <SEQ TYPE="NULL">.</SEQ>
+        <SEQ TYPE="NULL">,</SEQ>
+        <SEQ TYPE="LABEL">:</SEQ>
+        <SEQ TYPE="NULL">(</SEQ>
+        <SEQ TYPE="NULL">)</SEQ>
+        <SEQ TYPE="NULL">]</SEQ>
+        <SEQ TYPE="NULL">[</SEQ>
+        <SEQ TYPE="NULL">$</SEQ>
+
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">%</SEQ>
+
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">~</SEQ>
+        <SEQ TYPE="OPERATOR">!</SEQ>
+
+        <!--SEQ TYPE="OPERATOR">=</SEQ-->
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+
+        <KEYWORDS IGNORE_CASE="TRUE">
+            <KEYWORD1>ALIGN</KEYWORD1>
+            <KEYWORD1>BASE</KEYWORD1>
+            <KEYWORD1>CLIST</KEYWORD1>
+            <KEYWORD1>DC</KEYWORD1>
+            <KEYWORD1>DCB</KEYWORD1>
+            <KEYWORD1>DS</KEYWORD1>
+            <KEYWORD1>ELSE</KEYWORD1>
+            <KEYWORD1>ELSEC</KEYWORD1>
+            <KEYWORD1>END</KEYWORD1>
+            <KEYWORD1>ENDC</KEYWORD1>
+            <KEYWORD1>ENDIF</KEYWORD1>
+            <KEYWORD1>ENDM</KEYWORD1>
+            <KEYWORD1>EQU</KEYWORD1>
+            <KEYWORD1>FAIL</KEYWORD1>
+            <KEYWORD1>HIGH</KEYWORD1>
+            <KEYWORD1>IF</KEYWORD1>
+            <KEYWORD1>IFC</KEYWORD1>
+            <KEYWORD1>IFDEF</KEYWORD1>
+            <KEYWORD1>IFEQ</KEYWORD1>
+            <KEYWORD1>IFGE</KEYWORD1>
+            <KEYWORD1>IFGT</KEYWORD1>
+            <KEYWORD1>IFLE</KEYWORD1>
+            <KEYWORD1>IFLT</KEYWORD1>
+            <KEYWORD1>IFNC</KEYWORD1>
+            <KEYWORD1>IFNDEF</KEYWORD1>
+            <KEYWORD1>IFNE</KEYWORD1>
+            <KEYWORD1>INCLUDE</KEYWORD1>
+            <KEYWORD1>LIST</KEYWORD1>
+            <KEYWORD1>LLEN</KEYWORD1>
+            <KEYWORD1>LONGEVEN</KEYWORD1>
+            <KEYWORD1>LOW</KEYWORD1>
+            <KEYWORD1>MACRO</KEYWORD1>
+            <KEYWORD1>MEXIT</KEYWORD1>
+            <KEYWORD1>MLIST</KEYWORD1>
+            <KEYWORD1>NOLIST</KEYWORD1>
+            <KEYWORD1>NOPAGE</KEYWORD1>
+            <KEYWORD1>ORG</KEYWORD1>
+            <KEYWORD1>PAGE</KEYWORD1>
+            <KEYWORD1>PLEN</KEYWORD1>
+            <KEYWORD1>SECTION</KEYWORD1>
+            <KEYWORD1>SET</KEYWORD1>
+            <KEYWORD1>SPC</KEYWORD1>
+            <KEYWORD1>TABS</KEYWORD1>
+            <KEYWORD1>TITLE</KEYWORD1>
+            <KEYWORD1>XDEF</KEYWORD1>
+            <KEYWORD1>XREF</KEYWORD1>
+
+            <KEYWORD2>ADC</KEYWORD2>
+            <KEYWORD2>ADD</KEYWORD2>
+            <KEYWORD2>AND</KEYWORD2>
+            <KEYWORD2>BCP</KEYWORD2>
+            <KEYWORD2>BRES</KEYWORD2>
+            <KEYWORD2>BSET</KEYWORD2>
+            <KEYWORD2>BTJF</KEYWORD2>
+            <KEYWORD2>BTJT</KEYWORD2>
+            <KEYWORD2>CALL</KEYWORD2>
+            <KEYWORD2>CALLR</KEYWORD2>
+            <KEYWORD2>CLR</KEYWORD2>
+            <KEYWORD2>CP</KEYWORD2>
+            <KEYWORD2>CPL</KEYWORD2>
+            <KEYWORD2>DEC</KEYWORD2>
+            <KEYWORD2>HALT</KEYWORD2>
+            <KEYWORD2>INC</KEYWORD2>
+            <KEYWORD2>IRET</KEYWORD2>
+            <KEYWORD2>JP</KEYWORD2>
+            <KEYWORD2>JRA</KEYWORD2>
+            <KEYWORD2>JRC</KEYWORD2>
+            <KEYWORD2>JREQ</KEYWORD2>
+            <KEYWORD2>JRF</KEYWORD2>
+            <KEYWORD2>JRH</KEYWORD2>
+            <KEYWORD2>JRIH</KEYWORD2>
+            <KEYWORD2>JRIL</KEYWORD2>
+            <KEYWORD2>JRM</KEYWORD2>
+            <KEYWORD2>JRMI</KEYWORD2>
+            <KEYWORD2>JRNC</KEYWORD2>
+            <KEYWORD2>JRNE</KEYWORD2>
+            <KEYWORD2>JRNH</KEYWORD2>
+            <KEYWORD2>JRNM</KEYWORD2>
+            <KEYWORD2>JRPL</KEYWORD2>
+            <KEYWORD2>JRT</KEYWORD2>
+            <KEYWORD2>JRUGE</KEYWORD2>
+            <KEYWORD2>JRUGT</KEYWORD2>
+            <KEYWORD2>JRULE</KEYWORD2>
+            <KEYWORD2>JRULT</KEYWORD2>
+            <KEYWORD2>LD</KEYWORD2>
+            <KEYWORD2>MUL</KEYWORD2>
+            <KEYWORD2>NEG</KEYWORD2>
+            <KEYWORD2>NOP</KEYWORD2>
+            <KEYWORD2>OR</KEYWORD2>
+            <KEYWORD2>POP</KEYWORD2>
+            <KEYWORD2>PUSH</KEYWORD2>
+            <KEYWORD2>RCF</KEYWORD2>
+            <KEYWORD2>RET</KEYWORD2>
+            <KEYWORD2>RIM</KEYWORD2>
+            <KEYWORD2>RLC</KEYWORD2>
+            <KEYWORD2>RRC</KEYWORD2>
+            <KEYWORD2>RSP</KEYWORD2>
+            <KEYWORD2>SBC</KEYWORD2>
+            <KEYWORD2>SCF</KEYWORD2>
+            <KEYWORD2>SIM</KEYWORD2>
+            <KEYWORD2>SLA</KEYWORD2>
+            <KEYWORD2>SLL</KEYWORD2>
+            <KEYWORD2>SRA</KEYWORD2>
+            <KEYWORD2>SRL</KEYWORD2>
+            <KEYWORD2>SUB</KEYWORD2>
+            <KEYWORD2>SWAP</KEYWORD2>
+            <KEYWORD2>TNZ</KEYWORD2>
+            <KEYWORD2>TRAP</KEYWORD2>
+            <KEYWORD2>WFI</KEYWORD2>
+            <KEYWORD2>XOR</KEYWORD2>
+
+            <!-- Registers -->
+            <KEYWORD3>#</KEYWORD3>
+            <KEYWORD3>A</KEYWORD3>
+            <KEYWORD3>CC</KEYWORD3>
+            <KEYWORD3>S</KEYWORD3>
+            <KEYWORD3>X</KEYWORD3>
+            <KEYWORD3>Y</KEYWORD3>
+
+        </KEYWORDS>
+    </RULES>
+</MODE>
+

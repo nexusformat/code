@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sgtgraphics Plug-in
+Bundle-SymbolicName: sgtgraphics
+Bundle-Version: 3.1.0
+Bundle-Localization: plugin
+Export-Package: gov.noaa.pmel.sgt,
+ gov.noaa.pmel.sgt.dm,
+ gov.noaa.pmel.sgt.swing,
+ gov.noaa.pmel.util

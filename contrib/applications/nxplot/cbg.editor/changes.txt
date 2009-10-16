@@ -1,0 +1,17 @@
+2006-04-23  1.1.0
+Updated for Eclipse 3.2
+Updated to latest JEdit mode files, thanks Philippe Ombredanne.
+
+2003-11-25  0.3.0
+Updated for Eclipse 3.0 Milestone 5
+
+2002-10-25	0.2.7
+Updated the catalog to handle .project and .classpath files suggested by David Whiteman.
++ Added some testcases (yah!)
+- Fixed a bug opening a file from the CVS view reported by Sinegar.
+- Fixed a PHP bug reported by Philippe LACHAISE.
+Refactored some code to support JUnit testing.
+ProGuarded dom4j and regexp lib to make much smaller.
+Added a changes file.
+
+

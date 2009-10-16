@@ -1,0 +1,58 @@
+These are features that folks have "wished" for.
+I've tried to given proper attribution but may
+have missed some.
+
+Seems like the preferences ought to be set by mode and 
+within mode use the TYPE names, with DEFAULTs maybe set separately.
+Bob Foster
+
+Templates
+Adam Kiezun
+
+Ability to edit ShiftJIS html...
+A gui of some sort to butcher the modes files.
+Brett Morgan
+
+Add a format feature
+MEHAUT Xavier
+
+Harmonize the default display scheme (Font, color, bold)
+with the scheme used by the standard Java editor of Eclipse.
+Dr. Michael Paus
+
+Code Completion
+Inumerable
+
+Spell Checker
+Chris Grindstaff
+
+Keybinding Mapping Tool
+Todd Chambery
+
+Add support for tab-size and "insert spaces instead of tabs".
+Andreas (on http://eclipse-plugins.2y.net)
+
+Colorize .classpath and .project files
+David Whiteman
+
+Line wrapping per type
+David Buttler
+
+Add support for SEQ_REGEXP
+Luke Evans
+
+Brace matching
+Ali Asad Lotia
+
+Add support for AnyEditTools
+Carfield Yim
+
+Add background color support for the view.
+Jakub Coufal 
+
+Line number indication
+Sergio Blanco Cuaresma 
+
+Add background for each type.
+Bob Hicks
+

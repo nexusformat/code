@@ -1,0 +1,12 @@
++ Add support for MarkFollowing
++ Add unit tests for partitioning
++ Do something useful with Mode properties
+  + Use the mode properties to drive the AutoIndentStrategy
++ Add better support for delegates. Right now a span contained within
+another span does not work. Delegates employ this concept very
+often. I think this will be quite a bit of work to fix sense you will
+need to reimplement a lot of the eclipse classes because they mostly
+all assume that you don't have overlapping content types. It may be
+possible to fake with a special damager.
++ Create better default colors :-)
++ Add preference listeners so editor updates on color preference changes.

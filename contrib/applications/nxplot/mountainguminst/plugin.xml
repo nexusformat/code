@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="ch.psi.num.mountaingum.ui.eclipse.NodeEditor">
+      <editor
+            className="ch.psi.num.mountaingum.sans.SansRadialViewer"
+            id="mountaingumui.SansRadialViewer"
+            name="Sans Radial Viewer"/>
+      <editor
+            className="ch.psi.num.mountaingum.focus.FocusViewer"
+            id="mountaingumui.FocusViewer"
+            name="Focus Viewer"/>
+     <editor
+            className="ch.psi.num.mountaingum.poldi.PoldiViewer"
+            id="mountaingumui.Poldi1D"
+            name="Poldi Viewer"/>
+      <editor
+            className="ch.psi.num.mountaingum.sans.SansViewer"
+            id="mountaingumui.SansViewer"
+            name="SansViewer"/>
+     <editor
+            className="ch.psi.num.mountaingum.fourcircle.UBRefineEditor"
+            id="mountaingumui.ubrefine"
+            name="UBRefine"/>
+    <editor
+            className="ch.psi.num.mountaingum.fourcircle.Index"
+            id="mountaingumui.index"
+            name="Index"/>
+   <editor
+            className="ch.psi.num.mountaingum.tas.TasRefTable"
+            id="mountaingumui.tasref"
+            name="TasRef"/>
+  <editor
+            className="ch.psi.num.mountaingum.tas.QEScanEditor"
+            id="mountaingumui.qescan"
+            name="TasQEScan"/>
+   </extension>
+   <extension
+         point="ch.psi.num.mountaingum.tree.DataFilter">
+      <DataFilter
+            className="ch.psi.num.mountaingum.sans.SansFilter"
+            id="mountainguminst.SansFilter"
+            name="mountainguminst.SansFilter"/>
+   </extension>
+   <extension
+         point="ch.psi.num.mountaingum.nexus.loader.NexusMapper">
+      <NexusMapper
+            className="ch.psi.num.mountaingum.sans.SansNexusMapper"
+            id="mountainguminst.SansMapper"
+            name="mountainguminst.SansMapper"/>
+      <NexusMapper
+            className="ch.psi.num.mountaingum.focus.FocusNexusMapper"
+            id="mountainguminst.FocusMapper"
+            name="mountainguminst.FocusMapper"/>
+      <NexusMapper
+            className="ch.psi.num.mountaingum.tas.RitaNexusMapper"
+            id="mountainguminst.RitaMapper"
+            name="mountainguminst.RitaMapper"/>
+     <NexusMapper
+            className="ch.psi.num.mountaingum.amor.AmorNexusMapper"
+            id="mountainguminst.AmorMapper"
+            name="mountainguminst.AmorMapper"/>
+    </extension>
+
+</plugin>

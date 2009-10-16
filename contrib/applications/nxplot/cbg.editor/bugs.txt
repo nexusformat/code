@@ -1,0 +1,7 @@
+1) I set <PROPERTY NAME="noWordSep" VALUE="-" /> in the props section, but 
+   all my foo-bar-baz: labels are only colored in the 'baz' part.
+
+2) I've not managed to color labels that have spaces after it and the colon, i.e
+   foo-bar : 
+Karl Trygve Kalleberg
+

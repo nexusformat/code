@@ -1,0 +1,9 @@
+This plugin makes use of Jedit's catalog and mode files.
+For more information see http://jedit.org.
+JEdit 4.1pre4
+
+09-14-2004 Phil Wise
+Supplied a patch to the plugin.xml to for vhd and vhdl files.
+
+04-23-2006 Philippe Ombredanne
+Updated to latest JEdit mode files
