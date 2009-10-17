@@ -77,7 +77,11 @@ static const char* definition_name = NULL;
 int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_)
 {
    int i, nx_is_definition = 0;
-   definition_name = definition_name_;
+   if (definition_name_[0] == '\0') {
+     definition_name = NULL;
+   } else {
+     definition_name = definition_name_;
+   }
    char* tstr;
    links_count = 0;
    current_path[0] = '\0';
