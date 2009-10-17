@@ -14,12 +14,9 @@ package  gov.noaa.pmel.sgt;
 
 import gov.noaa.pmel.util.Point2D;
 
-import java.util.Vector;
 import java.awt.Graphics;
-import java.awt.Color;
 import java.awt.Rectangle;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.Vector;
 // jdk1.2
 //import java.awt.geom.Point2D;
 
@@ -104,7 +101,7 @@ public class PlainAxis extends SpaceAxis implements Cloneable {
       g.drawLine(xloc, yloc, xend, yloc);
       //
       dir = delta > 0? 1.0: -1.0;
-      xt = (int)((uRange_.start/delta + (dir*uRange_.start > 0? 1.0: -1.0)*0.00001))*delta;
+      xt = ((uRange_.start/delta + (dir*uRange_.start > 0? 1.0: -1.0)*0.00001))*delta;
       if(dir*xt < dir*uRange_.start) xt += delta;
       istop = (int)((uRange_.end - xt)/delta + 0.00001);
       x = xt;
@@ -185,7 +182,7 @@ public class PlainAxis extends SpaceAxis implements Cloneable {
       g.drawLine(xloc, yloc, xloc, yend);
       //
       dir = delta > 0? 1.0: -1.0;
-      yt = (int)((uRange_.start/delta) + (dir*uRange_.start > 0? 1.0: -1.0)*0.00001)*delta;
+      yt = ((uRange_.start/delta) + (dir*uRange_.start > 0? 1.0: -1.0)*0.00001)*delta;
       if(dir*yt < dir*uRange_.start) yt += delta;
       istop = (int)((uRange_.end - yt)/delta + 0.00001);
       y = yt;
@@ -330,16 +327,5 @@ public class PlainAxis extends SpaceAxis implements Cloneable {
       width = graph_.getLayer().getXPtoD(xmax) - x;
     }
     return new Rectangle(x, y, width, height);
-  }
-  /**
-   * Not implemented.
-   */
-  public void setBounds(Rectangle r) {
-    setBounds(r.x, r.y, r.width, r.height);
-  }
-  /**
-   * Not implemented.
-   */
-  public void setBounds(int x, int y, int width, int height) {
   }
 }
