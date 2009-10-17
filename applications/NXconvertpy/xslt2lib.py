@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 NXCONVERT = "nxconvert"
-XSLT_PROC = "xsltproc"
+XSLTPROC = "xsltproc"
 
 def run(cmd, **kwargs):
   """Execute the supplied command and return the tuple (return value,
@@ -21,7 +21,7 @@ def nxconvert(definition=None, input=None, output=None, verbose=0):
   if verbose > 1:
     print stdout
   if code != 0:
-    raise RuntimeError(NXCONVERT + " returned " + code)
+    raise RuntimeError(NXCONVERT + " returned " + str(code))
   
 
 def process(xml=None, xslt=None, output=None, verbose=0):
@@ -29,22 +29,42 @@ def process(xml=None, xslt=None, output=None, verbose=0):
     raise Exception("xml file is None")
   if xslt is None:
     raise Exception("xslt file is None")
-  command = "%s -o %s %s %s" % (XSLT_PROC, output, xslt, xml)
+  command = "%s -o %s %s %s" % (XSLTPROC, output, xslt, xml)
   if verbose > 1:
     print command
   (code, stdout) = run(command)
   if verbose > 1:
     print stdout
   if code != 0:
-    raise RuntimeError(XSLT_PROC + " returned " + code)
+    raise RuntimeError(XSLTPROC + " returned " + str(code))
+
+def schematron2xslt(schematron=None, xslt=None, verbose=0):
+  xslt1="iso_dsdl_include.xsl"
+  xslt2="iso_abstract_expand.xsl"
+  xslt3="iso_svrl_for_xsltn.xsl"
+
+  (path, name) = os.path.split(schematron)
+  schematron1 = name + ".step1"
+  schematron2 = name + ".step2"
+
+  process(schematron, xslt1, schematron1, verbose)
+  process(schematron1, xslt2, schematron2, verbose)
+  process(schematron2, xslt3, xslt, verbose)
+  
+  "xslt -stylesheet theSchema.xsl  myDocument.xml > myResult.xml"
 
 if __name__ == "__main__":
   import os
   doc_root = "~/code/nexus-dfn/"
+  VERBOSE = 2
 
   xslt = os.path.join(doc_root, "xslt/nxdl2xsd.xsl")
   xml = os.path.join(doc_root, "base_classes/NXlog.nxdl.xml")
-  process(xml, xslt, "transformednxdl")
+  process(xml, xslt, "transformednxdl", VERBOSE)
 
   nexus = os.path.join(doc_root, "test/NXmonopd.hdf")
-  nxconvert("NXmonopd", nexus, "reducednexus")
+  reduced = "reducednexus"
+  nxconvert("NXmonopd", nexus, reduced, VERBOSE)
+
+  schematron = os.path.join(doc_root, "test/schematron.sch")
+  schematron2xslt(schematron, "schema.xslt", VERBOSE)
