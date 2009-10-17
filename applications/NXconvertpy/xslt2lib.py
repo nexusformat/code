@@ -21,19 +21,22 @@ def nxconvert(definition=None, input=None, output=None, verbose=0):
   if verbose > 1:
     print stdout
   if code != 0:
-    raise RuntimeError("Failed to run " + NXCONVERT)
+    raise RuntimeError(NXCONVERT + " returned " + code)
   
 
-def process(xml=None, xslt=None, output=None):
+def process(xml=None, xslt=None, output=None, verbose=0):
   if xml is None:
     raise Exception("xml file is None")
   if xslt is None:
     raise Exception("xslt file is None")
   command = "%s -o %s %s %s" % (XSLT_PROC, output, xslt, xml)
-  print command
+  if verbose > 1:
+    print command
   (code, stdout) = run(command)
-  print "RETURN:", code
-  print "STDOUT:", stdout
+  if verbose > 1:
+    print stdout
+  if code != 0:
+    raise RuntimeError(XSLT_PROC + " returned " + code)
 
 if __name__ == "__main__":
   import os
