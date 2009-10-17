@@ -53,6 +53,9 @@ public class NexusLoader {
 	}
 
 	public TreeNode loadNexusIntoTree(String filename) throws IOException {
+		TreeNode oldTree = root;
+		root = null;
+		
 		nf = null;
 		boolean canWrite = false;
 
@@ -82,6 +85,9 @@ public class NexusLoader {
 			throw new IOException(ne.getMessage());
 		}
 
+		//If all went well, destroy old tree
+		//TODO
+		//oldTree.dispose();
 		return root;
 	}
 
@@ -329,21 +335,17 @@ public class NexusLoader {
 
 		dim = new int[32];
 		info = new int[2];
+		String pathel[] = nxpath.substring(1).split("/");
+		String name = pathel[pathel.length - 1];
+
 		try {
+
+			nf.opendata(name);
+
 			nf.getinfo(dim, info);
 			for (int i = 0; i < info[0]; i++) {
 				totalLength *= dim[i];
 			}
-
-			/**
-			 * This section is a workaround for a problem with attribute reading
-			 * through the Java-API. This can be removed once nxinitattrdir()
-			 * has been included and is used by nf.attrdir()
-			 */
-			String pathel[] = nxpath.substring(1).split("/");
-			String name = pathel[pathel.length - 1];
-			nf.closedata();
-			nf.opendata(name);
 
 			Hashtable attr = nf.attrdir();
 			if (attr.get("axis") != null) {
@@ -355,8 +357,8 @@ public class NexusLoader {
 				node = makeSimpleParNode(parent, nxpath, dim, info);
 			}
 		} catch (NexusException ne) {
-
-		}
+			ne.printStackTrace();
+		} 
 		return node;
 	}
 
