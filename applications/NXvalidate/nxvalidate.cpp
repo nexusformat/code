@@ -85,6 +85,11 @@ struct Definition {
   string nxdl_path;
 };
 
+struct NeXus {
+  string raw;
+  string reduced;
+};
+
 static int url_encode(char c, FILE* f)
 {
 	switch(c)
@@ -111,15 +116,15 @@ static int url_encode(char c, FILE* f)
 	return 0;
 }
 
-#define NXVALIDATE_ERROR_EXIT	exit(1)
+#define NXVALIDATE_ERROR_EXIT	exit(EXIT_FAILURE)
 
 static const string DEFAULT_NXDL_PATH(".");
 
 static int quiet = 0;
 
-static int convertNXS(const string& nxsfile_in, string& nxsfile_out, Definition &definition) 
+static int convertNXS(NeXus &nexus, Definition &definition) 
 {
-   const char *inFile = nxsfile_in.c_str();
+   const char *inFile = nexus.raw.c_str();
    char outFile[256];
    int fd;
 
@@ -133,11 +138,11 @@ static int convertNXS(const string& nxsfile_in, string& nxsfile_out, Definition 
    if (!quiet) {
      cout << "* Writing tempfile " << outFile << endl;
    }
-   nxsfile_out = outFile;
+   nexus.reduced = outFile;
    if (convert_file(NX_DEFINITION, inFile, NXACC_READ, outFile,
                     NXACC_CREATEXML, definition.name.c_str()) != NX_OK)
    {
-     cerr << "* Error converting file " << nxsfile_in
+     cerr << "* Error converting file " << nexus.raw
           << " to definiton XML format";
      return 1;
    }
@@ -147,26 +152,31 @@ static int convertNXS(const string& nxsfile_in, string& nxsfile_out, Definition 
 static int validate(const string& nxsfile, Definition &definition, 
 		    const int keep_temps, int use_web) 
 {
-   char command[512], outFile2[512], *strPtr;
-   const char* cStrPtr;
-   string extra_xmllint_args;
-   int ret, opt, c, i, fd;
-   FILE *fIn, *fOut2;
+  NeXus nexus;
+  nexus.raw = nxsfile;
 
-   extra_xmllint_args.append(" --nowarning");
    if (!quiet) {
-     cout << "* Validating " << nxsfile << " using definition "
-          << (!definition.name.empty() ? definition.name : "<default>") << " for all NXentry" << endl;
+     cout << "* Validating " << nexus.raw << " using definition "
+          << (!definition.name.empty() ? definition.name : "<default>")
+	  << " for all NXentry" << endl;
    }
-   string nxsfile_xml;
-   if (convertNXS(nxsfile, nxsfile_xml, definition) != 0) {
+   if (convertNXS(nexus, definition) != 0) {
      return 1;
    }
 
+   char command[512], outFile2[512], *strPtr;
+   const char* cStrPtr;
+   int ret, opt, c, i, fd;
+   FILE *fIn, *fOut2;
+
+   string extra_xmllint_args;
+   extra_xmllint_args.append(" --nowarning");
+ 
+   // check without the web
    if (use_web == 0)
    {
        sprintf(command, "xmllint %s --noout --path \"%s\" --schema \"%s.xsd\" \"%s\" %s", 
-         extra_xmllint_args.c_str(), definition.nxdl_path, NEXUS_SCHEMA_BASE, nxsfile_xml.c_str(), (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
+	       extra_xmllint_args.c_str(), definition.nxdl_path, NEXUS_SCHEMA_BASE, nexus.reduced.c_str(), (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
        if (!quiet) {
          cout << "* Validating using locally installed \"xmllint\" program"
               << endl;
@@ -177,11 +187,11 @@ static int validate(const string& nxsfile, Definition &definition,
        {
 	    if (!keep_temps)
 	    {
-		remove(nxsfile_xml.c_str());
+		remove(nexus.reduced.c_str());
 	    }
 	    if (WEXITSTATUS(ret) != 0)
 	    {
-              cout << "* Validation with \"xmllint\" of " << nxsfile
+              cout << "* Validation with \"xmllint\" of " << nexus.raw
                    << " failed" << endl;
               cout << "* If the program was unable to find all the required "
                    << "schema from the web, check your \"http_proxy\" "
@@ -191,7 +201,7 @@ static int validate(const string& nxsfile, Definition &definition,
 	    else
 	    {
 	        if (!quiet) {
-                  cout << "* Validation with \"xmllint\" of " << nxsfile 
+                  cout << "* Validation with \"xmllint\" of " << nexus.raw
                        << " OK" << endl;
                 }
 	        return 0;
@@ -202,8 +212,10 @@ static int validate(const string& nxsfile, Definition &definition,
        cout << "* \"xmllint\" is installed as part of libxml2 from "
             << "xmlsoft.org" << endl;
        NXVALIDATE_ERROR_EXIT;
-   }
-   sprintf(outFile2, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, nxsfile.c_str());
+   } // this section returns whether or not it works
+
+   // set up post request for post request
+   sprintf(outFile2, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, nexus.raw.c_str());
    if ( (fd = mkstemp(outFile2)) == -1 )
    {
      cerr << "Failed to make the temporary file " << outFile2 << endl;
@@ -211,9 +223,9 @@ static int validate(const string& nxsfile, Definition &definition,
    }
    close(fd);
    fOut2 = fopen(outFile2, "wt");
-   fIn = fopen(nxsfile_xml.c_str(), "rt");
+   fIn = fopen(nexus.reduced.c_str(), "rt");
    fprintf(fOut2, "file_name=");
-   for(cStrPtr = nxsfile_xml.c_str(); *cStrPtr != '\0'; ++cStrPtr)
+   for(cStrPtr = nexus.reduced.c_str(); *cStrPtr != '\0'; ++cStrPtr)
    {
 	url_encode(*cStrPtr, fOut2);
    }
@@ -234,6 +246,8 @@ static int validate(const string& nxsfile, Definition &definition,
    }
    fclose(fIn);
    fclose(fOut2);
+
+   // post the validation information to the web
    sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/dovalidate/run", (quiet ? NULL_DEVICE : "-"), outFile2);
    if (!quiet) {
      cout << "* Validating via http://definition.nexusformat.org using "
@@ -243,20 +257,21 @@ static int validate(const string& nxsfile, Definition &definition,
    ret = system(command);
    if (!keep_temps)
    {
-	remove(nxsfile_xml.c_str());
+	remove(nexus.reduced.c_str());
 	remove(outFile2);
    }
    if (ret == -1)
    {
-        cout << "* Unable to find \"wget\" to validate the file " << nxsfile
+        cout << "* Unable to find \"wget\" to validate the file " << nexus.raw
           << " over the web" << endl;
 	NXVALIDATE_ERROR_EXIT;
    }
 
+   // cleanup and return code
    if (WIFEXITED(ret) && (WEXITSTATUS(ret) != 0))
    {
         cerr << "* Validation via http://definition.nexusformat.org/ of "
-          << nxsfile << " failed" << endl;
+          << nexus.raw << " failed" << endl;
         cerr << "* If \"wget\" was unable to load the schema files from the "
           << "web, check your \"http_proxy\" environment variable" << endl;
 	NXVALIDATE_ERROR_EXIT;
@@ -264,7 +279,7 @@ static int validate(const string& nxsfile, Definition &definition,
    else if (!quiet)
    {
         cout << "* Validation via http://definition.nexusformat.org/ of "
-          << nxsfile << " OK" << endl;
+          << nexus.raw << " OK" << endl;
    }
    return 0;
 }
