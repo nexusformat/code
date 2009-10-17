@@ -62,8 +62,8 @@ public class OpenNexus implements IWorkbenchWindowActionDelegate {
 				}catch(Exception edith){
 					edith.printStackTrace();
 				}
-			}catch(IOException eva){
-				UIRegistry.getAdapter().displayError(eva.getMessage());
+			}catch(Exception eva){
+				eva.printStackTrace();
 			}
 		}
 	}
