@@ -2,6 +2,15 @@
 NXCONVERT = "nxconvert"
 XSLTPROC = "xsltproc"
 
+def getSourceDir():
+  """Returns the location of the source code."""
+  import os
+  import sys
+  script = os.path.abspath(sys.argv[0])
+  if os.path.islink(script):
+    script = os.path.realpath(script)
+  return os.path.dirname(script)
+
 def run(cmd, **kwargs):
   """Execute the supplied command and return the tuple (return value,
   stdout)"""
@@ -15,10 +24,9 @@ def run(cmd, **kwargs):
 
 def nxconvert(definition=None, input=None, output=None, verbose=0):
   command = "%s -d %s %s" % (NXCONVERT, input, output)
-  if verbose > 1:
-    print command
   (code, stdout) = run(command)
-  if verbose > 1:
+  if verbose > 1 or code != 0:
+    print command
     print stdout
   if code != 0:
     raise RuntimeError(NXCONVERT + " returned " + str(code))
@@ -30,18 +38,19 @@ def process(xml=None, xslt=None, output=None, verbose=0):
   if xslt is None:
     raise Exception("xslt file is None")
   command = "%s -o %s %s %s" % (XSLTPROC, output, xslt, xml)
-  if verbose > 1:
-    print command
   (code, stdout) = run(command)
-  if verbose > 1:
+  if verbose > 1 or code != 0:
+    print command
     print stdout
   if code != 0:
     raise RuntimeError(XSLTPROC + " returned " + str(code))
 
 def schematron2xslt(schematron=None, xslt=None, verbose=0):
-  xslt1="iso_dsdl_include.xsl"
-  xslt2="iso_abstract_expand.xsl"
-  xslt3="iso_svrl_for_xsltn.xsl"
+  source_dir = getSourceDir()
+  import os
+  xslt1 = os.path.join(source_dir, "iso_dsdl_include.xsl")
+  xslt2 = os.path.join(source_dir, "iso_abstract_expand.xsl")
+  xslt3 = os.path.join(source_dir, "iso_svrl_for_xslt2.xsl")
 
   (path, name) = os.path.split(schematron)
   schematron1 = name + ".step1"
@@ -56,7 +65,7 @@ def schematron2xslt(schematron=None, xslt=None, verbose=0):
 if __name__ == "__main__":
   import os
   doc_root = "~/code/nexus-dfn/"
-  VERBOSE = 2
+  VERBOSE = 1
 
   nexus = os.path.join(doc_root, "test/NXmonopd.hdf")
   reduced = "reducednexus"
@@ -64,3 +73,7 @@ if __name__ == "__main__":
 
   schematron = os.path.join(doc_root, "test/schematron.sch")
   schematron2xslt(schematron, "schema.xslt", VERBOSE)
+
+  # bang the files together
+  process(reduced, "schematron.xslt", "results", VERBOSE)
+  
