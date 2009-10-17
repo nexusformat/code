@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 
 import org.nexusformat.AttributeEntry;
-import org.nexusformat.NeXusFileInterface;
 import org.nexusformat.NexusException;
 import org.nexusformat.NexusFile;
 
@@ -46,14 +45,15 @@ import ch.psi.num.mountaingum.ui.eclipse.RCPUtil;
 
 public class NexusLoader {
 
-	private Hashtable<String, String> pathToType = new Hashtable<String, String>();
 	private HashSet<String> checkedPaths = new HashSet<String>();
+	private TreeNode root;
+	private FlatNexusFile nf;
 
 	public NexusLoader() {
 	}
 
 	public TreeNode loadNexusIntoTree(String filename) throws IOException {
-		FlatNexusFile nf = null;
+		nf = null;
 		boolean canWrite = false;
 
 		File f = new File(filename);
@@ -72,31 +72,20 @@ public class NexusLoader {
 			throw new IOException(ne.getMessage());
 		}
 
-		buildPathMap(nf);
-
-		TreeNode root = buildTree(nf, filename);
+		buildTree(filename);
 
 		setPrivilege(root, canWrite);
-		
+
 		try {
 			nf.close();
 		} catch (NexusException ne) {
 			throw new IOException(ne.getMessage());
 		}
-		
+
 		return root;
 	}
 
-	private void buildPathMap(FlatNexusFile nf) throws IOException {
-		pathToType.clear();
-		try {
-			recursivelyBuildPathMap(nf, "");
-		} catch (NexusException ne) {
-			throw new IOException(ne.getMessage());
-		}
-	}
-
-	private void recursivelyBuildPathMap(FlatNexusFile nf, String path)
+	private void recurseFile(TreeNode parent, String path)
 			throws NexusException {
 		String name, type, newPath;
 		StringBuffer stb;
@@ -114,10 +103,10 @@ public class NexusLoader {
 			stb.append('/');
 			stb.append(name);
 			newPath = stb.toString();
-			pathToType.put(newPath, type);
-			if (!type.equalsIgnoreCase("SDS")) {
+			TreeNode nextLevel = makeNode(parent, type, newPath);
+			if (!type.equalsIgnoreCase("SDS") && nextLevel != null) {
 				nf.opengroup(name, type);
-				recursivelyBuildPathMap(nf, newPath);
+				recurseFile(nextLevel, newPath);
 				nf.closegroup();
 			}
 		}
@@ -143,25 +132,17 @@ public class NexusLoader {
 		FuncUtil.map(root.getTreeStream(), new PrivFunc(canWrite));
 	}
 
-	private TreeNode buildTree(FlatNexusFile nf, String filename)
-			throws IOException {
-		String path, type;
+	private void buildTree(String filename) throws IOException {
 
-		TreeNode root = new TreeNode(null, "");
+		root = new TreeNode(null, "");
 		root.setProperty("filename", filename);
+		locateGraphics();
 
-		Enumeration<String> pathList = pathToType.keys();
-		while (pathList.hasMoreElements()) {
-			path = (String) pathList.nextElement();
-			type = (String) pathToType.get(path);
-			try {
-				nf.openpath(path);
-				map(root, nf, type, path);
-			} catch (NexusException ne) {
-				throw new IOException(ne.getMessage());
-			}
+		try {
+			recurseFile(root, "");
+		} catch (NexusException e) {
+			throw new IOException(e);
 		}
-		return root;
 	}
 
 	// private NeXusMapper findMapper(FlatNexusFile nf) {
@@ -268,93 +249,67 @@ public class NexusLoader {
 		}
 	}
 
-	public void saveTree(TreeNode root, String filename) throws IOException {
-
-		String oldfile = root.getProperty("filename");
-		if (!oldfile.equals(filename)) {
-			/**
-			 * To fix this I need to copy the old file on the new file and then
-			 * apply the changes. For this I would need the apache commons-io
-			 * library, or include it into the source or whatever. As of now
-			 * (08/2009) I cannot yet bring myself to add the additional
-			 * dependency.
-			 */
-			throw new IOException("Filename mismatch");
-		}
-
-		try {
-			FlatNexusFile nf = new FlatNexusFile(filename, NexusFile.NXACC_RDWR);
-			FuncUtil.map(root.getTreeStream(), new SaveNXPar(nf));
-			nf.close();
-		} catch (NexusException ne) {
-			throw new IOException(ne.getMessage());
-		}
-	}
-
 	/**
 	 * the main mapping function, entry to all the work
 	 */
-	public void map(TreeNode root, FlatNexusFile nf, String nxclass,
-			String nxpath) {
+	public TreeNode makeNode(TreeNode parent, String nxclass, String nxpath) {
 
-		if (alreadySeen(nf, nxpath)) {
-			return;
+		if (alreadySeen(nxpath)) {
+			return null;
 		}
+
+		TreeNode node;
 
 		if (nxclass.equalsIgnoreCase("SDS")) {
-			makeParameterNode(root, nf, nxpath);
+			node = makeParameterNode(parent, nxpath, nxclass);
 		} else {
-			makeGroupNode(root, nf, nxpath);
+			node = makeGroupNode(parent, nxpath, nxclass);
 		}
 
-		addPath(nxpath, nf);
+		addPath(nxpath);
+
+		return node;
 	}
 
-	protected void addPath(String nxpath, FlatNexusFile nf) {
+	protected void addPath(String nxpath) {
 		checkedPaths.add(nxpath);
-		try {
-			nf.openpath(nxpath);
-			/**
-			 * This section is a workaround for a problem with attribute reading
-			 * through the Java-API. This can be removed once nxinitattrdir()
-			 * has been included and is used by nf.attrdir()
-			 */
-			String pathel[] = nxpath.substring(1).split("/");
-			String name = pathel[pathel.length - 1];
-			nf.closedata();
-			nf.opendata(name);
-			String link = getAttr(nf, "target");
-			if (link != null) {
-				checkedPaths.add(link);
-			}
-		} catch (NexusException ne) {
-		}
+		//TODO
+//		try {
+//			nf.openpath(nxpath);
+//			/**
+//			 * This section is a workaround for a problem with attribute reading
+//			 * through the Java-API. This can be removed once nxinitattrdir()
+//			 * has been included and is used by nf.attrdir()
+//			 */
+//			String pathel[] = nxpath.substring(1).split("/");
+//			String name = pathel[pathel.length - 1];
+//			nf.closedata();
+//			nf.opendata(name);
+//			String link = getAttr("target");
+//			if (link != null) {
+//				checkedPaths.add(link);
+//			}
+//		} catch (NexusException ne) {
+//		}
 	}
 
 	/*
 	 * This creates all the group hierarchy components till nxpath.
 	 */
-	protected void makeGroupNode(TreeNode root, FlatNexusFile nf, String nxpath) {
+	protected TreeNode makeGroupNode(TreeNode parent, String nxpath, String type) {
 		String pathElement[] = nxpath.substring(1).split("/");
+		String name = pathElement[pathElement.length - 1];
 		TreeNode current;
-		StringBuilder sb = new StringBuilder();
 
-		TreeNode parent = root;
-		for (int i = 0; i < pathElement.length; i++) {
-			current = TreeUtil.findChild(parent, pathElement[i]);
-			sb.append("/").append(pathElement[i]);
-			if (current == null) {
-				current = new TreeNode(parent, pathElement[i]);
-				String type = pathToType.get(sb.toString());
-				if (type == null) {
-					System.out.println("could not get type for " + sb);
-					type = "NXwidget";
-				}
-				current.setProperty("type", type);
-				parent.insertNode(TreeNode.APPEND, current);
-			}
-			parent = current;
+		current = new TreeNode(parent, name);
+		if (type == null) {
+			System.out.println("could not get type for " + nxpath);
+			type = "NXwidget";
 		}
+		current.setProperty("type", type);
+		parent.insertNode(TreeNode.APPEND, current);
+
+		return current;
 	}
 
 	/**
@@ -362,12 +317,15 @@ public class NexusLoader {
 	 * 
 	 * @param root
 	 * @param nf
+	 * @param parent
 	 * @param nxpath
+	 * @param nxclass
+	 * @return
 	 */
-	protected void makeParameterNode(TreeNode root, FlatNexusFile nf,
-			String nxpath) {
+	protected TreeNode makeParameterNode(TreeNode parent, String nxpath,
+			String nxclass) {
 		int dim[], info[], totalLength = 1;
-		;
+		TreeNode node = null;
 
 		dim = new int[32];
 		info = new int[2];
@@ -390,17 +348,16 @@ public class NexusLoader {
 			Hashtable attr = nf.attrdir();
 			if (attr.get("axis") != null) {
 				// ignore: will be picked up when building graph data
-				return;
 			} else if (attr.get("signal") != null || totalLength > 100) {
 				System.out.println("Making graphnode for " + nxpath);
-				makeGraphNode(root, nf, nxpath);
-				return;
+				node = makeGraphNode(parent, nxpath);
 			} else {
-				makeSimpleParNode(root, nf, nxpath, dim, info);
+				node = makeSimpleParNode(parent, nxpath, dim, info);
 			}
 		} catch (NexusException ne) {
 
 		}
+		return node;
 	}
 
 	/**
@@ -412,31 +369,18 @@ public class NexusLoader {
 	 * @param dim
 	 * @param info
 	 */
-	protected TreeNode makeSimpleParNode(TreeNode root, FlatNexusFile nf,
-			String nxpath, int[] dim, int[] info) {
+	protected TreeNode makeSimpleParNode(TreeNode parent, String nxpath,
+			int[] dim, int[] info) {
 		String name, pathel[];
-		StringBuffer pathToGroup;
-		TreeNode group;
 		NexusParameter par;
 
-		/*
-		 * split off the name and ensure that the desired group exists.
-		 */
 		pathel = nxpath.substring(1).split("/");
 		name = pathel[pathel.length - 1];
-		pathToGroup = new StringBuffer();
-		for (int i = 0; i < pathel.length - 1; i++) {
-			pathToGroup.append('/');
-			pathToGroup.append(pathel[i]);
-		}
-		String groupath = pathToGroup.toString();
-		makeGroupNode(root, nf, groupath);
-		group = TreeUtil.searchNode(root, groupath.substring(1));
 
-		par = new NexusParameter(group, name);
-		group.insertNode(TreeNode.APPEND, par);
+		par = new NexusParameter(parent, name);
+		parent.insertNode(TreeNode.APPEND, par);
 
-		NodeValue v = makeValue(nf, dim, info);
+		NodeValue v = makeValue(dim, info);
 		par.updateValue(v);
 		par.setProperty("nxpath", nxpath);
 		return par;
@@ -450,7 +394,7 @@ public class NexusLoader {
 	 * @param info
 	 * @return
 	 */
-	private NodeValue makeValue(FlatNexusFile nf, int[] dim, int[] info) {
+	private NodeValue makeValue(int[] dim, int[] info) {
 		NodeValue v;
 		IntValue iv;
 		DoubleValue dv;
@@ -505,18 +449,18 @@ public class NexusLoader {
 	 * 
 	 * @param root
 	 * @param nf
+	 * @param parent
 	 * @param nxpath
 	 * @return
 	 */
-	protected TreeNode makeGraphNode(TreeNode root, FlatNexusFile nf,
-			String nxpath) {
+	protected TreeNode makeGraphNode(TreeNode parent, String nxpath) {
 		TreeNode graphics, mygraph = null;
 		InternalParameter tmp;
 		int dim[], info[], helpdim[], i;
 		IntValue iv;
 
 		// ensure graphics node
-		graphics = locateGraphics(root);
+		graphics = locateGraphics();
 
 		// get data info
 		dim = new int[32];
@@ -552,12 +496,12 @@ public class NexusLoader {
 
 		// add our data
 		if (info[0] == 3) {
-			makeFrameSeriesViewer(mygraph, nxpath, info, dim, nf);
+			makeFrameSeriesViewer(mygraph, nxpath, info, dim);
 			return mygraph;
 		} else {
 			tmp = new InternalParameter(mygraph, "counts");
 			mygraph.insertNode(TreeNode.APPEND, tmp);
-			tmp.updateValue(makeValue(nf, dim, info));
+			tmp.updateValue(makeValue(dim, info));
 			tmp.setProperty("type", "data");
 		}
 
@@ -566,14 +510,14 @@ public class NexusLoader {
 		} catch (NexusException ne) {
 		}
 
-		findAxis(nf, nxpath, mygraph);
+		findAxis(nxpath, mygraph);
 
 		checkAndDefaultAxis(mygraph, info[0], dim);
 
 		return mygraph;
 	}
 
-	protected TreeNode locateGraphics(TreeNode root) {
+	protected TreeNode locateGraphics() {
 		TreeNode graphics = TreeUtil.findChild(root, "graphics");
 		if (graphics == null) {
 			graphics = new TreeNode(root, "graphics");
@@ -612,7 +556,7 @@ public class NexusLoader {
 	}
 
 	protected void makeFrameSeriesViewer(TreeNode mygraph, String nxpath,
-			int info[], int dim[], FlatNexusFile nf) {
+			int info[], int dim[]) {
 		int helpdim[] = new int[1], i, idim;
 		IntValue iv;
 		InternalParameter work;
@@ -666,7 +610,7 @@ public class NexusLoader {
 		} catch (NexusException ne) {
 		}
 
-		findAxis(nf, nxpath, mygraph);
+		findAxis(nxpath, mygraph);
 
 		/**
 		 * Axis numbers in the NeXus file refer to a 3D array. This has to be
@@ -759,7 +703,7 @@ public class NexusLoader {
 	 * @param nxpath
 	 * @param mygraph
 	 */
-	protected void findAxis(FlatNexusFile nf, String nxpath, TreeNode mygraph) {
+	protected void findAxis(String nxpath, TreeNode mygraph) {
 		String name, type, axAttr;
 		try {
 			Hashtable dir = nf.groupdir();
@@ -769,9 +713,9 @@ public class NexusLoader {
 				type = (String) dir.get(name);
 				if (type.equalsIgnoreCase("SDS")) {
 					nf.opendata(name);
-					axAttr = getAttr(nf, "axis");
+					axAttr = getAttr("axis");
 					if (axAttr != null) {
-						makeAxis(nf, name, axAttr, mygraph);
+						makeAxis(name, axAttr, mygraph);
 					}
 					nf.closedata();
 				}
@@ -790,8 +734,8 @@ public class NexusLoader {
 	 * @param mygraph
 	 * @throws NexusException
 	 */
-	protected void makeAxis(FlatNexusFile nf, String name, String axAttr,
-			TreeNode mygraph) throws NexusException {
+	protected void makeAxis(String name, String axAttr, TreeNode mygraph)
+			throws NexusException {
 		InternalParameter ax = new InternalParameter(mygraph, name);
 		mygraph.insertNode(TreeNode.APPEND, ax);
 		ax.setProperty("type", "axis");
@@ -800,7 +744,7 @@ public class NexusLoader {
 		int dim[] = new int[32];
 		int info[] = new int[2];
 		nf.getinfo(dim, info);
-		ax.updateValue(makeValue(nf, dim, info));
+		ax.updateValue(makeValue(dim, info));
 	}
 
 	/**
@@ -810,11 +754,11 @@ public class NexusLoader {
 	 * @param nxpath
 	 * @return
 	 */
-	protected boolean alreadySeen(NeXusFileInterface nf, String nxpath) {
+	protected boolean alreadySeen(String nxpath) {
 		if (checkedPaths.contains(nxpath)) {
 			return true;
 		}
-		String link = getAttr(nf, "target");
+		String link = getAttr("target");
 		if (link != null) {
 			if (checkedPaths.contains(link)) {
 				return true;
@@ -830,7 +774,7 @@ public class NexusLoader {
 	 * @param name
 	 * @return
 	 */
-	protected String getAttr(NeXusFileInterface nf, String name) {
+	protected String getAttr(String name) {
 		try {
 			Hashtable h = nf.attrdir();
 			AttributeEntry e = (AttributeEntry) h.get(name);
@@ -882,24 +826,47 @@ public class NexusLoader {
 	public void reset() {
 		checkedPaths.clear();
 	}
-	
+
+	public void saveTree(TreeNode root, String filename) throws IOException {
+
+		String oldfile = root.getProperty("filename");
+		if (!oldfile.equals(filename)) {
+			/**
+			 * To fix this I need to copy the old file on the new file and then
+			 * apply the changes. For this I would need the apache commons-io
+			 * library, or include it into the source or whatever. As of now
+			 * (08/2009) I cannot yet bring myself to add the additional
+			 * dependency.
+			 */
+			throw new IOException("Filename mismatch");
+		}
+
+		try {
+			FlatNexusFile nf = new FlatNexusFile(filename, NexusFile.NXACC_RDWR);
+			FuncUtil.map(root.getTreeStream(), new SaveNXPar(nf));
+			nf.close();
+		} catch (NexusException ne) {
+			throw new IOException(ne.getMessage());
+		}
+	}
+
 	public void viewNode(TreeNode root) {
 		if (root == null) {
 			return;
 		}
-		
+
 		NexusTree btv = (NexusTree) RCPUtil.findView(NexusTree.ID);
 		if (btv == null) {
 			// This means that the Nexus perspective has not yet been opened
 			return;
 		}
-		
+
 		btv.setTree(root);
 		EditorView ed = (EditorView) RCPUtil.findView(TreeEditorView.ID, "1");
 		if (ed != null) {
 			ed.disconnect();
 		}
-		
+
 		NameView nv = (NameView) RCPUtil.findView(NameView.ID);
 		if (nv != null) {
 			nv.setName(root.getProperty("filename"));
