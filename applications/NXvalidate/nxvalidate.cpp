@@ -79,9 +79,11 @@ static int mkstemp(char* template)
 #define TMP_DIR P_tmpdir
 #endif /* _WIN32 */
 
-static const char* definition_name = NULL;
-static const char* definition_version = NEXUS_SCHEMA_VERSION;
-static const char* schema_path = ".";
+struct Definition {
+  string name;
+  string version;
+  string nxdl_path;
+};
 
 static int url_encode(char c, FILE* f)
 {
@@ -111,10 +113,11 @@ static int url_encode(char c, FILE* f)
 
 #define NXVALIDATE_ERROR_EXIT	exit(1)
 
+static const string DEFAULT_NXDL_PATH(".");
 
 static int quiet = 0;
 
-static int convertNXS(const string& nxsfile_in, string& nxsfile_out) 
+static int convertNXS(const string& nxsfile_in, string& nxsfile_out, Definition &definition) 
 {
    const char *inFile = nxsfile_in.c_str();
    char outFile[256];
@@ -132,7 +135,7 @@ static int convertNXS(const string& nxsfile_in, string& nxsfile_out)
    }
    nxsfile_out = outFile;
    if (convert_file(NX_DEFINITION, inFile, NXACC_READ, outFile,
-                    NXACC_CREATEXML, definition_name) != NX_OK)
+                    NXACC_CREATEXML, definition.name.c_str()) != NX_OK)
    {
      cerr << "* Error converting file " << nxsfile_in
           << " to definiton XML format";
@@ -141,7 +144,8 @@ static int convertNXS(const string& nxsfile_in, string& nxsfile_out)
    return 0;
 }
 
-static int validate(const string& nxsfile, const char* definition_name, const char* definition_version, const int keep_temps, int use_web) 
+static int validate(const string& nxsfile, Definition &definition, 
+		    const int keep_temps, int use_web) 
 {
    char command[512], outFile2[512], *strPtr;
    const char* cStrPtr;
@@ -152,17 +156,17 @@ static int validate(const string& nxsfile, const char* definition_name, const ch
    extra_xmllint_args.append(" --nowarning");
    if (!quiet) {
      cout << "* Validating " << nxsfile << " using definition "
-          << (definition_name != NULL ? definition_name : "<default>") << " for all NXentry" << endl;
+          << (!definition.name.empty() ? definition.name : "<default>") << " for all NXentry" << endl;
    }
    string nxsfile_xml;
-   if (convertNXS(nxsfile, nxsfile_xml) != 0) {
+   if (convertNXS(nxsfile, nxsfile_xml, definition) != 0) {
      return 1;
    }
 
    if (use_web == 0)
    {
        sprintf(command, "xmllint %s --noout --path \"%s\" --schema \"%s.xsd\" \"%s\" %s", 
-         extra_xmllint_args.c_str(), schema_path, NEXUS_SCHEMA_BASE, nxsfile_xml.c_str(), (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
+         extra_xmllint_args.c_str(), definition.nxdl_path, NEXUS_SCHEMA_BASE, nxsfile_xml.c_str(), (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
        if (!quiet) {
          cout << "* Validating using locally installed \"xmllint\" program"
               << endl;
@@ -214,12 +218,12 @@ static int validate(const string& nxsfile, const char* definition_name, const ch
 	url_encode(*cStrPtr, fOut2);
    }
    fprintf(fOut2, "&definition_name=");
-   for(cStrPtr = definition_name; cStrPtr != NULL && *cStrPtr != '\0'; ++cStrPtr)
+   for(cStrPtr = definition.name.c_str(); cStrPtr != NULL && *cStrPtr != '\0'; ++cStrPtr)
    {
 	url_encode(*cStrPtr, fOut2);
    }
    fprintf(fOut2, "&definition_version=");
-   for(cStrPtr = definition_version; *cStrPtr != '\0'; ++cStrPtr)
+   for(cStrPtr = definition.version.c_str(); *cStrPtr != '\0'; ++cStrPtr)
    {
 	url_encode(*cStrPtr, fOut2);
    }
@@ -280,9 +284,9 @@ int main(int argc, char *argv[])
    ValueArg<string> definition_name_arg("d", "def", temp.str(), false, 
                                         "", "definition", cmd);
    temp.str("");
-   temp << "specify schema version (default: " << definition_version << ")";
+   temp << "specify schema version (default: " << NEXUS_SCHEMA_VERSION << ")";
    ValueArg<string> definition_version_arg("", "defver", temp.str(), false, 
-                                           definition_version, "version", cmd);
+                                          NEXUS_SCHEMA_VERSION, "version", cmd);
 
    SwitchArg quiet_arg("q", "quiet", "Turn on quiet mode (only report errors)",
                        false, cmd);
@@ -292,9 +296,10 @@ int main(int argc, char *argv[])
                        false, cmd);
 
    temp.str("");
-   temp << "Specify path to additional schema files (default: " << schema_path << ")";
+   temp << "Specify path to additional schema files (default: "
+	<< DEFAULT_NXDL_PATH << ")";
    ValueArg<string> schema_path_arg("p", "path", temp.str(), false, 
-                                           schema_path, "path", cmd);
+				    DEFAULT_NXDL_PATH, "path", cmd);
 
    temp.str("");
    temp << "Send file to NeXus web site (using wget) for validation "
@@ -308,11 +313,6 @@ int main(int argc, char *argv[])
 
    // parse the command line and turn it into variables
    cmd.parse(argc, argv);
-   definition_name = definition_name_arg.getValue().c_str();
-   if (definition_name[0] == '\0')
-   {
-      definition_name = NULL;
-   }
    if (quiet_arg.getValue()) {
      quiet = 1;
    }
@@ -325,11 +325,12 @@ int main(int argc, char *argv[])
    if (nodef_arg.getValue()) {
      ignore_definition = 1;
    }
+   Definition definition;
    if (ignore_definition) {
-      definition_name = "NXentry";
+     definition.name = "NXentry";
    }
-   definition_version = definition_version_arg.getValue().c_str();
-   schema_path = schema_path_arg.getValue().c_str();
+   definition.version = definition_version_arg.getValue();
+   definition.nxdl_path = schema_path_arg.getValue();
    vector<string> infiles = infiles_arg.getValue();
    if (infiles.empty()) {
      cerr << "Must supply at least one data file" << endl;
@@ -339,8 +340,7 @@ int main(int argc, char *argv[])
    // do the work
    int result = 0;
    for (size_t i = 0; i < infiles.size(); i++) {
-     result += validate(infiles[i], definition_name, definition_version,
-                        keep_temps, use_web);
+     result += validate(infiles[i], definition, keep_temps, use_web);
    }
    return result;
 }
