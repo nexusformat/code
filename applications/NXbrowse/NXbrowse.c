@@ -25,7 +25,7 @@
            Argonne, IL 60439-4845
            USA
 
- For further information, see <http://www.neutron.anl.gov/NeXus/>
+ For further information, see <http://www.nexusformat.org>
 
  $Id$
 !----------------------------------------------------------------------------*/
@@ -110,13 +110,17 @@ int main(int argc, char *argv[])
          stringPtr = strtok(NULL, " "); 
          if (stringPtr != NULL) {
             strcpy (groupName, stringPtr);
-            status = NXBopen (fileId, groupName);
-            /* Add the group to the prompt string */
-            if (status == NX_OK) {
-               strcat (path, "/");
-               strcat (path, groupName);
-               groupLevel++;
-            }
+			 if (StrEq(groupName, "..")) {
+				 strcpy(command, "CLOSE");
+			 } else {
+				 status = NXBopen (fileId, groupName);
+				 /* Add the group to the prompt string */
+				 if (status == NX_OK) {
+					 strcat (path, "/");
+					 strcat (path, groupName);
+					 groupLevel++;
+				 }
+			 }
          }
          else {
             printf ("NX_ERROR: Specify a group\n");
