@@ -9,10 +9,13 @@
  */
 package ch.psi.num.mountaingum.nexus.Perspective;
 
+import org.eclipse.swt.widgets.Composite;
+
 import ch.psi.num.mountaingum.tree.TreeNode;
 import ch.psi.num.mountaingum.ui.EditorView.EditorView;
 import ch.psi.num.mountaingum.ui.EditorView.TreeEditorView;
 import ch.psi.num.mountaingum.ui.TreeViewer.BaseTreeView;
+import ch.psi.num.mountaingum.ui.TreeViewer.IconTreeLabelProvider;
 import ch.psi.num.mountaingum.ui.eclipse.RCPUtil;
 
 public class NexusTree extends BaseTreeView {
@@ -28,5 +31,10 @@ public class NexusTree extends BaseTreeView {
 	public TreeNode getTree(){
 		return root;
 	}
-	
+
+	@Override
+	public void createPartControl(Composite parent) {
+		super.createPartControl(parent);
+		treeViewer.setLabelProvider(new IconTreeLabelProvider());
+	}
 }

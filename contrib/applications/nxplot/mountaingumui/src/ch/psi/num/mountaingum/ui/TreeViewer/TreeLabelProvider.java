@@ -1,5 +1,5 @@
 /**
- * This class is reponsible for retrieving the right data for each 
+ * This class is responsible for retrieving the right data for each 
  * column of the table tree view.  
  * 
  * copyright: GPL
