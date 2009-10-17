@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+NXCONVERT = "nxconvert"
 XSLT_PROC = "xsltproc"
 
 def run(cmd, **kwargs):
@@ -11,6 +12,17 @@ def run(cmd, **kwargs):
   (stdout, stderr) = proc.communicate()
   return_code = proc.wait()
   return (return_code, stdout)
+
+def nxconvert(definition=None, input=None, output=None, verbose=0):
+  command = "%s -d %s %s" % (NXCONVERT, input, output)
+  if verbose > 1:
+    print command
+  (code, stdout) = run(command)
+  if verbose > 1:
+    print stdout
+  if code != 0:
+    raise RuntimeError("Failed to run " + NXCONVERT)
+  
 
 def process(xml=None, xslt=None, output=None):
   if xml is None:
@@ -26,6 +38,10 @@ def process(xml=None, xslt=None, output=None):
 if __name__ == "__main__":
   import os
   doc_root = "~/code/nexus-dfn/"
+
   xslt = os.path.join(doc_root, "xslt/nxdl2xsd.xsl")
   xml = os.path.join(doc_root, "base_classes/NXlog.nxdl.xml")
-  process(xml, xslt, "deleteme")
+  process(xml, xslt, "transformednxdl")
+
+  nexus = os.path.join(doc_root, "test/NXmonopd.hdf")
+  nxconvert("NXmonopd", nexus, "reducednexus")
