@@ -9,20 +9,29 @@ class NXconvert {
   private String redfile;
   private int verbose;
 
-  NXconvert(final String filename) {
+  NXconvert(final String filename)
+                                   throws IOException, InterruptedException {
     this(filename, 0);
   }
 
-  NXconvert(final String filename, final int verbose) {
+  NXconvert(final String filename, final int verbose)
+                                   throws IOException, InterruptedException {
     this.rawfile = filename;
     this.redfile = filename + ".reduced";
     this.verbose = verbose;
+    this.convert();
+  }
+  
+  String getReducedName() {
+    return this.redfile;
   }
 
   private void printStd(final String command, final String out,
                         final String err) {
     if (this.verbose > 0) {
-      
+      System.out.println(command);
+      System.out.println(out);
+      System.out.println(err);
     }
   }
 
