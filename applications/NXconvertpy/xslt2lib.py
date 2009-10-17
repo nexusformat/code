@@ -58,10 +58,6 @@ if __name__ == "__main__":
   doc_root = "~/code/nexus-dfn/"
   VERBOSE = 2
 
-  xslt = os.path.join(doc_root, "xslt/nxdl2xsd.xsl")
-  xml = os.path.join(doc_root, "base_classes/NXlog.nxdl.xml")
-  process(xml, xslt, "transformednxdl", VERBOSE)
-
   nexus = os.path.join(doc_root, "test/NXmonopd.hdf")
   reduced = "reducednexus"
   nxconvert("NXmonopd", nexus, reduced, VERBOSE)
