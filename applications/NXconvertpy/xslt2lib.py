@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 NXCONVERT = "nxconvert"
-XSLTPROC = "xsltproc"
+XSLTPROC = "java -jar saxon9he.jar"
 
 def getSourceDir():
   """Returns the location of the source code."""
@@ -37,7 +37,8 @@ def process(xml=None, xslt=None, output=None, verbose=0):
     raise Exception("xml file is None")
   if xslt is None:
     raise Exception("xslt file is None")
-  command = "%s -o %s %s %s" % (XSLTPROC, output, xslt, xml)
+  command = "%s %s %s > %s" % (XSLTPROC, xml, xslt, output)
+  print command
   (code, stdout) = run(command)
   if verbose > 1 or code != 0:
     print command
@@ -46,11 +47,13 @@ def process(xml=None, xslt=None, output=None, verbose=0):
     raise RuntimeError(XSLTPROC + " returned " + str(code))
 
 def schematron2xslt(schematron=None, xslt=None, verbose=0):
+
   source_dir = getSourceDir()
   import os
   xslt1 = os.path.join(source_dir, "iso_dsdl_include.xsl")
   xslt2 = os.path.join(source_dir, "iso_abstract_expand.xsl")
   xslt3 = os.path.join(source_dir, "iso_svrl_for_xslt2.xsl")
+
 
   (path, name) = os.path.split(schematron)
   schematron1 = name + ".step1"
@@ -64,7 +67,7 @@ def schematron2xslt(schematron=None, xslt=None, verbose=0):
 
 if __name__ == "__main__":
   import os
-  doc_root = "~/code/nexus-dfn/"
+  doc_root = "~/sandpit/NeXus/definitions/trunk/"
   VERBOSE = 1
 
   nexus = os.path.join(doc_root, "test/NXmonopd.hdf")
@@ -75,5 +78,5 @@ if __name__ == "__main__":
   schematron2xslt(schematron, "schema.xslt", VERBOSE)
 
   # bang the files together
-  process(reduced, "schematron.xslt", "results", VERBOSE)
+  process(reduced, "schema.xslt", "results", VERBOSE)
   
