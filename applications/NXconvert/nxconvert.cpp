@@ -33,12 +33,12 @@
 
 static void print_usage()
 {
-    printf("Usage: nxconvert [ -x | -h4 | -h5 | -d | -o keepws | -o table ] [ infile ] [ outfile ]\n");
+    printf("Usage: nxconvert [ -x | -h4 | -h5 | -d | -Dfile | -o keepws | -o table ] [ infile ] [ outfile ]\n");
 }
 
 #define NXCONVERT_EXIT_ERROR	exit(1)
 
-static const char* definition_name = NEXUS_SCHEMA_BASE;
+static const char* definition_name = NULL /* NEXUS_SCHEMA_BASE */;
 
 int main(int argc, char *argv[])
 {
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
    int opt, nx_format = -1, nx_write_access = 0;
    int nx_read_access = NXACC_READ;
 
-   while( (opt = getopt(argc, argv, "h:xdo:")) != -1 )
+   while( (opt = getopt(argc, argv, "h:xdD:o:")) != -1 )
    {
 /* use with "-:" in getopt	
 	if (opt == '-')
@@ -63,6 +63,15 @@ int main(int argc, char *argv[])
 	    break;
 
 	  case 'd':
+	    nx_format = NX_DEFINITION;
+	    nx_write_access |= NXACC_CREATEXML;
+	    if (optarg != NULL && *optarg != '\0')
+	    {
+		definition_name = optarg;
+	    }
+	    break;
+
+	  case 'D':
 	    nx_format = NX_DEFINITION;
 	    nx_write_access |= NXACC_CREATEXML;
 	    if (optarg != NULL && *optarg != '\0')
@@ -143,7 +152,7 @@ int main(int argc, char *argv[])
    }
    printf("Converting %s to %s NeXus file %s\n", inFile, nx_formats[nx_format], outFile);
 
-   if (convert_file(nx_format, inFile, nx_read_access, outFile, nx_write_access, NULL) != NX_OK) {
+   if (convert_file(nx_format, inFile, nx_read_access, outFile, nx_write_access, definition_name) != NX_OK) {
       NXCONVERT_EXIT_ERROR;
    }
    printf("Convertion successful.\n");

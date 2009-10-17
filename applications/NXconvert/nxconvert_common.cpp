@@ -77,7 +77,7 @@ static const char* definition_name = NULL;
 int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_)
 {
    int i, nx_is_definition = 0;
-   if (definition_name_[0] == '\0') {
+   if (definition_name_ != NULL && definition_name_[0] == '\0') {
      definition_name = NULL;
    } else {
      definition_name = definition_name_;
