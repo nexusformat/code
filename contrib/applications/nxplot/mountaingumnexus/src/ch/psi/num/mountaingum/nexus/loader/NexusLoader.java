@@ -1,8 +1,8 @@
 /**
  * This is the main driver class for loading  NeXus file data into 
- * a GTSE tree. I first build a list of all paths to consider, then 
+ * a tree. I first build a list of all paths to consider, then 
  * iterate through this list. The idea is that the mapper may choose 
- * to step through the file at its own pleasure in order to find axis 
+ * to step through the tree at its own pleasure in order to find axis 
  * data or whatever. 
  *
  * This also supports saving of NeXus trees.
@@ -77,32 +77,49 @@ public class NexusLoader {
 		TreeNode root = buildTree(nf, filename);
 
 		setPrivilege(root, canWrite);
+		
 		try {
 			nf.close();
 		} catch (NexusException ne) {
 			throw new IOException(ne.getMessage());
 		}
+		
 		return root;
 	}
 
-	public void viewNode(TreeNode root) {
+	private void buildPathMap(FlatNexusFile nf) throws IOException {
+		pathToType.clear();
+		try {
+			recursivelyBuildPathMap(nf, "");
+		} catch (NexusException ne) {
+			throw new IOException(ne.getMessage());
+		}
+	}
 
-		if (root == null) {
-			return;
-		}
-		NexusTree btv = (NexusTree) RCPUtil.findView(NexusTree.ID);
-		if (btv == null) {
-			// This means that the Nexus perspective has not yet been opened
-			return;
-		}
-		btv.setTree(root);
-		EditorView ed = (EditorView) RCPUtil.findView(TreeEditorView.ID, "1");
-		if (ed != null) {
-			ed.disconnect();
-		}
-		NameView nv = (NameView) RCPUtil.findView(NameView.ID);
-		if (nv != null) {
-			nv.setName(root.getProperty("filename"));
+	private void recursivelyBuildPathMap(FlatNexusFile nf, String path)
+			throws NexusException {
+		String name, type, newPath;
+		StringBuffer stb;
+
+		Hashtable dir = nf.groupdir();
+		Enumeration d = dir.keys();
+		while (d.hasMoreElements()) {
+			name = (String) d.nextElement();
+			type = (String) dir.get(name);
+			if (type.equalsIgnoreCase("CDF0.0")) {
+				continue;
+			}
+			stb = new StringBuffer();
+			stb.append(path);
+			stb.append('/');
+			stb.append(name);
+			newPath = stb.toString();
+			pathToType.put(newPath, type);
+			if (!type.equalsIgnoreCase("SDS")) {
+				nf.opengroup(name, type);
+				recursivelyBuildPathMap(nf, newPath);
+				nf.closegroup();
+			}
 		}
 	}
 
@@ -165,42 +182,6 @@ public class NexusLoader {
 	// }
 	// return new DefaultNexusMapper();
 	// }
-
-	private void buildPathMap(FlatNexusFile nf) throws IOException {
-		pathToType.clear();
-		try {
-			recursePath(nf, "");
-		} catch (NexusException ne) {
-			throw new IOException(ne.getMessage());
-		}
-	}
-
-	private void recursePath(FlatNexusFile nf, String path)
-			throws NexusException {
-		String name, type, newPath;
-		StringBuffer stb;
-
-		Hashtable dir = nf.groupdir();
-		Enumeration d = dir.keys();
-		while (d.hasMoreElements()) {
-			name = (String) d.nextElement();
-			type = (String) dir.get(name);
-			if (type.equalsIgnoreCase("CDF0.0")) {
-				continue;
-			}
-			stb = new StringBuffer();
-			stb.append(path);
-			stb.append('/');
-			stb.append(name);
-			newPath = stb.toString();
-			pathToType.put(newPath, type);
-			if (!type.equalsIgnoreCase("SDS")) {
-				nf.opengroup(name, type);
-				recursePath(nf, newPath);
-				nf.closegroup();
-			}
-		}
-	}
 
 	public TreeNode getTree() {
 		NexusTree btv = (NexusTree) RCPUtil.findView(NexusTree.ID);
@@ -900,5 +881,28 @@ public class NexusLoader {
 	 */
 	public void reset() {
 		checkedPaths.clear();
+	}
+	
+	public void viewNode(TreeNode root) {
+		if (root == null) {
+			return;
+		}
+		
+		NexusTree btv = (NexusTree) RCPUtil.findView(NexusTree.ID);
+		if (btv == null) {
+			// This means that the Nexus perspective has not yet been opened
+			return;
+		}
+		
+		btv.setTree(root);
+		EditorView ed = (EditorView) RCPUtil.findView(TreeEditorView.ID, "1");
+		if (ed != null) {
+			ed.disconnect();
+		}
+		
+		NameView nv = (NameView) RCPUtil.findView(NameView.ID);
+		if (nv != null) {
+			nv.setName(root.getProperty("filename"));
+		}
 	}
 }
