@@ -143,6 +143,9 @@ public class BaseTreeView extends ViewPart{
 				} else {
 					String editor = pn.getProperty("viewer");
 					ne = RCPUtil.getNodeEditor(editor,"mountaingumui.SingleParEditor");
+					if(! (ne instanceof ParameterNode)){
+						return;
+					}
 					getEditorView().makeEditorContainer(ne, pn);
 				}
 			}
