@@ -29,6 +29,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unistd.h>
 #include <vector>
@@ -42,7 +43,9 @@ using namespace TCLAP;
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::runtime_error;
 using std::string;
+using std::stringstream;
 using std::vector;
 
 #if HAVE_SYS_WAIT_H
@@ -119,50 +122,63 @@ static int url_encode(char c, FILE* f)
 #define NXVALIDATE_ERROR_EXIT	exit(EXIT_FAILURE)
 
 static const string DEFAULT_NXDL_PATH(".");
+static const int STR_BUFFER_SIZE = 256;
 
 static int quiet = 0;
 
-static int convertNXS(NeXus &nexus, Definition &definition) 
+/**
+ * Generate a temporary file based on the name of a supplied file. This will 
+ * generate the file to make sure that it can be created.
+ */
+static string tempfile(const string &in) //, string &out)
 {
-   const char *inFile = nexus.raw.c_str();
-   char outFile[256];
-   int fd;
+  // generate the temporary filename
+  char outFile[STR_BUFFER_SIZE];
+  sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, in.c_str());
 
-   sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile);
+  // generate the temporary file
+  int fd;
    if ( (fd = mkstemp(outFile)) == -1 )
    {
-     cerr << "error making temporary directory\n" << endl;
-        return 1;
+     stringstream msg;
+     msg << "error making temporary file " << outFile;
+     throw runtime_error(msg.str());
    }
    close(fd);
-   if (!quiet) {
-     cout << "* Writing tempfile " << outFile << endl;
-   }
-   nexus.reduced = outFile;
-   if (convert_file(NX_DEFINITION, inFile, NXACC_READ, outFile,
-                    NXACC_CREATEXML, definition.name.c_str()) != NX_OK)
+
+   return string(outFile);
+}
+
+static void convertDFN(Definition &definition)
+{
+}
+
+static void convertNXS(NeXus &nexus, Definition &definition) 
+{
+   nexus.reduced = tempfile(nexus.raw);
+   if (convert_file(NX_DEFINITION, nexus.raw.c_str(), NXACC_READ, 
+                    nexus.reduced.c_str(), NXACC_CREATEXML, 
+                    definition.name.c_str()) != NX_OK)
    {
-     cerr << "* Error converting file " << nexus.raw
-          << " to definiton XML format";
-     return 1;
+     stringstream msg;
+     msg << "Error converting file " << nexus.raw
+         << " to definiton XML format";
+     throw runtime_error(msg.str()); 
    }
-   return 0;
 }
 
 static int validate(const string& nxsfile, Definition &definition, 
 		    const int keep_temps, int use_web) 
 {
-  NeXus nexus;
-  nexus.raw = nxsfile;
+   NeXus nexus;
+   nexus.raw = nxsfile;
 
    if (!quiet) {
      cout << "* Validating " << nexus.raw << " using definition "
           << (!definition.name.empty() ? definition.name : "<default>")
 	  << " for all NXentry" << endl;
    }
-   if (convertNXS(nexus, definition) != 0) {
-     return 1;
-   }
+   convertNXS(nexus, definition);
 
    char command[512], outFile2[512], *strPtr;
    const char* cStrPtr;
