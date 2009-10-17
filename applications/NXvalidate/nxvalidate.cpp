@@ -183,7 +183,7 @@ static void convertNXS(NeXus &nexus, Definition &definition)
 }
 
 static int validate(const string& nxsfile, Definition &definition, 
-		    const int keep_temps, int use_web) 
+		    const bool keep_temps, const bool use_web) 
 {
    // set up the validation file
    convertDFN(definition);
@@ -210,7 +210,7 @@ static int validate(const string& nxsfile, Definition &definition,
    extra_xmllint_args.append(" --nowarning");
  
    // check without the web
-   if (use_web == 0)
+   if (!use_web)
    {
        stringstream command_buff;
        command_buff << "xmllint " << extra_xmllint_args << " --noout --path \"" << definition.nxdl_path << "\" --schema \"" << NEXUS_SCHEMA_BASE << ".xsd\" \"" << nexus.reduced << "\"" << (quiet ? "> " NULL_DEVICE " 2>&1" : "");
@@ -330,10 +330,9 @@ static int validate(const string& nxsfile, Definition &definition,
 
 int main(int argc, char *argv[])
 {
-   char *strPtr;
-   int use_web = 0;
-   int keep_temps = 0;
-   int ignore_definition = 0;
+   bool use_web;
+   bool keep_temps;
+   bool ignore_definition;
 
    // set up the command line arguments
    CmdLine cmd("Validate a NeXus file", ' ', "1.1.0");
@@ -375,15 +374,9 @@ int main(int argc, char *argv[])
    if (quiet_arg.getValue()) {
      quiet = 1;
    }
-   if (send_arg.getValue()) {
-     use_web = 1;
-   }
-   if (keep_arg.getValue()) {
-     keep_temps = 1;
-   }
-   if (nodef_arg.getValue()) {
-     ignore_definition = 1;
-   }
+   use_web = send_arg.getValue();
+   keep_temps = keep_arg.getValue();
+   ignore_definition = nodef_arg.getValue();
    Definition definition;
    if (ignore_definition) {
      definition.name = "NXentry";
