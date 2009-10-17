@@ -34,8 +34,8 @@
             application="NXplot.application"
             name="NXplot">
          <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+               name="appName"
+               value="NXplot">
          </property>
       </product>
    </extension>
