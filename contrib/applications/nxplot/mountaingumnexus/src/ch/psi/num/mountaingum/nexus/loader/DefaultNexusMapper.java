@@ -564,7 +564,15 @@ public class DefaultNexusMapper implements NeXusMapper {
 			dim[1] = e.type;
 			byte bdata[] = new byte[e.length];
 			nf.getattr(name, bdata, dim);
-			return new String(fixTrailingZero(bdata));
+			byte byteArr[] = fixTrailingZero(bdata);
+			// Check to see if the attribute is some sort of integer
+			if (e.type > NexusFile.NX_BINARY) {
+				Byte myByte = new Byte(byteArr[0]);
+				long myLong = myByte.longValue();
+				//System.out.println(name + " : " + Long.toString(myLong));
+				return Long.toString(myLong);
+			}
+			return new String(byteArr);
 		}catch(NexusException ne){
 			return null;
 		}
