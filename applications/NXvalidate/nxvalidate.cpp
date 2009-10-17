@@ -130,13 +130,22 @@ static int quiet = 0;
  * Generate a temporary file based on the name of a supplied file. This will 
  * generate the file to make sure that it can be created.
  */
-static string tempfile(const string &in) //, string &out)
+static string tempfile(const string &in)
 {
+  // get the name of the file without the path
+  string separator(DIR_SEPARATOR);
+  string inFile(in);
+  size_t found;
+  found = inFile.rfind(DIR_SEPARATOR);
+  if (found != string::npos) {
+    inFile.erase(0, found + separator.length());
+  }
+
   // generate the temporary filename
   char outFile[STR_BUFFER_SIZE];
-  sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, in.c_str());
+  sprintf(outFile, "%s%s%s.XXXXXX", TMP_DIR, DIR_SEPARATOR, inFile.c_str());
 
-  // generate the temporary file
+  // create the temporary file
   int fd;
    if ( (fd = mkstemp(outFile)) == -1 )
    {
@@ -151,11 +160,17 @@ static string tempfile(const string &in) //, string &out)
 
 static void convertDFN(Definition &definition)
 {
+  cout << "name:" << definition.name << endl
+       << "vers:" << definition.version << endl
+       << "path:" << definition.nxdl_path << endl;
 }
 
 static void convertNXS(NeXus &nexus, Definition &definition) 
 {
    nexus.reduced = tempfile(nexus.raw);
+   if (!quiet) {
+     cout << "* Converting nexus file to reduced format" << endl;
+   }
    if (convert_file(NX_DEFINITION, nexus.raw.c_str(), NXACC_READ, 
                     nexus.reduced.c_str(), NXACC_CREATEXML, 
                     definition.name.c_str()) != NX_OK)
@@ -170,17 +185,23 @@ static void convertNXS(NeXus &nexus, Definition &definition)
 static int validate(const string& nxsfile, Definition &definition, 
 		    const int keep_temps, int use_web) 
 {
+   // set up the validation file
+   convertDFN(definition);
+
+   // set up the reduced nexus file
    NeXus nexus;
    nexus.raw = nxsfile;
+   convertNXS(nexus, definition);
 
+   // let people know what is going on
    if (!quiet) {
      cout << "* Validating " << nexus.raw << " using definition "
           << (!definition.name.empty() ? definition.name : "<default>")
 	  << " for all NXentry" << endl;
    }
-   convertNXS(nexus, definition);
 
-   char command[512], outFile2[512], *strPtr;
+   char outFile2[STR_BUFFER_SIZE], *strPtr;
+   string command;
    const char* cStrPtr;
    int ret, opt, c, i, fd;
    FILE *fIn, *fOut2;
@@ -191,14 +212,16 @@ static int validate(const string& nxsfile, Definition &definition,
    // check without the web
    if (use_web == 0)
    {
-       sprintf(command, "xmllint %s --noout --path \"%s\" --schema \"%s.xsd\" \"%s\" %s", 
-	       extra_xmllint_args.c_str(), definition.nxdl_path, NEXUS_SCHEMA_BASE, nexus.reduced.c_str(), (quiet ? "> " NULL_DEVICE " 2>&1" : ""));
+       stringstream command_buff;
+       command_buff << "xmllint " << extra_xmllint_args << " --noout --path \"" << definition.nxdl_path << "\" --schema \"" << NEXUS_SCHEMA_BASE << ".xsd\" \"" << nexus.reduced << "\"" << (quiet ? "> " NULL_DEVICE " 2>&1" : "");
+
+	   command = command_buff.str();
        if (!quiet) {
          cout << "* Validating using locally installed \"xmllint\" program"
               << endl;
          cout << command << endl;
        }
-       ret = system(command);
+       ret = system(command.c_str());
        if (ret != -1 && WIFEXITED(ret))
        {
 	    if (!keep_temps)
@@ -264,13 +287,18 @@ static int validate(const string& nxsfile, Definition &definition,
    fclose(fOut2);
 
    // post the validation information to the web
-   sprintf(command, "wget --quiet -O %s --post-file=\"%s\" http://definition.nexusformat.org/dovalidate/run", (quiet ? NULL_DEVICE : "-"), outFile2);
+   stringstream command_buff;
+   command_buff << "wget --quiet -O " << (quiet ? NULL_DEVICE : "-")
+                << " --post-file=\"" << outFile2
+                << "\" http://definition.nexusformat.org/dovalidate/run";
+   command = command_buff.str();
+
    if (!quiet) {
      cout << "* Validating via http://definition.nexusformat.org using "
           << "\"wget\"" << endl;
      cout << command << endl;
    }
-   ret = system(command);
+   ret = system(command.c_str());
    if (!keep_temps)
    {
 	remove(nexus.reduced.c_str());
