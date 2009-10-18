@@ -1,41 +1,49 @@
 package org.nexusformat;
 
+import java.io.File;
 import java.io.IOException;
 
 class NXconvert {
   private static final String NXCONVERT = "nxconvert";
   private String command;
-  private String rawfile;
-  private String redfile;
+  private File rawfile;
+  private File redfile;
   private int verbose;
 
-  NXconvert(final String filename)
+  NXconvert(final String filename, final boolean keepTemp, final int verbose)
                                    throws IOException, InterruptedException {
-    this(filename, 0);
-  }
-
-  NXconvert(final String filename, final int verbose)
-                                   throws IOException, InterruptedException {
-    this.rawfile = filename;
-    this.redfile = filename + ".reduced";
+    this.rawfile = new File(filename);
+    this.redfile = File.createTempFile(this.rawfile.getName() + ".",
+                                       ".reduced");
+    if (!keepTemp) {
+      this.redfile.deleteOnExit();
+    }
     this.verbose = verbose;
     this.convert();
   }
   
   String getReducedName() {
-    return this.redfile;
+    return this.redfile.getAbsolutePath();
   }
 
   private void printStd(final String command, final String out,
                         final String err) {
-    if (this.verbose > 0) {
+    if (this.verbose > 1) {
       System.out.println(command);
-      System.out.println(out);
-      System.out.println(err);
+      if (out.length() > 0) {
+        System.out.print(out);
+      }
+      if (err.length() > 0) {
+        System.out.print(err);
+      }
     }
   }
 
   void convert() throws IOException, InterruptedException {
+    if (verbose > 0) {
+      System.out.println("Creating " + this.redfile.getAbsolutePath());
+    }
+
     // the command to run
     String command = NXCONVERT + " -d " + this.rawfile + " " + this.redfile;
 
@@ -58,6 +66,18 @@ class NXconvert {
       buffer.append("\" failed. Returned ");
       buffer.append(exitValue);
       throw new IOException(buffer.toString());
+    }
+  }
+  
+  public static void main(String[] args) {
+    if (args.length != 1) {
+      System.out.println("Must specify one input file");
+      return;
+    }
+    try {
+      NXconvert convert = new NXconvert(args[0], false, 1);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
