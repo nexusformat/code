@@ -15,6 +15,10 @@ package ch.psi.num.mountaingum.nexus.loader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -48,6 +52,7 @@ public class NexusLoader {
 	private HashSet<String> checkedPaths = new HashSet<String>();
 	private TreeNode root;
 	private FlatNexusFile nf;
+	public static final Charset nexusCharset = Charset.forName("UTF-8");
 
 	public NexusLoader() {
 	}
@@ -55,7 +60,7 @@ public class NexusLoader {
 	public TreeNode loadNexusIntoTree(String filename) throws IOException {
 		TreeNode oldTree = root;
 		root = null;
-		
+
 		nf = null;
 		boolean canWrite = false;
 
@@ -85,14 +90,13 @@ public class NexusLoader {
 			throw new IOException(ne.getMessage());
 		}
 
-		//If all went well, destroy old tree
-		//TODO
-		//oldTree.dispose();
+		// If all went well, destroy old tree
+		// TODO
+		// oldTree.dispose();
 		return root;
 	}
 
-	private void recurseFile(TreeNode parent, String path)
-			throws NexusException {
+	private void recurseFile(TreeNode parent, String path) throws NexusException {
 		String name, type, newPath;
 		StringBuffer stb;
 
@@ -246,8 +250,7 @@ public class NexusLoader {
 							break;
 						}
 					} catch (NexusException ne) {
-						SysRegistry.getLogger()
-								.error("Failed to write " + path);
+						SysRegistry.getLogger().error("Failed to write " + path);
 					}
 				}
 			}
@@ -279,24 +282,24 @@ public class NexusLoader {
 
 	protected void addPath(String nxpath) {
 		checkedPaths.add(nxpath);
-		//TODO
-//		try {
-//			nf.openpath(nxpath);
-//			/**
-//			 * This section is a workaround for a problem with attribute reading
-//			 * through the Java-API. This can be removed once nxinitattrdir()
-//			 * has been included and is used by nf.attrdir()
-//			 */
-//			String pathel[] = nxpath.substring(1).split("/");
-//			String name = pathel[pathel.length - 1];
-//			nf.closedata();
-//			nf.opendata(name);
-//			String link = getAttr("target");
-//			if (link != null) {
-//				checkedPaths.add(link);
-//			}
-//		} catch (NexusException ne) {
-//		}
+		// TODO
+		// try {
+		// nf.openpath(nxpath);
+		// /**
+		// * This section is a workaround for a problem with attribute reading
+		// * through the Java-API. This can be removed once nxinitattrdir()
+		// * has been included and is used by nf.attrdir()
+		// */
+		// String pathel[] = nxpath.substring(1).split("/");
+		// String name = pathel[pathel.length - 1];
+		// nf.closedata();
+		// nf.opendata(name);
+		// String link = getAttr("target");
+		// if (link != null) {
+		// checkedPaths.add(link);
+		// }
+		// } catch (NexusException ne) {
+		// }
 	}
 
 	/*
@@ -328,8 +331,7 @@ public class NexusLoader {
 	 * @param nxclass
 	 * @return
 	 */
-	protected TreeNode makeParameterNode(TreeNode parent, String nxpath,
-			String nxclass) {
+	protected TreeNode makeParameterNode(TreeNode parent, String nxpath, String nxclass) {
 		int dim[], info[], totalLength = 1;
 		TreeNode node = null;
 
@@ -358,7 +360,7 @@ public class NexusLoader {
 			}
 		} catch (NexusException ne) {
 			ne.printStackTrace();
-		} 
+		}
 		return node;
 	}
 
@@ -371,8 +373,7 @@ public class NexusLoader {
 	 * @param dim
 	 * @param info
 	 */
-	protected TreeNode makeSimpleParNode(TreeNode parent, String nxpath,
-			int[] dim, int[] info) {
+	protected TreeNode makeSimpleParNode(TreeNode parent, String nxpath, int[] dim, int[] info) {
 		String name, pathel[];
 		NexusParameter par;
 
@@ -557,8 +558,7 @@ public class NexusLoader {
 		graphics.insertNode(TreeNode.APPEND, mygraph);
 	}
 
-	protected void makeFrameSeriesViewer(TreeNode mygraph, String nxpath,
-			int info[], int dim[]) {
+	protected void makeFrameSeriesViewer(TreeNode mygraph, String nxpath, int info[], int dim[]) {
 		int helpdim[] = new int[1], i, idim;
 		IntValue iv;
 		InternalParameter work;
@@ -568,9 +568,7 @@ public class NexusLoader {
 		mygraph.setProperty("viewer", "mountaingumui.frameseries");
 
 		work = (InternalParameter) TreeUtil.findChild(mygraph, "dim");
-		work
-				.setValue(Integer.toString(dim[1]) + " "
-						+ Integer.toString(dim[2]));
+		work.setValue(Integer.toString(dim[1]) + " " + Integer.toString(dim[2]));
 
 		work = (InternalParameter) TreeUtil.findChild(mygraph, "rank");
 		work.setValue("2");
@@ -600,8 +598,7 @@ public class NexusLoader {
 		oldframe.setProperty("nxpath", nxpath);
 		oldframe.setProperty("type", "command");
 		mygraph.insertNode(TreeNode.APPEND, oldframe);
-		InternalParameter num = (InternalParameter) TreeUtil.findChild(
-				oldframe, "framenumber");
+		InternalParameter num = (InternalParameter) TreeUtil.findChild(oldframe, "framenumber");
 		num.setValue(Integer.toString(dim[0] - 1));
 		oldframe.start();
 
@@ -736,8 +733,7 @@ public class NexusLoader {
 	 * @param mygraph
 	 * @throws NexusException
 	 */
-	protected void makeAxis(String name, String axAttr, TreeNode mygraph)
-			throws NexusException {
+	protected void makeAxis(String name, String axAttr, TreeNode mygraph) throws NexusException {
 		InternalParameter ax = new InternalParameter(mygraph, name);
 		mygraph.insertNode(TreeNode.APPEND, ax);
 		ax.setProperty("type", "axis");
@@ -783,43 +779,101 @@ public class NexusLoader {
 			if (e == null) {
 				return null;
 			}
-			int dim[] = new int[2];
-			dim[0] = e.length;
-			dim[1] = e.type;
-			byte bdata[] = new byte[e.length];
-			nf.getattr(name, bdata, dim);
-			byte byteArr[] = fixTrailingZero(bdata);
-			// Check to see if the attribute is some sort of integer
-			if (e.type > NexusFile.NX_BINARY) {
-				Byte myByte = new Byte(byteArr[0]);
-				long myLong = myByte.longValue();
-				return Long.toString(myLong);
-			}
-			return new String(byteArr);
+			Serializable value = getAttrInSuitableJavaType(name, e.type, e.length);
+			return value.toString();
 		} catch (NexusException ne) {
 			return null;
 		}
 	}
 
-	/**
-	 * This removes trailing zeros from bdata. Trailing zero bytes confuse the
-	 * conversion to string.
-	 * 
-	 * @param bdata
-	 * @return
-	 */
-	private byte[] fixTrailingZero(byte[] bdata) {
-		int i, length = 0;
-		for (i = 0; i < bdata.length; i++) {
-			if (bdata[i] != 0) {
-				length++;
+	private Serializable getAttrInSuitableJavaType(String name, int type, int length) throws NexusException {
+		/*
+		 * add on 1 extra byte for the null in the attribute string hdfdump
+		 * shows that we simply put the attribute using the code:
+		 * file.putattr(name, (String)value.getBytes(), NexusFile.NX_CHAR); but
+		 * the attribute length does not account the byte for the null
+		 */
+
+		if (type == NexusFile.NX_CHAR) {
+			length += 1;
+		}
+
+		int args[] = new int[] { length, type };
+
+		Serializable data = createObjectFromTypeAndLength(type, length);
+
+		nf.getattr(name, data, args);
+
+		// remove the 1 extra bytes added on for the null in the attribute
+		// string
+		if (type == NexusFile.NX_CHAR) {
+			data = Arrays.copyOf((byte[]) data, length - 1);
+			return new String((byte[]) data, nexusCharset);
+		}
+
+		return (Serializable) Array.get(data, 0);
+	}
+
+	private Object getDataInSuitableJavaType(int[] infoDims, int[] infoArgs) throws NexusException {
+		int rank = infoArgs[0];
+		int[] dimensions = new int[rank];
+		for (int i = 0; i < rank; i++) {
+			dimensions[i] = infoDims[i];
+		}
+		int type = infoArgs[1];
+		int totalLength = calcTotalLength(dimensions);
+
+		Serializable data = null;
+		if (totalLength > 0) {
+			data = createObjectFromTypeAndLength(type, totalLength);
+			if (data == null) {
+				throw new NexusException("Nexus type " + Integer.toString(type) + " is not supported");
 			}
+			nf.getdata(data);
 		}
-		byte result[] = new byte[length];
-		for (i = 0; i < length; i++) {
-			result[i] = bdata[i];
+		return data;
+	}
+
+	private Serializable createObjectFromTypeAndLength(int type, int length) {
+		Serializable data = null;
+		switch (type) {
+		case NexusFile.NX_CHAR:
+		case NexusFile.NX_INT8:
+		case NexusFile.NX_UINT8:
+			data = new byte[length];
+			break;
+		case NexusFile.NX_INT16:
+		case NexusFile.NX_UINT16:
+			data = new short[length];
+			break;
+		case NexusFile.NX_INT32:
+		case NexusFile.NX_UINT32:
+			data = new int[length];
+			break;
+		case NexusFile.NX_INT64:
+		case NexusFile.NX_UINT64:
+			data = new long[length];
+			break;
+		case NexusFile.NX_FLOAT32:
+			data = new float[length];
+			break;
+		case NexusFile.NX_FLOAT64:
+			data = new double[length];
+			break;
 		}
-		return result;
+		return data;
+	}
+
+	/**
+	 * @param dimensions
+	 * @return the size of a buffer needed to hold the data in an SDS block
+	 */
+	static public int calcTotalLength(int[] dimensions) {
+		int totalLength = 1;
+		for (int i = 0; i < dimensions.length; i++) {
+			totalLength *= dimensions[i];
+		}
+		return totalLength;
 	}
 
 	/**

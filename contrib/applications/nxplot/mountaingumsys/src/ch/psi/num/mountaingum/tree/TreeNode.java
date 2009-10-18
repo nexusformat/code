@@ -275,4 +275,8 @@ public class TreeNode {
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
 	}
+	@Override
+	public String toString() {
+		return getProperty("name");
+	}
 }
