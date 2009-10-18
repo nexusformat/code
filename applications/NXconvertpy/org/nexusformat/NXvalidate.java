@@ -7,11 +7,13 @@ public class NXvalidate {
   static final String VERSION = "0.1 alpha";
 
   private Vector<String> filenames;
+  private String schematron;
   private boolean keepTemp;
   private int verbose;
 
   NXvalidate() {
     this.filenames = new Vector<String>();
+    this.schematron = new String("");
     this.keepTemp = false;
     this.verbose = 0;
   }
@@ -35,6 +37,9 @@ public class NXvalidate {
         this.verbose += 1;
       } else if (args[i].equals("-k") || args[i].equals("--keep")) {
         this.keepTemp = true;
+      } else if (args[i].equals("-d") || args[i].equals("--dfn")) {
+        this.schematron = args[i+1];
+        i++;
       } else {
         this.filenames.add(args[i]);
       }
@@ -43,6 +48,11 @@ public class NXvalidate {
     // confirm that the manditory arguments are there
     if (this.filenames.size() <= 0) {
       System.out.println("Must specify at least one nexus file");
+      this.printHelp(0);
+      System.exit(-1);
+    }
+    if (this.schematron.length() <= 0) {
+      System.out.println("Must specify a schematron file");
       this.printHelp(0);
       System.exit(-1);
     }
@@ -65,6 +75,10 @@ public class NXvalidate {
     try {
         NXconvert converter = new NXconvert(filename, this.keepTemp, 
                                             this.verbose);
+        NXschematron schematron = new NXschematron(converter.getReducedName(), 
+                                            this.schematron);
+        String result = schematron.validate();
+        System.out.println(result);
     } catch (Exception e) {
       System.out.println("While processing " + filename + " encountered " 
                          + e.toString());
@@ -96,6 +110,7 @@ public class NXvalidate {
     System.out.println();    
     System.out.println("-h, --help    print this help information");
     System.out.println("-v, --verbose increase verbose printing");
+    System.out.println("-d, --dfn     specify the definition file");
     System.out.println("-k, --keep    keep temporary files");
   }
 
