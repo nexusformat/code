@@ -23,6 +23,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.nexusformat.AttributeEntry;
 import org.nexusformat.NexusException;
 import org.nexusformat.NexusFile;
@@ -153,26 +155,25 @@ public class NexusLoader {
 		} catch (NexusException e) {
 			throw new IOException(e);
 		}
+
+		engageMappers();
 	}
 
-	// private NeXusMapper findMapper(FlatNexusFile nf) {
-	// NeXusMapper o;
-	// IConfigurationElement[] decl =
-	// Platform.getExtensionRegistry().getConfigurationElementsFor("ch.psi.num.mountaingum.nexus.loader.NexusMapper");
-	// for(int i = 0; i < decl.length; i++){
-	// IConfigurationElement e = decl[i];
-	// try{
-	// o = (NeXusMapper)e.createExecutableExtension("className");
-	// if(o.isApplicable(nf)){
-	// return o;
-	// }
-	// }catch(CoreException eva){
-	// UIRegistry.getAdapter().displayError("Failed to load class for " +
-	// e.getAttribute("className"));
-	// }
-	// }
-	// return new DefaultNexusMapper();
-	// }
+	private void engageMappers() {
+
+		NeXusMapper mapper;
+		IConfigurationElement[] decl = Platform.getExtensionRegistry().getConfigurationElementsFor(
+				"ch.psi.num.mountaingum.nexus.loader.NexusMapper");
+		for (int i = 0; i < decl.length; i++) {
+			IConfigurationElement e = decl[i];
+			try {
+				mapper = (NeXusMapper) e.createExecutableExtension("class");
+				mapper.transform(root, nf);
+			} catch (Exception eva) {
+				eva.printStackTrace();
+			}
+		}
+	}
 
 	public TreeNode getTree() {
 		NexusTree btv = (NexusTree) RCPUtil.findView(NexusTree.ID);
@@ -312,7 +313,7 @@ public class NexusLoader {
 
 		current = new TreeNode(parent, name);
 		if (type == null) {
-			System.out.println("could not get type for " + nxpath);
+			System.out.println("could not get type for " + nxpath + " you may guess this shouldn't happen");
 			type = "NXwidget";
 		}
 		current.setProperty("type", type);
@@ -353,7 +354,7 @@ public class NexusLoader {
 			if (attr.get("axis") != null) {
 				// ignore: will be picked up when building graph data
 			} else if (attr.get("signal") != null || totalLength > 100) {
-				System.out.println("Making graphnode for " + nxpath);
+				// System.out.println("Making graphnode for " + nxpath);
 				node = makeGraphNode(parent, nxpath);
 			} else {
 				node = makeSimpleParNode(parent, nxpath, dim, info);
@@ -809,10 +810,10 @@ public class NexusLoader {
 			// remove the 1 extra bytes added on for the null in the attribute
 			length -= 1;
 			// remove training zero, if any
-			while (length > 0 && 
-					((Number) Array.get(data, length-1)).intValue() == 0) 
+			while (length > 0 && ((Number) Array.get(data, length - 1)).intValue() == 0)
 				length -= 1;
-			if (length == 0) return "";
+			if (length == 0)
+				return "";
 			data = Arrays.copyOf((byte[]) data, length);
 			return new String((byte[]) data, nexusCharset);
 		}

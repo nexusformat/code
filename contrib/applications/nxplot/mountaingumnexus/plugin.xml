@@ -61,5 +61,13 @@
             name="NameView">
       </view>
    </extension>
+   <extension
+         point="ch.psi.num.mountaingum.nexus.loader.NexusMapper">
+               <view
+            class="ch.psi.num.mountaingum.nexus.loader.NexusMapperDemo"
+            id="mountaingumnexus.NexusMapperDemo"
+            name="NexusMapperDemo">
+      </view>
+   </extension>
 
 </plugin>

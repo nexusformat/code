@@ -39,18 +39,18 @@ public class IconTreeLabelProvider extends TreeLabelProvider {
 					ImageDescriptor iconDes = ImageDescriptor.createFromURL(iconUrl);
 					Image icon = iconDes.createImage(false);
 					if (icon == null) {
-						System.out.println("dishing out default icon for " + type);
+//						System.out.println("dishing out default icon for " + type);
 						icon = defaultIcon;
 					}
 					classToIcon.put(type, icon);
 					return icon;
 				}
 			} else {
-				System.out.println("IconTreeLabelProvider.getColumnImage() type null");
+//				System.out.println("IconTreeLabelProvider.getColumnImage() type null");
 			}
 		}
 
-		System.out.println("dishing out default icon for " + element);
+//		System.out.println("dishing out default icon for " + element);
 
 		Image columnImage = super.getColumnImage(element, columnIndex);
 		return columnImage;
