@@ -16,12 +16,14 @@ public class NXschematron {
 
 	private String fileToValidate; 
 	private String SchematronToUse;
+	private boolean keepTemp;
 	
-	public NXschematron(String ReducedNeXusFilename, String SchematronFilename) {
+	public NXschematron(String ReducedNeXusFilename, String SchematronFilename,
+			final boolean keepTemp) {
 	
 		this.fileToValidate = ReducedNeXusFilename;
 		this.SchematronToUse = SchematronFilename;
-		
+		this.keepTemp = keepTemp;
 	}
 
 	public static void TransformoMatic(String inputFilename,
@@ -67,18 +69,26 @@ public class NXschematron {
 		// Step 1
 		File schematronFile = new File(schematron);
 		File schematron1 = File.createTempFile("schematron", ".step1");
+		if (!this.keepTemp)
+			schematron1.deleteOnExit();
 		TransformoMatic(schematronFile, xslt1File, schematron1);
 
 		// Step 2
 		File schematron2 = File.createTempFile("schematron", ".step2");
+		if (!this.keepTemp)
+			schematron2.deleteOnExit();
 		TransformoMatic(schematron1, xslt2File, schematron2);
 
 		// Step 3
 		File SchemaFile = File.createTempFile("schema", ".xslt");
+		if (!this.keepTemp)
+			SchemaFile.deleteOnExit();
 		TransformoMatic(schematron2, xslt3File, SchemaFile);
 
 		// Now lets validate the actual reduced file.
 		File resultsFile = File.createTempFile("result", ".xml");
+		if (!this.keepTemp)
+			resultsFile.deleteOnExit();
 		TransformoMatic(new File(filename), SchemaFile, resultsFile);
 
 		// Return the filename
@@ -91,7 +101,7 @@ public class NXschematron {
 			return;
 		}
 		try {
-			NXschematron sch = new NXschematron(args[0], args[1]);
+			NXschematron sch = new NXschematron(args[0], args[1], false);
 			String results = sch.validate();
 			System.out.println(results);
 		} catch (Exception e) {

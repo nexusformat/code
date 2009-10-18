@@ -104,7 +104,7 @@ public class NXvalidate {
 
     	// create the validation setup
         NXschematron schematron = new NXschematron(reduced, 
-                                            	   this.schematron);
+                                            this.schematron, this.keepTemp);
         String result = schematron.validate();
 
         // create the report
