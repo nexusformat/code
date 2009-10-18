@@ -256,7 +256,8 @@ class NXSnode implements TreeModel {
 	}
 
 	public boolean isLeaf(Object node) {
-		return (this.children.size() <= 0);
+		NXSnode temp = toNXSnode(node);
+		return (temp.children.size() <= 0);
 	}
 
 	@Override
