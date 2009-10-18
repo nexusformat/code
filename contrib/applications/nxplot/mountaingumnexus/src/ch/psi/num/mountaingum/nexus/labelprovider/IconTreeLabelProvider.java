@@ -36,7 +36,11 @@ public class IconTreeLabelProvider extends TreeLabelProvider {
 					URL iconUrl = getClass().getResource("icons/"+type+".gif");
 					ImageDescriptor iconDes = ImageDescriptor.createFromURL(iconUrl);
 					Image icon = iconDes.createImage(false);
-					if (icon == null) icon = defaultIcon;
+					if (icon == null) {
+						System.out
+								.println("dishing out default icon for "+type);
+						icon = defaultIcon;
+					}
 					classToIcon.put(type, icon);
 					return icon;
 				}
