@@ -2,6 +2,7 @@ package org.nexusformat;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,7 +15,7 @@ import org.xml.sax.SAXException;
 
 class Report {
 	NXSnode report;
-	int numErrors;
+	Vector<SVRLitem> errors;
 
 	private static String NXROOT = "NXroot";
 	private static String SVRLROOT = "svrl:schematron-output";
@@ -27,17 +28,33 @@ class Report {
 
 		// add the svrl report to the reduced
 		Document svrlDoc = parse(report);
-		this.numErrors = this.report.addSVRL(getSVRLroot(svrlDoc));
-
-		this.report.printTree();
+		this.errors = this.report.addSVRL(getSVRLroot(svrlDoc));
 	}
 
 	public int numErrors() {
-		return this.numErrors;
+		return this.errors.size();
 	}
 
-	public NXSnode getReport() {
+	public Vector<SVRLitem> getReport() {
+		return this.errors;
+	}
+
+	public void printReport() {
+		int size = this.numErrors();
+		for (int i = 0; i < size; i++) {
+			System.out.println(this.errors.get(i));
+			if (i + 1 < size) {
+				System.out.println("----------");
+			}
+		}
+	}
+
+	public NXSnode getTree() {
 		return this.report;
+	}
+
+	public void printTree() {
+		this.report.printTree();
 	}
 	
 	static private Node getNXroot(final Document doc) {
@@ -65,22 +82,5 @@ class Report {
 		DocumentBuilder builder
 		            = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		return builder.parse(file);
-	}
-	
-	static private void print(final Document doc) {
-		NodeList nodes = doc.getChildNodes();
-		int size = nodes.getLength();
-		for (int i = 0; i < size; i++) {
-			print(nodes.item(i));
-		}
-	}
-
-	static private void print(final Node node) {
-		System.out.println(node);
-		NodeList nodes = node.getChildNodes();
-		int size = nodes.getLength();
-		for (int i = 0; i < size; i++) {
-			print(nodes.item(i));
-		}
 	}
 }

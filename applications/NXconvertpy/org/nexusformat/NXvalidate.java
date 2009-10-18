@@ -100,6 +100,15 @@ public class NXvalidate {
 
         // create the report
         Report report = new Report(reduced, result);
+        System.out.println("===== Tree");
+        report.printTree();
+        int numErrors = report.numErrors();
+        if (numErrors > 0) {
+        	System.out.println("===== Report");
+        	report.printReport();
+        }
+        System.out.println("===== Found " + report.numErrors() + " errors");
+
         System.out.println(result);
     } catch (Exception e) {
       System.out.println("While processing " + filename + " encountered " 

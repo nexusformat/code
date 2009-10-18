@@ -23,6 +23,16 @@ public class SVRLitem {
 		this.setMessage(node);
 	}
 
+	public String toString() {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(this.test + " failed at " + this.getLocation());
+		if (this.message.length() > 0) {
+			buffer.append("\n");
+			buffer.append(this.message);
+		}
+		return buffer.toString();
+	}
+
 	Vector<String> getLocationArray() {
 		Vector<String> result = new Vector<String>();
 		for (int i = 0; i < this.location.length; i++) {
@@ -38,6 +48,10 @@ public class SVRLitem {
 			buffer.append(item);
 		}
 		return buffer.toString();
+	}
+
+	public String getType() {
+		return this.type;
 	}
 
 	public String getTest() {
