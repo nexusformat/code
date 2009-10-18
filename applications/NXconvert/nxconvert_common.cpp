@@ -34,7 +34,7 @@
 #include "nxconvert_common.h"
 
 static int WriteGroup (int is_definition);
-static int WriteAttributes (int is_definition);
+static int WriteAttributes (int is_definition, int is_group);
 
 #define MAX_LINKS 1024
 struct link_to_make
@@ -103,7 +103,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    }
 
 /* Output global attributes */
-   if (WriteAttributes (nx_is_definition) != NX_OK)
+   if (WriteAttributes (nx_is_definition, 1) != NX_OK)
    {
 	return NX_ERROR;
    }
@@ -175,7 +175,7 @@ static int WriteGroup (int is_definition)
 	    {
                 if (NXmakegroup (outId, name, nxclass) != NX_OK) return NX_ERROR;
                 if (NXopengroup (outId, name, nxclass) != NX_OK) return NX_ERROR;
-                if (WriteAttributes (is_definition) != NX_OK) return NX_ERROR;
+                if (WriteAttributes (is_definition, 1) != NX_OK) return NX_ERROR;
 		if (is_definition && !strcmp(nxclass, "NXentry"))
 		{
 		    if (definition_name != NULL)
@@ -220,7 +220,7 @@ static int WriteGroup (int is_definition)
                 if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
                 if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
                 if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
-                if (WriteAttributes (is_definition) != NX_OK) return NX_ERROR;
+                if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
                 if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
                 if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
                 if (NXclosedata (outId) != NX_OK) return NX_ERROR;
@@ -246,17 +246,22 @@ static int WriteGroup (int is_definition)
    return NX_OK;
 }
 
-static int WriteAttributes (int is_definition)
+static int WriteAttributes (int is_definition, int is_group)
 {
    int status, i, attrLen, attrType;
    NXname attrName;
    void *attrBuffer;
+   int found_napitype = 0;
 
    i = 0;
    do {
       status = NXgetnextattr (inId, attrName, &attrLen, &attrType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
+         if (strcmp(attrName, "NAPItype") == 0)
+	 {
+		found_napitype = 1;
+	 }
          if (strcmp(attrName, "NeXus_version") && strcmp(attrName, "XML_version") &&
              strcmp(attrName, "HDF_version") && strcmp(attrName, "HDF5_Version") && 
              strcmp(attrName, "file_name") && strcmp(attrName, "file_time")) {
@@ -269,6 +274,13 @@ static int WriteAttributes (int is_definition)
          i++;
       }
    } while (status != NX_EOD);
+   // if we are creating a reduced file for definiiton purposes,
+   // make sure we always have a NAPItype attribute
+   if (is_definition && !is_group && !found_napitype)
+   {
+       // need to be cleverer - cannot do this
+       //if (NXputattr (outId, "NAPItype", (void*)"NX_CHAR", strlen("NX_CHAR"), NX_CHAR) != NX_OK) return NX_ERROR;
+   }
    return NX_OK;
 }
 
