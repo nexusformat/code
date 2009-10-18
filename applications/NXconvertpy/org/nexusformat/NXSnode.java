@@ -11,11 +11,13 @@ import org.w3c.dom.NodeList;
 class NXSnode {
 	private static final String PADDING = "  ";
 	private static final String SDS = "SDS";
+	private static final Logger LOG = Logger.getInstance();
 
 	private String name;
 	private String nxclass;
 	private Map<String, String> attrs;
 	private Vector<NXSnode> children;
+	private SVRLitem svrl;
 
 	NXSnode(final Node node) {
 		this.nxclass  = node.getNodeName();
@@ -27,6 +29,70 @@ class NXSnode {
 		this.children = new Vector<NXSnode>();
 		for (int i = 0; i < size; i++) {
 			this.addChild(nodes.item(i));
+		}
+		this.svrl = null;
+	}
+
+	void addSVRL(final Node svrl) {
+		// generate a list of xml error nodes
+		Vector<Node> errors = new Vector<Node>();
+		addSVRL(svrl, errors);
+
+		// convert it to java classes
+		Vector<SVRLitem> items = new Vector<SVRLitem>();
+		for (Node node: errors) {
+			items.add(new SVRLitem(node));
+		}
+
+		// find the appropriate nodes to attach it to
+		NXSnode nxsnode;
+		for (SVRLitem item: items) {
+			nxsnode = getNode(this, item.getLocationArray(), 1);
+			nxsnode.svrl = item;
+		}
+	}
+
+	private static NXSnode getNode(NXSnode parent, Vector<String> location,
+			int depth) {
+		// chop up this part of the path to be useful
+		String partPath = location.get(depth);
+		int left = partPath.indexOf("[");
+		int right = partPath.indexOf("]", left);
+		String name = partPath.substring(0, left);
+		int index = Integer.parseInt(partPath.substring(left + 1, right)) - 1;
+		LOG.info("Looking for " + name + "[" + index + "]");
+
+		// get the options
+		Vector<NXSnode> choices = new Vector<NXSnode>();
+		for (NXSnode child: parent.children) {
+			System.out.println("*****" + child);
+			if (child.getType().equals(name)) {
+				choices.add(child);
+			}
+		}
+
+		// pick which one to return
+		int numChoice = choices.size();
+		LOG.info("Found " + numChoice + " options");
+		if ((numChoice <= 0) || (numChoice < index)){
+			throw new Error("Failed to find \"" + partPath + "\" in " + parent);
+		}
+		if (depth == location.size()) {
+			return choices.get(index);
+		} else {
+			return getNode(choices.get(index), location, depth + 1);
+		}
+	}
+
+	private static void addSVRL(final Node node, final Vector<Node> errors) {
+		if (SVRLitem.hasLocation(node)) {
+			errors.add(node);
+			return;
+		}
+		NodeList nodes = node.getChildNodes();
+		int size = nodes.getLength();
+		for (int i = 0; i < size; i++) {
+			addSVRL(nodes.item(i), errors);
 		}
 	}
 
@@ -45,7 +111,6 @@ class NXSnode {
 	void setAttr(final String name, final String value) {
 		if (name.equals("name")) {
 			this.name = value;
-			this.nxclass = SDS;
 		}
 		else if (name.equals("NAPItype")) {
 			this.name = this.nxclass;
@@ -75,8 +140,17 @@ class NXSnode {
 		return this.nxclass;
 	}
 
+	boolean hasError() {
+		return (this.svrl != null);
+	}
+
 	public String toString() {
-		return this.name + ":" + this.nxclass;
+		String result = this.name + ":" + this.nxclass;
+		if (this.hasError()) {
+			return result + "*";
+		} else {
+			return result;
+		}
 	}
 
 	public void printTree() {

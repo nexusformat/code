@@ -13,29 +13,42 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 class Report {
-	Document reduced;
-	Document report;
-	private static String RED_ROOT = "NXroot";
+	NXSnode report;
+
+	private static String NXROOT = "NXroot";
+	private static String SVRLROOT = "svrl:schematron-output";
 
 	Report(final String reduced, final String report)
 	            throws ParserConfigurationException, SAXException, IOException {
-		this.reduced = parse(reduced);
-		this.report = parse(report);
-		
-		//print(this.report);
-		NXSnode node = new NXSnode(getNXroot(this.reduced));
-		node.printTree();
+		// parse the reduced file and turn it into a node tree
+		Document redDoc = parse(reduced);
+		this.report = new NXSnode(getNXroot(redDoc));
+		this.report.printTree();
+
+		// add the svrl report to the reduced
+		Document svrlDoc = parse(report);
+		this.report.addSVRL(getSVRLroot(svrlDoc));
 	}
 	
 	static private Node getNXroot(final Document doc) {
-		NodeList nodes = doc.getElementsByTagName(RED_ROOT);
+		NodeList nodes = doc.getElementsByTagName(NXROOT);
 		int size = nodes.getLength();
 		if (size == 1) {
 			return nodes.item(0);
 		}
-		throw new Error("Failed to find one NXroot (found " + size + ")");
+		throw new Error("Failed to find one " + NXROOT + " (found " + size
+				        + ")");
 	}
-	
+
+	static private Node getSVRLroot(final Document doc) {
+		NodeList nodes = doc.getElementsByTagName(SVRLROOT);
+		int size = nodes.getLength();
+		if (size == 1) {
+			return nodes.item(0);
+		}
+		throw new Error("Failed to find one " + SVRLROOT + " (found " + size
+				        + ")");
+	}
 	static private Document parse(final String filename)
 	            throws ParserConfigurationException, SAXException, IOException {
 		File file = new File(filename);

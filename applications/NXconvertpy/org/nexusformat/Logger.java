@@ -20,7 +20,7 @@ final class Logger {
 	}
 
 	private void println(final String message, final int level) {
-		if (level > this.level) {
+		if (level >= this.level) {
 			System.out.println(message);
 		}
 	}
