@@ -23,11 +23,12 @@ class Report {
 		// parse the reduced file and turn it into a node tree
 		Document redDoc = parse(reduced);
 		this.report = new NXSnode(getNXroot(redDoc));
-		this.report.printTree();
 
 		// add the svrl report to the reduced
 		Document svrlDoc = parse(report);
 		this.report.addSVRL(getSVRLroot(svrlDoc));
+
+		this.report.printTree();
 	}
 	
 	static private Node getNXroot(final Document doc) {

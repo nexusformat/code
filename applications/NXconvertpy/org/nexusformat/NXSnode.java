@@ -17,7 +17,7 @@ class NXSnode {
 	private String nxclass;
 	private Map<String, String> attrs;
 	private Vector<NXSnode> children;
-	private SVRLitem svrl;
+	private Vector<SVRLitem> svrl;
 
 	NXSnode(final Node node) {
 		this.nxclass  = node.getNodeName();
@@ -30,7 +30,7 @@ class NXSnode {
 		for (int i = 0; i < size; i++) {
 			this.addChild(nodes.item(i));
 		}
-		this.svrl = null;
+		this.svrl = new Vector<SVRLitem>();
 	}
 
 	void addSVRL(final Node svrl) {
@@ -48,40 +48,54 @@ class NXSnode {
 		NXSnode nxsnode;
 		for (SVRLitem item: items) {
 			nxsnode = getNode(this, item.getLocationArray(), 1);
-			nxsnode.svrl = item;
+			nxsnode.svrl.add(item);
 		}
 	}
 
 	private static NXSnode getNode(NXSnode parent, Vector<String> location,
 			int depth) {
 		// chop up this part of the path to be useful
+		if (location.size() <= depth) {
+			return parent;
+		}
 		String partPath = location.get(depth);
 		int left = partPath.indexOf("[");
 		int right = partPath.indexOf("]", left);
 		String name = partPath.substring(0, left);
 		int index = Integer.parseInt(partPath.substring(left + 1, right)) - 1;
-		LOG.info("Looking for " + name + "[" + index + "]");
+		LOG.debug("Looking for " + name + "[" + index + "]");
 
 		// get the options
 		Vector<NXSnode> choices = new Vector<NXSnode>();
 		for (NXSnode child: parent.children) {
-			System.out.println("*****" + child);
-			if (child.getType().equals(name)) {
+			if (equals(child.getType(), name)) {
+				choices.add(child);
+			} else if (equals(child.getName(), name)) {
 				choices.add(child);
 			}
 		}
 
 		// pick which one to return
 		int numChoice = choices.size();
-		LOG.info("Found " + numChoice + " options");
+		LOG.debug("Found " + numChoice + " options");
 		if ((numChoice <= 0) || (numChoice < index)){
-			throw new Error("Failed to find \"" + partPath + "\" in " + parent);
+			return parent;
 		}
-		if (depth == location.size()) {
+		if (depth >= location.size()) {
 			return choices.get(index);
 		} else {
 			return getNode(choices.get(index), location, depth + 1);
 		}
+	}
+
+	private static boolean equals(final String left, final String right) {
+		if (left == null) {
+			return false;
+		}
+		if (right == null) {
+			return false;
+		}
+		return left.equals(right);
 	}
 
 	private static void addSVRL(final Node node, final Vector<Node> errors) {
@@ -111,12 +125,14 @@ class NXSnode {
 	void setAttr(final String name, final String value) {
 		if (name.equals("name")) {
 			this.name = value;
-		}
-		else if (name.equals("NAPItype")) {
+		} else if (name.equals("NAPItype")) {
 			this.name = this.nxclass;
 			this.nxclass = SDS;
-		}
-		else {
+		} else if (name.equals("target")) {
+			this.name = this.nxclass;
+			this.nxclass = null;
+			this.attrs.put(name, value);
+		} else {
 			this.attrs.put(name, value);
 		}
 	}
@@ -141,7 +157,7 @@ class NXSnode {
 	}
 
 	boolean hasError() {
-		return (this.svrl != null);
+		return (this.svrl.size() > 0);
 	}
 
 	public String toString() {
