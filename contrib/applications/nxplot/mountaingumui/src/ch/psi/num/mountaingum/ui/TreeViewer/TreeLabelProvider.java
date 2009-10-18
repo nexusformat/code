@@ -36,7 +36,7 @@ public class TreeLabelProvider implements ITableLabelProvider, IColorProvider {
 	private ImageDescriptor lock;
 	private Image lockImage;
 	
-	TreeLabelProvider(){
+	protected TreeLabelProvider(){
 		URL ulli = Platform.getBundle("mountaingumui").getEntry("icons/lock-icon.png");
 		lock = ImageDescriptor.createFromURL(ulli);
 		lockImage = null;

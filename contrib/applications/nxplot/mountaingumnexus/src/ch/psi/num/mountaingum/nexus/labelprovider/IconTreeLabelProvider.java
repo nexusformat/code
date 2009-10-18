@@ -1,4 +1,4 @@
-package ch.psi.num.mountaingum.ui.TreeViewer;
+package ch.psi.num.mountaingum.nexus.labelprovider;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 import ch.psi.num.mountaingum.tree.TreeNode;
+import ch.psi.num.mountaingum.ui.TreeViewer.TreeLabelProvider;
 
 public class IconTreeLabelProvider extends TreeLabelProvider {
 
