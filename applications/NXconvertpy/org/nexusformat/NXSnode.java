@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-class NXSnode {
+class NXSnode implements TreeModel {
 	private static final String PADDING = "  ";
 	private static final String SDS = "SDS";
 	private static final Logger LOG = Logger.getInstance();
@@ -181,5 +185,89 @@ class NXSnode {
 		for (NXSnode node: this.children) {
 			node.printTree(padding);
 		}
+	}
+
+	public boolean equals(final Object other) {
+		// do the simple checks
+		if (this == other)
+			return true;
+		if (other == null)
+			return false;
+		if (!(other instanceof NXSnode))
+			return false;
+
+		// cast and do deep comparison
+		NXSnode temp = (NXSnode) other;
+		if (!this.name.equals(temp.name))
+			return false;
+		if (!this.nxclass.equals(temp.nxclass))
+			return false;
+		if (!this.attrs.equals(temp.attrs))
+			return false;
+		if (!this.children.equals(temp.children))
+			return false;
+		if (!this.svrl.equals(temp.svrl))
+			return false;
+
+		// this far must be ok
+		return true;
+	}
+
+	private static NXSnode toNXSnode(final Object object) {
+		if (object == null) {
+			throw new Error("Cannot convert null object to NXSnode");
+		}
+		if (!(object instanceof NXSnode)) {
+			throw new Error("Cannot convert \"" + object + "\"  to NXSnode");
+		}
+		return (NXSnode) object;
+	}
+
+	// ---------------- TreeModel requirements
+	@Override
+	public void addTreeModelListener(TreeModelListener l) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Object getChild(Object parent, int index) {
+		NXSnode temp = toNXSnode(parent);
+		return temp.children.get(index);
+	}
+
+	public int getChildCount(Object parent) {
+		NXSnode temp = toNXSnode(parent);
+		return temp.children.size();
+	}
+
+	public int getIndexOfChild(Object parent, Object child) {
+		if (parent == null)
+			return -1;
+		if (child == null)
+			return -1;
+		NXSnode myParent = toNXSnode(parent);
+		NXSnode myChild = toNXSnode(child);
+
+		return myParent.children.indexOf(myChild);
+	}
+
+	public Object getRoot() {
+		return this;
+	}
+
+	public boolean isLeaf(Object node) {
+		return (this.children.size() <= 0);
+	}
+
+	@Override
+	public void removeTreeModelListener(TreeModelListener l) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void valueForPathChanged(TreePath path, Object newValue) {
+		// TODO Auto-generated method stub
+		
 	}
 }
