@@ -83,6 +83,7 @@ public class NXvalidate {
       System.out.println("Validating " + filename);
     }
     try {
+    	// reduce the nexus file
     	String reduced = "";
     	if (this.convertNxs) {
     		NXconvert converter = new NXconvert(filename, this.keepTemp, 
@@ -91,9 +92,14 @@ public class NXvalidate {
     	} else {
     		reduced = toAbsFile(filename);
     	}
+
+    	// create the validation setup
         NXschematron schematron = new NXschematron(reduced, 
                                             	   this.schematron);
         String result = schematron.validate();
+
+        // create the report
+        Report report = new Report(reduced, result);
         System.out.println(result);
     } catch (Exception e) {
       System.out.println("While processing " + filename + " encountered " 
