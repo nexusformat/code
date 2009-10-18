@@ -17,6 +17,8 @@
 //*****************************************************************************
 #include <fcntl.h>
 #include <stdlib.h>
+#include <cstdio>
+#include <cstring>
 
 #include "base.h"
 #include "membuf.h"
@@ -540,7 +542,7 @@ void FileName::MkDir(mode_t mode, uid_t uid, gid_t gid) const
     p = const_cast<char*>(strchr(PSZ(str), SEP_PATH));
   }
 #else
-  p = strchr(PSZ(str), SEP_PATH);
+  p = const_cast<char*>(strchr(PSZ(str), SEP_PATH));
 #endif
 
   if( !p )

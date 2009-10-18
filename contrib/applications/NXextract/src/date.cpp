@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <cstring>
 
 #if defined(WIN32)
   #include <sys\timeb.h>

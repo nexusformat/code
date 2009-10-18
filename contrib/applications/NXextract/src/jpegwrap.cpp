@@ -7,6 +7,10 @@
 //
 //*****************************************************************************
 
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+
 #include "base.h"
 #include "file.h"
 #include "membuf.h"

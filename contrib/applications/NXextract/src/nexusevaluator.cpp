@@ -21,9 +21,11 @@
 #include "nxfile.h"
 #include "membuf.h"
 #include "nexusevaluator.h"
+#include <sstream>
+#include <cstring>
+#include <cstdlib>
 #include "extractor.h"
 #include "templateparsor.h"
-#include <sstream>
 
 // special attributes
 const char SIZE_ATTR[] = "_size_";

@@ -14,6 +14,9 @@
 // FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //
 //*****************************************************************************
+//
+#include <cstdio>
+#include <cstdlib>
 
 #include "base.h"
 #include "file.h"

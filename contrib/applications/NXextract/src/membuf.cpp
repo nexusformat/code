@@ -20,7 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include <cstring>
 #include "membuf.h"
 
 using namespace soleil;
