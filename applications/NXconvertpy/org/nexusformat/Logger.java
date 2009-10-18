@@ -3,7 +3,7 @@ package org.nexusformat;
 final class Logger {
 	private static final Logger logger = new Logger();
 
-	private int level;
+	private static int loggingLevel;
 	
 	public static final int TRACE = 0;
 	public static final int DEBUG = 1;
@@ -12,7 +12,11 @@ final class Logger {
 	public static final int ERROR = 4;
 
 	private Logger() {
-		this.level = INFO;
+		loggingLevel = INFO;
+	}
+
+	public static void setLevel(final int level) {
+		loggingLevel = level;
 	}
 
 	static Logger getInstance() {
@@ -20,7 +24,7 @@ final class Logger {
 	}
 
 	private void println(final String message, final int level) {
-		if (level >= this.level) {
+		if (level >= loggingLevel) {
 			System.out.println(message);
 		}
 	}

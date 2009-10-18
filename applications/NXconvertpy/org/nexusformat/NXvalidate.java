@@ -49,6 +49,7 @@ public class NXvalidate {
         this.filenames.add(args[i]);
       }
     }
+    this.setLoggingLevel();
 
     // confirm that the manditory arguments are there
     if (this.filenames.size() <= 0) {
@@ -63,6 +64,15 @@ public class NXvalidate {
     }
   }
 
+  void setLoggingLevel() {
+	  if (this.verbose == 1)
+		  Logger.setLevel(Logger.INFO);
+	  else if (this.verbose == 2)
+		  Logger.setLevel(Logger.DEBUG);
+	  else if (this.verbose > 2)
+		  Logger.setLevel(Logger.TRACE);
+  }
+  
   void process() {
     if (this.verbose > 0) {
       System.out.println("Running NXvalidate (version:"+VERSION+")");
@@ -86,8 +96,7 @@ public class NXvalidate {
     	// reduce the nexus file
     	String reduced = "";
     	if (this.convertNxs) {
-    		NXconvert converter = new NXconvert(filename, this.keepTemp, 
-    			 	                            this.verbose);
+    		NXconvert converter = new NXconvert(filename, this.keepTemp);
     		reduced = converter.convert();
     	} else {
     		reduced = toAbsFile(filename);

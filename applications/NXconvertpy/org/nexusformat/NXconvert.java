@@ -6,11 +6,12 @@ import java.io.IOException;
 class NXconvert {
   private static final String NXCONVERT = "nxconvert";
   public static final String EXTENSION = ".reduced";
+  private static final Logger LOG = Logger.getInstance();
+
   private File rawfile;
   private File redfile;
-  private int verbose;
 
-  NXconvert(final String filename, final boolean keepTemp, final int verbose)
+  NXconvert(final String filename, final boolean keepTemp)
                                    throws IOException, InterruptedException {
     this.rawfile = new File(filename);
     this.redfile = File.createTempFile(this.rawfile.getName() + ".",
@@ -18,26 +19,17 @@ class NXconvert {
     if (!keepTemp) {
       this.redfile.deleteOnExit();
     }
-    this.verbose = verbose;
   }
   
   private void printStd(final String command, final String out,
                         final String err) {
-    if (this.verbose > 1) {
-      System.out.println(command);
-      if (out.length() > 0) {
-        System.out.print(out);
-      }
-      if (err.length() > 0) {
-        System.out.print(err);
-      }
-    }
+	  LOG.info(command);
+	  LOG.info(out);
+	  LOG.warn(err);
   }
 
   String convert() throws IOException, InterruptedException {
-    if (verbose > 0) {
-      System.out.println("Creating " + this.redfile.getAbsolutePath());
-    }
+	  LOG.info("Creating " + this.redfile.getAbsolutePath());
 
     // the command to run
     String command = NXCONVERT + " -d " + this.rawfile + " " + this.redfile;
@@ -66,12 +58,13 @@ class NXconvert {
   }
   
   public static void main(String[] args) {
+	  Logger.setLevel(Logger.DEBUG);
     if (args.length != 1) {
-      System.out.println("Must specify one input file");
+    	LOG.error("Must specify one input file");
       return;
     }
     try {
-      NXconvert convert = new NXconvert(args[0], false, 1);
+      NXconvert convert = new NXconvert(args[0], false);
       convert.convert();
     } catch (Exception e) {
       e.printStackTrace();
