@@ -75,8 +75,9 @@ public class NXvalidate {
     try {
         NXconvert converter = new NXconvert(filename, this.keepTemp, 
                                             this.verbose);
-        NXschematron schematron = new NXschematron(converter.getReducedName(), 
-                                            this.schematron);
+        String reduced = converter.convert();
+        NXschematron schematron = new NXschematron(reduced, 
+                                            	   this.schematron);
         String result = schematron.validate();
         System.out.println(result);
     } catch (Exception e) {

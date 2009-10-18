@@ -19,13 +19,8 @@ class NXconvert {
       this.redfile.deleteOnExit();
     }
     this.verbose = verbose;
-    this.convert();
   }
   
-  String getReducedName() {
-    return this.redfile.getAbsolutePath();
-  }
-
   private void printStd(final String command, final String out,
                         final String err) {
     if (this.verbose > 1) {
@@ -39,7 +34,7 @@ class NXconvert {
     }
   }
 
-  void convert() throws IOException, InterruptedException {
+  String convert() throws IOException, InterruptedException {
     if (verbose > 0) {
       System.out.println("Creating " + this.redfile.getAbsolutePath());
     }
@@ -67,6 +62,7 @@ class NXconvert {
       buffer.append(exitValue);
       throw new IOException(buffer.toString());
     }
+    return this.redfile.getAbsolutePath();
   }
   
   public static void main(String[] args) {
@@ -76,6 +72,7 @@ class NXconvert {
     }
     try {
       NXconvert convert = new NXconvert(args[0], false, 1);
+      convert.convert();
     } catch (Exception e) {
       e.printStackTrace();
     }
