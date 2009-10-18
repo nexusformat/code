@@ -14,8 +14,14 @@ import javax.xml.transform.stream.StreamSource;
 
 public class NXschematron {
 
-	public NXschematron() {
-
+	private String fileToValidate; 
+	private String SchematronToUse;
+	
+	public NXschematron(String ReducedNeXusFilename, String SchematronFilename) {
+	
+		this.fileToValidate = ReducedNeXusFilename;
+		this.SchematronToUse = SchematronFilename;
+		
 	}
 
 	public static void TransformoMatic(String inputFilename,
@@ -45,6 +51,10 @@ public class NXschematron {
 	protected String schematronxslt[] = new String[] { "iso_dsdl_include.xsl",
 			"iso_abstract_expand.xsl", "iso_svrl_for_xslt2.xsl" };
 
+	String validate() throws IOException, TransformerException {
+		return this.validate(this.fileToValidate, this.SchematronToUse);
+	}
+	
 	String validate(String filename, String schematron) throws IOException,
 			TransformerException {
 
