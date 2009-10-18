@@ -90,8 +90,8 @@ public class NXschematron {
 			return;
 		}
 		try {
-			NXschematron sch = new NXschematron();
-			String results = sch.validate(args[0], args[1]);
+			NXschematron sch = new NXschematron(args[0], args[1]);
+			String results = sch.validate();
 			System.out.println(results);
 		} catch (Exception e) {
 			e.printStackTrace();
