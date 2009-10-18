@@ -1,5 +1,6 @@
 package org.nexusformat;
 
+import java.io.File;
 import java.util.Vector;
 
 public class NXvalidate {
@@ -9,12 +10,14 @@ public class NXvalidate {
   private Vector<String> filenames;
   private String schematron;
   private boolean keepTemp;
+  private boolean convertNxs;
   private int verbose;
 
   NXvalidate() {
     this.filenames = new Vector<String>();
     this.schematron = new String("");
     this.keepTemp = false;
+    this.convertNxs = true;
     this.verbose = 0;
   }
 
@@ -40,6 +43,8 @@ public class NXvalidate {
       } else if (args[i].equals("-d") || args[i].equals("--dfn")) {
         this.schematron = args[i+1];
         i++;
+      } else if (args[i].equals("--noconvert")) {
+    	  this.convertNxs = false;
       } else {
         this.filenames.add(args[i]);
       }
@@ -68,14 +73,24 @@ public class NXvalidate {
     }
   }
 
+  private static String toAbsFile(final String filename) {
+	  File file = new File(filename);
+	  return file.getAbsolutePath();
+  }
+  
   private int process(final String filename) {
     if (this.verbose > 0) {
       System.out.println("Validating " + filename);
     }
     try {
-        NXconvert converter = new NXconvert(filename, this.keepTemp, 
-                                            this.verbose);
-        String reduced = converter.convert();
+    	String reduced = "";
+    	if (this.convertNxs) {
+    		NXconvert converter = new NXconvert(filename, this.keepTemp, 
+    			 	                            this.verbose);
+    		reduced = converter.convert();
+    	} else {
+    		reduced = toAbsFile(filename);
+    	}
         NXschematron schematron = new NXschematron(reduced, 
                                             	   this.schematron);
         String result = schematron.validate();
@@ -113,6 +128,7 @@ public class NXvalidate {
     System.out.println("-v, --verbose increase verbose printing");
     System.out.println("-d, --dfn     specify the definition file");
     System.out.println("-k, --keep    keep temporary files");
+    System.out.println("--noconvert   do not reduce the nexus file");
   }
 
   public static void main(String[] args) {
