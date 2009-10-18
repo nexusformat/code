@@ -29,7 +29,7 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I/usr/include/readline
 AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 
 EXTRA_DIST=SConscript
@@ -42,7 +42,7 @@ bin_PROGRAMS = nxbrowse $(F90_TARGETS)
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
-nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ -lreadline -lhistory $(LDFLAGS)
 
 NXbrowse90_SOURCES = NXbrowse90.f90
 NXbrowse90_LDADD = $(LIBNEXUS90)
