@@ -217,7 +217,12 @@ int main(int argc, char *argv[])
 
    rl_readline_name = "NXbrowse";
    rl_attempted_completion_function = nxbrowse_complete;
+#if READLINE_VERSION >= 0x500
    rl_catch_signals = 0;
+#else
+#define rl_crlf() fprintf(rl_outstream, "\r\n");
+#define rl_on_new_line() 1
+#endif
    using_history();
 
    printf ("NXBrowse %s Copyright (C) 2009 NeXus Data Format\n", NEXUS_VERSION);
