@@ -33,7 +33,7 @@ class NXSnode {
 		this.svrl = new Vector<SVRLitem>();
 	}
 
-	void addSVRL(final Node svrl) {
+	int addSVRL(final Node svrl) {
 		// generate a list of xml error nodes
 		Vector<Node> errors = new Vector<Node>();
 		addSVRL(svrl, errors);
@@ -50,6 +50,8 @@ class NXSnode {
 			nxsnode = getNode(this, item.getLocationArray(), 1);
 			nxsnode.svrl.add(item);
 		}
+
+		return items.size();
 	}
 
 	private static NXSnode getNode(NXSnode parent, Vector<String> location,

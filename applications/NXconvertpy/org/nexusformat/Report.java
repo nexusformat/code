@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 
 class Report {
 	NXSnode report;
+	int numErrors;
 
 	private static String NXROOT = "NXroot";
 	private static String SVRLROOT = "svrl:schematron-output";
@@ -26,9 +27,17 @@ class Report {
 
 		// add the svrl report to the reduced
 		Document svrlDoc = parse(report);
-		this.report.addSVRL(getSVRLroot(svrlDoc));
+		this.numErrors = this.report.addSVRL(getSVRLroot(svrlDoc));
 
 		this.report.printTree();
+	}
+
+	public int numErrors() {
+		return this.numErrors;
+	}
+
+	public NXSnode getReport() {
+		return this.report;
 	}
 	
 	static private Node getNXroot(final Document doc) {
