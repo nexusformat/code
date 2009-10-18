@@ -6,7 +6,6 @@ import java.io.IOException;
 class NXconvert {
   private static final String NXCONVERT = "nxconvert";
   public static final String EXTENSION = ".reduced";
-  private String command;
   private File rawfile;
   private File redfile;
   private int verbose;
