@@ -804,10 +804,16 @@ public class NexusLoader {
 
 		nf.getattr(name, data, args);
 
-		// remove the 1 extra bytes added on for the null in the attribute
 		// string
 		if (type == NexusFile.NX_CHAR) {
-			data = Arrays.copyOf((byte[]) data, length - 1);
+			// remove the 1 extra bytes added on for the null in the attribute
+			length -= 1;
+			// remove training zero, if any
+			while (length > 0 && 
+					((Number) Array.get(data, length-1)).intValue() == 0) 
+				length -= 1;
+			if (length == 0) return "";
+			data = Arrays.copyOf((byte[]) data, length);
 			return new String((byte[]) data, nexusCharset);
 		}
 
