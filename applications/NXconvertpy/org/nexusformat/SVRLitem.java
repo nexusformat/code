@@ -14,7 +14,6 @@ public class SVRLitem {
 
 	public SVRLitem(final Node node) {
 		this.setLocation(node);
-		System.out.println(this.getLocation());
 	}
 
 	Vector<String> getLocationArray() {
