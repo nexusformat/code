@@ -5,6 +5,7 @@ import java.io.IOException;
 
 class NXconvert {
   private static final String NXCONVERT = "nxconvert";
+  public static final String EXTENSION = ".reduced";
   private String command;
   private File rawfile;
   private File redfile;
@@ -14,7 +15,7 @@ class NXconvert {
                                    throws IOException, InterruptedException {
     this.rawfile = new File(filename);
     this.redfile = File.createTempFile(this.rawfile.getName() + ".",
-                                       ".reduced");
+                                       EXTENSION);
     if (!keepTemp) {
       this.redfile.deleteOnExit();
     }
