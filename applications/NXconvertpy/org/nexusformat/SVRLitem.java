@@ -34,6 +34,10 @@ public class SVRLitem {
 		return buffer.toString();
 	}
 
+	public String getMessage() {
+		return "Stuff is wrong";
+	}
+
 	private void setLocation(final Node node) {
 		// deal with the root splitting
 		this.xpath_str = getLocation(node);
