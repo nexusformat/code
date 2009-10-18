@@ -41,6 +41,7 @@ public class NXschematron {
 		// Create a transformer for the xsl stylesheet
 		Transformer transformer = myFactory.newTransformer(new StreamSource(
 				xslFile));
+		transformer.setParameter("generate-paths", "yes");
 
 		// Do the transform
 		transformer.transform(new StreamSource(inputFile), new StreamResult(
