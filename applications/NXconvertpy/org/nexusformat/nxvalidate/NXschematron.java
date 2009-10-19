@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nexusformat;
+package org.nexusformat.nxvalidate;
 
 import java.io.File;
 import java.io.IOException;

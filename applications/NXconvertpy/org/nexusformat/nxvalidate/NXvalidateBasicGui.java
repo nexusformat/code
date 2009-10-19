@@ -1,4 +1,4 @@
-package org.nexusformat;
+package org.nexusformat.nxvalidate;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

@@ -1,8 +1,8 @@
-package org.nexusformat;
+package org.nexusformat.nxvalidate;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.nexusformat.NXvalidateGuiTree.ITag;
+import org.nexusformat.nxvalidate.NXvalidateGuiTree.ITag;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
