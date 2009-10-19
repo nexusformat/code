@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -89,7 +90,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		validatePanel.add(validateButton);
 
 		// Create the tree view
-		tree = new JTree();
+		tree = new JTree(new NXSnode());
 
 		DefaultTreeCellRenderer rend1 = new DefaultTreeCellRenderer();
 		// IconAndTipRenderer rend2 = new
@@ -155,7 +156,8 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 				File file = fc.getSelectedFile();
 				// Set the text box value to show the selected filename.
 				filenameText.setText(file.getAbsolutePath());
-				log.append("Selected NeXus File: " + file.getName() + "." + newline);
+				log.append("Selected NeXus File: " + file.getName() + "."
+						+ newline);
 				// TODO move code to make the reduced file here (and also after
 				// the filename has been typed).
 			} else {
@@ -220,7 +222,14 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 				tree.setModel(report.getTree());
 
 				log.append("There were " + report.numErrors()
-						+ " errors found.");
+						+ " errors found." + newline);
+
+				Vector<SVRLitem> messages = report.getReport();
+
+				Iterator i = messages.iterator();
+				while (i.hasNext()) {
+					log.append("->" + i.next() + newline);
+				}
 
 			} catch (Exception e1) {
 				log.append(e1.getMessage() + newline);
