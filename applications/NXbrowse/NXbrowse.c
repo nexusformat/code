@@ -33,10 +33,30 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include "napi.h"
 #include "napiconfig.h"
+#if HAVE_LIBREADLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#else
+#define rl_completion_matches(a,b) NULL
+#define rl_outstream stdout
+static char* readline(const char* prompt)
+{
+    char inputText[256];
+    char* stringPtr;
+    fprintf(stdout, "%s", prompt);
+    if (fgets(inputText, sizeof(inputText), stdin) == NULL)
+    {
+	return NULL;
+    }
+    if ((stringPtr = strchr(inputText, '\n')) != NULL) 
+    {
+        *stringPtr = '\0';
+    }
+    return strdup(inputText);
+}
+#endif
 
 #define StrEq(s1, s2) (strcmp((s1), (s2)) == 0)
 
@@ -215,6 +235,7 @@ int main(int argc, char *argv[])
    NXname groupName, dataName;
    int status, groupLevel = 0, i;
 
+#if HAVE_LIBREADLINE
    rl_readline_name = "NXbrowse";
    rl_attempted_completion_function = nxbrowse_complete;
 #if READLINE_VERSION >= 0x500
@@ -224,6 +245,11 @@ int main(int argc, char *argv[])
 #define rl_on_new_line() 1
 #endif
    using_history();
+#else
+#define rl_crlf()
+#define rl_on_new_line()
+#define add_history(a)
+#endif
 
    printf ("NXBrowse %s Copyright (C) 2009 NeXus Data Format\n", NEXUS_VERSION);
 
@@ -361,6 +387,7 @@ int main(int argc, char *argv[])
          return NX_OK;
       }
       status = NX_OK;
+      free(inputText);
    } while (status == NX_OK);
    return NX_OK;
 }

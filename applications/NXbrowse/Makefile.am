@@ -42,7 +42,7 @@ bin_PROGRAMS = nxbrowse $(F90_TARGETS)
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
-nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ -lreadline -lhistory $(LDFLAGS)
+nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 NXbrowse90_SOURCES = NXbrowse90.f90
 NXbrowse90_LDADD = $(LIBNEXUS90)
