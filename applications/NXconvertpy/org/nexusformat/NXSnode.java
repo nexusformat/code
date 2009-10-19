@@ -26,18 +26,24 @@ class NXSnode implements TreeModel {
 	private Vector<NXSnode> children;
 	private Vector<SVRLitem> svrl;
 
-	NXSnode(final Node node) {
-		this.nxclass  = node.getNodeName();
+	NXSnode() {
+		this.name = NXROOT;
+		this.nxclass = "";
 		this.attrs = new HashMap<String, String>();
+		this.children = new Vector<NXSnode>();
+		this.svrl = new Vector<SVRLitem>();
+	}
+
+	NXSnode(final Node node) {
+		this();
+		this.nxclass  = node.getNodeName();
 		this.setAttrs(node.getAttributes());
 
 		NodeList nodes = node.getChildNodes();
 		int size = nodes.getLength();
-		this.children = new Vector<NXSnode>();
 		for (int i = 0; i < size; i++) {
 			this.addChild(nodes.item(i));
 		}
-		this.svrl = new Vector<SVRLitem>();
 	}
 
 	Vector<SVRLitem> addSVRL(final Node svrl) {
