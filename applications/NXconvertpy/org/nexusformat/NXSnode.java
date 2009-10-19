@@ -14,6 +14,9 @@ import org.w3c.dom.NodeList;
 
 class NXSnode implements TreeModel {
 	private static final String PADDING = "  ";
+	private static final String NXROOT = "NXroot";
+	private static final String TYPE = "NAPItype";
+	private static final String LINK = "NAPIlink";
 	private static final String SDS = "SDS";
 	private static final Logger LOG = Logger.getInstance();
 
@@ -131,16 +134,15 @@ class NXSnode implements TreeModel {
 	void setAttr(final String name, final String value) {
 		if (name.equals("name")) {
 			this.name = value;
-		} else if (name.equals("NAPItype")) {
+			return;
+		} else if (name.equals(TYPE)) {
 			this.name = this.nxclass;
 			this.nxclass = SDS;
 		} else if (name.equals("target")) {
 			this.name = this.nxclass;
 			this.nxclass = null;
-			this.attrs.put(name, value);
-		} else {
-			this.attrs.put(name, value);
 		}
+		this.attrs.put(name, value);
 	}
 
 	private void addChild(final Node node) {
@@ -167,7 +169,16 @@ class NXSnode implements TreeModel {
 	}
 
 	public String toString() {
-		String result = this.name + ":" + this.nxclass;
+		String result;
+		if (NXROOT.equals(this.name) || NXROOT.equals(this.nxclass)) {
+			result = NXROOT;
+		} else if (LINK.equals(this.name)) {
+			result = this.name + ":target=" + this.attrs.get("target");
+		} else if (SDS.equals(this.nxclass)) {
+			result = this.name + ":" + TYPE + "="+ this.attrs.get(TYPE);
+		} else {
+			result = this.name + ":" + this.nxclass;
+		}
 		if (this.hasError()) {
 			return result + "*";
 		} else {
