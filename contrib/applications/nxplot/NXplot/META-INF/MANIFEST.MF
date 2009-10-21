@@ -7,7 +7,7 @@ Bundle-Vendor: NeXus International Advisory Comittee
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  mountaingumsys;bundle-version="0.1.0",
- mountaingumui;bundle-version="1.0.0",
+ mountaingumuibase;bundle-version="1.0.0",
  mountaingumnexus;bundle-version="1.0.0",
  org.eclipse.nebula.compositetable;bundle-version="1.0.0",
  jnexus;bundle-version="4.2.0"
