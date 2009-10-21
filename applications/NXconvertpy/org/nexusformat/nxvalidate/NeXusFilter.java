@@ -1,4 +1,4 @@
-package org.nexusformat;
+package org.nexusformat.nxvalidate;
 
 import java.io.FileFilter;
 import java.util.Vector;
