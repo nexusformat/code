@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="ch.psi.num.mountaingum.nexus.loader.NexusMapper" name="NexusMapper" schema="schema/NexusMapper.ID.exsd"/>
+   <extension-point id="ch.psi.num.mountaingum.nexus.loader.NexusMapper" name="NexusMapper" schema="schema/ch.psi.num.mountaingum.nexus.loader.nexusMapper.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -63,11 +63,11 @@
    </extension>
    <extension
          point="ch.psi.num.mountaingum.nexus.loader.NexusMapper">
-               <view
-            class="ch.psi.num.mountaingum.nexus.loader.NexusMapperDemo"
-            id="mountaingumnexus.NexusMapperDemo"
-            name="NexusMapperDemo">
-      </view>
+         <NexusMapper
+          className="ch.psi.num.mountaingum.nexus.loader.NexusMapperDemo"
+          id="mountaingumnexus.demo"
+          name="mountaingumnexus.demo"
+           />
    </extension>
 
 </plugin>

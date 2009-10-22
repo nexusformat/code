@@ -7,3 +7,6 @@ Bundle-Vendor: The NeXus Group
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: ncsa.hdf.hdflib,
  org.nexusformat
+Eclipse-LazyStart: true
+Bundle-Activator: NexusActivator
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.3.100"

@@ -1,8 +1,8 @@
 /**
  * This is a the interface to be implemented by any NeXus data file 
- * mapper. The mapper's task is to create instrument specific graphics 
- * nodes in the tree hierarchy or do other customisations before the tree
- * is displayed to the user.
+ * mapper. The mappers task is to edit the raw hierarchy as created 
+ * by the NexusLoader in order to adapt it to different needs. 
+ * 
  * 
  * copyright GPL
  * 
@@ -21,7 +21,8 @@ public interface NeXusMapper {
 	 * 
 	 * @param root the populated tree
 	 * @param nf a handle to the file if needed
+	 * @param nl The NexusLoader for support functions
 	 */
-	public void transform(TreeNode root, FlatNexusFile nf);
+	public void transform(TreeNode root, FlatNexusFile nf, NexusLoader nl);
 
 }

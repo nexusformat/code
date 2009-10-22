@@ -54,6 +54,7 @@ public class NexusLoader {
 	private HashSet<String> checkedPaths = new HashSet<String>();
 	private TreeNode root;
 	private FlatNexusFile nf;
+	
 	public static final Charset nexusCharset = Charset.forName("UTF-8");
 
 	public NexusLoader() {
@@ -149,7 +150,8 @@ public class NexusLoader {
 		root = new TreeNode(null, "");
 		root.setProperty("filename", filename);
 		locateGraphics();
-
+		checkedPaths.clear();
+		
 		try {
 			recurseFile(root, "");
 		} catch (NexusException e) {
@@ -167,8 +169,8 @@ public class NexusLoader {
 		for (int i = 0; i < decl.length; i++) {
 			IConfigurationElement e = decl[i];
 			try {
-				mapper = (NeXusMapper) e.createExecutableExtension("class");
-				mapper.transform(root, nf);
+				mapper = (NeXusMapper) e.createExecutableExtension("className");
+				mapper.transform(root, nf, this);
 			} catch (Exception eva) {
 				eva.printStackTrace();
 			}
@@ -272,11 +274,10 @@ public class NexusLoader {
 
 		if (nxclass.equalsIgnoreCase("SDS")) {
 			node = makeParameterNode(parent, nxpath, nxclass);
+			addPath(nxpath);
 		} else {
 			node = makeGroupNode(parent, nxpath, nxclass);
 		}
-
-		addPath(nxpath);
 
 		return node;
 	}
@@ -284,23 +285,23 @@ public class NexusLoader {
 	protected void addPath(String nxpath) {
 		checkedPaths.add(nxpath);
 		// TODO
-		// try {
-		// nf.openpath(nxpath);
-		// /**
-		// * This section is a workaround for a problem with attribute reading
-		// * through the Java-API. This can be removed once nxinitattrdir()
-		// * has been included and is used by nf.attrdir()
-		// */
-		// String pathel[] = nxpath.substring(1).split("/");
-		// String name = pathel[pathel.length - 1];
-		// nf.closedata();
-		// nf.opendata(name);
-		// String link = getAttr("target");
-		// if (link != null) {
-		// checkedPaths.add(link);
-		// }
-		// } catch (NexusException ne) {
-		// }
+		 try {
+		 nf.openpath(nxpath);
+		 /**
+		 * This section is a workaround for a problem with attribute reading
+		 * through the Java-API. This can be removed once nxinitattrdir()
+		 * has been included and is used by nf.attrdir()
+		 */
+		 String pathel[] = nxpath.substring(1).split("/");
+		 String name = pathel[pathel.length - 1];
+		 nf.closedata();
+		 nf.opendata(name);
+		 String link = getAttr("target");
+		 if (link != null) {
+		 checkedPaths.add(link);
+		 }
+		 } catch (NexusException ne) {
+		 }
 	}
 
 	/*
@@ -457,7 +458,7 @@ public class NexusLoader {
 	 * @param nxpath
 	 * @return
 	 */
-	protected TreeNode makeGraphNode(TreeNode parent, String nxpath) {
+	public TreeNode makeGraphNode(TreeNode parent, String nxpath) {
 		TreeNode graphics, mygraph = null;
 		InternalParameter tmp;
 		int dim[], info[], helpdim[], i;
@@ -521,7 +522,8 @@ public class NexusLoader {
 		return mygraph;
 	}
 
-	protected TreeNode locateGraphics() {
+
+	public TreeNode locateGraphics() {
 		TreeNode graphics = TreeUtil.findChild(root, "graphics");
 		if (graphics == null) {
 			graphics = new TreeNode(root, "graphics");
@@ -656,7 +658,7 @@ public class NexusLoader {
 		}
 	}
 
-	protected void addDefaultAxis(TreeNode mygraph, int dim, int size) {
+	public void addDefaultAxis(TreeNode mygraph, int dim, int size) {
 		String name = "axis" + dim;
 		InternalParameter ax = new InternalParameter(mygraph, name);
 		ax.setProperty("type", "axis");
@@ -773,7 +775,7 @@ public class NexusLoader {
 	 * @param name
 	 * @return
 	 */
-	protected String getAttr(String name) {
+	public String getAttr(String name) {
 		try {
 			Hashtable h = nf.attrdir();
 			AttributeEntry e = (AttributeEntry) h.get(name);
@@ -933,6 +935,20 @@ public class NexusLoader {
 		NameView nv = (NameView) RCPUtil.findView(NameView.ID);
 		if (nv != null) {
 			nv.setName(root.getProperty("filename"));
+		}
+	}
+
+	public void removeUnwanted(TreeNode root, String[] toRemove) {
+		int i;
+		TreeNode n;
+		
+		for(i = 0; i < toRemove.length; i++){
+			n = TreeUtil.searchNode(root, toRemove[i]);
+			if(n != null){
+				n.getParent().deleteChild(n);
+			}else {
+				System.out.println("Failed to remove: " + toRemove[i]);
+			}
 		}
 	}
 }
