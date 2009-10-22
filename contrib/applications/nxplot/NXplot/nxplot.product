@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.4"?>
+<?pde version="3.5"?>
 
-<product name="NXplot" id="NXplot.product" application="NXplot.application" version="1.0" useFeatures="false">
+<product name="NXplot" uid="NXPlot.ID" id="NXplot.product" application="NXplot.application" version="1.0" useFeatures="false" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="/NXplot/icons/nexusw.png"/>
+      <text>
+         NXplot
+
+An extendable utility for plotting any NeXus file.
+
+NeXus International Advisory Committee (2009 - ????)
+      </text>
+   </aboutInfo>
 
    <configIni use="default">
    </configIni>
@@ -10,7 +21,8 @@
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages/>
+   <windowImages i32="/NXplot/icons/nexusw32.png" i128="/NXplot/icons/nexusw.png"/>
+
 
    <launcher name="nxplot">
       <solaris/>
@@ -19,8 +31,10 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="NXplot"/>
@@ -59,5 +73,6 @@
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="sgtgraphics"/>
    </plugins>
+
 
 </product>

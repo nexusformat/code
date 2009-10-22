@@ -29,7 +29,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// them
 	// in the fill methods. This ensures that the actions aren't recreated
 	// when fillActionBars is called with FILL_PROXY.
-	private IWorkbenchAction exitAction;
+	private IWorkbenchAction exitAction, about;
 	private IAction open, save;
 	
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -47,6 +47,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		exitAction = ActionFactory.QUIT.create(window);
 		register(exitAction);
 		
+		about = ActionFactory.ABOUT.create(window);
+		
 		open = new ActionDelegateProxy("Open" ,new OpenNexus());
 		register(open);
 		save = new ActionDelegateProxy("Save" ,new SaveNexus());
@@ -61,5 +63,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(open);
 		fileMenu.add(save);
 		fileMenu.add(exitAction);
+		
+		MenuManager helpMenu = new MenuManager("&Help",
+				IWorkbenchActionConstants.HELP_END);
+		menuBar.add(helpMenu);
+		helpMenu.add(about);
+		
 	}
 }

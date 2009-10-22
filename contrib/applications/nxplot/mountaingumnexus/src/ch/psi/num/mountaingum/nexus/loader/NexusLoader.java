@@ -285,23 +285,23 @@ public class NexusLoader {
 	protected void addPath(String nxpath) {
 		checkedPaths.add(nxpath);
 		// TODO
-		 try {
-		 nf.openpath(nxpath);
-		 /**
-		 * This section is a workaround for a problem with attribute reading
-		 * through the Java-API. This can be removed once nxinitattrdir()
-		 * has been included and is used by nf.attrdir()
-		 */
-		 String pathel[] = nxpath.substring(1).split("/");
-		 String name = pathel[pathel.length - 1];
-		 nf.closedata();
-		 nf.opendata(name);
-		 String link = getAttr("target");
-		 if (link != null) {
-		 checkedPaths.add(link);
-		 }
-		 } catch (NexusException ne) {
-		 }
+		try {
+			nf.openpath(nxpath);
+			/**
+			 * This section is a workaround for a problem with attribute reading
+			 * through the Java-API. This can be removed once nxinitattrdir()
+			 * has been included and is used by nf.attrdir()
+			 */
+			String pathel[] = nxpath.substring(1).split("/");
+			String name = pathel[pathel.length - 1];
+			nf.closedata();
+			nf.opendata(name);
+			String link = getAttr("target");
+			if (link != null) {
+				checkedPaths.add(link);
+			}
+		} catch (NexusException ne) {
+		}
 	}
 
 	/*
@@ -384,10 +384,15 @@ public class NexusLoader {
 
 		par = new NexusParameter(parent, name);
 		parent.insertNode(TreeNode.APPEND, par);
-
-		NodeValue v = makeValue(dim, info);
-		par.updateValue(v);
 		par.setProperty("nxpath", nxpath);
+
+		if(calcTotalLength(dim,info) < 1000){
+			NodeValue v = makeValue(nf,dim, info);
+			par.updateValue(v);
+		} else {
+			// use deferred loading
+			par.setProperty("visible", "false");
+		}
 		return par;
 	}
 
@@ -399,7 +404,7 @@ public class NexusLoader {
 	 * @param info
 	 * @return
 	 */
-	private NodeValue makeValue(int[] dim, int[] info) {
+	public static NodeValue makeValue(FlatNexusFile nf, int[] dim, int[] info) {
 		NodeValue v;
 		IntValue iv;
 		DoubleValue dv;
@@ -504,10 +509,16 @@ public class NexusLoader {
 			makeFrameSeriesViewer(mygraph, nxpath, info, dim);
 			return mygraph;
 		} else {
-			tmp = new InternalParameter(mygraph, "counts");
+			tmp = new NexusParameter(mygraph, "counts");
 			mygraph.insertNode(TreeNode.APPEND, tmp);
-			tmp.updateValue(makeValue(dim, info));
 			tmp.setProperty("type", "data");
+			tmp.setProperty("nxpath", nxpath);
+			if(calcTotalLength(dim,info) < 1000){
+				tmp.updateValue(makeValue(nf,dim, info));
+			} else {
+				// use deferred loading
+				tmp.setProperty("visible", "false");
+			}
 		}
 
 		try {
@@ -745,7 +756,7 @@ public class NexusLoader {
 		int dim[] = new int[32];
 		int info[] = new int[2];
 		nf.getinfo(dim, info);
-		ax.updateValue(makeValue(dim, info));
+		ax.updateValue(makeValue(nf,dim, info));
 	}
 
 	/**
@@ -830,7 +841,7 @@ public class NexusLoader {
 			dimensions[i] = infoDims[i];
 		}
 		int type = infoArgs[1];
-		int totalLength = calcTotalLength(dimensions);
+		int totalLength = calcTotalLength(dimensions,infoArgs);
 
 		Serializable data = null;
 		if (totalLength > 0) {
@@ -877,9 +888,9 @@ public class NexusLoader {
 	 * @param dimensions
 	 * @return the size of a buffer needed to hold the data in an SDS block
 	 */
-	static public int calcTotalLength(int[] dimensions) {
+	static public int calcTotalLength(int[] dimensions, int[] info) {
 		int totalLength = 1;
-		for (int i = 0; i < dimensions.length; i++) {
+		for (int i = 0; i < info[0]; i++) {
 			totalLength *= dimensions[i];
 		}
 		return totalLength;

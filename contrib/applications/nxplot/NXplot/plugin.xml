@@ -37,6 +37,18 @@
                name="appName"
                value="NXplot">
          </property>
+         <property
+               name="aboutImage"
+               value="icons/nexusw.png">
+         </property>
+         <property
+               name="aboutText"
+               value="NXplot&#x0A;&#x0A;An extendable utility for plotting any NeXus file.&#x0A;&#x0A;NeXus International Advisory Committee (2009 - ????)">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/nexusw32.png,icons/nexusw.png">
+         </property>
       </product>
    </extension>
 
