@@ -68,6 +68,11 @@
           id="mountaingumnexus.demo"
           name="mountaingumnexus.demo"
            />
+         <NexusMapper
+          className="ch.psi.num.mountaingum.nexus.loader.PruneEmptyGroup"
+          id="mountaingumnexus.prune"
+          name="mountaingumnexus.prune"
+           />
    </extension>
 
 </plugin>

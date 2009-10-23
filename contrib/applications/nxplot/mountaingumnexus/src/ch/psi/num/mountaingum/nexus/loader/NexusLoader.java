@@ -284,6 +284,8 @@ public class NexusLoader {
 
 	protected void addPath(String nxpath) {
 		checkedPaths.add(nxpath);
+		//System.out.println("Added " + nxpath);
+		
 		// TODO
 		try {
 			nf.openpath(nxpath);
@@ -299,6 +301,7 @@ public class NexusLoader {
 			String link = getAttr("target");
 			if (link != null) {
 				checkedPaths.add(link);
+				//System.out.println("Added target" + link);
 			}
 		} catch (NexusException ne) {
 		}
@@ -347,9 +350,7 @@ public class NexusLoader {
 			nf.opendata(name);
 
 			nf.getinfo(dim, info);
-			for (int i = 0; i < info[0]; i++) {
-				totalLength *= dim[i];
-			}
+			totalLength = calcTotalLength(dim,info);
 
 			Hashtable attr = nf.attrdir();
 			if (attr.get("axis") != null) {
@@ -660,11 +661,20 @@ public class NexusLoader {
 	 */
 	protected void checkAndDefaultAxis(TreeNode mygraph, int rank, int[] dim) {
 		int i;
-
+		
 		for (i = 0; i < rank; i++) {
-			TreeNode ax = locateAxis(mygraph, i);
+			ParameterNode ax = (ParameterNode)locateAxis(mygraph, i);
 			if (ax == null) {
 				addDefaultAxis(mygraph, i, dim[i]);
+			} else {
+				if(ax.getValue().getLength() != dim[i]){
+					/*
+					System.out.println("Dimension mismatch on axis " + ax.getName() + 
+							", is " + ax.getValue().getLength() +", should " + dim[i]);
+							*/
+					mygraph.deleteChild(ax);
+					addDefaultAxis(mygraph, i, dim[i]);
+				}
 			}
 		}
 	}
