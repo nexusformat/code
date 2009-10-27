@@ -30,7 +30,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// in the fill methods. This ensures that the actions aren't recreated
 	// when fillActionBars is called with FILL_PROXY.
 	private IWorkbenchAction exitAction, about;
-	private IAction open, save;
+	private IAction open, save, png, print;
 	
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -53,6 +53,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(open);
 		save = new ActionDelegateProxy("Save" ,new SaveNexus());
 		register(save);
+		png = new ActionDelegateProxy("Export PNG" ,new PNGNexusGraph());
+		register(save);
+		print = new ActionDelegateProxy("Print" ,new PrintNexusGraph());
+		register(save);
 
 	}
 
@@ -62,6 +66,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(fileMenu);
 		fileMenu.add(open);
 		fileMenu.add(save);
+		fileMenu.add(png);
+		fileMenu.add(print);
 		fileMenu.add(exitAction);
 		
 		MenuManager helpMenu = new MenuManager("&Help",

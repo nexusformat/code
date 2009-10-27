@@ -36,7 +36,6 @@ public class NexusTree extends BaseTreeView {
 		return root;
 	}
 
-	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		treeViewer.setLabelProvider(new IconTreeLabelProvider());
@@ -71,4 +70,5 @@ public class NexusTree extends BaseTreeView {
 		};
 		treeViewer.setComparator(comparator);
 	}
+	
 }

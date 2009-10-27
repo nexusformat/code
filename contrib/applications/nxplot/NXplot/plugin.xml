@@ -43,7 +43,7 @@
          </property>
          <property
                name="aboutText"
-               value="NXplot&#x0A;&#x0A;An extendable utility for plotting any NeXus file.&#x0A;&#x0A;NeXus International Advisory Committee (2009 - ????)">
+               value="NXplot&#x0A;&#x0A;An extendable utility for plotting any NeXus file.&#x0A;&#x0A;NeXus International Advisory Committee (2009 - ????)&#x0A;&#x0A;Problems to be reported to: nexus-developers@nexusformat.org">
          </property>
          <property
                name="windowImages"

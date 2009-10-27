@@ -26,6 +26,20 @@
             </groupMarker>
          </menu>
          <action
+               class="ch.psi.num.mountaingum.nexus.actions.PrintNexusGraph"
+               id="mountaingumnexus.Print"
+               label="Print"
+               menubarPath="mountaingumnexus.Nexus/mountaingumnexus.nexusgroup"
+               style="push">
+         </action>
+         <action
+               class="ch.psi.num.mountaingum.nexus.actions.PNGNexusGraph"
+               id="mountaingumnexus.Hard"
+               label="Make PNG"
+               menubarPath="mountaingumnexus.Nexus/mountaingumnexus.nexusgroup"
+               style="push">
+         </action>
+         <action
                class="ch.psi.num.mountaingum.nexus.actions.SaveNexus"
                id="mountaingumnexus.Save"
                label="Save"
@@ -46,7 +60,7 @@
                menubarPath="mountaingumnexus.Nexus/mountaingumnexus.nexusgroup"
                style="push">
          </action>
-      </actionSet>
+       </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.views">
