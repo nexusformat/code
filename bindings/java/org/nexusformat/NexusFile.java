@@ -185,6 +185,7 @@ public class  NexusFile implements NeXusFileInterface {
     protected native void nxopenpath(int handle, String path);
     protected native void nxopengrouppath(int handle, String path);
     protected native void nxclosegroup(int handle);
+    protected native String nxgetpath(int handle);
 
     /** 
       * makegroup creates a new group below the current group within
@@ -245,7 +246,16 @@ public class  NexusFile implements NeXusFileInterface {
     	checkForNull(path);
 	nxopengrouppath(handle,path);
     }
-
+    /**
+     * return the current path into the NeXus file in the 
+     * form of a Unix path string.
+     * @return A unix path string
+     */
+    public String getpath() throws NexusException 
+    {
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	return nxgetpath(handle);
+    }
     /**
       * closegroup closes access to the current group and steps down one
       * step in group hierarchy.

@@ -65,6 +65,7 @@ int main (int argc, char *argv[])
   char filename[256];
   int64_t grossezahl[4];
   const char* ch_test_data = "NeXus ><}&{'\\&\" Data";
+  char path[512];
 
   grossezahl[0] = 12;
   grossezahl[2] = 23;
@@ -243,6 +244,8 @@ int main (int argc, char *argv[])
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   NXgetattrinfo(fileid,&i);
   printf("Number of group attributes: %d\n", i);
+  if(NXgetpath(fileid,path,512) != NX_OK)return 1;
+  printf("NXentry path %s\n", path);
   do { 
      attr_status = NXgetnextattr (fileid, name, NXdims, &NXtype);
      if (attr_status == NX_ERROR) return 1;
@@ -269,7 +272,9 @@ int main (int argc, char *argv[])
      } else {
         if (entry_status == NX_OK) {
            if (NXopendata (fileid, name) != NX_OK) return 1;
-              if (NXgetinfo (fileid, &NXrank, NXdims, &NXtype) != NX_OK) return 1;
+	    if(NXgetpath(fileid,path,512) != NX_OK)return 1;
+	    printf("Data path %s\n", path);
+	    if (NXgetinfo (fileid, &NXrank, NXdims, &NXtype) != NX_OK) return 1;
                  printf ("   %s(%d)", name, NXtype);
               if (NXmalloc ((void **) &data_buffer, NXrank, NXdims, NXtype) != NX_OK) return 1;
 	      n = 1;
@@ -364,6 +369,8 @@ int main (int argc, char *argv[])
 
   if (NXopengroup (fileid, "link", "NXentry") != NX_OK) return 1;
     if (NXopengroup (fileid, "sample", "NXsample") != NX_OK) return 1;
+    if(NXgetpath(fileid,path,512) != NX_OK)return 1;
+    printf("Group path %s\n", path);
       if (NXgetgroupID (fileid, &blink) != NX_OK) return 1;
         if (NXsameID(fileid, &glink, &blink) != NX_OK)
 	{

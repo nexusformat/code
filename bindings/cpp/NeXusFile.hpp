@@ -190,6 +190,12 @@ namespace NeXus {
      * '/' (i.e. "/entry/sample/name").
      */
     void openGroupPath(const std::string& path);
+    /**
+     * Get the path into the current file
+     * \return A unix like path string pointing to the current 
+     *         position in the file
+     */
+    std::string  getPath();
 
     /**
      * Close the currently open group.

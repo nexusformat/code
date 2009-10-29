@@ -56,6 +56,7 @@ extern int nx_makegroup(void *handle, char *name, char *nxclass);
 extern int nx_opengroup(void *handle, char *name, char *nxclass);
 extern int nx_openpath(void *handle, char *path);
 extern int nx_opengrouppath(void *handle, char *path);
+extern char *nx_getpath(void *handle);
 extern int nx_closegroup(void *handle);
 extern char *nx_getnextentry(void *handle, char separator);
 extern void *nx_getgroupID(void *handle);

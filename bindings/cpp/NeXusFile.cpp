@@ -231,6 +231,19 @@ void File::openGroupPath(const string& path) {
   }
 }
 
+std::string File::getPath(){
+  char cPath[1024];
+
+  memset(cPath,0,1024*sizeof(char));
+  NXstatus status = NXgetpath(this->m_file_id,cPath, 1024);
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXgetpath() failed";
+    throw Exception(msg.str(), status);
+  }
+  return std::string(cPath);
+}
+
 void File::closeGroup() {
   NXstatus status = NXclosegroup(this->m_file_id);
   if (status != NX_OK) {

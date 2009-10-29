@@ -89,6 +89,12 @@ public interface NeXusFileInterface {
     public void opengrouppath(String path) throws 
                            NexusException;
     /**
+     * return the current path into the NeXus file in the 
+     * form of a Unix path string.
+     * @return A unix path string
+     */
+    public String getpath() throws NexusException;
+    /**
       * closegroup closes access to the current group and steps down one
       * step in group hierarchy.
       * @exception NexusException when an HDF error occurs during this

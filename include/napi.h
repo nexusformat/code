@@ -179,6 +179,7 @@ typedef struct {
 #    define NXmakegroup         MANGLE(nximakegroup)
 #    define NXopengroup         MANGLE(nxiopengroup)
 #    define NXopenpath          MANGLE(nxiopenpath)
+#    define NXgetpath           MANGLE(nxigetpath)
 #    define NXopengrouppath     MANGLE(nxiopengrouppath)
 #    define NXclosegroup        MANGLE(nxiclosegroup)
 #    define NXmakedata          MANGLE(nximakedata)
@@ -227,7 +228,7 @@ typedef struct {
 #    define NXfcompmakedata     MANGLE(nxifcompmakedata)
 #    define NXfcompress         MANGLE(nxifcompress)
 #    define NXfputattr          MANGLE(nxifputattr)
-
+#    define NXfgetpath          MANGLE(nxifgetpath)
 
 /* 
  * Standard interface 
@@ -323,6 +324,14 @@ extern  NXstatus  NXopenpath (NXhandle handle, CONSTCHAR *path);
    * \ingroup c_readwrite
    */
 extern  NXstatus  NXopengrouppath (NXhandle handle, CONSTCHAR *path);
+  /**
+   * Retrieve the current path in the NeXus file
+   * \param handle a NeXus file handle
+   * \param path A buffer to copy the path too
+   * \parm  pathlen The maximum number of characters to copy into path
+   * \return NX_OK or NX_ERROR
+   */
+extern NXstatus NXgetpath(NXhandle handle, char *path, int pathlen);
 
   /**
    * Closes the currently open group and steps one step down in the NeXus file 
@@ -783,8 +792,8 @@ extern  NXstatus  NXsetcache(long newVal);
 /* FORTRAN internals */
 
   extern NXstatus  NXfopen(char * filename, NXaccess* am, 
-					NexusFunction* pHandle);
-  extern NXstatus  NXfclose (NexusFunction* pHandle);
+					NXhandle pHandle);
+  extern NXstatus  NXfclose (NXhandle pHandle);
   extern NXstatus  NXfputattr(NXhandle fid, char *name, void *data, 
                                    int *pDatalen, int *pIType);
   extern NXstatus  NXfcompress(NXhandle fid, int *compr_type);
@@ -794,8 +803,8 @@ extern  NXstatus  NXsetcache(long newVal);
                 int *compression_type, int chunk[]);
   extern NXstatus  NXfmakedata(NXhandle fid, char *name, int *pDatatype,
 		int *pRank, int dimensions[]);
-  extern NXstatus  NXfflush(NexusFunction* pHandle);
-
+  extern NXstatus  NXfflush(NXhandle pHandle);
+  extern NXstatus  NXfgetpath(NXhandle fid, char *path, int *pathlen);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

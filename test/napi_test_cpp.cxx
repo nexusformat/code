@@ -274,11 +274,13 @@ int readTest(const string & filename) {
 	file.getData(result);
         cout << toString(result);
       }
+      cout <<  endl;
+      cout << "   Path = " << file.getPath() << endl;
+      file.closeData();
     }
     else {
-      cout << ":" << it->second;
+      cout << ":" << it->second << endl;
     }
-    cout <<  endl;
   }
   file.closeGroup();
 

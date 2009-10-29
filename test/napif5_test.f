@@ -26,7 +26,7 @@ C------------------------------------------------------------------------------
 
       INCLUDE 'napif.inc'
       INTEGER NXRANK, NXDIMS(NX_MAXRANK), NXTYPE, NXLEN
-      INTEGER ENTRY_STATUS, ATTR_STATUS
+      INTEGER ENTRY_STATUS, ATTR_STATUS, STAT
       INTEGER*4 I, J
       REAL*4 R
       INTEGER*1 I1_ARRAY(4)
@@ -41,6 +41,7 @@ C------------------------------------------------------------------------------
       CHARACTER*128 CHAR_BUFFER
       INTEGER*1 CHAR_BUFFER_B(128)
       CHARACTER*64 GROUP_NAME, CLASS_NAME
+      CHARACTER*70 PATH
       INTEGER FILEID(NXHANDLESIZE)
       INTEGER GLINK(NXLINKSIZE), DLINK(NXLINKSIZE), BLINK(NXLINKSIZE)
       INTEGER*4 COMP_ARRAY(20,100)
@@ -140,6 +141,7 @@ C------------------------------------------------------------------------------
                   IF (NXOPENDATA(FILEID, 'flush_data') .NE. NX_OK) STOP
                      IF (NXPUTSLAB(FILEID, U_BUFFER(I), SLAB_START, 
      +                 SLAB_SIZE) .NE. NX_OK) STOP
+                     STAT = NXCLOSEDATA(FILEID)
                      IF (NXFLUSH(FILEID) .NE. NX_OK) STOP
                END DO
          IF (NXCLOSEGROUP(FILEID) .NE. NX_OK) STOP
@@ -195,6 +197,8 @@ C *** read data
          END IF
       ELSE IF (ENTRY_STATUS .EQ. NX_OK) THEN
          IF (NXOPENDATA(FILEID,NAME) .NE. NX_OK) STOP
+         IF(NXGETPATH(FILEID,PATH) .NE. NX_OK) STOP
+         WRITE(*,*)'Path = ', PATH
          IF (NXGETINFO(FILEID,NXRANK,NXDIMS,NXTYPE) .NE. NX_OK) STOP
          WRITE(*,FMT='(4X,A,I2,A)') NAME(1:LEN_TRIM(NAME))//'(', 
      +     NXTYPE,')'

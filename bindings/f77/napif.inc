@@ -35,7 +35,8 @@ C *** NXaccess enum - access modes for NXopen
 C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
 C *** large enough to hold an NXhandle structure
       INTEGER NXHANDLESIZE
-      PARAMETER(NXHANDLESIZE=5120)
+C      PARAMETER(NXHANDLESIZE=5120)
+      PARAMETER(NXHANDLESIZE=9058)
 C *** NXLINKSIZE is (at least) the size of an INTEGER*4 array that can hold
 C *** an NXlink structure: we'll assume 64bit alignment of structure members for safety
       INTEGER NXLINKSIZE
@@ -78,7 +79,7 @@ C**** NeXus Unlimited Dimension
      +       NXGETGROUPINFO, NXINITGROUPDIR, NXGETATTRINFO, 
      +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA, NXOPENPATH,
      +       NXSETNUMBERFORMAT, NXOPENGROUPPATH, NXOPENSOURCEGROUP,
-     +       NXMAKENAMEDLINK
+     +       NXMAKENAMEDLINK, NXGETPATH
       LOGICAL NXSAMEID
       EXTERNAL NXOPEN, NXCLOSE, NXMAKEGROUP, NXOPENGROUP, NXCLOSEGROUP,
      +       NXMAKEDATA, NXOPENDATA, NXCLOSEDATA, NXGETDATA, 
@@ -90,4 +91,4 @@ C**** NeXus Unlimited Dimension
      +       NXINITATTRDIR, NXFLUSH, NXCOMPMAKEDATA, NXSAMEID, 
      +       NXOPENPATH,NXSETNUMBERFORMAT, NXOPENGROUPPATH,
      +       NXOPENSOURCEGROUP, NXINQUIREFILE, NXISEXTERNALGROUP, 
-     +       NXLINKEXTERNAL, NXMAKENAMEDLINK
+     +       NXLINKEXTERNAL, NXMAKENAMEDLINK, NXGETPATH
