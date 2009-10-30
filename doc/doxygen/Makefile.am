@@ -16,7 +16,7 @@ if HAVE_PDFLATEX
 if HAVE_DOT
 	rm -fr latex html
 	$(DOXYGEN) Doxyfile
-	( cd latex; make pdf )
+	( cd latex; ) # ( cd latex; make pdf )
 	rm -f refman.pdf
 	ln -s latex/refman.pdf .
 endif
