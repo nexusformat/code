@@ -93,7 +93,6 @@ static void ignoreError(void *data, char *text){
 /*---------------------------------------------------------------------*/
 static void buildCurrentPath(pNexusFile5 self, char *pathBuffer, 
 			     int pathBufferLen){
-  int length;
 
   memset(pathBuffer,0,pathBufferLen);
   if(self->iCurrentG != 0) {
@@ -772,8 +771,7 @@ static int nxToHDF5Type(int datatype)
   {
   pNexusFile5 pFile;
   int chunk_size[H5S_MAX_RANK];
-  int i;
-  
+   
   pFile = NXI5assert (fid);
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int));
   memcpy(chunk_size,dimensions,rank*sizeof(int));
@@ -1142,7 +1140,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 {
     pNexusFile5 pFile;
     char linkTarget[1024];
-    int type = NX_CHAR, length;
+    int type = NX_CHAR;
     int status;
 
     pFile = NXI5assert (fid);
@@ -1177,7 +1175,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   {
     pNexusFile5 pFile;
     char linkTarget[1024];
-    int type = NX_CHAR, length;
+    int type = NX_CHAR;
     char *itemName = NULL;
     int status;
 
@@ -1475,7 +1473,7 @@ static int h5MemType(hid_t atype)
     pNexusFile5 pFile;
     hid_t grp, attr1,type,atype;
     int iRet,iPtype, i;
-    int idx,data_id,size_id, sign_id;
+    int idx,data_id;
     char data[128];
     char ph_name[1024];
     info_type op_data;
@@ -1598,7 +1596,7 @@ static int h5MemType(hid_t atype)
    {
      pNexusFile5 pFile;
      int iStart[H5S_MAX_RANK], status;
-     hid_t data_id, memtype_id, size_id, sign_id;    
+     hid_t data_id, memtype_id;    
      int dims;    
 
      pFile = NXI5assert (fid);
@@ -1645,7 +1643,7 @@ static int h5MemType(hid_t atype)
      pNexusFile5 pFile;
      int i, iRank, mType, iRet;
      hsize_t myDim[H5S_MAX_RANK]; 
-     hid_t data_id,size_id,sign_id;
+     hid_t data_id;
 
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
@@ -1681,7 +1679,7 @@ static int h5MemType(hid_t atype)
      hsize_t mySize[H5S_MAX_RANK];
      hsize_t mStart[H5S_MAX_RANK];
      hid_t   memspace, iRet, data_id;
-     hid_t   memtype_id, size_id, sign_id;
+     hid_t   memtype_id;
      char *tmp_data = NULL;
      char *data1;
      int i, dims, iRank, mtype = 0;
@@ -1787,7 +1785,7 @@ static int h5MemType(hid_t atype)
 				       int *iLength, int *iType)
    {
      pNexusFile5 pFile;
-     hid_t attr_id,size_id,sign_id;
+     hid_t attr_id;
      hid_t iRet, atype, aspace;
      int iPType,rank;
      char *iname = NULL; 
@@ -1927,8 +1925,7 @@ static int h5MemType(hid_t atype)
      char *iname = NULL; 
      unsigned int idx;
      int vid;
-     herr_t iRet;
-
+    
      pFile = NXI5assert (fid);
      idx=0;
      *iN = idx;
@@ -1954,8 +1951,7 @@ static int h5MemType(hid_t atype)
    NXstatus  NX5getgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile5 pFile;
-    int u, datalen, type = NX_CHAR;
-    char group_name[64], class_name[64];
+    int datalen, type = NX_CHAR;
     ErrFunc oldErr;
   
     pFile = NXI5assert (fileid);
