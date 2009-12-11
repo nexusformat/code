@@ -197,7 +197,7 @@ C *** read data
       ELSE IF (ENTRY_STATUS .EQ. NX_OK) THEN
          IF (NXOPENDATA(FILEID,NAME) .NE. NX_OK) STOP
          IF (NXGETPATH(FILEID,PATH) .NE. NX_OK)STOP
-         WRITE(*,*)'Path = ', PATH
+         WRITE(*,FMT='(1X,A,A)') 'Path = ', PATH(1:LEN_TRIM(PATH))
          IF (NXGETINFO(FILEID,NXRANK,NXDIMS,NXTYPE) .NE. NX_OK) STOP
          WRITE(*,FMT='(4X,A,I2,A)') NAME(1:LEN_TRIM(NAME))//'(', 
      +     NXTYPE,')'

@@ -40,6 +40,13 @@ namespace NeXus {
     throw Exception(msg.str());
   }
 
+  template<>
+  NXDLL_EXPORT NXnumtype getType(char number) {
+    stringstream msg;
+    msg << "NeXus::getType() does not know type of \"char\" " << number;
+    throw Exception(msg.str());
+  }
+
   // template specialisations for types we know 
   template<>
   NXDLL_EXPORT NXnumtype getType(float number) {
@@ -90,6 +97,7 @@ namespace NeXus {
   NXDLL_EXPORT NXnumtype getType(uint64_t number) {
     return UINT64;
   }
+
 
 }
 

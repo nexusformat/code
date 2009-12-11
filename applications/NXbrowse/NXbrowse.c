@@ -35,13 +35,7 @@
 #include <stdlib.h>
 #include "napi.h"
 #include "napiconfig.h"
-#if HAVE_LIBREADLINE
-#include <readline/readline.h>
-#include <readline/history.h>
-#else
-#define rl_completion_matches(a,b) NULL
-#define rl_outstream stdout
-static char* readline(const char* prompt)
+static char* my_readline(const char* prompt)
 {
     char inputText[256];
     char* stringPtr;
@@ -56,6 +50,13 @@ static char* readline(const char* prompt)
     }
     return strdup(inputText);
 }
+#if HAVE_LIBREADLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#else
+#define rl_completion_matches(a,b) NULL
+#define rl_outstream stdout
+#define readline my_readline
 #endif
 
 #define StrEq(s1, s2) (strcmp((s1), (s2)) == 0)
@@ -277,10 +278,17 @@ int main(int argc, char *argv[])
    strcpy (path, "NX");
    do {
       sprintf (prompt, "%s> ", path);
-      while ( (inputText = readline(prompt)) == NULL )
+      if (getenv("NO_READLINE") != NULL)
       {
-	rl_crlf();
-	rl_on_new_line();
+          inputText = my_readline(prompt);
+      }
+      else
+      {
+          inputText = readline(prompt);
+      }
+      if (inputText == NULL)
+      {
+          inputText = strdup("EXIT");
       }
       if (*inputText)
       {
