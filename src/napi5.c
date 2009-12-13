@@ -22,6 +22,9 @@
   For further information, see <http://www.neutron.anl.gov/NeXus/>
 
 ----------------------------------------------------------------------------*/
+
+#ifdef HDF5 
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -2047,3 +2050,5 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX5initattrdir;
       fHandle->nxprintlink=NX5printlink;
 }
+
+#endif /* HDF5 */
