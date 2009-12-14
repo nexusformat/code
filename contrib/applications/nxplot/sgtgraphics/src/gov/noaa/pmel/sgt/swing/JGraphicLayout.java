@@ -1122,4 +1122,10 @@ public abstract class JGraphicLayout extends JPane {
   public void removePropertyChangeListener(PropertyChangeListener l) {
     changes_.removePropertyChangeListener(l);
   }
+  public void finalize(){
+	  changes_ = null;
+	  vetos_ = null;
+	  data_ = null;
+	  dataAttrMap_ = null;
+  }
 }

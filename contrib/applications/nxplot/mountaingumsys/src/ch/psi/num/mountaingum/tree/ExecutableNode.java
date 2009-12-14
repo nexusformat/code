@@ -168,4 +168,11 @@ public abstract class ExecutableNode extends TreeNode {
 	public int getState(){
 		return state;
 	}
+	public void dispose() {
+		super.dispose();
+		logListeners = null;
+		updateListeners = null;
+		logBuffer = null;
+	}
+
 }

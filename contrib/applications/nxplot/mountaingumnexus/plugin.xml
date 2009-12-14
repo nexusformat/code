@@ -6,7 +6,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="ch.psi.num.mountaingum.nexus.Perspective.NexusPerspective"
-            icon="icons/nexusw.png"
+            icon="icons/nexusw32.png"
             id="mountaingum.NexusPerspective"
             name="Nexus">
       </perspective>

@@ -60,4 +60,8 @@ public abstract class ParameterNode extends ExecutableNode {
 	public void configure(int type, int rank, int dim[]){
 		v = TreeUtil.makeNodeValue(type, rank, dim);
 	}
+	public void dispose() {
+		super.dispose();
+		v = null;
+	}
 }

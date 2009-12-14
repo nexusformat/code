@@ -2286,4 +2286,8 @@ public class JPlotLayout extends JGraphicLayout
       }
     }
   }
+  public void finalize(){
+	  gAttr_ = null;
+	  super.finalize();
+  }
 }

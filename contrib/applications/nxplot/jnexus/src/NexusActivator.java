@@ -22,10 +22,13 @@ public class NexusActivator extends Plugin {
 		super.start(context);
 		
 		os = System.getProperty("os.name");
-		if(os.indexOf("Windows") < 0){
-			libfile = os + System.getProperty("os.arch") + ".lib";
-		} else {
+		if(os.indexOf("Windows") >= 0){
 			libfile = "windoof" + System.getProperty("os.arch") + ".lib";
+		} else if(os.indexOf("Mac OS X") >= 0){
+			libfile = "macosx.lib";
+		} else {
+			libfile = os + System.getProperty("os.arch") + ".lib";
+			libfile = libfile.replace(" ", "_");	
 		}
 		System.out.println("Trying to load libraries from " + libfile);
 		URL ulli = Platform.getBundle("jnexus").getEntry(libfile);

@@ -79,4 +79,8 @@ public class DynamicIntArray {
 	public int[] getRawArray(){
 		return data;
 	}
+	protected void finalize() throws Throwable {
+		super.finalize();
+		data = null;
+	}
 }

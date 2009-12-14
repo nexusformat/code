@@ -482,6 +482,7 @@ protected double[] xloc_;
 		grid_ = null;
 		xEdges_ = null;
 		yEdges_ = null;
+		changes_ = null;
 	}
  
 }

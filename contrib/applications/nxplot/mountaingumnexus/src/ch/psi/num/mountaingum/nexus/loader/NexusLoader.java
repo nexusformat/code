@@ -61,7 +61,6 @@ public class NexusLoader {
 	}
 
 	public TreeNode loadNexusIntoTree(String filename) throws IOException {
-		TreeNode oldTree = root;
 		root = null;
 
 		nf = null;
@@ -93,9 +92,6 @@ public class NexusLoader {
 			throw new IOException(ne.getMessage());
 		}
 
-		// If all went well, destroy old tree
-		// TODO
-		// oldTree.dispose();
 		return root;
 	}
 

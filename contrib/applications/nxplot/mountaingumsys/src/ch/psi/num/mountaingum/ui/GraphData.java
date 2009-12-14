@@ -88,6 +88,7 @@ public class GraphData implements UpdateListener {
 		if(d != null){
 			dr.calculate(d);
 		}
+		d = null;
 		return dr;
 	}
 	public int getDataLength(){
@@ -147,5 +148,12 @@ public class GraphData implements UpdateListener {
 			getData();
 		}
 		return data[pos[0]];
+	}
+	public void finalize() throws Throwable {
+		data = null;
+		graph = null;
+		node = null;
+		//System.out.println("Killing GraphData.." );
+		super.finalize();
 	}
 }

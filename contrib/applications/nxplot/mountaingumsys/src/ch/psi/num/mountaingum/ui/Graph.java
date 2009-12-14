@@ -11,6 +11,7 @@
 package ch.psi.num.mountaingum.ui;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import ch.psi.num.mountaingum.func.FuncUtil;
 import ch.psi.num.mountaingum.func.IFunc;
@@ -106,5 +107,17 @@ public abstract class Graph {
 			yAxis.getNode().getValue();
 		}
 		FuncUtil.map(new IteratorStream(data.values()), new DataUpdate());
+	}
+	public void dispose() {
+		Iterator it = data.values().iterator();
+		while(it.hasNext()){
+			GraphData dg = (GraphData)it.next();
+			try{
+				dg.finalize();
+			}catch(Throwable t){}
+		}
+		data = null;
+		xAxis = null;
+		yAxis = null;
 	}
 }

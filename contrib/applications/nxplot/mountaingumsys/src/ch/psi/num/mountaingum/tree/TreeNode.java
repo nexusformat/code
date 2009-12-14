@@ -275,8 +275,24 @@ public class TreeNode {
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
 	}
-	@Override
 	public String toString() {
 		return getProperty("name");
+	}
+	public void dispose(){
+		TreeNode son, tmp;
+		
+		parent = null;
+		treeListeners = null;
+		p = null;
+		
+		son = babies;
+		while(son != null){
+			son.dispose();
+			tmp = son.next;
+			son.previous = null;
+			son.next = null;
+			son = tmp;
+		}
+		babies = null;
 	}
 }
