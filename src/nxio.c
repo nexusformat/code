@@ -23,7 +23,10 @@
  *
  *  For further information, see <http://www.neutron.anl.gov/NeXus/>
  */
-#include <mxml.h>
+
+#ifdef NXXML 
+
+#include <mxml.h> 
 #include <assert.h>
 #include "napi.h"
 #include "nxio.h"
@@ -736,3 +739,6 @@ int main(int argc, char *argv[]){
 
 }
 #endif
+
+
+#endif /*NXXML*/ 

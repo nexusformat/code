@@ -24,6 +24,9 @@
   $Id$
 
 ----------------------------------------------------------------------------*/
+
+#ifdef HDF4 
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -2008,3 +2011,5 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX4initattrdir;
       fHandle->nxprintlink=NX4printlink;
 }
+
+#endif /*HDF4*/

@@ -20,6 +20,10 @@
  *
  *  For further information, see <http://www.nexusformat.org>
  */
+
+
+#ifdef NXXML 
+
 #include <stdio.h>
 #include <napi.h>
 #include <assert.h>
@@ -1934,3 +1938,6 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxprintlink=NXXprintlink;
 }
 
+
+
+#endif /*NXXML*/
