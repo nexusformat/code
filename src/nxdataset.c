@@ -178,8 +178,7 @@ static int calculateAddress(pNXDS dataset, int pos[]){
 /*-----------------------------------------------------------------------*/
 double getNXDatasetValue(pNXDS dataset, int pos[]){
   int address;
-  double value;
-
+ 
   if(dataset == NULL){
     return 0;
   }
@@ -229,7 +228,7 @@ double getNXDatasetValueAt(pNXDS dataset, int address){
 /*-----------------------------------------------------------------------*/
 char  *getNXDatasetText(pNXDS dataset){
   char *resultBuffer = NULL;
-  int length, status = 1;
+  int status = 1;
 
   if(dataset == NULL){
     return strdup("NULL");

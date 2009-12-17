@@ -231,8 +231,7 @@ extern void NXMEnableErrorReporting()
 static int determineFileType(CONSTCHAR *filename)
 {
   FILE *fd = NULL;
-  int iRet, fapl;
-  NXhandle handle;
+  int iRet;
   
   /*
     this is for reading, check for existence first
@@ -282,7 +281,6 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am,
 NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   int status;
   pFileStack fileStack = NULL;
-  NXhandle hfile;
 
   *gHandle = NULL;
   fileStack = makeFileStack();
@@ -1210,7 +1208,6 @@ static NXstatus moveOneDown(NXhandle hfil)
 static char *moveDown(NXhandle hfil, char *path, int *code)
 {
   int status;
-  NXname pathElem;
   char *pPtr;
 
   *code = NX_OK;
@@ -1239,7 +1236,7 @@ static char *moveDown(NXhandle hfil, char *path, int *code)
 /*--------------------------------------------------------------------*/
 static NXstatus stepOneUp(NXhandle hfil, char *name)
 {
-  int status, datatype;
+  int datatype;
   NXname name2, xclass;
   char pBueffel[256];  
 
@@ -1275,7 +1272,7 @@ static NXstatus stepOneUp(NXhandle hfil, char *name)
 /*--------------------------------------------------------------------*/
 static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
 {
-  int status, datatype;
+  int datatype;
   NXname name2, xclass;
   char pBueffel[256];  
 
@@ -1405,7 +1402,6 @@ NXstatus NXgetpath(NXhandle fid, char *path, int pathlen){
   format NeXus time. Code needed in every NeXus file driver
   ---------------------------------------------------------------------*/
 char *NXIformatNeXusTime(){
-    char *timeData;
     time_t timer;
     char* time_buffer = NULL;
     struct tm *time_info;
