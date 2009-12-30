@@ -345,7 +345,6 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
 NXstatus  NXXclosegroup (NXhandle fid){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
-  char error[1024];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -723,7 +722,7 @@ NXstatus  NXXputdatatable (NXhandle fid, void *data){
   mxml_node_t *dataNode = NULL;
   const char* name;
   pNXDS dataset;
-  int i, offset, length, type, rank, dim[NX_MAXRANK];
+  int i, offset, length;
   char *pPtr = NULL;
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -822,7 +821,7 @@ NXstatus  NXXgetdatatable (NXhandle fid, void *data){
   mxml_node_t *dataNode = NULL;
   const char* name;
   pNXDS dataset;
-  int i, offset, length, type, rank, dim[NX_MAXRANK];
+  int i, offset, length;
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
@@ -1296,8 +1295,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
   const char *attribute = NULL;
   char error[1024];
   const char *attData = NULL;
-  int iValue, nx_type;
-  float fValue;
+  int nx_type;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1667,7 +1665,7 @@ NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
 NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
-  int stackPtr, currentAtt, skip;
+  int stackPtr, skip;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1743,7 +1741,6 @@ static char *findLinkPath(mxml_node_t *node){
   int stackPtr;
   mxml_node_t *current = NULL;
   char *pathString = NULL, *result = NULL;
-  int count;
 
   path = (mxml_node_t **)malloc(NXMAXSTACK*sizeof(mxml_node_t *));
   if(path == NULL){

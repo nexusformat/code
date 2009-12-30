@@ -329,8 +329,7 @@ static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
 			    int *iDim){
   const char *typeString;
   mxml_node_t* tnode;
-  mxml_type_t myType;
-  int i, nx_type = -1;
+  int nx_type = -1;
   int table_mode = 0;
 
   *rank = 1;
@@ -405,7 +404,6 @@ static char *getNextNumber(char *pStart, char pNumber[80]){
 /*--------------------------------------------------------------------*/
 mxml_type_t nexusTypeCallback(mxml_node_t *parent){
   const char *typeString;
-  mxml_node_t * tnode;
 
   if(strstr(parent->value.element.name,"?xml") != NULL ||
      !strncmp(parent->value.element.name,"NX",2) ||
@@ -445,7 +443,7 @@ int nexusLoadCallback(mxml_node_t *node, const char *buffer){
   char pNumber[80], *pStart;
   long address, maxAddress;
   pNXDS dataset = NULL;
-  int i, table_mode;
+  int table_mode;
 
   parent = node->parent;
   table_mode = analyzeDataType(parent,&rank,&type,iDim);
@@ -481,7 +479,7 @@ int nexusLoadCallback(mxml_node_t *node, const char *buffer){
 /*---------------------------------------------------------------------*/
 static void stringIntoBuffer(char **buffer, char **bufPtr, int *bufSize, 
 		      char *string){
-  int i;
+  size_t i;
 
   for(i = 0; i < strlen(string); i++){
     myxml_add_char(string[i],bufPtr,buffer,bufSize);

@@ -112,7 +112,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   static int32 NXIFindVgroup (pNexusFile pFile, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     int32 iNew, iRef, iTag;
-    int iN, i, status;
+    int iN, i;
     int32 *pArray = NULL;
     NXname pText;
   
@@ -1324,7 +1324,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
-    int32 iVG, iRet, dataID, type = DFNT_CHAR8, length;
+    int32 dataID, type = DFNT_CHAR8, length;
     char name[] = "target";
   
     pFile = NXIassert (fid);
@@ -1356,7 +1356,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4makenamedlink (NXhandle fid, CONSTCHAR* newname, NXlink* sLink)
   {
     pNexusFile pFile;
-    int32 iVG, iRet, dataID, type = DFNT_CHAR8, length, dataType = NX_CHAR, 
+    int32 dataID, type = DFNT_CHAR8, length, dataType = NX_CHAR, 
       rank = 1, attType = NX_INT32;
     int iDim[1];
     char name[] = "target";

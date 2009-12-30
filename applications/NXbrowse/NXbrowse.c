@@ -144,8 +144,8 @@ static char* field_generator(const char* text, int state)
     struct name_item *item, *t_item;
     static struct name_item *names = NULL, *last_item = NULL;
     char* res;
-    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], length;
-    NXname name, nxclass, nxurl;
+    int status, dataType;
+    NXname name, nxclass;
     if (!state)
     {
 	item = names;
