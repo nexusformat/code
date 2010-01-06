@@ -1,0 +1,25 @@
+<project>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/NXvalidate.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="org.nexusformat.nxvalidate.NXvalidateBasicGui"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="build/jar/NXvalidate.jar" fork="true"/>
+    </target>
+
+</project>
