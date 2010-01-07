@@ -63,6 +63,12 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		fc = new JFileChooser();
 
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		NeXusFilter nxsFilter = new NeXusFilter();
+		this.fc.addChoosableFileFilter(nxsFilter);
+		this.fc.addChoosableFileFilter(new AllNeXusFilter());
+		this.fc.addChoosableFileFilter(new HdfFilter());
+		this.fc.addChoosableFileFilter(new XmlFilter());
+        this.fc.setFileFilter(nxsFilter);
 
 		// Create the filename label
 		filenameLabel = new JLabel("Filename:");

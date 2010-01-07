@@ -3,7 +3,8 @@ package org.nexusformat.nxvalidate;
 import java.io.File;
 import java.io.FileFilter;
 
-public class ExtensionFilter implements FileFilter {
+public class ExtensionFilter extends javax.swing.filechooser.FileFilter
+                                     implements FileFilter {
 	private String extension;
 	private boolean withDirectories;
 
@@ -30,4 +31,8 @@ public class ExtensionFilter implements FileFilter {
 		return (pathname.getName().endsWith(this.extension));
 	}
 
+    @Override
+    public String getDescription() {
+        return "*" + this.extension;
+    }
 }
