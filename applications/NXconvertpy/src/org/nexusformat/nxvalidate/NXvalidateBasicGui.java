@@ -188,6 +188,10 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 					throw new Exception(
 							"We only sent a single file to be processed, but have received multiple reports back.");
 				}
+				if (this.reports.size() < 1) {
+				    throw new Exception(
+				        "Failed to generate a report for " + filenameText.getText());
+				}
 
 				// converter = new NXconvert(filenameText.getText(), true);
 				// log.append("Converting NeXus file into reduced format."
@@ -217,7 +221,6 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 				//			
 
 				log.append("Finished Validating." + newline);
-
 				Report report = reports.get(0);
 				tree.setModel(report.getTree());
 
@@ -231,7 +234,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 					log.append("->" + i.next() + newline);
 				}
 
-			} catch (Exception e1) {
+			} catch (Throwable e1) {
 				log.append(e1.getMessage() + newline);
 				e1.printStackTrace();
 			}
