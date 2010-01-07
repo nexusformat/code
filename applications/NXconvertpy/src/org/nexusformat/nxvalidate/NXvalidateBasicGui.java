@@ -37,9 +37,13 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 	JButton validateButton;
 	JLabel filenameLabel;
 	JTextField filenameText;
+	JLabel nxdlLabel;
+	JButton browseNxdlButton;
+	JTextField nxdlText;
 	JTextArea log;
 	JTree tree;
 	JFileChooser fc;
+	JFileChooser nxdlChooser;
 	String reducedNeXusFilename;
 	String schematronFile = "schematron.sch";
 	NXconvert converter;
@@ -59,7 +63,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		log.setEditable(false);
 		JScrollPane logScrollPane = new JScrollPane(log);
 
-		// Create a file chooser
+		// Create a nexus file chooser
 		fc = new JFileChooser();
 
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -70,8 +74,18 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		this.fc.addChoosableFileFilter(new XmlFilter());
         this.fc.setFileFilter(nxsFilter);
 
+		// set the default definition filename
+		this.setDefaultDefinition();
+
+        // create a definition file chooser
+        this.nxdlChooser = new JFileChooser();
+        nxdlChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        nxdlChooser.setSelectedFile(new File(this.schematronFile));
+        this.nxdlChooser.addChoosableFileFilter(new SchematronFilter());
+        
+        // ----- nexus file loading
 		// Create the filename label
-		filenameLabel = new JLabel("Filename:");
+		filenameLabel = new JLabel("NXS File:");
 
 		// Create the filename text field
 		filenameText = new JTextField(30);
@@ -81,19 +95,24 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		browseFileButton = new JButton("Browse...");
 		browseFileButton.addActionListener(this);
 
+		// ----- nxdl file loading
+		// Create the filename label
+		nxdlLabel = new JLabel("NXDL File:");
+
+		// Create the text field
+		nxdlText = new JTextField(30);
+		nxdlText.setToolTipText("The definition to validate against");
+		nxdlText.setText(this.schematronFile);
+
+		// create the browse button
+		browseNxdlButton = new JButton("Browse...");
+		browseNxdlButton.addActionListener(this);
+
+		// ----- the big validate button
 		// Create the validation button.
 		validateButton = new JButton("Perform Validation");
 		validateButton.setToolTipText("Perform Validation");
 		validateButton.addActionListener(this);
-
-		// For layout purposes, put the buttons in a separate panel
-		JPanel filePanel = new JPanel(); // use FlowLayout
-		filePanel.add(filenameLabel);
-		filePanel.add(filenameText);
-		filePanel.add(browseFileButton);
-
-		JPanel validatePanel = new JPanel();
-		validatePanel.add(validateButton);
 
 		// Create the tree view
 		tree = new JTree(new NXSnode());
@@ -107,6 +126,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 
 		// Add the buttons and the log to this panel.
 
+		// nxs input
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridy = 0;
 		c.gridx = 0;
@@ -127,8 +147,30 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		c.weightx = 0.5;
 		add(browseFileButton, c);
 
+		// nxdl input
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridy = 1;
+		c.gridx = 0;
+		c.weightx = 0.5;
+		c.insets = new Insets(0, 10, 0, 0);
+		add(nxdlLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(0, 0, 0, 0);
+		c.gridy = 1;
+		c.gridx = 1;
+		c.weightx = 0.5;
+		add(nxdlText, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridy = 1;
+		c.gridx = 2;
+		c.weightx = 0.5;
+		add(browseNxdlButton, c);
+
+		// validate button
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridy = 2;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.gridwidth = 3;
@@ -136,12 +178,17 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
-		c.gridy = 2;
+		c.gridy = 3;
 		add(new JScrollPane(tree), c);
 
 		c.weightx = 0.0;
-		c.gridy = 3;
+		c.gridy = 4;
 		add(logScrollPane, c);
+	}
+
+	private void setDefaultDefinition() {
+		File file = new File(this.schematronFile);
+		this.schematronFile = file.getAbsolutePath();
 	}
 
 	public TreeModel parseXML(String filename) throws Exception {
@@ -154,8 +201,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 
-		// Handle open button action.
-		if (e.getSource() == browseFileButton) {
+		if (e.getSource() == browseFileButton) { // Handle open button action.
 			int returnVal = fc.showOpenDialog(NXvalidateBasicGui.this);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -167,12 +213,21 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 				// TODO move code to make the reduced file here (and also after
 				// the filename has been typed).
 			} else {
-				log.append("Browse command cancelled by user." + newline);
+				log.append("Browse nexus cancelled by user." + newline);
 			}
 			log.setCaretPosition(log.getDocument().getLength());
 
-			// Handle save button action.
-		} else if (e.getSource() == validateButton) {
+		} else if (e.getSource() == this.browseNxdlButton) {
+			int returnVal = this.nxdlChooser.showOpenDialog(NXvalidateBasicGui.this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				this.nxdlText.setText(file.getAbsolutePath());
+				log.append("Selected Definition File: " + file.getName() + "."
+						+ newline);
+			} else {
+				log.append("Browse definition cancelled by user." + newline);
+			}
+		} else if (e.getSource() == validateButton) { // Handle save button action.
 			// Do the validation
 			try {
 
