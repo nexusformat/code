@@ -143,49 +143,59 @@ public class NXvalidate {
 		return file.getAbsolutePath();
 	}
 
-	private int process(final String filename) {
+	private void process(final String filename) throws Error {
 		if (this.verbose > 0) {
 			System.out.println("Validating " + filename);
 		}
-		try {
-			// reduce the nexus file
-			String reduced = "";
-			if (this.convertNxs) {
+
+		// reduce the nexus file
+		String reduced = "";
+		if (this.convertNxs) {
+			try {
 				NXconvert converter = new NXconvert(filename, this.keepTemp);
-				reduced = converter.convert();
-			} else {
-				reduced = toAbsFile(filename);
+			    reduced = converter.convert();
+		    } catch (Exception e) {
+				throw new Error("While converting \"" + filename
+		            + "\" to reduced xml format", e);
 			}
-
-			// create the validation setup
-			NXschematron schematron = new NXschematron(reduced,
-					this.schematron, this.keepTemp);
-
-			String result = schematron.validate();
-
-			// create the report
-			Report report = new Report(reduced, result);
-			// Add to vector of reports (one for each input file)
-			reports.add(report);
-			System.out.println("===== Tree");
-			report.printTree();
-			int numErrors = report.numErrors();
-			if (numErrors > 0) {
-				System.out.println("===== Report");
-				report.printReport();
-			}
-			System.out.println("===== Found " + report.numErrors() + " errors");
-
-			System.out.println(result);
-		} catch (Exception e) {
-			System.out.println("While processing " + filename + " encountered "
-					+ e.toString());
-			if (this.verbose > 0) {
-				e.printStackTrace();
-			}
-			return 1;
+		} else {
+			reduced = toAbsFile(filename);
 		}
-		return 0;
+
+		// create the validation setup
+		NXschematron schematron = new NXschematron(reduced,
+				this.schematron, this.keepTemp);
+
+		String result = "";
+        try {
+			result  = schematron.validate();
+		} catch (Exception e) {
+		    throw new Error("While creating validation report", e);
+		}
+
+		// create the report
+		Report report = null;
+		try {
+		    report = new Report(reduced, result);
+		} catch (Exception e) {
+		    throw new Error("While generating the report object", e);
+		}
+
+		// Add to vector of reports (one for each input file)
+		reports.add(report);
+		System.out.println("===== Tree");
+		report.printTree();
+		int numErrors = report.numErrors();
+		if (numErrors > 0) {
+			System.out.println("===== Report");
+			report.printReport();
+		}
+		System.out.println("===== Found " + report.numErrors() + " errors");
+
+		System.out.println(result);
+		/*} catch (Exception e) {
+		    throw new Error("While processing " + filename, e);
+		}*/
 	}
 
 	private void printVersion() {
