@@ -760,6 +760,7 @@ AC_CONFIG_FILES([Makefile
 		contrib/applications/CBFLib/Makefile
 		contrib/bindings/Makefile
 		contrib/bindings/python/Makefile
+		macosx_install_kit/Makefile
 		macosx_install_kit/pkg.config
 		scripts/Makefile
 		scripts/nexus.pc:scripts/nexus_pc.in

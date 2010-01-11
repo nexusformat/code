@@ -24,17 +24,23 @@ endif
 endif
 	touch doxy.remove_me_to_remake
 
+dist-hook :
 if HAVE_DOXYGEN
 if HAVE_PDFLATEX
 if HAVE_DOT
-dist-hook :
 	test -f $(srcdir)/refman.pdf && cp $(srcdir)/refman.pdf $(distdir)
 	if test -d $(srcdir)/html; then \
 		cp -r $(srcdir)/html $(distdir); \
 		find $(distdir)/html -depth -type d -name '.svn' -exec rm -fr {} \; ;\
 	fi
+endif
+endif
+endif
 
 install-data-local :
+if HAVE_DOXYGEN
+if HAVE_PDFLATEX
+if HAVE_DOT
 	$(mkinstalldirs) $(DESTDIR)$(nxdoxydir)
 	test -f $(srcdir)/refman.pdf && cp $(srcdir)/refman.pdf $(DESTDIR)$(nxdoxydir)
 	if test -d $(srcdir)/html; then \
