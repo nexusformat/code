@@ -125,16 +125,23 @@ java_host="linux"
 JAVAROOT=""
 AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK i.e. where the bin, lib and include directories live]),
 	[], [with_java_home=$withval])
+AC_ARG_WITH([java], AC_HELP_STRING([--with-java=path to java executable], [Specify location of JAVA executable]),
+	[], [with_java=no])
+if test -z "$with_java_home" -a x$with_java != xno; then
+    def_javac=`which javac`
+    link_javac=`readlink -e "$def_javac"`
+    with_java_home=`dirname "$link_javac"`/..
+fi
 if test -d "$with_java_home"; then
 	JAVAROOT="$with_java_home"
 	AC_MSG_NOTICE([Java SDK home is $JAVAROOT])
 	JAVAINCLUDE="-I$JAVAROOT/include"
-	AC_PATH_PROGS(JAVAC,gcj javac,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVAC,javac gcj,,[$JAVAROOT/bin])
 	if test `basename "$JAVAC"` = "gcj"; then
 	    JAVACFLAGS="-C"	# force creation of .class files
 	fi
-	AC_PATH_PROGS(JAVA,gij java,,[$JAVAROOT/bin])
-	AC_PATH_PROGS(JAVAH,gcjh javah,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVA,java gij,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVAH,javah gcjh,,[$JAVAROOT/bin])
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$JAVAROOT/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar fastjar,,[$JAVAROOT/bin:$PATH])
 fi
