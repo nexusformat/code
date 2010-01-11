@@ -28,7 +28,9 @@ dist-hook :
 if HAVE_DOXYGEN
 if HAVE_PDFLATEX
 if HAVE_DOT
-	test -f $(srcdir)/refman.pdf && cp $(srcdir)/refman.pdf $(distdir)
+	if test -f $(srcdir)/refman.pdf; then \
+	    cp $(srcdir)/refman.pdf $(distdir); \
+	fi
 	if test -d $(srcdir)/html; then \
 		cp -r $(srcdir)/html $(distdir); \
 		find $(distdir)/html -depth -type d -name '.svn' -exec rm -fr {} \; ;\

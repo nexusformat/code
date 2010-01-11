@@ -33,4 +33,4 @@
 if HAVE_PYTHON
 PYSUB = python
 endif
-SUBDIRS = $(JAVASUB) $(PYSUB)
+SUBDIRS = $(PYSUB) # $(JAVASUB)
