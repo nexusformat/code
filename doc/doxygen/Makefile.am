@@ -44,7 +44,9 @@ if HAVE_DOXYGEN
 if HAVE_PDFLATEX
 if HAVE_DOT
 	$(mkinstalldirs) $(DESTDIR)$(nxdoxydir)
-	test -f $(srcdir)/refman.pdf && cp $(srcdir)/refman.pdf $(DESTDIR)$(nxdoxydir)
+	if test -f $(srcdir)/refman.pdf; then \
+	    cp $(srcdir)/refman.pdf $(DESTDIR)$(nxdoxydir); \
+        fi
 	if test -d $(srcdir)/html; then \
 		cp -r $(srcdir)/html $(DESTDIR)$(nxdoxydir); \
 		find $(DESTDIR)$(nxdoxydir) -type f -exec chmod 0644 {} \; ;\
