@@ -2,10 +2,10 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
-#
-#  Makefile for coordinating the generation of language bindings
+#  $Id: Makefile.am 1251 2009-05-01 15:41:53Z Freddie Akeroyd $
 #  
+#  Makefile for building NeXus applications
+#
 #  Copyright (C) 2004 Freddie Akeroyd
 #  
 #  This library is free software; you can redistribute it and/or
@@ -26,11 +26,12 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #====================================================================
-
-#if HAVE_JAVAC
-#JAVASUB = java
-#endif
-if HAVE_PYTHON
-PYSUB = python
-endif
-SUBDIRS = $(PYSUB) # $(JAVASUB)
+EXTRA_DIST=build_mac_kit.sh pkg.config.in ReadMe.txt \
+	bin/*.sh \
+	Resources/postflight Resources/preflight \
+	Resources/English.lproj/background.jpg \
+	Resources/English.lproj/Conclusion.txt \
+	Resources/English.lproj/Description.plist \
+	Resources/English.lproj/License.txt \
+	Resources/English.lproj/ReadMe.txt \
+	Resources/English.lproj/Welcome.txt
