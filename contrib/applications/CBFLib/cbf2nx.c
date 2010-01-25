@@ -2,6 +2,7 @@
  *          cif2nx -- convert a cif or cbf to a NeXus file            *
  *                                                                    *
  * Part of CBFlib Version 0.7.8 20 September 2007                     *
+ * Rev 25 Jan 2010, HJB -- drop CIF down below NXcif group            *
  *                                                                    *
  *                          Paul Ellis and                            *
  *         Herbert J. Bernstein (yaya@bernstein-plus-sons.com)        *
@@ -478,6 +479,7 @@ int main (int argc, char *argv [])
   const char *category_name;
   const char *column_name;
   const char *value;
+  char *cifname;
   unsigned int colnum, rownum;
   unsigned int columns;
   unsigned int rows;
@@ -490,6 +492,7 @@ int main (int argc, char *argv [])
 /**********************************************************************
  *  cif2nx [-i input_cif] [-o output_nx] \                            *
  *    [-e [4|5|x]] [-c [n|g|h|r]]        \                            *
+ *    [-n cifname] \                                                  *
  *    [-v dictionary]* \                                              *
  *    [input_cif] [output_nx]                                         *
  *                                                                    *
@@ -506,6 +509,7 @@ int main (int argc, char *argv [])
 
    cifin = NULL;
    nxout = NULL;
+   cifname = NULL;
    ciftmpused = 0;
    
    strcpy(nxcifbuf,"NXcif_");
@@ -514,7 +518,7 @@ int main (int argc, char *argv [])
    nxcifrowbase=strlen(nxcifrow);
    
    
-   while ((c = getopt(argc, argv, "i:o:v:e:c:")) != EOF) {
+   while ((c = getopt(argc, argv, "i:o:v:e:c:n:")) != EOF) {
      switch (c) {
        case 'i':
          if (cifin) errflg++;
@@ -523,6 +527,10 @@ int main (int argc, char *argv [])
        case 'o':
          if (nxout) errflg++;
          else nxout = optarg;
+         break;
+       case 'n':
+         if (cifname) errflg++;
+         else cifname = optarg;
          break;
        case 'v':
          if (ndict < NUMDICTS)
@@ -575,6 +583,8 @@ int main (int argc, char *argv [])
        "  cif2nx [-i input_cif] [-o output_nx] \\\n");
      fprintf(stderr,
        "    [-e [4|5|x]] [-c [n|g|h|r]]        \\\n");
+     fprintf(stderr,
+       "    [-n cifname] \\\n");
      fprintf(stderr,
        "    [-v dictionary]* \\\n");
      fprintf(stderr,
@@ -672,6 +682,18 @@ int main (int argc, char *argv [])
    if (NXopen (nxout, nxf_access, &nxf) != NX_OK) {
      fprintf (stderr," cif2nx: Couldn't open the output NeXus file %s\n", nxout);
    }
+   
+   if (!cifname) cifname = "NXcif";
+       
+   if (NXmakegroup (nxf, cifname, "NXcif") != NX_OK) {
+     	fprintf(stderr," cif2nx: Failed to create group NXcif::%s\n",cifname);
+        local_exit (1);
+   }
+   if (NXopengroup (nxf, cifname, "NXcif") != NX_OK) {
+     	fprintf(stderr," cif2nx: Failed to open group NXcif::%s\n",cifname);
+        local_exit (1);
+   }
+    
 
    cbf_failnez (cbf_rewind_datablock(cif))
 
@@ -679,787 +701,787 @@ int main (int argc, char *argv [])
 
    for (blocknum = 0; blocknum < blocks;  blocknum++ )
    { /* start of copy loop */
-   
-     char ** columnarray = NULL; 
-     char ** columnarraytype; 
-
-     cbf_failnez (cbf_select_datablock(cif, blocknum))
-     cbf_failnez (cbf_datablock_name(cif, &datablock_name))
-     strcpy(nxcifbuf+nxcifbufbase,datablock_name);
-     if (NXmakegroup (nxf, nxcifbuf+nxcifbufbase, "NXentry") != NX_OK) {
-     	fprintf(stderr," cif2nx: Failed to create NXentry %s\n",nxcifbuf);
-        local_exit (1);
-     }
-     if (NXopengroup (nxf, nxcifbuf+nxcifbufbase, "NXentry") != NX_OK) {
-     	fprintf(stderr," cif2nx: Failed to open NXentry %s\n",nxcifbuf);
-        local_exit (1);
-     }
-
-     if ( !cbf_rewind_blockitem(cif, &itemtype) ) {
-     cbf_failnez (cbf_count_blockitems(cif, &blockitems))
-
-     for (itemnum = 0; itemnum < blockitems;  itemnum++) {
-       cbf_select_blockitem(cif, itemnum, &itemtype);
-       if (itemtype == CBF_CATEGORY) {
-         cbf_category_name(cif,&category_name);
-         /* Create the NeXus NXcifcat group for this category */
-         if (NXmakegroup (nxf, category_name, "category") != NX_OK) {
-         fprintf(stderr," cif2nx: Failed to create category %s\n",category_name);
-         local_exit (1);
-         }
-         /*  Open the NeXus NXcifcat group for this category */
-         if (NXopengroup (nxf, category_name, "category") != NX_OK) {
-     	   fprintf(stderr," cif2nx: Failed to open category %s\n",category_name);
+       
+       char ** columnarray = NULL; 
+       char ** columnarraytype; 
+       
+       cbf_failnez (cbf_select_datablock(cif, blocknum))
+       cbf_failnez (cbf_datablock_name(cif, &datablock_name))
+       if (NXmakegroup (nxf, datablock_name, "datablock") != NX_OK) {
+           fprintf(stderr," cif2nx: Failed to create datablock %s\n",nxcifbuf);
            local_exit (1);
-         }
-         cbf_count_rows(cif,&rows);
-         nxrank[0]=rows;
-         nxrank[1]=2;
-         if (rows) columnarray = (char **)malloc(rows*sizeof(char *)*2);
-         if (rows && !columnarray) {
-           fprintf(stderr," cif2nx: Failed to allocate columnarray %s\n",category_name);
-           local_exit (1);
-         }
-         columnarraytype = columnarray+rows;
-         cbf_count_columns(cif,&columns);
-
-         /*  Transfer the columns names from cif to nexus */
-         if (columns && ! cbf_rewind_column(cif) ) {
-           int somebinary;
-           unsigned int irn=0;
-           int irnrank=1;
-           char scratchbuf[40];
-           do {
-             cbf_failnez(cbf_column_name(cif, &column_name))
-             cbf_rewind_row(cif);
-             somebinary=0;
-             /* Transfer column from cif to nexus */
-             for (rownum = 0; rownum < rows; rownum++) {
-               const char *typeofvalue;
-               columnarray[rownum]=NULL;
-               columnarraytype[rownum]=NULL;
-               cbf_failnez(cbf_select_row(cif,rownum))
-               if ( ! cbf_get_value(cif, &value) ) {
-             	 cbf_failnez (cbf_get_typeofvalue(cif, &typeofvalue))
-             	 columnarray[rownum]=(char *)value;
-             	 columnarraytype[rownum]=(char *)typeofvalue;
-             	 if (!columnarray[rownum]) {
-             	   columnarray[rownum] = ".";
-             	   columnarraytype[rownum] = "null";
-             	 }
-                 if (columnarraytype[rownum]==NULL) columnarraytype[rownum]= "undefined";
-                 
-                 /* DEBUG:  fprintf(stderr,"Column %s, row %d, value %s, type %s\n",
-                   column_name, rownum, columnarray[rownum], columnarraytype[rownum] ); */
- 
-                 if (somebinary) {
-                   char * strbuf;
-                   sprintf(nxcifrow,"data[%-d]",rownum);
-                   if (rows==1)sprintf(nxcifrow,"data");
-                   cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[rownum],columnarraytype[rownum]))
-                   irnrank=strlen(strbuf)+1;
-                   if (irnrank < 4096 || !compression){
-                     if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1);
-                     }
-                   } else {
-                     if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1);
-                     }                 	
-                   }
-                   if (NXopendata (nxf, nxcifrow) != NX_OK) {
-     	             fprintf(stderr," cif2nx: Failed to open row %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);
-                   }
-                   if (NXputdata (nxf, strbuf ) != NX_OK ) {
-     	             fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1); 	
-                   } 
-                   free(strbuf);
-                   if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);	
-                   }
-                   NXclosedata(nxf);
-                 }
-               } else {
-                 char * typebuffer;
-                 void * array;
-                 int binary_id, elsigned, elunsigned;
-                 size_t elements,elements_read, elsize;
-                 int minelement, maxelement;
-                 unsigned int cifcompression;
-                 int realarray;
-                 const char *byteorder;
-                 size_t dim1, dim2, dim3, padding;
-                 
-                 /* If this is the first encounter with a binary in the column
-                    we need to create a group for the column and move whatever rows
-                    were being saved in columnarray into individual datasets  */
-                 
-                 if (!somebinary) {
-                
-                   if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
-                     fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                     local_exit (1);
-                   }
-                   if (NXopengroup (nxf, column_name, "column") != NX_OK) {
-                     fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
-                     local_exit (1);
-                   }
-                   /* copy the rows that were already done */
-                   for (irn = 0; irn < rownum; irn++) {
-                     char * strbuf;
-                     sprintf(nxcifrow,"data[%-d]",irn);
-                     if (rows==1) sprintf(nxcifrow,"data");
-                     cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[irn],columnarraytype[irn]))
-                     irnrank=strlen(strbuf)+1;
-                     if (irnrank < 4096 || !compression){
-                       if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
-     	                 fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                         local_exit (1);
-                       }
-                     } else {
-                       if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
-     	                 fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                         local_exit (1);
-                       }                 	
-                     }
-
-                     if (NXopendata (nxf, nxcifrow) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1);
-                     }
-                     if (NXputdata (nxf, strbuf ) != NX_OK ) {
-     	               fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1); 	
-                     } 
-                     free(strbuf);
-                     if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
-                       fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1);	
-                     }
-                     NXclosedata(nxf);
-                   }
-                   somebinary = 1;
-                 }
-                 
-                 
-                 /* The data we get from CIF may be an integer array of up to 3 dimensions
-                    or a real array of up to 3 dimensions.  (Note that the limit to 3 dimensions
-                    is just a matter of the current CBFlib API.  CBF itself may have any number
-                    of dimensions, and this should be allowed for in anything we do here) */
-
-                 cbf_failnez(cbf_get_arrayparameters_wdims(
-                   cif, &cifcompression,
-                   &binary_id, &elsize, &elsigned, &elunsigned,
-                   &elements, &minelement, &maxelement, &realarray,
-                   &byteorder, &dim1, &dim2, &dim3, &padding))
-                   if ((array=malloc(elsize*elements))) {
-                   
-                     int ii, arrayrank, nexustype;
-                     
-                     if (!realarray)  {
-                       cbf_failnez (cbf_get_integerarray(
-                        cif, &binary_id, array, elsize, elsigned,
-                         elements, &elements_read))
-                     } else {
-                       cbf_failnez (cbf_get_realarray(
-                         cif, &binary_id, array, elsize,
-                         elements, &elements_read))
-                       elsigned = 1;
-                     }
-                     nxrank[0] = dim1;
-                     nxrank[1] = dim2;
-                     nxrank[2] = dim3;
-                     
-                     nexustype = NX_UINT8;
-                     if (realarray) {
-                       if (elsize == 4) nexustype = NX_FLOAT32;
-                       else if (elsize == 8) nexustype = NX_FLOAT64;
-                     } else {
-                       if (elunsigned) {
-                         if (elsize == 1) nexustype = NX_UINT8;
-                         else if (elsize == 2) nexustype = NX_UINT16;
-                         else if (elsize == 4) nexustype = NX_UINT32;                       	
-                       } else {
-                         if (elsize == 1) nexustype = NX_INT8;
-                         else if (elsize == 2) nexustype = NX_INT16;
-                         else if (elsize == 4) nexustype = NX_INT32;                       	
-                       	
-                       }
-                     	
-                     }
-                     
-                     arrayrank=1;
-                     for (ii=0; ii< 3; ii++)  {
-                       if (nxrank[ii] == 0) nxrank[ii] = 1;
-                       if (nxrank[ii] > 1) arrayrank = ii+1;
-                     }
-                     if (nexustype == NX_UINT8) nxrank[0] *= elsize;
-
-
-                    /* Now we have already made the column into a group and the rows into
-                    data sets, the group for the column is open.  We need to create and
-                    populate the data set as the next row */ 
-
-                   sprintf(nxcifrow,"data[%-d]",rownum);
-                   if (rows==1)sprintf(nxcifrow,"data");
-                   if (!compression)  {
-                     if (NXmakedata (nxf, nxcifrow, nexustype, arrayrank, nxrank) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1);
-                     }
-                   } else  {
-                     if (NXcompmakedata (nxf, nxcifrow, nexustype, arrayrank, nxrank,nexus_compression,nxrank) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                       local_exit (1);
-                     }                   	
-                   }
-                   if (NXopendata (nxf, nxcifrow) != NX_OK) {
-     	             fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);
-                   }
-                   if (NXputdata (nxf,array) != NX_OK) {
-     	             fprintf(stderr," cif2nx: Failed to put data in open %s in column %s\n",nxcifrow,column_name);
-                   }
-                   free(array);
-                   if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);	
-                   }
-                   if (NXputattr(nxf,"NXciftype","binary",strlen("binary"),NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store CIF type of %s in column %s\n",nxcifrow,column_name);
-                    local_exit (1);	
-                   }
-                   if (NXputattr(nxf,"NXcifarrayelementtype",
-                     realarray?"real":"integer",
-                     strlen(realarray?"real":"integer"),NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store CIF arrayelementtype of %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);	
-                   }
-                   sprintf(scratchbuf,"%-ld",elsize);
-                   if (NXputattr(nxf,"NXcifarrayelementsize",scratchbuf,strlen(scratchbuf),NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store CIF arrayelementsize of %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);	
-                   }
-                   if (NXputattr(nxf,"NXcifarrayelementsign",
-                     elunsigned?"unsigned":"signed",
-                    strlen(elunsigned?"unsigned":"signed"),NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store CIF arrayelementsign of %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);	
-                   }
-                   if (NXputattr(nxf,"NXcifarraybyteorder", (char *)byteorder, strlen(byteorder),NX_CHAR) != NX_OK ) {
-                     fprintf(stderr," cif2nx: Failed to store CIF arraybyteorder of %s in column %s\n",nxcifrow,column_name);
-                     local_exit (1);	
-                   }
-                   NXclosedata(nxf);
-                                               
-                   NXflush(&nxf);
-
-
-                 } else {
-                   fprintf(stderr,
-                     "\nFailed to allocate memory %ld bytes",
-                     (long) elsize*elements);
-                   local_exit (1);
-                 }
-                   
-               }
-             }
-             for (rownum = 0; rownum < rows; rownum++) {
-               if (columnarraytype[rownum]==NULL) columnarraytype[rownum]= "null";
-                   /* DEBUG:  fprintf(stderr,"Column %s, row %d, value %s, type %s\n",
-                   column_name, rownum, columnarray[rownum], columnarraytype[rownum] ); */
-
-             }
-             
-             if (!somebinary) {
-             
-               int numchars;
-               char * strbuf;
-               char * pchar;
-             
-               /* Create and open a column group to hold the entire column */
-                   
-               if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
-                  fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                  local_exit (1);
-               }
-               if (NXopengroup (nxf, column_name, "column") != NX_OK) {
-                  fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
-                  local_exit (1);
-               }
-
-               /* The rows have not been transferred.  We will convert to one
-                  large concatenated string, putting a newline between rows */
-                   
-               numchars = 0;
-               for (rownum = 0; rownum < rows;rownum++) {
-                 numchars++;
-                 numchars+=strlen(columnarray[rownum]);
-                 if (!cbf_cistrcmp(columnarraytype[rownum],"sglq") || 
-                   !cbf_cistrcmp(columnarraytype[rownum],"dblq")) numchars+=2;
-                 if (!cbf_cistrcmp(columnarraytype[rownum],"text")) numchars+=5;
-               }
-               
-               numchars++;
-               
-               if (!(strbuf = (char *)malloc(numchars) ) ) {
-                 fprintf(stderr," cbf2nx -- Failed to allocate memory for category %s column %s\n",
-                   category_name,column_name);
-               }
-               
-               pchar = strbuf;
-               if (rows > 1) *pchar++='\n';
-               
-               for (rownum = 0; rownum < rows; rownum++) {
-                 if (rownum > 0)  *pchar++='\n';
-                 if (!cbf_cistrcmp(columnarraytype[rownum],"sglq")) {
-                   *pchar++='\'';
-                   strcpy(pchar,columnarray[rownum]);
-                   pchar+=strlen(columnarray[rownum]);
-                   *pchar++='\'';
-                   continue;
-                 }
-                 if (!cbf_cistrcmp(columnarraytype[rownum],"dblq")) {
-                   *pchar++='\"';
-                   strcpy(pchar,columnarray[rownum]);
-                   pchar+=strlen(columnarray[rownum]);
-                   *pchar++='\"';
-                   continue;
-                 }
-                 if (!cbf_cistrcmp(columnarraytype[rownum],"text")) {
-                   *pchar++='\n'; *pchar++=';';
-                   strcpy(pchar,columnarray[rownum]);
-                   pchar+=strlen(columnarray[rownum]);
-                   *pchar++='\n'; *pchar++=';';
-                   continue;
-                 }
-                   strcpy(pchar,columnarray[rownum]);
-                   pchar+=strlen(columnarray[rownum]);
-               }
-               *pchar++='\0';
-               numchars = strlen(strbuf)+1;
-
-               if (numchars < 4096 || !compression) {
-                 if (NXmakedata (nxf, "data", NX_CHAR, 1, &numchars) != NX_OK) {
-     	          fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                   local_exit (1);
-                 }	
-               } else  {
-                 if (NXcompmakedata (nxf, "data", NX_CHAR, 1, &numchars,nexus_compression, &numchars) != NX_OK) {
-     	          fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                   local_exit (1);
-                 }
-               }
-               if (NXopendata (nxf, "data") != NX_OK) {
-     	         fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
-                 local_exit (1);
-               }
-               if (NXputdata (nxf, strbuf) != NX_OK ) {
-     	         fprintf(stderr," cif2nx: Failed to store column %s\n",column_name);
-                 local_exit (1);	
-               }
-               sprintf(nxcifrow,"%-d",rows);
-               if (NXputattr(nxf,"items",nxcifrow,strlen(nxcifrow),NX_CHAR) != NX_OK ) {
-                  fprintf(stderr," cif2nx: Failed to store itemcount %s in column %s\n",nxcifrow,column_name);
-                  local_exit (1);	
-               }
-               free(strbuf);
-               NXclosedata( nxf ); /* close the columns as a data set */
-             }
-             NXclosegroup( nxf); /* close the columns as a group */
-           } while ( ! cbf_next_column(cif) );
-           if (rows) free(columnarray);
-         }
-         NXclosegroup( nxf ); /* close the category */
-       } else {
-         cbf_saveframe_name(cif,&saveframe_name);
-         if (NXmakegroup (nxf, saveframe_name, "saveframe") != NX_OK) {
-         fprintf(stderr," cif2nx: Failed to create saveframe %s\n",saveframe_name);
-         local_exit (1);
-         }
-         if (NXopengroup (nxf, saveframe_name, "saveframe") != NX_OK) {
-     	   fprintf(stderr," cif2nx: Failed to open saveframe %s\n",saveframe_name);
-           local_exit (1);
-         }
-         if ( !cbf_rewind_category(cif) ) {
-           cbf_failnez (cbf_count_categories(cif, &categories))
-
-           for (catnum = 0; catnum < categories;  catnum++) {
-             cbf_select_category(cif, catnum);
-             cbf_category_name(cif,&category_name);
-             if (NXmakegroup (nxf, category_name, "category") != NX_OK) {
-               fprintf(stderr," cif2nx: Failed to create category %s\n",category_name);
-               local_exit (1);
-             }
-             if (NXopengroup (nxf, category_name, "category") != NX_OK) {
-     	       fprintf(stderr," cif2nx: Failed to open category %s\n",category_name);
-               local_exit (1);
-             }
-             cbf_count_rows(cif,&rows);
-             nxrank[0]=rows;
-             nxrank[1]=2;
-             if (rows) columnarray = (char **)malloc(rows*sizeof(char *)*2);
-             if (rows && !columnarray) {
-               fprintf(stderr," cif2nx: Failed to allocate columnarray %s\n",category_name);
-               local_exit (1);
-             }
-             columnarraytype = columnarray+rows;
-             cbf_count_columns(cif,&columns);
-             
-             /*  Transfer the columns names from cif to nexus */
-             if (columns && ! cbf_rewind_column(cif) ) {
-               int somebinary;
-               somebinary = 0;
-               unsigned int irn;
-               int irnrank=1;
-               char scratchbuf[40];
-               do {
-                 cbf_failnez(cbf_column_name(cif, &column_name))
-                 cbf_rewind_row(cif);
-                 /* Transfer column from cif to nexus */
-                 for (rownum = 0; rownum < rows; rownum++) {
-                   const char *typeofvalue;
-                   columnarray[rownum]=NULL;
-                   columnarraytype[rownum]=NULL;
-                   cbf_failnez(cbf_select_row(cif,rownum))
-                   if ( ! cbf_get_value(cif, &value) ) {
-               	     cbf_failnez (cbf_get_typeofvalue(cif, &typeofvalue))
-             	     columnarray[rownum]=(char *)value;
-             	     columnarraytype[rownum]=(char *)typeofvalue;
-             	     if (!columnarray[rownum]) {
-             	       columnarray[rownum] = ".";
-             	       columnarraytype[rownum] = "null";
-             	     }
-                     if (columnarraytype[rownum]==NULL) columnarraytype[rownum]= "undefined";
-                     if (somebinary) {
-                       char * strbuf;
-                       sprintf(nxcifrow,"data[%-d]",rownum);
-                       if (rows==1)sprintf(nxcifrow,"data");
-                       cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[rownum],columnarraytype[rownum]))
-                       irnrank=strlen(strbuf)+1;
-                       if (irnrank < 4096 || !compression){
-                         if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
-     	                   fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                           local_exit (1);
-                         }
-                       } else {
-                         if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
-     	                   fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                           local_exit (1);
-                         }                 	
-                       }
-                       if (NXopendata (nxf, nxcifrow) != NX_OK) {
-     	                 fprintf(stderr," cif2nx: Failed to open%s in column %s\n",nxcifrow,column_name);
-                         local_exit (1);
-                       }
-                       if (NXputdata (nxf, strbuf ) != NX_OK ) {
-     	                 fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
-                         local_exit (1); 	
-                       } 
-                       free(strbuf);
-                       if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
-                         fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
-                         local_exit (1);	
-                       }
-                       NXclosedata(nxf);
-                    }
-                   } else {
-                     char * typebuffer;
-                     void * array;
-                     int binary_id, elsigned, elunsigned;
-                     size_t elements,elements_read, elsize;
-                     int minelement, maxelement;
-                     unsigned int cifcompression;
-                     int realarray;
-                     const char *byteorder;
-                     size_t dim1, dim2, dim3, padding;
-                 
-                     /* If this is the first encounter with a binary in the column
-                        we need to create a group for the column and move whatever rows
-                        were being saved in columnarray into individual datasets  */
-                 
-                     if (!somebinary) {
-                
-                        if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
-                         fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                         local_exit (1);
-                       }
-                       if (NXopengroup (nxf, column_name, "column") != NX_OK) {
-                         fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
-                         local_exit (1);
-                       }
-                       /* copy the rows that were already done */
-                       for (irn = 0; irn < rownum; irn++) {
-                         char* strbuf;
-                         sprintf(nxcifrow,"data[%-d]",irn);
-                         if (rows==1) sprintf(nxcifrow,"data");
-                         cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[irn],columnarraytype[irn]))
-                         irnrank=strlen(strbuf)+1;
-                         if (irnrank < 4096 || !compression){
-                           if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
-     	                     fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                             local_exit (1);
-                           }
-                         } else {
-                           if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
-     	                     fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                             local_exit (1);
-                           }                 	
-                         }
-                         if (NXopendata (nxf, nxcifrow) != NX_OK) {
-     	                   fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
-                           local_exit (1);
-                         }
-                           if (NXputdata (nxf, strbuf ) != NX_OK ) {
-     	                   fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
-                           local_exit (1); 	
-                         } 
-                         free(strbuf);
-
-                         if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
-                           fprintf(stderr," cif2nx: Failed to store rowspan of row %s in column %s\n",nxcifrow,column_name);
-                           local_exit (1);	
-                         }
-                         NXclosedata(nxf);
-                       }
-                       somebinary = 1;
-                     }
-                 
-                 
-                     /* The data we get from CIF may be an integer array of up to 3 dimensions
-                        or a real array of up to 3 dimensions.  (Note that the limit to 3 dimensions
-                        is just a matter of the current CBFlib API.  CBF itself may have any number
-                        of dimensions, and this should be allowed for in anything we do here) */
-
-                     cbf_failnez(cbf_get_arrayparameters_wdims(
-                       cif, &cifcompression,
-                       &binary_id, &elsize, &elsigned, &elunsigned,
-                       &elements, &minelement, &maxelement, &realarray,
-                       &byteorder, &dim1, &dim2, &dim3, &padding))
-                       if ((array=malloc(elsize*elements))) {
-                   
-                         int ii, arrayrank, nexustype;
-                     
-                         if (!realarray)  {
-                           cbf_failnez (cbf_get_integerarray(
-                             cif, &binary_id, array, elsize, elsigned,
-                             elements, &elements_read))
-                         } else {
-                           cbf_failnez (cbf_get_realarray(
-                             cif, &binary_id, array, elsize,
-                             elements, &elements_read))
-                           elsigned = 1;
-                         }
-                         nxrank[0] = dim1;
-                         nxrank[1] = dim2;
-                         nxrank[2] = dim3;
-                     
-                         nexustype = NX_UINT8;
-                         if (realarray) {
-                           if (elsize == 4) nexustype = NX_FLOAT32;
-                           else if (elsize == 8) nexustype = NX_FLOAT64;
-                         } else {
-                           if (elunsigned) {
-                           if (elsize == 1) nexustype = NX_UINT8;
-                             else if (elsize == 2) nexustype = NX_UINT16;
-                             else if (elsize == 4) nexustype = NX_UINT32;                       	
-                           } else {
-                             if (elsize == 1) nexustype = NX_INT8;
-                             else if (elsize == 2) nexustype = NX_INT16;
-                             else if (elsize == 4) nexustype = NX_INT32;
-                           }
-                         }
-                     
-                         arrayrank=1;
-                         for (ii=0; ii< 3; ii++)  {
-                           if (nxrank[ii] == 0) nxrank[ii] = 1;
-                           if (nxrank[ii] > 1) arrayrank = ii+1;
-                         }
-                         if (nexustype == NX_UINT8) nxrank[0] *= elsize;
-
-                        /* Now we have already made the column into a group and the rows into
-                        data sets, the group for the column is open.  We need to create and
-                        populate the data set as the next row */ 
-
-               
-                        sprintf(nxcifrow,"data[%-d]",rownum);
-                        if (rows==1)sprintf(nxcifrow,"data");
-                        if (!compression) {
-                          if (NXmakedata (nxf, nxcifrow, nexustype, 1, nxrank) != NX_OK) {
-     	                    fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                            local_exit (1);
-                          }	
-                        } else {
-                          if (NXcompmakedata (nxf, nxcifrow, nexustype, 1, nxrank, nexus_compression,nxrank) != NX_OK) {
-     	                    fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
-                            local_exit (1);
-                          }	
-                        }
-                        if (NXopendata (nxf, nxcifrow) != NX_OK) {
-     	                  fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
-                          local_exit (1);
-                        }
-                        if (NXputdata (nxf,array) != NX_OK) {
-     	                 fprintf(stderr," cif2nx: Failed to put data in open %s in column %s\n",nxcifrow,column_name);
-                        }
-                        free(array);
-                        if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
-                          fprintf(stderr," cif2nx: Failed to store rowspan of %s in column %s\n",nxcifrow,column_name);
-                          local_exit (1);	
-                        }
-                        if (NXputattr(nxf,"NXciftype","binary",strlen("binary"),NX_CHAR) != NX_OK ) {
-                         fprintf(stderr," cif2nx: Failed to store CIF type of %s in column %s\n",nxcifrow,column_name);
-                         local_exit (1);	
-                        }
-                        if (NXputattr(nxf,"NXcifarrayelementtype",
-                          realarray?"real":"integer",
-                          strlen(realarray?"real":"integer"),NX_CHAR) != NX_OK ) {
-                          fprintf(stderr," cif2nx: Failed to store CIF arrayelementtype of %s in column %s\n",nxcifrow,column_name);
-                          local_exit (1);	
-                        }
-                        sprintf(scratchbuf,"%-ld",elsize);
-                        if (NXputattr(nxf,"NXcifarrayelementsize",scratchbuf,strlen(scratchbuf),NX_CHAR) != NX_OK ) {
-                          fprintf(stderr," cif2nx: Failed to store CIF arrayelementsize of %s in column %s\n",nxcifrow,column_name);
-                          local_exit (1);	
-                        }
-                        if (NXputattr(nxf,"NXcifarrayelementsign",
-                          elunsigned?"unsigned":"signed",
-                          strlen(elunsigned?"unsigned":"signed"),NX_CHAR) != NX_OK ) {
-                          fprintf(stderr," cif2nx: Failed to store CIF arrayelementsign of %s in column %s\n",nxcifrow,column_name);
-                          local_exit (1);	
-                        }
-                        if (NXputattr(nxf,"NXcifarraybyteorder", (char *)byteorder, strlen(byteorder),NX_CHAR) != NX_OK ) {
-                          fprintf(stderr," cif2nx: Failed to store CIF arraybyteorder of %s in column %s\n",nxcifrow,column_name);
-                          local_exit (1);	
-                        }
-                        NXclosedata(nxf);  /* Close the data set, leave the column open */
- 
-                      } else {
-                        fprintf(stderr,
-                          "\nFailed to allocate memory %ld bytes",
-                          (long) elsize*elements);
-                        local_exit (1);
-                     } 
-                   }
-                 } /* for (rownum = 0; rownum < rows; rownum++) */
-             
-                 /* See if we got to the end without hitting a binary */
-                 if (!somebinary) {
-             
-                   int numchars;
-                   char * strbuf;
-                   char * pchar;
-             
-                   /* Create and open an column group to hold the entire column */
-                   
-                   if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
-                      fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                      local_exit (1);
-                   }
-                   if (NXopengroup (nxf, column_name, "column") != NX_OK) {
-                      fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
-                      local_exit (1);
-                   }
-
-                   /* The rows have not been transferred.  We will convert to one
-                      large concatenated string, putting a newline between rows */
-                   
-                   for (rownum = 0; rownum < rows;rownum++) {
-                     numchars++;
-                     numchars+=strlen(columnarray[rownum]);
-                     if (!cbf_cistrcmp(columnarraytype[rownum],"sglq") || 
-                       !cbf_cistrcmp(columnarraytype[rownum],"dblq")) numchars+=2;
-                     if (!cbf_cistrcmp(columnarraytype[rownum],"text")) numchars+=5;
-                   }
-               
-                   numchars++;
-               
-                   if (!(strbuf = (char *)malloc(numchars) ) ) {
-                     fprintf(stderr," cbf2nx -- Failed to allocate memory for category %s column %s\n",
-                       category_name,column_name);
-                   }
-               
-                   pchar = strbuf;
-                   if (rows > 1) *pchar++='\n';
-               
-                   for (rownum = 0; rownum < rows; rownum++) {
-                     if (rownum > 0)  *pchar++='\n';
-                     if (!cbf_cistrcmp(columnarraytype[rownum],"sglq")) {
-                      *pchar++='\'';
-                       strcpy(pchar,columnarray[rownum]);
-                       pchar+=strlen(columnarray[rownum]);
-                      *pchar++='\'';
-                       continue;
-                     }
-                     if (!cbf_cistrcmp(columnarraytype[rownum],"dblq")) {
-                       *pchar++='\"';
-                       strcpy(pchar,columnarray[rownum]);
-                       pchar+=strlen(columnarray[rownum]);
-                       *pchar++='\"';
-                       continue;
-                     }
-                     if (!cbf_cistrcmp(columnarraytype[rownum],"text")) {
-                       *pchar++='\n'; *pchar++=';';
-                       strcpy(pchar,columnarray[rownum]);
-                       pchar+=strlen(columnarray[rownum]);
-                       *pchar++='\n'; *pchar++=';';
-                       continue;
-                     }
-                     strcpy(pchar,columnarray[rownum]);
-                     pchar+=strlen(columnarray[rownum]);
-                   }
-                   *pchar++='\0';
-                   numchars = strlen(strbuf)+1;
-             
-                   if (numchars < 4096 || !compression) {
-                     if (NXmakedata (nxf, "data", NX_CHAR, 1, &numchars) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                       local_exit (1);
-                     }	
-                   } else {
-                     if (NXcompmakedata (nxf, "data", NX_CHAR, 1, &numchars, nexus_compression, &numchars) != NX_OK) {
-     	               fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
-                       local_exit (1);
-                     }	
-               	
-                   }
-                   if (NXopendata (nxf, "data") != NX_OK) {
-     	             fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
-                     local_exit (1);
-                   }
-                   if (NXputdata (nxf, strbuf) != NX_OK ) {
-     	             fprintf(stderr," cif2nx: Failed to store column %s\n",column_name);
-                     local_exit (1);	
-                   }
-                   sprintf(nxcifrow,"%-d",rows);
-                   if (NXputattr(nxf,"items",nxcifrow,strlen(nxcifrow),NX_CHAR) != NX_OK ) {
-                      fprintf(stderr," cif2nx: Failed to store itemcount %s in column %s\n",nxcifrow,column_name);
-                      local_exit (1);	
-                   }
-
-                   free(strbuf);
-                   NXclosedata( nxf );  /* Close the column as a dataset */
-                 } 
-                 NXclosegroup( nxf );  /* Close the column as a group */
-                 somebinary = 0;
-               } while ( ! cbf_next_column(cif) );
-               if (rows) free(columnarray);
-             }
-           NXclosegroup( nxf );  /* close the category */
-           }
-         }
-         NXclosegroup( nxf ); /* close the save frame */
        }
-     }
-
+       if (NXopengroup (nxf, datablock_name, "datablock") != NX_OK) {
+           fprintf(stderr," cif2nx: Failed to open datablock %s\n",nxcifbuf);
+           local_exit (1);
+       }
+       
+       if ( !cbf_rewind_blockitem(cif, &itemtype) ) {
+           cbf_failnez (cbf_count_blockitems(cif, &blockitems))
+           
+           for (itemnum = 0; itemnum < blockitems;  itemnum++) {
+               cbf_select_blockitem(cif, itemnum, &itemtype);
+               if (itemtype == CBF_CATEGORY) {
+                   cbf_category_name(cif,&category_name);
+                   /* Create the category group for this category */
+                   if (NXmakegroup (nxf, category_name, "category") != NX_OK) {
+                       fprintf(stderr," cif2nx: Failed to create category %s\n",category_name);
+                       local_exit (1);
+                   }
+                   /*  Open the category group for this category */
+                   if (NXopengroup (nxf, category_name, "category") != NX_OK) {
+                       fprintf(stderr," cif2nx: Failed to open category %s\n",category_name);
+                       local_exit (1);
+                   }
+                   cbf_count_rows(cif,&rows);
+                   nxrank[0]=rows;
+                   nxrank[1]=2;
+                   if (rows) columnarray = (char **)malloc(rows*sizeof(char *)*2);
+                   if (rows && !columnarray) {
+                       fprintf(stderr," cif2nx: Failed to allocate columnarray %s\n",category_name);
+                       local_exit (1);
+                   }
+                   columnarraytype = columnarray+rows;
+                   cbf_count_columns(cif,&columns);
+                   
+                   /*  Transfer the columns names from cif to nexus */
+                   if (columns && ! cbf_rewind_column(cif) ) {
+                       int somebinary;
+                       unsigned int irn=0;
+                       int irnrank=1;
+                       char scratchbuf[40];
+                       do {
+                           cbf_failnez(cbf_column_name(cif, &column_name))
+                           cbf_rewind_row(cif);
+                           somebinary=0;
+                           /* Transfer column from cif to nexus */
+                           for (rownum = 0; rownum < rows; rownum++) {
+                               const char *typeofvalue;
+                               columnarray[rownum]=NULL;
+                               columnarraytype[rownum]=NULL;
+                               cbf_failnez(cbf_select_row(cif,rownum))
+                               if ( ! cbf_get_value(cif, &value) ) {
+                                   cbf_failnez (cbf_get_typeofvalue(cif, &typeofvalue))
+                                   columnarray[rownum]=(char *)value;
+                                   columnarraytype[rownum]=(char *)typeofvalue;
+                                   if (!columnarray[rownum]) {
+                                       columnarray[rownum] = ".";
+                                       columnarraytype[rownum] = "null";
+                                   }
+                                   if (columnarraytype[rownum]==NULL) columnarraytype[rownum]= "undefined";
+                                   
+                                   /* DEBUG:  fprintf(stderr,"Column %s, row %d, value %s, type %s\n",
+                                    column_name, rownum, columnarray[rownum], columnarraytype[rownum] ); */
+                                   
+                                   if (somebinary) {
+                                       char * strbuf;
+                                       sprintf(nxcifrow,"data[%-d]",rownum);
+                                       if (rows==1)sprintf(nxcifrow,"data");
+                                       cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[rownum],columnarraytype[rownum]))
+                                       irnrank=strlen(strbuf)+1;
+                                       if (irnrank < 4096 || !compression){
+                                           if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1);
+                                           }
+                                       } else {
+                                           if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1);
+                                           }                 	
+                                       }
+                                       if (NXopendata (nxf, nxcifrow) != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to open row %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);
+                                       }
+                                       if (NXputdata (nxf, strbuf ) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1); 	
+                                       } 
+                                       free(strbuf);
+                                       if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       NXclosedata(nxf);
+                                   }
+                               } else {
+                                   char * typebuffer;
+                                   void * array;
+                                   int binary_id, elsigned, elunsigned;
+                                   size_t elements,elements_read, elsize;
+                                   int minelement, maxelement;
+                                   unsigned int cifcompression;
+                                   int realarray;
+                                   const char *byteorder;
+                                   size_t dim1, dim2, dim3, padding;
+                                   
+                                   /* If this is the first encounter with a binary in the column
+                                    we need to create a group for the column and move whatever rows
+                                    were being saved in columnarray into individual datasets  */
+                                   
+                                   if (!somebinary) {
+                                       
+                                       if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                           local_exit (1);
+                                       }
+                                       if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
+                                           local_exit (1);
+                                       }
+                                       /* copy the rows that were already done */
+                                       for (irn = 0; irn < rownum; irn++) {
+                                           char * strbuf;
+                                           sprintf(nxcifrow,"data[%-d]",irn);
+                                           if (rows==1) sprintf(nxcifrow,"data");
+                                           cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[irn],columnarraytype[irn]))
+                                           irnrank=strlen(strbuf)+1;
+                                           if (irnrank < 4096 || !compression){
+                                               if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);
+                                               }
+                                           } else {
+                                               if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);
+                                               }                 	
+                                           }
+                                           
+                                           if (NXopendata (nxf, nxcifrow) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1);
+                                           }
+                                           if (NXputdata (nxf, strbuf ) != NX_OK ) {
+                                               fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1); 	
+                                           } 
+                                           free(strbuf);
+                                           if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
+                                               fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1);	
+                                           }
+                                           NXclosedata(nxf);
+                                       }
+                                       somebinary = 1;
+                                   }
+                                   
+                                   
+                                   /* The data we get from CIF may be an integer array of up to 3 dimensions
+                                    or a real array of up to 3 dimensions.  (Note that the limit to 3 dimensions
+                                    is just a matter of the current CBFlib API.  CBF itself may have any number
+                                    of dimensions, and this should be allowed for in anything we do here) */
+                                   
+                                   cbf_failnez(cbf_get_arrayparameters_wdims(
+                                                                             cif, &cifcompression,
+                                                                             &binary_id, &elsize, &elsigned, &elunsigned,
+                                                                             &elements, &minelement, &maxelement, &realarray,
+                                                                             &byteorder, &dim1, &dim2, &dim3, &padding))
+                                   if ((array=malloc(elsize*elements))) {
+                                       
+                                       int ii, arrayrank, nexustype;
+                                       
+                                       if (!realarray)  {
+                                           cbf_failnez (cbf_get_integerarray(
+                                                                             cif, &binary_id, array, elsize, elsigned,
+                                                                             elements, &elements_read))
+                                       } else {
+                                           cbf_failnez (cbf_get_realarray(
+                                                                          cif, &binary_id, array, elsize,
+                                                                          elements, &elements_read))
+                                           elsigned = 1;
+                                       }
+                                       nxrank[0] = dim1;
+                                       nxrank[1] = dim2;
+                                       nxrank[2] = dim3;
+                                       
+                                       nexustype = NX_UINT8;
+                                       if (realarray) {
+                                           if (elsize == 4) nexustype = NX_FLOAT32;
+                                           else if (elsize == 8) nexustype = NX_FLOAT64;
+                                       } else {
+                                           if (elunsigned) {
+                                               if (elsize == 1) nexustype = NX_UINT8;
+                                               else if (elsize == 2) nexustype = NX_UINT16;
+                                               else if (elsize == 4) nexustype = NX_UINT32;                       	
+                                           } else {
+                                               if (elsize == 1) nexustype = NX_INT8;
+                                               else if (elsize == 2) nexustype = NX_INT16;
+                                               else if (elsize == 4) nexustype = NX_INT32;                       	
+                                               
+                                           }
+                                           
+                                       }
+                                       
+                                       arrayrank=1;
+                                       for (ii=0; ii< 3; ii++)  {
+                                           if (nxrank[ii] == 0) nxrank[ii] = 1;
+                                           if (nxrank[ii] > 1) arrayrank = ii+1;
+                                       }
+                                       if (nexustype == NX_UINT8) nxrank[0] *= elsize;
+                                       
+                                       
+                                       /* Now we have already made the column into a group and the rows into
+                                        data sets, the group for the column is open.  We need to create and
+                                        populate the data set as the next row */ 
+                                       
+                                       sprintf(nxcifrow,"data[%-d]",rownum);
+                                       if (rows==1)sprintf(nxcifrow,"data");
+                                       if (!compression)  {
+                                           if (NXmakedata (nxf, nxcifrow, nexustype, arrayrank, nxrank) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1);
+                                           }
+                                       } else  {
+                                           if (NXcompmakedata (nxf, nxcifrow, nexustype, arrayrank, nxrank,nexus_compression,nxrank) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                               local_exit (1);
+                                           }                   	
+                                       }
+                                       if (NXopendata (nxf, nxcifrow) != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);
+                                       }
+                                       if (NXputdata (nxf,array) != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to put data in open %s in column %s\n",nxcifrow,column_name);
+                                       }
+                                       free(array);
+                                       if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       if (NXputattr(nxf,"NXciftype","binary",strlen("binary"),NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store CIF type of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       if (NXputattr(nxf,"NXcifarrayelementtype",
+                                                     realarray?"real":"integer",
+                                                     strlen(realarray?"real":"integer"),NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store CIF arrayelementtype of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       sprintf(scratchbuf,"%-ld",elsize);
+                                       if (NXputattr(nxf,"NXcifarrayelementsize",scratchbuf,strlen(scratchbuf),NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store CIF arrayelementsize of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       if (NXputattr(nxf,"NXcifarrayelementsign",
+                                                     elunsigned?"unsigned":"signed",
+                                                     strlen(elunsigned?"unsigned":"signed"),NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store CIF arrayelementsign of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       if (NXputattr(nxf,"NXcifarraybyteorder", (char *)byteorder, strlen(byteorder),NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store CIF arraybyteorder of %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       NXclosedata(nxf);
+                                       
+                                       NXflush(&nxf);
+                                       
+                                       
+                                   } else {
+                                       fprintf(stderr,
+                                               "\nFailed to allocate memory %ld bytes",
+                                               (long) elsize*elements);
+                                       local_exit (1);
+                                   }
+                                   
+                               }
+                           }
+                           for (rownum = 0; rownum < rows; rownum++) {
+                               if (columnarraytype[rownum]==NULL) columnarraytype[rownum]= "null";
+                               /* DEBUG:  fprintf(stderr,"Column %s, row %d, value %s, type %s\n",
+                                column_name, rownum, columnarray[rownum], columnarraytype[rownum] ); */
+                               
+                           }
+                           
+                           if (!somebinary) {
+                               
+                               int numchars;
+                               char * strbuf;
+                               char * pchar;
+                               
+                               /* Create and open a column group to hold the entire column */
+                               
+                               if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                   fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                   local_exit (1);
+                               }
+                               if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                   fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
+                                   local_exit (1);
+                               }
+                               
+                               /* The rows have not been transferred.  We will convert to one
+                                large concatenated string, putting a newline between rows */
+                               
+                               numchars = 0;
+                               for (rownum = 0; rownum < rows;rownum++) {
+                                   numchars++;
+                                   numchars+=strlen(columnarray[rownum]);
+                                   if (!cbf_cistrcmp(columnarraytype[rownum],"sglq") || 
+                                       !cbf_cistrcmp(columnarraytype[rownum],"dblq")) numchars+=2;
+                                   if (!cbf_cistrcmp(columnarraytype[rownum],"text")) numchars+=5;
+                               }
+                               
+                               numchars++;
+                               
+                               if (!(strbuf = (char *)malloc(numchars) ) ) {
+                                   fprintf(stderr," cbf2nx -- Failed to allocate memory for category %s column %s\n",
+                                           category_name,column_name);
+                               }
+                               
+                               pchar = strbuf;
+                               if (rows > 1) *pchar++='\n';
+                               
+                               for (rownum = 0; rownum < rows; rownum++) {
+                                   if (rownum > 0)  *pchar++='\n';
+                                   if (!cbf_cistrcmp(columnarraytype[rownum],"sglq")) {
+                                       *pchar++='\'';
+                                       strcpy(pchar,columnarray[rownum]);
+                                       pchar+=strlen(columnarray[rownum]);
+                                       *pchar++='\'';
+                                       continue;
+                                   }
+                                   if (!cbf_cistrcmp(columnarraytype[rownum],"dblq")) {
+                                       *pchar++='\"';
+                                       strcpy(pchar,columnarray[rownum]);
+                                       pchar+=strlen(columnarray[rownum]);
+                                       *pchar++='\"';
+                                       continue;
+                                   }
+                                   if (!cbf_cistrcmp(columnarraytype[rownum],"text")) {
+                                       *pchar++='\n'; *pchar++=';';
+                                       strcpy(pchar,columnarray[rownum]);
+                                       pchar+=strlen(columnarray[rownum]);
+                                       *pchar++='\n'; *pchar++=';';
+                                       continue;
+                                   }
+                                   strcpy(pchar,columnarray[rownum]);
+                                   pchar+=strlen(columnarray[rownum]);
+                               }
+                               *pchar++='\0';
+                               numchars = strlen(strbuf)+1;
+                               
+                               if (numchars < 4096 || !compression) {
+                                   if (NXmakedata (nxf, "data", NX_CHAR, 1, &numchars) != NX_OK) {
+                                       fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                       local_exit (1);
+                                   }	
+                               } else  {
+                                   if (NXcompmakedata (nxf, "data", NX_CHAR, 1, &numchars,nexus_compression, &numchars) != NX_OK) {
+                                       fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                       local_exit (1);
+                                   }
+                               }
+                               if (NXopendata (nxf, "data") != NX_OK) {
+                                   fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
+                                   local_exit (1);
+                               }
+                               if (NXputdata (nxf, strbuf) != NX_OK ) {
+                                   fprintf(stderr," cif2nx: Failed to store column %s\n",column_name);
+                                   local_exit (1);	
+                               }
+                               sprintf(nxcifrow,"%-d",rows);
+                               if (NXputattr(nxf,"items",nxcifrow,strlen(nxcifrow),NX_CHAR) != NX_OK ) {
+                                   fprintf(stderr," cif2nx: Failed to store itemcount %s in column %s\n",nxcifrow,column_name);
+                                   local_exit (1);	
+                               }
+                               free(strbuf);
+                               NXclosedata( nxf ); /* close the columns as a data set */
+                           }
+                           NXclosegroup( nxf); /* close the columns as a group */
+                       } while ( ! cbf_next_column(cif) );
+                       if (rows) free(columnarray);
+                   }
+                   NXclosegroup( nxf ); /* close the category */
+               } else {
+                   cbf_saveframe_name(cif,&saveframe_name);
+                   if (NXmakegroup (nxf, saveframe_name, "saveframe") != NX_OK) {
+                       fprintf(stderr," cif2nx: Failed to create saveframe %s\n",saveframe_name);
+                       local_exit (1);
+                   }
+                   if (NXopengroup (nxf, saveframe_name, "saveframe") != NX_OK) {
+                       fprintf(stderr," cif2nx: Failed to open saveframe %s\n",saveframe_name);
+                       local_exit (1);
+                   }
+                   if ( !cbf_rewind_category(cif) ) {
+                       cbf_failnez (cbf_count_categories(cif, &categories))
+                       
+                       for (catnum = 0; catnum < categories;  catnum++) {
+                           cbf_select_category(cif, catnum);
+                           cbf_category_name(cif,&category_name);
+                           if (NXmakegroup (nxf, category_name, "category") != NX_OK) {
+                               fprintf(stderr," cif2nx: Failed to create category %s\n",category_name);
+                               local_exit (1);
+                           }
+                           if (NXopengroup (nxf, category_name, "category") != NX_OK) {
+                               fprintf(stderr," cif2nx: Failed to open category %s\n",category_name);
+                               local_exit (1);
+                           }
+                           cbf_count_rows(cif,&rows);
+                           nxrank[0]=rows;
+                           nxrank[1]=2;
+                           if (rows) columnarray = (char **)malloc(rows*sizeof(char *)*2);
+                           if (rows && !columnarray) {
+                               fprintf(stderr," cif2nx: Failed to allocate columnarray %s\n",category_name);
+                               local_exit (1);
+                           }
+                           columnarraytype = columnarray+rows;
+                           cbf_count_columns(cif,&columns);
+                           
+                           /*  Transfer the columns names from cif to nexus */
+                           if (columns && ! cbf_rewind_column(cif) ) {
+                               int somebinary;
+                               somebinary = 0;
+                               unsigned int irn;
+                               int irnrank=1;
+                               char scratchbuf[40];
+                               do {
+                                   cbf_failnez(cbf_column_name(cif, &column_name))
+                                   cbf_rewind_row(cif);
+                                   /* Transfer column from cif to nexus */
+                                   for (rownum = 0; rownum < rows; rownum++) {
+                                       const char *typeofvalue;
+                                       columnarray[rownum]=NULL;
+                                       columnarraytype[rownum]=NULL;
+                                       cbf_failnez(cbf_select_row(cif,rownum))
+                                       if ( ! cbf_get_value(cif, &value) ) {
+                                           cbf_failnez (cbf_get_typeofvalue(cif, &typeofvalue))
+                                           columnarray[rownum]=(char *)value;
+                                           columnarraytype[rownum]=(char *)typeofvalue;
+                                           if (!columnarray[rownum]) {
+                                               columnarray[rownum] = ".";
+                                               columnarraytype[rownum] = "null";
+                                           }
+                                           if (columnarraytype[rownum]==NULL) columnarraytype[rownum]= "undefined";
+                                           if (somebinary) {
+                                               char * strbuf;
+                                               sprintf(nxcifrow,"data[%-d]",rownum);
+                                               if (rows==1)sprintf(nxcifrow,"data");
+                                               cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[rownum],columnarraytype[rownum]))
+                                               irnrank=strlen(strbuf)+1;
+                                               if (irnrank < 4096 || !compression){
+                                                   if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
+                                                       fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1);
+                                                   }
+                                               } else {
+                                                   if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
+                                                       fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1);
+                                                   }                 	
+                                               }
+                                               if (NXopendata (nxf, nxcifrow) != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to open%s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);
+                                               }
+                                               if (NXputdata (nxf, strbuf ) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1); 	
+                                               } 
+                                               free(strbuf);
+                                               if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store itemcount of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               NXclosedata(nxf);
+                                           }
+                                       } else {
+                                           char * typebuffer;
+                                           void * array;
+                                           int binary_id, elsigned, elunsigned;
+                                           size_t elements,elements_read, elsize;
+                                           int minelement, maxelement;
+                                           unsigned int cifcompression;
+                                           int realarray;
+                                           const char *byteorder;
+                                           size_t dim1, dim2, dim3, padding;
+                                           
+                                           /* If this is the first encounter with a binary in the column
+                                            we need to create a group for the column and move whatever rows
+                                            were being saved in columnarray into individual datasets  */
+                                           
+                                           if (!somebinary) {
+                                               
+                                               if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                                   local_exit (1);
+                                               }
+                                               if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
+                                                   local_exit (1);
+                                               }
+                                               /* copy the rows that were already done */
+                                               for (irn = 0; irn < rownum; irn++) {
+                                                   char* strbuf;
+                                                   sprintf(nxcifrow,"data[%-d]",irn);
+                                                   if (rows==1) sprintf(nxcifrow,"data");
+                                                   cbf_failnez(cbf_format_dataitem(&strbuf,columnarray[irn],columnarraytype[irn]))
+                                                   irnrank=strlen(strbuf)+1;
+                                                   if (irnrank < 4096 || !compression){
+                                                       if (NXmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank) != NX_OK) {
+                                                           fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                           local_exit (1);
+                                                       }
+                                                   } else {
+                                                       if (NXcompmakedata (nxf, nxcifrow, NX_CHAR, 1, &irnrank, nexus_compression, &irnrank) != NX_OK) {
+                                                           fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                           local_exit (1);
+                                                       }                 	
+                                                   }
+                                                   if (NXopendata (nxf, nxcifrow) != NX_OK) {
+                                                       fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1);
+                                                   }
+                                                   if (NXputdata (nxf, strbuf ) != NX_OK ) {
+                                                       fprintf(stderr," cif2nx: Failed to store %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1); 	
+                                                   } 
+                                                   free(strbuf);
+                                                   
+                                                   if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
+                                                       fprintf(stderr," cif2nx: Failed to store rowspan of row %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1);	
+                                                   }
+                                                   NXclosedata(nxf);
+                                               }
+                                               somebinary = 1;
+                                           }
+                                           
+                                           
+                                           /* The data we get from CIF may be an integer array of up to 3 dimensions
+                                            or a real array of up to 3 dimensions.  (Note that the limit to 3 dimensions
+                                            is just a matter of the current CBFlib API.  CBF itself may have any number
+                                            of dimensions, and this should be allowed for in anything we do here) */
+                                           
+                                           cbf_failnez(cbf_get_arrayparameters_wdims(
+                                                                                     cif, &cifcompression,
+                                                                                     &binary_id, &elsize, &elsigned, &elunsigned,
+                                                                                     &elements, &minelement, &maxelement, &realarray,
+                                                                                     &byteorder, &dim1, &dim2, &dim3, &padding))
+                                           if ((array=malloc(elsize*elements))) {
+                                               
+                                               int ii, arrayrank, nexustype;
+                                               
+                                               if (!realarray)  {
+                                                   cbf_failnez (cbf_get_integerarray(
+                                                                                     cif, &binary_id, array, elsize, elsigned,
+                                                                                     elements, &elements_read))
+                                               } else {
+                                                   cbf_failnez (cbf_get_realarray(
+                                                                                  cif, &binary_id, array, elsize,
+                                                                                  elements, &elements_read))
+                                                   elsigned = 1;
+                                               }
+                                               nxrank[0] = dim1;
+                                               nxrank[1] = dim2;
+                                               nxrank[2] = dim3;
+                                               
+                                               nexustype = NX_UINT8;
+                                               if (realarray) {
+                                                   if (elsize == 4) nexustype = NX_FLOAT32;
+                                                   else if (elsize == 8) nexustype = NX_FLOAT64;
+                                               } else {
+                                                   if (elunsigned) {
+                                                       if (elsize == 1) nexustype = NX_UINT8;
+                                                       else if (elsize == 2) nexustype = NX_UINT16;
+                                                       else if (elsize == 4) nexustype = NX_UINT32;                       	
+                                                   } else {
+                                                       if (elsize == 1) nexustype = NX_INT8;
+                                                       else if (elsize == 2) nexustype = NX_INT16;
+                                                       else if (elsize == 4) nexustype = NX_INT32;
+                                                   }
+                                               }
+                                               
+                                               arrayrank=1;
+                                               for (ii=0; ii< 3; ii++)  {
+                                                   if (nxrank[ii] == 0) nxrank[ii] = 1;
+                                                   if (nxrank[ii] > 1) arrayrank = ii+1;
+                                               }
+                                               if (nexustype == NX_UINT8) nxrank[0] *= elsize;
+                                               
+                                               /* Now we have already made the column into a group and the rows into
+                                                data sets, the group for the column is open.  We need to create and
+                                                populate the data set as the next row */ 
+                                               
+                                               
+                                               sprintf(nxcifrow,"data[%-d]",rownum);
+                                               if (rows==1)sprintf(nxcifrow,"data");
+                                               if (!compression) {
+                                                   if (NXmakedata (nxf, nxcifrow, nexustype, 1, nxrank) != NX_OK) {
+                                                       fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1);
+                                                   }	
+                                               } else {
+                                                   if (NXcompmakedata (nxf, nxcifrow, nexustype, 1, nxrank, nexus_compression,nxrank) != NX_OK) {
+                                                       fprintf(stderr," cif2nx: Failed to create %s in column %s\n",nxcifrow,column_name);
+                                                       local_exit (1);
+                                                   }	
+                                               }
+                                               if (NXopendata (nxf, nxcifrow) != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to open %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);
+                                               }
+                                               if (NXputdata (nxf,array) != NX_OK) {
+                                                   fprintf(stderr," cif2nx: Failed to put data in open %s in column %s\n",nxcifrow,column_name);
+                                               }
+                                               free(array);
+                                               if (NXputattr(nxf,"items","1",1,NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store rowspan of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               if (NXputattr(nxf,"NXciftype","binary",strlen("binary"),NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store CIF type of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               if (NXputattr(nxf,"NXcifarrayelementtype",
+                                                             realarray?"real":"integer",
+                                                             strlen(realarray?"real":"integer"),NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store CIF arrayelementtype of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               sprintf(scratchbuf,"%-ld",elsize);
+                                               if (NXputattr(nxf,"NXcifarrayelementsize",scratchbuf,strlen(scratchbuf),NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store CIF arrayelementsize of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               if (NXputattr(nxf,"NXcifarrayelementsign",
+                                                             elunsigned?"unsigned":"signed",
+                                                             strlen(elunsigned?"unsigned":"signed"),NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store CIF arrayelementsign of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               if (NXputattr(nxf,"NXcifarraybyteorder", (char *)byteorder, strlen(byteorder),NX_CHAR) != NX_OK ) {
+                                                   fprintf(stderr," cif2nx: Failed to store CIF arraybyteorder of %s in column %s\n",nxcifrow,column_name);
+                                                   local_exit (1);	
+                                               }
+                                               NXclosedata(nxf);  /* Close the data set, leave the column open */
+                                               
+                                           } else {
+                                               fprintf(stderr,
+                                                       "\nFailed to allocate memory %ld bytes",
+                                                       (long) elsize*elements);
+                                               local_exit (1);
+                                           } 
+                                       }
+                                   } /* for (rownum = 0; rownum < rows; rownum++) */
+                                   
+                                   /* See if we got to the end without hitting a binary */
+                                   if (!somebinary) {
+                                       
+                                       int numchars;
+                                       char * strbuf;
+                                       char * pchar;
+                                       
+                                       /* Create and open an column group to hold the entire column */
+                                       
+                                       if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                           local_exit (1);
+                                       }
+                                       if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
+                                           local_exit (1);
+                                       }
+                                       
+                                       /* The rows have not been transferred.  We will convert to one
+                                        large concatenated string, putting a newline between rows */
+                                       
+                                       for (rownum = 0; rownum < rows;rownum++) {
+                                           numchars++;
+                                           numchars+=strlen(columnarray[rownum]);
+                                           if (!cbf_cistrcmp(columnarraytype[rownum],"sglq") || 
+                                               !cbf_cistrcmp(columnarraytype[rownum],"dblq")) numchars+=2;
+                                           if (!cbf_cistrcmp(columnarraytype[rownum],"text")) numchars+=5;
+                                       }
+                                       
+                                       numchars++;
+                                       
+                                       if (!(strbuf = (char *)malloc(numchars) ) ) {
+                                           fprintf(stderr," cbf2nx -- Failed to allocate memory for category %s column %s\n",
+                                                   category_name,column_name);
+                                       }
+                                       
+                                       pchar = strbuf;
+                                       if (rows > 1) *pchar++='\n';
+                                       
+                                       for (rownum = 0; rownum < rows; rownum++) {
+                                           if (rownum > 0)  *pchar++='\n';
+                                           if (!cbf_cistrcmp(columnarraytype[rownum],"sglq")) {
+                                               *pchar++='\'';
+                                               strcpy(pchar,columnarray[rownum]);
+                                               pchar+=strlen(columnarray[rownum]);
+                                               *pchar++='\'';
+                                               continue;
+                                           }
+                                           if (!cbf_cistrcmp(columnarraytype[rownum],"dblq")) {
+                                               *pchar++='\"';
+                                               strcpy(pchar,columnarray[rownum]);
+                                               pchar+=strlen(columnarray[rownum]);
+                                               *pchar++='\"';
+                                               continue;
+                                           }
+                                           if (!cbf_cistrcmp(columnarraytype[rownum],"text")) {
+                                               *pchar++='\n'; *pchar++=';';
+                                               strcpy(pchar,columnarray[rownum]);
+                                               pchar+=strlen(columnarray[rownum]);
+                                               *pchar++='\n'; *pchar++=';';
+                                               continue;
+                                           }
+                                           strcpy(pchar,columnarray[rownum]);
+                                           pchar+=strlen(columnarray[rownum]);
+                                       }
+                                       *pchar++='\0';
+                                       numchars = strlen(strbuf)+1;
+                                       
+                                       if (numchars < 4096 || !compression) {
+                                           if (NXmakedata (nxf, "data", NX_CHAR, 1, &numchars) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                               local_exit (1);
+                                           }	
+                                       } else {
+                                           if (NXcompmakedata (nxf, "data", NX_CHAR, 1, &numchars, nexus_compression, &numchars) != NX_OK) {
+                                               fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
+                                               local_exit (1);
+                                           }	
+                                           
+                                       }
+                                       if (NXopendata (nxf, "data") != NX_OK) {
+                                           fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
+                                           local_exit (1);
+                                       }
+                                       if (NXputdata (nxf, strbuf) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store column %s\n",column_name);
+                                           local_exit (1);	
+                                       }
+                                       sprintf(nxcifrow,"%-d",rows);
+                                       if (NXputattr(nxf,"items",nxcifrow,strlen(nxcifrow),NX_CHAR) != NX_OK ) {
+                                           fprintf(stderr," cif2nx: Failed to store itemcount %s in column %s\n",nxcifrow,column_name);
+                                           local_exit (1);	
+                                       }
+                                       
+                                       free(strbuf);
+                                       NXclosedata( nxf );  /* Close the column as a dataset */
+                                   } 
+                                   NXclosegroup( nxf );  /* Close the column as a group */
+                                   somebinary = 0;
+                               } while ( ! cbf_next_column(cif) );
+                               if (rows) free(columnarray);
+                           }
+                           NXclosegroup( nxf );  /* close the category */
+                       }
+                   }
+                   NXclosegroup( nxf ); /* close the save frame */
+               }
+           }
+           NXclosegroup( nxf ); /* close the data block */
+       }
+       
    }
-
-   }
+   NXclosegroup( nxf ); /* close the NXcif group */
 
    b = clock ();
    fprintf (stderr,
