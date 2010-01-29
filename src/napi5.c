@@ -1279,20 +1279,19 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 
   herr_t group_info1(hid_t loc_id, const char *name, void *opdata)
   {
-    NexusFile5 self;
     H5G_stat_t statbuf;
-    self.iNX = *((int*)opdata);
+    int iNX = *((int*)opdata);
     H5Gget_objinfo(loc_id, name, 0, &statbuf);
     
     switch (statbuf.type) 
     {
       case H5G_GROUP: 
-        self.iNX++;
-        *((int*)opdata)=self.iNX;
+        iNX++;
+        *((int*)opdata)=iNX;
         break;
       case H5G_DATASET:
-        self.iNX++;
-        *((int*)opdata)=self.iNX;
+        iNX++;
+        *((int*)opdata)=iNX;
         break;
       default:
 	break;
