@@ -457,6 +457,7 @@ int main (int argc, char *argv [])
   int errflg = 0;
   char *cifin, *nxout;
   char *dictionary[NUMDICTS];
+  char *nxprefix;
   char nxcifbuf[90];
   char nxcifrow[90];
   char *ciftmp=NULL;
@@ -492,7 +493,7 @@ int main (int argc, char *argv [])
 /**********************************************************************
  *  cif2nx [-i input_cif] [-o output_nx] \                            *
  *    [-e [4|5|x]] [-c [n|g|h|r]]        \                            *
- *    [-n cifname] \                                                  *
+ *    [-n cifname] [-p prefix ]          \                                                  *
  *    [-v dictionary]* \                                              *
  *    [input_cif] [output_nx]                                         *
  *                                                                    *
@@ -510,15 +511,12 @@ int main (int argc, char *argv [])
    cifin = NULL;
    nxout = NULL;
    cifname = NULL;
+   nxprefix = NULL;
    ciftmpused = 0;
    
-   strcpy(nxcifbuf,"NXcif_");
-   strcpy(nxcifrow,"NXcif_");
-   nxcifbufbase=strlen(nxcifbuf);
-   nxcifrowbase=strlen(nxcifrow);
    
    
-   while ((c = getopt(argc, argv, "i:o:v:e:c:n:")) != EOF) {
+   while ((c = getopt(argc, argv, "i:o:v:e:c:n:p:")) != EOF) {
      switch (c) {
        case 'i':
          if (cifin) errflg++;
@@ -531,6 +529,10 @@ int main (int argc, char *argv [])
        case 'n':
          if (cifname) errflg++;
          else cifname = optarg;
+         break;
+       case 'p':
+         if (nxprefix) errflg++;
+         else nxprefix = optarg;
          break;
        case 'v':
          if (ndict < NUMDICTS)
@@ -582,9 +584,9 @@ int main (int argc, char *argv [])
      fprintf(stderr,
        "  cif2nx [-i input_cif] [-o output_nx] \\\n");
      fprintf(stderr,
-       "    [-e [4|5|x]] [-c [n|g|h|r]]        \\\n");
+       "    [-e [4|5|x]] [-c [n|g|h|r]] \\\n");
      fprintf(stderr,
-       "    [-n cifname] \\\n");
+       "    [-n cifname] [-p nxprefix]  \\\n");
      fprintf(stderr,
        "    [-v dictionary]* \\\n");
      fprintf(stderr,
@@ -593,7 +595,15 @@ int main (int argc, char *argv [])
    }
 
 
-
+    /* Use "NXcif_" as a prefix if nothing has been specified */
+    
+    if (!nxprefix) nxprefix = "NXcif_";
+    strncpy(nxcifbuf,nxprefix,75);
+    nxcifbuf[75] = '\0';
+    strcpy(nxcifrow,nxprefix);
+    nxcifbufbase=strlen(nxcifbuf);
+    nxcifrowbase=strlen(nxcifrow);
+    
 
     /* Read the cif */
 
@@ -707,12 +717,13 @@ int main (int argc, char *argv [])
        
        cbf_failnez (cbf_select_datablock(cif, blocknum))
        cbf_failnez (cbf_datablock_name(cif, &datablock_name))
-       if (NXmakegroup (nxf, datablock_name, "datablock") != NX_OK) {
-           fprintf(stderr," cif2nx: Failed to create datablock %s\n",nxcifbuf);
+       strcpy(nxcifbuf+nxcifbufbase,"datablock");
+       if (NXmakegroup (nxf, datablock_name, nxcifbuf) != NX_OK) {
+           fprintf(stderr," cif2nx: Failed to create datablock %s\n",datablock_name);
            local_exit (1);
        }
-       if (NXopengroup (nxf, datablock_name, "datablock") != NX_OK) {
-           fprintf(stderr," cif2nx: Failed to open datablock %s\n",nxcifbuf);
+       if (NXopengroup (nxf, datablock_name, nxcifbuf) != NX_OK) {
+           fprintf(stderr," cif2nx: Failed to open datablock %s\n",datablock_name);
            local_exit (1);
        }
        
@@ -724,12 +735,13 @@ int main (int argc, char *argv [])
                if (itemtype == CBF_CATEGORY) {
                    cbf_category_name(cif,&category_name);
                    /* Create the category group for this category */
-                   if (NXmakegroup (nxf, category_name, "category") != NX_OK) {
+                   strcpy(nxcifbuf+nxcifbufbase,"category");
+                   if (NXmakegroup (nxf, category_name, nxcifbuf) != NX_OK) {
                        fprintf(stderr," cif2nx: Failed to create category %s\n",category_name);
                        local_exit (1);
                    }
                    /*  Open the category group for this category */
-                   if (NXopengroup (nxf, category_name, "category") != NX_OK) {
+                   if (NXopengroup (nxf, category_name, nxcifbuf) != NX_OK) {
                        fprintf(stderr," cif2nx: Failed to open category %s\n",category_name);
                        local_exit (1);
                    }
@@ -822,11 +834,12 @@ int main (int argc, char *argv [])
                                    
                                    if (!somebinary) {
                                        
-                                       if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                       strcpy(nxcifbuf+nxcifbufbase,"column");
+                                       if (NXmakegroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                            fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
                                            local_exit (1);
                                        }
-                                       if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                       if (NXopengroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                            fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
                                            local_exit (1);
                                        }
@@ -1005,11 +1018,12 @@ int main (int argc, char *argv [])
                                
                                /* Create and open a column group to hold the entire column */
                                
-                               if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                               strcpy(nxcifbuf+nxcifbufbase,"column");
+                               if (NXmakegroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                    fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
                                    local_exit (1);
                                }
-                               if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                               if (NXopengroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                    fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
                                    local_exit (1);
                                }
@@ -1099,11 +1113,12 @@ int main (int argc, char *argv [])
                    NXclosegroup( nxf ); /* close the category */
                } else {
                    cbf_saveframe_name(cif,&saveframe_name);
-                   if (NXmakegroup (nxf, saveframe_name, "saveframe") != NX_OK) {
+                   strcpy(nxcifbuf+nxcifbufbase,"saveframe");
+                   if (NXmakegroup (nxf, saveframe_name, nxcifbuf) != NX_OK) {
                        fprintf(stderr," cif2nx: Failed to create saveframe %s\n",saveframe_name);
                        local_exit (1);
                    }
-                   if (NXopengroup (nxf, saveframe_name, "saveframe") != NX_OK) {
+                   if (NXopengroup (nxf, saveframe_name, nxcifbuf) != NX_OK) {
                        fprintf(stderr," cif2nx: Failed to open saveframe %s\n",saveframe_name);
                        local_exit (1);
                    }
@@ -1113,11 +1128,12 @@ int main (int argc, char *argv [])
                        for (catnum = 0; catnum < categories;  catnum++) {
                            cbf_select_category(cif, catnum);
                            cbf_category_name(cif,&category_name);
-                           if (NXmakegroup (nxf, category_name, "category") != NX_OK) {
+                           strcpy(nxcifbuf+nxcifbufbase,"category");
+                           if (NXmakegroup (nxf, category_name, nxcifbuf) != NX_OK) {
                                fprintf(stderr," cif2nx: Failed to create category %s\n",category_name);
                                local_exit (1);
                            }
-                           if (NXopengroup (nxf, category_name, "category") != NX_OK) {
+                           if (NXopengroup (nxf, category_name, nxcifbuf) != NX_OK) {
                                fprintf(stderr," cif2nx: Failed to open category %s\n",category_name);
                                local_exit (1);
                            }
@@ -1206,11 +1222,12 @@ int main (int argc, char *argv [])
                                            
                                            if (!somebinary) {
                                                
-                                               if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                               strcpy(nxcifbuf+nxcifbufbase,"column");
+                                               if (NXmakegroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                                    fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
                                                    local_exit (1);
                                                }
-                                               if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                               if (NXopengroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                                    fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
                                                    local_exit (1);
                                                }
@@ -1378,11 +1395,12 @@ int main (int argc, char *argv [])
                                        
                                        /* Create and open an column group to hold the entire column */
                                        
-                                       if (NXmakegroup (nxf, column_name, "column") != NX_OK) {
+                                       strcpy(nxcifbuf+nxcifbufbase,"column");
+                                       if (NXmakegroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                            fprintf(stderr," cif2nx: Failed to create column %s\n",column_name);
                                            local_exit (1);
                                        }
-                                       if (NXopengroup (nxf, column_name, "column") != NX_OK) {
+                                       if (NXopengroup (nxf, column_name, nxcifbuf) != NX_OK) {
                                            fprintf(stderr," cif2nx: Failed to open column %s\n",column_name);
                                            local_exit (1);
                                        }
