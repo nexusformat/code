@@ -1301,7 +1301,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus  NX5getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  NXstatus  NX5getgroupinfo_recurse (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile5 pFile;
     hid_t atype,attr_id;
@@ -1330,6 +1330,62 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
         pFile->iNX=0;
         iRet=H5Giterate(pFile->iFID,pFile->name_ref,0,group_info1, &pFile->iNX);
         *iN=pFile->iNX;
+        H5Aclose(attr_id);
+      }
+    }
+    return NX_OK;
+  }
+/*---------------------------------------------------------------------------*/
+static int countObjectsInGroup(hid_t loc_id)
+{
+  int count = 0, type;
+  hsize_t numobj, i;
+  
+  herr_t status;
+
+  status = H5Gget_num_objs(loc_id, &numobj);
+  if(status < 0) {
+    NXIReportError(NXpData,"Internal error, failed to retrive no of objects");
+    return 0;
+  }
+
+  for(i = 0; i < numobj; i++){
+    type = H5Gget_objtype_by_idx(loc_id,i);
+    if(type == H5G_GROUP || type == H5G_DATASET){
+      count++;
+    }
+  }
+  return count;
+}
+/*----------------------------------------------------------------------------*/
+  NXstatus  NX5getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  {
+    pNexusFile5 pFile;
+    hid_t atype, attr_id, gid;
+    char data[64];
+    int iRet;
+        
+    pFile = NXI5assert (fid);
+    /* check if there is a group open */
+    if (pFile->iCurrentG == 0) {
+       strcpy (pName, "root");
+       strcpy (pClass, "NXroot");
+       gid = H5Gopen(pFile->iFID,"/");
+       *iN = countObjectsInGroup(gid);
+       H5Gclose(gid);
+    }
+    else {
+      strcpy (pName,pFile->name_ref);
+      attr_id = H5Aopen_name(pFile->iCurrentG,"NX_class");
+      if (attr_id<0) {
+         strcpy(pClass, NX_UNKNOWN_GROUP);
+      } else {
+        atype=H5Tcopy(H5T_C_S1);
+        H5Tset_size(atype,sizeof(data));  
+        H5Aread(attr_id, atype, data);
+        strcpy(pClass,data);
+        pFile->iNX=0;
+        *iN = countObjectsInGroup(pFile->iCurrentG);
         H5Aclose(attr_id);
       }
     }
