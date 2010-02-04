@@ -57,6 +57,27 @@
 static FILE *fd = NULL;
 #endif
 
+static jclass nexusException;  // Global variable
+static jmethodID nexusExceptionConstructor;  // Global variable
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+
+    jint ret = (*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_1);
+
+    assert(ret == JNI_OK);
+
+    // Find the class and store the method ID
+    // Will use the class loader that loaded the JNI library
+    nexusException = (*env)->FindClass(env,"org/nexusformat/NexusException");
+    assert(nexusException);
+
+    nexusExceptionConstructor = (*env)->GetMethodID(env, nexusException, "<init>","(Ljava/lang/String;)V");
+    assert(nexusExceptionConstructor);
+
+    return JNI_VERSION_1_1;
+}
+
 /*---------------------------------------------------------------------------
                               ERROR TREATMENT
 
@@ -69,26 +90,25 @@ static FILE *fd = NULL;
 static void JapiError(void *pData, char *text)
 {
     JNIEnv *env = (JNIEnv *)pData;
-    jclass jc;
-    jmethodID jm;
     jobject exception;
     jstring jtext;
     char *args[2];
 
-    assert(env);
-
 #ifdef DEBUG
     fprintf(fd,"JapiError called with: %s\n", text); 
 #endif
-    jc = (*env)->FindClass(env,"org/nexusformat/NexusException");
-    assert(jc);
-    jm = (*env)->GetMethodID(env, jc, "<init>","(Ljava/lang/String;)V");
-    assert(jm != NULL);
+
+    if (env == NULL) {
+	// if there is not thread environment we do not need to throw an exception
+	return;
+    }
+
     jtext = (*env)->NewStringUTF(env,text);
     args[0] = (char *)jtext;
     args[1] = 0;
-    exception = (*env)->NewObjectA(env, jc, jm, (jvalue *) args);
+    exception = (*env)->NewObjectA(env, nexusException, nexusExceptionConstructor, (jvalue *) args);
     (*env)->Throw(env, exception);
+
 } 
 
 /*------------------------------------------------------------------------
