@@ -91,7 +91,7 @@ structure and diffent bases is easy.
 
 <para>The last command line argument is the
 "<parameter>-D</parameter>" switch. This switch allows for
-substituting strings in the the translation file for the &mime_type ,
+substituting strings in the the translation file for the &mime-type ,
 &source , and &location attributes in the translation file. To get a
 better understanding of what this means see Chapter 2. For now it is enough to show an example. 
 

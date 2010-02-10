@@ -44,7 +44,7 @@ detector pixel identifier</para></listitem>
 
 </para>
 
-<example id="TOFNPD-time_focus.xml"><title><filename>TOFNPD:time_focus.xml</filename></title>
+<example id="TOFNPD-time-focus.xml"><title><filename>TOFNPD:time_focus.xml</filename></title>
 <programlisting role="XML">
 <![CDATA[<!--
 URL:     http://www.neutron.anl.gov/nexus/xml/NXtofnpd.xml

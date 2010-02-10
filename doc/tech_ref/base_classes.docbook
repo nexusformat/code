@@ -1,5 +1,5 @@
 <!-- ******************** BASE CLASSES ******************** -->
-<chapter id="base_classes"><title>Base Classes</title>
+<chapter id="base-classes"><title>Base Classes</title>
 
 <para>This chapter will list all of the base classes and their
 contents. </para>
@@ -58,7 +58,7 @@ Template of a beamline attenuator.-->
 </programlisting>
 </example>
 
-<example id="NXbeam_stop.xml"><title><filename>NXbeam_stop.xml</filename></title>
+<example id="NXbeam-stop.xml"><title><filename>NXbeam_stop.xml</filename></title>
 <programlisting role="XML">
 <![CDATA[<!--
 URL:     http://www.neutron.anl.gov/nexus/xml/NXbeam_stop.xml
@@ -467,7 +467,7 @@ Template of a detector, detector bank, or multidetector.-->
 </programlisting>
 </example>
 
-<example id="NXdisk_chopper.xml"><title><filename>NXdisk_chopper.xml</filename></title>
+<example id="NXdisk-chopper.xml"><title><filename>NXdisk_chopper.xml</filename></title>
 <programlisting role="XML">
 <![CDATA[<!--
 URL:     http://www.neutron.anl.gov/nexus/xml/NXdisc_chopper.xml
@@ -624,7 +624,7 @@ This class describes an external condition applied to the sample-->
 </programlisting>
 </example>
 
-<example id="NXevent_data.xml"><title><filename>NXevent_data.xml</filename></title>
+<example id="NXevent-data.xml"><title><filename>NXevent_data.xml</filename></title>
 <programlisting role="XML">
 <![CDATA[<!--
 URL:     http://www.neutron.anl.gov/nexus/xml/NXevent_data.xml
@@ -660,7 +660,7 @@ Template of NXevent_data-->
 </programlisting>
 </example>
 
-<example id="NXfermi_chopper.xml"><title><filename>NXfermi_chopper.xml</filename></title>
+<example id="NXfermi-chopper.xml"><title><filename>NXfermi_chopper.xml</filename></title>
 <programlisting role="XML">
 <![CDATA[<!--
 URL:     http://www.neutron.anl.gov/nexus/xml/NXfermi_chopper.xml
@@ -1615,7 +1615,7 @@ should be used if they have different  affiliations, etc.
 </programlisting>
 </example>
 
-<example id="NXvelocity_selector.xml"><title><filename>NXvelocity_selector.xml</filename></title>
+<example id="NXvelocity-selector.xml"><title><filename>NXvelocity_selector.xml</filename></title>
 <programlisting role="XML">
 <![CDATA[<!--
 URL:     http://www.neutron.anl.gov/nexus/xml/NXvelocity_selector.xml

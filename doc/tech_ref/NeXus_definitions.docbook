@@ -1,7 +1,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.0//EN" [
  <!ENTITY terminology  SYSTEM "terminology.docbook">
  <!ENTITY methods      SYSTEM "methods.docbook">
- <!ENTITY base_classes SYSTEM "base_classes.docbook">
+ <!ENTITY base-classes SYSTEM "base_classes.docbook">
  <!ENTITY monoref      SYSTEM "monoref.docbook">
  <!ENTITY monotas      SYSTEM "monotas.docbook">
  <!ENTITY tofdgs       SYSTEM "tofdgs.docbook">
@@ -9,11 +9,11 @@
  <!ENTITY tofnref      SYSTEM "tofnref.docbook">
  <!ENTITY nxtranslate  "<application>NXtranslate</application>">
  <!ENTITY napi         "<acronym>napi</acronym>">
- <!ENTITY mime_type    "<parameter>NXS:mime_type</parameter>">
+ <!ENTITY mime-type    "<parameter>NXS:mime_type</parameter>">
  <!ENTITY source       "<parameter>NXS:source</parameter>">
  <!ENTITY location     "<parameter>NXS:location</parameter>">
- <!ENTITY make_link    "<parameter>target</parameter>">
- <!ENTITY link_tag     "<parameter>NAPIlink</parameter>">
+ <!ENTITY make-link    "<parameter>target</parameter>">
+ <!ENTITY link-tag     "<parameter>NAPIlink</parameter>">
 ]>
  
 <book id="NXtranslate" lang="en">
@@ -60,7 +60,7 @@ discussed in detail.</para>
 &methods
 
 <!-- ******************** BASE CLASSES ******************** -->
-&base_classes
+&base-classes
 
 <!-- ******************** DEFINITIONS ******************** -->
 <chapter id="definitions"><title>Definitions</title>

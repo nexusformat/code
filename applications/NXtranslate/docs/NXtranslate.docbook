@@ -4,11 +4,11 @@
  <!ENTITY retrievers  SYSTEM "retrievers.docbook">
  <!ENTITY nxtranslate "<application>NXtranslate</application>">
  <!ENTITY napi        "<acronym>napi</acronym>">
- <!ENTITY mime_type   "<parameter>NXS:mime_type</parameter>">
+ <!ENTITY mime-type   "<parameter>NXS:mime_type</parameter>">
  <!ENTITY source      "<parameter>NXS:source</parameter>">
  <!ENTITY location    "<parameter>NXS:location</parameter>">
- <!ENTITY make_link   "<parameter>target</parameter>">
- <!ENTITY link_tag    "<parameter>NAPIlink</parameter>">
+ <!ENTITY make-link   "<parameter>target</parameter>">
+ <!ENTITY link-tag    "<parameter>NAPIlink</parameter>">
 ]>
  
 <book id="NXtranslate" lang="en">

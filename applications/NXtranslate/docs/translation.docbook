@@ -86,16 +86,16 @@ sometimes refered to as a "data" or a
 <varlistentry><term><parameter>retriever</parameter></term><listitem><para>An
 object whose job is to retrieve information from a source external to
 the translation file. Which retriever is created is determined by the
-value of &mime_type . The retriever is initialized using the value of
+value of &mime-type . The retriever is initialized using the value of
 &source . Information is produced by the retriever using the &location
 .</para></listitem></varlistentry>
 
 <varlistentry><term>special attribute</term><listitem><para>An
 attribute that is interpreted by &nxtranslate as a command to deal
-with external information. The special attributes are &mime_type , &source ,
-&location , and &make_link .</para></listitem></varlistentry>
+with external information. The special attributes are &mime-type , &source ,
+&location , and &make-link .</para></listitem></varlistentry>
 
-<varlistentry><term>&mime_type</term><listitem><para>A keyword that
+<varlistentry><term>&mime-type</term><listitem><para>A keyword that
 denotes what library to use to retrieve information from an external
 source. It can be a valid mime type.</para></listitem></varlistentry>
 
@@ -110,16 +110,16 @@ the NeXus retriever this is a path to a particular node in the file
 which will be written out to the resulting NeXus
 file.</para></listitem></varlistentry>
 
-<varlistentry><term>&link_tag</term><listitem><para>This denotes a
+<varlistentry><term>&link-tag</term><listitem><para>This denotes a
 node that is a link to another node in the file. It must have a
-&make_link attribute. All other attributes will be
+&make-link attribute. All other attributes will be
 ignored</para></listitem></varlistentry>
 
-<varlistentry><term>&make_link</term><listitem><para>The attribute
-denoting what a &link_tag node should be linked to. The syntax for
+<varlistentry><term>&make-link</term><listitem><para>The attribute
+denoting what a &link-tag node should be linked to. The syntax for
 describing location is the same as for the <link linkend="nexus">NeXus
 retriever</link>. If this attribute appears in a node other than
-&link_tag it will be treated as a normal
+&link-tag it will be treated as a normal
 attribute.</para></listitem></varlistentry>
 
 <varlistentry><term>primative type</term><listitem><para>Any of the
@@ -143,13 +143,13 @@ dimension arrays of <parameter>NX_CHAR</parameter>.
 <listitem><para>The root node in a file will be
 <parameter><![CDATA[<NXroot>]]></parameter>. There will be nothing
 before or after it, and only one of them. The NXroot can be used to
-set global values for &mime_type and &source .</para></listitem>
+set global values for &mime-type and &source .</para></listitem>
 
 <listitem><para>Only groups can exist directly inside the
 root. This is a constraint of the NeXus API.</para></listitem>
 
 <listitem><para>Every node (except the <parameter>NXroot</parameter>
-and &link_tag ) needs a <parameter>name</parameter> and
+and &link-tag ) needs a <parameter>name</parameter> and
 <parameter>type</parameter>. If the node has a &location then the type
 can be omitted since the retriever will provide it.</para></listitem>
 
@@ -181,14 +181,14 @@ automatically).</para></listitem>
 
 </sect1>
 
-<sect1 id="simple_translation"><title>Simple Translation</title>
+<sect1 id="simple-translation"><title>Simple Translation</title>
 
 <para>While &nxtranslate is the anything to NeXus translator, it is
 possible to have everything specfied in the translation file. <xref
-linkend="simple_translation_xml"> shows a translation file where no
+linkend="simple-translation-xml"> shows a translation file where no
 information will be taken from any other file.</para>
 
-<example id="simple_translation_xml"><title>Simple translation file <filename>test_simple.xml</filename></title>
+<example id="simple-translation-xml"><title>Simple translation file <filename>test_simple.xml</filename></title>
 <programlisting role="XML" linenumbering="numbered">
 <![CDATA[<NXroot>
   <NXentry name="entry1">
@@ -242,7 +242,7 @@ and spaces. These are ignored (as suggested by the term "ignorable
 whitespace") and are present to aid those looking at the raw XML to
 see the node hierarchy.</para>
 
-<para>The main purpose of <xref linkend="simple_translation_xml"> is
+<para>The main purpose of <xref linkend="simple-translation-xml"> is
 to show how to specify information in a translation file. Line 4
 demonstrates the method for strings. Here the
 <parameter>name</parameter> is <parameter>author</parameter> and the
@@ -270,14 +270,14 @@ altogether as seen in line 24.</quote></para>
 
 </sect1>
 
-<sect1 id="nexus_translation"><title>Translation from NeXus</title>
+<sect1 id="nexus-translation"><title>Translation from NeXus</title>
 
 <para>Next is to show how to use NXtranslate to bring in information
-from external sources. <xref linkend="nexus_translation_xml">
+from external sources. <xref linkend="nexus-translation-xml">
 demonstrates various features of importing information from external
 sources, including modifying it before writing.</para>
 
-<example id="nexus_translation_xml"><title>Translation from NeXus file <filename>test_nexus.xml</filename></title>
+<example id="nexus-translation-xml"><title>Translation from NeXus file <filename>test_nexus.xml</filename></title>
 <programlisting role="XML" linenumbering="numbered">
 <![CDATA[<NXroot NXS:source="test_simple.nxs" NXS:mime_type="application/x-NeXus">
   <entry_1D NXS:location="/entry1"/>
@@ -298,7 +298,7 @@ sources, including modifying it before writing.</para>
 </example>
 
 <para>As suggested earlier the root node (line 1) has defined a
-&source and &mime_type to use for creating a retriever. Line 2
+&source and &mime-type to use for creating a retriever. Line 2
 demonstrates that entire entries can be copied from one file to the
 next and that the name of a node can be changed. In this case it is
 from <parameter>entry1</parameter> to
@@ -319,18 +319,18 @@ empty string as the value.</para>
 
 <para>These two examples have shown the way to set up a translation
 file. You can import information from multiple files by declaring
-another &source and &mime_type . There are a couple of things to know
-about these as well. The default &mime_type is
+another &source and &mime-type . There are a couple of things to know
+about these as well. The default &mime-type is
 "<parameter>application/x-NeXus</parameter>" so it does not need to be
-specified. For each &source , whatever &mime_type was defined in the
+specified. For each &source , whatever &mime-type was defined in the
 parent node will be used for the current &source . <xref
-linkend="convoluted_translation_xml"> shows what, in principle, could
+linkend="convoluted-translation-xml"> shows what, in principle, could
 be done with &nxtranslate as more retrievers get
 written.<footnote><para>While retrievers that import information from
 mySQL and jpeg images would be nice, they do not currently
 exist.</para></footnote> </para>
 
-<example id="convoluted_translation_xml"><title>A contrived example</title>
+<example id="convoluted-translation-xml"><title>A contrived example</title>
 <programlisting role="XML" linenumbering="numbered">
 <![CDATA[<NXroot>
   <entry1  NXS:source="test_simple.nxs" NXS:location="/entry1">
@@ -355,11 +355,11 @@ copy. There is no way to decipher which is the original and which is
 the copy without direct comparison of ids using the NeXus api. Links
 can be either to a group or field. Links to attributes are not
 supported by the &napi . A link to a group and field are both shown in
-<xref linkend="two_links_xml">. The first link is to a group whose
+<xref linkend="two-links-xml">. The first link is to a group whose
 name was <parameter>group1</parameter>, while the second link is to a
 field <parameter>array1</parameter>.</para>
 
-<example id="two_links_xml"><title>Two links</title>
+<example id="two-links-xml"><title>Two links</title>
 <programlisting role="XML">
 <![CDATA[<NAPIlink target="/entry/group1"/>
 <NAPIlink target="/entry/group1/array1"/>]]>
@@ -382,7 +382,7 @@ from the others.</para>
 
 <sect2 id="nexus"><title>NeXus</title>
 
-<para>As seen earlier in this chapter the &mime_type for NeXus files
+<para>As seen earlier in this chapter the &mime-type for NeXus files
 is <parameter>application/x-NeXus</parameter>. Similarly the &location
 strings are as simple as possible. NeXus files are organized
 hierarchically similar to the translation file. A good analogy is to
@@ -390,8 +390,8 @@ compare it to a file system where the groups are directories and the
 fields are files. Using this analogy the &location strings are
 absolute paths to the directory or file to be copied. Since there
 examples of NeXus location strings in <xref
-linkend="nexus_translation_xml"> and <xref
-linkend="convoluted_translation_xml"> there is only one other thing to
+linkend="nexus-translation-xml"> and <xref
+linkend="convoluted-translation-xml"> there is only one other thing to
 mention, the path separator is a forward slash, "/".
 
 </para>
@@ -400,7 +400,7 @@ mention, the path separator is a forward slash, "/".
 
 <sect2 id="ipns"><title>IPNS Runfile</title>
 
-<para>The &mime_type for the IPNS retriever is
+<para>The &mime-type for the IPNS retriever is
 <parameter>application/x-IPNS</parameter>. Currently the IPNS retriever only provides access to a small portion of the runfile. The targets
 
 <variablelist><title>IPNS retriever location strings</title>
@@ -442,9 +442,9 @@ mention, the path separator is a forward slash, "/".
 
 </sect2>
 
-<sect2 id="text_plain"><title>Simple ASCII</title>
+<sect2 id="text-plain"><title>Simple ASCII</title>
 
-<para>The &mime_type for the simple ASCII retriever is
+<para>The &mime-type for the simple ASCII retriever is
 <parameter>text/plain</parameter>. The functionality of the simple
 ASCII retriever is limited. This is to emphasize the methodology for
 building retrievers, rather than build a general purpose one. All of
@@ -453,9 +453,9 @@ first line of the file is zero.</para>
 
 </sect2>
 
-<sect2 id="SNS_histogram"><title>SNS Histogram</title>
+<sect2 id="SNS-histogram"><title>SNS Histogram</title>
 
-<para>The &mime_type for the SNS histogram retriever is
+<para>The &mime-type for the SNS histogram retriever is
 <parameter>application/x-SNS-histogram</parameter>.</para>
 
 <para>The &location is of the general form
@@ -585,9 +585,9 @@ columns.</para></listitem></varlistentry>
 
 </sect2>
 
-<sect2 id="text_xml"><title>XML retriever</title>
+<sect2 id="text-xml"><title>XML retriever</title>
 
-<para>The &mime_type for the XML retriever is
+<para>The &mime-type for the XML retriever is
 <parameter>text/xml</parameter>. The XML retriever is built on top of
 libxml2's document object model (DOM) parser. Because of this the
 entire file for information to be retrived from is loaded into memory

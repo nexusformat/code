@@ -48,10 +48,10 @@ abstract base class. In addition to these methods there are a couple
 of assumptions made about classes that implement this interface
 
 <orderedlist><title>Other constraints</title>
- <listitem id="no_copy_or_assign"><para>The copy constructor and
+ <listitem id="no-copy-or-assign"><para>The copy constructor and
  assignment operator will not be used. It is suggested that they are
  made private methods.</para></listitem>
- <listitem id="mime_type"><para>There is a static const string called
+ <listitem id="mime-type"><para>There is a static const string called
  MIME_TYPE which will be used to determine if that particular
  Retriever should be created by the factory. Care must be made to
  select a unique MIME_TYPE to prevent name clashing.</para></listitem>
@@ -69,14 +69,14 @@ code, and header, for an example implementation.</para>
 
 <sect1><title>The Simple ASCII Retriever as an Example</title>
 
-<para>The simplest retriever is the the one for the &mime_type
+<para>The simplest retriever is the the one for the &mime-type
 <parameter>text/plain</parameter>. Because of this it makes a good
 example of how to create your own retriever. The files are located in
 the <filename>text_plain</filename> subdirectory as
 <filename>retriever.h</filename> and
 <filename>retriever.cpp</filename>.</para>
 
-<example id="text_plain_retriever.h"><title>listing of <filename>text_plain/retriever.h</filename></title>
+<example id="text-plain-retriever.h"><title>listing of <filename>text_plain/retriever.h</filename></title>
   <programlisting role="C++">
 <![CDATA[#include "../retriever.h"
 #include <fstream>
@@ -104,13 +104,13 @@ intended to be derived from directly. That being said, you may want to
 copy the header and code for your own retriever as a basis of what
 works. In this example the copy constructor and assignment operator
 are made private as specified in Other constraints <xref
-linkend="no_copy_or_assign">. The private data is a filehandle and the
+linkend="no-copy-or-assign">. The private data is a filehandle and the
 name of the file that is open for reading. The file name and
-&mime_type are used in the <function>toString</function> to identify
+&mime-type are used in the <function>toString</function> to identify
 it uniquely for debugging as seen in <xref
-linkend="text_plain_toString">.</para>
+linkend="text-plain-toString">.</para>
 
-<example id="text_plain_toString"><title>Listing of simple ascii <function>toString</function></title>
+<example id="text-plain-toString"><title>Listing of simple ascii <function>toString</function></title>
   <programlisting role="C++">
 <![CDATA[string TextPlainRetriever::toString() const{
   return "["+MIME_TYPE+"] "+source;
@@ -129,7 +129,7 @@ brief because C++ <parameter>fstream</parameter> library provides the
 <parameter>ifstream</parameter> object that does most of the
 work.</para>
 
-<example id="simple_ascii_constructor"><title>Listing of the simple ascii constructor</title>
+<example id="simple-ascii-constructor"><title>Listing of the simple ascii constructor</title>
   <programlisting role="C++" linenumbering="numbered">
 <![CDATA[TextPlainRetriever::TextPlainRetriever(const string &str): source(str),current_line(0){
   // open the file
@@ -143,13 +143,13 @@ work.</para>
 </example>
 
 <para>The destructor for the Retriever in <xref
-linkend="simple_ascii_destructor"> is just as simple simpler since all
+linkend="simple-ascii-destructor"> is just as simple simpler since all
 it has to do is close the file. There were no calls in the constructor
 (or anywhere else) to <function>new</function> or
 <function>malloc</function> so the constructor does not need to call
 <function>delete</function> or <function>free</function>.</para>
 
-<example id="simple_ascii_destructor"><title>Listing of the simple ascii destructor</title>
+<example id="simple-ascii-destructor"><title>Listing of the simple ascii destructor</title>
   <programlisting role="C++">
 <![CDATA[TextPlainRetriever::~TextPlainRetriever(){
   // close the file
@@ -172,7 +172,7 @@ the generic <parameter>node</parameter> with the string read in from
 the source file. Finally line 21 adds the single node to the supplied
 tree.</para>
 
-<example id="simple_ascii_getData"><title>Listing of the simple ascii <function>getData</function></title>
+<example id="simple-ascii-getData"><title>Listing of the simple ascii <function>getData</function></title>
   <programlisting role="C++" linenumbering="numbered">
 <![CDATA[void TextPlainRetriever::getData(const string &location, tree<Node> &tr){
   // check that the argument is not an empty string
@@ -199,7 +199,7 @@ tree.</para>
   </programlisting>
 </example>
 
-<para><xref linkend="simple_ascii_getData"> is brief because it
+<para><xref linkend="simple-ascii-getData"> is brief because it
 leverages existing functionality. The <parameter>ifstream</parameter>
 objects does all of the work of getting information out of a
 file. <function>skip_to_line</function> and

@@ -30,13 +30,13 @@ definition.</para></listitem>
 <listitem id="method.ol.niac"><para>The NIAC will construct the XML
 definition.</para></listitem>
 
-<listitem id="method.ol.write_file"><para>Write a sample NeXus file
+<listitem id="method.ol.write-file"><para>Write a sample NeXus file
 conforming to the instrument definition (for example, using
 NXtranslate).</para></listitem>
 
 <listitem id="method.ol.test"><para>Test the file, repeating steps
 <xref linkend="method.ol.niac"> and <xref
-linkend="method.ol.write_file"> as appropriate.</para></listitem>
+linkend="method.ol.write-file"> as appropriate.</para></listitem>
 
 <listitem id="method.ol.ratify"><para>Request ratification once the
 testing phase is complete.</para></listitem>
