@@ -14,11 +14,21 @@ doxy.remove_me_to_remake :
 if HAVE_DOXYGEN
 if HAVE_PDFLATEX
 if HAVE_DOT
-	rm -fr latex html
-	$(DOXYGEN) Doxyfile
-	( cd latex; ) # ( cd latex; make pdf )
+	rm -fr latex html latex-* html-*
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) Doxyfile_c
+	( cd latex-c; ) # ( cd latex-c; make pdf )
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) Doxyfile_cpp
+	( cd latex-cpp; ) # ( cd latex-cpp; make pdf )
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) Doxyfile_java
+	( cd latex-java; ) # ( cd latex-java; make pdf )
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) Doxyfile_python
+	( cd latex-python; ) # ( cd latex-python; make pdf )
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) Doxyfile_f90
+	( cd latex-f90; ) # ( cd latex-f90; make pdf )
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) Doxyfile_f77
+	( cd latex-f77; ) # ( cd latex-f77; make pdf )
 	rm -f refman.pdf
-	ln -s latex/refman.pdf .
+	ln -s latex-c/refman.pdf .
 endif
 endif
 endif

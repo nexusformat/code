@@ -746,7 +746,6 @@ AC_CONFIG_FILES([Makefile
 		examples/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile
-		doc/doxygen/Doxyfile
 		doc/api/Makefile
 		doc/nxdict/Makefile
 		doc/tech_ref/Makefile
