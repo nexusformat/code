@@ -58,7 +58,7 @@ static FILE *fd = NULL;
 #endif
 
 static jclass nexusException;  // Global variable
-static jmethodID nexusExceptionConstructor;  // Global variable
+static JavaVM *jvm;  // Global variable
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -67,13 +67,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     assert(ret == JNI_OK);
 
-    // Find the class and store the method ID
-    // Will use the class loader that loaded the JNI library
+    // Find and store the NexusException class for use in JapiError
     nexusException = (*env)->FindClass(env,"org/nexusformat/NexusException");
     assert(nexusException);
 
-    nexusExceptionConstructor = (*env)->GetMethodID(env, nexusException, "<init>","(Ljava/lang/String;)V");
-    assert(nexusExceptionConstructor);
+    jvm = vm;
 
     return JNI_VERSION_1_1;
 }
@@ -81,34 +79,25 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 /*---------------------------------------------------------------------------
                               ERROR TREATMENT
 
-  The NAPI writes any errors to stdout through a special function. 
-  This is not very feasible in a Java environment where an exception should
-  be thrown. Fortunately it is possible to define an own error processing
-  function to be used for error processing. This error handling function
-  is defined here. A NexusException is constructed and thrown.
+  The NAPI posts any errors to a customisable function. 
+  We construct and throw a NexusException with the message received.
   --------------------------------------------------------------------------*/
-static void JapiError(void *pData, char *text)
-{
-    JNIEnv *env = (JNIEnv *)pData;
-    jobject exception;
-    jstring jtext;
-    char *args[2];
+static void JapiError(void *pData, char *text) {
+    // better ignore the env passed in via pData, it is unsafe due to #219
+    JNIEnv *env;
 
 #ifdef DEBUG
     fprintf(fd,"JapiError called with: %s\n", text); 
 #endif
 
+    (*jvm)->AttachCurrentThread (jvm, (void **) &env, NULL);
+
     if (env == NULL) {
-	// if there is not thread environment we do not need to throw an exception
+	// if there is no thread environment we do not need to throw an exception
 	return;
     }
 
-    jtext = (*env)->NewStringUTF(env,text);
-    args[0] = (char *)jtext;
-    args[1] = 0;
-    exception = (*env)->NewObjectA(env, nexusException, nexusExceptionConstructor, (jvalue *) args);
-    (*env)->Throw(env, exception);
-
+    (*env)->ThrowNew(env, nexusException, text);
 } 
 
 /*------------------------------------------------------------------------
