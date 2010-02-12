@@ -67,7 +67,7 @@ endif
 endif
 
 clean-local :
-	rm -fr html latex refman.pdf
+	rm -fr html-* latex-* refman.pdf
 
 uninstall-local :
 	rm -fr $(DESTDIR)$(nxdoxydir)
