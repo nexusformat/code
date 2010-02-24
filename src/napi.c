@@ -1617,3 +1617,8 @@ NXstatus NXfgetpath(NXhandle fid, char *path, int *pathlen)
 {
   return NXgetpath(fid,path,*pathlen);
 }
+
+const char* NXgetversion()
+{
+    return NEXUS_VERSION ;
+}
