@@ -28,6 +28,7 @@
 #
 #====================================================================
 lib_LTLIBRARIES=libNeXus77.la
+AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 
 libNeXus77_la_SOURCES=napif.f
 libNeXus77_la_LIBADD=$(top_builddir)/src/libNeXus.la # @FLIBS@

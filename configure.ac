@@ -35,6 +35,9 @@ AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
+# used by libtool - need to get if from 4.2.0 better
+NXLTVERSINFO="4:2:4"
+
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
 AC_CANONICAL_TARGET
@@ -54,6 +57,7 @@ FCFLAGS="$F90FLAGS $FCFLAGS" # for compatibility with nexus-3.0
 
 AM_INIT_AUTOMAKE([1.6])
 
+AC_SUBST(NXLTVERSINFO)
 
 AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
 
@@ -224,6 +228,8 @@ AC_SUBST(JAVAINCLUDE)
 AC_SUBST(PACKAGE_RELEASE)
 test -z "$PACKAGE_RELEASE" && PACKAGE_RELEASE=1
 
+SHARED_LDFLAGS=""
+
 NXDOCDIR='${datadir}/nexus/doc'
 NXEXAMPLEDIR='${datadir}/nexus/examples'
 NXTESTDIR='${prefix}/nexus/tests'
@@ -387,7 +393,7 @@ case $host in
 	;;
 
     *mingw*)
-	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
+	SHARED_LDFLAGS="$SHARED_LDFLAGS -no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
 	HDF5_EXT=dll
@@ -396,7 +402,7 @@ case $host in
 	;;
 
     *cygwin*)
-#	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
+#	SHARED_LDFLAGS="$SHARED_LDFLAGS -no-undefined" #  -Wl,--add-stdcall-alias
 	;;
 
     *darwin*)
@@ -415,7 +421,7 @@ dnl does not get set with the commands to create a shared library
 	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 dnl	FCFLAGS="$FCFLAGS -qextname"
-	SHARED_LDFLAGS="-Wl,-single_module"
+	SHARED_LDFLAGS="$SHARED_LDFLAGS -Wl,-single_module"
 #	LTF90COMPILETAG="--tag=F77"
 #	LTF90LINKTAG="--tag=CC"
 dnl	LDFLAGS="$LDFLAGS -flat_namespace"

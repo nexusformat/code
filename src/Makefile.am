@@ -29,6 +29,7 @@
 #====================================================================
 
 AM_CPPFLAGS=-I$(top_srcdir)/include @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@ -DIN_NEXUS_LIBRARY
+AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 AM_CFLAGS=-prefer-pic
 
 if HAVE_HDF4
