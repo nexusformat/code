@@ -217,6 +217,7 @@ typedef struct {
 #    define NXinquirefile       MANGLE(nxiinquirefile) 
 #    define NXisexternalgroup   MANGLE(nxiisexternalgroup)
 #    define NXlinkexternal      MANGLE(nxilinkexternal)
+#    define NXgetversion        MANGLE(nxigetversion)
 
 /* 
  * FORTRAN helpers - for NeXus internal use only 
@@ -680,6 +681,14 @@ extern  NXstatus  NXlinkexternal(NXhandle handle, CONSTCHAR *name, CONSTCHAR *nx
    * \ingroup c_memory
    */ 
 extern  NXstatus  NXmalloc(void** data, int rank, int dimensions[], int datatype);
+
+  /**
+   * Utility function to return NeXus version
+   * \return pointer to string in static storage. Version in
+   * same format as NEXUS_VERSION string in napi.h i.e. "major.minor.patch"
+   * \ingroup c_metadata
+   */
+extern  const char* NXgetversion();
 
   /**
    * Utility function to release the memory for data.
