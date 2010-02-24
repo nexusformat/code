@@ -113,6 +113,20 @@ int nx_opengrouppath(void *handle, char *path){
   }
 }
 /*--------------------------------------------------------------------*/
+char *nx_getpath(void *handle){
+  int status;
+  NXhandle hfil;
+  char path[1024];
+
+  hfil = (NXhandle)handle;
+  status = NXgetpath(hfil,path,1024);
+  if(status == NX_OK){
+    return strdup(path);
+  } else {
+    return strdup("Error in NXgetpath");
+  }
+}
+/*--------------------------------------------------------------------*/
 int nx_closegroup(void *handle){
   int status;
   NXhandle hfil;

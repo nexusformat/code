@@ -29,6 +29,7 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <cstdio>
 #include <vector>
 #include "data_util.hpp"
 #include "nxsummary.hpp"

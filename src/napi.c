@@ -231,8 +231,7 @@ extern void NXMEnableErrorReporting()
 static int determineFileType(CONSTCHAR *filename)
 {
   FILE *fd = NULL;
-  int iRet, fapl;
-  NXhandle handle;
+  int iRet;
   
   /*
     this is for reading, check for existence first
@@ -282,7 +281,6 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am,
 NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   int status;
   pFileStack fileStack = NULL;
-  NXhandle hfile;
 
   *gHandle = NULL;
   fileStack = makeFileStack();
@@ -544,6 +542,9 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     pFunc = handleToNexusFunc(fid);
 
     status = pFunc->nxopengroup(pFunc->pNexusData, name, nxclass);  
+    if(status == NX_OK){
+      pushPath(fileStack,name);
+    }
     oldError = NXMGetError();
     NXIReportError = NXNXNoReport;
     attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
@@ -579,7 +580,11 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     pNexusFunction pFunc = handleToNexusFunc(fid);
     fileStack = (pFileStack)fid;
     if(fileStackDepth(fileStack) == 0){
-      return pFunc->nxclosegroup(pFunc->pNexusData);  
+      status = pFunc->nxclosegroup(pFunc->pNexusData);  
+      if(status == NX_OK){
+	popPath(fileStack);
+      }
+      return status;
     } else {
       /* we have to check for leaving an external file */
       NXgetgroupID(fid,&currentID);
@@ -589,6 +594,9 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 	status = NXclosegroup(fid);
       } else {
 	status = pFunc->nxclosegroup(pFunc->pNexusData);
+	if(status == NX_OK){
+	  popPath(fileStack);
+	}
       }
       return status;
     }
@@ -627,8 +635,16 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   
   NXstatus  NXopendata (NXhandle fid, CONSTCHAR *name)
   {
+    int status;
+    pFileStack fileStack = NULL;
+
     pNexusFunction pFunc = handleToNexusFunc(fid); 
-    return pFunc->nxopendata(pFunc->pNexusData, name); 
+    fileStack = (pFileStack)fid;
+    status = pFunc->nxopendata(pFunc->pNexusData, name); 
+    if(status == NX_OK){
+      pushPath(fileStack,name);
+    }
+    return status;
   } 
 
 
@@ -636,8 +652,16 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     
   NXstatus  NXclosedata (NXhandle fid)
   { 
+    int status;
+    pFileStack fileStack = NULL;
+
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    return pFunc->nxclosedata(pFunc->pNexusData);
+    fileStack = (pFileStack)fid;
+    status = pFunc->nxclosedata(pFunc->pNexusData);
+    if(status == NX_OK){
+      popPath(fileStack);
+    }
+    return status;
   }
 
   /* ------------------------------------------------------------------- */
@@ -1061,7 +1085,7 @@ NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   return NX_OK;
 }
 /*------------------------------------------------------------------------
-  Implementation of NXopenpath. 
+  Implementation of NXopenpath 
   --------------------------------------------------------------------------*/
 static int isDataSetOpen(NXhandle hfil)
 {
@@ -1184,7 +1208,6 @@ static NXstatus moveOneDown(NXhandle hfil)
 static char *moveDown(NXhandle hfil, char *path, int *code)
 {
   int status;
-  NXname pathElem;
   char *pPtr;
 
   *code = NX_OK;
@@ -1213,7 +1236,7 @@ static char *moveDown(NXhandle hfil, char *path, int *code)
 /*--------------------------------------------------------------------*/
 static NXstatus stepOneUp(NXhandle hfil, char *name)
 {
-  int status, datatype;
+  int datatype;
   NXname name2, xclass;
   char pBueffel[256];  
 
@@ -1249,7 +1272,7 @@ static NXstatus stepOneUp(NXhandle hfil, char *name)
 /*--------------------------------------------------------------------*/
 static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
 {
-  int status, datatype;
+  int datatype;
   NXname name2, xclass;
   char pBueffel[256];  
 
@@ -1356,18 +1379,29 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
   }
   return NX_OK;
 }
-
+/*---------------------------------------------------------------------*/
 NXstatus NXIprintlink(NXhandle fid, NXlink* link)
 {
      pNexusFunction pFunc = handleToNexusFunc(fid);
      return pFunc->nxprintlink(pFunc->pNexusData, link);   
+}
+/*----------------------------------------------------------------------*/
+NXstatus NXgetpath(NXhandle fid, char *path, int pathlen){
+  int status;
+  pFileStack fileStack = NULL;
+
+  fileStack = (pFileStack)fid;
+  status = buildPath(fileStack,path,pathlen);
+  if(status != 1){
+    return NX_ERROR;
+  } 
+  return NX_OK;
 }
 
 /*--------------------------------------------------------------------
   format NeXus time. Code needed in every NeXus file driver
   ---------------------------------------------------------------------*/
 char *NXIformatNeXusTime(){
-    char *timeData;
     time_t timer;
     char* time_buffer = NULL;
     struct tm *time_info;
@@ -1445,18 +1479,18 @@ char *NXIformatNeXusTime(){
    * instead, but that would mean writing far more wrappers
    */
   NXstatus  NXfopen(char * filename, NXaccess* am, 
-                                 NexusFunction* pHandle)
+                                 NXhandle pHandle)
   {
 	NXstatus ret;
  	NXhandle fileid = NULL;
 	ret = NXopen(filename, *am, &fileid);
 	if (ret == NX_OK)
 	{
-	    memcpy(pHandle, fileid, sizeof(NexusFunction));
+	  memcpy(pHandle, fileid, getFileStackSize());
 	}
 	else
 	{
-	    memset(pHandle, 0, sizeof(NexusFunction));
+	  memset(pHandle, 0, getFileStackSize());
 	}
 	if (fileid != NULL)
 	{
@@ -1469,26 +1503,26 @@ char *NXIformatNeXusTime(){
  * array holding the NexusFunction structure. We need to malloc()
  * a temporary copy as NXclose will try to free() this
  */
-  NXstatus  NXfclose (NexusFunction* pHandle)
+  NXstatus  NXfclose (NXhandle pHandle)
   {
     NXhandle h;
     NXstatus ret;
-    h = (NXhandle)malloc(sizeof(NexusFunction));
-    memcpy(h, pHandle, sizeof(NexusFunction));
+    h = (NXhandle)malloc(getFileStackSize());
+    memcpy(h, pHandle, getFileStackSize());
     ret = NXclose(&h);		/* does free(h) */
-    memset(pHandle, 0, sizeof(NexusFunction));
+    memset(pHandle, 0, getFileStackSize());
     return ret;
   }
   
 /*---------------------------------------------------------------------*/  
-  NXstatus  NXfflush(NexusFunction* pHandle)
+  NXstatus  NXfflush(NXhandle pHandle)
   {
     NXhandle h;
     NXstatus ret;
-    h = (NXhandle)malloc(sizeof(NexusFunction));
-    memcpy(h, pHandle, sizeof(NexusFunction));
+    h = (NXhandle)malloc(getFileStackSize());
+    memcpy(h, pHandle, getFileStackSize());
     ret = NXflush(&h);		/* modifies and reallocates h */
-    memcpy(pHandle, h, sizeof(NexusFunction));
+    memcpy(pHandle, h, getFileStackSize());
     return ret;
   }
 /*----------------------------------------------------------------------*/
@@ -1519,7 +1553,7 @@ char *NXIformatNeXusTime(){
     return ret;
   }
 
-
+/*-----------------------------------------------------------------------*/
   NXstatus  NXfcompmakedata(NXhandle fid, char *name, 
                 int *pDatatype,
 		int *pRank, int dimensions[],
@@ -1578,3 +1612,8 @@ char *NXIformatNeXusTime(){
 	  return ret;
   }
 
+/*--------------------------------------------------------------------------*/
+NXstatus NXfgetpath(NXhandle fid, char *path, int *pathlen)
+{
+  return NXgetpath(fid,path,*pathlen);
+}

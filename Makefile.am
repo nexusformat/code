@@ -1,8 +1,6 @@
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
-#  $Id$
-#
 #  Top level Makefile for coordinating NeXus build
 #  
 #  Copyright (C) 2004 Freddie Akeroyd
@@ -22,7 +20,7 @@
 #  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
 #  MA  02111-1307  USA
 #             
-#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#  For further information, see <http://www.nexusformat.org>
 #
 #  @configure_input@
 #
@@ -44,3 +42,13 @@ EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autoversion.sh \
 # Add any flags here that you want passed to configure when you do 
 # a "make distcheck"
 # DISTCHECK_CONFIGURE_FLAGS=--without-java
+MAINTAINERCLEANFILES = \
+ ChangeLog \
+ INSTALL \
+ aclocal.m4 \
+ config \
+ configure \
+ doc/tech_ref/NeXus_definitions.pdf \
+ doc/tech_ref/NeXus_definitions.txt \
+ include/nxconfig_h.in \
+ `find "$(srcdir)" -type f -name Makefile.in -print`

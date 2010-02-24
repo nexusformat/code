@@ -19,6 +19,10 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  
   For further information, see <http://www.neutron.anl.gov/NeXus/>
+
+  Added functions to deal with the path stack for NXgetpath
+  Mark Koennecke, October 2009
+
 */
 #ifndef NEXUSFILESTACK
 #define NEXUSFILESTACK
@@ -28,6 +32,7 @@ typedef struct __fileStack *pFileStack;
 
 pFileStack makeFileStack();
 void killFileStack(pFileStack self);
+int getFileStackSize();
 
 void pushFileStack(pFileStack self, pNexusFunction pDriv, char *filename);
 void popFileStack(pFileStack self);
@@ -38,6 +43,10 @@ void peekIDOnStack(pFileStack self, NXlink *id);
 void setCloseID(pFileStack self, NXlink id);
  
 int fileStackDepth(pFileStack self);
+
+void pushPath(pFileStack self, char *name);
+void popPath(pFileStack self);
+int buildPath(pFileStack self, char *path, int pathlen);
 
 #endif
 

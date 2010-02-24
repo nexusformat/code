@@ -21,6 +21,10 @@
 
    Updated for 64 bit types, Mark Koennecke, August 2007
 
+   Added NXinitattrdir and NXinitgroupdir, Mark Koennecke, October 2009
+
+   Added NXgetpath, Mark Koennecke, October 2009
+
    IMPLEMENTATION NOTES
 
    The NAPI uses a handle type for hiding the NeXus file datastructure.
@@ -53,38 +57,47 @@
 static FILE *fd = NULL;
 #endif
 
+static jclass nexusException;  // Global variable
+static JavaVM *jvm;  // Global variable
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+
+    jint ret = (*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_1);
+
+    assert(ret == JNI_OK);
+
+    // Find and store the NexusException class for use in JapiError
+    nexusException = (*env)->FindClass(env,"org/nexusformat/NexusException");
+    assert(nexusException);
+
+    jvm = vm;
+
+    return JNI_VERSION_1_1;
+}
+
 /*---------------------------------------------------------------------------
                               ERROR TREATMENT
 
-  The NAPI writes any errors to stdout through a special function. 
-  This is not very feasible in a Java environment where an exception should
-  be thrown. Fortunately it is possible to define an own error processing
-  function to be used for error processing. This error handling function
-  is defined here. A NexusException is constructed and thrown.
+  The NAPI posts any errors to a customisable function. 
+  We construct and throw a NexusException with the message received.
   --------------------------------------------------------------------------*/
-static void JapiError(void *pData, char *text)
-{
-    JNIEnv *env = (JNIEnv *)pData;
-    jclass jc;
-    jmethodID jm;
-    jobject exception;
-    jstring jtext;
-    char *args[2];
-
-    assert(env);
+static void JapiError(void *pData, char *text) {
+    // better ignore the env passed in via pData, it is unsafe due to #219
+    JNIEnv *env;
 
 #ifdef DEBUG
     fprintf(fd,"JapiError called with: %s\n", text); 
 #endif
-    jc = (*env)->FindClass(env,"org/nexusformat/NexusException");
-    assert(jc);
-    jm = (*env)->GetMethodID(env, jc, "<init>","(Ljava/lang/String;)V");
-    assert(jm != NULL);
-    jtext = (*env)->NewStringUTF(env,text);
-    args[0] = (char *)jtext;
-    args[1] = 0;
-    exception = (*env)->NewObjectA(env, jc, jm, (jvalue *) args);
-    (*env)->Throw(env, exception);
+
+    (*jvm)->AttachCurrentThread (jvm, (void **) &env, NULL);
+
+    if (env == NULL) {
+	// if there is no thread environment we do not need to throw an exception
+	return;
+    }
+
+    (*env)->ThrowNew(env, nexusException, text);
 } 
 
 /*------------------------------------------------------------------------
@@ -304,6 +317,25 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengrouppath
     /* release strings */
     (*env)->ReleaseStringUTFChars(env,path, nxpath);
 }
+/*-----------------------------------------------------------------------*/
+JNIEXPORT jstring JNICALL Java_org_nexusformat_NexusFile_nxgetpath
+  (JNIEnv *env, jobject obj, jint handle)
+{
+    NXhandle nxhandle;
+    int iRet;
+    char path[1024];
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXgetpath(nxhandle, path,1024);
+    
+    return (*env)->NewStringUTF(env,path);
+}
+
 /*------------------------------------------------------------------------
                      nxclosegroup
 --------------------------------------------------------------------------*/
@@ -1231,6 +1263,37 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
       rstring = (*env)->NewStringUTF(env,nxurl);
       (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
     }
+}
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initattrdir
+(JNIEnv *env, jobject obj, jint handle)
+{
+    NXhandle nxhandle;
+    int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXinitattrdir(nxhandle);
+
+}
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
+(JNIEnv *env, jobject obj, jint handle)
+{
+    NXhandle nxhandle;
+    int iRet;
+
+    /* set error handler */
+    NXMSetError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXinitgroupdir(nxhandle);
 }
 /*------------------------------------------------------------------------
                                debugstop

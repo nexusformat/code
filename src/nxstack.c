@@ -19,6 +19,9 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  
   For further information, see <http://www.neutron.anl.gov/NeXus/>
+
+  Added code to support the path stack for NXgetpath, 
+        Mark Koennecke, October 2009
 */
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +42,8 @@ typedef struct {
 typedef struct __fileStack {
   int fileStackPointer;
   fileStackEntry fileStack[MAXEXTERNALDEPTH];
+  int pathPointer;
+  char pathStack[NXMAXSTACK][NX_MAXNAMELEN];
 }fileStack;
 /*---------------------------------------------------------------------*/
 pFileStack makeFileStack(){
@@ -50,6 +55,7 @@ pFileStack makeFileStack(){
   }
   memset(pNew,0,sizeof(fileStack));
   pNew->fileStackPointer = -1;
+  pNew->pathPointer = -1;
   return pNew;
 }
 /*---------------------------------------------------------------------*/
@@ -57,6 +63,10 @@ void killFileStack(pFileStack self){
   if(self != NULL){
     free(self);
   }
+}
+/*---------------------------------------------------------------------*/
+int getFileStackSize(){
+  return sizeof(fileStack);
 }
 /*----------------------------------------------------------------------*/
 void pushFileStack(pFileStack self, pNexusFunction pDriv, char *file){
@@ -97,4 +107,38 @@ void setCloseID(pFileStack self, NXlink id){
 /*----------------------------------------------------------------------*/
 int fileStackDepth(pFileStack self){
   return self->fileStackPointer;
+}
+/*----------------------------------------------------------------------*/
+void pushPath(pFileStack self, char *name){
+  self->pathPointer++;
+  strncpy(self->pathStack[self->pathPointer],name,NX_MAXNAMELEN-1);
+}
+/*-----------------------------------------------------------------------*/
+void popPath(pFileStack self){
+  self->pathPointer--;
+  if(self->pathPointer < -1){
+    self->pathPointer = -1;
+  }
+}
+/*-----------------------------------------------------------------------*/
+int buildPath(pFileStack self, char *path, int pathlen){
+  int i, totalPathLength;
+  char *totalPath;
+
+  for(i = 0, totalPathLength = 5; i <= self->pathPointer; i++){
+    totalPathLength += strlen(self->pathStack[i]) + 1;
+  }
+  totalPath = malloc(totalPathLength*sizeof(char));
+  if(totalPath == NULL){
+    return 0;
+  }
+  memset(totalPath,0,totalPathLength*sizeof(char));
+  for(i = 0; i <= self->pathPointer; i++){
+    strcat(totalPath,"/");
+    strcat(totalPath,self->pathStack[i]);
+  }
+  
+  strncpy(path,totalPath,pathlen-1);
+  free(totalPath);
+  return 1;
 }

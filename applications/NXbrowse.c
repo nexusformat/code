@@ -25,15 +25,39 @@
            Argonne, IL 60439-4845
            USA
 
- For further information, see <http://www.neutron.anl.gov/NeXus/>
+ For further information, see <http://www.nexusformat.org>
 
  $Id$
 !----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "napi.h"
 #include "napiconfig.h"
+static char* my_readline(const char* prompt)
+{
+    char inputText[256];
+    char* stringPtr;
+    fprintf(stdout, "%s", prompt);
+    if (fgets(inputText, sizeof(inputText), stdin) == NULL)
+    {
+	return NULL;
+    }
+    if ((stringPtr = strchr(inputText, '\n')) != NULL) 
+    {
+        *stringPtr = '\0';
+    }
+    return strdup(inputText);
+}
+#if HAVE_LIBREADLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#else
+#define rl_completion_matches(a,b) NULL
+#define rl_outstream stdout
+#define readline my_readline
+#endif
 
 #define StrEq(s1, s2) (strcmp((s1), (s2)) == 0)
 
@@ -56,14 +80,179 @@ static int nxTypeSize(int dataType);
 static int iByteAsChar = 1; /* Assume global attributes are all characters */
 static char nxFile[256];
 
+static NXhandle the_fileId;
+
+/* 
+ * Freddie Akeroyd 18/10/2009 
+ *
+ * Add in support for readline and completion (nxbrowse_complete) of commands
+ * (command_generator) and on data/group names (field_generator)
+ * a / character is appended to group names for display, but stripped off
+ * by the cd command (we may want to remove this and use openpath() later)
+ *
+ */
+typedef struct {
+    const char* name;
+    const char* doc;
+} COMMAND;
+
+COMMAND commands[] = {
+    { "cd", "Move into to a group" },
+    { "close", "Move out of a group" },
+    { "dir", "" },
+    { "read", "" },
+    { "open", "" },
+    { "help", "" },
+    { "info", "" },
+    { "exit", "" },
+    { "dump", "" },
+    { "bytesaschar", "" },
+    { NULL, NULL }
+};
+
+static char* command_generator(const char* text, int state)
+{
+    static int len, list_index;
+    const char* name;
+    if (!state)
+    {
+        list_index = 0;
+        len = strlen(text);
+    } 
+    while( (name = commands[list_index].name) != NULL )
+    {
+	++list_index;
+	if (strncasecmp(name, text, len) == 0)
+	{
+	    return strdup(name);
+	}
+    }
+    return NULL;
+}
+
+struct name_item;
+
+struct name_item
+{
+    char* name;
+    struct name_item* next;
+};
+    
+static char* field_generator(const char* text, int state)
+{
+    static int len;
+    struct name_item *item, *t_item;
+    static struct name_item *names = NULL, *last_item = NULL;
+    char* res;
+    int status, dataType;
+    NXname name, nxclass;
+    if (!state)
+    {
+	item = names;
+	while(item != NULL)
+	{
+	    if (item->name != NULL)
+	    {
+		free(item->name);
+	  	item->name = NULL;
+	    }
+	    t_item = item;
+	    item = item->next;
+	    t_item->next = NULL;
+	    free(t_item);
+	}
+	last_item = names = NULL;
+        len = strlen(text);
+        if (NXinitgroupdir (the_fileId) != NX_OK)
+        {
+	    return NULL;
+        }
+        do 
+        {
+           status = NXgetnextentry (the_fileId, name, nxclass, &dataType);
+           if (status == NX_ERROR) break;
+           if (status == NX_OK) 
+           {
+	      if (strncmp(nxclass,"CDF",3) == 0){ 
+	          ;
+	      }
+	      else if (strncmp(name, text, len) == 0)
+              {
+		  item = (struct name_item*)malloc(sizeof(struct name_item));
+                  item->name = strdup(name);
+	          if (strcmp(nxclass,"SDS") != 0){ 
+		     strcat(item->name, "/");
+		  }
+		  item->next = NULL;
+		  if (last_item == NULL)
+		  {
+		    names = item;
+                  }
+		  else
+		  {
+		    last_item->next = item;
+		  }
+		  last_item = item;
+              }
+           } 
+        } while (status == NX_OK);
+        last_item = names;
+    }
+    if (last_item != NULL)
+    {
+       res = strdup(last_item->name);
+       last_item = last_item->next;
+    }
+    else
+    {
+	res = NULL;
+    }
+    return res;
+}
+
+static char** nxbrowse_complete(const char* text, int start, int end)
+{
+    char** matches = NULL;
+    static char line[512];
+    strncpy(line, text+start, end-start);
+    line[end-start] = '\0';
+    if (start == 0) 
+    {
+	matches = rl_completion_matches(text, command_generator);
+    }
+    else
+    {
+	matches = rl_completion_matches(text, field_generator);
+    }
+    return matches;
+}
+
+
 int main(int argc, char *argv[])
 {
-   NXhandle fileId;
-   char fileName[80], inputText[255], path[80], *command, *dimensions, *stringPtr;
+   char fileName[80], path[80], *command, *dimensions, *stringPtr;
+   char prompt[512];
+   char *inputText;
    NXname groupName, dataName;
    int status, groupLevel = 0, i;
 
-   printf ("NXBrowse %s Copyright (C) 2000 R. Osborn, M. Koennecke, P. Klosowski\n", NEXUS_VERSION);
+#if HAVE_LIBREADLINE
+   rl_readline_name = "NXbrowse";
+   rl_attempted_completion_function = nxbrowse_complete;
+#if READLINE_VERSION >= 0x500
+   rl_catch_signals = 0;
+#else
+#define rl_crlf() fprintf(rl_outstream, "\r\n");
+#define rl_on_new_line() 1
+#endif
+   using_history();
+#else
+#define rl_crlf()
+#define rl_on_new_line()
+#define add_history(a)
+#endif
+
+   printf ("NXBrowse %s Copyright (C) 2009 NeXus Data Format\n", NEXUS_VERSION);
 
 /* if there is a filename given on the command line use that,
       else ask for a filename */
@@ -79,23 +268,32 @@ int main(int argc, char *argv[])
    strcpy (nxFile, fileName);
  
 /* Open input file and output global attributes */
-   if (NXopen (fileName, NXACC_READ, &fileId) != NX_OK) {
+   if (NXopen (fileName, NXACC_READ, &the_fileId) != NX_OK) {
       printf ("NX_ERROR: Can't open %s\n", fileName);
       return NX_ERROR;
    }
-   PrintAttributes (fileId);
+   PrintAttributes (the_fileId);
    iByteAsChar = 0; /* Display remaining NX_INT8 and NX_UINT8 variables as integers by default */
 /* Input commands until the EXIT command is given */
    strcpy (path, "NX");
    do {
-      printf ("%s> ", path);
-      if (fgets(inputText, sizeof(inputText), stdin) == NULL)
+      sprintf (prompt, "%s> ", path);
+      if (getenv("NO_READLINE") != NULL)
       {
-         return NX_OK;
+          inputText = my_readline(prompt);
       }
-
-      if ((stringPtr = strchr(inputText, '\n')) != NULL) 
-         *stringPtr = '\0';
+      else
+      {
+          inputText = readline(prompt);
+      }
+      if (inputText == NULL)
+      {
+          inputText = strdup("EXIT");
+      }
+      if (*inputText)
+      {
+          add_history(inputText);
+      }
       command = strtok(inputText," ");
       /* Check if a command has been given */
       if (command == NULL) command = " ";
@@ -103,23 +301,27 @@ int main(int argc, char *argv[])
       ConvertUpperCase (command);
       /* Command is to print a directory of the current group */
       if (StrEq(command, "DIR") || StrEq(command, "LS")) {
-         status = NXBdir (fileId);
+         status = NXBdir (the_fileId);
       }    
       /* Command is to open the specified group */
       if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
-         stringPtr = strtok(NULL, " "); 
+         stringPtr = strtok(NULL, " /"); 
          if (stringPtr != NULL) {
             strcpy (groupName, stringPtr);
-            status = NXBopen (fileId, groupName);
-            /* Add the group to the prompt string */
-            if (status == NX_OK) {
-               strcat (path, "/");
-               strcat (path, groupName);
-               groupLevel++;
-            }
+			 if (StrEq(groupName, "..")) {
+				 strcpy(command, "CLOSE");
+			 } else {
+				 status = NXBopen (the_fileId, groupName);
+				 /* Add the group to the prompt string */
+				 if (status == NX_OK) {
+					 strcat (path, "/");
+					 strcat (path, groupName);
+					 groupLevel++;
+				 }
+			 }
          }
          else {
-            printf ("NX_ERROR: Specify a group\n");
+            fprintf (rl_outstream, "NX_ERROR: Specify a group\n");
          }
       }
       /* Command is to  dump data values to a file */
@@ -130,14 +332,14 @@ int main(int argc, char *argv[])
             stringPtr = strtok(NULL," ");
             if (stringPtr != NULL) {
                strcpy (fileName, stringPtr);
-               status = NXBdump (fileId, dataName, fileName);
+               status = NXBdump (the_fileId, dataName, fileName);
             }
             else {
-               printf ("NX_ERROR: Specify a dump file name \n");
+               fprintf (rl_outstream, "NX_ERROR: Specify a dump file name \n");
             }
          }
          else {
-            printf ("NX_ERROR: Specify a data item\n");
+            fprintf (rl_outstream, "NX_ERROR: Specify a data item\n");
          }
       }
       /* Command is to print the values of the data */
@@ -146,16 +348,16 @@ int main(int argc, char *argv[])
          if (stringPtr != NULL) {
             strcpy (dataName, stringPtr);
             dimensions = strtok(NULL, "[]");
-            status = NXBread (fileId, dataName, dimensions);
+            status = NXBread (the_fileId, dataName, dimensions);
          }
          else {
-            printf ("NX_ERROR: Specify a data item\n");
+            fprintf (rl_outstream, "NX_ERROR: Specify a data item\n");
          }
       }
       /* Command is to close the current group */
       if (StrEq(command, "CLOSE")) {
          if (groupLevel > 0) {
-            if (NXclosegroup (fileId) == NX_OK) {
+            if (NXclosegroup (the_fileId) == NX_OK) {
                /* Remove the group from the prompt string */
                stringPtr = strrchr (path, '/'); /* position of last group delimiter */
                if (stringPtr != NULL) 
@@ -164,7 +366,7 @@ int main(int argc, char *argv[])
             }
          }
          else {
-            printf ("NX_WARNING: Already at root level of file\n");
+            fprintf (rl_outstream, "NX_WARNING: Already at root level of file\n");
          }
       }
       /* Command is to print help information */
@@ -188,11 +390,12 @@ int main(int argc, char *argv[])
       }
       /* Command is to exit the program */
       if (StrEq(command, "EXIT") || StrEq(command, "QUIT")) {
-         for (i = groupLevel; i > 0; i--) NXclosegroup (fileId);
-         NXclose (&fileId);
+         for (i = groupLevel; i > 0; i--) NXclosegroup (the_fileId);
+         NXclose (&the_fileId);
          return NX_OK;
       }
       status = NX_OK;
+      free(inputText);
    } while (status == NX_OK);
    return NX_OK;
 }

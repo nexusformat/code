@@ -33,7 +33,6 @@
 //#include <utility> // REMOVE
 
 #define NXDATA "NXdata"
-#define ATTR   "ATTR"
 
 using std::string;
 using std::cout;

@@ -217,6 +217,41 @@ static IDL_VPTR NXopengrouppath_this(int argc, IDL_VPTR *argv)
 
   return IDL_GettmpInt(status);
 }
+/*======================================================================
+ * NXgetpath
+ * string = NXgetpath(file_id)
+ *======================================================================*/
+static IDL_VPTR NXgetpath_this(int argc, IDL_VPTR *argv)
+{
+  int fileid;
+  NXhandle hHandle;
+  int iHandle, status;
+  char path[1024];
+
+  if (argc != 1) {
+	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "One argument expected");
+	return IDL_StrToSTRING("One argument expected");
+	}
+
+  IDL_ENSURE_SCALAR(argv[0]);
+
+  fileid = (int)IDL_LongScalar(argv[0]);
+
+  if(HHCheckIfHandleExists(fileid) == -1) {
+        IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, "Unknown file id");
+	return IDL_StrToSTRING("ERROR: Unknown file ID");
+	}
+
+  hHandle = HHGetPointer(fileid);
+  NXMSetError(NULL,idlError);
+
+  status = NXgetpath(hHandle,path,1024);
+  if(status == NX_ERROR){
+ 	IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_INFO, nexusError);
+	return IDL_StrToSTRING(nexusError);
+  }
+   return IDL_StrToSTRING(path);
+}
 
 /*======================================================================
  * Nxclose
@@ -2548,7 +2583,8 @@ int IDL_Load(void)
     { NXclose_this, "NXCLOSE", 0, IDL_MAXPARAMS, 0, 0},
     { NXsetnumberformat_this, "NXSETNUMBERFORMAT", 0, IDL_MAXPARAMS, 0, 0},
     { NXopenpath_this, "NXOPENPATH", 0, IDL_MAXPARAMS, 0, 0},
-	{ NXopengrouppath_this, "NXOPENGROUPPATH", 0, IDL_MAXPARAMS, 0, 0},
+    { NXopengrouppath_this, "NXOPENGROUPPATH", 0, IDL_MAXPARAMS, 0, 0},
+    { NXgetpath_this, "NXGETPATH", 0, IDL_MAXPARAMS, 0, 0},
     { NXmakegroup_this, "NXMAKEGROUP", 0, IDL_MAXPARAMS, 0, 0},
     { NXopengroup_this, "NXOPENGROUP", 0, IDL_MAXPARAMS, 0, 0},
 	{ NXcompress_this, "NXCOMPRESS", 0, IDL_MAXPARAMS, 0, 0},

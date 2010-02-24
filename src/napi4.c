@@ -24,6 +24,9 @@
   $Id$
 
 ----------------------------------------------------------------------------*/
+
+#ifdef HDF4 
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -109,7 +112,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   static int32 NXIFindVgroup (pNexusFile pFile, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     int32 iNew, iRef, iTag;
-    int iN, i, status;
+    int iN, i;
     int32 *pArray = NULL;
     NXname pText;
   
@@ -1321,7 +1324,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile pFile;
-    int32 iVG, iRet, dataID, type = DFNT_CHAR8, length;
+    int32 dataID, type = DFNT_CHAR8, length;
     char name[] = "target";
   
     pFile = NXIassert (fid);
@@ -1353,7 +1356,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4makenamedlink (NXhandle fid, CONSTCHAR* newname, NXlink* sLink)
   {
     pNexusFile pFile;
-    int32 iVG, iRet, dataID, type = DFNT_CHAR8, length, dataType = NX_CHAR, 
+    int32 dataID, type = DFNT_CHAR8, length, dataType = NX_CHAR, 
       rank = 1, attType = NX_INT32;
     int iDim[1];
     char name[] = "target";
@@ -1812,6 +1815,9 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     }
     *iType = (int)iType32;
     iLen = iLen * DFKNTsize (*iType);
+    if(*iType == NX_CHAR){
+      iLen += 1;
+    }
     pData = (void *) malloc (iLen);
     if (!pData) {
       NXIReportError (NXpData, "ERROR: allocating memory in NXgetattr");
@@ -2005,3 +2011,5 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX4initattrdir;
       fHandle->nxprintlink=NX4printlink;
 }
+
+#endif /*HDF4*/

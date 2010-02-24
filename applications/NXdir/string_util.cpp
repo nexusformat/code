@@ -281,8 +281,8 @@ extern string path_to_str(const Path path, const PathMode print_mode){
  * Converts a float (any precision) to a string.
  */
 static string float_to_str(double value){
-  char temp[20];
-  sprintf(temp,"%f",value);
+  char temp[40];
+  snprintf(temp,40,"%f",value);
 
   return string(temp);
 }
@@ -291,8 +291,8 @@ static string float_to_str(double value){
  * Converts an integer (any precision) to a string.
  */
 extern string int_to_str(const long value){
-  char temp[20];
-  sprintf(temp,"%d",value);
+  char temp[40];
+  snprintf(temp,40,"%d",value);
 
   return string(temp);
 }

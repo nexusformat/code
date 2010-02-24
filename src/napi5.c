@@ -22,6 +22,9 @@
   For further information, see <http://www.neutron.anl.gov/NeXus/>
 
 ----------------------------------------------------------------------------*/
+
+#ifdef HDF5 
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -93,7 +96,6 @@ static void ignoreError(void *data, char *text){
 /*---------------------------------------------------------------------*/
 static void buildCurrentPath(pNexusFile5 self, char *pathBuffer, 
 			     int pathBufferLen){
-  int length;
 
   memset(pathBuffer,0,pathBufferLen);
   if(self->iCurrentG != 0) {
@@ -772,8 +774,7 @@ static int nxToHDF5Type(int datatype)
   {
   pNexusFile5 pFile;
   int chunk_size[H5S_MAX_RANK];
-  int i;
-  
+   
   pFile = NXI5assert (fid);
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int));
   memcpy(chunk_size,dimensions,rank*sizeof(int));
@@ -1142,7 +1143,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 {
     pNexusFile5 pFile;
     char linkTarget[1024];
-    int type = NX_CHAR, length;
+    int type = NX_CHAR;
     int status;
 
     pFile = NXI5assert (fid);
@@ -1177,7 +1178,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   {
     pNexusFile5 pFile;
     char linkTarget[1024];
-    int type = NX_CHAR, length;
+    int type = NX_CHAR;
     char *itemName = NULL;
     int status;
 
@@ -1278,20 +1279,19 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 
   herr_t group_info1(hid_t loc_id, const char *name, void *opdata)
   {
-    NexusFile5 self;
     H5G_stat_t statbuf;
-    self.iNX = *((int*)opdata);
+    int iNX = *((int*)opdata);
     H5Gget_objinfo(loc_id, name, 0, &statbuf);
     
     switch (statbuf.type) 
     {
       case H5G_GROUP: 
-        self.iNX++;
-        *((int*)opdata)=self.iNX;
+        iNX++;
+        *((int*)opdata)=iNX;
         break;
       case H5G_DATASET:
-        self.iNX++;
-        *((int*)opdata)=self.iNX;
+        iNX++;
+        *((int*)opdata)=iNX;
         break;
       default:
 	break;
@@ -1301,7 +1301,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus  NX5getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  NXstatus  NX5getgroupinfo_recurse (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile5 pFile;
     hid_t atype,attr_id;
@@ -1335,139 +1335,212 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     }
     return NX_OK;
   }
-
-/*------------------------------------------------------------------------*/
-static int hdf5ToNXType(int data_id, hid_t atype)
+/*---------------------------------------------------------------------------*/
+static int countObjectsInGroup(hid_t loc_id)
 {
-  int iPtype = -1;
-  hid_t sign_id, size_id;
+  int count = 0, type;
+  hsize_t numobj, i;
+  
+  herr_t status;
 
-           if (data_id==H5T_STRING)
-           {
-             iPtype=NX_CHAR;
-           }
-           if (data_id==H5T_INTEGER)
-          {
-             size_id=H5Tget_size(atype);
-             sign_id=H5Tget_sign(atype);
-             if (size_id==1)
-             {
-                if (sign_id==H5T_SGN_2)
-                {
-                   iPtype=NX_INT8;
-                } else {
-                   iPtype=NX_UINT8;
-                }
-             } 
-             else if (size_id==2) 
-             {
-                if (sign_id==H5T_SGN_2)
-                {
-                   iPtype=NX_INT16;
-                } else {
-                   iPtype=NX_UINT16;
-                }
-             }
-             else if (size_id==4) 
-             {
-                 if (sign_id==H5T_SGN_2)
-                 {
-                    iPtype=NX_INT32;
-                 } else {
-                    iPtype=NX_UINT32;
-                 }
-             } 
-             else if(size_id == 8)
-	     {
-                 if (sign_id==H5T_SGN_2)
-                 {
-                    iPtype=NX_INT64;
-                 } else {
-                    iPtype=NX_UINT64;
-                 }
-             }
-        } else if (data_id==H5T_FLOAT)     
-            {
-            size_id=H5Tget_size(atype);
-            if (size_id==4)
-            {
-               iPtype=NX_FLOAT32;
-            } 
-            else if (size_id==8) 
-            {
-               iPtype=NX_FLOAT64;
-            }
-        }
-	if (iPtype == -1)
-	{
-         NXIReportError (NXpData, "ERROR: hdf5ToNXtype: invalid type");
-	}
+  status = H5Gget_num_objs(loc_id, &numobj);
+  if(status < 0) {
+    NXIReportError(NXpData,"Internal error, failed to retrive no of objects");
+    return 0;
+  }
 
-	   return iPtype;
+  for(i = 0; i < numobj; i++){
+    type = H5Gget_objtype_by_idx(loc_id,i);
+    if(type == H5G_GROUP || type == H5G_DATASET){
+      count++;
+    }
+  }
+  return count;
 }
-/*--------------------------------------------------------------------------*/
-static int h5MemType(hid_t atype)
-{
-  hid_t data_id, size_id, sign_id, memtype_id = -1;
- 
-  data_id = H5Tget_class(atype);
+/*----------------------------------------------------------------------------*/
+  NXstatus  NX5getgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  {
+    pNexusFile5 pFile;
+    hid_t atype, attr_id, gid;
+    char data[64];
+    int iRet;
+        
+    pFile = NXI5assert (fid);
+    /* check if there is a group open */
+    if (pFile->iCurrentG == 0) {
+       strcpy (pName, "root");
+       strcpy (pClass, "NXroot");
+       gid = H5Gopen(pFile->iFID,"/");
+       *iN = countObjectsInGroup(gid);
+       H5Gclose(gid);
+    }
+    else {
+      strcpy (pName,pFile->name_ref);
+      attr_id = H5Aopen_name(pFile->iCurrentG,"NX_class");
+      if (attr_id<0) {
+         strcpy(pClass, NX_UNKNOWN_GROUP);
+      } else {
+        atype=H5Tcopy(H5T_C_S1);
+        H5Tset_size(atype,sizeof(data));  
+        H5Aread(attr_id, atype, data);
+        strcpy(pClass,data);
+        pFile->iNX=0;
+        *iN = countObjectsInGroup(pFile->iCurrentG);
+        H5Aclose(attr_id);
+      }
+    }
+    return NX_OK;
+  }
 
-       if (data_id==H5T_INTEGER)
-     {
-	size_id=H5Tget_size(atype);
-	sign_id=H5Tget_sign(atype);
-	if (size_id==1)
-	{
-	    if (sign_id==H5T_SGN_2)
-	    {
-	       memtype_id = H5T_NATIVE_INT8;
-	    } else {
-	       memtype_id = H5T_NATIVE_UINT8;
-	    }
-	} 
-	else if (size_id==2) 
-	{
-	   if (sign_id==H5T_SGN_2)
-	   {
-	      memtype_id = H5T_NATIVE_INT16;
-	   } else {
-	      memtype_id = H5T_NATIVE_UINT16; 
-	   }
-	}
-	else if (size_id==4) 
-	{
-	  if (sign_id==H5T_SGN_2)
-	  {
-	     memtype_id = H5T_NATIVE_INT32;
-	  } else {
-	     memtype_id = H5T_NATIVE_UINT32; 
-	  }
-	}
-	else if (size_id==8) 
-	{
-	  if (sign_id==H5T_SGN_2)
-	  {
-	    memtype_id = H5T_NATIVE_INT64;
-	  } else {
-	    memtype_id = H5T_NATIVE_UINT64;
-	  }
-	}
+
+/*-------------------------------------------------------------------------
+ * Function: hdf5ToNXType
+ *
+ * Purpose:	Convert a HDF5 class to a NeXus "type";  it handles the following HDF5 classes
+ *  H5T_STRING
+ *  H5T_INTEGER
+ *  H5T_FLOAT
+ *
+ * Return: the NeXus "type" 
+ *
+ *-------------------------------------------------------------------------
+ */
+  static int hdf5ToNXType(H5T_class_t tclass, hid_t atype)
+  {
+      int        iPtype = -1;
+      size_t     size_id;
+      H5T_sign_t sign_id;
+
+      if (tclass==H5T_STRING)
+      {
+          iPtype=NX_CHAR;
+      }
+      else if (tclass==H5T_INTEGER)
+      {
+          size_id=H5Tget_size(atype);
+          sign_id=H5Tget_sign(atype);
+          if (size_id==1)
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  iPtype=NX_INT8;
+              } else {
+                  iPtype=NX_UINT8;
+              }
+          } 
+          else if (size_id==2) 
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  iPtype=NX_INT16;
+              } else {
+                  iPtype=NX_UINT16;
+              }
+          }
+          else if (size_id==4) 
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  iPtype=NX_INT32;
+              } else {
+                  iPtype=NX_UINT32;
+              }
+          } 
+          else if(size_id == 8)
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  iPtype=NX_INT64;
+              } else {
+                  iPtype=NX_UINT64;
+              }
+          }
+      } 
+      else if (tclass==H5T_FLOAT)     
+      {
+          size_id=H5Tget_size(atype);
+          if (size_id==4)
+          {
+              iPtype=NX_FLOAT32;
+          } 
+          else if (size_id==8) 
+          {
+              iPtype=NX_FLOAT64;
+          }
+      }
+      if (iPtype == -1)
+      {
+          NXIReportError (NXpData, "ERROR: hdf5ToNXtype: invalid type");
+      }
+
+      return iPtype;
+  }
+/*--------------------------------------------------------------------------*/
+  static int h5MemType(hid_t atype)
+  {
+      hid_t memtype_id = -1;
+      size_t size_id;
+      H5T_sign_t sign_id;
+      H5T_class_t data_id;
+
+      data_id = H5Tget_class(atype);
+
+      if (data_id==H5T_INTEGER)
+      {
+          size_id=H5Tget_size(atype);
+          sign_id=H5Tget_sign(atype);
+          if (size_id==1)
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  memtype_id = H5T_NATIVE_INT8;
+              } else {
+                  memtype_id = H5T_NATIVE_UINT8;
+              }
+          } 
+          else if (size_id==2) 
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  memtype_id = H5T_NATIVE_INT16;
+              } else {
+                  memtype_id = H5T_NATIVE_UINT16; 
+              }
+          }
+          else if (size_id==4) 
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  memtype_id = H5T_NATIVE_INT32;
+              } else {
+                  memtype_id = H5T_NATIVE_UINT32; 
+              }
+          }
+          else if (size_id==8) 
+          {
+              if (sign_id==H5T_SGN_2)
+              {
+                  memtype_id = H5T_NATIVE_INT64;
+              } else {
+                  memtype_id = H5T_NATIVE_UINT64;
+              }
+          }
       } else if (data_id==H5T_FLOAT)     
-	{
-	  size_id=H5Tget_size(atype);
-	  if (size_id==4)
-	  {
-	     memtype_id = H5T_NATIVE_FLOAT; 
-	  } else if (size_id==8) {
-	     memtype_id = H5T_NATIVE_DOUBLE;
-	  }
+      {
+          size_id=H5Tget_size(atype);
+          if (size_id==4)
+          {
+              memtype_id = H5T_NATIVE_FLOAT; 
+          } else if (size_id==8) {
+              memtype_id = H5T_NATIVE_DOUBLE;
+          }
       }           
       if (memtype_id == -1)
       {
-         NXIReportError (NXpData, "ERROR: h5MemType: invalid type");
+          NXIReportError (NXpData, "ERROR: h5MemType: invalid type");
       }
       return memtype_id;
-}
+  }
   /*-------------------------------------------------------------------------*/
 
   NXstatus  NX5getnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype)
@@ -1475,7 +1548,8 @@ static int h5MemType(hid_t atype)
     pNexusFile5 pFile;
     hid_t grp, attr1,type,atype;
     int iRet,iPtype, i;
-    int idx,data_id,size_id, sign_id;
+    int idx;
+    H5T_class_t data_id;
     char data[128];
     char ph_name[1024];
     info_type op_data;
@@ -1598,7 +1672,8 @@ static int h5MemType(hid_t atype)
    {
      pNexusFile5 pFile;
      int iStart[H5S_MAX_RANK], status;
-     hid_t data_id, memtype_id, size_id, sign_id;    
+     hid_t memtype_id; 
+     H5T_class_t data_id;
      int dims;    
 
      pFile = NXI5assert (fid);
@@ -1645,7 +1720,7 @@ static int h5MemType(hid_t atype)
      pNexusFile5 pFile;
      int i, iRank, mType, iRet;
      hsize_t myDim[H5S_MAX_RANK]; 
-     hid_t data_id,size_id,sign_id;
+     H5T_class_t data_id;
 
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
@@ -1680,8 +1755,9 @@ static int h5MemType(hid_t atype)
      hsize_t myStart[H5S_MAX_RANK];
      hsize_t mySize[H5S_MAX_RANK];
      hsize_t mStart[H5S_MAX_RANK];
-     hid_t   memspace, iRet, data_id;
-     hid_t   memtype_id, size_id, sign_id;
+     hid_t   memspace, iRet;
+     H5T_class_t data_id;
+     hid_t   memtype_id;
      char *tmp_data = NULL;
      char *data1;
      int i, dims, iRank, mtype = 0;
@@ -1787,7 +1863,7 @@ static int h5MemType(hid_t atype)
 				       int *iLength, int *iType)
    {
      pNexusFile5 pFile;
-     hid_t attr_id,size_id,sign_id;
+     hid_t attr_id;
      hid_t iRet, atype, aspace;
      int iPType,rank;
      char *iname = NULL; 
@@ -1927,8 +2003,7 @@ static int h5MemType(hid_t atype)
      char *iname = NULL; 
      unsigned int idx;
      int vid;
-     herr_t iRet;
-
+    
      pFile = NXI5assert (fid);
      idx=0;
      *iN = idx;
@@ -1954,8 +2029,7 @@ static int h5MemType(hid_t atype)
    NXstatus  NX5getgroupID (NXhandle fileid, NXlink* sRes)
   {
     pNexusFile5 pFile;
-    int u, datalen, type = NX_CHAR;
-    char group_name[64], class_name[64];
+    int datalen, type = NX_CHAR;
     ErrFunc oldErr;
   
     pFile = NXI5assert (fileid);
@@ -2051,3 +2125,5 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX5initattrdir;
       fHandle->nxprintlink=NX5printlink;
 }
+
+#endif /* HDF5 */

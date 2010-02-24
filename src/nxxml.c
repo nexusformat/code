@@ -20,6 +20,10 @@
  *
  *  For further information, see <http://www.nexusformat.org>
  */
+
+
+#ifdef NXXML 
+
 #include <stdio.h>
 #include <napi.h>
 #include <assert.h>
@@ -70,13 +74,6 @@ typedef struct {
  */
 #define XMLSTACK_OPTION_TABLE 		0x1 /**< indicates table option in xmlStack */
 
-/**
- * Freddie Akeroyd 14/7/2008
- * Add NeXus schema support - this uses BASE.xsd as the initial file
- */
-#define NEXUS_SCHEMA_VERSION	"3.0" 	/**< version of NeXus definition schema */
-#define NEXUS_SCHEMA_NAMESPACE 	"http://definition.nexusformat.org/schema/" NEXUS_SCHEMA_VERSION 	/**< XML schema namespace specified by xmlns */
-#define NEXUS_SCHEMA_FILE 	NEXUS_SCHEMA_NAMESPACE "/BASE.xsd" /**< location of default schema file for namespace */
 
 /*---------------------------------------------------------------------*/
 typedef struct {
@@ -183,7 +180,7 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
     mxmlElementSetAttr(current,"xmlns", NEXUS_SCHEMA_NAMESPACE);
     mxmlElementSetAttr(current,"xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
     mxmlElementSetAttr(current,"xsi:schemaLocation",
-	NEXUS_SCHEMA_NAMESPACE " " NEXUS_SCHEMA_FILE);
+	NEXUS_SCHEMA_NAMESPACE " " NEXUS_SCHEMA_URL);
     time_buffer = NXIformatNeXusTime();
     if(time_buffer != NULL){
       mxmlElementSetAttr(current,"file_time",time_buffer);
@@ -348,7 +345,6 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
 NXstatus  NXXclosegroup (NXhandle fid){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
-  char error[1024];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -394,7 +390,7 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
   memset(typestring,0,132*sizeof(char));
 
   getNumberText(datatype,typestring,130);
-  if(rank > 1 || dimensions[0] > 1) {
+  if(rank > 1 || datatype == NX_CHAR || dimensions[0] > 1) {
     strcat(typestring,"[");
     snprintf(pNumber,19,"%d",dimensions[0]);
     strncat(typestring,pNumber,130-strlen(typestring));
@@ -726,7 +722,7 @@ NXstatus  NXXputdatatable (NXhandle fid, void *data){
   mxml_node_t *dataNode = NULL;
   const char* name;
   pNXDS dataset;
-  int i, offset, length, type, rank, dim[NX_MAXRANK];
+  int i, offset, length;
   char *pPtr = NULL;
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -825,7 +821,7 @@ NXstatus  NXXgetdatatable (NXhandle fid, void *data){
   mxml_node_t *dataNode = NULL;
   const char* name;
   pNXDS dataset;
-  int i, offset, length, type, rank, dim[NX_MAXRANK];
+  int i, offset, length;
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
@@ -1299,8 +1295,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
   const char *attribute = NULL;
   char error[1024];
   const char *attData = NULL;
-  int iValue, nx_type;
-  float fValue;
+  int nx_type;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1670,7 +1665,7 @@ NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
 NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
-  int stackPtr, currentAtt, skip;
+  int stackPtr, skip;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1746,7 +1741,6 @@ static char *findLinkPath(mxml_node_t *node){
   int stackPtr;
   mxml_node_t *current = NULL;
   char *pathString = NULL, *result = NULL;
-  int count;
 
   path = (mxml_node_t **)malloc(NXMAXSTACK*sizeof(mxml_node_t *));
   if(path == NULL){
@@ -1941,3 +1935,6 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxprintlink=NXXprintlink;
 }
 
+
+
+#endif /*NXXML*/

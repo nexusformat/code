@@ -5,7 +5,12 @@
 #include <windows.h>
 #endif /* _WIN32 */
 
+#ifdef __VMS
+#include <nxconfig_vms.h>
+#else
 #include <nxconfig.h>
+#endif /* __VMS */
+
 
 /*
  * Integer type definitions
@@ -15,6 +20,8 @@
  */
 #if HAVE_STDINT_H
 #include <stdint.h>
+#elif HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif /* HAVE_STDINT_H */
 
 

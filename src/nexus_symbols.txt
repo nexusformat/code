@@ -12,6 +12,7 @@ nxifmakedata_
 nxifopen_
 nxifputattr_
 nxifree_
+nxifgetpath_
 nxigetattr_
 nxigetattrinfo_
 nxigetdata_
@@ -33,6 +34,7 @@ nxiopendata_
 nxiopengroup_
 nxiopengrouppath_
 nxiopenpath_
+nxigetpath_
 nxiopensourcegroup_
 nxiputattr_
 nxiputdata_

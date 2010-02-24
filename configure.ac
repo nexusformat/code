@@ -61,11 +61,6 @@ AC_ARG_ENABLE([debug], AC_HELP_STRING([--enable-debug],[Turn off optimisation]),
 
 AC_ARG_ENABLE([32bit], AC_HELP_STRING([--enable-32bit],[build 32bit binary on 64 bit computer]), [enable_32bit=$enableval],[enable_32bit=no])
 
-if test "$enable_32bit" = "yes"; then
-    CFLAGS="$CFLAGS -m32"
-    CXXFLAGS="$CXXFLAGS -m32"
-fi
-
 dnl Checks for programs.
 AC_ARG_WITH([cc], AC_HELP_STRING([--with-cc=c compiler], [Specify name of C compiler]),
 	[with_cc=$withval], [with_cc=yes])
@@ -86,9 +81,10 @@ else
 	CXX=
 fi
 
+AC_SUBST(WITH_F77)
 AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[with_f77=$withval], [with_f77=no])
-if test x"$with_f77" != x"no" ; then
+	[], [with_f77=no])
+if test ! -z "$with_f77" -a x"$with_f77" != x"no" ; then
 	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
 	AC_PROG_F77
 	dnl Check FORTRAN compiler options
@@ -98,15 +94,18 @@ if test x"$with_f77" != x"no" ; then
 	dnl get right F77 include option
 	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
 	AC_F77_LIBRARY_LDFLAGS
+	WITH_F77=yes
 else
 	F77=
+	WITH_F77=no
 fi
 
+AC_SUBST(WITH_F90)
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
-	[with_f90=$withval], [with_f90=no])
-if test x"$with_f90" != x"no" ; then
+	[], [with_f90=no])
+if test ! -z "$with_f90" -a x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(FC, [g95 f90 f95 ifort])
+		AC_CHECK_PROGS(FC, [g95 gfortran f90 f95 ifort])
 	else
 		FC="$with_f90"
 		AC_CHECK_PROGS(FC, [$with_f90])
@@ -122,24 +121,33 @@ if test x"$with_f90" != x"no" ; then
 	AC_FC_LIBRARY_LDFLAGS
 #        if test x$with_f77=xno; then with_f77=$FC; fi
 #        if test x$with_f77=xno; then with_f77=yes; fi
+	WITH_F90=yes
 else
 	FC=
+	WITH_F90=no
 fi
 
 java_host="linux"
 JAVAROOT=""
 AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK i.e. where the bin, lib and include directories live]),
 	[], [with_java_home=$withval])
+AC_ARG_WITH([java], AC_HELP_STRING([--with-java=path to java executable], [Specify location of JAVA executable]),
+	[], [with_java=no])
+if test -z "$with_java_home" -a x$with_java != xno; then
+    def_javac=`which javac`
+    link_javac=`readlink -e "$def_javac"`
+    with_java_home=`dirname "$link_javac"`/..
+fi
 if test -d "$with_java_home"; then
 	JAVAROOT="$with_java_home"
 	AC_MSG_NOTICE([Java SDK home is $JAVAROOT])
 	JAVAINCLUDE="-I$JAVAROOT/include"
-	AC_PATH_PROGS(JAVAC,gcj javac,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVAC,javac gcj,,[$JAVAROOT/bin])
 	if test `basename "$JAVAC"` = "gcj"; then
 	    JAVACFLAGS="-C"	# force creation of .class files
 	fi
-	AC_PATH_PROGS(JAVA,gij java,,[$JAVAROOT/bin])
-	AC_PATH_PROGS(JAVAH,gcjh javah,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVA,java gij,,[$JAVAROOT/bin])
+	AC_PATH_PROGS(JAVAH,javah gcjh,,[$JAVAROOT/bin])
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$JAVAROOT/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar fastjar,,[$JAVAROOT/bin:$PATH])
 fi
@@ -310,6 +318,10 @@ if test "$enable_debug" = "yes"; then
     CXXFLAGS="$CXXFLAGS -O0 -g"
 fi
 
+if test "$enable_32bit" = "yes"; then
+    CFLAGS="$CFLAGS -m32"
+    CXXFLAGS="$CXXFLAGS -m32"
+fi
 
 # enable compiler warnings if gcc
 if test "$CC" = "gcc"; then
@@ -618,6 +630,11 @@ AC_CHECK_LIB(df, Hopen)
 AC_CHECK_LIB(mfhdf, SDcreate)
 AC_CHECK_LIB(hdf5, H5open)
 AC_CHECK_LIB(xml2, xmlParseDocument)
+AC_CHECK_LIB(readline, readline)
+AC_CHECK_LIB(history, add_history)
+dnl AC_LANG_PUSH([C++])
+dnl AC_CHECK_LIB(mxmlplus, _ZN4MXML4NodeD2Ev)
+dnl AC_LANG_POP([C++])
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -686,6 +703,7 @@ AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
 AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
 AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
+dnl AM_CONDITIONAL(HAVE_LIBMXMLPLUS, [ test "$ac_cv_lib_mxmlplus__ZN4MXML4NodeD2Ev" = "yes" ])
 AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT" -a ! -z "$DOCBOOK2PDF"])
 AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
 #AM_CONDITIONAL(INSTALL_NXPYTHON, [test ! -z "$INSTALL_NXPYTHON"])
@@ -730,7 +748,6 @@ AC_CONFIG_FILES([Makefile
 		examples/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile
-		doc/doxygen/Doxyfile
 		doc/api/Makefile
 		doc/nxdict/Makefile
 		doc/tech_ref/Makefile
