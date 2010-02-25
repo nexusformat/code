@@ -1,0 +1,85 @@
+If you wish to build using Microsoft Visual studio, there are workspace and
+project files in the WIN32_VS directory - just open "nexus.dsw"
+
+For more information see the README.TXT file in the WIN32_VS directory
+
+
+--------------------------------------------------------------------------
+
+
+**************************************************************************
+*** below are my old notes for WIN32 compilation. These have hopefully ***
+*** been superceded by the ones in WIN32_VS, but are left here in case ***
+*** they are useful                                                    ***
+**************************************************************************
+
+
+*** Notes Specific for Compilation on PC/Windows ***
+
+Due to the availability of different calling conventions 
+on the PC, it may be necessary to edit "napi.h" and 
+manually select the appropriate form of the MANGLE() function.
+
+Please refer to the "WINDOWS SPECIFIC CONFIGURATION" section of
+"napi.h" for further instructions.
+
+If you get a LINK error saying the function _htons@4 is undefined,
+add "wsock32.lib" to the list of libraries you link against
+
+*** Building a Dynamic Link Library (NEXUS.DLL) *** 
+
+These instructions are for Visual Studio 97 ... later versions should
+be similar, but menu/item names may have changed slightly
+
+If you wish to build "nexus.dll", you need to do the following:
+
+1. Obtain the binary distribution of the HDF libraries for WinNT/95 from  
+        ftp://ftp.ncsa.uiuc.edu/HDF/HDF/HDF_Current/zip/winNT95/HDF41r3.zip
+       (see http://hdf.ncsa.uiuc.edu/ for more information on HDF in general)
+   and unzip to e.g. C:\ to create e.g. C:\HDF4.1R3
+2. Create a WIN32 DLL project in Visual Studio called "NEXUS" and add to it "napi.c" and "napi.h"
+3. Go to "Build", "Set Active Configuration" and choose "Release" rather than "Debug"; this
+   is because the above HDF binary distribution only include "Release" libraries, so 
+   if you wish to use "Debug" libraries you must compile the HDF libraries yourself
+   from the supplied source
+4. In "Project", "Setting", "C/C++", "Preprocessor" add the following to "Preprocessor definitions"
+
+    _HDFDLL_,NEXUS_LIBRARY
+
+   Also in the "Additional Include directories" box put the HDF include directory e.g.
+
+     C:\HDF4.1R3\INCLUDE
+
+5. In "Project", "Setting", "C/C++" "code generation", select "Multithreaded DLL" for the "run-time library" to use
+6. Select "Project", "Add to project", "Files" and add the HDF DLL import libraries
+   (hd413m.lib and hm413m.lib) to the project - they are in e.g. C:\HDF4.1R3\DLLLIB
+7. In "Project", "Setting", "Link" add the following to the start of the "Object/library modules" line
+
+        /nodefaultlib:"libcmt.lib" msvcrt.lib
+
+8. Now build the library ... it will generate a "nexus.dll" and a "nexus.lib" file in 
+   the "Release" directory. The "nexus.lib" import library contains information that is needed by
+   programs that need to link against the "nexus.dll" DLL; see "building examples" below
+
+*** Building the Example Programs to use NEXUS.DLL ***
+
+1. Create a WIN32 console project
+2. Go to "Build", "Set Active Configuration" and choose "Release" rather than "Debug"
+3. In "Project", "Setting", "C/C++" "code generation", select "Multithreaded DLL" for the "run-time library" to use
+4. Select "Project" "Add to project" "Files" and add nexus.lib, hd413m.lib and hm413m.lib to the project
+5. In "Project", "Setting", "C/C++", "Preprocessor" add the directory for napi.h and the HDF include files
+6. Build
+
+*** Running the Example Programs with NEXUS.DLL ***
+
+When the example programs start running, they need be able to locate NEXUS.DLL, HD413M.DLL and HM413M.DLL
+A quick solution is to copy these DLL files into the same directory as the program executable,
+but as a longer term solution you may want to add a directory to the PATH environment variable
+and put the DLL files there
+
+Freddie Akeroyd <Freddie.Akeroyd@rl.ac.uk>
+ISIS Facility
+Rutherford Appleton Laboratory
+GB
+
+$Id$

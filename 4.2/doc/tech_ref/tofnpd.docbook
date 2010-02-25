@@ -1,0 +1,141 @@
+<sect1><title>Time of Flight Neutron  Powder Diffractometer</title>
+
+<mediaobject>
+<imageobject><imagedata fileref="tofnpd.gif" format="gif"></imageobject>
+<imageobject><imagedata fileref="tofnpd.jpg" format="jpg"></imageobject>
+<caption> <para>Schematic diagram of the generic time of flight
+neutron powder diffractometer.  </para> </caption>
+</mediaobject>
+
+<para>The time of flight powder diffractometer (TOFNPD) is an
+instrument used with a couple of different types of analysis. For that
+reason the composite TOFNPD definition is made up of three separate
+definitions.</para>
+
+<sect2><title>TOFNPD:Time Focus</title>
+
+<para>To time focus data there is little information required. The parameters needed in the file are
+
+<orderedlist>
+
+<listitem><para>unique detector pixel identifier</para></listitem>
+
+<listitem><para>primary flight path</para></listitem>
+
+<listitem><para>detector pixel position</para></listitem>
+
+<listitem><para>detector pixel solid angle covered</para></listitem>
+
+</orderedlist>
+
+In addition, the software needs to have some additional information
+that is specified by the user.
+
+<orderedlist>
+
+<listitem><para>mapping of detector pixel identifiers to focused
+detector pixel identifier</para></listitem>
+
+<listitem><para>focused detector position</para></listitem>
+
+<listitem><para>unique focused detector identifier</para></listitem>
+
+</orderedlist>
+
+</para>
+
+<example id="TOFNPD-time-focus.xml"><title><filename>TOFNPD:time_focus.xml</filename></title>
+<programlisting role="XML">
+<![CDATA[<!--
+URL:     http://www.neutron.anl.gov/nexus/xml/NXtofnpd.xml
+Editor:  NIAC
+$Id$
+
+Instrument definition for a time-of-flight neutron powder diffractometer that 
+can be time focused.
+-->
+<NXentry name="{Entry Name}">
+  <definition URL="http://www.neutron.anl.gov/nexus/xml/NXtofnpd-timefocus.xml" 
+      version="$Revision$" type="NX_CHAR[]" instrument="TOFNPD">
+    Time Focus
+  </definition>
+  <NXsample name="">
+     <chemical_formula type="NX_CHAR"></chemical_formula>
+  </NXsample>
+  <NXinstrument name="{name of the instrument}">
+    <name long_name="{full name of instrument}?" type="NX_CHAR[]">
+      {Abbreviated name of instrument}
+    </name>
+    <NXmoderator name="">
+      <distance units="metre" type="NX_FLOAT">
+        {distance from the sample (should be negative)}
+      </distance>
+    </NXmoderator>
+    <NXdetector name="{Name of detector bank}">+
+      <time_of_flight link="{absolute path to location in NXdetector}" 
+          units="10^-6 second|10^-7 second" type="NX_FLOAT[i+1]">
+        {Total time of flight}
+      </time_of_flight>
+      <pixel_id link="{absolute path to location in NXdetector}" 
+          type="NX_INT[j]">
+        {Identifier for detector}
+      </pixel_id>
+      <counts signal="1" axes="[time_of_flight,pixel_id]" 
+          link="{absolute path to location in NXdetector}" 
+          units="number" type="NX_FLOAT[i,j]">
+        {Data values}
+      </counts>
+      <distance axes="pixel_id" type="NX_FLOAT[j]">
+      </distance>
+      <polar_angle axes="pixel_id" type="NX_FLOAT[j]">
+      </polar_angle>
+      <azimuthal_angle axes="pixel_id" type="NX_FLOAT[j]">
+      </azimuthal_angle>
+      <solid_angle axes="pixel_id" type="NX_FLOAT[j]"></solid_angle>
+      <TOF_to_d method="linear|quadradic" type="NX_FLOAT[j,k]">
+         {Calibrated conversion factors to be used for time focusing}
+      </TOF_to_d>
+    </NXdetector>
+  </NXinstrument>
+  <NXdata name="">
+      <time_of_flight 
+          NAPIlink="/NXentry/NXinstrument/NXdetector/time_of_flight"/>
+      <pixel_id 
+          NAPIlink="/NXentry/NXinstrument/NXdetector/pixel_id"/>
+      <counts
+          NAPIlink="/NXentry/NXinstrument/NXdetector/data"/>
+  </NXdata>
+</NXentry>]]>
+</programlisting>
+</example>
+
+<example id="TOFNPD-rietveld.xml"><title><filename>TOFNPD:rietveld.xml</filename></title>
+<programlisting role="XML">
+<![CDATA[<!--
+URL:     http://www.neutron.anl.gov/nexus/xml/NXtofnpd.xml
+Editor:  NIAC
+$Id$
+
+Instrument definition for a time-of-flight neutron powder diffractometer that 
+can be time focused.
+-->
+<NXentry name="{Entry Name}">
+  <conforms_to>
+    <definition URL="" version="">TOFNPD:Time Focus</definition>
+  </conforms_to>
+  <definition URL="http://www.neutron.anl.gov/nexus/xml/NXtofnpd-timefocus.xml" 
+      version="$Revision$" type="NX_CHAR[]" >
+    TOFNPD:Rietveld
+  </definition>
+  <NXcharacterization
+     name="isotropic_scatterer"
+     NXS:location="" instrument="TOFNPD" version="" URL="" 
+     definition="Time Focus">{Should be same scales as this entry}
+  </NXcharacterization>
+</NXentry>]]>
+</programlisting>
+</example>
+
+</sect2>
+
+</sect1>

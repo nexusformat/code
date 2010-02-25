@@ -1,0 +1,92 @@
+<chapter id="terms"><title>Terminology</title>
+
+<sect1><title>The NeXus XML Meta-DTD Format</title>
+
+<para>The contents of NeXus files are defined using XML. The hierarchical structure of NeXus files maps very conveniently into XML files with NeXus groups and items as the XML entities, and data attributes as XML attributes. NeXus utilities are being developed to help people determine whether their files are standard-conforming. However, formal XML format definitions (DTDs) are difficult for the non-expert to read, so we have produced a much simpler meta-DTD format, which produces well-formed (DTD-less) XML files that will be converted into DTD files. This page describes the rules for producing these files - some examples are available below and in the NeXus content section. The utility NXtoDTD can be used to generate the skeleton of such a file from an existing NeXus file; it outputs the XML tags without the data or any annotation. 
+Meta-DTD Definition</para>
+
+<orderedlist>
+
+<listitem><para>
+Each meta-DTD file should begin with a standard XML document tag, i.e. 
+<programlisting><![CDATA[<?xml version="1.0" ?>]]></programlisting>
+</para></listitem>
+
+<listitem><para> This should be followed by a comment block giving the
+URL of the XML file, the name of the editor, the keyword $Id$, which
+will generate a revision number when the file is committed to the
+NeXus CVS server, and a brief description of the file, e.g.
+
+<programlisting><![CDATA[<!--
+URL:     http://www.neutron.anl.gov/nexus/xml/NXgroup.xml
+Editor:  Jean Dupont <JDupont@some.where>
+$Id$
+Definition of a fake but well-formed NeXus group.
+-->]]></programlisting></para></listitem>
+
+<listitem><para> Each NeXus group is an XML entity defined by its
+class, e.g. NXuser, NXdata, ....</para></listitem>
+
+<listitem><para>The name of the group is given by the name attribute
+of the entity. N.B. XML attributes are the name="value" pairs located
+within the opening tag of the XML entity,
+e.g. <programlisting><![CDATA[<NXsample name="sample">]]></programlisting>.
+</para></listitem>
+
+
+<listitem><para>All other data items are XML entities defined by their name,
+e.g. <programlisting><![CDATA[<temperature>]]></programlisting></para></listitem>
+
+<listitem><para>Data attributes are stored as XML attributes. The data
+type is defined as an XML attribute although it is not defined as an
+HDF attribute in the NeXus file itself, e.g.
+<programlisting><![CDATA[<temperature type="NX_FLOAT32" units="K">]]>
+</programlisting></para></listitem>
+
+<listitem><para> If the value of an attribute is not defined by the
+DTD, a short description is enclosed within quotes and curly braces,
+e.g.
+<programlisting><![CDATA[<NXdetector name="{Name of detector bank}">]]>
+</programlisting></para></listitem>
+
+<listitem><para> Similarly, the value of a data item which is not
+defined by the DTD should be placed within curly braces between the
+opening and closing tag, e.g.
+<programlisting><![CDATA[<temperature>{Temperature of sample}</temperature>]]>
+</programlisting></para></listitem>
+
+<listitem><para>Following the opening tag of a group entity and before
+the closing tag of a data entity, there may be one of three symbols,
+which have the same meanings that they have in regular expressions.
+<programlisting><![CDATA[*   May occur 0 or more times
++   May occur one or more times (i.e. at least once)
+?   May occur 0 or one times (i.e. no more than once)]]>
+</programlisting>
+e.g. 
+<programlisting><![CDATA[<NXsample>?
+   <temperature>{Temperature of sample}?</temperature> 
+</NXsample>]]></programlisting>
+If no symbol is given, the item is mandatory. </para></listitem>
+
+<listitem><para>If a data item is an array, add the array dimensions
+in square brackets to the type attribute. Use a colon if the dimension
+length is not defined by the DTD, e.g.
+<programlisting><![CDATA[<polar_angle type="NX_FLOAT32[:]">]]></programlisting>
+Replace the colon with i, j, ... if you wish to match the dimension
+length to other data items within the same group.</para></listitem>
+
+<listitem><para> If no data type is specified, it is assumed to be a
+character string (NX_CHAR).  </para></listitem>
+
+<listitem><para> The "version" attribute of the "analysis" entity,
+defined in each NXentry group should be set to $Revision$ when the
+file is first written so that the CVS revision number is substituted
+when the XML file is committed to the CVS server, e.g.
+<programlisting><![CDATA[<analysis version="$Revision$">]]></programlisting>
+</para></listitem>
+
+</orderedlist>
+
+</sect1>
+
+</chapter>

@@ -1,0 +1,29 @@
+NXtranslate interface to ISIS Open GENIE package using the dynamic interface
+----------------------------------------------------------------------------
+
+Note: There is currently a problem with activating "genie.so" dynamically -
+to make it work you need to have genie linked into the nxtranslate 
+exectuable which you do by adding   -lgenie   to the   nxtranslate_LDADD  
+line in the Makefile.am file; then rebuild nxtranslate
+
+To run the test, type
+
+       make test_opengenie.nxs
+
+in the NXtranslate directory - this will read the test_opengenie.xml
+configuration file and generate the requested output file
+
+
+Usage
+-----
+
+The module is loaded  via the NXtranslate NXS:mime_type="dynamic/libnxgenie.so"
+On loading, additional GCL commands can be installed by setting the 
+NXGENIE_INIT environment variable to point at the relevant file
+
+see test_opengenie.xml for an example of usage
+
+Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk>
+
+---
+$Id$

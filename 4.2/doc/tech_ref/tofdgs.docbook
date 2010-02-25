@@ -1,0 +1,239 @@
+<sect1><title>Time of Flight Neutron Direct Geometry Spectrometer</title>
+
+<!--
+<mediaobject>
+<imageobject><imagedata fileref="tofnpd.gif" format="gif"></imageobject>
+<imageobject><imagedata fileref="tofnpd.jpg" format="jpg"></imageobject>
+<caption> <para>Schematic diagram of the generic time of flight
+neutron powder diffractometer.  </para> </caption>
+</mediaobject>
+
+<para>The time of flight powder diffractometer (TOFNPD) is an
+instrument used with a couple of different types of analysis. For that
+reason the composite TOFNPD definition is made up of three separate
+definitions.</para>
+
+<sect2><title>TOFNPD:Time Focus</title>
+
+<para>To time focus data there is little information required. The parameters needed in the file are
+
+<orderedlist>
+
+<listitem><para>unique detector pixel identifier</para></listitem>
+
+<listitem><para>primary flight path</para></listitem>
+
+<listitem><para>detector pixel position</para></listitem>
+
+<listitem><para>detector pixel solid angle covered</para></listitem>
+
+</orderedlist>
+
+In addition, the software needs to have some additional information
+that is specified by the user.
+
+<orderedlist>
+
+<listitem><para>mapping of detector pixel identifiers to focused
+detector pixel identifier</para></listitem>
+
+<listitem><para>focused detector position</para></listitem>
+
+<listitem><para>unique focused detector identifier</para></listitem>
+
+</orderedlist>
+
+</para>
+<sect2><title>TOFNPD:Time Focus</title>
+-->
+
+<example id="NXtofndgs.xml"><title><filename>NXtofndgs.xml</filename></title>
+<programlisting role="XML">
+<![CDATA[<!--
+URL:     http://www.nexus.anl.gov/classes/xml/NXtofndgs.xml
+Editor:  NIAC
+NIAC Version: 0.1
+$Id$
+
+Template of a generic NeXus file containing data from a direct geometry 
+time-of-flight spectrometer.
+-->
+<NXentry name="{Name of entry}">
+  <title>
+    {Extended title for entry}
+  </title>
+  <definition URL="http://www.nexus.anl.gov/instruments/xml/NXtofndgs.xml" 
+      version="1.0">
+    NXtofndgs
+  </definition>
+  <start_time type="ISO8601">
+    {Starting time of measurement}
+  </start_time>
+  <NXsample name="sample">
+    <name type="NX_CHAR">
+      {Descriptive name of sample}?
+    </name>
+    <unit_cell type="NX_FLOAT32[1,6])">
+      {Unit cell parameters (lengths and angles)}?
+    </unit_cell>
+    <sample_orientation type="NX_FLOAT[3]">
+      {This will follow the Busing and Levy convention from Acta.Crysta v22, 
+      p457 (1967)}?
+    </sample_orientation>
+    <orientation_matrix type="NX_FLOAT[3,3]">
+      {Orientation matrix of single crystal sample}{The is the orientation 
+      matrix using Busing-Levy convention}?
+    </orientation_matrix>
+    <mass type="NX_FLOAT">
+      {Mass of sample}?
+    </mass>
+    <NXgeometry>
+      <NXshape>
+        {Shape of sample}
+      </NXshape>
+    </NXgeometry>
+  </NXsample>
+  <NXinstrument name="{Name of instrument}">
+    <NXmoderator name="{Name of moderator}">
+      <distance type="NX_FLOAT">
+        {Effective distance as seen by measuring radiation}?
+      </distance>
+    </NXmoderator>
+    <NXchopper name="monochromator">
+      <distance>
+        {Distance of the centre of the chopper to the sample.}
+      </distance>
+      <energy type="NX_FLOAT">
+        {Optimum energy transmitted by the chopper.}
+      </energy>
+      <type type="NX_CHAR">
+        {fermi|disk|counter-rotating|statistical}
+      </type>
+      <rotation_speed type="NX_FLOAT">
+        {Chopper rotation speed}
+      </rotation_speed>
+    </NXchopper>
+    <NXcrystal name="monochromator">
+      <distance>
+        {Distance of the centre of the crystal monochromator to the sample.}
+      </distance>
+      <type type="NX_CHAR">
+        {"PG (Highly Oriented Pyrolytic Graphite)" | "Ge" | "Si" | "Cu" | 
+        "Fe3Si" | "CoFe" | "Cu2MnAl (Heusler)" | "Multilayer"}
+      </type>
+      <energy units="meV" type="NX_FLOAT32[:]">
+        {Optimum diffracted energy}
+      </energy>
+      <d_spacing units="Angstrom" type="NX_FLOAT32">
+        {The planar spacing of the nominal reflection}
+      </d_spacing>
+    </NXcrystal>
+    <NXdetector name="{Name of detector bank}">
+      <data signal="1" axes="x_angle:y_angle:time_of_flight" 
+          type="NX_FLOAT[i,j,k]|NX_INT[i,j,k]">
+        {Data values}?
+      </data>
+      <time_of_flight type="NX_FLOAT[k+1]">
+        {Total time of flight}
+      </time_of_flight>
+      <distance type="NX_FLOAT[i,j]">
+        {distance from the sample
+      </distance>
+      <data_errors type="NX_FLOAT[i,j,...]|NX_INT[i,j,...]">
+        {Data errors}
+      </data_errors>
+      <x_offset type="NX_FLOAT[i]">
+        {offset from the detector center in x-direction}?
+      </x_offset>
+      <y_offset type="NX_FLOAT[j]">
+        {offset from the detector center in the y-direction}?
+      </y_offset>
+      <x_angle type="NX_FLOAT[i]">
+        {angle of detector in x-direction with respect to unscattered beam}?
+      </x_angle>
+      <y_angle type="NX_FLOAT[j]">
+        {angle of detector in y-direction with respect to unscattered beam}?
+      </y_angle>
+      <polar_angle type="NX_FLOAT[i,j]">
+        {polar angle of a detector pixel}
+      </polar_angle>
+      <azimuthal_angle type="NX_FLOAT[i,j]">
+        {azimuthal angle of a detector pixel}
+      </azimuthal_angle>
+      <solid_angle type="NX_FLOAT[i,j]">
+        {Solid angle subtended by the detector pixel at the sample}?
+      </solid_angle>
+      <x_pixelsize type="NX_FLOAT[i,j]">
+        {Size of each detector pixel}?
+      </x_pixelsize>
+      <y_pixelsize type="NX_FLOAT[i,j]">
+        {Size of each detector pixel}?
+      </y_pixelsize>
+      <gas_pressure type="NX_FLOAT[i]">
+        {Detector gas pressure}?
+      </gas_pressure>
+      <type type="NX_CHAR">
+        "He3 gas cylinder"|He3 PSD"|?
+      </type>
+      <NXgeometry name="geometry">
+        {Position and orientation of detectors}?
+      </NXgeometry>
+    </NXdetector>
+  </NXinstrument>
+  <NXmonitor name="whitebeam_monitor">
+    <distance type="NX_FLOAT">
+      {Distance of monitor from sample}
+    </distance>
+    <time_of_flight type="NX_FLOAT[i]">
+      {Time-of-flight}
+    </time_of_flight>
+    <data signal="1" axes="time_of_flight" type="NX_INT[i]">
+      {Monitor data}
+    </data>
+  </NXmonitor>
+  <NXmonitor name="presample_monitor">
+    <distance type="NX_FLOAT">
+      {Distance of monitor from sample}
+    </distance>
+    <time_of_flight type="NX_FLOAT[i]">
+      {Time-of-flight}
+    </time_of_flight>
+    <data signal="1" axes="time_of_flight" type="NX_INT[i]">
+      {Monitor data}
+    </data>
+  </NXmonitor>
+  <NXmonitor name="beamstop_monitor">
+    <distance type="NX_FLOAT">
+      {Distance of monitor from sample}
+    </distance>
+    <time_of_flight type="NX_FLOAT[i]">
+      {Time-of-flight}
+    </time_of_flight>
+    <data signal="1" axes="time_of_flight" type="NX_INT[i]">
+      {Monitor data}
+    </data>
+  </NXmonitor>
+  <NXdata name="{Name of data bank}">
+    <data NAPIlink="NXentry/NXinstrument/NXdetector/data">
+    </data>
+    <x_angle NAPIlink="NXentry/NXinstrument/NXdetector/x_angle">
+    </x_angle>
+    <y_angle NAPIlink="NXentry/NXinstrument/NXdetector/y_angle">
+    </y_angle>
+    <x_offset NAPIlink="NXentry/NXinstrument/NXdetector/x_offset">
+    </x_offset>
+    <y_offset NAPIlink="NXentry/NXinstrument/NXdetector/y_offset">
+    </y_offset>
+    <time_of_flight NAPIlink="NXentry/NXinstrument/NXdetector/time_of_flight">
+    </time_of_flight>
+  </NXdata>
+</NXentry>
+]]>
+</programlisting>
+</example>
+
+
+<!--
+</sect2>
+-->
+</sect1>

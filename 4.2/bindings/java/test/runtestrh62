@@ -1,0 +1,12 @@
+#!/bin/sh
+#------------------------------------------------------------------------
+# shell script for running the test program for the Java NeXus API
+#
+# Version for Redhat 
+#
+# Mark Koennecke, October 2000
+#------------------------------------------------------------------------
+javac -classpath ../jnexus.jar:. TestJapi.java
+java -cp ../jnexus.jar:. \
+ -Dorg.nexusformat.JNEXUSLIB=/afs/psi.ch/user/k/koennecke/src/trunk/bindings/java/.libs/libjnexus.so.0.0.0 TestJapi $1
+ 

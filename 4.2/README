@@ -1,0 +1,172 @@
+-------------------------------------------------------------------------
+NeXus - a common format for neutron and X-ray scattering data
+             http://www.nexusformat.org/
+-------------------------------------------------------------------------
+
+Installation Instructions
+=========================
+
+Unix (including Mac OS X)
+-------------------------
+
+We have recently changed the installation procedure to use the GNU autoconf 
+system.  This will automatically check for the relevant HDF and other libraries
+and adjust the configuration scripts accordingly.
+
+1) Ensure that you have current versions of the HDF4 and/or the HDF5 
+   libraries.  It is now possible to link the NeXus libraries against 
+   either or both libraries, depending on the selected make option.
+ 
+   The libraries, which are available as precompiled binaries for a wide
+   range of systems, may be downloaded from:
+   
+    http://www.hdfgroup.org/
+
+2) At present it is necessary to run the autogen shell script to produce the 
+   correct configure file.
+
+   sh autogen.sh
+
+3) Run 'configure' and 'make'.
+
+   ./configure
+   ./make
+   
+   If there are any problems, try different configure options to see if one 
+   will work.  You can see what switches are available by typing
+   
+   ./configure --help
+
+4) Install the files in the default location (usually /usr/local/nexus) using
+
+   make install
+
+5) Test the installation using 
+
+   make test
+   
+   The standard test procedures produce the following output:
+   
+ Number of global attributes:  4
+    NeXus_version = 2.0.0.
+    file_name = NXtest.nx5
+    HDF5_Version = 1.4.3
+    file_time = 2002-05-17 14:40:24-0600
+ Group: entry(NXentry) contains  8 items
+    ch_data( 4)
+    Values : NeXus data
+    Subgroup: data(NXdata)
+    i1_data(20)
+    Values :   1  2  3  4
+    i2_data(22)
+    Values :   1000  2000  3000  4000
+    i4_data(24)
+    Values :      1000000     2000000     3000000     4000000
+    r4_data( 5)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+    r8_data( 6)
+    Values :    1.00   2.00   3.00   4.00
+           :    5.00   6.00   7.00   8.00
+           :    9.00  10.00  11.00  12.00
+           :   13.00  14.00  15.00  16.00
+           :   17.00  18.00  19.00  20.00
+       ch_attribute : NeXus
+       i4_attribute :    42
+       r4_attribute :   3.141593
+    Subgroup: sample(NXsample)
+ Link Check OK
+
+   There are small differences in the formatting of the C and Fortran 
+   files.  All of them may be viewed by NXbrowse using, e.g.:
+   
+   ./NXbrowse NXtest.nxs
+   
+Windows
+-------
+   See README.WIN32.
+
+Mac OS X
+--------
+   See README.macosx
+
+VMS
+---
+1) There is no VMS version of HDF5, so it is only possible to link to 
+   the HDF4 libraries.  Ensure that you have the current versions, 
+   which are available as precompiled binaries at:
+   
+    http://www.hdfgroup.org/
+
+   The NeXus libraries link against the following libraries:
+   
+2) Edit MAKE_VMS.COM to specify the correct location of the HDF 
+   libraries, and comment out either the F77 or F90 options if necessary.
+   
+3) If you are installing the Fortran 90 library, edit NXtest.f90 to 
+   replace NXACC_CREATE5 with NXACC_CREATE4 in the first call to NXopen.
+
+4) Run MAKE_VMS.COM (i.e. type @MAKE_VMS) to build the NeXus libraries 
+   and utilities.
+
+5) Run the test programs to check the installation.
+
+   $ RUN NAPI4_TEST           (Tests C creation of NXtest.nx4)
+   $ RUN NAPIF_TEST or NXtest (Tests Fortran creation of NXtest.nxs)
+
+6) Install the NeXus libraries NEXUS.OLB and/or NEXUS90.OLB, and the 
+   include (or module) files in a standard location for building other 
+   NeXus programs.
+   
+
+Comments to : ROsborn@anl.gov
+
+Argonne National Laboratory is operated by The University of Chicago for
+the U.S. Department of Energy under contract W-31-109-ENG-38.
+LEGAL POSTLUDE
+--------------
+The NeXus API is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published 
+by the Free Software Foundation; either version 2.1 of the License, or
+(at your option) any later version.
+
+The NeXus API is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+DISCLAIMER OF LIABILITY: This document was prepared as an account of
+work sponsored by an agency of the U.S. Government. Neither the U.S.
+Government nor any agency thereof, nor the University of Chicago, nor
+any of their employees or officers, makes any warranty, express or
+implied, or assumes any legal liability or responsibility for the
+accuracy, completeness, or usefulness of any information, apparatus,
+product, or process disclosed, or represents that its use would not
+infringe privately owned rights. 
+
+DISCLAIMER OF ENDORSEMENT: Reference to any specific commercial
+product, process, or service by trade name, trademark, manufacturer,
+or otherwise does not necessarily constitute or imply its endorsement,
+recommendation, or favoring by the U.S. Government or any agency
+thereof. The views and opinions of document authors do not necessarily
+state or reflect those of the U.S. Government or any agency thereof,
+Argonne National Laboratory, or the University of Chicago.
+
+COPYRIGHT STATUS: Documents authored by Argonne National Laboratory
+employees resulted from work under U.S. Government contract
+W-31-109-ENG-38 and are subject to the following license: the
+Government is granted for itself and others acting on its behalf a
+paid-up, nonexclusive, irrevokable worldwide license in these
+documents to reproduce, prepare derivative works, and perform publicly
+and display publicly by or on behalf of the Government.
+
+----------------------------------------------------------------------------
+
+$Id$
