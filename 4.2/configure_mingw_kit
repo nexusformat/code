@@ -1,5 +1,0 @@
-#!/bin/sh
-#
-# this is just for building the mingw nexus kit on my machine
-#
-env am_cv_python_pythondir='${prefix}/lib/python' am_cv_python_pyexecdir='${prefix}/lib/python' ./configure --prefix=/c/nxinstall --with-python=/c/Python25 --with-java-home=/c/mingw
