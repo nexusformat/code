@@ -548,9 +548,9 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     return NX_OK;
   }
 /*-----------------------------------------------------------------------*/
-static int nxToHDF5Type(int datatype)
+static hid_t nxToHDF5Type(int datatype)
 {
-  int type;
+  hid_t type;
     if (datatype == NX_CHAR)
     {
         type=H5T_C_S1;
@@ -864,7 +864,7 @@ static int nxToHDF5Type(int datatype)
   NXstatus  NX5putdata (NXhandle fid, void *data)
   {
     pNexusFile5 pFile;
-    hid_t iRet;
+    herr_t iRet;
     
     char pError[512] = "";
       
@@ -910,7 +910,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     pNexusFile5 pFile;
     hid_t  attr1, aid1, aid2;
     hid_t type;
-    int iRet;
+    herr_t iRet;
     int vid;  
 
     pFile = NXI5assert (fid);
@@ -1090,7 +1090,9 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 /*--------------------------------------------------------------------*/
 static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
 {
-  herr_t length, dataID, status, aid2, aid1, attID;
+  size_t length;
+  hid_t  dataID, aid2, aid1, attID;
+  herr_t status;
   int type = NX_CHAR;
   char name[] = "target";
 
@@ -1142,9 +1144,9 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
 NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 {
     pNexusFile5 pFile;
-    char linkTarget[1024];
-    int type = NX_CHAR;
-    int status;
+    char        linkTarget[1024];
+    int         type = NX_CHAR;
+    herr_t      status;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1177,10 +1179,10 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   NXstatus  NX5makelink (NXhandle fid, NXlink* sLink)
   {
     pNexusFile5 pFile;
-    char linkTarget[1024];
-    int type = NX_CHAR;
-    char *itemName = NULL;
-    int status;
+    char        linkTarget[1024];
+    int         type = NX_CHAR;
+    char        *itemName = NULL;
+    herr_t      status;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1224,7 +1226,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   NXstatus  NX5flush(NXhandle *pHandle)
   {
     pNexusFile5 pFile = NULL;
-    int iRet;
+    herr_t      iRet;
    
     pFile = NXI5assert (*pHandle);    
     if (pFile->iCurrentD != 0)
@@ -1304,9 +1306,9 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   NXstatus  NX5getgroupinfo_recurse (NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile5 pFile;
-    hid_t atype,attr_id;
-    char data[64];
-    int iRet;
+    hid_t       atype, attr_id;
+    char        data[64];
+    herr_t      iRet;
         
     pFile = NXI5assert (fid);
     /* check if there is a group open */
@@ -1363,7 +1365,6 @@ static int countObjectsInGroup(hid_t loc_id)
     pNexusFile5 pFile;
     hid_t atype, attr_id, gid;
     char data[64];
-    int iRet;
         
     pFile = NXI5assert (fid);
     /* check if there is a group open */
@@ -1396,20 +1397,20 @@ static int countObjectsInGroup(hid_t loc_id)
 /*-------------------------------------------------------------------------
  * Function: hdf5ToNXType
  *
- * Purpose:	Convert a HDF5 class to a NeXus "type";  it handles the following HDF5 classes
+ * Purpose:	Convert a HDF5 class to a NeXus type;  it handles the following HDF5 classes
  *  H5T_STRING
  *  H5T_INTEGER
  *  H5T_FLOAT
  *
- * Return: the NeXus "type" 
+ * Return: the NeXus type
  *
  *-------------------------------------------------------------------------
  */
   static int hdf5ToNXType(H5T_class_t tclass, hid_t atype)
   {
       int        iPtype = -1;
-      size_t     size_id;
-      H5T_sign_t sign_id;
+      size_t     size;
+      H5T_sign_t sign;
 
       if (tclass==H5T_STRING)
       {
@@ -1417,38 +1418,38 @@ static int countObjectsInGroup(hid_t loc_id)
       }
       else if (tclass==H5T_INTEGER)
       {
-          size_id=H5Tget_size(atype);
-          sign_id=H5Tget_sign(atype);
-          if (size_id==1)
+          size=H5Tget_size(atype);
+          sign=H5Tget_sign(atype);
+          if (size==1)
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   iPtype=NX_INT8;
               } else {
                   iPtype=NX_UINT8;
               }
           } 
-          else if (size_id==2) 
+          else if (size==2) 
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   iPtype=NX_INT16;
               } else {
                   iPtype=NX_UINT16;
               }
           }
-          else if (size_id==4) 
+          else if (size==4) 
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   iPtype=NX_INT32;
               } else {
                   iPtype=NX_UINT32;
               }
           } 
-          else if(size_id == 8)
+          else if(size == 8)
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   iPtype=NX_INT64;
               } else {
@@ -1458,12 +1459,12 @@ static int countObjectsInGroup(hid_t loc_id)
       } 
       else if (tclass==H5T_FLOAT)     
       {
-          size_id=H5Tget_size(atype);
-          if (size_id==4)
+          size=H5Tget_size(atype);
+          if (size==4)
           {
               iPtype=NX_FLOAT32;
           } 
-          else if (size_id==8) 
+          else if (size==8) 
           {
               iPtype=NX_FLOAT64;
           }
@@ -1476,62 +1477,62 @@ static int countObjectsInGroup(hid_t loc_id)
       return iPtype;
   }
 /*--------------------------------------------------------------------------*/
-  static int h5MemType(hid_t atype)
+  static hid_t h5MemType(hid_t atype)
   {
-      hid_t memtype_id = -1;
-      size_t size_id;
-      H5T_sign_t sign_id;
-      H5T_class_t data_id;
+      hid_t       memtype_id = -1;
+      size_t      size;
+      H5T_sign_t  sign;
+      H5T_class_t tclass;
 
-      data_id = H5Tget_class(atype);
+      tclass = H5Tget_class(atype);
 
-      if (data_id==H5T_INTEGER)
+      if (tclass==H5T_INTEGER)
       {
-          size_id=H5Tget_size(atype);
-          sign_id=H5Tget_sign(atype);
-          if (size_id==1)
+          size=H5Tget_size(atype);
+          sign=H5Tget_sign(atype);
+          if (size==1)
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   memtype_id = H5T_NATIVE_INT8;
               } else {
                   memtype_id = H5T_NATIVE_UINT8;
               }
           } 
-          else if (size_id==2) 
+          else if (size==2) 
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   memtype_id = H5T_NATIVE_INT16;
               } else {
                   memtype_id = H5T_NATIVE_UINT16; 
               }
           }
-          else if (size_id==4) 
+          else if (size==4) 
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   memtype_id = H5T_NATIVE_INT32;
               } else {
                   memtype_id = H5T_NATIVE_UINT32; 
               }
           }
-          else if (size_id==8) 
+          else if (size==8) 
           {
-              if (sign_id==H5T_SGN_2)
+              if (sign==H5T_SGN_2)
               {
                   memtype_id = H5T_NATIVE_INT64;
               } else {
                   memtype_id = H5T_NATIVE_UINT64;
               }
           }
-      } else if (data_id==H5T_FLOAT)     
+      } else if (tclass==H5T_FLOAT)     
       {
-          size_id=H5Tget_size(atype);
-          if (size_id==4)
+          size=H5Tget_size(atype);
+          if (size==4)
           {
               memtype_id = H5T_NATIVE_FLOAT; 
-          } else if (size_id==8) {
+          } else if (size==8) {
               memtype_id = H5T_NATIVE_DOUBLE;
           }
       }           
@@ -1546,15 +1547,16 @@ static int countObjectsInGroup(hid_t loc_id)
   NXstatus  NX5getnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile5 pFile;
-    hid_t grp, attr1,type,atype;
-    int iRet,iPtype, i;
-    int idx;
-    H5T_class_t data_id;
-    char data[128];
-    char ph_name[1024];
-    info_type op_data;
-    int iRet_iNX=-1;
-    char pBuffer[256];
+    hid_t       grp, attr1,type,atype;
+    herr_t      iRet;
+    int         iPtype, i;
+    int         idx;
+    H5T_class_t tclass;
+    char        data[128];
+    char        ph_name[1024];
+    info_type   op_data;
+    herr_t      iRet_iNX=-1;
+    char        pBuffer[256];
      
     pFile = NXI5assert (fid);
     op_data.iname = NULL;
@@ -1634,8 +1636,8 @@ static int countObjectsInGroup(hid_t loc_id)
            grp=H5Dopen(pFile->iCurrentG,name);
            type=H5Dget_type(grp);
            atype=H5Tcopy(type);
-           data_id = H5Tget_class(atype);
-           iPtype = hdf5ToNXType(data_id, atype);
+           tclass = H5Tget_class(atype);
+           iPtype = hdf5ToNXType(tclass, atype);
            *datatype=iPtype;
            strcpy(nxclass, "SDS");
            H5Tclose(atype);
@@ -1673,7 +1675,7 @@ static int countObjectsInGroup(hid_t loc_id)
      pNexusFile5 pFile;
      int iStart[H5S_MAX_RANK], status;
      hid_t memtype_id; 
-     H5T_class_t data_id;
+     H5T_class_t tclass;
      int dims;    
 
      pFile = NXI5assert (fid);
@@ -1685,8 +1687,8 @@ static int countObjectsInGroup(hid_t loc_id)
      }
      memset (iStart, 0, H5S_MAX_RANK * sizeof(int));
      /* map datatypes of other plateforms */
-     data_id = H5Tget_class(pFile->iCurrentT);
-     if (data_id==H5T_STRING)
+     tclass = H5Tget_class(pFile->iCurrentT);
+     if (tclass==H5T_STRING)
      {
 	dims = H5Tget_size(pFile->iCurrentT);
 	memtype_id = H5Tcopy(H5T_C_S1);
@@ -1700,7 +1702,7 @@ static int countObjectsInGroup(hid_t loc_id)
      /* actually read */    
      status = H5Dread (pFile->iCurrentD, memtype_id, 
 		       H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
-     if(data_id == H5T_STRING)
+     if(tclass == H5T_STRING)
      {
        H5Tclose(memtype_id);
      }
@@ -1720,7 +1722,7 @@ static int countObjectsInGroup(hid_t loc_id)
      pNexusFile5 pFile;
      int i, iRank, mType, iRet;
      hsize_t myDim[H5S_MAX_RANK]; 
-     H5T_class_t data_id;
+     H5T_class_t tclass;
 
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
@@ -1730,13 +1732,13 @@ static int countObjectsInGroup(hid_t loc_id)
      }
 
      /* read information */
-     data_id = H5Tget_class(pFile->iCurrentT);
-     mType = hdf5ToNXType(data_id,pFile->iCurrentT);
+     tclass = H5Tget_class(pFile->iCurrentT);
+     mType = hdf5ToNXType(tclass,pFile->iCurrentT);
      iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS);
      iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
      /* conversion to proper ints for the platform */ 
      *iType = (int)mType;
-     if (data_id==H5T_STRING && myDim[iRank-1] == 1) {
+     if (tclass==H5T_STRING && myDim[iRank-1] == 1) {
         myDim[iRank-1] = H5Tget_size(pFile->iCurrentT);
      } 
      *rank = (int)iRank;
@@ -1756,7 +1758,7 @@ static int countObjectsInGroup(hid_t loc_id)
      hsize_t mySize[H5S_MAX_RANK];
      hsize_t mStart[H5S_MAX_RANK];
      hid_t   memspace, iRet;
-     H5T_class_t data_id;
+     H5T_class_t tclass;
      hid_t   memtype_id;
      char *tmp_data = NULL;
      char *data1;
@@ -1776,8 +1778,8 @@ static int countObjectsInGroup(hid_t loc_id)
 	  mySize[i]  = (hsize_t)iSize[i];
 	  mStart[i] = (hsize_t)0;
 	}
-      data_id = H5Tget_class(pFile->iCurrentT);
-      if (data_id == H5T_STRING) {
+      tclass = H5Tget_class(pFile->iCurrentT);
+      if (tclass == H5T_STRING) {
 /* 
  * FAA 24/1/2007: I don't think this will work for multidimensional
  * string arrays. 
@@ -1812,7 +1814,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	  return NX_ERROR;
 	}
        /* map datatypes of other plateforms */
-       if (data_id == H5T_STRING)
+       if (tclass == H5T_STRING)
        {
 	 dims = H5Tget_size(pFile->iCurrentT);
 	 memtype_id = H5Tcopy(H5T_C_S1);
@@ -1835,7 +1837,7 @@ static int countObjectsInGroup(hid_t loc_id)
 		     pFile->iCurrentS, H5P_DEFAULT,data);
       }    
       /* cleanup */
-      if (data_id == H5T_STRING) { /* we used H5Tcopy */
+      if (tclass == H5T_STRING) { /* we used H5Tcopy */
          H5Tclose(memtype_id);
       }
       H5Sclose(memspace);
