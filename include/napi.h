@@ -55,7 +55,13 @@
 
 #ifdef _MSC_VER
 #define snprintf nxisnprintf
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 extern int nxisnprintf(char* buffer, int len, const char* format, ... );
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* _MSC_VER */
 
 typedef void* NXhandle;         /* really a pointer to a NexusFile structure */

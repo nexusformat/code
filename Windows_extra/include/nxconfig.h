@@ -8,7 +8,7 @@
 #define HAVE_FTIME 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+#define HAVE_INTTYPES_H 0
 
 /* Define to 1 if you have the `df' library (-ldf). */
 /* #undef HAVE_LIBDF */
