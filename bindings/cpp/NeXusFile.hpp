@@ -8,12 +8,18 @@
 #include "napi.h"
 
 #ifdef _WIN32
+
+#ifdef _MSC_VER 
+#  define NXDLL_EXPORT
+#else
 #  if IN_NEXUS_CPP_LIBRARY
 #    define NXDLL_EXPORT __declspec(dllexport)
 #  else
 #    define NXDLL_EXPORT __declspec(dllimport)
 #  endif
-#else
+#endif /* _MSC_VER */
+
+#else /* _WIN32 */
 #  define NXDLL_EXPORT 
 #endif /* _WIN32 */
 
