@@ -35,6 +35,9 @@ AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
+# used by libtool - need to get if from 4.3.0 better
+NXLTVERSINFO="4:3:4"
+
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
 AC_CANONICAL_TARGET
@@ -54,6 +57,7 @@ FCFLAGS="$F90FLAGS $FCFLAGS" # for compatibility with nexus-3.0
 
 AM_INIT_AUTOMAKE([1.6])
 
+AC_SUBST(NXLTVERSINFO)
 
 AM_CONFIG_HEADER(include/nxconfig.h:include/nxconfig_h.in)
 
@@ -218,6 +222,8 @@ AC_SUBST(JAVAINCLUDE)
 AC_SUBST(PACKAGE_RELEASE)
 test -z "$PACKAGE_RELEASE" && PACKAGE_RELEASE=1
 
+SHARED_LDFLAGS=""
+
 NXDOCDIR='${datadir}/nexus/doc'
 NXEXAMPLEDIR='${datadir}/nexus/examples'
 NXTESTDIR='${prefix}/nexus/tests'
@@ -250,6 +256,7 @@ if test x$with_python != xno; then
 	if test -r "$PYTHONROOT/python"; then PYTHON="$PYTHONROOT/python"; fi
     fi
     AM_PATH_PYTHON(,, :)
+    AC_CHECK_PYTHON_MODULE(numpy)
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
@@ -381,7 +388,7 @@ case $host in
 	;;
 
     *mingw*)
-	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
+	SHARED_LDFLAGS="$SHARED_LDFLAGS -no-undefined" #  -Wl,--add-stdcall-alias
 	MINGW_MSYS=yes
 	HDF_EXT=dll
 	HDF5_EXT=dll
@@ -390,7 +397,7 @@ case $host in
 	;;
 
     *cygwin*)
-#	SHARED_LDFLAGS="-no-undefined" #  -Wl,--add-stdcall-alias
+#	SHARED_LDFLAGS="$SHARED_LDFLAGS -no-undefined" #  -Wl,--add-stdcall-alias
 	;;
 
     *darwin*)
@@ -409,7 +416,7 @@ dnl does not get set with the commands to create a shared library
 	JAVAINCLUDE="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 dnl	F90FLAGS="$F90FLAGS -g -cons -YEXT_NAMES=LCS -YEXT_SFX=_"
 dnl	FCFLAGS="$FCFLAGS -qextname"
-	SHARED_LDFLAGS="-Wl,-single_module"
+	SHARED_LDFLAGS="$SHARED_LDFLAGS -Wl,-single_module"
 #	LTF90COMPILETAG="--tag=F77"
 #	LTF90LINKTAG="--tag=CC"
 dnl	LDFLAGS="$LDFLAGS -flat_namespace"
@@ -686,7 +693,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
-AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
+AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy" -eq 1])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
@@ -803,7 +810,7 @@ F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAROOT" ; then echo yes ; else echo no ; fi` 
 IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
-PYTHONBINDING=`if test -n "$PYTHONROOT" ; then echo yes; else echo no ; fi` 
+PYTHONBINDING=`if test -n "$HAVE_PYTHON_FALSE" ; then echo yes; else echo no ; fi` 
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
@@ -838,7 +845,7 @@ build:
                 JAVA:          ${JAVABINDING} (--with-java-home=${JAVAROOT}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
-	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT})
+	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
 
 	documentation:
 	     Doxygen:	       ${DOXYGENDOCS}
