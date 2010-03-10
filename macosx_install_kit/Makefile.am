@@ -27,7 +27,7 @@
 #
 #====================================================================
 EXTRA_DIST=build_mac_kit.sh pkg.config.in ReadMe.txt \
-	bin/*.sh \
+	$(srcdir)/bin/*.sh \
 	Resources/postflight Resources/preflight \
 	Resources/English.lproj/background.jpg \
 	Resources/English.lproj/Conclusion.txt \

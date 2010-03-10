@@ -85,9 +85,10 @@ else
 	CXX=
 fi
 
+AC_SUBST(WITH_F77)
 AC_ARG_WITH([f77], AC_HELP_STRING([--with-f77=f77 compiler], [Specify name of FORTRAN 77 compiler]),
-	[with_f77=$withval], [with_f77=no])
-if test x"$with_f77" != x"no" ; then
+	[], [with_f77=no])
+if test ! -z "$with_f77" -a x"$with_f77" != x"no" ; then
 	if test x"$with_f77" != x"yes" ; then F77="$with_f77"; fi
 	AC_PROG_F77
 	dnl Check FORTRAN compiler options
@@ -97,15 +98,18 @@ if test x"$with_f77" != x"no" ; then
 	dnl get right F77 include option
 	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
 	AC_F77_LIBRARY_LDFLAGS
+	WITH_F77=yes
 else
 	F77=
+	WITH_F77=no
 fi
 
+AC_SUBST(WITH_F90)
 AC_ARG_WITH([f90], AC_HELP_STRING([--with-f90=f90 compiler], [Specify name of FORTRAN 90 compiler]),
-	[with_f90=$withval], [with_f90=no])
-if test x"$with_f90" != x"no" ; then
+	[], [with_f90=no])
+if test ! -z "$with_f90" -a x"$with_f90" != x"no" ; then
 	if test x"$with_f90" = x"yes" ; then
-		AC_CHECK_PROGS(FC, [g95 f90 f95 ifort])
+		AC_CHECK_PROGS(FC, [g95 gfortran f90 f95 ifort])
 	else
 		FC="$with_f90"
 		AC_CHECK_PROGS(FC, [$with_f90])
@@ -121,8 +125,10 @@ if test x"$with_f90" != x"no" ; then
 	AC_FC_LIBRARY_LDFLAGS
 #        if test x$with_f77=xno; then with_f77=$FC; fi
 #        if test x$with_f77=xno; then with_f77=yes; fi
+	WITH_F90=yes
 else
 	FC=
+	WITH_F90=no
 fi
 
 java_host="linux"

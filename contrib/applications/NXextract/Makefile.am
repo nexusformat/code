@@ -27,4 +27,4 @@
 #
 #====================================================================
 SUBDIRS = src
-EXTRA_DIST=readme.txt example/*.nxe example/template_2/*.nxe
+EXTRA_DIST=readme.txt $(srcdir)/example/*.nxe $(srcdir)/example/template_2/*.nxe

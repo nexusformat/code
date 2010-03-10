@@ -28,14 +28,14 @@ else
 fi
 export HAVE_XML
 #
-if test ! -z "@F77@"; then
+if test "@WITH_F77@" = "yes"; then
     HAVE_F77=run_test
 else
     HAVE_F77=skip_test
 fi
 export HAVE_F77
 #
-if test ! -z "@FC@"; then
+if test "@WITH_F90@" = "yes"; then
     HAVE_F90=run_test
 else
     HAVE_F90=skip_test

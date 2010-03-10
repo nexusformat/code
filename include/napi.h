@@ -49,7 +49,7 @@
 #define NEXUSAPI
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "4.2.0"                /* major.minor.patch */
+#define NEXUS_VERSION   "4.3.0"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
