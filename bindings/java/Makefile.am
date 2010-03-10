@@ -57,6 +57,7 @@ jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \
 
 # jni definitions
 lib_LTLIBRARIES		= libjnexus.la
+AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
                        native/hdfexceptionImp.c \
                        native/handle.c \

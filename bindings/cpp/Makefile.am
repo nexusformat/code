@@ -34,6 +34,7 @@
 ############################################################################
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 lib_LTLIBRARIES=libNeXusCPP.la
+AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 
 # nxincludedir=$(includedir)/nexus
 nxincludedir=$(pkgincludedir)
