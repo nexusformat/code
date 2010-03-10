@@ -155,3 +155,20 @@ AC_DEFUN(
         fi
     fi
   ])
+
+AC_DEFUN([AC_CHECK_PYTHON_MODULE],
+[
+    if test -z "$PYTHON"; then PYTHON="python"; fi
+    AC_MSG_CHECKING(for python module $1)
+    $PYTHON -c "import $1" 2>/dev/null
+    if test $? -eq 0; then
+        eval PYTHON_$1=1
+        eval PYTHON_$1_found="yes"
+        AC_MSG_RESULT(found)
+    else
+        eval PYTHON_$1=0
+        eval PYTHON_$1_found="no"
+        AC_MSG_RESULT(not found)
+    fi
+    AC_SUBST(PYTHON_$1)
+])

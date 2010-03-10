@@ -262,6 +262,7 @@ if test x$with_python != xno; then
 	if test -r "$PYTHONROOT/python"; then PYTHON="$PYTHONROOT/python"; fi
     fi
     AM_PATH_PYTHON(,, :)
+    AC_CHECK_PYTHON_MODULE(numpy)
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
@@ -698,7 +699,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
-AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT"])
+AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy" -eq 1])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
@@ -807,7 +808,7 @@ F77BINDING=`if test -n "$F77" ; then echo yes ; else echo no ; fi`
 F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAROOT" ; then echo yes ; else echo no ; fi` 
 IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
-PYTHONBINDING=`if test -n "$PYTHONROOT" ; then echo yes; else echo no ; fi` 
+PYTHONBINDING=`if test -n "$HAVE_PYTHON_FALSE"; then echo yes; else echo no ; fi` 
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
@@ -842,7 +843,7 @@ build:
                 JAVA:          ${JAVABINDING} (--with-java-home=${JAVAROOT}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
-	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT})
+	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
 
 	documentation:
 	     Doxygen:	       ${DOXYGENDOCS}
