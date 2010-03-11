@@ -31,14 +31,6 @@ def getPercentDiff(left, right, nandiff=float("nan")):
     diffs = left-right
     combine = numpy.fabs(left) + numpy.fabs(right)
 
-    # fix the denominator so there are not nans
-    try:
-        indices = (combine == 0)
-        left[indices] = 1.
-    except IndexError:
-        if combine == 0:
-            left = 1.
-
     # do the percent part
     diffs = 100. * numpy.fabs(diffs/left)
     try:
