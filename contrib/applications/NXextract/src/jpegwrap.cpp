@@ -2,14 +2,18 @@
 // Synchrotron SOLEIL
 //
 //
-// Création : 01/12/2006
-// Auteur   : Stéphane Poirier
+// Creation : 01/12/2006
+// Author   : Stephane Poirier
+//
+// This program is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; version 2 of the License.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT 
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //
 //*****************************************************************************
-
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
 
 #include "base.h"
 #include "file.h"
@@ -199,7 +203,11 @@ void JpegEncoder::DestMemBuf::InitDestination(struct jpeg_compress_struct *pcinf
 //------------------------------------------------------------------------
 // JpegEncoder::DestMemBuf::empty_output_buffer_wrapper
 //------------------------------------------------------------------------
-boolean JpegEncoder::DestMemBuf::empty_output_buffer_wrapper(struct jpeg_compress_struct *pcinfo)
+#ifdef __WIN32__
+uint8 JpegEncoder::DestMemBuf::empty_output_buffer_wrapper(struct jpeg_compress_struct *pcinfo)
+#else
+int JpegEncoder::DestMemBuf::empty_output_buffer_wrapper(struct jpeg_compress_struct *pcinfo)
+#endif
 {
   // Search in JpegEncoder::s_mapCinfoToOutput on which instance of DestMemBuf
   // we should call EmptyOutputBuffer

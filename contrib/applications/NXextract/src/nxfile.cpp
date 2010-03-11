@@ -2244,21 +2244,3 @@ int NexusFile::GetScanDim(const char *pszGroupPath)
 
   return iMaxAxis;
 }
-
-//-----------------------------------------------------------------------------
-// NexusFile::CloneGroup
-//-----------------------------------------------------------------------------
-void NexusFile::CloneGroup(const string &strGroupPath, const string &strDestFile, const string &strParentGroupPath)
-{
-/*
-  // Open destination file
-  NexusFile nxfDest;
-  if( FileExists(strDestFile) )
-    nxfDest.OpenReadWrite(PSZ(strDestFile));
-  else
-    nxfDest.Create(PSZ(strDestFile));
-
-  
-*/
-
-}

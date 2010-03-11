@@ -64,11 +64,10 @@
 #ifdef __WIN32__
   // Fake definitions
   typedef int mode_t;
-  typedef int uid_t;
-  typedef int gid_t;
+  typedef long uid_t;
+  typedef long gid_t;
   typedef int fsid_t;
 #endif
-
 
 // Cast a string object to a const char *
 #define PSZ(s) (s).c_str()
@@ -230,9 +229,19 @@ public:
   int ExtractTokenRight(char cLeft, char cRight, String *pstrToken);
   //@}
 
+  /// Remove characters that enclose string: quotes, paranthesis, etc...
+  /// ex: RemoveEnclosure("'", "'") -> removes quotes in a string like 'string'
+  /// ex: RemoveEnclosure("([", ")]") -> removes paranthesis in a string like (string) or [string]
+  ///                                    but not in string like (string]
+  /// @param pcszLeft list of possible left enclosure chars
+  /// @param pcszRight list of possible right enclosure chars
+  /// @return true if enclosure was removed
+  bool RemoveEnclosure(psz pszLeft, psz pszRight);
+  bool RemoveEnclosure(char cLeft, char cRight);
+
   /// Match string with mask containing '*' and '?' jokers
   bool Match(pcsz pszMask) const;
-  bool Match(String strMask) const;
+  bool Match(const String &strMask) const;
 
   /// Remove white space and begining and end of string
   void Trim();
@@ -246,7 +255,21 @@ public:
   /// @param pvecstr pointer to a vector of strings
   ///
   void Split(char c, vector<String> *pvecstr);
+  void Split(char c, vector<String> *pvecstr) const;
   void Split(char c, String *pstrLeft, String *pstrRight, bool bPreserve=false);
+
+  /// Join strings from string vector
+  ///
+  /// @param cSep Items separator
+  ///
+  void Join(const vector<String> &vecStr, char cSep=',');
+
+  /// Remove item in a string like "item1,item2,item3,..."
+  ///
+  /// @param cSep Items separator
+  ///
+  /// @return true if the item was found, otherwise false
+  bool RemoveItem(const String &strItem, char cSep=',');
 
   /// Convert characters to lowercase
   void ToLower();
@@ -287,7 +310,7 @@ public:
   ulong Hash() const;
 };
 
-//## Will be removed when all String object will be replaced with CString
+//## Will be removed when all String object will be replaced with String
 typedef String CString;
 
 // Empty string - useful when need a const string &
@@ -354,8 +377,8 @@ private:
   
 
 public:
-  static void Push(const CString &strReason, const CString &strDesc, 
-                   const CString &strOrigin, CError::ELevel eLevel = CError::_ERROR);
+  static void Push(const String &strReason, const String &strDesc, 
+                   const String &strOrigin, CError::ELevel eLevel = CError::_ERROR);
 
   /// Activate logging when a error is pushed
   static void SetLogError(bool bLog = true);
@@ -768,7 +791,7 @@ public:
   LogForward(pfn_log_fwd pfn_log_fwd);
 
   /// ILogTarget
-  virtual void Log(ELogLevel eLevel, pcsz pszType, const CString &strMsg);
+  virtual void Log(ELogLevel eLevel, pcsz pszType, const String &strMsg);
 };
 
 // For deprecated class name CLogForward
@@ -923,8 +946,8 @@ public:
 private:
   std::list<IVariableEvaluator *> m_lstEvaluator;
   NotFoundReplacement m_eNotFoundReplacement;
-  bool PrivProcess(String *pstrTemplate, bool bRecurse, set<CString> &setEvaluatedSymbols);
-  bool PrivProcessVar(String *pstrVar, bool bRecurse, bool bDeepEvaluation, set<CString> &setEvaluatedSymbols);
+  bool PrivProcess(String *pstrTemplate, bool bRecurse, set<String> &setEvaluatedSymbols);
+  bool PrivProcessVar(String *pstrVar, bool bRecurse, bool bDeepEvaluation, set<String> &setEvaluatedSymbols);
 
 public:
   ///
@@ -1166,7 +1189,6 @@ public:
   /// @return true if metadata was found, otherwise false (if bThrow == false)
   bool GetDoubleMetadata(const String &strKey, double *pdValue, bool bThrow=true) const;
 };
-
 
 } // namespace soleil
 

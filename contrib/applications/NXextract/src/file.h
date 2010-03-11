@@ -270,7 +270,7 @@ public:
   /// Convert separators
   void Set(const String &strFullName);
   void Set(const String &strPath, const String &strName);
-  void Set(const String &strPath, const String &strName, const  String &stdExt);
+  void Set(const String &strPath, const String &strName, const  String &strExt);
 
   void SetFullName(pcsz pszFileName);
 

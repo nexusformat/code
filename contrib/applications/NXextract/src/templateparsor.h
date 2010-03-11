@@ -89,6 +89,8 @@ public:
   void Parse(const string &strTemplateName);
   void ReadHeader(const string &strTemplateName, String *pstrParams);
 
+
+  static ExpressionPtr ParseExpression(const String &strExpr);
 };
 
 #endif

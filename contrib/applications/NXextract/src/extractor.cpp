@@ -19,6 +19,7 @@
 #include "file.h"
 #include "membuf.h"
 #include "nxfile.h"
+#include "variant.h"
 
 #ifdef __JPEG_SUPPORT__
   #include "jpegwrap.h"
@@ -30,8 +31,6 @@
 #include <fstream>
 #include <sstream>  
 #include <vector>
-#include <cstring>
-#include <cstdlib>
 
 #include "nexusevaluator.h"
 #include "extractor.h"
@@ -581,16 +580,28 @@ String Extractor::ValueToString(DataBuf &aValue)
 //-----------------------------------------------------------------------------
 int Extractor::ExecLoopOver(int iCurrentPos)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
+
   String strCollection = Token.m_strParam2;
   m_TempParsor.ProcessNoRecursion(&strCollection);
   ItemList *pList = NULL;
-  ItemList *pCachedList=NULL;
+  ItemList *pCachedList = NULL;
   ItemList lstItems;
 
   if( strCollection.StartWith("nxs:") )
     // NeXus collection
     pCachedList = m_pNxEval->GetItemsList(&strCollection, Token.m_strParam1);
+  else
+  {
+    // The collection is a variable containing a list of value with '|' as separator
+    m_TempParsor.ProcessNoRecursion(&strCollection);
+    String strItem;
+    while( !strCollection.empty() )
+    {
+      strCollection.ExtractToken('|', &strItem);
+      lstItems.push_back(NxItem(strItem, strItem));
+    }
+  }
 
   if( pCachedList )
     pList = pCachedList;
@@ -624,7 +635,7 @@ int Extractor::ExecLoopOver(int iCurrentPos)
 //-----------------------------------------------------------------------------
 int Extractor::ExecBlock(int iCurrentPos)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
   String strLimit = Token.m_strParam2;
   m_TempParsor.ProcessNoRecursion(&strLimit);
 
@@ -683,7 +694,7 @@ int Extractor::ExecBlock(int iCurrentPos)
 //-----------------------------------------------------------------------------
 void Extractor::ExecPadding(int iCurrentPos)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
   // Check Output object type
   MemBufOutput *pBufOutput = dynamic_cast<MemBufOutput *>(m_stkOut.top().ObjectPtr());
   if( !pBufOutput )
@@ -763,7 +774,7 @@ void Extractor::OutBinaryScalarFromString(const TemplateToken &Token, const Stri
 //-----------------------------------------------------------------------------
 void Extractor::ExecBinary(int iCurrentPos)
 {
-  TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
 
   // Evaluate target
   String strData = GetTokenArgument(&Token);
@@ -848,7 +859,7 @@ void Extractor::ExecBinary(int iCurrentPos)
 //-----------------------------------------------------------------------------
 int Extractor::ExecComp(int iCurrentPos, bool bInf, bool bNot)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
 
   DataBuf aValue1, aValue2;
   String strParam1 = Token.m_strParam1;
@@ -879,7 +890,7 @@ int Extractor::ExecComp(int iCurrentPos, bool bInf, bool bNot)
 //-----------------------------------------------------------------------------
 int Extractor::ExecIfEq(int iCurrentPos, bool bNot)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
 
   DataBuf aValue1, aValue2;
   String strParam1 = Token.m_strParam1;
@@ -891,7 +902,7 @@ int Extractor::ExecIfEq(int iCurrentPos, bool bNot)
   if( m_pNxEval->Evaluate(strParam2, &aValue2) )
     strParam2 = ValueToString(aValue2);
 
-  bool bCond = strParam1.Match(strParam2);
+  bool bCond = strParam1.Match(PSZ(strParam2));
   if( (bCond && !bNot) || (!bCond && bNot ) )
     // Condition is satisfyed
     Exec(iCurrentPos+1, Token.m_iEndBlockPos+1);
@@ -905,7 +916,7 @@ int Extractor::ExecIfEq(int iCurrentPos, bool bNot)
 //-----------------------------------------------------------------------------
 int Extractor::ExecIfExists(int iCurrentPos)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
   bool bExists = false;
   if( !Token.m_strData.empty() )
   {
@@ -924,40 +935,92 @@ int Extractor::ExecIfExists(int iCurrentPos)
 }
 
 //-----------------------------------------------------------------------------
+// Extractor::ExecSet
+//-----------------------------------------------------------------------------
+void Extractor::ExecSet(int iCurrentPos)
+{
+  TokenSet &Token = *((TokenSet *)(m_vecToken[iCurrentPos].ObjectPtr()));
+  String strValue = Token.m_strParam2;
+  if( Token.m_bEvalArgument )
+    m_TempParsor.Process(&strValue);
+  m_dictVar[Token.m_strParam1] = strValue;
+}
+
+//-----------------------------------------------------------------------------
+// Extractor::ExecSetList
+//-----------------------------------------------------------------------------
+void Extractor::ExecSetList(int iCurrentPos)
+{
+  TokenSet &Token = *((TokenSet *)(m_vecToken[iCurrentPos].ObjectPtr()));
+  String strCollection = Token.m_strParam2;
+  m_TempParsor.ProcessNoRecursion(&strCollection);
+  ItemList *pList = NULL;
+  ItemList *pCachedList=NULL;
+  ItemList lstItems;
+  bool bNexusItem = false;
+
+  if( strCollection.StartWith("nxs:") )
+  {
+    // NeXus collection
+    pList = m_pNxEval->GetItemsList(&strCollection, Token.m_strParam1);
+    bNexusItem = true;
+  }
+
+  String strValueList;
+  ItemList::iterator it = pList->begin();
+  // Loop over list items pairs
+  for(; it != pList->end(); it++)
+  {
+    String strValue = (*it).first;
+    if( !(*it).second.empty() )
+    {
+      if( !strValueList.empty() )
+        strValueList += "|";  // List separator
+      if( !Token.m_strParam3.empty() && bNexusItem )
+      {
+        // Value to be evaluated
+        String strToEvaluate = "nxs:" + (*it).second + Token.m_strParam3;
+        m_pNxEval->Evaluate(strToEvaluate, &m_aValue);
+        strValueList += ScalarValueToString();
+
+      }
+      else
+        strValueList += (*it).second;
+    }
+  }
+
+  m_dictVar[Token.m_strParam1] = strValueList;
+}
+
+//-----------------------------------------------------------------------------
 // Extractor::ExecLoop
 //-----------------------------------------------------------------------------
 int Extractor::ExecLoop(int iCurrentPos)
 {
-  const TemplateToken &Token = m_vecToken[iCurrentPos];
+  TemplateToken &Token = *(m_vecToken[iCurrentPos]);
+  TokenLoop *pToken = dynamic_cast<TokenLoop *>(&Token);
+  Expression::s_pValueEval = this;
 
-  int iInit = 0;
-  String strValStart = Token.m_strParam2;
-  m_TempParsor.ProcessNoRecursion(&strValStart);
-  if( m_pNxEval->Evaluate(strValStart, &m_aValue) )
-    iInit = ValueToInteger();
-  else
-    iInit = atoi(PSZ(strValStart));
-   
-  int iEnd = 0; 
-  String strValEnd = Token.m_strParam3;
-  m_TempParsor.ProcessNoRecursion(&strValEnd);
-  if( m_pNxEval->Evaluate(strValEnd, &m_aValue) )
-    iEnd = ValueToInteger();
-  else
-    iEnd = atoi(PSZ(strValEnd));
+  int iInit = pToken->ptrExprBegin->Eval();
+  int iEnd = pToken->ptrExprEnd->Eval();
+  int iStep = 1;
+  if( iInit > iEnd )
+    iStep = -1;
+  if( !pToken->ptrExprStep.IsNull() )
+    iStep = pToken->ptrExprStep->Eval();
 
   // Add counter
   pair<MapCounters::iterator, bool> 
     prItBool = m_dictCounters.insert(MapCounters::value_type(Token.m_strParam1, 0));
 
   if( iInit < iEnd )
-    for(int i = iInit; i < iEnd; i++)
+    for(int i = iInit; i < iEnd; i += iStep)
     {
       (prItBool.first)->second = i;              // Update counter value
       Exec(iCurrentPos+1, Token.m_iEndBlockPos+1); // Execute code until next end-loop
     }
   else
-    for(int i = iInit; i > iEnd; i--)
+    for(int i = iInit; i > iEnd; i += iStep)
     {
       (prItBool.first)->second = i;              // Update counter value
       Exec(iCurrentPos+1, Token.m_iEndBlockPos+1); // Execute code until next end-loop
@@ -1049,7 +1112,7 @@ void Extractor::Exec(int iStartPos, int iEndPos)
   
   for(int iPos = iStartPos; iPos < iEndPos; iPos++ )
   {
-    pToken = &m_vecToken[iPos];
+    pToken = m_vecToken[iPos];
 
     switch( pToken->m_TokenType )
     {
@@ -1101,12 +1164,12 @@ void Extractor::Exec(int iStartPos, int iEndPos)
         break;
 
       case TemplateToken::SET:
-      {
-        String strValue = pToken->m_strParam2;
-        m_TempParsor.Process(&strValue);
-        m_dictVar[pToken->m_strParam1] = strValue;
+        ExecSet(iPos);
         break;
-      }
+
+      case TemplateToken::SET_LIST:
+        ExecSetList(iPos);
+        break;
 
       case TemplateToken::OUTPUT:
       {
@@ -1156,7 +1219,7 @@ void Extractor::SetOutputFile(const String &strFile, bool bBinary)
   {
     // Output stream redirection on console
 #ifdef __WIN32__
-    m_fiOut = freopen("CON", "w", stdout);
+    freopen_s(&m_fiOut, "CON", "w", stdout);
 #else // UNIX
     m_fiOut = freopen("/dev/tty", "w", stdout);
 #endif
@@ -1180,11 +1243,19 @@ void Extractor::SetOutputFile(const String &strFile, bool bBinary)
 
   if( !bBinary )
     // Output stream redirection
+#ifdef __WIN32__
+    freopen_s(&m_fiOut, PSZ(m_strCurrentFile), "w", stdout);
+#else // UNIX
     m_fiOut = freopen(PSZ(m_strCurrentFile), "w", stdout);
+#endif
   else
   {
     // Open binary file
+#ifdef __WIN32__
+    fopen_s(&m_fiOut, PSZ(m_strCurrentFile), "wb");
+#else // UNIX
     m_fiOut = fopen(PSZ(m_strCurrentFile), "wb");
+#endif
     BinaryFileOutput *pOut = new BinaryFileOutput(m_fiOut);
     m_stkOut.push(pOut);
   }
@@ -1293,6 +1364,49 @@ MemBufPtr Extractor::GetBuf(const String &strName, bool bCreate)
   }
   
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Extractor::ScalarValueToString
+//-----------------------------------------------------------------------------
+String Extractor::ScalarValueToString()
+{
+  String strValue;
+  switch( m_aValue.DataType() )
+  {
+    // if we have a string format.
+    case DataBuf::CHAR:
+      strValue.append((char *)m_aValue.Buf(), m_aValue.Len());
+      break;
+    // the case of int,long,unsigned char or short.
+    case DataBuf::BYTE:
+      strValue.Printf("%d", *((uint8 *)m_aValue.Buf()));
+      break;
+    case DataBuf::SHORT:
+      strValue.Printf("%h", *((short *)m_aValue.Buf()));
+      break;
+    case DataBuf::USHORT:
+      strValue.Printf("%hu", *((unsigned short *)m_aValue.Buf()));
+      break;
+    case DataBuf::LONG:
+      strValue.Printf("%ld", *((long *)m_aValue.Buf()));
+      break;
+    case DataBuf::INT:
+      strValue.Printf("%ld", *((int *)m_aValue.Buf()));
+      break;
+    case DataBuf::ULONG:
+      strValue.Printf("%lu", *((unsigned long *)m_aValue.Buf()));
+      break;
+    case DataBuf::FLOAT:
+      strValue.Printf("%g", *((float *)m_aValue.Buf()));
+      break;
+    case DataBuf::DOUBLE:
+      strValue.Printf("%lg", *((double *)m_aValue.Buf()));
+      break;
+    default:
+      break;
+  }
+  return strValue;
 }
 
 //-----------------------------------------------------------------------------
@@ -1427,6 +1541,21 @@ bool Extractor::GetValue(const String &strVar, int *piValue)
     return true;
   }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+// Extractor::Evaluate
+//-----------------------------------------------------------------------------
+Variant Extractor::Evaluate(const String &str)
+{
+  String strToEval = str;
+  int iValue = 0;
+  m_TempParsor.ProcessNoRecursion(&strToEval);
+  if( m_pNxEval->Evaluate(strToEval, &m_aValue) )
+    iValue = ValueToInteger();
+  else
+    iValue = atoi(PSZ(strToEval));
+  return iValue;
 }
 
 //===========================================================================
@@ -1648,3 +1777,97 @@ void BinaryFileOutput::Out(void *pData, int iDataLen)
   fwrite(pData, iDataLen, 1, m_pFile);
 }
 
+//===========================================================================
+/// class Constant
+//===========================================================================
+//-----------------------------------------------------------------------------
+// Expression::Constant::GetValue
+//-----------------------------------------------------------------------------
+Variant Expression::Constant::GetValue()
+{
+  return m_vValue;
+}
+Expression::Constant::~Constant()
+{}
+
+//===========================================================================
+/// class Expression
+//===========================================================================
+IValueEvaluator *Expression::s_pValueEval = NULL;
+
+Expression::~Expression()
+{}
+
+//-----------------------------------------------------------------------------
+// Expression::Eval
+//-----------------------------------------------------------------------------
+double Expression::Eval()
+{
+  return double(GetValue());
+}
+
+//-----------------------------------------------------------------------------
+// Expression::GetValue
+//-----------------------------------------------------------------------------
+Variant Expression::GetValue()
+{
+  double dResult = 0;
+  for( list<FragmentPtr>::iterator it = m_lstFragment.begin(); it != m_lstFragment.end(); it++ )
+  {
+    Variant v = (*it)->Value();
+    double dVal = 0;
+    if( v.Type() == Variant::STRING )
+    {
+      if( s_pValueEval != NULL )
+        dVal = s_pValueEval->Evaluate(v);
+    }
+
+    if( (*it)->UnaryOp() != NOP )
+    {
+      // Unary evaluation: not implemented yet
+    }
+
+    switch( (*it)->BinaryOp() )
+    {
+      case ADD:
+        dResult += dVal;
+        break;
+      case SUB:
+        dResult -= dVal;
+        break;
+      case MUL:
+        dResult *= dVal;
+        break;
+      case DIV:
+        dResult /= dVal;
+        break;
+      case NOP:
+      default:
+        dResult = dVal;
+    }
+  }
+  return dResult;
+}
+
+//-----------------------------------------------------------------------------
+// Expression::CharToOp
+//-----------------------------------------------------------------------------
+Expression::Operation Expression::CharToOp(char c)
+{
+  switch( c )
+  {
+    case '+':
+      return ADD;
+    case '-':
+      return SUB;
+    case '*':
+      return MUL;
+    case '/':
+      return DIV;
+    case 'N':
+      return NOP;
+    default:
+      //## should throw an exception
+      return NOP;
+  }
+}

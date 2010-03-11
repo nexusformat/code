@@ -49,6 +49,23 @@ inline void InvertLong(long *pL)
   *(p+1) = *(p+2);
   *(p+2) = c;
 }
+inline void InvertInt64(int64 *pi64)
+{
+  // ABCDEFGH -> HGFEDCBA
+  char *p = (char*)pi64;
+  char c = *p;
+  *p = *(p+7);
+  *(p+7) = c;
+  c = *(p+1);
+  *(p+1) = *(p+6);
+  *(p+6) = c;
+  c = *(p+5);
+  *(p+2) = *(p+5);
+  *(p+5) = c;
+  c = *(p+4);
+  *(p+4) = *(p+3);
+  *(p+3) = c;
+}
 
 inline void InvertFloat(float *pF)
 {
@@ -216,6 +233,8 @@ public:
   CMemBuf& operator>>(ushort &us);
   CMemBuf& operator<<(long l);
   CMemBuf& operator>>(long &l);
+  CMemBuf& operator<<(int64 i64);
+  CMemBuf& operator>>(int64 &i64);
   CMemBuf& operator<<(ulong ul);
   CMemBuf& operator>>(ulong &ul);
   CMemBuf& operator<<(float f);
@@ -228,7 +247,7 @@ public:
   CMemBuf& operator<<(const CMemBuf& membuf);
 
   // Get buffer content as hexadecimal string
-  CString HexString() const;
+  String HexString() const;
 
   /// Put a haxadecimal string into the buffer
   void PutHexString(const char *pszHex, int iLen = -1);

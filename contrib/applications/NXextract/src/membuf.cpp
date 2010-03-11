@@ -17,10 +17,11 @@
 #include "base.h"
 #include "date.h"
 #include <stdlib.h>
+#include <string.h>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cstring>
+
 #include "membuf.h"
 
 using namespace soleil;
@@ -540,8 +541,6 @@ CMemBuf& CMemBuf::operator>>(long &l)
   #endif
   return *this;
 }
-
-
 CMemBuf& CMemBuf::operator<<(ulong ul)
 {
   #ifdef __MOTOROLA_ENDIAN__
@@ -556,6 +555,22 @@ CMemBuf& CMemBuf::operator>>(ulong &ul)
   #ifdef __MOTOROLA_ENDIAN__
     InvertLong((long*)&ul);
   #endif
+  return *this;
+}
+CMemBuf& CMemBuf::operator>>(int64 &i64)
+{
+  GetBloc(&i64, sizeof(int64));           
+  #ifdef __MOTOROLA_ENDIAN__
+    InvertInt64(&i64);
+  #endif
+  return *this;
+}
+CMemBuf& CMemBuf::operator<<(int64 i64)
+{
+  #ifdef __MOTOROLA_ENDIAN__
+    InvertInt64((long*)&ul);
+  #endif
+  PutBloc(&i64, sizeof(i64)); 
   return *this;
 }
 
@@ -625,11 +640,11 @@ CMemBuf& CMemBuf::operator<<(const CMemBuf& membuf)
 //---------------------------------------------------------------------------
 // CMemBuf::HexString
 //---------------------------------------------------------------------------
-CString CMemBuf::HexString() const
+String CMemBuf::HexString() const
 {
   static char *pszHexa = "0123456789ABCDEF";
   ostringstream oss;
-  CString str;
+  String str;
   str.reserve(2 * m_uiLen);
   for (uint ui = 0; ui < m_uiLen; ui++)
     oss << (pszHexa[(uchar)m_pBuf[ui] >> 4]) 
@@ -929,14 +944,14 @@ void CMemBuf::KeyGen(CMemBuf *pmbCryptedKey, int iKeyLen, bool bInitRand)
 
 //=============================================================================
 //
-// CString methods
+// String methods
 //
 //=============================================================================
 
 //---------------------------------------------------------------------------
-// CString::Crypt
+// String::Crypt
 //---------------------------------------------------------------------------
-void CString::Crypt(const char* pszXorKey, const char* pszRotKey)
+void String::Crypt(const char* pszXorKey, const char* pszRotKey)
 {
   CMemBuf membuf;
 	membuf << *this;
@@ -945,9 +960,9 @@ void CString::Crypt(const char* pszXorKey, const char* pszRotKey)
 }
 
 //---------------------------------------------------------------------------
-// CString::Decrypt
+// String::Decrypt
 //---------------------------------------------------------------------------
-void CString::Decrypt(const char* pszXorKey, const char* pszRotKey)
+void String::Decrypt(const char* pszXorKey, const char* pszRotKey)
 {
   CMemBuf membuf;
   membuf.PutHexString(c_str(), size());

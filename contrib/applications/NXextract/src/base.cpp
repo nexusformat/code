@@ -170,8 +170,8 @@ Error ErrorStack::s_EmptyError("OK", "No error", "nowhere");
 //----------------------------------------------------------------------------
 // ErrorStack::Push
 //----------------------------------------------------------------------------
-void ErrorStack::Push(const CString &strReason, const CString &strDesc, 
-                  const CString &strOrigin, Error::ELevel eLevel)
+void ErrorStack::Push(const String &strReason, const String &strDesc, 
+                  const String &strOrigin, Error::ELevel eLevel)
 {
   if( !Instance()->m_bIgnoreError )
   {
@@ -578,15 +578,15 @@ String gdshare::StrFormat(pcsz pszFormat, ...)
 //---------------------------------------------------------------------------
 // ExportDict
 //---------------------------------------------------------------------------
-void StringDict::Export(CString *pstrDest)
+void StringDict::Export(String *pstrDest)
 {
   pstrDest->erase();
 
   const_iterator it = begin();
   for( ; it != end(); it++ )
   {
-    CString strName = it->first;
-    CString strValue = it->second;
+    String strName = it->first;
+    String strValue = it->second;
 
     strName.Trim();
 
@@ -600,11 +600,11 @@ void StringDict::Export(CString *pstrDest)
 //---------------------------------------------------------------------------
 // ImportDict
 //---------------------------------------------------------------------------
-void StringDict::Import(const CString &_strSrc)
+void StringDict::Import(const String &_strSrc)
 {
   clear();
-  CString strSrc = _strSrc;
-  CString strSize, strName, strValue;
+  String strSrc = _strSrc;
+  String strSize, strName, strValue;
   int iStatus = 0;
   while( strSrc.size() > 0 )
   {
@@ -629,10 +629,10 @@ void StringDict::Import(const CString &_strSrc)
 //---------------------------------------------------------------------------
 // StringDict::ConcatValue
 //---------------------------------------------------------------------------
-void StringDict::ConcatValue(const CString &strKey, const CString &strValue, char cSep)
+void StringDict::ConcatValue(const String &strKey, const String &strValue, char cSep)
 {
   // Get already stored value
-  CString strStoredValue;
+  String strStoredValue;
   if( find(strKey) != end() )
     strStoredValue = (*this)[strKey] + cSep;
 
@@ -646,7 +646,7 @@ void StringDict::ConcatValue(const CString &strKey, const CString &strValue, cha
 //---------------------------------------------------------------------------
 // StringDict::Value
 //---------------------------------------------------------------------------
-const CString &StringDict::Value(const CString &strKey) const
+const String &StringDict::Value(const String &strKey) const
 {
   StringDict::const_iterator itDict;
 
@@ -660,7 +660,7 @@ const CString &StringDict::Value(const CString &strKey) const
 //---------------------------------------------------------------------------
 // StringDict::HasKey
 //---------------------------------------------------------------------------
-bool StringDict::HasKey(const CString &strKey) const
+bool StringDict::HasKey(const String &strKey) const
 {
   StringDict::const_iterator itDict = find(strKey);
   if( itDict != end() )
@@ -829,6 +829,47 @@ int String::ExtractTokenRight(char cLeft, char cRight, String *pstrToken)
 }
 
 //---------------------------------------------------------------------------
+// String::RemoveEnclosure
+//---------------------------------------------------------------------------
+bool String::RemoveEnclosure(psz pszLeft, psz pszRight)
+{
+  // pcszLeft & pcszRight must have the same length
+  if( strlen(pszLeft) != strlen(pszRight) )
+    return false;
+  
+  for( uint ui = 0; ui < strlen(pszLeft); ui++ )
+  {
+    string strMask;
+    strMask += pszLeft[ui];
+    strMask += '*';
+    strMask += pszRight[ui];
+    if( Match(strMask) )
+    {
+      *this = substr(strlen(pszLeft), size() - (strlen(pszLeft) + strlen(pszRight)));
+      return true;
+    }
+  }
+  return false;
+}
+
+//---------------------------------------------------------------------------
+// String::RemoveEnclosure
+//---------------------------------------------------------------------------
+bool String::RemoveEnclosure(char cLeft, char cRight)
+{
+  string strMask;
+  strMask += cLeft;
+  strMask += '*';
+  strMask += cRight;
+  if( Match(strMask) )
+  {
+    *this = substr(1, size() - 2);
+    return true;
+  }
+  return false;
+}
+
+//---------------------------------------------------------------------------
 // String::IsEquals
 //---------------------------------------------------------------------------
 bool String::IsEquals(const String &str) const
@@ -909,7 +950,7 @@ bool String::EndWith(char c) const
 }
 
 //---------------------------------------------------------------------------
-// Look for occurence fo a string in another
+// Look for occurence for a string in another
 // Take care of '?' that match any character
 //---------------------------------------------------------------------------
 static pcsz FindSubStrWithJoker(pcsz pszSrc, pcsz pMask, uint uiLenMask)
@@ -952,7 +993,7 @@ static pcsz FindSubStrWithJoker(pcsz pszSrc, pcsz pMask, uint uiLenMask)
 //---------------------------------------------------------------------------
 // String::Match
 //---------------------------------------------------------------------------
-bool String::Match(String strMask) const
+bool String::Match(const String &strMask) const
 {
   return Match(PSZ(strMask));
 }
@@ -963,11 +1004,21 @@ bool String::Match(String strMask) const
 bool String::Match(pcsz pszMask) const
 {
   pcsz pszTxt = c_str();
-
   while (*pszMask)
   {
     switch (*pszMask)
     {
+
+      case '\\':
+        // escape next special mask char (e.g. '?' or '*')
+        pszMask++;
+        if( *pszMask )
+        {
+          if( *(pszMask++) != *(pszTxt++) )
+            return false;
+        }
+        break;
+
       case '?': // joker at one position
         if (!*pszTxt)
           return true; // no match
@@ -1076,12 +1127,72 @@ void String::Split(char c, vector<String> *pvecstr)
 {
   // Clear vector
   pvecstr->clear();
-  CString strToken;
+  String strToken;
   while( !empty() )
   {
     if( 0 != ExtractToken(c, &strToken) )
       pvecstr->push_back(strToken);
-  } 
+  }
+}
+
+//---------------------------------------------------------------------------
+// String::Split (const version)
+//---------------------------------------------------------------------------
+void String::Split(char c, vector<String> *pvecstr) const
+{
+  // Clear vector
+  pvecstr->clear();
+  String strToken;
+  String strTmp(*this);
+  while( !strTmp.empty() )
+  {
+    if( 0 != strTmp.ExtractToken(c, &strToken) )
+      pvecstr->push_back(strToken);
+  }
+}
+
+//---------------------------------------------------------------------------
+// String::Join
+//---------------------------------------------------------------------------
+void String::Join(const vector<String> &vecStr, char cSep)
+{
+  erase();
+  for( uint ui=0; ui < vecStr.size(); ui++ )
+  {
+    if( 0 < ui )
+      *this += cSep;
+    *this += vecStr[ui];
+  }
+}
+
+//---------------------------------------------------------------------------
+// String::RemoveItem
+//---------------------------------------------------------------------------
+bool String::RemoveItem(const String &strItem, char cSep)
+{
+  uint uiPos = find(strItem);
+  if( uiPos == string::npos )
+    return false;
+
+  if( *this == strItem )
+  {
+    erase();
+    return true;
+  }
+
+  vector<String> vecstr;
+  Split(cSep, &vecstr);
+  for( vector<String>::iterator it = vecstr.begin(); it != vecstr.end(); it++ )
+  {
+    if( *it == strItem )
+    {
+      vecstr.erase(it);
+      Join(vecstr, cSep);
+      return true;
+    }
+  }
+  Join(vecstr, cSep);
+  return false;
 }
 
 //---------------------------------------------------------------------------
@@ -1206,8 +1317,8 @@ int gdshare::Exec(const char* pszCmdLine, const char *pszDefDir, int bBackground
   //  *a priori* si la commande est un executable ou un fichier. Note:
   //  si pas d'extension on considere que c'est un executable)
   bool bIsExecutable;
-  CString strCommandLine = pszCmdLine;
-  CString strCmd;
+  String strCommandLine = pszCmdLine;
+  String strCmd;
   strCommandLine.Trim();
 
   if ( strCommandLine.StartWith('"') )
@@ -1227,8 +1338,8 @@ int gdshare::Exec(const char* pszCmdLine, const char *pszDefDir, int bBackground
 
   // strCmd vaut le premier argument (= le nom de l'exe ou du document)
   // extraction de l'extension :
-  CString strExt;
-  CString strCmdDummy = strCmd;
+  String strExt;
+  String strCmdDummy = strCmd;
   rc = strCmdDummy.ExtractTokenRight('.', &strExt );
   // Seul le cas rc = 1 (chaine extraite et separateur trouvé) indique
   //  que l'on a une extension.
@@ -1318,7 +1429,7 @@ int gdshare::Exec(const char* pszCmdLine, const char *pszDefDir, int bBackground
   return 0;
 
 #else
-  CString sCmd = pszCmdLine;
+  String sCmd = pszCmdLine;
   if( bBackground )
     // Background task
     sCmd += "&";
@@ -1346,8 +1457,8 @@ int gdshare::ExecAs(const char* pszCmdLine, const char *pszDefDir, int bBackgrou
   //  *a priori* si la commande est un executable ou un fichier. Note:
   //  si pas d'extension on considere que c'est un executable)
   bool bIsExecutable;
-  CString strCommandLine = pszCmdLine;
-  CString strCmd;
+  String strCommandLine = pszCmdLine;
+  String strCmd;
   strCommandLine.Trim();
 
   if ( strCommandLine.StartWith('"') )
@@ -1367,8 +1478,8 @@ int gdshare::ExecAs(const char* pszCmdLine, const char *pszDefDir, int bBackgrou
 
   // strCmd vaut le premier argument (= le nom de l'exe ou du document)
   // extraction de l'extension :
-  CString strExt;
-  CString strCmdDummy = strCmd;
+  String strExt;
+  String strCmdDummy = strCmd;
   rc = strCmdDummy.ExtractTokenRight('.', &strExt );
   // Seul le cas rc = 1 (chaine extraite et separateur trouvé) indique
   //  que l'on a une extension.
@@ -1458,7 +1569,7 @@ int gdshare::ExecAs(const char* pszCmdLine, const char *pszDefDir, int bBackgrou
   return 0;
 
 #else
-  CString sCmd = pszCmdLine;
+  String sCmd = pszCmdLine;
   if( bBackground )
     // Background task
     sCmd += "&";
@@ -2164,7 +2275,7 @@ LogForward::LogForward(pfn_log_fwd pfn_log_fwd)
 //----------------------------------------------------------------------------
 // LogForward::Log
 //----------------------------------------------------------------------------
-void LogForward::Log(ELogLevel eLevel, pcsz pszType, const CString &strMsg)
+void LogForward::Log(ELogLevel eLevel, pcsz pszType, const String &strMsg)
 {
 	if( m_pfn_log_fwd != NULL )
 		m_pfn_log_fwd(eLevel, pszType, PSZ(strMsg));
@@ -2339,21 +2450,21 @@ bool TemplateProcessor::ProcessNoRecursion(String *pstrTemplate)
 //----------------------------------------------------------------------------
 bool TemplateProcessor::Process(String *pstrTemplate, bool bRecurse)
 {
-  set<CString> setSymbols;
+  set<String> setSymbols;
   return PrivProcess(pstrTemplate, bRecurse, setSymbols);
 }
 
 //----------------------------------------------------------------------------
 // TemplateProcessor::Process
 //----------------------------------------------------------------------------
-bool TemplateProcessor::PrivProcess(String *pstrTemplate, bool bRecurse, set<CString> &setPrevSymbols)
+bool TemplateProcessor::PrivProcess(String *pstrTemplate, bool bRecurse, set<String> &setPrevSymbols)
 {
   String strEval, strTmp;
   String strTmpl = *pstrTemplate;
   String strVar, strValue;
   bool bNotReturnValue = false;
 
-  set<CString> setSymbols = setPrevSymbols;
+  set<String> setSymbols = setPrevSymbols;
 
   while( strTmpl.size() > 0 )
   {
@@ -2427,7 +2538,7 @@ bool TemplateProcessor::PrivProcess(String *pstrTemplate, bool bRecurse, set<CSt
 //----------------------------------------------------------------------------
 bool TemplateProcessor::ProcessVar(String *pstrVar)
 {
-  set<CString> emptySet;
+  set<String> emptySet;
   return PrivProcessVar(pstrVar, false, false, emptySet);
 }
 
@@ -2435,7 +2546,7 @@ bool TemplateProcessor::ProcessVar(String *pstrVar)
 // TemplateProcessor::Process
 //----------------------------------------------------------------------------
 bool TemplateProcessor::PrivProcessVar(String *pstrVar, bool bRecurse, 
-                          bool bDeepEvaluation, set<CString> &setEvaluatedSymbols)
+                          bool bDeepEvaluation, set<String> &setEvaluatedSymbols)
 {
   std::list<IVariableEvaluator *>::iterator itEvaluator = m_lstEvaluator.begin();
 

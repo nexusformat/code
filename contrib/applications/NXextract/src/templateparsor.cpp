@@ -19,13 +19,12 @@
 #include "file.h"
 #include "membuf.h"
 #include "nxfile.h"
+#include "variant.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>  
 #include <vector>
-#include <cstring>
-#include <cstdlib>
 
 #include "nexusevaluator.h"
 #include "extractor.h"
@@ -96,8 +95,8 @@ void TemplateFileParsor::SuppressComments(String *pstrLine)
 //-----------------------------------------------------------------------------
 void TemplateFileParsor::ParseSet(String *pstrLine, int iLine)
 {
-  TemplateToken aToken;
-  aToken.m_TokenType = TemplateToken::SET;
+  TokenSet *pToken = new TokenSet;
+  pToken->m_TokenType = TemplateToken::SET;
 
   // Looking for the commentaries to eliminate them.
   SuppressComments(pstrLine);
@@ -106,13 +105,31 @@ void TemplateFileParsor::ParseSet(String *pstrLine, int iLine)
   String strVarName;
   pstrLine->ExtractToken('=' , &strVarName);
 
-  aToken.m_strParam1 = strVarName;
-  aToken.m_strParam1.Trim();
-  aToken.m_strParam2 = *pstrLine; // value
-  aToken.m_strParam2.Trim();
-  aToken.m_iTemplateLine = iLine;
-
-  m_vecToken.push_back(aToken);
+  pToken->m_strParam1 = strVarName;
+  pToken->m_strParam1.Trim();
+  (*pstrLine).Trim();
+  pToken->m_bEvalArgument = true;
+  if( pstrLine->Match("'*'") || pstrLine->Match("\"*\"") )
+  {
+    pToken->m_iTemplateLine = iLine;
+    (*pstrLine).RemoveEnclosure("'\"", "'\"");
+    pToken->m_bEvalArgument = false;
+    pToken->m_strParam2 = *pstrLine; // value
+  }
+  else if( pstrLine->Match("[*]*") )
+  {
+    // This is a list
+    pToken->m_TokenType = TemplateToken::SET_LIST;
+    pstrLine->ExtractToken('[', ']', &pToken->m_strParam2);
+    pToken->m_strParam3 = *pstrLine;
+  }
+  else
+  {
+    // Standard argument
+    pToken->m_iTemplateLine = iLine;
+    pToken->m_strParam2 = *pstrLine; // value
+  }
+  m_vecToken.push_back(TemplateTokenPtr(pToken));
 }
 
 //-----------------------------------------------------------------------------
@@ -120,19 +137,19 @@ void TemplateFileParsor::ParseSet(String *pstrLine, int iLine)
 //-----------------------------------------------------------------------------
 void TemplateFileParsor::ParseOutput(String *pstrLine, int iLine, bool bBinary)
 {
-  TemplateToken aToken;
-  aToken.m_TokenType = TemplateToken::OUTPUT;
+  TemplateTokenPtr ptrToken(new TemplateToken);
+  ptrToken->m_TokenType = TemplateToken::OUTPUT;
 
   // we look for the commentaries to eliminate them.
   SuppressComments(pstrLine);
 
   // Store parameters
-  aToken.m_strParam1 = *pstrLine;
-  aToken.m_strParam1.Trim();
-  aToken.m_iTemplateLine = iLine;
-  aToken.m_iParam1 = bBinary ? 1 : 0;
+  ptrToken->m_strParam1 = *pstrLine;
+  ptrToken->m_strParam1.Trim();
+  ptrToken->m_iTemplateLine = iLine;
+  ptrToken->m_iParam1 = bBinary ? 1 : 0;
 
-  m_vecToken.push_back(aToken);
+  m_vecToken.push_back(ptrToken);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,37 +157,41 @@ void TemplateFileParsor::ParseOutput(String *pstrLine, int iLine, bool bBinary)
 //-----------------------------------------------------------------------------
 int TemplateFileParsor::ParseLoop(String *pstrLine, int iLine)
 {
-  TemplateToken aToken;
-  aToken.m_iTemplateLine = iLine;
+  TokenLoop *pToken = new TokenLoop;
+
+  pToken->m_iTemplateLine = iLine;
   
   // we look for the commentaries to eliminate them.
   SuppressComments(pstrLine);
 
   // Extract the name of iteration variable
-  pstrLine->ExtractToken('=', &aToken.m_strParam1);
+  pstrLine->ExtractToken('=', &pToken->m_strParam1);
   // Next parameter
-  int rc = pstrLine->ExtractToken(',', &aToken.m_strParam2);
+  int rc = pstrLine->ExtractToken(',', &pToken->m_strParam2);
+  if( pstrLine->find(',') != string::npos )
+    // Loop step
+    pstrLine->ExtractTokenRight(',', &pToken->m_strParam4);
 
   // Suppress white spaces
-  aToken.m_strParam1.Trim();
-  aToken.m_strParam2.Trim();
+  pToken->m_strParam1.Trim();
+  pToken->m_strParam2.Trim();
 
   if( 2 == rc ) // token not found
   {
-    aToken.m_TokenType = TemplateToken::LOOP_OVER;
-    if( aToken.m_strParam1.empty() )
+    pToken->m_TokenType = TemplateToken::LOOP_OVER;
+    if( pToken->m_strParam1.empty() )
     {
       cerr << "Error: Missed variable name at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
       exit(1);
     }
 
-    if( aToken.m_strParam2.empty() )
+    if( pToken->m_strParam2.empty() )
     {
       cerr << "Error: Missed NeXus path at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
       exit(1);
     }
-    if( aToken.m_strParam2.StartWith('[') && aToken.m_strParam2.EndWith(']') )
-      aToken.m_strParam2 = aToken.m_strParam2.substr(1, aToken.m_strParam2.size()-2 );
+    if( pToken->m_strParam2.Match("[*]") )
+      pToken->m_strParam2 = pToken->m_strParam2.substr(1, pToken->m_strParam2.size()-2 );
     else
     {
       cerr << "Error: Bad loop syntax at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
@@ -179,31 +200,36 @@ int TemplateFileParsor::ParseLoop(String *pstrLine, int iLine)
   }
   else
   {
-    aToken.m_TokenType = TemplateToken::LOOP;
+    pToken->m_TokenType = TemplateToken::LOOP;
     // End value 
-    aToken.m_strParam3 = *pstrLine;
-    aToken.m_strParam3.Trim();
-    if( aToken.m_strParam1.empty() )
+    pToken->m_strParam3 = *pstrLine;
+    pToken->m_strParam3.Trim();
+    if( pToken->m_strParam1.empty() )
     {
       cerr << "Error: Missed counter name at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
       exit(1);
     }
 
-    if( aToken.m_strParam2.empty() )
+    if( pToken->m_strParam2.empty() )
     {
       cerr << "Error: Missed initial value for counter at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
       exit(1);
     }
 
-    if( aToken.m_strParam3.empty() )
+    if( pToken->m_strParam3.empty() )
     {
       cerr << "Error: Missed final value for counter at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
       exit(1);
     }
+
+    // Parse expressions
+    pToken->ptrExprBegin = ParseExpression(pToken->m_strParam2);
+    pToken->ptrExprEnd = ParseExpression(pToken->m_strParam3);
+    if( !pToken->m_strParam4.empty() )
+      pToken->ptrExprStep = ParseExpression(pToken->m_strParam4);
   }
 
-
-  m_vecToken.push_back(aToken);
+  m_vecToken.push_back(pToken);
   return m_vecToken.size()-1;
 }
 
@@ -212,8 +238,8 @@ int TemplateFileParsor::ParseLoop(String *pstrLine, int iLine)
 //-----------------------------------------------------------------------------
 int TemplateFileParsor::ParseIfCond(String *pstrLine, int iLine)
 {
-  TemplateToken aToken;
-  aToken.m_iTemplateLine = iLine;
+  TemplateTokenPtr ptrToken(new TemplateToken);
+  ptrToken->m_iTemplateLine = iLine;
   
   // Extract payload charge
   SuppressComments(pstrLine);
@@ -226,8 +252,8 @@ int TemplateFileParsor::ParseIfCond(String *pstrLine, int iLine)
     uiPos = pstrLine->rfind("!=");
     if( uiPos != string::npos )
     {
-      aToken.m_TokenType = TemplateToken::IF_NOT_EQ;
-      aToken.m_strParam1 = pstrLine->substr(0, uiPos);
+      ptrToken->m_TokenType = TemplateToken::IF_NOT_EQ;
+      ptrToken->m_strParam1 = pstrLine->substr(0, uiPos);
       strParam2 = pstrLine->substr(uiPos + 2);
     }
   }
@@ -236,8 +262,8 @@ int TemplateFileParsor::ParseIfCond(String *pstrLine, int iLine)
     uiPos = pstrLine->rfind("=");
     if( uiPos != string::npos )
     {
-      aToken.m_TokenType = TemplateToken::IF_EQ;
-      aToken.m_strParam1 = pstrLine->substr(0, uiPos);
+      ptrToken->m_TokenType = TemplateToken::IF_EQ;
+      ptrToken->m_strParam1 = pstrLine->substr(0, uiPos);
       strParam2 = pstrLine->substr(uiPos + 1);
     }
   }
@@ -246,8 +272,8 @@ int TemplateFileParsor::ParseIfCond(String *pstrLine, int iLine)
     uiPos = pstrLine->rfind(">");
     if( uiPos != string::npos )
     {
-      aToken.m_TokenType = TemplateToken::IF_SUP;
-      aToken.m_strParam1 = pstrLine->substr(0, uiPos);
+      ptrToken->m_TokenType = TemplateToken::IF_SUP;
+      ptrToken->m_strParam1 = pstrLine->substr(0, uiPos);
       strParam2 = pstrLine->substr(uiPos + 1);
     }
   }
@@ -256,24 +282,24 @@ int TemplateFileParsor::ParseIfCond(String *pstrLine, int iLine)
     uiPos = pstrLine->rfind("<");
     if( uiPos != string::npos )
     {
-      aToken.m_TokenType = TemplateToken::IF_INF;
-      aToken.m_strParam1 = pstrLine->substr(0, uiPos);
+      ptrToken->m_TokenType = TemplateToken::IF_INF;
+      ptrToken->m_strParam1 = pstrLine->substr(0, uiPos);
       strParam2 = pstrLine->substr(uiPos + 1);
     }
   }
 
-  aToken.m_strParam1.Trim();
+  ptrToken->m_strParam1.Trim();
   strParam2.Trim();
 
   // Remove quotes or double quotes if any
-  strParam2.ExtractToken('\'', '\'', &aToken.m_strParam2);
-  if( aToken.m_strParam2.empty() )
-    strParam2.ExtractToken('"', '"', &aToken.m_strParam2);
-  if( aToken.m_strParam2.empty() )
+  strParam2.ExtractToken('\'', '\'', &ptrToken->m_strParam2);
+  if( ptrToken->m_strParam2.empty() )
+    strParam2.ExtractToken('"', '"', &ptrToken->m_strParam2);
+  if( ptrToken->m_strParam2.empty() )
     // No quotes
-    aToken.m_strParam2 = strParam2;
+    ptrToken->m_strParam2 = strParam2;
 
-  m_vecToken.push_back(aToken);
+  m_vecToken.push_back(ptrToken);
   return m_vecToken.size()-1;
 }
 
@@ -282,9 +308,9 @@ int TemplateFileParsor::ParseIfCond(String *pstrLine, int iLine)
 //-----------------------------------------------------------------------------
 int TemplateFileParsor::ParseIfExists(String *pstrLine, int iLine)
 {
-  TemplateToken aToken;
-  aToken.m_TokenType = TemplateToken::IF_EXISTS;
-  aToken.m_iTemplateLine = iLine;
+  TemplateTokenPtr ptrToken(new TemplateToken);
+  ptrToken->m_TokenType = TemplateToken::IF_EXISTS;
+  ptrToken->m_iTemplateLine = iLine;
 
   // Extract payload charge
   SuppressComments(pstrLine);
@@ -292,10 +318,10 @@ int TemplateFileParsor::ParseIfExists(String *pstrLine, int iLine)
   // we parse the name of the NeXus Object.
   pstrLine->Trim();
   if( pstrLine->StartWith("nxs:") )
-    aToken.m_strData = *pstrLine;
+    ptrToken->m_strData = *pstrLine;
   else // Variable
-    aToken.m_strParam1 = *pstrLine;
-  m_vecToken.push_back(aToken);
+    ptrToken->m_strParam1 = *pstrLine;
+  m_vecToken.push_back(ptrToken);
   return m_vecToken.size()-1;
 }
 
@@ -321,15 +347,15 @@ int TemplateFileParsor::ParseBlockStart(String *pstrLine)
   SuppressComments(pstrLine);
   pstrLine->Trim();
 
-  TemplateToken aToken;
-  aToken.m_TokenType = TemplateToken::BLOCK_START;
+  TemplateTokenPtr ptrToken(new TemplateToken);
+  ptrToken->m_TokenType = TemplateToken::BLOCK_START;
 
   // Get block name
-  pstrLine->ExtractToken(' ', &aToken.m_strParam1); 
+  pstrLine->ExtractToken(' ', &ptrToken->m_strParam1); 
   // Get max block length
-  aToken.m_strParam2 = *pstrLine;
+  ptrToken->m_strParam2 = *pstrLine;
 
-  m_vecToken.push_back(aToken);
+  m_vecToken.push_back(ptrToken);
   return m_vecToken.size()-1;
 }
 
@@ -342,17 +368,17 @@ int TemplateFileParsor::ParsePadding(String *pstrLine, int iLine)
   SuppressComments(pstrLine);
   pstrLine->Trim();
 
-  TemplateToken aToken;
-  aToken.m_TokenType = TemplateToken::PADDING;
+  TemplateTokenPtr ptrToken(new TemplateToken);
+  ptrToken->m_TokenType = TemplateToken::PADDING;
 
   // Get Padding pattern
-  aToken.m_strParam1 = *pstrLine;
+  ptrToken->m_strParam1 = *pstrLine;
   if( pstrLine->empty() )
     // default padding pattern : 80 blanks characters and a LF
-    aToken.m_strParam1 = "                                                                                \n";
+    ptrToken->m_strParam1 = "                                                                                \n";
   else
   {
-    int iRc = pstrLine->ExtractToken('"', '"', &aToken.m_strParam1);
+    int iRc = pstrLine->ExtractToken('"', '"', &ptrToken->m_strParam1);
     if( iRc != String::SEP_FOUND )
     {
       cerr << "Error: bad syntax at line " << iLine << " in file " << m_strCurrentTemplateFile << "; quotes missing." << endl;
@@ -360,7 +386,7 @@ int TemplateFileParsor::ParsePadding(String *pstrLine, int iLine)
     }
   }
 
-  m_vecToken.push_back(aToken);
+  m_vecToken.push_back(ptrToken);
   return m_vecToken.size()-1;
 }
 
@@ -457,10 +483,7 @@ DataBuf::Type TemplateFileParsor::GetTypeFromFormat(char cType, char cMod)
 //-----------------------------------------------------------------------------
 void TemplateFileParsor::ParsePrintData(String *pstrLine, int iLine)
 {
-  if( pstrLine->StartWith("print", true) )
-    pstrLine->erase(0, strlen("print"));
   pstrLine->Trim();
-
   String strToPrint;
   int iRc = pstrLine->ExtractToken('"', '"', &strToPrint);
 
@@ -510,12 +533,12 @@ void TemplateFileParsor::ParsePrintData(String *pstrLine, int iLine)
       if( !strTxt.empty() )
       {
         // Text to print before format directive
-        TemplateToken aToken;
-        aToken.m_iTemplateLine = iLine;
-        aToken.m_TokenType = TemplateToken::PRINT_TEXT;
-        aToken.m_strData = strTxt;
-        aToken.m_Format.Set("%s");
-        m_vecToken.push_back(aToken);
+        TemplateTokenPtr ptrToken(new TemplateToken);
+        ptrToken->m_iTemplateLine = iLine;
+        ptrToken->m_TokenType = TemplateToken::PRINT_TEXT;
+        ptrToken->m_strData = strTxt;
+        ptrToken->m_Format.Set("%s");
+        m_vecToken.push_back(ptrToken);
       }
 
       if( 1 == iRc )
@@ -533,63 +556,79 @@ void TemplateFileParsor::ParsePrintData(String *pstrLine, int iLine)
         strArgument.Trim();
 
         // Check argument type
-        if( strArgument.StartWith("[") )
+        if( strArgument.Match("[nxs:*<*>]*") )
         {
           // This is a array type argument
           // Erase '[' and ']' enclosers
           strArgument.erase(0, 1); // '['
           uint uiMatchingPos = strArgument.find(']');
-          if( uiMatchingPos == string::npos )
-          {
-            cerr << "Error: Missing ']' at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
-            exit(1);
-          }
           strArgument.erase(uiMatchingPos, 1); // ']'
- 
+
           // Insert a loop/end-loop couple
-          TemplateToken aLoopToken;
-          aLoopToken.m_iTemplateLine = iLine;
-          aLoopToken.m_TokenType = TemplateToken::LOOP_OVER;
-          aLoopToken.m_strParam1 = "loopvar";
+          TemplateTokenPtr ptrLoopToken(new TemplateToken);
+          ptrLoopToken->m_iTemplateLine = iLine;
+          ptrLoopToken->m_TokenType = TemplateToken::LOOP_OVER;
+          ptrLoopToken->m_strParam1 = "loopvar";
 
           // Extract loop part of the argument
           String strLastPart;
           int iLastPart = strArgument.rfind('>');
           strLastPart = strArgument.substr(iLastPart+1);
-          aLoopToken.m_strParam2 = strArgument.substr(0, iLastPart+1);
-          aLoopToken.m_iEndBlockPos = m_vecToken.size() + 1;
+          ptrLoopToken->m_strParam2 = strArgument.substr(0, iLastPart+1);
+          ptrLoopToken->m_iEndBlockPos = m_vecToken.size() + 1;
           // Add 'loop' Token
-          m_vecToken.push_back(aLoopToken);
+          m_vecToken.push_back(ptrLoopToken);
 
           // Replace loop element with variable access
           String strTmp;
           strArgument.ExtractTokenRight('<', '>', &strTmp);
           strArgument += "$(loopvar_name)" + strLastPart;
         }
+        else if( strArgument.Match("*[$(*)]*") )
+        {
+          uint uiMatchingPos = strArgument.find("[$(");
+          uint uiLastPos = strArgument.find("]", uiMatchingPos);
+          String strBeforePattern = strArgument.substr(0, uiMatchingPos);
+          String strAfterPattern = strArgument.substr(uiLastPos + 1);
+          String strMatchedPattern = strArgument.substr(uiMatchingPos + 1, uiLastPos - uiMatchingPos - 1);
 
-        TemplateToken aToken;
-        aToken.m_iTemplateLine = iLine;
-        aToken.m_TokenType = TemplateToken::PRINT_DATA;
+          // Insert a loop/end-loop couple
+          TemplateTokenPtr ptrLoopToken(new TemplateToken);
+          ptrLoopToken->m_iTemplateLine = iLine;
+          ptrLoopToken->m_TokenType = TemplateToken::LOOP_OVER;
+          ptrLoopToken->m_strParam1 = "loopvar";
 
-        if( false == BuildDataFragments(&aToken, strArgument) )
+          ptrLoopToken->m_strParam2 = strMatchedPattern;
+          ptrLoopToken->m_iEndBlockPos = m_vecToken.size() + 1;
+          // Add 'loop' Token
+          m_vecToken.push_back(ptrLoopToken);
+          // Rebuild argument for next token (inside loop)
+          strArgument = strBeforePattern + "$(loopvar_name)" + strAfterPattern;
+        }
+
+        TemplateTokenPtr ptrToken(new TemplateToken);
+        ptrToken->m_iTemplateLine = iLine;
+        ptrToken->m_TokenType = TemplateToken::PRINT_DATA;
+
+        if( false == BuildDataFragments(ptrToken.ObjectPtr(), strArgument) )
           // If no variable are presents in the argument string then fill strData member
-          aToken.m_strData = strArgument;
+          ptrToken->m_strData = strArgument;
         
         // Extend format string up to next format directive
         int iPos = strToPrint.find('%');
         // Parse format
-        aToken.m_Format.Set('%' + strToPrint.substr(0, iPos));
+        ptrToken->m_Format.Set('%' + strToPrint.substr(0, iPos));
         // Search for format type in first 10 characters
-        DataBuf::Type eType = GetTypeFromFormat(aToken.m_Format.Type(), aToken.m_Format.Modifier());
+        DataBuf::Type eType = GetTypeFromFormat(ptrToken->m_Format.Type(), ptrToken->m_Format.Modifier());
         if( DataBuf::NO_TYPE == eType )
         {
           cerr << "Error: Bad type specification at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
           exit(1);
         }
-        aToken.m_eOutputType = eType;
-        aToken.m_strPrintFmt = aToken.m_Format.Get();
+        ptrToken->m_eOutputType = eType;
+        ptrToken->m_strPrintFmt = ptrToken->m_Format.Get();
 
-        m_vecToken.push_back(aToken);
+        m_vecToken.push_back(ptrToken);
         strToPrint.erase(0, iPos);
       }
     }
@@ -620,64 +659,64 @@ void TemplateFileParsor::ParseBinary(String *pstrLine, int iLine)
     exit(1);
   }
 
-  TemplateToken aToken;
-  aToken.m_iTemplateLine = iLine;
-  aToken.m_TokenType = TemplateToken::BINARY;
+  TemplateTokenPtr ptrToken(new TemplateToken);
+  ptrToken->m_iTemplateLine = iLine;
+  ptrToken->m_TokenType = TemplateToken::BINARY;
 
-  if( false == BuildDataFragments(&aToken, *pstrLine) )
+  if( false == BuildDataFragments(ptrToken.ObjectPtr(), *pstrLine) )
     // If no variable are presents in the argument string then fill strData member
-    aToken.m_strData = *pstrLine;
+    ptrToken->m_strData = *pstrLine;
 
   if( strBinaryFormat == "c" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::CHAR;
-    aToken.m_uiTypeSize = 1;
+    ptrToken->m_eBinaryDataType = TemplateToken::CHAR;
+    ptrToken->m_uiTypeSize = 1;
   }
   else if( strBinaryFormat == "i1" || strBinaryFormat == "bt" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::BYTE;
-    aToken.m_uiTypeSize = 1;
+    ptrToken->m_eBinaryDataType = TemplateToken::BYTE;
+    ptrToken->m_uiTypeSize = 1;
   }
   else if( strBinaryFormat == "i2" || strBinaryFormat == "si")
   {
-    aToken.m_eBinaryDataType = TemplateToken::SHORT;
-    aToken.m_uiTypeSize = sizeof(short);
+    ptrToken->m_eBinaryDataType = TemplateToken::SHORT;
+    ptrToken->m_uiTypeSize = sizeof(short);
   }
   else if( strBinaryFormat == "ui2" || strBinaryFormat == "usi")
   {
-    aToken.m_eBinaryDataType = TemplateToken::USHORT;
-    aToken.m_uiTypeSize = sizeof(unsigned short);
+    ptrToken->m_eBinaryDataType = TemplateToken::USHORT;
+    ptrToken->m_uiTypeSize = sizeof(unsigned short);
   }
   else if( strBinaryFormat == "i4" || strBinaryFormat == "li" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::LONG;
-    aToken.m_uiTypeSize = sizeof(long);
+    ptrToken->m_eBinaryDataType = TemplateToken::LONG;
+    ptrToken->m_uiTypeSize = sizeof(long);
   }
   else if( strBinaryFormat == "ui4" || strBinaryFormat == "uli" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::LONG;
-    aToken.m_uiTypeSize = sizeof(unsigned long);
+    ptrToken->m_eBinaryDataType = TemplateToken::LONG;
+    ptrToken->m_uiTypeSize = sizeof(unsigned long);
   }
   else if( strBinaryFormat == "f4" || strBinaryFormat == "f" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::FLOAT;
-    aToken.m_uiTypeSize = sizeof(float);
+    ptrToken->m_eBinaryDataType = TemplateToken::FLOAT;
+    ptrToken->m_uiTypeSize = sizeof(float);
   }
   else if( strBinaryFormat == "f8" || strBinaryFormat == "lf" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::DOUBLE;
-    aToken.m_uiTypeSize = sizeof(double);
+    ptrToken->m_eBinaryDataType = TemplateToken::DOUBLE;
+    ptrToken->m_uiTypeSize = sizeof(double);
   }
   else if( strBinaryFormat == "b" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::RAW;
-    aToken.m_uiTypeSize = 0;
+    ptrToken->m_eBinaryDataType = TemplateToken::RAW;
+    ptrToken->m_uiTypeSize = 0;
   }
   else if( strBinaryFormat == "jpeg" )
   {
 #ifdef __JPEG_SUPPORT__
-    aToken.m_eBinaryDataType = TemplateToken::JPEG_IMAGE;
-    aToken.m_uiTypeSize = 0;
+    ptrToken->m_eBinaryDataType = TemplateToken::JPEG_IMAGE;
+    ptrToken->m_uiTypeSize = 0;
 #else
     cerr << "Error: jpeg output not supported in this version (line: " << iLine << " in file " << m_strCurrentTemplateFile << ")." << endl;
     exit(1);
@@ -685,15 +724,15 @@ void TemplateFileParsor::ParseBinary(String *pstrLine, int iLine)
   }
   else if( strBinaryFormat == "bmp" )
   {
-    aToken.m_eBinaryDataType = TemplateToken::BMP_IMAGE;
-    aToken.m_uiTypeSize = 0;
+    ptrToken->m_eBinaryDataType = TemplateToken::BMP_IMAGE;
+    ptrToken->m_uiTypeSize = 0;
   }
   else
   {
     cerr << "Error: unknown binary format '" << strBinaryFormat << "' at line " << iLine << " in file " << m_strCurrentTemplateFile << "." << endl;
     exit(1);
   }
-  m_vecToken.push_back(aToken);
+  m_vecToken.push_back(ptrToken);
 }
 
 //-----------------------------------------------------------------------------
@@ -878,7 +917,7 @@ void TemplateFileParsor::Tokenize(ifstream &fs, int &iLine, TemplateToken::Type 
         int iPos = ParseLoop(&strLine, iLine);
         Tokenize(fs, iLine, TemplateToken::END_LOOP);
         // Store end block position in token vector
-        m_vecToken[iPos].m_iEndBlockPos = m_vecToken.size() - 1;
+        m_vecToken[iPos]->m_iEndBlockPos = m_vecToken.size() - 1;
         break;
       }
       case TemplateToken::IF:
@@ -886,7 +925,7 @@ void TemplateFileParsor::Tokenize(ifstream &fs, int &iLine, TemplateToken::Type 
         int iPos = ParseIf(&strLine, iLine);
         Tokenize(fs, iLine, TemplateToken::END_IF);
         // Store end block position in token vector
-        m_vecToken[iPos].m_iEndBlockPos = m_vecToken.size() - 1;
+        m_vecToken[iPos]->m_iEndBlockPos = m_vecToken.size() - 1;
         break;
       }
       case TemplateToken::BLOCK_START:
@@ -894,7 +933,7 @@ void TemplateFileParsor::Tokenize(ifstream &fs, int &iLine, TemplateToken::Type 
           int iPos = ParseBlockStart(&strLine);
           Tokenize(fs, iLine, TemplateToken::BLOCK_END);
           // Store end block position in token vector
-          m_vecToken[iPos].m_iEndBlockPos = m_vecToken.size() - 1;
+          m_vecToken[iPos]->m_iEndBlockPos = m_vecToken.size() - 1;
           break;
         }
       case TemplateToken::END_LOOP:
@@ -936,4 +975,50 @@ void TemplateFileParsor::Tokenize(ifstream &fs, int &iLine, TemplateToken::Type 
     cerr << "Error : Unexpected end of template file (" << m_strCurrentTemplateFile << ")." << endl;
     exit(1);
   }
+}
+
+//-----------------------------------------------------------------------------
+// TemplateFileParsor::ParseExpression
+//-----------------------------------------------------------------------------
+ExpressionPtr TemplateFileParsor::ParseExpression(const String &_strExpr)
+{
+  // Very basic math expression parsor:
+  // - can only parse expression like 'a + b - c * d / e' without parenthesis
+  // - spaces characters must enclose operators
+  ExpressionPtr ptrExpression = new Expression();
+
+  String strExpr = _strExpr;
+  Expression::Operation opPrevious = Expression::CharToOp('N');
+  uint uiStartSearch = 0;
+  while( !strExpr.empty() )
+  {
+    int iOpPos = strExpr.find_first_of("+-/*", uiStartSearch);
+
+    if( string::npos != iOpPos )
+    {
+      String strMatching = strExpr.substr(iOpPos-1,3);
+      // Operator must be enclosed by spaces characters
+      if( strMatching.Match(" * ") )
+      { 
+        char cOp = strExpr[iOpPos];
+        String strToken;
+        // Extract first operand
+        strExpr.ExtractToken(cOp, &strToken);
+        strToken.Trim();
+        ptrExpression->AddFragment(new Expression::Fragment(new Expression::Constant(strToken), opPrevious));
+        opPrevious = Expression::CharToOp(cOp);
+      }
+      else
+      { // Look forward
+        uiStartSearch = iOpPos + 1;
+      }
+    }
+    else
+    {
+      strExpr.Trim();
+      ptrExpression->AddFragment(new Expression::Fragment(new Expression::Constant(strExpr), opPrevious));
+      break;
+    }
+  }
+  return ptrExpression;
 }

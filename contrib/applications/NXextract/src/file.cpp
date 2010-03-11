@@ -17,8 +17,8 @@
 //*****************************************************************************
 #include <fcntl.h>
 #include <stdlib.h>
-#include <cstdio>
-#include <cstring>
+#include <string.h>
+#include <stdio.h>
 
 #include "base.h"
 #include "membuf.h"
@@ -136,7 +136,7 @@ bool gdshare::FileExists(pcsz pcszFullName)
 //----------------------------------------------------------------------------
 // AccessFromString
 //----------------------------------------------------------------------------
-mode_t gdshare::AccessFromString(const CString &strAccess)
+mode_t gdshare::AccessFromString(const String &strAccess)
 {
   mode_t mode = 0;
 #ifdef __LINUX__
@@ -385,7 +385,7 @@ String FileName::RelName(const char* pszPath) const
   if (!p || !pRef)
     return m_strFile;
 
-  CString str;
+  String str;
   bool bClimbStarted = false;
   for(;;)
   {
@@ -443,7 +443,7 @@ String FileName::RelName(const char* pszPath) const
 //----------------------------------------------------------------------------
 String FileName::NameExt() const
 {
-  CString strFileName = Name();
+  String strFileName = Name();
   if( Ext().size() > 0 )
     strFileName += '.' + Ext();
   return strFileName;
@@ -512,7 +512,7 @@ void FileName::ConvertSeparators(String *pstr)
 //----------------------------------------------------------------------------
 void FileName::MkDir(mode_t mode, uid_t uid, gid_t gid) const
 {
-  LogVerbose("file", "Creating directory '%s'...", PSZ(FullName()));
+  LogVerbose("file", "Creating directory '%s'...", PSZ(Path()));
   String str = Path();
   if( str.empty() )
     return;
@@ -542,7 +542,7 @@ void FileName::MkDir(mode_t mode, uid_t uid, gid_t gid) const
     p = const_cast<char*>(strchr(PSZ(str), SEP_PATH));
   }
 #else
-  p = const_cast<char*>(strchr(PSZ(str), SEP_PATH));
+  p = strchr(PSZ(str), SEP_PATH);
 #endif
 
   if( !p )
@@ -649,7 +649,7 @@ bool FileName::LinkExists() const
   if( IsPathName() )
     strFullName.erase(strFullName.size()-1, 1);
   int iRc = lstat(PSZ(strFullName), &st);
-  if( !iRc && (st.st_mode & S_IFLNK) )
+  if( !iRc && S_ISLNK(st.st_mode) )
     return true;
 #endif
   return false;
@@ -658,14 +658,14 @@ bool FileName::LinkExists() const
 //----------------------------------------------------------------------------
 // FileName::MakeSymLink
 //----------------------------------------------------------------------------
-void FileName::MakeSymLink(const CString &strTarget, uid_t uid, gid_t gid) const
+void FileName::MakeSymLink(const String &strTarget, uid_t uid, gid_t gid) const
 {
 #ifdef __LINUX__
   int iRc = symlink(PSZ(strTarget), PSZ(FullName()));
   if( iRc )
   {
     String strErr = StrFormat(ERR_CANNOT_CREATE_LINK, PSZ(FullName()), PSZ(strTarget));
-    ThrowExceptionFromErrno(PSZ(strErr), "FileName::MkDir");
+    ThrowExceptionFromErrno(PSZ(strErr), "FileName::MakeSymLink");
   }
   // Change owner if needed
   if( (int)uid != -1 || (int)gid != -1 )
@@ -674,7 +674,7 @@ void FileName::MakeSymLink(const CString &strTarget, uid_t uid, gid_t gid) const
     {
       // changing owner mode failed
       String strErr = StrFormat(ERR_CHOWN_FAILED, PSZ(FullName()), uid, gid);
-      ThrowExceptionFromErrno(PSZ(strErr), "FileName::MkDir");
+      ThrowExceptionFromErrno(PSZ(strErr), "FileName::MakeSymLink");
     }
   }
 
@@ -1377,7 +1377,7 @@ void FileEnum::Init(const String &strPath, EEnumMode eMode)
   m_dirDir = opendir(PSZ(Path()));
   if( NULL == m_dirDir )
   {
-    CString strErr = StrFormat(ERR_CANNOT_ENUM_DIR, PSZ(Path()));
+    String strErr = StrFormat(ERR_CANNOT_ENUM_DIR, PSZ(Path()));
     throw BadPathException(PSZ(strErr), "Bad path", "FileEnum::Init");
   }
   m_strPath = strPath; // Save initial path.

@@ -34,7 +34,7 @@ nxextract_SOURCES = extractorapp.cpp extractor.cpp templateparsor.cpp \
 			date.cpp bmp.cpp file.cpp membuf.cpp \
 			base.h bmp.h date.h extractor.h file.h \
 			jpegwrap.h membuf.h nexusevaluator.h nxfile.h \
-			templateparsor.h
+			templateparsor.h variant.h variant.cpp
 nxextract_LDADD = $(LIBNEXUS)
 nxextract_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 

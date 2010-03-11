@@ -103,7 +103,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// struct SDataFragment
+// class SDataFragment
 // to boost performances requests are divided in several fragments which store
 // references to variables and plain text
 // a full request is the concatenation of all the snippets
@@ -129,10 +129,114 @@ public:
 typedef list<DataFragment> DataFragmentsList;
 
 //-----------------------------------------------------------------------------
-// struct TemplateToken
+// Interface IOperand
+//
+// Used in Expression class (see below)
 //-----------------------------------------------------------------------------
-struct TemplateToken
+class IOperand: public MReferencable
 {
+public:
+  virtual Variant GetValue() = 0;
+};
+
+typedef RefPtr<IOperand> OperandPtr;
+typedef list<OperandPtr> OperandPtrList;
+
+//-----------------------------------------------------------------------------
+// Interface IValueEvaluator
+// 
+// Used in Expression class (see below)
+//-----------------------------------------------------------------------------
+class IValueEvaluator
+{
+public:
+  virtual Variant Evaluate(const String &str) = 0;
+};
+
+//-----------------------------------------------------------------------------
+// Class Expression
+//
+// Basic expression evaluator:
+// - can do recursive evaluation
+// - all values are converted to double float type
+// - unary operators not implemented yet
+//-----------------------------------------------------------------------------
+class Expression : public IOperand
+{
+public:
+  enum Operation
+  {
+    NOP = 0, // no operation
+    ADD, 
+    SUB,
+    MUL,
+    DIV
+  };
+
+  // Object that can evaluate a value like a variable
+  static IValueEvaluator *s_pValueEval;
+
+  // Convenience method: return Op code from char in [+-*/]
+  static Operation CharToOp(char c);
+
+  // Class Constant
+  //
+  class Constant: public IOperand
+  {
+  private:
+    Variant m_vValue; // The value
+    TemplateProcessor *m_pTmplProc;
+  public:
+
+    Constant(const Variant &v): m_vValue(v) {}
+    virtual ~Constant();
+
+    // IOperand
+    virtual Variant GetValue();
+  };
+
+  // Class Fragment
+  //
+  class Fragment: public MReferencable
+  {
+  private:
+    OperandPtr m_ptrOperand;
+    Operation m_opUnary;
+    Operation m_opBinary;
+
+  public:
+    Fragment(OperandPtr ptrOperand, Operation Op2=NOP, Operation Op1=NOP)
+    { m_ptrOperand = ptrOperand; m_opBinary = Op2; m_opUnary = Op1; }
+
+    Operation UnaryOp() const { return m_opUnary; }
+    Operation BinaryOp() const { return m_opBinary; }
+    Variant Value() { return m_ptrOperand->GetValue(); }
+  };
+  typedef RefPtr<Fragment> FragmentPtr;
+
+private:
+  
+  list<FragmentPtr> m_lstFragment;
+
+public:
+
+  virtual ~Expression();
+
+  void AddFragment(FragmentPtr ptrFragment) { m_lstFragment.push_back(ptrFragment); }
+
+  double Eval();
+
+  // IOperand
+  virtual Variant GetValue();
+};
+typedef RefPtr<Expression> ExpressionPtr;
+
+//-----------------------------------------------------------------------------
+// class TemplateToken
+//-----------------------------------------------------------------------------
+class TemplateToken : public MReferencable
+{
+public:
   enum Type
   {
     PRINT = 0,
@@ -143,6 +247,7 @@ struct TemplateToken
     END_LOOP,
     OUTPUT,
     SET,
+    SET_LIST,
     IF,
     IF_EXISTS,
     IF_SUP,
@@ -192,9 +297,31 @@ struct TemplateToken
   String m_strParam1;  // loop on / output file
   String m_strParam2;  // loop begin
   String m_strParam3;  // loop end
+  String m_strParam4;  // loop step
+
+  virtual ~TemplateToken() {}
 };
 
-typedef vector<TemplateToken> VecToken;
+//-----------------------------------------------------------------------------
+// struct TemplateToken
+//-----------------------------------------------------------------------------
+class TokenLoop : public TemplateToken
+{
+public:
+  ExpressionPtr ptrExprBegin, ptrExprEnd, ptrExprStep;
+};
+
+typedef RefPtr<TemplateToken> TemplateTokenPtr;
+typedef vector<TemplateTokenPtr> VecToken;
+
+//-----------------------------------------------------------------------------
+// class TokenSet
+//-----------------------------------------------------------------------------
+class TokenSet: public TemplateToken
+{
+public:
+  bool m_bEvalArgument;
+};
 
 //===========================================================================
 /// Interface for counter variables type
@@ -321,11 +448,12 @@ public:
 
 typedef map<String, int> MapCounters;
 typedef map<String, MemBufPtr> MapBufPtr;
+
 //-----------------------------------------------------------------------------
 // Class CTemplateFileParsor
 //
 //-----------------------------------------------------------------------------
-class Extractor : public IVariableEvaluator, public ICounterVars
+class Extractor : public IVariableEvaluator, public ICounterVars, public IValueEvaluator
 {
 private:
   VecToken           &m_vecToken;       // Tokenized template file
@@ -358,7 +486,7 @@ private:
 
   // Executing script
   int  ExecLoopOver(int iCurrentPos);
-  void ExecPrintData(struct TemplateToken *pToken);
+  void ExecPrintData(TemplateToken *pToken);
   int  ExecBlock(int iCurrentPos);
   int  ExecLoop(int iCurrentPos);
   void Exec(int iStartPos, int iEndPos);
@@ -367,10 +495,13 @@ private:
   int  ExecComp(int iCurrentPos, bool bInf, bool bNot);
   void ExecPadding(int iCurrentPos);
   void ExecBinary(int iCurrentPos);
+  void ExecSet(int iCurrentPos);
+  void ExecSetList(int iCurrentPos);
 
   String GetTokenArgument(TemplateToken *pToken);
   void PrintData(TemplateToken *pToken);
   void OutBinaryScalarFromString(const TemplateToken &Token, const String &strData);
+  String ScalarValueToString();
 
 public:
   // @param pstrVar Variable to evaluate
@@ -398,6 +529,9 @@ public:
 
   // ICounterVars
   bool GetValue(const String &strVar, int *piValue);
+
+  // IValueEvaluator
+  Variant Evaluate(const String &str);
 
 #ifdef __JPEG_SUPPORT__
   /// Convert image embedded in a Nxextract DataBuf into jpeg format

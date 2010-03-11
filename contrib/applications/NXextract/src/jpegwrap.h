@@ -2,8 +2,16 @@
 // Synchrotron SOLEIL
 //
 //
-// Création : 01/12/2006
-// Auteur   : Stéphane Poirier
+// Creation : 01/12/2006
+// Author   : Stephane Poirier
+//
+// This program is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; version 2 of the License.
+// 
+// This program is distributed in the hope that it will be useful, but WITHOUT 
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //
 //*****************************************************************************
 
@@ -80,7 +88,11 @@ public:
       static void CONVCALL init_destination_wrapper(struct jpeg_compress_struct * cinfo);
 
       /// Method called by libjpeg when output buffer is full
-      static boolean CONVCALL empty_output_buffer_wrapper(struct jpeg_compress_struct * cinfo);
+#ifdef __WIN32__
+      static uint8 CONVCALL empty_output_buffer_wrapper(struct jpeg_compress_struct * cinfo);
+#else
+      static int CONVCALL empty_output_buffer_wrapper(struct jpeg_compress_struct * cinfo);
+#endif
 
       /// Method called by libjpeg when compressor has finished
       static void CONVCALL term_destination_wrapper(struct jpeg_compress_struct * cinfo);

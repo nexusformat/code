@@ -19,12 +19,12 @@
 #include "file.h"
 #include "membuf.h"
 #include "nxfile.h"
+#include "variant.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>  
 #include <vector>
-#include <cstring>
 
 #include "nexusevaluator.h"
 #include "extractor.h"
@@ -108,7 +108,7 @@ bool ExtractorApp::Evaluate(String *pstrVar)
 //-----------------------------------------------------------------------------
 void ExtractorApp::OnCommandLineOpts()
 {
-  CCommandLine::SetCmdNameVersion("nxextract", "1.10.0");
+  CCommandLine::SetCmdNameVersion("nxextract", "1.12.0");
   CCommandLine::AddOpt('t', "template", "file", "Template file");
   CCommandLine::AddOpt('D', "Define", "symbols", "Symbols list");
   CCommandLine::AddOpt('s', "silent", NULL, "Silent mode");
@@ -149,7 +149,7 @@ void ExtractorApp::GetInputFiles(std::set<String> *psetSources)
       FileEnum feDir(fnPathArg.Path(), FileEnum::ENUM_FILE);
       while( feDir.Find() )
       {
-        if( strPattern.empty() || feDir.NameExt().Match(strPattern) )
+        if( strPattern.empty() || feDir.NameExt().Match(PSZ(strPattern)) )
           psetSources->insert(feDir.FullName());
       }
     }

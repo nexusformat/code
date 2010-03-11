@@ -20,12 +20,12 @@
 #include "file.h"
 #include "nxfile.h"
 #include "membuf.h"
+#include "variant.h"
+
 #include "nexusevaluator.h"
-#include <sstream>
-#include <cstring>
-#include <cstdlib>
 #include "extractor.h"
 #include "templateparsor.h"
+#include <sstream>
 
 // special attributes
 const char SIZE_ATTR[] = "_size_";
@@ -687,9 +687,12 @@ void NexusEvaluator::GetDataEx(const NexusDataSet &nxDataSet, int *piDim, DataBu
     if( -1 == piDim[i] )
       break;
 
-    if( piDim[i] < 0 || piDim[i] > nxDataSet.DimArray()[iRank - i - 1] )
+
+//## 29/01/10 : à vérifier
+//    if( piDim[i] < 0 || piDim[i] > nxDataSet.DimArray()[iRank - i - 1] )
+    if( piDim[i] < 0 || piDim[i] > nxDataSet.DimArray()[i] )
     {
-      throw Exception(PSZ(StrFormat("Cannot read array at index %d on dimension %d. Dimension size is %d", piDim[i], i+1, nxDataSet.DimArray()[iRank - i - 1])), "ARRAY_OUT_OF_BOUNDS", "NexusEvaluator::GetData");
+      throw Exception(PSZ(StrFormat("Cannot read array at index %d on dimension %d. Dimension size is %d", piDim[i], i+1, nxDataSet.DimArray()[i])), "ARRAY_OUT_OF_BOUNDS", "NexusEvaluator::GetData");
     }
   }
   int iDimMax = i;
@@ -746,9 +749,11 @@ void NexusEvaluator::GetData(const NexusDataSet &nxDataSet, int *piDim, DataBuf 
     if( -1 == piDim[i] )
       break;
 
-    if( piDim[i] < 0 || piDim[i] > nxDataSet.DimArray()[iRank - i - 1] )
+//## 29/01/10 : à vérifier
+//    if( piDim[i] < 0 || piDim[i] > nxDataSet.DimArray()[iRank - i - 1] )
+    if( piDim[i] < 0 || piDim[i] > nxDataSet.DimArray()[i] )
     {
-      throw Exception(PSZ(StrFormat("Cannot read array at index %d on dimension %d. Dimension size is %d", piDim[i], i+1, nxDataSet.DimArray()[iRank - i - 1])), "ARRAY_OUT_OF_BOUNDS", "NexusEvaluator::GetData");
+      throw Exception(PSZ(StrFormat("Cannot read array at index %d on dimension %d. Dimension size is %d", piDim[i], i+1, nxDataSet.DimArray()[iRank])), "ARRAY_OUT_OF_BOUNDS", "NexusEvaluator::GetData");
     }
   }
 
@@ -1007,28 +1012,39 @@ bool NexusEvaluator::ReadAttribute(const String &strAttr, DataBuf *pValue, Nexus
 //-----------------------------------------------------------------------------
 bool NexusEvaluator::CheckItem(const String &_strPath)
 {
-  String strPath = _strPath;
+  String strPath = _strPath, strDataSet, strAttribut;
   if( strPath.StartWith("nxs:") )
     strPath.erase(0, strlen("nxs:"));
+
+  // Attribute part ?
+  if( strPath.find_last_of('.') != string::npos )
+    strPath.ExtractTokenRight('.', &strAttribut);
 
   if( strPath.EndWith('/') )
   {
     // It is a group path
-    if( m_nxf.OpenGroupPath(PSZ(strPath), false) )
-      return true;
-    return false;
+    if( !m_nxf.OpenGroupPath(PSZ(strPath), false) )
+      return false;
+    // Group attribute ?
+    if( !strAttribut.empty() && !m_nxf.HasAttribute(PSZ(strAttribut)) )
+      return false;
+    return true;
   }
 
   // Extract DataSet part
-  String strDataSet;
+
   strPath.ExtractTokenRight('/', &strDataSet);
 
   if( !m_nxf.OpenGroupPath(PSZ(strPath), false) )
     return false;
 
-  if( m_nxf.OpenDataSet(PSZ(strDataSet), false) )
-    return true;
+  // Try to opening dataset
+  if( !strDataSet.empty() && m_nxf.OpenDataSet(PSZ(strDataSet), false)  == false )
+     return false;
 
-  // Item does not exist
-  return false;
+  // Check attribute
+  if( !strAttribut.empty() && !m_nxf.HasAttribute(PSZ(strAttribut)) )
+    return false;
+
+  return true;
 }

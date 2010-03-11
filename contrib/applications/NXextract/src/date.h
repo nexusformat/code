@@ -155,6 +155,10 @@ public:
   /// @name Accessors
   //@{
 
+  /// Returns data internal value
+  int64 RawValue() const { return m_llDate; }
+  void SetRawValue(int64 i) { m_llDate = i; }
+
   /// return 'true' if date is empty
   bool IsEmpty() const { return m_llDate == 0; }
 
@@ -259,6 +263,9 @@ public:
 
   /// Sets the Julian date
   void SetJulianDate(long lJulianDate);
+
+  /// Sets the internal value
+  void Set(int64 ui64) { m_llDate = ui64; }
 
   /// Clears the time part (hour, min, sec)
   void ClearTime();
@@ -366,6 +373,9 @@ public:
 
   /// Month name
   static pcsz MonthName(int iMonth);
+
+  /// Unix time
+  static ulong UnixTime();
 
   //@} Static methods
 

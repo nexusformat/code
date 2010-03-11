@@ -921,7 +921,6 @@ public:
   void GetAttribute(const char *pcszAttr, char *pszValue, int iBufLen);
 
   //@}
-  void CloneGroup(const string &strGroupPath, const string &strDestFile, const string &strParentGroupPath);
 
 };
 
