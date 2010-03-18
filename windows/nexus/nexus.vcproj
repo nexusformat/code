@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="E:\hdf5-1.8.4\src;..\..\include;..\..\Windows_extra\include"
-				PreprocessorDefinitions="HDF5, H5_USE_16_API;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..\..\..\..\hdf5-1.8.4\src;..\..\include;..\..\Windows_extra\include"
+				PreprocessorDefinitions="HDF5;H5_USE_16_API;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
