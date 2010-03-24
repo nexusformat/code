@@ -723,8 +723,7 @@ static hid_t nxToHDF5Type(int datatype)
               return NX_ERROR;
           }
           H5Pset_deflate(cparms,compress_level); 
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, 
-              dataspace, cparms);   
+          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
       } 
       else if (compress_type == NX_COMP_NONE) 
       {
@@ -734,25 +733,33 @@ static hid_t nxToHDF5Type(int datatype)
               iNew = H5Pset_chunk(cparms,rank,chunkdims);
               if (iNew < 0) 
               {
-                  NXIReportError (NXpData, 
-                      "ERROR: Size of chunks could not be set!");
+                  NXIReportError (NXpData, "ERROR: Size of chunks could not be set!");
                   return NX_ERROR;
               }
-              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, 
-                  dataspace, cparms);   
+              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
           } 
           else 
           {
-              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, 
-                  dataspace, H5P_DEFAULT);
+              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT);
           }               
+      } 
+      else if (compress_type == NX_CHUNK) 
+      {
+          cparms = H5Pcreate(H5P_DATASET_CREATE);
+          iNew = H5Pset_chunk(cparms,rank,chunkdims);
+          if (iNew < 0) 
+          {
+              NXIReportError (NXpData, "ERROR: Size of chunks could not be set!");
+              return NX_ERROR;
+          }
+          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
+
       } 
       else 
       {
           NXIReportError (NXpData, 
               "HDF5 doesn't support selected compression method! Dataset was saved without compression");
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, 
-              dataspace, H5P_DEFAULT); 
+          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT); 
       }
       if (iRet < 0) 
       {

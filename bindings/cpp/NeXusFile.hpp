@@ -73,6 +73,7 @@ namespace NeXus {
    * \ingroup cpp_types
    */
   enum NXcompression {
+    CHUNK = NX_CHUNK,
     NONE = NX_COMP_NONE,
     LZW = NX_COMP_LZW,
     RLE = NX_COMP_RLE,

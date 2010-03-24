@@ -146,6 +146,7 @@ typedef struct {
 #define NX_BINARY   21
 
 /* Map NeXus compression methods to HDF compression methods */
+#define NX_CHUNK     0
 #define NX_COMP_NONE 100
 #define NX_COMP_LZW 200
 #define NX_COMP_RLE 300
