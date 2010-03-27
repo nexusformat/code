@@ -136,6 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib $(LIB_HDF5) $(LIB_ZLIB) $(LIB_SZIP)"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

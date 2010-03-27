@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="nxbrowse"
-	ProjectGUID="{C6712742-F924-4CD0-B6AD-7E5EA41B5AF2}"
-	RootNamespace="nxbrowse"
+	Name="nxtranslate"
+	ProjectGUID="{24257BE2-5D00-47E6-9646-5DA534EA42DA}"
+	RootNamespace="nxtranslate"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\Windows_extra\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\Windows_extra\include;..\..\..\..\libxml2-2.7.6\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,9 +61,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib $(LIB_HDF5) $(LIB_ZLIB) $(LIB_SZIP)"
+				AdditionalDependencies="wsock32.lib ws2_32.lib $(LIB_HDF5) $(LIB_ZLIB) $(LIB_SZIP)  $(LIB_XML) "
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -117,8 +116,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\Windows_extra\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\Windows_extra\include;..\..\..\..\libxml2-2.7.6\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -136,7 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib $(LIB_HDF5) $(LIB_ZLIB) $(LIB_SZIP)"
+				AdditionalDependencies="wsock32.lib ws2_32.lib $(LIB_HDF5) $(LIB_ZLIB) $(LIB_SZIP)  $(LIB_XML) "
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -176,7 +175,47 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\applications\NXbrowse\NXbrowse.c"
+				RelativePath="..\..\..\applications\NXtranslate\attr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\dynamic_retriever.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\nexus_retriever.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\nexus_util.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\node.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\node_util.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\retriever.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\string_util.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\xml_parser.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\xml_util.cpp"
 				>
 			</File>
 		</Filter>
@@ -185,6 +224,58 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\attr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\dynamic_retriever.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\nexus_retriever.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\nexus_util.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\node.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\node_util.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\nxtranslate_debug.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\Ptr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\retriever.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\string_util.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\tree.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\xml_parser.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\applications\NXtranslate\xml_util.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
