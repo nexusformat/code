@@ -31,7 +31,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#if defined (HAVE_UNISTD_H)
 #include <unistd.h>
+#endif
+#if defined (WIN32)
+#include <io.h>
+#endif
+
 #include <vector>
 
 #include "napi.h"
@@ -59,11 +65,11 @@ using std::vector;
 #endif
 #if HAVE_MKSTEMP
 #else
-static int mkstemp(char* template)
+static int mkstemp(char* template_name)
 {
-    if (mktemp(template) != NULL)
+    if (mktemp(template_name) != NULL)
     {
-	return open(template, O_RDWR | O_CREAT, 0600);
+	return open(template_name, O_RDWR | O_CREAT, 0600);
     }
     else
     {
@@ -200,10 +206,10 @@ static int validate(const string& nxsfile, Definition &definition,
 	  << " for all NXentry" << endl;
    }
 
-   char outFile2[STR_BUFFER_SIZE], *strPtr;
+   char outFile2[STR_BUFFER_SIZE];
    string command;
    const char* cStrPtr;
-   int ret, opt, c, i, fd;
+   int ret, c, fd;
    FILE *fIn, *fOut2;
 
    string extra_xmllint_args;

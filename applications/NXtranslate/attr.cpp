@@ -18,9 +18,9 @@ Attr::Attr(const string name, const void* val,const int len, const int type): __
   int dims[1]={__length};
 
   // copy the value
-  NXmalloc(&__value,1,dims,__type);
+  NXmalloc(&_value,1,dims,__type);
   size_t size=nexus_util::calc_size(1,dims,__type);
-  memcpy(__value,val,size);
+  memcpy(_value,val,size);
 }
 
 Attr::Attr(const Attr& old): __name(old.__name), __length(old.__length), __type(old.__type){
@@ -28,20 +28,20 @@ Attr::Attr(const Attr& old): __name(old.__name), __length(old.__length), __type(
   int dims[1]={__length};
 
   // copy the value
-  NXmalloc(&__value,1,dims,__type);
+  NXmalloc(&_value,1,dims,__type);
   size_t size=nexus_util::calc_size(1,dims,__type);
-  memcpy(__value,old.__value,size);
+  memcpy(_value,old._value,size);
 }
 
 Attr::~Attr(){
-  if(NXfree(&__value)!=NX_OK)
+  if(NXfree(&_value)!=NX_OK)
     throw runtime_error("NXfree failed");
 }
 
 Attr& Attr::operator=(const Attr& old){
   if(this==&old) return *this;
 
-  if(NXfree(&__value)!=NX_OK)
+  if(NXfree(&_value)!=NX_OK)
     throw runtime_error("NXfree failed");
 
   // copy everything other than the value
@@ -53,9 +53,9 @@ Attr& Attr::operator=(const Attr& old){
   int dims[1]={__length};
 
   // copy the value
-  NXmalloc(&__value,1,dims,__type);
+  NXmalloc(&_value,1,dims,__type);
   size_t size=nexus_util::calc_size(1,dims,__type);
-  memcpy(__value,old.__value,size);
+  memcpy(_value,old._value,size);
 
   return *this;
 }
@@ -65,7 +65,7 @@ std::string Attr::name(){
 }
 
 void* Attr::value(){
-  return __value;
+  return _value;
 }
 
 int Attr::length(){

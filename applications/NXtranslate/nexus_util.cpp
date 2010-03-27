@@ -74,7 +74,7 @@ extern void nexus_util::open(NXhandle *handle, const Node &node){
       int rank=node.rank();
       if(rank<=0) return;
 
-      int dims[rank];
+      int dims[NX_MAXRANK];
       { // copy the dimensions from the node
         vector<int> vec_dim=node.dims();
         for( int i=0 ; i<rank ; i++ )

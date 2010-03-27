@@ -21,7 +21,7 @@ class Attr{
 
  private:
   std::string __name;
-  void *__value;
+  void *_value;
   int __length;
   int __type;
 };

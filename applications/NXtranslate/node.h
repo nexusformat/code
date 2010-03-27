@@ -55,7 +55,7 @@ class Node{
   bool __is_data;
   std::vector<int> __dims;
   std::vector<int> __comp_buffer_dims;
-  void *__value;
+  void *_value;
   std::vector<Attr> __attrs;
   NXcompress __comp_type;
   std::size_t* __ref_count;

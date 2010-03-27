@@ -232,7 +232,11 @@ inline void StdOutput::spacePrint( std::ostream& os,
 		while ( start < len )
 		{
 			// find the substring length
-			int stringLen = std::min( len - start, allowedLen );
+#if defined (_MSC_VER)             
+			int stringLen = (std::min)( len - start, allowedLen ); 
+#else
+            int stringLen = std::min( len - start, allowedLen );
+#endif
 
 			// trim the length so it doesn't end in middle of a word
 			if ( stringLen == allowedLen )

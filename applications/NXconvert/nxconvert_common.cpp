@@ -27,7 +27,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef _MSC_VER
+#include "getopt.h"
+#else
 #include <unistd.h>
+#endif
 #include "napi.h"
 #include "NeXusFile.hpp"
 #include "NeXusStream.hpp"
@@ -153,8 +157,8 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 /* Prints the contents of each group as XML tags and values */
 static int WriteGroup (int is_definition)
 { 
-   int i;
-   int status, dataType, dataRank, dataDimensions[NX_MAXRANK], dataLen;     
+  
+   int status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
    NXname name, nxclass;
    void *dataBuffer;
    NXlink link;

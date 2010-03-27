@@ -80,7 +80,7 @@ extern void update_node_from_string(Node &node, string &char_data,
   int rank=v_dims.size();
   if(type==NX_CHAR)
     rank=1;
-  int dims[rank];
+  int dims[NX_MAXRANK];
   if(type==NX_CHAR){
     dims[0]=char_data.size();
   }else{
@@ -155,7 +155,7 @@ extern Attr make_attr(const string &name, const string &value){
   }
   
   int rank=1;
-  int dims[rank];
+  int dims[NX_MAXRANK];
   if(int_type==Node::CHAR)
     dims[0]=my_val.size();
   else

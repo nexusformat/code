@@ -41,7 +41,7 @@ static string convert_type(int type){
 }
 
 // ==================== Node implementation
-Node::Node(const std::string &name, const std::string &type):__name(name),__type(type),__value(NULL),__comp_type(COMP_NONE),__ref_count(new size_t(1)){
+Node::Node(const std::string &name, const std::string &type):__name(name),__type(type),_value(NULL),__comp_type(COMP_NONE),__ref_count(new size_t(1)){
   // determine if this is data
   try{
     Node::NXtype int_type=Node::int_type(); // throws an exception if not data
@@ -51,7 +51,7 @@ Node::Node(const std::string &name, const std::string &type):__name(name),__type
   }
 }
 
-Node::Node(const Node &old): __name(old.__name), __type(old.__type), __is_data(old.__is_data), __dims(old.__dims), __value(old.__value), __attrs(old.__attrs), __comp_type(old.__comp_type), __ref_count(old.__ref_count){
+Node::Node(const Node &old): __name(old.__name), __type(old.__type), __is_data(old.__is_data), __dims(old.__dims), _value(old._value), __attrs(old.__attrs), __comp_type(old.__comp_type), __ref_count(old.__ref_count){
   (*__ref_count)++;
   //std::cout << "Node(" << __name << ")" << std::endl; // REMOVE
 }
@@ -65,8 +65,8 @@ Node& Node::operator=(const Node &old){
 
   // delete the old value (if necessary)
   (*__ref_count)--;
-  if( (__is_data) && (*__ref_count==0) && (__value!=NULL) )
-    NXfree(&__value);
+  if( (__is_data) && (*__ref_count==0) && (_value!=NULL) )
+    NXfree(&_value);
 
   // copy everything except the value
   __name=old.__name;
@@ -78,25 +78,25 @@ Node& Node::operator=(const Node &old){
   __attrs.insert(__attrs.begin(),old.__attrs.begin(),old.__attrs.end());
   __comp_type=old.__comp_type;
   __ref_count=new size_t(1);
-  __value=NULL;
+  _value=NULL;
 
 
   // copy the value
   if(__is_data){
     int rank=__dims.size();
-    int dims[rank];
+    int dims[NX_MAXRANK];
     for( int i=0 ; i<rank ; i++ )
       dims[i]=__dims[i];
     int type=this->int_type();
 
     // allocate space for the data
-    NXmalloc(&__value,rank,dims,type);
+    NXmalloc(&_value,rank,dims,type);
 
     // determine how much to copy
     size_t size=nexus_util::calc_size(rank,dims,type);
 
     // copy the array
-    memcpy(__value,old.__value,size);
+    memcpy(_value,old._value,size);
   }
 
   return *this;
@@ -106,10 +106,10 @@ Node::~Node(){
   //std::cout << "~Node(" << __name << "," << *__ref_count << ")" << std::endl; // REMOVE
   (*__ref_count)--;
   if(*__ref_count==0){
-    if(__value!=NULL){
-      if(NXfree(&__value)!=NX_OK)
+    if(_value!=NULL){
+      if(NXfree(&_value)!=NX_OK)
         throw runtime_error("NXfree failed in destructor");
-      __value=NULL;
+      _value=NULL;
     }
     delete __ref_count;
   }
@@ -172,7 +172,7 @@ const std::vector<int> Node::comp_buffer_dims() const{
 }
 
 void* Node::data() const{
-  return __value;
+  return _value;
 }
 
 void Node::copy_data(void *&data)const{
@@ -183,7 +183,7 @@ void Node::copy_data(void *&data)const{
   int int_rank=rank();
 
   // int array version of dimensions
-  int my_dims[int_rank];
+  int my_dims[NX_MAXRANK];
   for( int i=0 ; i<int_rank ; i++ )
     my_dims[i]=__dims[i];
 
@@ -195,7 +195,7 @@ void Node::copy_data(void *&data)const{
   size_t size=nexus_util::calc_size(int_rank,my_dims,type);
 
   // copy the array
-  memcpy(data,__value,size);
+  memcpy(data,_value,size);
 }
 
 const int Node::num_attr() const{
@@ -243,7 +243,7 @@ const void Node::set_name(const string &name){
 const void Node::set_data(void *&data,const int irank, const int* dims,const int type){
   // copy the dimensions
   __dims.clear();
-  int my_dims[irank];
+  int my_dims[NX_MAXRANK];
   for( int i=0 ; i<irank ; i++ ){
     __dims.push_back(dims[i]);
     my_dims[i]=dims[i];
@@ -254,13 +254,13 @@ const void Node::set_data(void *&data,const int irank, const int* dims,const int
   __type=convert_type(type);
 
   // allocate space for the data
-  NXmalloc(&__value,irank,my_dims,type);
+  NXmalloc(&_value,irank,my_dims,type);
 
   // determine how much to copy
   size_t size=nexus_util::calc_size(irank,my_dims,type);
 
   // copy the array
-  memcpy(__value,data,size);
+  memcpy(_value,data,size);
 
   // set that this is a data
   __is_data=true;
