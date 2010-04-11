@@ -696,6 +696,8 @@ dnl Checks for library functions.
 
 AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 
+AC_CHECK_FUNC([rl_completion_matches])
+
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])

@@ -53,6 +53,9 @@ static char* my_readline(const char* prompt)
 #if HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
+#ifndef HAVE_RL_COMPLETION_MATCHES
+#define rl_completion_matches(a,b) completion_matches(a,b)
+#endif /* ifndef HAVE_RL_COMPLETION_MATCHES */
 #else
 #define rl_completion_matches(a,b) NULL
 #define rl_outstream stdout
