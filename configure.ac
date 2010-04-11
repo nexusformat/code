@@ -30,12 +30,12 @@ dnl
 
 AC_PREREQ(2.61)
 AC_REVISION($Revision$)
-AC_INIT([NeXus Library], [4.2.0], [nexus-developers@nexusformat.org], [nexus])
+AC_INIT([NeXus Library], [4.2.1], [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
-# used by libtool - need to get if from 4.2.0 better
+# used by libtool - need to get if from 4.2.1 better
 NXLTVERSINFO="4:2:4"
 
 AC_CONFIG_AUX_DIR(config)
