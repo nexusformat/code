@@ -598,13 +598,13 @@ if test -d /usr/local/lib; then
     LDFLAGS="$LDFLAGS -L/usr/local/lib"
 fi
 # for Mac/fink when hdf and hdf5 are not taken from fink, but jpeg is
-if test -d /sw/lib; then
-    LDFLAGS="$LDFLAGS -L/sw/lib"
-fi
+#if test -d /sw/lib; then
+#    LDFLAGS="$LDFLAGS -L/sw/lib"
+#fi
 # for Mac/Macports when you are not using fink at all.
-if test -d /opt/local/lib; then
-    LDFLAGS="$LDFLAGS -L/opt/local/lib"
-fi
+#if test -d /opt/local/lib; then
+#    LDFLAGS="$LDFLAGS -L/opt/local/lib"
+#fi
 
 # remove initial :
 if test ! -z "$EXTRA_LD_LIBRARY_PATH"; then
@@ -661,9 +661,12 @@ AC_TYPE_INT64_T
 AC_TYPE_UINT64_T
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
-AC_CHECK_SIZEOF([int])
-AC_CHECK_SIZEOF([long int])
-AC_CHECK_SIZEOF([long long int])
+dnl these are not compatible with cross architecture compiling
+if test x$cross_compiling != xyes; then
+    AC_CHECK_SIZEOF([int])
+    AC_CHECK_SIZEOF([long int])
+    AC_CHECK_SIZEOF([long long int])
+fi
 AC_STRUCT_TM
 
 AC_SYS_LARGEFILE
