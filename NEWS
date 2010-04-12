@@ -1,9 +1,20 @@
-Version 4.2.0
-=============
 
 For the latest information see 
 
     http://www.nexusformat.org/Nexus_42_Release_Notes
+
+Version 4.2.1
+=============
+
+The following new featues have been added: 
+
+* NXbrowse now has readline support (i.e. previous command line recall and 
+  TAB completion of entry names) 
+* new API functions NXgetpath() and NXgetversion() added 
+* NXgetnextentry() now uses less stack space 
+
+Version 4.2.0
+=============
 
 ==System Requirements==
 '''MXML XML Parsing Library'''
