@@ -13,3 +13,4 @@ BackgroundAlignment="bottomleft"
 nx_version=@PACKAGE_VERSION@
 RELEASE=.${nx_version#*.*.}
 VERSION=${nx_version%.*}
+AllowBackRev="true"

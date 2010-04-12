@@ -10,13 +10,14 @@ test -d package_root && sudo rm -fr package_root
 cd ..
 echo "Building NeXus"
 make distclean # needed as we disable dependency tracking
-arch_flags="-arch i386 -arch ppc"
+arch_flags="-arch i386 -arch ppc -arch x86_64 -arch ppc64"
 export MACOSX_DEPLOYMENT_TARGET=10.4
 env CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk $arch_flags" \
     CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk $arch_flags" \
     LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk $arch_flags" \
     ./configure --with-hdf4=/usr/local/hdf4.2r4 \
     --with-hdf5=/usr/local/hdf5-1.8.2 --with-python \
+    --with-java-home=/usr --without-opengenie \
     --disable-dependency-tracking
 make
 make install DESTDIR=`pwd`/macosx_install_kit/package_root
