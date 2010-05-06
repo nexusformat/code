@@ -36,7 +36,7 @@
  * \ingroup c_main
  * \defgroup c_readwrite Reading and Writing Data
  * \ingroup c_main
- * \defgroup c_navigate General File navigation
+ * \defgroup c_navigation General File navigation
  * \ingroup c_main
  * \defgroup c_metadata Meta data routines
  * \ingroup c_main
