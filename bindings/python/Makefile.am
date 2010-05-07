@@ -37,7 +37,7 @@ nxspython_PYTHON = nxs/__init__.py nxs/napi.py
 EXTRA_DIST	= README.html nxs.napi.html nxstest.py run_nxstest setup.py
 
 nxs.napi.html : $(srcdir)/nxs/napi.py
-	pydoc -w $(srcdir)/nxs/napi.py
+	env NEXUSLIB=../../src/.libs/libNeXus.so pydoc -w $(srcdir)/nxs/napi.py
 	mv napi.html $@
 
 install-data-hook :
