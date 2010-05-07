@@ -29,12 +29,16 @@
 #====================================================================
 
 pydocdir 	= $(NXDOCDIR)/python
-pydoc_DATA	= README.html
+pydoc_DATA	= README.html nxs.napi.html
 #nxspythondir	= $(pkgpythondir)/nxs
 nxspythondir	= $(pythondir)/nxs
 #pkgpython_PYTHON = nxstest.py
 nxspython_PYTHON = nxs/__init__.py nxs/napi.py
-EXTRA_DIST	= README.html nxstest.py run_nxstest setup.py
+EXTRA_DIST	= README.html nxs.napi.html nxstest.py run_nxstest setup.py
+
+nxs.napi.html : $(srcdir)/nxs/napi.py
+	pydoc -w $(srcdir)/nxs/napi.py
+	mv napi.html $@
 
 install-data-hook :
 	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs/napi.py > $(DESTDIR)${nxspythondir}/napi.py
@@ -45,5 +49,6 @@ install-data-hook :
 	fi
 
 # python setup.py install --root=$(DESTDIR)
+CLEANFILES=nxs.napi.html
 
 include $(top_srcdir)/build_rules.am

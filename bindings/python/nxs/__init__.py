@@ -1,5 +1,5 @@
 # This program is public domain
-"""
+"""@package nxs
 Python NeXus interface.
 
 NeXus_ is a common data format for neutron, Xray and muon science.
@@ -13,5 +13,8 @@ underlying HDF_ files.  Binary packages are available for some
 platforms from the NeXus site.  Details of where the nxs package
 searches for the libraries are recorded in `nxs.napi`.
 """
+
+## @mainpage NeXus Python Documentation
+## See nxs.napi on the Packages tab
 
 from nxs.napi import *

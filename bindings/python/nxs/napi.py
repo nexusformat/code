@@ -1,7 +1,7 @@
 # This program is public domain 
 # Author: Paul Kienzle
 
-"""
+"""@package nxs.napi
 Wrapper for the NeXus shared library.
 
 Use this interface when converting code from other languages which
