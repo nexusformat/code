@@ -161,6 +161,12 @@ namespace NeXus {
     /** Flush the file. */
     void flush();
 
+    template<typename NumT>
+    void malloc(NumT*& data, const Info& info);
+
+    template<typename NumT>
+    void free(NumT*& data);
+
     /**
      * Create a new group.
      *

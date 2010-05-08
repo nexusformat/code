@@ -117,7 +117,7 @@ static int check_double_too_big[8 - sizeof(double) + ARRAY_OFFSET]; // error if 
 static int check_double_too_small[sizeof(double) - 8 + ARRAY_OFFSET]; // error if double < 8 bytes
 static int check_char_too_big[1 - sizeof(char) + ARRAY_OFFSET]; // error if char > 1 byte
 
-static void inner_malloc(void* & data, std::vector<int>& dims, NXnumtype type) {
+static void inner_malloc(void* & data, const std::vector<int>& dims, NXnumtype type) {
   int rank = dims.size();
   int c_dims[NX_MAXRANK];
   for (int i = 0; i < rank; i++) {
@@ -962,6 +962,23 @@ void File::linkExternal(const string& name, const string& type,
     throw Exception(msg.str(), status);
   }
 }
+
+template<typename NumT>
+void File::malloc(NumT*& data, const Info& info)
+{
+    if (getType<NumT>() != info.type)
+    {
+        throw Exception("Type mismatch in malloc()");
+    }
+    inner_malloc((void*&)data, info.dims, info.type);
+}
+
+template<typename NumT>
+void File::free(NumT*& data)
+{
+    inner_free((void*&)data);
+}
+
 }
 
 /* ---------------------------------------------------------------- */
@@ -1192,3 +1209,17 @@ template
 NXDLL_EXPORT void File::getAttr(const std::string& name, double& value);
 template 
 NXDLL_EXPORT void File::getAttr(const std::string& name, int& value);
+
+template
+NXDLL_EXPORT void File::malloc(int*& data, const Info& info);
+template
+NXDLL_EXPORT void File::malloc(float*& data, const Info& info);
+template
+NXDLL_EXPORT void File::malloc(double*& data, const Info& info);
+
+template
+NXDLL_EXPORT void File::free(int*& data);
+template
+NXDLL_EXPORT void File::free(float*& data);
+template
+NXDLL_EXPORT void File::free(double*& data);
