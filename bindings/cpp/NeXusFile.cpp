@@ -13,6 +13,22 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
+/**
+ * \mainpage NeXus C++ API documentation
+ * \section sec_purpose Purpose of API
+ *  This provides a C++ like interface to the NeXus C API. It adds:
+ * - Exceptions
+ * - suport for std::vector<type> and std::string
+ *
+ * \section sec_core Core C++ API
+ * The core API provides the basic routines for reading, writing and navigating NeXus files. See the \b Modules tab.
+ *
+ * C++ programs that call the above routines should include the following header file: 
+ * \code
+ * #include "NeXusFile.hpp"
+ * \endcode
+ */
+
 static const string NULL_STR = "NULL";
 
 template <typename NumT>
