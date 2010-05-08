@@ -19,6 +19,8 @@ using std::vector;
  *  This provides a C++ like interface to the NeXus C API. It adds:
  * - Exceptions
  * - suport for std::vector<type> and std::string
+ * - can directly obtain a container of entry/attribute details rather than needing to iterate via getNext calls. 
+ *
  *
  * \section sec_core Core C++ API
  * The core API provides the basic routines for reading, writing and navigating NeXus files. See the \b Modules tab.
@@ -27,6 +29,7 @@ using std::vector;
  * \code
  * #include "NeXusFile.hpp"
  * \endcode
+ * For details of the C API see http://download.nexusformat.org/doxygen/html-c/
  */
 
 static const string NULL_STR = "NULL";

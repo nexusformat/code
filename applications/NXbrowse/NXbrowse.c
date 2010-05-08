@@ -100,11 +100,13 @@ COMMAND commands[] = {
     { "cd", "Move into to a group" },
     { "close", "Move out of a group" },
     { "dir", "" },
+    { "ls", "" },
     { "read", "" },
     { "open", "" },
     { "help", "" },
     { "info", "" },
     { "exit", "" },
+    { "quit", "" },
     { "dump", "" },
     { "bytesaschar", "" },
     { NULL, NULL }
@@ -372,7 +374,9 @@ int main(int argc, char *argv[])
       /* Command is to print help information */
       if (StrEq(command, "HELP") || StrEq(command, "INFO")) {
          printf ("NXbrowse commands : DIR\n");
+         printf ("                    LS\n");
          printf ("                    OPEN <groupName>\n");
+         printf ("                    CD <groupName>\n");
          printf ("                    READ <dataName>\n");
          printf ("                    READ <dataName>[<dimension indices...>]\n");
          printf ("                    DUMP <dataName> <fileName> \n");
@@ -380,6 +384,12 @@ int main(int argc, char *argv[])
          printf ("                    BYTEASCHAR\n");
          printf ("                    HELP\n");
          printf ("                    EXIT\n");
+         printf ("\n");
+         printf ("If readline support is enabled, pressing <TAB> after a command \n");
+	 printf ("or partial nexus object name will list/complete possible names\n");
+         printf ("\n");
+	 printf ("    cd ent<TAB KEY PRESSED>     # all items starting with ent are listed\n");
+         printf ("\n");
       }
       /* Command is to print byte as char information */
       if (StrEq(command, "BYTEASCHAR")) {

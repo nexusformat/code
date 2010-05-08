@@ -38,7 +38,7 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 /**
  * \mainpage NeXus API documentation
  * \section sec_purpose Purpose of API
- * The NeXus Application Program Interface is a suite of subroutines, written in C but with wrappers in Fortran 77 and 90. 
+ * The NeXus Application Program Interface is a suite of subroutines, written in C but with wrappers in C++, JAVA, PYTHON, Fortran 77 and 90. 
  *  The subroutines call HDF routines to read and write the NeXus files with the correct structure. 
  * An API serves a number of useful purposes: 
  * - It simplifies the reading and writing of NeXus files. 
@@ -63,6 +63,7 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
  * \code
  * #include "napi.h"
  * \endcode
+ * For the C++ API see http://download.nexusformat.org/doxygen/html-cpp
  */
 
 
