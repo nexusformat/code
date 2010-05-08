@@ -306,7 +306,7 @@ namespace NeXus {
                        const std::vector<int> & bufsize);
 
     /**
-     * \param The name of the data to open.
+     * \param name The name of the data to open.
      */
     void openData(const std::string& name);
 
@@ -338,7 +338,7 @@ namespace NeXus {
      * Put the supplied data as an attribute into the currently open data.
      *
      * \param name Name of the attribute to add.
-     * \param data The attribute value.
+     * \param value The attribute value.
      */
     template <typename NumT>
     void putAttr(const std::string& name, const NumT value);
@@ -347,7 +347,7 @@ namespace NeXus {
      * Put a string as an attribute in the file.
      *
      * \param name Name of the attribute to add.
-     * \param data The attribute value.
+     * \param value The attribute value.
      */
     void putAttr(const char* name, const char* value);
 
@@ -355,7 +355,7 @@ namespace NeXus {
      * Put a string as an attribute in the file.
      *
      * \param name Name of the attribute to add.
-     * \param data The attribute value.
+     * \param value The attribute value.
      */
     void putAttr(const std::string& name, const std::string value);
 
@@ -534,7 +534,7 @@ namespace NeXus {
     /**
      * Diagnostic print of the link information.
      *
-     * \param The link to print to stdout.
+     * \param link The link to print to stdout.
      */
     void printLink(NXlink & link);
 
@@ -550,7 +550,7 @@ namespace NeXus {
     /**
      * Find out the name of the file this object is holding onto.
      *
-     * \param The size of the buffer to use for reading the name.
+     * \param buff_length The size of the buffer to use for reading the name.
      *
      * \return The name of the file.
      */
