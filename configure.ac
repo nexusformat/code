@@ -131,6 +131,16 @@ else
 	WITH_F90=no
 fi
 
+AC_ARG_WITH([matlabroot], AC_HELP_STRING([--with-matlabroot=path to matlab install dir], [Specify location of matlab installation directory]),
+        [], [with_matlabroot=no])
+if test x"$with_matlabroot" != x"no" ; then
+    MATLABROOT="$with_matlabroot"
+fi
+AC_PATH_PROG(MATLAB,matlab,[],[$MATLABROOT/bin:/usr/local/matlab/bin:/opt/matlab/bin:$PATH])
+if test x"$MATLABROOT" = x -a x"$MATLAB" != x; then
+    MATLABROOT=`dirname $MATLAB`/..
+fi
+
 java_host="linux"
 JAVAROOT=""
 AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK i.e. where the bin, lib and include directories live]),
@@ -718,6 +728,7 @@ AM_CONDITIONAL(HAVE_MZSCHEME, [test ! -z "$INSTALL_NXPYTHON"])
 AM_CONDITIONAL(MINGW_MSYS, [test x$MINGW_MSYS = xyes])
 AM_CONDITIONAL(HAVE_OPENGENIE, [test ! -z "$OPENGENIEROOT"])
 AM_CONDITIONAL(HAVE_DOXYGEN, [test ! -z "$DOXYGEN"])
+AM_CONDITIONAL(HAVE_MATLAB, [test ! -z "$MATLAB"])
 AM_CONDITIONAL(HAVE_PDFLATEX, [test ! -z "$PDFLATEX"])
 AM_CONDITIONAL(HAVE_DOT, [test ! -z "$DOT"])
 
@@ -727,6 +738,31 @@ AM_CONDITIONAL(HAVE_XMLLINT, [test ! -z "$XMLLINT"])
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
+
+if test X$MATLAB != X; then
+    for i in glnxa64 glnxi64 glnx86 maci maci64; do
+        if test -r "$MATLABROOT/bin/$i"; then
+                MATLAB_ARCH="$i"
+        fi
+    done
+    case $MATLAB_ARCH in
+        glnx86)
+            MATLAB_MEXSUFFIX=mexglx
+            ;;
+        glnxa64)
+            MATLAB_MEXSUFFIX=mexa64
+            ;;
+        glnxi64)
+            MATLAB_MEXSUFFIX=mexi64
+            ;;
+        maci)
+            MATLAB_MEXSUFFIX=mexmaci
+            ;;
+    esac
+    AC_SUBST(MATLAB_MEXSUFFIX)
+    AC_SUBST(MATLAB_ARCH)
+    AC_SUBST(MATLABROOT)
+fi
 
 LINUX_DISTRIBUTION
 
@@ -782,6 +818,7 @@ AC_CONFIG_FILES([Makefile
 		macosx_install_kit/Makefile
 		macosx_install_kit/pkg.config
 		scripts/Makefile
+		scripts/nexus-config
 		scripts/nexus.pc:scripts/nexus_pc.in
 		scripts/nxbuild])
 dnl src/nxdict/Makefile
@@ -817,6 +854,8 @@ F90BINDING=`if test -n "$FC" ; then echo yes ; else echo no ; fi`
 JAVABINDING=`if test -n "$JAVAROOT" ; then echo yes ; else echo no ; fi` 
 IDLBINDING=`if test -n "$IDLROOT" ; then echo yes ; else echo no ; fi` 
 PYTHONBINDING=`if test -n "$HAVE_PYTHON_FALSE" ; then echo yes; else echo no ; fi` 
+MATLABBINDING=`if test -n "$MATLAB" ; then echo "yes (matlabroot=$MATLABROOT)"; else echo no ; fi`
+
 if test -n "$SWIG" ; then 
     SWIGBINDING="yes ("
     test -n "$TCLROOT" && SWIGBINDING="$SWIGBINDING tcl"
@@ -851,6 +890,7 @@ build:
                 JAVA:          ${JAVABINDING} (--with-java-home=${JAVAROOT}, JAVA=${JAVA}, JAVAC=${JAVAC}, JAVAH=${JAVAH})
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
+		 MATLAB:	       ${MATLABBINDING} (--with-matlabroot=${MATLABROOT})
 	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
 
 	documentation:
