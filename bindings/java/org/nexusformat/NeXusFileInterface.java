@@ -177,7 +177,7 @@ public interface NeXusFileInterface {
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
-    public void getdata(Object arrary)throws 
+    public void getdata(Object array)throws 
                           NexusException;
     /**
       * getslab reads a subset of a large dataset into array.
@@ -334,7 +334,7 @@ public interface NeXusFileInterface {
     /** 
      * linkexternal links group name, nxclass to the URL nxurl
      * @param name The name of the vgroup to link to
-     * @apram nxcall The class name of the linked vgroup
+     * @param nxclass The class name of the linked vgroup
      * @param nxurl The URL to the linked external file
      * @throws NexusException if things are wrong
      */

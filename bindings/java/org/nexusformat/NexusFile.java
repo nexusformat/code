@@ -116,7 +116,7 @@ public class  NexusFile implements NeXusFileInterface {
     /**
       * constructs a new NexusFile Object.
       * @param filename The name of the NeXus file to access.
-      * @param access. The access mode for the file. Can only be one
+      * @param access The access mode for the file. Can only be one
       * of the predefined NeXus access code NXACC.... These are:
       * <dl>
       * <dt>NXACC_CREATE
@@ -126,7 +126,6 @@ public class  NexusFile implements NeXusFileInterface {
       * data.
       * <DT>NXACC_READ
       * <DD>For opening a file for reading.
-      * </dl>
       * <DT>NXACC_NOSTRIP
       * <DD>To keep leading and trailing whitespace on strings
       * </dl>
@@ -777,7 +776,7 @@ public class  NexusFile implements NeXusFileInterface {
     /** 
      * linkexternal links group name, nxclass to the URL nxurl
      * @param name The name of the vgroup to link to
-     * @apram nxcall The class name of the linked vgroup
+     * @param nxclass The class name of the linked vgroup
      * @param nxurl The URL to the linked external file
      * @throws NexusException if things are wrong
      */
