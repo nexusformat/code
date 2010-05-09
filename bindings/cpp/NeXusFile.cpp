@@ -14,7 +14,9 @@ using std::stringstream;
 using std::vector;
 
 /**
- * \mainpage NeXus C++ API documentation
+ * \mainpage NeXus C++ API
+ * @author Peter Peterson
+ * @author Freddie Akeroyd
  * \section sec_purpose Purpose of API
  *  This provides a C++ like interface to the NeXus C API. It adds:
  * - Exceptions
@@ -29,6 +31,10 @@ using std::vector;
  * \code
  * #include "NeXusFile.hpp"
  * \endcode
+ *
+ * \example napi_test_cpp.cxx
+ * Test program for NeXus C++ Interface
+ *
  * For details of the C API see http://download.nexusformat.org/doxygen/html-c/
  */
 

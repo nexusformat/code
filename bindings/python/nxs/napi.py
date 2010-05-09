@@ -13,21 +13,22 @@ Library Location
 This wrapper needs the location of the libNeXus precompiled binary. It
 looks in the following places in order::
 
-    os.environ['NEXUSLIB']                  - All
-    directory containing nxs.py             - All
-    os.environ['NEXUSDIR']\bin              - Windows
-    os.environ['LD_LIBRARY_PATH']           - Unix
-    os.environ['DYLD_LIBRARY_PATH']         - Darwin
-    PREFIX/lib                              - Unix and Darwin
-    /usr/local/lib                          - Unix and Darwin
-    /usr/lib                                - Unix and Darwin
+@verbatim
+   os.environ['NEXUSLIB']                  - All
+   directory containing nxs.py             - All
+   os.environ['NEXUSDIR']\bin              - Windows
+   os.environ['LD_LIBRARY_PATH']           - Unix
+   os.environ['DYLD_LIBRARY_PATH']         - Darwin
+   PREFIX/lib                              - Unix and Darwin
+   /usr/local/lib                          - Unix and Darwin
+   /usr/lib                                - Unix and Darwin
+@endverbatim
 
-On Windows it looks for one of libNeXus.dll or libNeXus-0.dll.
-On OS X it looks for libNeXus.dylib
-On Unix it looks for libNeXus.so
-NEXUSDIR defaults to r'C:\Program Files\NeXus Data Format'.
-PREFIX defaults to /usr/local, but is replaced by the value of
---prefix during configure.
+- On Windows it looks for one of libNeXus.dll or libNeXus-0.dll.
+- On OS X it looks for libNeXus.dylib
+- On Unix it looks for libNeXus.so
+- NEXUSDIR defaults to 'C:\\Program Files\\NeXus Data Format'.
+- PREFIX defaults to /usr/local, but is replaced by the value of --prefix during configure.
 
 The import will raise an OSError exception if the library wasn't found
 or couldn't be loaded.  Note that on Windows in particular this may be
@@ -39,15 +40,16 @@ first import of nxs.
 
 Example
 =======
-
+@code
   import nxs
   file = nxs.open('filename.nxs','rw')
   file.opengroup('entry1')
   file.opendata('definition')
   print file.getdata()
   file.close()
+@endcode
 
-  See nxstest.py for a more complete example.
+  See @example nxstest.py for a more complete example.
 
 Interface
 =========
@@ -70,17 +72,19 @@ This wrapper differs from NAPI in several respects::
 
 File open modes can be constants or strings::
 
-  nxs.ACC_READ      'r'
-  nxs.ACC_RDWR      'rw'
-  nxs.ACC_CREATE    'w'
-  nxs.ACC_CREATE4   'w4'
-  nxs.ACC_CREATE5   'w5'
-  nxs.ACC_CREATEXML 'wx'
+@verbatim
+ nxs.ACC_READ      'r'
+ nxs.ACC_RDWR      'rw'
+ nxs.ACC_CREATE    'w'
+ nxs.ACC_CREATE4   'w4'
+ nxs.ACC_CREATE5   'w5'
+ nxs.ACC_CREATEXML 'wx'
+@endverbatim
 
 Dimension constants::
 
-  nxs.UNLIMITED  - for the extensible data dimension
-  nxs.MAXRANK    - for the number of possible dimensions
+  - nxs.UNLIMITED  - for the extensible data dimension
+  - nxs.MAXRANK    - for the number of possible dimensions
 
 Data types are strings corresponding to the numpy data types::
 
@@ -103,24 +107,24 @@ Compression codes are::
 
 Miscellaneous constants::
 
-  nxs.MAXNAMELEN  - names must be shorter than this
-  nxs.MAXPATHLEN  - total path length must be shorter than this
-  nxs.H4SKIP - class names that may appear in HDF4 files but can be ignored
+  - nxs.MAXNAMELEN  - names must be shorter than this
+  - nxs.MAXPATHLEN  - total path length must be shorter than this
+  - nxs.H4SKIP - class names that may appear in HDF4 files but can be ignored
 
 Caveats
 =======
 
-TODO: NOSTRIP constant is probably not handled properly,
-TODO: Embedded nulls in strings is not supported
+@todo NOSTRIP constant is probably not handled properly,
+@todo Embedded nulls in strings is not supported
 
-WARNING:  We have a memory leak.  Calling open/close costs about 90k a pair.
+@warning  We have a memory leak.  Calling open/close costs about 90k a pair.
 This is an eigenbug:
-   - if I test ctypes on a simple library it does not leak
-   - if I use the leak_test1 code in the nexus distribution it doesn't leak
-   - if I remove the open/close call in the wrapper it doesn't leak.
+ - if I test ctypes on a simple library it does not leak
+ - if I use the leak_test1 code in the nexus distribution it doesn't leak
+ - if I remove the open/close call in the wrapper it doesn't leak.
 
-.. _NAPI:  http://www.nexusformat.org/Application_Program_Interface
 """
+
 __all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','H4SKIP',
            'NeXus','NeXusError','open']
 

@@ -6,7 +6,7 @@
 
 # documenttion subdirectories
 nxdoxydir	= $(NXDOCDIR)/doxygen
-CLEANFILES =  doxy.remove_me_to_remake
+CLEANFILES =  doxy.remove_me_to_remake c-api.tag
 
 all : doxy.remove_me_to_remake
 

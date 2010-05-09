@@ -256,6 +256,7 @@ namespace NeXus {
     /**
      * Create a 1D data field, insert the data, and close the data.
      *
+     * \tparam NumT numeric data type of \a value
      * \param name The name of the field to create.
      * \param value The vector to put into the file.
      */
@@ -265,6 +266,7 @@ namespace NeXus {
     /**
      * Create a 1D data field, insert the data, and close the data.
      *
+     * \tparam NumT numeric data type of \a value
      * \param name The name of the field to create.
      * \param value The value to put into the file.
      */
@@ -277,6 +279,7 @@ namespace NeXus {
      * \param name The name of the field to create.
      * \param value The data to put into the file.
      * \param dims The dimensions of the data.
+     * \tparam NumT numeric data type of \a value
      */
     template <typename NumT>
     void writeData(const std::string& name, const std::vector<NumT>& value,
@@ -304,6 +307,7 @@ namespace NeXus {
      * \param dims The dimensions of the data.
      * \param comp The compression algorithm to use.
      * \param bufsize The size of the compression buffer to use.
+     * \tparam NumT numeric data type of \a value
      */
     template <typename NumT>
     void writeCompData(const std::string & name,
@@ -328,6 +332,7 @@ namespace NeXus {
 
     /**
      * \param data The data to put in the file.
+     * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
     void putData(const std::vector<NumT>& data);
@@ -345,6 +350,7 @@ namespace NeXus {
      *
      * \param name Name of the attribute to add.
      * \param value The attribute value.
+     * \tparam NumT numeric data type of \a value
      */
     template <typename NumT>
     void putAttr(const std::string& name, const NumT value);
@@ -381,6 +387,7 @@ namespace NeXus {
      * \param data The array to put in the file.
      * \param start The starting index to insert the data.
      * \param size The size of the array to put in the file.
+     * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
     void putSlab(std::vector<NumT>& data, std::vector<int>& start,
@@ -392,6 +399,7 @@ namespace NeXus {
      * \param data The array to put in the file.
      * \param start The starting index to insert the data.
      * \param size The size of the array to put in the file.
+     * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
     void putSlab(std::vector<NumT>& data, int start, int size);
@@ -433,6 +441,7 @@ namespace NeXus {
      * Allocate memory and return the data as a vector. Since this
      * does call "new vector<NumT>" the caller is responsible for
      * calling "delete".
+     * \tparam NumT numeric data type of result
      *
      * \return The data as a vector.
      */
@@ -445,6 +454,7 @@ namespace NeXus {
      * the appropriate value.
      *
      * \param data Where to put the data.
+     * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
     void getData(std::vector<NumT>& data);
@@ -495,6 +505,7 @@ namespace NeXus {
      * Get the value of an attribute that is a scalar number.
      *
      * \param info Designation of which attribute to read.
+     * \tparam NumT numeric data type of result
      *
      * \return The attribute value.
      */
@@ -506,8 +517,8 @@ namespace NeXus {
      * Get the value of an attribute that is a scalar number.
      *
      * \param[in] name Name of attribute to read
-     *
      * \param[out] value The read attribute value.
+     * \tparam NumT numeric data type of \a value
      */
     template <typename NumT>
         void getAttr(const std::string& name, NumT& value);
@@ -593,6 +604,7 @@ namespace NeXus {
 
   /**
    * This function returns the NXnumtype given a concrete number.
+   * \tparam NumT numeric data type of \a number to check
    */
    template <typename NumT>
      NXDLL_EXPORT NXnumtype getType(NumT number = NumT());

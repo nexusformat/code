@@ -1,6 +1,7 @@
 /**
   *
-  * The NeXus-API for Java. NeXus is an attempt to define a common data 
+  * @mainpage The NeXus-API for Java. 
+  * NeXus is an attempt to define a common data 
   * format for org and x-ray diffraction. NeXus is built on top of the
   * Hierarchical Data Format from NCSA. There exist already API's to
   * NeXus files for F77, F90, C and C++. This is an implementation of
@@ -9,6 +10,8 @@
   * Some changes to the API have been necessary however, due to the 
   * different calling standards between C and Java. 
   *
+  * @example TestJapi.java
+  * Test program for Java API
   *
   * @author Mark Koennecke, October 2000
   *

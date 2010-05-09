@@ -118,18 +118,28 @@ typedef struct {
 #define NX_MAXNAMELEN 64
 
 
-/** \var NeXus data types
+/**
  * \ingroup c_types
- * \li NX_FLOAT32     32 bit float
- * \li NX_FLOAT64     64 nit float == double
- * \li NX_INT8        8 bit integer == byte
- * \li NX_UINT8       8 bit unsigned integer
- * \li NX_INT16       16 bit integer
- * \li NX_UINT16      16 bit unsigned integer
- * \li NX_INT32       32 bit integer
- * \li NX_UINT32      32 bit unsigned integer
- * \li NX_CHAR        8 bit character
- * \li NX_BINARY      lump of binary data == NX_UINT8
+ * \def NX_FLOAT32     
+ * 32 bit float
+ * \def NX_FLOAT64     
+ * 64 bit float == double
+ * \def NX_INT8        
+ * 8 bit integer == byte
+ * \def NX_UINT8       
+ * 8 bit unsigned integer
+ * \def NX_INT16       
+ * 16 bit integer
+ * \def NX_UINT16      
+ * 16 bit unsigned integer
+ * \def NX_INT32       
+ * 32 bit integer
+ * \def NX_UINT32      
+ * 32 bit unsigned integer
+ * \def NX_CHAR        
+ * 8 bit character
+ * \def NX_BINARY      
+ * lump of binary data == NX_UINT8
 */
 /*--------------------------------------------------------------------------*/ 
 
