@@ -32,4 +32,4 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 
-env PKG_CONFIG_PATH=${libdir}/pkgconfig `pkg-config $* nexus`
+env PKG_CONFIG_PATH=${libdir}/pkgconfig pkg-config $* nexus
