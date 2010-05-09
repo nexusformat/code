@@ -831,7 +831,7 @@ int String::ExtractTokenRight(char cLeft, char cRight, String *pstrToken)
 //---------------------------------------------------------------------------
 // String::RemoveEnclosure
 //---------------------------------------------------------------------------
-bool String::RemoveEnclosure(psz pszLeft, psz pszRight)
+bool String::RemoveEnclosure(pcsz pszLeft, pcsz pszRight)
 {
   // pcszLeft & pcszRight must have the same length
   if( strlen(pszLeft) != strlen(pszRight) )

@@ -236,7 +236,7 @@ public:
   /// @param pcszLeft list of possible left enclosure chars
   /// @param pcszRight list of possible right enclosure chars
   /// @return true if enclosure was removed
-  bool RemoveEnclosure(psz pszLeft, psz pszRight);
+  bool RemoveEnclosure(pcsz pszLeft, pcsz pszRight);
   bool RemoveEnclosure(char cLeft, char cRight);
 
   /// Match string with mask containing '*' and '?' jokers

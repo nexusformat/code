@@ -15,6 +15,9 @@
 //
 //*****************************************************************************
 
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 #include "base.h"
 #include "file.h"
 #include "membuf.h"

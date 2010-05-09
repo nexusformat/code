@@ -517,7 +517,7 @@ void FileName::MkDir(mode_t mode, uid_t uid, gid_t gid) const
   if( str.empty() )
     return;
 
-  char   *p;
+  const char   *p;
 #ifdef __WIN32__
   // Skeep UNC starting if it exists
   if( str[0u] == SEP_PATH && str[1u] == SEP_PATH )
@@ -574,7 +574,7 @@ void FileName::MkDir(mode_t mode, uid_t uid, gid_t gid) const
 
   do
   {
-    *p = 0;
+    str[p - PSZ(str)] = '\0';  // *p = 0;
     struct stat st;
     if( ::stat(PSZ(str), &st) )
     {
@@ -633,7 +633,7 @@ void FileName::MkDir(mode_t mode, uid_t uid, gid_t gid) const
       // Directory : ok
     }
     // Next path component
-    *p = SEP_PATH;
+    str[p - PSZ(str)] = SEP_PATH;   // *p = SEP_PATH;
     p = strchr(p+1, SEP_PATH);
   } while( p );
 }

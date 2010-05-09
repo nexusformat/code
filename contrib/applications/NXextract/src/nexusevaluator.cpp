@@ -22,10 +22,12 @@
 #include "membuf.h"
 #include "variant.h"
 
+#include <sstream>
+#include <cstdlib>
+#include <cstring>
 #include "nexusevaluator.h"
 #include "extractor.h"
 #include "templateparsor.h"
-#include <sstream>
 
 // special attributes
 const char SIZE_ATTR[] = "_size_";

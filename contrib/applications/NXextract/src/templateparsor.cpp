@@ -25,6 +25,8 @@
 #include <fstream>
 #include <sstream>  
 #include <vector>
+#include <cstring>
+#include <cstdlib>
 
 #include "nexusevaluator.h"
 #include "extractor.h"

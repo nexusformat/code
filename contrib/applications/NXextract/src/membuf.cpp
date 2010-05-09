@@ -642,7 +642,7 @@ CMemBuf& CMemBuf::operator<<(const CMemBuf& membuf)
 //---------------------------------------------------------------------------
 String CMemBuf::HexString() const
 {
-  static char *pszHexa = "0123456789ABCDEF";
+  static const char *pszHexa = "0123456789ABCDEF";
   ostringstream oss;
   String str;
   str.reserve(2 * m_uiLen);
