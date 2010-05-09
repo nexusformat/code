@@ -64,6 +64,7 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
  * #include "napi.h"
  * \endcode
  * For the C++ API see http://download.nexusformat.org/doxygen/html-cpp
+ * \sa napi_test.c
  */
 
 /**
