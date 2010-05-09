@@ -76,8 +76,6 @@ CLEANFILES	= $(jnexus_jar_CLASS) $(jnexus_jar_ARCHIVE) $(BUILT_SOURCES) \
 	libjnexus.def libjnexus.dll.lib libjnexus.dll.exp jnexus.dll \
                ncsa/hdf/hdflib/ArrayDescriptor.class
 
-clean-local:
-		rm -rf apidoc
 
 noinst_JAVA	= ncsa/hdf/hdflib/HDFArray.java \
 		ncsa/hdf/hdflib/HDFConstants.java \
@@ -92,7 +90,7 @@ noinst_JAVA	= ncsa/hdf/hdflib/HDFArray.java \
 		org/nexusformat/NexusFile.java \
 		test/TestJapi.java
 
-EXTRA_DIST	= $(noinst_JAVA) README.JNEXUS COPYING.NCSA 
+EXTRA_DIST	= $(noinst_JAVA) README.JNEXUS COPYING.NCSA
 
 # specific targets
 # org/nexusformat/NexusFile.class:	org/nexusformat/NexusFile.java
@@ -101,22 +99,41 @@ native/org_nexusformat_NexusFile.h: jnexus.jar # org/nexusformat/NexusFile.class
 	test -d native || mkdir native
 	$(JAVAH) -jni -d native -classpath . org.nexusformat.NexusFile
 
-jnexus.jar: $(jnexus_jar_CLASS)
+jnexus.jar: $(jnexus_jar_CLASS) apidoc
 	$(JAR) cvf jnexus.jar $(jnexus_jar_CLASS) \
                ncsa/hdf/hdflib/ArrayDescriptor.class
 
-#all: $(jnexus_jar_ARCHIVE) $(lib_LTLIBRARIES) javadoc
-
-javadoc:	$(noinst_JAVA)
-	test -d apidoc || mkdir apidoc
-	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath . \
-                      -sourcepath $(srcdir) org.nexusformat ncsa.hdf.hdflib
 
 SUFFIXES = .java .class
 
 .java.class:
 	$(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $<
 
+apidoc : $(noinst_JAVA)
+	test -d apidoc || mkdir apidoc
+	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath . \
+                      -sourcepath $(srcdir) org.nexusformat ncsa.hdf.hdflib
+
+dist-hook :
+	if test -d $(srcdir)/apidoc; then \
+	    cp -r $(srcdir)/apidoc $(distdir); \
+	fi
+
+install-data-local :
+	$(mkinstalldirs) $(DESTDIR)$(nxjavadocdir)
+	if test -d $(srcdir)/apidoc; then \
+	  cp -r $(srcdir)/apidoc $(DESTDIR)$(nxjavadocdir); \
+	  find $(DESTDIR)$(nxjavadocdir)/apidoc -type f -exec chmod 0644 {} \; ;\
+	  find $(DESTDIR)$(nxjavadocdir)/apidoc -type d -exec chmod 0755 {} \; ;\
+	fi
+
+clean-local :
+	rm -rf apidoc
+
+uninstall-local :
+	rm -fr $(DESTDIR)$(nxjavadocdir)/apidoc
+
+#
 # Windows import library for DLL
 
 if MINGW_MSYS
@@ -134,5 +151,6 @@ jnexusbin_DATA = jnexus.dll
 jnexus.dll : libjnexus.la
 	ln -sf .libs/libjnexus-0.dll jnexus.dll
 endif
+
 
 ## include $(top_srcdir)/build_rules.am

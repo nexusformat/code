@@ -66,6 +66,11 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
  * For the C++ API see http://download.nexusformat.org/doxygen/html-cpp
  */
 
+/**
+ * \example napi_test.c
+ * This is the test program for the NeXus C API.
+ * It illustrates calling most functions to read and write a file.
+ */
 
 
 /*---------------------------------------------------------------------

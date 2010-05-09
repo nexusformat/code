@@ -10,8 +10,6 @@
   * Some changes to the API have been necessary however, due to the 
   * different calling standards between C and Java. 
   *
-  * @example TestJapi.java
-  * Test program for Java API
   *
   * @author Mark Koennecke, October 2000
   *
@@ -20,6 +18,15 @@
   * copyright: see accompanying COPYRIGHT file
   *
   * added nxinitattrdir: Mark Koennecke, October 2009 
+  *
+  * @see TestJapi.java
+  *
+  */
+
+  /**
+  * @example TestJapi.java
+  * Test program for Java API.
+  * Illustrates using the #org.nexusformat package
   */
 package org.nexusformat;
 

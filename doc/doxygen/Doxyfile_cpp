@@ -641,7 +641,7 @@ EXAMPLE_PATH           = $(TOPSRC)/test
 # and *.h) to filter out the source-files in the directories. If left
 # blank all files are included.
 
-EXAMPLE_PATTERNS       = *.cpp *.cxx
+EXAMPLE_PATTERNS       = *.cpp *.cxx *.hpp
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
 # searched for input files to be used with the \include or \dontinclude

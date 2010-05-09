@@ -16,7 +16,7 @@ looks in the following places in order::
 @verbatim
    os.environ['NEXUSLIB']                  - All
    directory containing nxs.py             - All
-   os.environ['NEXUSDIR']\bin              - Windows
+   os.environ['NEXUSDIR']\\bin              - Windows
    os.environ['LD_LIBRARY_PATH']           - Unix
    os.environ['DYLD_LIBRARY_PATH']         - Darwin
    PREFIX/lib                              - Unix and Darwin
@@ -49,7 +49,7 @@ Example
   file.close()
 @endcode
 
-  See @example nxstest.py for a more complete example.
+  See @see nxstest.py for a more complete example.
 
 Interface
 =========
@@ -124,6 +124,9 @@ This is an eigenbug:
  - if I remove the open/close call in the wrapper it doesn't leak.
 
 """
+
+## @example nxstest.py
+#  Test program for NeXus python interface
 
 __all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','H4SKIP',
            'NeXus','NeXusError','open']

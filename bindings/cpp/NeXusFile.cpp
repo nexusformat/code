@@ -32,10 +32,17 @@ using std::vector;
  * #include "NeXusFile.hpp"
  * \endcode
  *
- * \example napi_test_cpp.cxx
- * Test program for NeXus C++ Interface
+ * \sa napi_test_cpp.cxx
  *
  * For details of the C API see http://download.nexusformat.org/doxygen/html-c/
+ *
+ */
+
+/**
+ * \example napi_test_cpp.cxx
+ * Test program for the NeXus C++ Interface.
+ * This illustrates calling most of the functions for reading and writing a file
+ *
  */
 
 static const string NULL_STR = "NULL";
