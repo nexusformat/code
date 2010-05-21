@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-VERSION = "1.4.0"
+VERSION = "1.4.1"
 
 import nxs
 import numpy
@@ -122,6 +122,12 @@ class Diff:
                 pass
             except AttributeError:
                 pass
+
+        # special case when the array is only nans
+        if numpy.alltrue(numpy.isnan(left.data)) and \
+           numpy.alltrue(numpy.isnan(right.data)):
+            return
+
         if numpy.alltrue(left.data == right.data):
             return
         else:
