@@ -39,6 +39,7 @@ F90_TARGETS = NXbrowse90
 endif
 
 bin_PROGRAMS = nxbrowse $(F90_TARGETS)
+man_MANS = nxbrowse.1
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)

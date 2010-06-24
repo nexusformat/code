@@ -32,6 +32,8 @@ LIBNEXUS=$(top_builddir)/src/libNeXus.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 
 bin_PROGRAMS = nxdir
+man_MANS = nxdir.1
+
 nxdir_SOURCES = main.cpp string_util.cpp tree.cpp data.cpp data_writer.cpp \
 		nxdir.h nxdir_help.h
 nxdir_LDADD = $(LIBNEXUS)

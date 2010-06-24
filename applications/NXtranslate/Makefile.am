@@ -39,6 +39,7 @@ SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs \
 	FRM2 loopy binary spec esrf_edf $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
+
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
 	node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp \

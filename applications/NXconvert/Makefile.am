@@ -34,6 +34,7 @@ EXTRA_DIST=SConscript
 
 lib_LTLIBRARIES = libnxconvert.la
 bin_PROGRAMS = nxconvert
+man_MANS = nxconvert.1
 
 libnxconvert_la_SOURCES = nxconvert_common.cpp nxconvert_common.h
 libnxconvert_la_LIBADD = $(LIBNEXUSCPP) $(LIBNEXUS)
