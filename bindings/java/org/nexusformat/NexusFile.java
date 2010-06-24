@@ -310,7 +310,8 @@ public class  NexusFile implements NeXusFileInterface {
 			     NexusException {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
         checkType(type);    
-        checkForNull(name);
+        checkForNull(name, rank, iChunk);
+        checkForNegInIntArray(true, dim, iChunk);
         switch(compression_type) {
 	case NexusFile.NX_COMP_NONE:
 	case NexusFile.NX_COMP_LZW:
@@ -319,7 +320,7 @@ public class  NexusFile implements NeXusFileInterface {
 	    throw new NexusException("Invalid compression code requested");
 
 	}
-	nxmakecompdata(handle,name,type,rank,dim,compression_type, iChunk);
+	nxmakecompdata(handle, name, type, rank, dim, compression_type, iChunk);
     }
 
     /**
@@ -339,8 +340,9 @@ public class  NexusFile implements NeXusFileInterface {
     {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
         checkType(type);
-        checkForNull(name);
-	nxmakedata(handle,name,type,rank,dim);
+        checkForNull(name, dim);
+        checkForNegInIntArray(true, dim);
+        nxmakedata(handle, name, type, rank, dim);
     }
     /**
       * opendata opens an existing dataset for access. For instance for 
@@ -441,7 +443,8 @@ public class  NexusFile implements NeXusFileInterface {
     {
         byte bdata[];
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-    	checkForNull(array);
+    	checkForNull(start, size, array);
+    	checkForNegInIntArray(false, start, size);
         try{
 	    HDFArray ha = new HDFArray(array);
             bdata = ha.emptyBytes();
@@ -528,7 +531,8 @@ public class  NexusFile implements NeXusFileInterface {
        byte data[];
 
        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-       checkForNull(array);
+       checkForNull(array, start, size);
+       checkForNegInIntArray(false, start,size);
        try{
            HDFArray ha =  new HDFArray(array);
            data = ha.byteify();
@@ -740,6 +744,23 @@ public class  NexusFile implements NeXusFileInterface {
     		if (o==null) throw new NullPointerException();
     }
     
+    /**
+     * checks if any of the ints in the arrays are negative, 
+     * throws appropriate runtime exception if so
+     * for some being zero is stupid, but hopefully not fatal
+     */
+    private void checkForNegInIntArray(boolean allowUnlimited, int[]... args) {
+    	boolean first=true;
+    	for (int[] array : args)
+    		for (int value: array) {
+    			if (value<0)
+    				if (value == this.NX_UNLIMITED && allowUnlimited && first) {
+    					// all ok this time
+    				} else
+    					throw new IllegalArgumentException("negative dimension received");
+    			first=false;
+    		}
+    }
     /**
       * checkType verifies if a parameter is a valid NeXus type code. 
       * If not an exception is thrown.
