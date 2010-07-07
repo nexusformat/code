@@ -24,9 +24,12 @@
  $Id$
 -----------------------------------------------------------------------------*/
 
+#include <iostream>
+#include <stdexcept>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <vector>
 #ifdef _MSC_VER
 #include "getopt.h"
 #else
@@ -34,132 +37,121 @@
 #endif
 #include "napi.h"
 #include "nxconvert_common.h"
+#include "tclap/CmdLine.h"
+
+using std::runtime_error;
+using std::string;
+using std::vector;
+using namespace TCLAP;
+
+static const string NXCONVERT_VERSION("1.0");
+static const string EMPTY("");
 
 static void print_usage()
 {
     printf("Usage: nxconvert [ -x | -h4 | -h5 | -d | -Dfile | -o keepws | -o table ] [ infile ] [ outfile ]\n");
 }
 
-#define NXCONVERT_EXIT_ERROR	exit(1)
-
-static const char* definition_name = NULL /* NEXUS_SCHEMA_BASE */;
-
 int main(int argc, char *argv[])
 {
-   char inFile[256], outFile[256], *stringPtr;
-   int opt, nx_format = -1, nx_write_access = 0;
-   int nx_read_access = NXACC_READ;
+  try {
+    // set up the command line  arguments
+    CmdLine cmd("Convert a NeXus file between different on disk file formats.",
+		' ', NXCONVERT_VERSION);
+    UnlabeledValueArg<string> inFileArg("inputFile", "Name of the input file.",
+					EMPTY, "inputFile");
+    cmd.add(inFileArg);
+    UnlabeledValueArg<string> outFileArg("outputFile",
+					 "Name of the output file.",
+					 EMPTY, "outputFile");
+    cmd.add(outFileArg);
+    SwitchArg xmlArg("x", "xml", "Output file in xml format", false);
+    SwitchArg hdf4Arg("4", "hdf4", "Output file in hdf4 format", false);
+    SwitchArg hdf5Arg("5", "hdf5", "Output file in hdf5 format", false);
+    SwitchArg defArg("d", "dfn",
+		     "Output definition file used for validating NeXus files",
+		     false);
+    ValueArg<string> defValueArg("D", "definition",
+		      "Output definition file used for validating NeXus files. Requires a definition name.",
+			    false, EMPTY, "defintion");
+    vector<string> allowedXml;
+    allowedXml.push_back("keepws");
+    allowedXml.push_back("table");
+    ValueArg<string> xmlSpecialArg("o", "outputxml",
+				   "Special arguments for xml. keepws defines that the whitespace should be preserved. table specifies a format that is more easiliy imported into spreadsheet programs. Either option forces xml output",
+				   false, "", allowedXml);
+    vector<Arg*> outputformats;
+    outputformats.push_back(&hdf5Arg);
+    outputformats.push_back(&xmlArg);
+    outputformats.push_back(&hdf4Arg);
+    outputformats.push_back(&defArg);
+    outputformats.push_back(&defValueArg);
+    outputformats.push_back(&xmlSpecialArg);
+    cmd.xorAdd(outputformats);
 
-   while( (opt = getopt(argc, argv, "h:xdD:o:")) != -1 )
-   {
-/* use with "-:" in getopt	
-	if (opt == '-')
-	{
-	    opt = optarg[0];
-	    optarg++;
-	} 
-*/
-	switch(opt)
-	{
-	  case 'x':
-	    nx_format = NX_XML;
-	    nx_write_access |= NXACC_CREATEXML;
-	    break;
+    // parse the arguments and configure converting the file
+    cmd.parse(argc, argv);
+    int nx_format = -1; // output format
+    int nx_write_access = 0; // output write access
+    int nx_read_access = NXACC_READ; // input read access
+    string definition_name; // NEXUS_SCHEMA_BASE is NULL
 
-	  case 'd':
-	    nx_format = NX_DEFINITION;
-	    nx_write_access |= NXACC_CREATEXML;
-	    if (optarg != NULL && *optarg != '\0')
-	    {
-		definition_name = optarg;
-	    }
-	    break;
 
-	  case 'D':
-	    nx_format = NX_DEFINITION;
-	    nx_write_access |= NXACC_CREATEXML;
-	    if (optarg != NULL && *optarg != '\0')
-	    {
-		definition_name = optarg;
-	    }
-	    break;
+    if (xmlArg.isSet()) {
+      nx_format = NX_XML;
+      nx_write_access |= NXACC_CREATEXML;
+    }
+    if (defArg.isSet() || defValueArg.isSet()) {
+      nx_format = NX_DEFINITION;
+      nx_write_access |= NXACC_CREATEXML;
+      if (defValueArg.isSet())
+	definition_name = defValueArg.getValue();
+    }
+    if (hdf4Arg.isSet()) {
+      nx_format = NX_HDF4;
+      nx_write_access |= NXACC_CREATE4;
+    }
+    if (hdf5Arg.isSet()) {
+      nx_format = NX_HDF5;
+      nx_write_access |= NXACC_CREATE5;
+    }
+    if (xmlSpecialArg.isSet()) {
+      nx_format |= NX_XML;
+      nx_write_access |= NXACC_CREATEXML;
+      string type = xmlSpecialArg.getValue();
+      if (type.compare("keepws")) {
+	nx_write_access |= NXACC_NOSTRIP;
+	nx_read_access |= NXACC_NOSTRIP;
+      }
+      else if (type.compare("table")) {
+	nx_write_access |= NXACC_TABLE;
+      }
+    }
+    string inFile(inFileArg.getValue());
+    string outFile(outFileArg.getValue());
 
-	  case 'h':
-	    if (!strcmp(optarg, "4") || !strcmp(optarg, "df4"))
-	    {
-		nx_format = NX_HDF4;
-	        nx_write_access |= NXACC_CREATE4;
-	    } 
-	    else if (!strcmp(optarg, "5") || !strcmp(optarg, "df5"))
-	    {
-		nx_format = NX_HDF5;
-	        nx_write_access |= NXACC_CREATE5;
-	    }
-	    else
-	    {
-	        printf("Invalid option -h%s\n", optarg);
-	        print_usage();
-		NXCONVERT_EXIT_ERROR;
-	    }
-	    break;
+    // do the actual conversion
+    std::cout << "Converting " << inFile << " to " << nx_formats[nx_format]
+	      << " NeXus file " << outFile << std::endl;
+    
+    if (convert_file(nx_format, inFile.c_str(), nx_read_access, outFile.c_str(), nx_write_access, definition_name.c_str()) != NX_OK) {
+      std::cerr << "Conversion failed" << std::endl;
+      return 1;
+    }
 
-	  case 'o':
-	    if (!strcmp(optarg, "keepws"))
-	    {
-	        nx_write_access |= NXACC_NOSTRIP;
-	        nx_read_access |= NXACC_NOSTRIP;
-	    }
-	    else if (!strcmp(optarg, "table"))
-	    {
-	        nx_write_access |= NXACC_TABLE;
-	    }
-	    else
-	    {
-	        printf("Invalid option -o%s\n", optarg);
-	        print_usage();
-		NXCONVERT_EXIT_ERROR;
-	    }
-	    break;
+  }
+  catch (ArgException &e) {
+    std::cerr << "PARSE ERROR:" << e.error() << " for arg " << e.argId()
+	      << std::endl;
+    return -1;
+  }
+  catch (runtime_error &e) {
+    std::cerr << "RUNTIME ERROR:" << e.what() << std::endl;
+    return -1;
+  }
 
-	  default:
-/*	    printf("Invalid option -%c\n", opt); */
-	    print_usage();
-	    NXCONVERT_EXIT_ERROR;
-	    break;
-	}
-   }
-   if (nx_format == -1)
-   {
-	nx_format = NX_HDF4;
-	nx_write_access |= NXACC_CREATE4;
-   }
-   if ((argc - optind) <  1)
-   {
-/* use command line arguments for input and output filenames if given */
-      printf ("Give name of input NeXus file : ");
-      fgets (inFile, sizeof(inFile), stdin);
-      if ((stringPtr = strchr(inFile, '\n')) != NULL) { *stringPtr = '\0'; }
-   }
-   else 
-   {
-     strcpy (inFile, argv[optind]);
-   }
-   if ((argc - optind) <  2)
-   {
-      printf ("Give name of output %s NeXus file : ", nx_formats[nx_format]);
-      fgets (outFile, sizeof(outFile), stdin);
-      if ((stringPtr = strchr(outFile, '\n')) != NULL) { *stringPtr = '\0'; }
-   }
-   else 
-   {
-     strcpy (outFile, argv[optind+1]);
-   }
-   printf("Converting %s to %s NeXus file %s\n", inFile, nx_formats[nx_format], outFile);
-
-   if (convert_file(nx_format, inFile, nx_read_access, outFile, nx_write_access, definition_name) != NX_OK) {
-      NXCONVERT_EXIT_ERROR;
-   }
-   printf("Convertion successful.\n");
-   return 0;
+  // tell the user that everything went ok
+  std::cout << "Convertion successful." << std::endl;
+  return 0;
 }
 
