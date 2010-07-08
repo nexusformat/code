@@ -822,7 +822,8 @@ AC_CONFIG_FILES([Makefile
 		macosx_install_kit/pkg.config
 		scripts/Makefile
 		scripts/nexus-config
-		scripts/nexus.pc:scripts/nexus_pc.in
+		scripts/nexus.pc
+		scripts/nexus-cpp.pc
 		scripts/nxbuild])
 dnl src/nxdict/Makefile
 AC_OUTPUT

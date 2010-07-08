@@ -1,0 +1,13 @@
+#
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name:@PACKAGE_NAME@ CPP bindings
+Description:Libraries and utilities for using NeXus format data files from C++
+Version:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Requires:
+Conflicts:
+Libs:	-L${libdir} -lNeXusCPP -lNeXus @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ @LIBS@
+Cflags:	-I${includedir}/nexus -I${includedir} @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
