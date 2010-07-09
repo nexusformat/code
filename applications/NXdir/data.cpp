@@ -163,9 +163,11 @@ extern long read_int_attr(NXhandle handle, const Path &path){
   if(attr_type==NX_INT8){
   }else if(attr_type==NX_INT16){
   }else if(attr_type==NX_INT32){
+  }else if(attr_type==NX_INT64){
   }else if(attr_type==NX_UINT8){
   }else if(attr_type==NX_UINT16){
   }else if(attr_type==NX_UINT32){
+  }else if(attr_type==NX_UINT64){
   }else{
     throw "Unsupported type in read_int_attr";
   }
@@ -181,17 +183,17 @@ extern long read_int_attr(NXhandle handle, const Path &path){
   // convert the value to an integer
   long result;
   if(attr_type==NX_INT8)
-    result=((short *)data)[0];
+    result=static_cast<long>(((int8_t *)data)[0]);
   else if(attr_type==NX_INT16)
-    result=((int *)data)[0];
+    result=static_cast<long>(((int16_t *)data)[0]);
   else if(attr_type==NX_INT32)
-    result=((long *)data)[0];
+    result=static_cast<long>(((int32_t *)data)[0]);
   else if(attr_type==NX_UINT8)
-    result=((unsigned short *)data)[0];
+    result=static_cast<long>(((uint8_t *)data)[0]);
   else if(attr_type==NX_UINT16)
-    result=((unsigned int *)data)[0];
+    result=static_cast<long>(((uint16_t *)data)[0]);
   else if(attr_type==NX_UINT32)
-    result=((unsigned long *)data)[0];
+    result=static_cast<long>(((uint32_t *)data)[0]);
 
   // release memory
   if(NXfree(&data)!=NX_OK)

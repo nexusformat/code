@@ -36,6 +36,7 @@
 
 /* -------------------- DO NOT EDIT BELOW THIS LINE -------------------- */
 #include "napi.h"
+#include "napiconfig.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -96,6 +97,8 @@ extern std::string oneD_to_string(const void *data, const int length,
 extern std::string to_string(const void *data, const int dims[],
                      const int rank, const int type, const PrintConfig config);
 extern std::string int_to_str(const long value);
+template <typename T>
+extern std::string value_to_string(const T value);
 extern std::string voidptr_to_str(const void *data, int pos,int type);
 
 // -------------------- tree.cpp

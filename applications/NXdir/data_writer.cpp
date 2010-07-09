@@ -553,7 +553,7 @@ extern void dump_data(std::string &filename,NXhandle handle, const Tree &tree,
     size*=2;
   }else if(type==NX_INT32 || type==NX_UINT32 || type==NX_FLOAT32){
     size*=4;
-  }else if(type==NX_FLOAT64){
+  }else if(type==NX_INT64 || type==NX_UINT64 || type==NX_FLOAT64){
     size*=8;
   }else{
     // NX_BOOLEAN NX_UINT

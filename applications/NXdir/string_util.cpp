@@ -26,12 +26,14 @@
 #include "nxdir.h"
 #include <string>
 #include <algorithm>
+#include <sstream>
 #include <stdio.h>
 
 #define ellipse std::string("...,")
 
 // bring some functions into this namespace
 using std::string;
+using std::stringstream;
 using std::cout;
 using std::endl;
 using std::find;
@@ -44,7 +46,6 @@ typedef Path::const_iterator PathIter;
 typedef string::const_iterator StrIter;
 
 // function prototypes
-static string float_to_str(double value);
 static string path_to_string( PathIter path_begin, PathIter path_end, PathMode print_mode);
 
 // ==================== UTILITY CODE
@@ -278,23 +279,20 @@ extern string path_to_str(const Path path, const PathMode print_mode){
 }
 
 /*
- * Converts a float (any precision) to a string.
+ * Converts a value to a string using the string stream class.
  */
-static string float_to_str(double value){
-  char temp[40];
-  snprintf(temp,40,"%f",value);
-
-  return string(temp);
+template <typename T>
+extern string value_to_str(const T value) {
+  std::stringstream ss;
+  ss << value;
+  return ss.str();
 }
 
 /*
  * Converts an integer (any precision) to a string.
  */
 extern string int_to_str(const long value){
-  char temp[40];
-  snprintf(temp,40,"%d",value);
-
-  return string(temp);
+  return value_to_str(value);
 }
 
 /*
@@ -317,21 +315,25 @@ static string fix_str(char *value,int length){
  */
 extern string voidptr_to_str(const void *data, int pos,int type){
   if(type==NX_FLOAT32)
-    return float_to_str( ((float *)data)[pos]);
+    return value_to_str(((float *)data)[pos]);
   else if(type==NX_FLOAT64)
-    return float_to_str(((double *)data)[pos]);
+    return value_to_str(((double *)data)[pos]);
   else if(type==NX_INT8)
-    return int_to_str(((unsigned char *)data)[pos]);
+    return value_to_str(((int8_t *)data)[pos]);
   else if(type==NX_INT16)
-    return int_to_str(     ((short *)data)[pos]);
+    return value_to_str(((int16_t *)data)[pos]);
   else if(type==NX_INT32)
-    return int_to_str(    ((int *)data)[pos]);
+    return value_to_str(((int32_t *)data)[pos]);
+  else if(type==NX_INT64)
+    return value_to_str(((int64_t *)data)[pos]);
   else if(type==NX_UINT8)
-    return int_to_str(((unsigned char *)data)[pos]);
+    return value_to_str(((uint8_t *)data)[pos]);
   else if(type==NX_UINT16)
-    return int_to_str(    ((unsigned short *)data)[pos]);
+    return value_to_str(((uint16_t *)data)[pos]);
   else if(type==NX_UINT32)
-    return int_to_str(   ((unsigned int *)data)[pos]);
+    return value_to_str(((uint32_t *)data)[pos]);
+  else if(type==NX_UINT64)
+    return value_to_str(((uint64_t *)data)[pos]);
   else
     throw "Do not understand type in voidptr_to_str";
 }
@@ -348,29 +350,28 @@ extern string oneD_to_string(const void *data, const int length,
     return fix_str((char *)data,length);
 
   // deal with everything else
-  string result;
   int itter_length=length;
   if( (max_items>0) && (length>max_items) )
     itter_length=max_items;
 
   // get the first element
-  result=voidptr_to_str(data,0,type);
   if(length==1)
-    return result;
+    return voidptr_to_str(data,0,type);
 
   // build an array string
-  result="["+result+",";
-  for( int i=1 ; i<itter_length ; i++ ){
-    result+=voidptr_to_str(data,i,type);
+  stringstream result;
+  result << "[";
+  for( int i=0 ; i<itter_length ; i++ ){
+    result << voidptr_to_str(data,i,type);
     if(i+1<length)
-      result+=",";
+      result << ",";
   }
   if(length!=itter_length)
-    result+=ellipse+voidptr_to_str(data,length-1,type);
-  result+="]";
+    result << ellipse << voidptr_to_str(data,length-1,type);
+  result << "]";
 
   // return the resulting array string
-  return result;
+  return result.str();
 }
 
 /*
@@ -390,26 +391,7 @@ static string twoD_to_string(const void *data, const int dims[], int type, Print
 
   // create the string for the first itter_length elements
   for( int i=0 ; i<itter_length ; i++ ){
-    if(type==NX_CHAR)
-      result+=oneD_to_string((char *)data+offset,row_len,type,config);
-    else if(type==NX_FLOAT32)
-      result+=oneD_to_string((float *)data+offset,row_len,type,config);
-    else if(type==NX_FLOAT64)
-      result+=oneD_to_string((double *)data+offset,row_len,type,config);
-    else if(type==NX_INT8)
-      result+=oneD_to_string((unsigned char *)data+offset,row_len,type,config);
-    else if(type==NX_INT16)
-      result+=oneD_to_string((short *)data+offset,row_len,type,config);
-    else if(type==NX_INT32)
-      result+=oneD_to_string((int *)data+offset,row_len,type,config);
-    else if(type==NX_UINT8)
-      result+=oneD_to_string((unsigned char *)data+offset,row_len,type,config);
-    else if(type==NX_UINT16)
-      result+=oneD_to_string((unsigned short *)data+offset,row_len,type,config);
-    else if(type==NX_UINT32)
-      result+=oneD_to_string((unsigned int *)data+offset,row_len,type,config);
-    else
-      throw "Do not understand type in twoD_to_string";
+    result+=oneD_to_string((char *)data+offset,row_len,type,config);
     if(i+1<col_len)
       result+=",";
     offset=offset+row_len;
@@ -421,26 +403,7 @@ static string twoD_to_string(const void *data, const int dims[], int type, Print
     result+=ellipse;
     offset=row_len*(col_len-1);
 
-    if(type==NX_CHAR)
-      result+=oneD_to_string((char *)data+offset,row_len,type,config);
-    else if(type==NX_FLOAT32)
-      result+=oneD_to_string((float *)data+offset,row_len,type,config);
-    else if(type==NX_FLOAT64)
-      result+=oneD_to_string((double *)data+offset,row_len,type,config);
-    else if(type==NX_INT8)
-      result+=oneD_to_string((unsigned char *)data+offset,row_len,type,config);
-    else if(type==NX_INT16)
-      result+=oneD_to_string((short *)data+offset,row_len,type,config);
-    else if(type==NX_INT32)
-      result+=oneD_to_string((int *)data+offset,row_len,type,config);
-    else if(type==NX_UINT8)
-      result+=oneD_to_string((unsigned char *)data+offset,row_len,type,config);
-    else if(type==NX_UINT16)
-      result+=oneD_to_string((unsigned short *)data+offset,row_len,type,config);
-    else if(type==NX_UINT32)
-      result+=oneD_to_string((unsigned int *)data+offset,row_len,type,config);
-    else
-      throw "Do not understand type in twoD_to_string";
+    result+=oneD_to_string((char *)data+offset,row_len,type,config);
   }
   result+="]";
 
