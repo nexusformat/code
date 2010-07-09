@@ -176,12 +176,15 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 		c.gridwidth = 3;
 		add(validateButton, c);
 
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
+		c.weighty = 1.0;
 		c.gridy = 3;
 		add(new JScrollPane(tree), c);
 
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.0;
+		c.weighty = 0.0;
 		c.gridy = 4;
 		add(logScrollPane, c);
 	}
