@@ -1,7 +1,9 @@
 package org.nexusformat.nxvalidate;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.event.TreeModelListener;
@@ -12,7 +14,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-class NXSnode implements TreeModel {
+class NXSnode extends AbstractNXSnode implements TreeModel {
 	private static final String PADDING = "  ";
 	private static final String NXROOT = "NXroot";
 	private static final String TYPE = "NAPItype";
@@ -20,17 +22,14 @@ class NXSnode implements TreeModel {
 	private static final String SDS = "SDS";
 	private static final Logger LOG = Logger.getInstance();
 
-	private String name;
 	private String nxclass;
-	private Map<String, String> attrs;
-	private Vector<NXSnode> children;
+	private Vector<AbstractNXSnode> children;
 	private Vector<SVRLitem> svrl;
 
 	NXSnode() {
-		this.name = NXROOT;
+	    super(NXROOT);
 		this.nxclass = "";
-		this.attrs = new HashMap<String, String>();
-		this.children = new Vector<NXSnode>();
+		this.children = new Vector<AbstractNXSnode>();
 		this.svrl = new Vector<SVRLitem>();
 	}
 
@@ -80,14 +79,18 @@ class NXSnode implements TreeModel {
 		int index = Integer.parseInt(partPath.substring(left + 1, right)) - 1;
 		LOG.debug("Looking for " + name + "[" + index + "]");
 
-		// get the options
+		// get the options - only works with NXSnodes
 		Vector<NXSnode> choices = new Vector<NXSnode>();
-		for (NXSnode child: parent.children) {
-			if (equals(child.getType(), name)) {
-				choices.add(child);
-			} else if (equals(child.getName(), name)) {
-				choices.add(child);
+		NXSnode temp;
+		for (AbstractNXSnode child: parent.children) {
+		    if (child instanceof NXSnode) {
+			temp = (NXSnode)child;
+			if (equals(temp.getType(), name)) {
+				choices.add(temp);
+			} else if (equals(temp.getName(), name)) {
+				choices.add(temp);
 			}
+		    }
 		}
 
 		// pick which one to return
@@ -139,16 +142,14 @@ class NXSnode implements TreeModel {
 
 	void setAttr(final String name, final String value) {
 		if (name.equals("name")) {
-			this.name = value;
+		    this.setName(value);
 			return;
 		} else if (name.equals(TYPE)) {
-			this.name = this.nxclass;
+		    this.setName(this.nxclass);
 			this.nxclass = SDS;
-		} else if (name.equals("target")) {
-			this.name = this.nxclass;
-			this.nxclass = null;
+			return;
 		}
-		this.attrs.put(name, value);
+		this.children.insertElementAt(new Attribute(name, value), 0);
 	}
 
 	private void addChild(final Node node) {
@@ -162,10 +163,6 @@ class NXSnode implements TreeModel {
 		this.children.add(new NXSnode(node));
 	}
 
-	String getName() {
-		return this.name;
-	}
-
 	String getType() {
 		return this.nxclass;
 	}
@@ -174,16 +171,29 @@ class NXSnode implements TreeModel {
 		return (this.svrl.size() > 0);
 	}
 
+    private String getAttrValue(final String name) {
+	int size = this.children.size();
+	AbstractNXSnode node;
+	for (int i = 0; i < size; i++) {
+	    node = this.children.get(i);
+	    if (node instanceof NXSnode)
+		return "";
+	    else if (this.children.get(i).getName().equals(name))
+		return ((Attribute) node).getValue();
+	}
+	return "";
+    }
+
 	public String toString() {
 		String result;
-		if (NXROOT.equals(this.name) || NXROOT.equals(this.nxclass)) {
+		if (NXROOT.equals(this.getName()) || NXROOT.equals(this.nxclass)) {
 			result = NXROOT;
-		} else if (LINK.equals(this.name)) {
-			result = this.name + ":target=" + this.attrs.get("target");
+		} else if (LINK.equals(this.getName())) {
+		    result = this.getName() + ":target=" + this.getAttrValue("target");
 		} else if (SDS.equals(this.nxclass)) {
-			result = this.name + ":" + TYPE + "="+ this.attrs.get(TYPE);
+		    result = this.getName() + ":" + TYPE + "="+ this.getAttrValue(TYPE);
 		} else {
-			result = this.name + ":" + this.nxclass;
+		    result = this.getName() + ":" + this.nxclass;
 		}
 		if (this.hasError()) {
 			return result + "*";
@@ -199,8 +209,9 @@ class NXSnode implements TreeModel {
 	private void printTree(String padding) {
 		System.out.println(padding + this.toString());
 		padding += PADDING;
-		for (NXSnode node: this.children) {
-			node.printTree(padding);
+		for (AbstractNXSnode node: this.children) {
+		    if (node instanceof NXSnode) // don't bother with attributes
+			((NXSnode)node).printTree(padding);
 		}
 	}
 
@@ -215,11 +226,9 @@ class NXSnode implements TreeModel {
 
 		// cast and do deep comparison
 		NXSnode temp = (NXSnode) other;
-		if (!this.name.equals(temp.name))
+		if (!this.getName().equals(temp.getName()))
 			return false;
 		if (!this.nxclass.equals(temp.nxclass))
-			return false;
-		if (!this.attrs.equals(temp.attrs))
 			return false;
 		if (!this.children.equals(temp.children))
 			return false;
@@ -248,8 +257,10 @@ class NXSnode implements TreeModel {
 	}
 
 	public Object getChild(Object parent, int index) {
-		NXSnode temp = toNXSnode(parent);
-		return temp.children.get(index);
+	    if (parent instanceof NXSnode)
+		return ((NXSnode)parent).children.get(index);
+	    else
+		return null;
 	}
 
 	public int getChildCount(Object parent) {
@@ -263,18 +274,21 @@ class NXSnode implements TreeModel {
 		if (child == null)
 			return -1;
 		NXSnode myParent = toNXSnode(parent);
-		NXSnode myChild = toNXSnode(child);
-
-		return myParent.children.indexOf(myChild);
+		if (child instanceof AbstractNXSnode)
+		    return myParent.children.indexOf((AbstractNXSnode)child);
+		else
+		    return -1;
 	}
 
 	public Object getRoot() {
 		return this;
 	}
 
-	public boolean isLeaf(Object node) {
-		NXSnode temp = toNXSnode(node);
-		return (temp.children.size() <= 0);
+	public boolean isLeaf(final Object node) {
+	    if (node instanceof NXSnode)
+		return (((NXSnode)node).children.size() <= 0);
+	    else
+		return true;
 	}
 
 	@Override
