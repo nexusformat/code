@@ -20,15 +20,15 @@ class Report {
     private static String NXROOT = "NXroot";
     private static String SVRLROOT = "svrl:schematron-output";
 
-    Report(final String reduced, final String report)
+    Report(final File reduced, final File reportFile)
             throws ParserConfigurationException, SAXException, IOException {
 
         // parse the reduced file and turn it into a node tree
         Document redDoc = parse(reduced);
-        this.report = new NXSnode(getNXroot(redDoc));
+        report = new NXSnode(getNXroot(redDoc));
 
         // add the svrl report to the reduced
-        Document svrlDoc = parse(report);
+        Document svrlDoc = parse(reportFile);
         this.errors = this.report.addSVRL(getSVRLroot(svrlDoc));
     }
 
@@ -76,9 +76,9 @@ class Report {
         throw new Error("Failed to find one " + SVRLROOT + " (found " + size + ")");
     }
 
-    static private Document parse(final String filename)
+    static private Document parse(final File file)
             throws ParserConfigurationException, SAXException, IOException {
-        File file = new File(filename);
+        
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         return builder.parse(file);
     }

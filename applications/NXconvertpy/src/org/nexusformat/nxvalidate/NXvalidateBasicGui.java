@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
-
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -51,7 +50,9 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
     JFileChooser fc;
     JFileChooser nxdlChooser;
     String reducedNeXusFilename;
-    String schematronFile = "schematron.sch";
+    String schematronFilename = "schematron.sch";
+    File rawFile = null;
+    File schematronFile = null;
     NXconvert converter;
     NXschematron schematron;
     Vector<Report> reports;
@@ -86,7 +87,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
         // create a definition file chooser
         this.nxdlChooser = new JFileChooser();
         nxdlChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        nxdlChooser.setSelectedFile(new File(this.schematronFile));
+        nxdlChooser.setSelectedFile(new File(this.schematronFilename));
         this.nxdlChooser.addChoosableFileFilter(new SchematronFilter());
 
         // ----- nexus file loading
@@ -108,7 +109,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
         // Create the text field
         nxdlText = new JTextField(30);
         nxdlText.setToolTipText("The definition to validate against");
-        nxdlText.setText(this.schematronFile);
+        nxdlText.setText(this.schematronFilename);
 
         // create the browse button
         browseNxdlButton = new JButton("Browse...");
@@ -196,8 +197,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 	}
 
     private void setDefaultDefinition() {
-        File file = new File(this.schematronFile);
-        this.schematronFile = file.getAbsolutePath();
+        schematronFile = new File(this.schematronFilename);
     }
 
     public TreeModel parseXML(String filename) throws Exception {
@@ -216,7 +216,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
                 // Set the text box value to show the selected filename.
-                filenameText.setText(file.getAbsolutePath());
+                rawFile = file;
                 log.append("Selected NeXus File: " + file.getName() + "." + newline);
                 // TODO move code to make the reduced file here (and also after
                 // the filename has been typed).
@@ -230,7 +230,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = nxdlChooser.getSelectedFile();
                 nxdlText.setText(file.getAbsolutePath());
-                schematronFile = file.getAbsolutePath();
+                schematronFile = file;
                 log.append("Selected Definition File: " + file.getName() + "." + newline);
             } else {
                 log.append("Browse definition cancelled by user." + newline);
@@ -240,7 +240,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
             try {
 
                 validator = new NXvalidate();
-                validator.setFilename(filenameText.getText());
+                validator.setNXSFile(rawFile);
                 validator.setConvertNxs(true);
                 validator.setSchematron(schematronFile);
                 validator.setKeepTemp(true);

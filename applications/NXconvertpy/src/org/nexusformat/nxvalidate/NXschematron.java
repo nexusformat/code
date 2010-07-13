@@ -19,8 +19,8 @@ import javax.xml.transform.stream.StreamSource;
 
 public class NXschematron {
 
-    private String fileToValidate;
-    private String SchematronToUse;
+    private File reducedNeXusFile;
+    private File schematronFile;
     private boolean keepTemp;
     private InputStream dsdlIncludeXSLTStream = null;
     private InputStream abstractExpandXSLTStream = null;
@@ -29,23 +29,27 @@ public class NXschematron {
     //protected String schematronxslt[] = new String[]{"iso_dsdl_include.xsl",
     //    "iso_abstract_expand.xsl", "iso_svrl_for_xslt2.xsl"};
 
-    public NXschematron(String ReducedNeXusFilename, String SchematronFilename,
+    public NXschematron(File reducedNeXusFile, File schematronFile,
             final boolean keepTemp) {
 
-        this.fileToValidate = ReducedNeXusFilename;
-        this.SchematronToUse = SchematronFilename;
+        this.reducedNeXusFile = reducedNeXusFile;
+        this.schematronFile = schematronFile;
         this.keepTemp = keepTemp;
 
         // The Schematron files...
         dsdlIncludeXSLTStream =
-                NXschematron.class.getResourceAsStream("resources/iso_dsdl_include.xsl");
+                NXschematron.class.getResourceAsStream(
+                "resources/iso_dsdl_include.xsl");
         abstractExpandXSLTStream =
-                NXschematron.class.getResourceAsStream("resources/iso_abstract_expand.xsl");
+                NXschematron.class.getResourceAsStream(
+                "resources/iso_abstract_expand.xsl");
         svrlForXslt2XSLTStream =
-                NXschematron.class.getResourceAsStream("resources/iso_svrl_for_xslt2.xsl");
+                NXschematron.class.getResourceAsStream(
+                "resources/iso_svrl_for_xslt2.xsl");
         //XSLT for NXDL to sch
         nxdl2schXSLTStream =
-                NXschematron.class.getResourceAsStream("resources/nxdl2sch.xsl");
+                NXschematron.class.getResourceAsStream(
+                "resources/nxdl2sch.xsl");
 
     }
 
@@ -110,20 +114,19 @@ public class NXschematron {
 
     }
 
-    String validate() throws IOException, TransformerException {
-        return this.validate(this.fileToValidate, this.SchematronToUse);
+    File validate() throws IOException, TransformerException {
+        return validate(reducedNeXusFile, schematronFile);
     }
 
-    String validate(String filename, String schematron) throws IOException,
-            TransformerException {
+    File validate(File reducedNeXusFile, File schematronFile) throws
+            IOException, TransformerException {
 
         // Step 0
-        File nxdlFile = new File(schematron);
         File schematron0 = File.createTempFile("nxdlFile", ".step0");
         if (!this.keepTemp) {
             schematron0.deleteOnExit();
         }
-        TransformoMatic(new FileInputStream(nxdlFile), nxdl2schXSLTStream,
+        TransformoMatic(new FileInputStream(schematronFile), nxdl2schXSLTStream,
                 new FileOutputStream(schematron0));
 
         // Step 1
@@ -139,16 +142,17 @@ public class NXschematron {
         if (!this.keepTemp) {
             schematron2.deleteOnExit();
         }
-        TransformoMatic(new FileInputStream(schematron1), abstractExpandXSLTStream,
+        TransformoMatic(new FileInputStream(schematron1),
+                abstractExpandXSLTStream,
                 new FileOutputStream(schematron2));
 
         // Step 3
-        File SchemaFile = File.createTempFile("schema", ".xslt");
+        File schemaFile = File.createTempFile("schema", ".xslt");
         if (!this.keepTemp) {
-            SchemaFile.deleteOnExit();
+            schemaFile.deleteOnExit();
         }
-        TransformoMatic(new FileInputStream(schematron2),svrlForXslt2XSLTStream ,
-                new FileOutputStream(SchemaFile));
+        TransformoMatic(new FileInputStream(schematron2),svrlForXslt2XSLTStream,
+                new FileOutputStream(schemaFile));
 
         // Now lets validate the actual reduced file.
         File resultsFile = File.createTempFile("result", ".xml");
@@ -156,12 +160,12 @@ public class NXschematron {
         if (!this.keepTemp) {
             resultsFile.deleteOnExit();
         }
-        TransformoMatic(new FileInputStream(filename),
-                new FileInputStream(SchemaFile),
+        TransformoMatic(new FileInputStream(reducedNeXusFile),
+                new FileInputStream(schemaFile),
                 new FileOutputStream(resultsFile));
 
         // Return the filename
-        return resultsFile.getCanonicalPath();
+        return resultsFile;
     }
 
     public static void main(String[] args) {
@@ -170,9 +174,10 @@ public class NXschematron {
             return;
         }
         try {
-            NXschematron sch = new NXschematron(args[0], args[1], false);
-            String results = sch.validate();
-            System.out.println(results);
+            NXschematron sch = new NXschematron(
+                    new File(args[0]), new File(args[1]), false);
+            File results = sch.validate();
+            System.out.println(results.getAbsolutePath());
         } catch (Exception e) {
             e.printStackTrace();
         }

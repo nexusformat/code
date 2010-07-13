@@ -43,6 +43,8 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     DocumentBuilder builder = null;
     private NXReducedToTree domTree = null;
     NXNodeMapper root = null;
+    NXvalidate validator = null;
+
     /** Creates new form NXvalidateFrame */
     public NXvalidateFrame() {
         initComponents();
@@ -156,18 +158,34 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             nxsFile = loadFile.getNXSFile();
             nxdcFile = loadFile.getNXDCFile();
 
-            if(nxsFile!=null){
+            if(nxsFile!=null && nxdcFile!=null){
 
                 try {
-                    Document document = builder.parse(nxsFile);
-                    NXNodeMapper node = new NXNodeMapper(document,true,nxsFile.getAbsolutePath());
+                    //Reduce the file with NXConvert.
+                    NXconvert convert = new NXconvert(nxsFile, true);
+                    File reducedFile  = convert.convert();
+
+                    //Display reduced file
+                    Document document = builder.parse(reducedFile);
+                    NXNodeMapper node = new NXNodeMapper(
+                            document,true,nxsFile);
+                    node.setSchematronFile(nxdcFile);
                     node.setRoot(root);
                     root.addNode(node);
                     domTree.updateTree();
+                    
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(
+                            NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                            null, ex);
                 } catch (SAXException ex) {
-                    Logger.getLogger(NXvalidateFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(
+                            NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                            null, ex);
                 } catch (IOException ex) {
-                    Logger.getLogger(NXvalidateFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(
+                            NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                            null, ex);
                 } 
 
             }

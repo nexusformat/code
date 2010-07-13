@@ -4,6 +4,7 @@
  */
 package org.nexusformat.nxvalidate;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
@@ -29,8 +30,26 @@ public class NXNodeMapper implements TreeNode {
     private int childCount = 0;
     private ArrayList<Node> children = null;
     private NXNodeMapper root = null;
+    private File nxsFile = null;
+    private File schematronFile = null;
 
     // Construct an Adapter node from a DOM node
+    public NXNodeMapper(Node node, boolean isDocument, File nxsFile) {
+
+        this.isDocument = isDocument;
+        domNode = node;
+
+        allowsChildren = true;
+        if (node.getNodeType() != ELEMENT_TYPE) {
+            isLeaf = true;
+        }
+
+        this.nxsFile = nxsFile;
+        nodeName = nxsFile.getAbsolutePath();
+        children = getElements();
+    }
+
+     // Construct an Adapter node from a DOM node
     public NXNodeMapper(Node node, boolean isDocument, String nodeName) {
 
         this.isDocument = isDocument;
@@ -70,6 +89,18 @@ public class NXNodeMapper implements TreeNode {
 
     public void addNode(NXNodeMapper node) {
         documents.add(node);
+    }
+
+    public File getNXSFile(){
+        return nxsFile;
+    }
+
+    public File getSchematronFile(){
+        return schematronFile;
+    }
+
+    public void setSchematronFile(File schematronFile){
+        this.schematronFile = schematronFile;
     }
 
     // Return the node name
