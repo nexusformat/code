@@ -1,5 +1,6 @@
-package org.nexusformat.nxvalidate;
+package org.nexusformat.nxvalidate.filter;
 
+import org.nexusformat.nxvalidate.*;
 import java.io.File;
 import java.util.Vector;
 import javax.swing.filechooser.FileFilter;

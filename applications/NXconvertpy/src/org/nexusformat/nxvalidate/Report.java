@@ -14,73 +14,72 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 class Report {
-	NXSnode report;
-	Vector<SVRLitem> errors;
 
-	private static String NXROOT = "NXroot";
-	private static String SVRLROOT = "svrl:schematron-output";
+    NXSnode report;
+    Vector<SVRLitem> errors;
+    private static String NXROOT = "NXroot";
+    private static String SVRLROOT = "svrl:schematron-output";
 
-	Report(final String reduced, final String report)
-	            throws ParserConfigurationException, SAXException, IOException {
-		// parse the reduced file and turn it into a node tree
-		Document redDoc = parse(reduced);
-		this.report = new NXSnode(getNXroot(redDoc));
+    Report(final String reduced, final String report)
+            throws ParserConfigurationException, SAXException, IOException {
 
-		// add the svrl report to the reduced
-		Document svrlDoc = parse(report);
-		this.errors = this.report.addSVRL(getSVRLroot(svrlDoc));
-	}
+        // parse the reduced file and turn it into a node tree
+        Document redDoc = parse(reduced);
+        this.report = new NXSnode(getNXroot(redDoc));
 
-	public int numErrors() {
-		return this.errors.size();
-	}
+        // add the svrl report to the reduced
+        Document svrlDoc = parse(report);
+        this.errors = this.report.addSVRL(getSVRLroot(svrlDoc));
+    }
 
-	public Vector<SVRLitem> getReport() {
-		return this.errors;
-	}
+    public int numErrors() {
+        return this.errors.size();
+    }
 
-	public void printReport() {
-		int size = this.numErrors();
-		for (int i = 0; i < size; i++) {
-			System.out.println(this.errors.get(i));
-			if (i + 1 < size) {
-				System.out.println("----------");
-			}
-		}
-	}
+    public Vector<SVRLitem> getReport() {
+        return this.errors;
+    }
 
-	public NXSnode getTree() {
-		return this.report;
-	}
+    public void printReport() {
+        int size = this.numErrors();
+        for (int i = 0; i < size; i++) {
+            System.out.println(this.errors.get(i));
+            if (i + 1 < size) {
+                System.out.println("----------");
+            }
+        }
+    }
 
-	public void printTree() {
-		this.report.printTree();
-	}
-	
-	static private Node getNXroot(final Document doc) {
-		NodeList nodes = doc.getElementsByTagName(NXROOT);
-		int size = nodes.getLength();
-		if (size == 1) {
-			return nodes.item(0);
-		}
-		throw new Error("Failed to find one " + NXROOT + " (found " + size
-				        + ")");
-	}
+    public NXSnode getTree() {
+        return this.report;
+    }
 
-	static private Node getSVRLroot(final Document doc) {
-		NodeList nodes = doc.getElementsByTagName(SVRLROOT);
-		int size = nodes.getLength();
-		if (size == 1) {
-			return nodes.item(0);
-		}
-		throw new Error("Failed to find one " + SVRLROOT + " (found " + size
-				        + ")");
-	}
-	static private Document parse(final String filename)
-	            throws ParserConfigurationException, SAXException, IOException {
-		File file = new File(filename);
-		DocumentBuilder builder
-		            = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		return builder.parse(file);
-	}
+    public void printTree() {
+        this.report.printTree();
+    }
+
+    static private Node getNXroot(final Document doc) {
+        NodeList nodes = doc.getElementsByTagName(NXROOT);
+        int size = nodes.getLength();
+        if (size == 1) {
+            return nodes.item(0);
+        }
+        throw new Error("Failed to find one " + NXROOT + " (found " + size + ")");
+    }
+
+    static private Node getSVRLroot(final Document doc) {
+        NodeList nodes = doc.getElementsByTagName(SVRLROOT);
+        int size = nodes.getLength();
+        if (size == 1) {
+            return nodes.item(0);
+        }
+        throw new Error("Failed to find one " + SVRLROOT + " (found " + size + ")");
+    }
+
+    static private Document parse(final String filename)
+            throws ParserConfigurationException, SAXException, IOException {
+        File file = new File(filename);
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        return builder.parse(file);
+    }
 }

@@ -1,4 +1,4 @@
-package org.nexusformat.nxvalidate;
+package org.nexusformat.nxvalidate.filter;
 
 import java.io.File;
 import javax.swing.filechooser.FileFilter;

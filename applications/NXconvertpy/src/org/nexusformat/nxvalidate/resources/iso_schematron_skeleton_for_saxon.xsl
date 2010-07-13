@@ -2156,7 +2156,7 @@ which require a preprocess.
 		 
 		<xsl:choose>
 		   <xsl:when test="string-length( $langCode ) = 0 or $langCode = 'default'" > 	   	 
-				<xsl:value-of select='document("")//xhtml:p[@id=concat("sch-message-", $number)]/text()' />
+				<xsl:value-of select='document("iso_schematron_skeleton_for_saxon.xsl")//xhtml:p[@id=concat("sch-message-", $number)]/text()' />
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:variable name="localizationDocumentFilename" >

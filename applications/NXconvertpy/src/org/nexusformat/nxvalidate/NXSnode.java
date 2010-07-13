@@ -15,12 +15,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 class NXSnode extends AbstractNXSnode implements TreeModel {
-	private static final String PADDING = "  ";
-	private static final String NXROOT = "NXroot";
-	private static final String TYPE = "NAPItype";
-	private static final String LINK = "NAPIlink";
-	private static final String SDS = "SDS";
-	private static final Logger LOG = Logger.getInstance();
 
 	private String nxclass;
 	private Vector<AbstractNXSnode> children;
@@ -33,51 +27,51 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		this.svrl = new Vector<SVRLitem>();
 	}
 
-	NXSnode(final Node node) {
-		this();
-		this.nxclass  = node.getNodeName();
-		this.setAttrs(node.getAttributes());
+    NXSnode(final Node node) {
+        this();
+        this.nxclass = node.getNodeName();
+        this.setAttrs(node.getAttributes());
 
-		NodeList nodes = node.getChildNodes();
-		int size = nodes.getLength();
-		for (int i = 0; i < size; i++) {
-			this.addChild(nodes.item(i));
-		}
-	}
+        NodeList nodes = node.getChildNodes();
+        int size = nodes.getLength();
+        for (int i = 0; i < size; i++) {
+            this.addChild(nodes.item(i));
+        }
+    }
 
-	Vector<SVRLitem> addSVRL(final Node svrl) {
-		// generate a list of xml error nodes
-		Vector<Node> errors = new Vector<Node>();
-		addSVRL(svrl, errors);
+    Vector<SVRLitem> addSVRL(final Node svrl) {
+        // generate a list of xml error nodes
+        Vector<Node> errors = new Vector<Node>();
+        addSVRL(svrl, errors);
 
-		// convert it to java classes
-		Vector<SVRLitem> items = new Vector<SVRLitem>();
-		for (Node node: errors) {
-			items.add(new SVRLitem(node));
-		}
+        // convert it to java classes
+        Vector<SVRLitem> items = new Vector<SVRLitem>();
+        for (Node node : errors) {
+            items.add(new SVRLitem(node));
+        }
 
-		// find the appropriate nodes to attach it to
-		NXSnode nxsnode;
-		for (SVRLitem item: items) {
-			nxsnode = getNode(this, item.getLocationArray(), 1);
-			nxsnode.svrl.add(item);
-		}
+        // find the appropriate nodes to attach it to
+        NXSnode nxsnode;
+        for (SVRLitem item : items) {
+            nxsnode = getNode(this, item.getLocationArray(), 1);
+            nxsnode.svrl.add(item);
+        }
 
-		return items;
-	}
+        return items;
+    }
 
-	private static NXSnode getNode(NXSnode parent, Vector<String> location,
-			int depth) {
-		// chop up this part of the path to be useful
-		if (location.size() <= depth) {
-			return parent;
-		}
-		String partPath = location.get(depth);
-		int left = partPath.indexOf("[");
-		int right = partPath.indexOf("]", left);
-		String name = partPath.substring(0, left);
-		int index = Integer.parseInt(partPath.substring(left + 1, right)) - 1;
-		LOG.debug("Looking for " + name + "[" + index + "]");
+    private static NXSnode getNode(NXSnode parent, Vector<String> location,
+            int depth) {
+        // chop up this part of the path to be useful
+        if (location.size() <= depth) {
+            return parent;
+        }
+        String partPath = location.get(depth);
+        int left = partPath.indexOf("[");
+        int right = partPath.indexOf("]", left);
+        String name = partPath.substring(0, left);
+        int index = Integer.parseInt(partPath.substring(left + 1, right)) - 1;
+        LOG.debug("Looking for " + name + "[" + index + "]");
 
 		// get the options - only works with NXSnodes
 		Vector<NXSnode> choices = new Vector<NXSnode>();
@@ -93,52 +87,52 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		    }
 		}
 
-		// pick which one to return
-		int numChoice = choices.size();
-		LOG.debug("Found " + numChoice + " options");
-		if ((numChoice <= 0) || (numChoice < index)){
-			return parent;
-		}
-		if (depth >= location.size()) {
-			return choices.get(index);
-		} else {
-			return getNode(choices.get(index), location, depth + 1);
-		}
-	}
+        // pick which one to return
+        int numChoice = choices.size();
+        LOG.debug("Found " + numChoice + " options");
+        if ((numChoice <= 0) || (numChoice < index)) {
+            return parent;
+        }
+        if (depth >= location.size()) {
+            return choices.get(index);
+        } else {
+            return getNode(choices.get(index), location, depth + 1);
+        }
+    }
 
-	private static boolean equals(final String left, final String right) {
-		if (left == null) {
-			return false;
-		}
-		if (right == null) {
-			return false;
-		}
-		return left.equals(right);
-	}
+    private static boolean equals(final String left, final String right) {
+        if (left == null) {
+            return false;
+        }
+        if (right == null) {
+            return false;
+        }
+        return left.equals(right);
+    }
 
-	private static void addSVRL(final Node node, final Vector<Node> errors) {
-		if (SVRLitem.hasLocation(node)) {
-			errors.add(node);
-			return;
-		}
-		NodeList nodes = node.getChildNodes();
-		int size = nodes.getLength();
-		for (int i = 0; i < size; i++) {
-			addSVRL(nodes.item(i), errors);
-		}
-	}
+    private static void addSVRL(final Node node, final Vector<Node> errors) {
+        if (SVRLitem.hasLocation(node)) {
+            errors.add(node);
+            return;
+        }
+        NodeList nodes = node.getChildNodes();
+        int size = nodes.getLength();
+        for (int i = 0; i < size; i++) {
+            addSVRL(nodes.item(i), errors);
+        }
+    }
 
-	private void setAttrs(final NamedNodeMap attrs) {
-		if (attrs == null) {
-			return;
-		}
-		int size = attrs.getLength();
-		Node attr;
-		for (int i = 0; i < size; i++) {
-			attr = attrs.item(i);
-			this.setAttr(attr.getNodeName(), attr.getNodeValue());
-		}
-	}
+    private void setAttrs(final NamedNodeMap attrs) {
+        if (attrs == null) {
+            return;
+        }
+        int size = attrs.getLength();
+        Node attr;
+        for (int i = 0; i < size; i++) {
+            attr = attrs.item(i);
+            this.setAttr(attr.getNodeName(), attr.getNodeValue());
+        }
+    }
 
 	void setAttr(final String name, final String value) {
 		if (name.equals("name")) {
@@ -152,24 +146,24 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		this.children.insertElementAt(new Attribute(name, value), 0);
 	}
 
-	private void addChild(final Node node) {
-		if (node == null) {
-			return;
-		}
-		int type = node.getNodeType();
-		if (type != Node.ELEMENT_NODE) {
-			return;
-		}
-		this.children.add(new NXSnode(node));
-	}
+    private void addChild(final Node node) {
+        if (node == null) {
+            return;
+        }
+        int type = node.getNodeType();
+        if (type != Node.ELEMENT_NODE) {
+            return;
+        }
+        this.children.add(new NXSnode(node));
+    }
 
-	String getType() {
-		return this.nxclass;
-	}
+    String getType() {
+        return this.nxclass;
+    }
 
-	boolean hasError() {
-		return (this.svrl.size() > 0);
-	}
+    boolean hasError() {
+        return (this.svrl.size() > 0);
+    }
 
     private String getAttrValue(final String name) {
 	int size = this.children.size();
@@ -202,9 +196,9 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		}
 	}
 
-	public void printTree() {
-		this.printTree("");
-	}
+    public void printTree() {
+        this.printTree("");
+    }
 
 	private void printTree(String padding) {
 		System.out.println(padding + this.toString());
@@ -215,14 +209,17 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		}
 	}
 
-	public boolean equals(final Object other) {
-		// do the simple checks
-		if (this == other)
-			return true;
-		if (other == null)
-			return false;
-		if (!(other instanceof NXSnode))
-			return false;
+    public boolean equals(final Object other) {
+        // do the simple checks
+        if (this == other) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof NXSnode)) {
+            return false;
+        }
 
 		// cast and do deep comparison
 		NXSnode temp = (NXSnode) other;
@@ -235,26 +232,25 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		if (!this.svrl.equals(temp.svrl))
 			return false;
 
-		// this far must be ok
-		return true;
-	}
+        // this far must be ok
+        return true;
+    }
 
-	private static NXSnode toNXSnode(final Object object) {
-		if (object == null) {
-			throw new Error("Cannot convert null object to NXSnode");
-		}
-		if (!(object instanceof NXSnode)) {
-			throw new Error("Cannot convert \"" + object + "\"  to NXSnode");
-		}
-		return (NXSnode) object;
-	}
+    private static NXSnode toNXSnode(final Object object) {
+        if (object == null) {
+            throw new Error("Cannot convert null object to NXSnode");
+        }
+        if (!(object instanceof NXSnode)) {
+            throw new Error("Cannot convert \"" + object + "\"  to NXSnode");
+        }
+        return (NXSnode) object;
+    }
 
-	// ---------------- TreeModel requirements
-	@Override
-	public void addTreeModelListener(TreeModelListener l) {
-		// TODO Auto-generated method stub
-		
-	}
+    // ---------------- TreeModel requirements
+    @Override
+    public void addTreeModelListener(TreeModelListener l) {
+        // TODO Auto-generated method stub
+    }
 
 	public Object getChild(Object parent, int index) {
 	    if (parent instanceof NXSnode)
@@ -263,10 +259,10 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		return null;
 	}
 
-	public int getChildCount(Object parent) {
-		NXSnode temp = toNXSnode(parent);
-		return temp.children.size();
-	}
+    public int getChildCount(Object parent) {
+        NXSnode temp = toNXSnode(parent);
+        return temp.children.size();
+    }
 
 	public int getIndexOfChild(Object parent, Object child) {
 		if (parent == null)
@@ -280,9 +276,9 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		    return -1;
 	}
 
-	public Object getRoot() {
-		return this;
-	}
+    public Object getRoot() {
+        return this;
+    }
 
 	public boolean isLeaf(final Object node) {
 	    if (node instanceof NXSnode)
@@ -291,15 +287,13 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
 		return true;
 	}
 
-	@Override
-	public void removeTreeModelListener(TreeModelListener l) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void removeTreeModelListener(TreeModelListener l) {
+        // TODO Auto-generated method stub
+    }
 
-	@Override
-	public void valueForPathChanged(TreePath path, Object newValue) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+        // TODO Auto-generated method stub
+    }
 }

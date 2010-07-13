@@ -14,6 +14,7 @@ public class XMLIconTreeHandler extends DefaultHandler {
 		return root;
 	}
 
+    @Override
 	public void startElement(String namespaceURI, String lName, String qName,
 			Attributes attrs) throws SAXException {
 		String eName = lName;

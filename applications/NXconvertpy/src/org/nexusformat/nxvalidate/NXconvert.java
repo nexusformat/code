@@ -10,6 +10,7 @@ class NXconvert {
 
   private File rawfile;
   private File redfile;
+  private NXproperties props = null;
 
   NXconvert(final String filename, final boolean keepTemp)
                                    throws IOException, InterruptedException {
@@ -19,6 +20,9 @@ class NXconvert {
     if (!keepTemp) {
       this.redfile.deleteOnExit();
     }
+
+    props = new NXproperties();
+
   }
   
   private void printStd(final String command, final String out,
@@ -32,7 +36,8 @@ class NXconvert {
 	  LOG.info("Creating " + this.redfile.getAbsolutePath());
 
     // the command to run
-    String command = NXCONVERT + " -d " + this.rawfile + " " + this.redfile;
+    String command = props.getProperty(NXCONVERT) + 
+            " -d " + this.rawfile + " " + this.redfile;
 
     // execute the command
     Runtime rt = Runtime.getRuntime();
