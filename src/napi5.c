@@ -625,6 +625,13 @@ static hid_t nxToHDF5Type(int datatype)
       int compress_level;
 
       pFile = NXI5assert (fid);
+      if (pFile->iCurrentG <= 0)
+      {
+          sprintf (pBuffer, "ERROR: no group open for makedata on %s",
+              name);
+          NXIReportError (NXpData, pBuffer);
+          return NX_ERROR;
+      }
 
       for (i = 0; i < rank; i++)
       {
