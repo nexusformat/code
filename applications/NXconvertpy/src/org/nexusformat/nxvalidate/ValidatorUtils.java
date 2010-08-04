@@ -20,8 +20,12 @@ public class ValidatorUtils {
     private boolean keepTemp = false;
     private File schematronFile = null;
     private boolean convertNxs = false;
+    private File nxconvertFile = null;
 
-    public ValidatorUtils() {
+    public ValidatorUtils(File nxconvertFile) {
+
+        this.nxconvertFile = nxconvertFile;
+
     }
 
     /**
@@ -116,7 +120,7 @@ public class ValidatorUtils {
         //Do the conversion to the reduced format.
         if (convertNxs && nxsFile != null) {
             try {
-                NXconvert converter = new NXconvert(nxsFile, keepTemp);
+                NXconvert converter = new NXconvert(nxsFile, keepTemp, nxconvertFile);
                 reduced = converter.convert();
             } catch (Exception e) {
                 Logger.getLogger(ValidatorUtils.class.getName()).log(Level.SEVERE,

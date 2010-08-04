@@ -151,7 +151,7 @@ public class NXvalidate {
 
         if (convertNxs) {
             try {
-                NXconvert converter = new NXconvert(file, keepTemp);
+                NXconvert converter = new NXconvert(file, keepTemp,null);
                 reduced = converter.convert();
             } catch (Exception e) {
                 Logger.getLogger(NXvalidate.class.getName()).log(Level.SEVERE,
