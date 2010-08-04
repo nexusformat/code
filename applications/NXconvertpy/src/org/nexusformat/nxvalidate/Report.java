@@ -2,6 +2,7 @@ package org.nexusformat.nxvalidate;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,7 +17,7 @@ import org.xml.sax.SAXException;
 class Report {
 
     NXSnode report;
-    Vector<SVRLitem> errors;
+    ArrayList<SVRLitem> errors;
     private static String NXROOT = "NXroot";
     private static String SVRLROOT = "svrl:schematron-output";
 
@@ -36,7 +37,7 @@ class Report {
         return this.errors.size();
     }
 
-    public Vector<SVRLitem> getReport() {
+    public ArrayList<SVRLitem> getReport() {
         return this.errors;
     }
 
@@ -64,7 +65,8 @@ class Report {
         if (size == 1) {
             return nodes.item(0);
         }
-        throw new Error("Failed to find one " + NXROOT + " (found " + size + ")");
+        throw new Error(
+                "Failed to find one " + NXROOT + " (found " + size + ")");
     }
 
     static private Node getSVRLroot(final Document doc) {
@@ -73,13 +75,15 @@ class Report {
         if (size == 1) {
             return nodes.item(0);
         }
-        throw new Error("Failed to find one " + SVRLROOT + " (found " + size + ")");
+        throw new Error(
+                "Failed to find one " + SVRLROOT + " (found " + size + ")");
     }
 
     static private Document parse(final File file)
             throws ParserConfigurationException, SAXException, IOException {
         
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilder builder =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder();
         return builder.parse(file);
     }
 }

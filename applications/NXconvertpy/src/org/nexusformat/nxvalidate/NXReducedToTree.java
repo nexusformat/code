@@ -23,8 +23,8 @@ import org.w3c.dom.Document;
 public class NXReducedToTree extends DefaultTreeModel {
 
     private Vector listenerList = new Vector();
-   
     private NXNodeMapper root = null;
+    
     public NXReducedToTree(TreeNode root) {
         super(root);
         this.root = (NXNodeMapper)root;
@@ -39,7 +39,9 @@ public class NXReducedToTree extends DefaultTreeModel {
 
     // Basic TreeModel operations
     public Object getRoot() {
+
         return root;
+        
     }
 
     public boolean isLeaf(Object aNode) {
@@ -56,40 +58,46 @@ public class NXReducedToTree extends DefaultTreeModel {
     }
 
     public int getChildCount(Object parent) {
-        NXNodeMapper node = (NXNodeMapper) parent;
 
+        NXNodeMapper node = (NXNodeMapper) parent;
         return node.getChildCount();
+        
     }
 
+    @Override
     public Object getChild(Object parent, int index) {
 
         NXNodeMapper node = (NXNodeMapper) parent;
-
         return node.getChildAt(index);
+        
     }
 
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
 
         NXNodeMapper node = (NXNodeMapper) parent;
-
         return node.getIndex((NXNodeMapper) child);
+
     }
 
+    @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-        // Null. We won't be making changes in the GUI
-        // If we did, we would ensure the new value was really new,
-        // adjust the model, and then fire a TreeNodesChanged event.
+       
 
-        }
+    }
 
+    @Override
     public void addTreeModelListener(TreeModelListener listener) {
+
         if ((listener != null) && !listenerList.contains(listener)) {
             listenerList.addElement(listener);
         }
 
     }
 
+    @Override
     public void removeTreeModelListener(TreeModelListener listener) {
+
         if (listener != null) {
             listenerList.removeElement(listener);
         }
@@ -107,6 +115,7 @@ public class NXReducedToTree extends DefaultTreeModel {
     //    ...
     //  }
     public void fireTreeNodesChanged(TreeModelEvent e) {
+
         Enumeration listeners = listenerList.elements();
 
         while (listeners.hasMoreElements()) {
@@ -115,9 +124,11 @@ public class NXReducedToTree extends DefaultTreeModel {
             listener.treeNodesChanged(e);
         }
         System.out.println("NXReducedToTree fireTreeNodesChanged");
+
     }
 
     public void fireTreeNodesInserted(TreeModelEvent e) {
+
         Enumeration listeners = listenerList.elements();
 
         while (listeners.hasMoreElements()) {
@@ -126,9 +137,11 @@ public class NXReducedToTree extends DefaultTreeModel {
             listener.treeNodesInserted(e);
         }
         System.out.println("NXReducedToTree fireTreeNodesInserted");
+
     }
 
     public void fireTreeNodesRemoved(TreeModelEvent e) {
+
         Enumeration listeners = listenerList.elements();
 
         while (listeners.hasMoreElements()) {
@@ -137,9 +150,11 @@ public class NXReducedToTree extends DefaultTreeModel {
             listener.treeNodesRemoved(e);
         }
         System.out.println("NXReducedToTree fireTreeNodesRemoved");
+
     }
 
     public void fireTreeStructureChanged(TreeModelEvent e) {
+
         Enumeration listeners = listenerList.elements();
 
         while (listeners.hasMoreElements()) {
@@ -148,5 +163,6 @@ public class NXReducedToTree extends DefaultTreeModel {
             listener.treeStructureChanged(e);
         }
         System.out.println("NXReducedToTree fireTreeStructureChanged");
+        
     }
 }

@@ -1,9 +1,6 @@
 package org.nexusformat.nxvalidate;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.event.TreeModelListener;
@@ -24,14 +21,14 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
     private static final Logger LOG = Logger.getInstance();
     private String name;
     private String nxclass;
-    private Vector<AbstractNXSnode> children;
-    private Vector<SVRLitem> svrl;
+    private ArrayList<AbstractNXSnode> children;
+    private ArrayList<SVRLitem> svrl;
 
     NXSnode() {
         super(NXROOT);
         this.nxclass = "";
-        this.children = new Vector<AbstractNXSnode>();
-        this.svrl = new Vector<SVRLitem>();
+        this.children = new ArrayList<AbstractNXSnode>();
+        this.svrl = new ArrayList<SVRLitem>();
     }
 
     NXSnode(final Node node) {
@@ -46,13 +43,13 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
         }
     }
 
-    Vector<SVRLitem> addSVRL(final Node svrl) {
+    ArrayList<SVRLitem> addSVRL(final Node svrl) {
         // generate a list of xml error nodes
-        Vector<Node> errors = new Vector<Node>();
+        ArrayList<Node> errors = new ArrayList<Node>();
         addSVRL(svrl, errors);
 
         // convert it to java classes
-        Vector<SVRLitem> items = new Vector<SVRLitem>();
+        ArrayList<SVRLitem> items = new ArrayList<SVRLitem>();
         for (Node node : errors) {
             items.add(new SVRLitem(node));
         }
@@ -67,7 +64,7 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
         return items;
     }
 
-    private static NXSnode getNode(NXSnode parent, Vector<String> location,
+    private static NXSnode getNode(NXSnode parent, ArrayList<String> location,
             int depth) {
         // chop up this part of the path to be useful
         if (location.size() <= depth) {
@@ -81,7 +78,7 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
         LOG.debug("Looking for " + name + "[" + index + "]");
 
         // get the options - only works with NXSnodes
-        Vector<NXSnode> choices = new Vector<NXSnode>();
+        ArrayList<NXSnode> choices = new ArrayList<NXSnode>();
         NXSnode temp;
         for (AbstractNXSnode child : parent.children) {
             if (child instanceof NXSnode) {
@@ -117,7 +114,7 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
         return left.equals(right);
     }
 
-    private static void addSVRL(final Node node, final Vector<Node> errors) {
+    private static void addSVRL(final Node node, final ArrayList<Node> errors) {
         if (SVRLitem.hasLocation(node)) {
             errors.add(node);
             return;
@@ -150,7 +147,7 @@ class NXSnode extends AbstractNXSnode implements TreeModel {
             this.nxclass = SDS;
             return;
         }
-        this.children.insertElementAt(new Attribute(name, value), 0);
+        this.children.add(0, new Attribute(name, value));
     }
 
     private void addChild(final Node node) {

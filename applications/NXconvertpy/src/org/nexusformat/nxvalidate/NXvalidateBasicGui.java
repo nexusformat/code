@@ -11,6 +11,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -55,7 +56,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
     File schematronFile = null;
     NXconvert converter;
     NXschematron schematron;
-    Vector<Report> reports;
+    ArrayList<Report> reports;
     NXvalidate validator;
 
     public NXvalidateBasicGui() {
@@ -295,7 +296,7 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
 
                 log.append("There were " + report.numErrors() + " errors found." + newline);
 
-                Vector<SVRLitem> messages = report.getReport();
+                ArrayList<SVRLitem> messages = report.getReport();
 
                 Iterator i = messages.iterator();
                 while (i.hasNext()) {

@@ -5,13 +5,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- *
- * @author ser65
+ * An interface which represents the concept that the elements in an XML
+ * Document can be good or bad after they have been validated against some
+ * criteria defined in the implementation.
+ * @author Stephen Rankin
  */
 public interface NodeFilterInterface {
 
     /**
-     * Sets a DOM document (filter document) that containes a list of nodes
+     * Sets a DOM document (filter document) that contains a list of nodes
      * that have failed any validation tests, for example, the SVRL file.
      * @param filterDoc a DOM document.
      */
@@ -28,5 +30,12 @@ public interface NodeFilterInterface {
      * @return
      */
     public ArrayList<Node> getBadNodeList();
+
+
+    /**
+     * Reset the bad nodes to indicate that they are now good nodes, i.e.
+     * resets them back to there original state.
+     */
+    public void resetBadNodes();
 
 }

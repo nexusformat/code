@@ -17,13 +17,13 @@ import java.io.File;
  *
  * @author ser65
  */
-public class NXLoadFilesDialog extends javax.swing.JDialog {
+public class NXValidateDialog extends javax.swing.JDialog {
 
     private File nxs = null;
     private File nxdc = null;
     private boolean OKButtonUsed = false;
     /** Creates new form NXLoadFilesDialog */
-    public NXLoadFilesDialog(java.awt.Frame parent, boolean modal) {
+    public NXValidateDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -39,9 +39,6 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 
         jFileChooser1 = new javax.swing.JFileChooser();
         jPanel1 = new javax.swing.JPanel();
-        nxsLabel = new javax.swing.JLabel();
-        nxsTextField = new javax.swing.JTextField();
-        openButton1 = new javax.swing.JButton();
         nxdcLabel = new javax.swing.JLabel();
         nxdcTextField = new javax.swing.JTextField();
         openButton2 = new javax.swing.JButton();
@@ -53,17 +50,6 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
         setResizable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5), javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED)));
-
-        nxsLabel.setText("Load NXS:");
-
-        nxsTextField.setEditable(false);
-
-        openButton1.setText("Open");
-        openButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openButton1ActionPerformed(evt);
-            }
-        });
 
         nxdcLabel.setText("Load NXDC:");
 
@@ -83,7 +69,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
             }
         });
 
-        OKButton.setText("OK");
+        OKButton.setText("Validate");
         OKButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 OKButtonActionPerformed(evt);
@@ -94,49 +80,33 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(nxsLabel)
-                            .addComponent(nxdcLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(nxdcTextField)
-                            .addComponent(nxsTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)))
-                    .addComponent(cancelButton))
-                .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(openButton1)
-                        .addContainerGap())
+                        .addComponent(cancelButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 482, Short.MAX_VALUE)
+                        .addComponent(OKButton))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(nxdcLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(openButton2)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(OKButton)
-                        .addContainerGap())))
+                        .addComponent(nxdcTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(openButton2)))
+                .addGap(23, 23, 23))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(nxsLabel)
-                    .addComponent(nxsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(openButton1))
-                .addGap(28, 28, 28)
+                .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nxdcLabel)
                     .addComponent(nxdcTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(openButton2))
-                .addGap(27, 27, 27)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cancelButton)
-                    .addComponent(OKButton))
+                    .addComponent(OKButton)
+                    .addComponent(cancelButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -144,7 +114,9 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,23 +125,6 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void openButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButton1ActionPerformed
-
-        if(evt.getSource() == openButton1){
-
-            int returnVal = jFileChooser1.showOpenDialog(this);
-
-            if (returnVal == jFileChooser1.APPROVE_OPTION) {
-                nxs = jFileChooser1.getSelectedFile();
-                nxsTextField.setText(nxs.getAbsolutePath());
-                nxsTextField.setToolTipText(nxs.getAbsolutePath());
-            } else {
-                nxs = null;
-            }
-
-        }
-}//GEN-LAST:event_openButton1ActionPerformed
 
     private void openButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButton2ActionPerformed
 
@@ -203,11 +158,14 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_OKButtonActionPerformed
 
-    public File getNXSFile(){
-        return nxs;
-    }
+    
     public File getNXDCFile(){
         return nxdc;
+    }
+
+    public void setNXDCFile(File file){
+        nxdc = file;
+        nxdcTextField.setText(nxdc.getAbsolutePath());
     }
 
     public boolean OKButtonUsed(){
@@ -220,7 +178,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NXLoadFilesDialog dialog = new NXLoadFilesDialog(new javax.swing.JFrame(), true);
+                NXValidateDialog dialog = new NXValidateDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -238,9 +196,6 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel nxdcLabel;
     private javax.swing.JTextField nxdcTextField;
-    private javax.swing.JLabel nxsLabel;
-    private javax.swing.JTextField nxsTextField;
-    private javax.swing.JButton openButton1;
     private javax.swing.JButton openButton2;
     // End of variables declaration//GEN-END:variables
 

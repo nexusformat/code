@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import javax.swing.tree.TreeNode;
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,6 +33,11 @@ public class NXNodeMapper implements TreeNode {
     private NXNodeMapper root = null;
     private File nxsFile = null;
     private File schematronFile = null;
+    private File reducedFile = null;
+    private File resultsFile = null;
+    private Document reducedDoc = null;
+    private Document resultsDoc = null;
+    private boolean badNode = false;
 
     // Construct an Adapter node from a DOM node
     public NXNodeMapper(Node node, boolean isDocument, File nxsFile) {
@@ -101,6 +107,82 @@ public class NXNodeMapper implements TreeNode {
 
     public void setSchematronFile(File schematronFile){
         this.schematronFile = schematronFile;
+    }
+
+    public File getReducedFile(){
+        return reducedFile;
+    }
+
+    public void setReducedFile(File reducedFile){
+        this.reducedFile = reducedFile;
+    }
+
+    public File getResultsFile(){
+        return resultsFile;
+    }
+
+    public void setResultsFile(File resultsFile){
+        this.resultsFile = resultsFile;
+    }
+
+    public Document getResultsDoc(){
+        return resultsDoc;
+    }
+
+    public void setResultsDoc(Document resultsDoc){
+        this.resultsDoc = resultsDoc;
+    }
+
+    public Document getReducedDoc(){
+        return reducedDoc;
+    }
+
+    public void setReducedDoc(Document reducedDoc){
+        this.reducedDoc = reducedDoc;
+    }
+
+    public void setBadNode(boolean badNode){
+        this.badNode = badNode;
+    }
+
+    public boolean getBadNode(){
+        return badNode;
+    }
+
+    public void checkBadNode(){
+        if(!isRoot){
+            Boolean bad = (Boolean)domNode.getUserData("bad");
+            if(bad !=null){
+                this.badNode = bad.booleanValue();
+            }
+        }
+    }
+
+    public void resetNode(){
+
+        badNode = false;
+
+        domNode.setUserData("texts", null, null);
+        domNode.setUserData("tests", null, null);
+        domNode.setUserData("diags", null, null);
+        domNode.setUserData("diagatts", null, null);
+        domNode.setUserData("bad", new Boolean(false), null);
+    }
+
+    public ArrayList<String> getNodeTexts(){
+        return (ArrayList<String>)domNode.getUserData("texts");
+    }
+
+    public ArrayList<String> getNodeTests(){
+        return (ArrayList<String>)domNode.getUserData("tests");
+    }
+
+    public ArrayList<String> getNodeDiags(){
+        return (ArrayList<String>)domNode.getUserData("diags");
+    }
+
+    public ArrayList<String> getNodeDiagAtts(){
+        return (ArrayList<String>)domNode.getUserData("diagatts");
     }
 
     // Return the node name
@@ -295,6 +377,7 @@ public class NXNodeMapper implements TreeNode {
             }
 
         }
+
     }
 }
 

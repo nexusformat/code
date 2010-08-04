@@ -1,5 +1,6 @@
 package org.nexusformat.nxvalidate;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.w3c.dom.NamedNodeMap;
@@ -33,8 +34,8 @@ public class SVRLitem {
 		return buffer.toString();
 	}
 
-	Vector<String> getLocationArray() {
-		Vector<String> result = new Vector<String>();
+	ArrayList<String> getLocationArray() {
+		ArrayList<String> result = new ArrayList<String>();
 		for (int i = 0; i < this.location.length; i++) {
 			result.add(this.location[i]);
 		}

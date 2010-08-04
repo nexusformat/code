@@ -1,37 +1,39 @@
 package org.nexusformat.nxvalidate;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NXvalidate {
 
     static final String VERSION = "0.1 alpha";
-    private Vector<File> files;
+    private ArrayList<File> files;
     private File schematronFile;
     private boolean keepTemp;
     private boolean convertNxs;
     private int verbose;
-    private Vector<Report> reports;
+    private ArrayList<Report> reports;
     private File reduced = null;
 
     NXvalidate() {
-        files = new Vector<File>();
+        files = new ArrayList<File>();
         this.schematronFile = null;
         this.keepTemp = false;
         this.convertNxs = true;
         this.verbose = 0;
-        this.reports = new Vector<Report>();
+        this.reports = new ArrayList<Report>();
     }
 
-    public Vector<Report> getReports() {
+    public ArrayList<Report> getReports() {
         return reports;
     }
 
-    public Vector<File> getFilenames() {
+    public ArrayList<File> getFilenames() {
         return files;
     }
 
-    public void setFilenames(Vector<String> filenames) {
+    public void setFilenames(ArrayList<String> filenames) {
         this.files = files;
     }
 
@@ -75,8 +77,12 @@ public class NXvalidate {
         return VERSION;
     }
 
-    public File getReduced(){
+    public File getReduced() {
         return reduced;
+    }
+
+    public File setReduced(File reduced) {
+        return this.reduced = reduced;
     }
 
     void parseArgs(final String[] args) {
@@ -107,7 +113,7 @@ public class NXvalidate {
                 files.add(new File(args[i]));
             }
         }
-        this.setLoggingLevel();
+       
 
         // confirm that the manditory arguments are there
         if (this.files.size() <= 0) {
@@ -122,15 +128,7 @@ public class NXvalidate {
         }
     }
 
-    void setLoggingLevel() {
-        if (this.verbose == 1) {
-            Logger.setLevel(Logger.INFO);
-        } else if (this.verbose == 2) {
-            Logger.setLevel(Logger.DEBUG);
-        } else if (this.verbose > 2) {
-            Logger.setLevel(Logger.TRACE);
-        }
-    }
+    
 
     void process() {
         if (this.verbose > 0) {
@@ -147,57 +145,58 @@ public class NXvalidate {
         return file;
     }
 
-    private void process(final File file) throws Error {
-        if (this.verbose > 0) {
-            System.out.println("Validating " + file);
-        }
-
-
-        if (this.convertNxs) {
-            try {
-                NXconvert converter = new NXconvert(file, this.keepTemp);
-                reduced = converter.convert();
-            } catch (Exception e) {
-                throw new Error("While converting \"" + file + "\" to reduced xml format", e);
-            }
-        } else {
-            reduced = file;
-        }
-
-        // create the validation setup
-        NXschematron schematron = new NXschematron(reduced,
-                schematronFile, this.keepTemp);
+    private File process(final File file) throws Error {
 
         File result = null;
-        try {
-            result = schematron.validate();
-        } catch (Exception e) {
-            throw new Error("While creating validation report", e);
+
+        if (convertNxs) {
+            try {
+                NXconvert converter = new NXconvert(file, keepTemp);
+                reduced = converter.convert();
+            } catch (Exception e) {
+                Logger.getLogger(NXvalidate.class.getName()).log(Level.SEVERE,
+                        "While converting \"" + file +
+                        "\" to reduced xml format",e);
+                throw new Error("While converting \"" + file +
+                        "\" to reduced xml format", e);
+            }
         }
 
-        // create the report
-        Report report = null;
-        try {
-            report = new Report(reduced, result);
-        } catch (Exception e) {
-            throw new Error("While generating the report object", e);
-        }
+        if (reduced != null && schematronFile !=null) {
+            
+            // create the validation setup
+            NXschematron schematron = new NXschematron(reduced,
+                    schematronFile, keepTemp);
 
-        // Add to vector of reports (one for each input file)
-        reports.add(report);
-        System.out.println("===== Tree");
-        report.printTree();
-        int numErrors = report.numErrors();
-        if (numErrors > 0) {
-            System.out.println("===== Report");
-            report.printReport();
-        }
-        System.out.println("===== Found " + report.numErrors() + " errors");
+            try {
+                result = schematron.validate();
+            } catch (Exception e) {
+                Logger.getLogger(NXvalidate.class.getName()).log(Level.SEVERE,
+                        "While creating validation report",e);
+                throw new Error("While creating validation report", e);
+            }
 
-        System.out.println(result);
-        /*} catch (Exception e) {
-        throw new Error("While processing " + filename, e);
-        }*/
+            // create the report
+            Report report = null;
+            try {
+                report = new Report(reduced, result);
+            } catch (Exception e) {
+                Logger.getLogger(NXvalidate.class.getName()).log(Level.SEVERE,
+                        "While generating the report object",e);
+                throw new Error("While generating the report object", e);
+            }
+
+            // Add to vector of reports (one for each input file)
+            reports.add(report);
+
+            report.printTree();
+            int numErrors = report.numErrors();
+            if (numErrors > 0) {
+                report.printReport();
+            }
+
+        }
+        return result;
     }
 
     private void printVersion() {
