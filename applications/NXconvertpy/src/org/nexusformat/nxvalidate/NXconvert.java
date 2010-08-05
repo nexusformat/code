@@ -14,7 +14,8 @@ public class NXconvert {
     private NXproperties props = null;
     private File convertFile = null;
 
-    public NXconvert(final File rawfile, final boolean keepTemp, final File convertFile)
+    public NXconvert(final File rawfile, final boolean keepTemp,
+            final File convertFile)
             throws IOException, InterruptedException {
 
         this.rawfile = rawfile;

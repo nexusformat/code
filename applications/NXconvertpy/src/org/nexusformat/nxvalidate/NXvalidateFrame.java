@@ -13,16 +13,14 @@ package org.nexusformat.nxvalidate;
 import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -37,7 +35,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author ser65
+ * @author Stephen Rankin
  */
 public class NXvalidateFrame extends javax.swing.JFrame {
 
@@ -53,8 +51,9 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private File resultsFile = null;
     private TreeUtils treeUtils = null;
     private ArrayList<Report> reports;
+    private UserSettings settings = null;
     private File nxconvertFile = null;
-    private Properties props = null;
+    private boolean foundNXconvert = false;
 
     /** Creates new form NXvalidateFrame */
     public NXvalidateFrame() {
@@ -89,17 +88,29 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         jTree1.setCellRenderer(rend);
 
+        settings = new UserSettings();
+
         try {
-            loadUserSettings();
+            settings.loadUserSettings();
+            nxconvertFile = settings.getNXconvert();
+
+            if(!settings.foundNXconvert()){
+                displayErrorMessage(
+                            bundle.getString("nxconvertMissingError"));
+                foundNXconvert = false;
+            }
+            else{
+                foundNXconvert = true;
+            }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE, "The settings file cannot be found.", ex);
+                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    "The settings file cannot be found.", ex);
         } catch (IOException ex) {
             Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE, "The settings file IO error.", ex);
+                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    "The settings file IO error.", ex);
         }
-
-
 
     }
 
@@ -216,6 +227,18 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void displayErrorMessage(String message) {
+
+        JTextArea ta = new JTextArea(message);
+        ta.setEditable(false);
+        ta.setWrapStyleWord(true);
+        ta.setLineWrap(true);
+        ta.setSize(200, 100);
+        dialogReportProblem.showMessageDialog(this, ta);
+
+   }
+
+
     private void loadFiles() {
         try {
 
@@ -290,109 +313,24 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
     }
 
-    private void loadUserSettings() throws FileNotFoundException, IOException {
-
-        props = new Properties();
-
-        Map<String, String> env = System.getenv();
-        for (String envName : env.keySet()) {
-            System.out.format("%s=%s%n", envName, env.get(envName));
-        }
-
-        File settings = new File(System.getProperty("user.home")
-                + System.getProperty("file.separator") + ".nxconvertpy.properties");
-        
-        if (settings.exists()) {
-            props.load(new FileInputStream(settings));
-            if (props.getProperty("nxconvert") != null) {
-                nxconvertFile = new File(props.getProperty("nxconvert"));
-            }
-            else{
-                dialogReportProblem.showMessageDialog(this,
-                    bundle.getString("settingsMissingError"));
-                defaultNXconvert();
-            }
-        } else {
-            dialogReportProblem.showMessageDialog(this,
-                    bundle.getString("settingsMissingError"));
-            settings.createNewFile();
-            defaultNXconvert();
-
-        }
-
-    }
-
-    private void defaultNXconvert(){
-        OSValidator os = new OSValidator();
-
-        String command = null;
-
-        if(os.isWindows()){
-            command = bundle.getString("defaultWindowsNXconvert");
-        } else if(os.isMac()){
-            command = bundle.getString("defaultMacNXconvert");
-        } else if(os.isUnix()){
-            command = bundle.getString("defaultUNIXNXconvert");
-        }
-
-        if(command!=null){
-
-            if(!command.equals("")){
-                nxconvertFile = new File(command);
-            }
-
-        }
-
-        if(nxconvertFile==null){
-            nxconvertFile = new File("nxconvert");
-        }
-        
-
-    }
-
-    private void saveUserSettings() {
-
-        File settings = new File(System.getProperty("user.home")
-                + System.getProperty("file.separator") + ".nxconvertpy.properties");
-        try {
-            if (settings.exists()) {
-
-                props.setProperty("nxconvert", nxconvertFile.getAbsolutePath());
-                props.store(new FileOutputStream(settings), "ISIS NXConvertpy");
-
-            } else {
-                settings.createNewFile();
-                props.setProperty("nxconvert", nxconvertFile.getAbsolutePath());
-                props.store(new FileOutputStream(settings), "ISIS NXConvertpy");
-
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE, "saveUserSettings(): The settings file cannot be found.", ex);
-        } catch (IOException ex) {
-            Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE, "saveUserSettings(): The settings file IO error.", ex);
-        }
-    }
-
     private void openFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFilesMenuItemActionPerformed
 
         if (evt.getSource() == openFilesMenuItem) {
 
+            if(!foundNXconvert){
+                displayErrorMessage(
+                            bundle.getString("nxconvertMissingError"));
+                return;
+            }
+
             boolean result = loadOpenFilesDialog();
-
-
 
             if (result) {
                 if (nxsFile != null) {
                     loadFiles();
-
-
                 } else {
                     dialogReportProblem.showMessageDialog(this,
                             bundle.getString("openNexusFileMessage"));
-
-
                 }
             }
         }
@@ -405,10 +343,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             if (jTree1.getSelectionPath() != null) {
                 NXNodeMapper node =
                         (NXNodeMapper) jTree1.getSelectionPath().getLastPathComponent();
-                updateTextPane(
-                        node);
-
-
+                updateTextPane(node);
 
             }
         }
@@ -419,56 +354,56 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         if (evt.getSource() == validateSelectedMenuItem) {
 
+            if(!foundNXconvert){
+                displayErrorMessage(
+                            bundle.getString("nxconvertMissingError"));
+                return;
+            }
+
             Document reducedDoc = null;
             Document resultsDoc = null;
 
-
+            //Check to see if the reduction and validation have not already
+            //been done, i.e. the files and documents already exist for the
+            //current selected tree.
             if (treeUtils.getNXDCFile(jTree1) != null) {
                 nxdcFile = treeUtils.getNXDCFile(jTree1);
-
-
             }
 
             if (treeUtils.getReducedFile(jTree1) != null) {
                 reducedFile = treeUtils.getReducedFile(jTree1);
                 reducedDoc = treeUtils.getReducedDoc(jTree1);
-
-
             }
 
             if (treeUtils.getResultsFile(jTree1) != null) {
                 resultsFile = treeUtils.getResultsFile(jTree1);
                 resultsDoc = treeUtils.getResultsDoc(jTree1);
-
-
             }
 
+            //Show the validate file dialog.
             boolean result = loadValidatFileDialog();
-
-
 
             if (result) {
                 if (nxdcFile != null) {
 
                     try {
 
+                        //Validation has already been done so we reset the tree
+                        //before doing the validation again.
                         if (resultsDoc != null) {
                             SVRLNodeFilter filter = new SVRLNodeFilter();
-
                             filter.setFilterDocument(resultsDoc);
                             filter.setDocument(reducedDoc);
                             filter.resetBadNodes();
-
-
-
                         }
 
+                        //Do the validation.
                         if(nxconvertFile!=null){
                             validator = new ValidatorUtils(nxconvertFile);
                         }
                         else{
-                            dialogReportProblem.showMessageDialog(this,
-                            bundle.getString("noConvertCommandFound"));
+                             displayErrorMessage(
+                            bundle.getString("nxconvertMissingError"));
                             return;
                         }
                         validator.setSchematron(nxdcFile);
@@ -496,24 +431,17 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                     } catch (NXConvertpyException ex) {
                         Logger.getLogger(NXvalidateFrame.class.getName()).log(
                                 Level.SEVERE, null, ex);
-                        ex.printStackTrace();
                     } catch (SAXException ex) {
                         Logger.getLogger(NXvalidateFrame.class.getName()).log(
                                 Level.SEVERE, null, ex);
-                        ex.printStackTrace();
                     } catch (IOException ex) {
                         Logger.getLogger(NXvalidateFrame.class.getName()).log(
                                 Level.SEVERE, null, ex);
-                        ex.printStackTrace();
                     }
-
-
-
 
                 } else {
                     dialogReportProblem.showMessageDialog(this,
                             bundle.getString("openSchemaFileMessage"));
-
 
                 }
             }
@@ -527,16 +455,18 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
             boolean result = loadSettingsFileDialog();
 
-
-
             if (result) {
                 if (nxconvertFile != null) {
-
-                    saveUserSettings();
-
-
-
+                    settings.setNXconvert(nxconvertFile);
+                    settings.saveUserSettings();
+                    foundNXconvert = settings.foundNXconvert();
                 }
+            }
+
+            if(!foundNXconvert){
+                displayErrorMessage(
+                            bundle.getString("nxconvertMissingError"));
+                return;
             }
 
         }
@@ -626,12 +556,8 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
             }
 
-
-
             doc.insertString(doc.getLength(), "Validation Errors:"
                     + newline + newline, doc.getStyle("errorheading"));
-
-
 
             if (node.getNodeTexts() != null) {
 
@@ -652,8 +578,6 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             doc.insertString(doc.getLength(), "Diagnostic Errors:"
                     + newline + newline, doc.getStyle("errorheading"));
 
-
-
             if (node.getNodeDiags() != null) {
 
                 for (int i = 0; i
@@ -665,17 +589,14 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                     doc.insertString(doc.getLength(), newline + newline,
                             doc.getStyle("heading"));
 
-
-
                 }
 
             }
 
         } catch (BadLocationException ex) {
-            Logger.getLogger(NXvalidateFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    null, ex);
         }
-
-
 
     }
 
@@ -717,8 +638,6 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.red);
 
-
-
     }
 
     /**
@@ -729,8 +648,6 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
             public void run() {
                 new NXvalidateFrame().setVisible(true);
-
-
             }
         });
 
