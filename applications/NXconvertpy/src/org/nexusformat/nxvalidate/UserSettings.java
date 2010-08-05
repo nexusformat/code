@@ -49,7 +49,12 @@ public class UserSettings {
         if (settings.exists()) {
             props.load(new FileInputStream(settings));
             if (props.getProperty("nxconvert") != null) {
-                nxconvertFile = new File(props.getProperty("nxconvert"));
+                
+                if(chechExists(props.getProperty("nxconvert"))){
+                    nxconvertFile = new File(props.getProperty("nxconvert"));
+                    foundNXconvert = true;
+                }
+                
             }
             else{
                 defaultNXconvert();

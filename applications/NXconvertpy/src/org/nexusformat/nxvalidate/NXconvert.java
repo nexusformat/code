@@ -47,11 +47,13 @@ public class NXconvert {
 
         // the command to run
         //String command = props.getProperty(NXCONVERT) +
-               // " -d " + this.rawfile + " " + redfile;
+         //       " -d " + this.rawfile + " " + redfile;
 
         String command = "";
         if(convertFile!=null){
-            command = convertFile.getAbsolutePath();
+            command = convertFile.getAbsolutePath() +
+                " -d " + this.rawfile + " " + redfile;;
+            System.out.println(command);
         }
         else{
             return null;
