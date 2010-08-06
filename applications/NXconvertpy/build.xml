@@ -10,6 +10,8 @@
 <project name="NXConvertpy" default="default" basedir=".">
     <description>Builds, tests, and runs the project NXConvertpy.</description>
     <import file="nbproject/build-impl.xml"/>
+    <echoproperties/>
+
     <!--
 
     There exist several targets which are by default empty and which can be 
