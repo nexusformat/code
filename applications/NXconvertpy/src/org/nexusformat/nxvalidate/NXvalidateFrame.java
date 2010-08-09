@@ -12,6 +12,7 @@ package org.nexusformat.nxvalidate;
 
 import java.awt.Color;
 import java.awt.Dialog.ModalityType;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,13 +20,13 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import javax.swing.tree.MutableTreeNode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,7 +55,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private UserSettings settings = null;
     private File nxconvertFile = null;
     private boolean foundNXconvert = false;
-
+    private MouseListener popupListener = null;
     /** Creates new form NXvalidateFrame */
     public NXvalidateFrame() {
         initComponents();
@@ -112,6 +113,10 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                     "The settings file IO error.", ex);
         }
 
+        popupListener = new PopupListener(treePopupMenu);
+        jTree1.addMouseListener(popupListener);
+
+        
     }
 
     /** This method is called from within the constructor to
@@ -124,6 +129,8 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         dialogReportProblem = new javax.swing.JOptionPane();
+        treePopupMenu = new javax.swing.JPopupMenu();
+        closeFileMenuItem = new javax.swing.JMenuItem();
         jPanel2 = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -141,6 +148,14 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         bulkMenuItem = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         settingsMenuItem = new javax.swing.JMenuItem();
+
+        closeFileMenuItem.setText("Close File");
+        closeFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeFileMenuItemActionPerformed(evt);
+            }
+        });
+        treePopupMenu.add(closeFileMenuItem);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/nexusformat/nxvalidate/resources/nxvalidate"); // NOI18N
@@ -256,7 +271,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             }
             node.setReducedFile(reducedFile);
             node.setRoot(root);
-            root.addNode(node);
+            root.insert(node);
             domTree.updateTree();
             nxsFile = null;
             nxdcFile = null;
@@ -473,6 +488,23 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_settingsMenuItemActionPerformed
 
+    private void closeFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeFileMenuItemActionPerformed
+        
+        if (evt.getSource() == closeFileMenuItem) {
+
+            NXNodeMapper node = treeUtils.getBaseNode(jTree1);
+            if(node!=null){
+                if(!node.isRoot()){
+                    root.removeNode(node);
+                    domTree.removeNodeFromParent((MutableTreeNode)node);
+                    domTree.updateTree();
+                }
+            }
+            
+
+        }
+    }//GEN-LAST:event_closeFileMenuItemActionPerformed
+
     private void updateTextPane(NXNodeMapper node) {
 
         String newline = "\n";
@@ -655,6 +687,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem bulkMenuItem;
+    private javax.swing.JMenuItem closeFileMenuItem;
     private javax.swing.JOptionPane dialogReportProblem;
     private javax.swing.JMenuItem filterMenuItem;
     private javax.swing.JMenu jMenu1;
@@ -671,6 +704,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private javax.swing.JTree jTree1;
     private javax.swing.JMenuItem openFilesMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
+    private javax.swing.JPopupMenu treePopupMenu;
     private javax.swing.JMenuItem validateSelectedMenuItem;
     // End of variables declaration//GEN-END:variables
 }

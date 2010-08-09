@@ -40,6 +40,14 @@ public class TreeUtils {
 
     }
 
+    public NXNodeMapper getBaseNode(JTree tree) {
+        if (getNode(tree) != null) {
+            return getNode(tree);
+        } else {
+            return null;
+        }
+    }
+
     public File getNXDCFile(JTree tree) {
         if (getNode(tree) != null) {
             return getNode(tree).getSchematronFile();
@@ -118,6 +126,11 @@ public class TreeUtils {
         }
 
         TreePath treePath = tree.getSelectionPath().getParentPath();
+
+        if(treePath==null){
+             return null;
+        }
+
         NXNodeMapper tmpNode = null;
         Object[] nodes = treePath.getPath();
         if (nodes.length > 1) {

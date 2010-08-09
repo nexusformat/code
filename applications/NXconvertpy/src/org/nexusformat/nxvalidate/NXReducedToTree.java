@@ -123,7 +123,7 @@ public class NXReducedToTree extends DefaultTreeModel {
                     (TreeModelListener) listeners.nextElement();
             listener.treeNodesChanged(e);
         }
-        System.out.println("NXReducedToTree fireTreeNodesChanged");
+        
 
     }
 
@@ -136,7 +136,7 @@ public class NXReducedToTree extends DefaultTreeModel {
                     (TreeModelListener) listeners.nextElement();
             listener.treeNodesInserted(e);
         }
-        System.out.println("NXReducedToTree fireTreeNodesInserted");
+        
 
     }
 
@@ -149,7 +149,7 @@ public class NXReducedToTree extends DefaultTreeModel {
                     (TreeModelListener) listeners.nextElement();
             listener.treeNodesRemoved(e);
         }
-        System.out.println("NXReducedToTree fireTreeNodesRemoved");
+        
 
     }
 
@@ -162,7 +162,7 @@ public class NXReducedToTree extends DefaultTreeModel {
                     (TreeModelListener) listeners.nextElement();
             listener.treeStructureChanged(e);
         }
-        System.out.println("NXReducedToTree fireTreeStructureChanged");
+        
         
     }
 }

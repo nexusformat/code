@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -16,9 +17,9 @@ import org.w3c.dom.NodeList;
 
 /**
  *
- * @author ser65
+ * @author Stephen Rankin
  */
-public class NXNodeMapper implements TreeNode {
+public class NXNodeMapper implements MutableTreeNode {
 
     Node domNode = null;
     private String nodeName = null;
@@ -38,6 +39,7 @@ public class NXNodeMapper implements TreeNode {
     private Document reducedDoc = null;
     private Document resultsDoc = null;
     private boolean badNode = false;
+    private Object userObject = null;
 
     // Construct an Adapter node from a DOM node
     public NXNodeMapper(Node node, boolean isDocument, File nxsFile) {
@@ -55,7 +57,7 @@ public class NXNodeMapper implements TreeNode {
         children = getElements();
     }
 
-     // Construct an Adapter node from a DOM node
+    // Construct an Adapter node from a DOM node
     public NXNodeMapper(Node node, boolean isDocument, String nodeName) {
 
         this.isDocument = isDocument;
@@ -93,72 +95,78 @@ public class NXNodeMapper implements TreeNode {
         this.root = root;
     }
 
-    public void addNode(NXNodeMapper node) {
+    public void insert(NXNodeMapper node) {
         documents.add(node);
     }
 
-    public File getNXSFile(){
+    public void removeNode(NXNodeMapper node) {
+        if (!isRoot) {
+            documents.remove(node);
+        }
+    }
+
+    public File getNXSFile() {
         return nxsFile;
     }
 
-    public File getSchematronFile(){
+    public File getSchematronFile() {
         return schematronFile;
     }
 
-    public void setSchematronFile(File schematronFile){
+    public void setSchematronFile(File schematronFile) {
         this.schematronFile = schematronFile;
     }
 
-    public File getReducedFile(){
+    public File getReducedFile() {
         return reducedFile;
     }
 
-    public void setReducedFile(File reducedFile){
+    public void setReducedFile(File reducedFile) {
         this.reducedFile = reducedFile;
     }
 
-    public File getResultsFile(){
+    public File getResultsFile() {
         return resultsFile;
     }
 
-    public void setResultsFile(File resultsFile){
+    public void setResultsFile(File resultsFile) {
         this.resultsFile = resultsFile;
     }
 
-    public Document getResultsDoc(){
+    public Document getResultsDoc() {
         return resultsDoc;
     }
 
-    public void setResultsDoc(Document resultsDoc){
+    public void setResultsDoc(Document resultsDoc) {
         this.resultsDoc = resultsDoc;
     }
 
-    public Document getReducedDoc(){
+    public Document getReducedDoc() {
         return reducedDoc;
     }
 
-    public void setReducedDoc(Document reducedDoc){
+    public void setReducedDoc(Document reducedDoc) {
         this.reducedDoc = reducedDoc;
     }
 
-    public void setBadNode(boolean badNode){
+    public void setBadNode(boolean badNode) {
         this.badNode = badNode;
     }
 
-    public boolean getBadNode(){
+    public boolean getBadNode() {
         return badNode;
     }
 
-    public void checkBadNode(){
-        if(!isRoot){
-            Boolean bad = (Boolean)domNode.getUserData("bad");
-            if(bad !=null){
+    public void checkBadNode() {
+        if (!isRoot) {
+            Boolean bad = (Boolean) domNode.getUserData("bad");
+            if (bad != null) {
                 this.badNode = bad.booleanValue();
             }
         }
     }
 
-    public void resetNode(){
+    public void resetNode() {
 
         badNode = false;
 
@@ -169,20 +177,36 @@ public class NXNodeMapper implements TreeNode {
         domNode.setUserData("bad", new Boolean(false), null);
     }
 
-    public ArrayList<String> getNodeTexts(){
-        return (ArrayList<String>)domNode.getUserData("texts");
+    public ArrayList<String> getNodeTexts() {
+        if (!isRoot) {
+            return (ArrayList<String>) domNode.getUserData("texts");
+        } else {
+            return null;
+        }
     }
 
-    public ArrayList<String> getNodeTests(){
-        return (ArrayList<String>)domNode.getUserData("tests");
+    public ArrayList<String> getNodeTests() {
+        if (!isRoot) {
+            return (ArrayList<String>) domNode.getUserData("tests");
+        } else {
+            return null;
+        }
     }
 
-    public ArrayList<String> getNodeDiags(){
-        return (ArrayList<String>)domNode.getUserData("diags");
+    public ArrayList<String> getNodeDiags() {
+        if (!isRoot) {
+            return (ArrayList<String>) domNode.getUserData("diags");
+        } else {
+            return null;
+        }
     }
 
-    public ArrayList<String> getNodeDiagAtts(){
-        return (ArrayList<String>)domNode.getUserData("diagatts");
+    public ArrayList<String> getNodeDiagAtts() {
+        if (!isRoot) {
+            return (ArrayList<String>) domNode.getUserData("diagatts");
+        } else {
+            return null;
+        }
     }
 
     // Return the node name
@@ -230,8 +254,8 @@ public class NXNodeMapper implements TreeNode {
             for (int i = 0; i < domNode.getChildNodes().getLength(); i++) {
                 node = domNode.getChildNodes().item(i);
 
-                if ((node.getNodeType() == ELEMENT_TYPE) &&
-                        (elementNodeIndex++ == searchIndex)) {
+                if ((node.getNodeType() == ELEMENT_TYPE)
+                        && (elementNodeIndex++ == searchIndex)) {
                     break;
                 }
             }
@@ -278,20 +302,20 @@ public class NXNodeMapper implements TreeNode {
         }
     }
 
-    public String[] getAttributeList(){
+    public String[] getAttributeList() {
 
-        if(isRoot){
+        if (isRoot) {
             return new String[0];
         }
 
         ArrayList<String> atts = new ArrayList<String>();
 
-        if(domNode.hasAttributes()){
+        if (domNode.hasAttributes()) {
 
             NamedNodeMap att = domNode.getAttributes();
             int na = domNode.getAttributes().getLength();
 
-            for(int i = 0; i < na; ++i){
+            for (int i = 0; i < na; ++i) {
                 atts.add(att.item(i).getNodeName() + " = " + att.item(i).getNodeValue());
             }
 
@@ -299,7 +323,7 @@ public class NXNodeMapper implements TreeNode {
         return atts.toArray(new String[0]);
     }
 
-    public String getValue(){
+    public String getValue() {
 
         if (isRoot) {
             return "";
@@ -309,12 +333,12 @@ public class NXNodeMapper implements TreeNode {
             return getTextValue(domNode);
         }
 
-        if(domNode.getTextContent()!=null){
+        if (domNode.getTextContent() != null) {
             return domNode.getTextContent().trim();
         }
 
         return "";
-        
+
     }
 
     private ArrayList<Node> getElements() {
@@ -333,14 +357,14 @@ public class NXNodeMapper implements TreeNode {
         return nodes;
     }
 
-    private String getTextValue(Node node){
+    private String getTextValue(Node node) {
 
-        if(node.hasChildNodes()){
+        if (node.hasChildNodes()) {
 
             NodeList nodes = node.getChildNodes();
 
-            for(int i = 0;i < nodes.getLength(); ++i){
-                if(nodes.item(i).getNodeType() == Node.TEXT_NODE){
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                if (nodes.item(i).getNodeType() == Node.TEXT_NODE) {
                     return nodes.item(i).getTextContent().trim();
                 }
             }
@@ -377,8 +401,47 @@ public class NXNodeMapper implements TreeNode {
             }
 
         }
+    }
+
+    public void insert(MutableTreeNode child, int index) {
+        if (isRoot) {
+
+            documents.add(index, (NXNodeMapper) child);
+
+        }
+    }
+
+    public void remove(int index) {
+        if (isRoot) {
+
+            documents.remove(index);
+
+        }
+    }
+
+    public void remove(MutableTreeNode node) {
+        if (isRoot) {
+
+            documents.remove((NXNodeMapper) node);
+
+        }
+    }
+
+    public void removeFromParent() {
+        if (!isRoot) {
+          documents.remove(this);
+        }
+    }
+
+    public void setParent(MutableTreeNode newParent) {
+
+
+
+    }
+
+    public void setUserObject(Object object) {
+
+        userObject = object;
 
     }
 }
-
-
