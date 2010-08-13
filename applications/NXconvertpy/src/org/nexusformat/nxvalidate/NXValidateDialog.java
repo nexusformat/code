@@ -20,7 +20,7 @@ import java.io.File;
 public class NXValidateDialog extends javax.swing.JDialog {
 
     private File nxs = null;
-    private File nxdc = null;
+    private File nxdl = null;
     private boolean OKButtonUsed = false;
     /** Creates new form NXLoadFilesDialog */
     public NXValidateDialog(java.awt.Frame parent, boolean modal) {
@@ -133,11 +133,11 @@ public class NXValidateDialog extends javax.swing.JDialog {
             int returnVal = jFileChooser1.showOpenDialog(this);
 
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
-                nxdc = jFileChooser1.getSelectedFile();
-                nxdcTextField.setText(nxdc.getAbsolutePath());
-                nxdcTextField.setToolTipText(nxdc.getAbsolutePath());
+                nxdl = jFileChooser1.getSelectedFile();
+                nxdcTextField.setText(nxdl.getAbsolutePath());
+                nxdcTextField.setToolTipText(nxdl.getAbsolutePath());
             } else {
-                nxdc = null;
+                nxdl = null;
             }
 
         }
@@ -159,13 +159,13 @@ public class NXValidateDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_OKButtonActionPerformed
 
     
-    public File getNXDCFile(){
-        return nxdc;
+    public File getNXDLFile(){
+        return nxdl;
     }
 
-    public void setNXDCFile(File file){
-        nxdc = file;
-        nxdcTextField.setText(nxdc.getAbsolutePath());
+    public void setNXDLFile(File file){
+        nxdl = file;
+        nxdcTextField.setText(nxdl.getAbsolutePath());
     }
 
     public boolean OKButtonUsed(){

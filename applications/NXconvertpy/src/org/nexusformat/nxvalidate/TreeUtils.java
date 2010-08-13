@@ -66,7 +66,6 @@ public class TreeUtils {
 
     public Document getReducedDoc(JTree tree) {
         if (getNode(tree) != null) {
-
             return getNode(tree).getReducedDoc();
         } else {
             return null;
@@ -75,7 +74,6 @@ public class TreeUtils {
 
     public Document getResultsDoc(JTree tree) {
         if (getNode(tree) != null) {
-
             return getNode(tree).getResultsDoc();
         } else {
             return null;

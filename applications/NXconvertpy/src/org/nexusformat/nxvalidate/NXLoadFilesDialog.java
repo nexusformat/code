@@ -20,7 +20,7 @@ import java.io.File;
 public class NXLoadFilesDialog extends javax.swing.JDialog {
 
     private File nxs = null;
-    private File nxdc = null;
+    private File nxdl = null;
     private boolean OKButtonUsed = false;
     /** Creates new form NXLoadFilesDialog */
     public NXLoadFilesDialog(java.awt.Frame parent, boolean modal) {
@@ -42,7 +42,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
         nxsLabel = new javax.swing.JLabel();
         nxsTextField = new javax.swing.JTextField();
         openButton1 = new javax.swing.JButton();
-        nxdcLabel = new javax.swing.JLabel();
+        nxdlLabel = new javax.swing.JLabel();
         nxdcTextField = new javax.swing.JTextField();
         openButton2 = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
@@ -65,7 +65,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
             }
         });
 
-        nxdcLabel.setText("Load NXDC:");
+        nxdlLabel.setText("Load NXDL:");
 
         nxdcTextField.setEditable(false);
 
@@ -100,7 +100,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(nxsLabel)
-                            .addComponent(nxdcLabel))
+                            .addComponent(nxdlLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(nxdcTextField)
@@ -108,17 +108,10 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
                     .addComponent(cancelButton))
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(openButton1)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(openButton2)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(OKButton)
-                        .addContainerGap())))
+                    .addComponent(openButton1)
+                    .addComponent(openButton2)
+                    .addComponent(OKButton))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,7 +123,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
                     .addComponent(openButton1))
                 .addGap(28, 28, 28)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(nxdcLabel)
+                    .addComponent(nxdlLabel)
                     .addComponent(nxdcTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(openButton2))
                 .addGap(27, 27, 27)
@@ -178,11 +171,11 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
             int returnVal = jFileChooser1.showOpenDialog(this);
 
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
-                nxdc = jFileChooser1.getSelectedFile();
-                nxdcTextField.setText(nxdc.getAbsolutePath());
-                nxdcTextField.setToolTipText(nxdc.getAbsolutePath());
+                nxdl = jFileChooser1.getSelectedFile();
+                nxdcTextField.setText(nxdl.getAbsolutePath());
+                nxdcTextField.setToolTipText(nxdl.getAbsolutePath());
             } else {
-                nxdc = null;
+                nxdl = null;
             }
 
         }
@@ -206,8 +199,8 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     public File getNXSFile(){
         return nxs;
     }
-    public File getNXDCFile(){
-        return nxdc;
+    public File getNXDLFile(){
+        return nxdl;
     }
 
     public boolean OKButtonUsed(){
@@ -236,8 +229,8 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     private javax.swing.JButton cancelButton;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel nxdcLabel;
     private javax.swing.JTextField nxdcTextField;
+    private javax.swing.JLabel nxdlLabel;
     private javax.swing.JLabel nxsLabel;
     private javax.swing.JTextField nxsTextField;
     private javax.swing.JButton openButton1;

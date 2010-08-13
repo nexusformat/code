@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.nexusformat.nxvalidate.exceptions.NXConvertpyException;
 
 public class NXconvert {
 
@@ -40,20 +41,15 @@ public class NXconvert {
 
     }
 
-    public File convert() throws IOException, InterruptedException {
+    public File convert() throws IOException, InterruptedException, NXConvertpyException {
 
         Logger.getLogger(NXconvert.class.getName()).log(
                 Level.INFO, "Creating " + redfile.getAbsolutePath());
-
-        // the command to run
-        //String command = props.getProperty(NXCONVERT) +
-         //       " -d " + this.rawfile + " " + redfile;
 
         String command = "";
         if(convertFile!=null){
             command = convertFile.getAbsolutePath() +
                 " -d " + this.rawfile + " " + redfile;;
-            System.out.println(command);
         }
         else{
             return null;
@@ -77,7 +73,7 @@ public class NXconvert {
             buffer.append(command);
             buffer.append("\" failed. Returned ");
             buffer.append(exitValue);
-            throw new IOException(buffer.toString());
+            throw new NXConvertpyException(buffer.toString());
         }
         return redfile;
     }

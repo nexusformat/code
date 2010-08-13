@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 /**
  * This maps the NX Reduced XML Document (as a DOM document) to
  * a JTree model.
- * @author ser65
+ * @author Stephen Rankin
  */
 public class NXReducedToTree extends DefaultTreeModel {
 

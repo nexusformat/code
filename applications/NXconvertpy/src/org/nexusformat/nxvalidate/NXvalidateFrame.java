@@ -1,16 +1,32 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+ /* NeXus - Neutron & X-ray Common Data Format
+  *
+  * NeXus file validation GUI tool.
+  *
+  * Copyright (C) 2010 Stephen Rankin
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+  * version 2 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  *
+  * For further information, see <http://www.neutron.anl.gov/NeXus/>
+  *
+  * NXvalidateFrame.java
+  *
+  * Created on 02-Jun-2010, 14:17:04
+  */
 
-/*
- * NXvalidateFrame.java
- *
- * Created on 02-Jun-2010, 14:17:04
- */
 package org.nexusformat.nxvalidate;
 
-import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -20,19 +36,14 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.nexusformat.nxvalidate.exceptions.NXConvertpyException;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -44,18 +55,19 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private DocumentBuilder builder = null;
     private NXReducedToTree domTree = null;
     private NXNodeMapper root = null;
-    private ValidatorUtils validator = null;
     private ResourceBundle bundle = null;
     private File nxsFile = null;
-    private File nxdcFile = null;
+    private File nxdlFile = null;
     private File reducedFile = null;
     private File resultsFile = null;
     private TreeUtils treeUtils = null;
-    private ArrayList<Report> reports;
     private UserSettings settings = null;
     private File nxconvertFile = null;
     private boolean foundNXconvert = false;
     private MouseListener popupListener = null;
+    private TextPaneStyle txtStyle = null;
+    private FileLoadingActions fileLoadingActions = null;
+
     /** Creates new form NXvalidateFrame */
     public NXvalidateFrame() {
         initComponents();
@@ -95,12 +107,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             settings.loadUserSettings();
             nxconvertFile = settings.getNXconvert();
 
-            if(!settings.foundNXconvert()){
+            if (!settings.foundNXconvert()) {
                 displayErrorMessage(
-                            bundle.getString("nxconvertMissingError"));
+                        bundle.getString("nxconvertMissingError"));
                 foundNXconvert = false;
-            }
-            else{
+            } else {
                 foundNXconvert = true;
             }
         } catch (FileNotFoundException ex) {
@@ -116,7 +127,10 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         popupListener = new PopupListener(treePopupMenu);
         jTree1.addMouseListener(popupListener);
 
-        
+        txtStyle = new TextPaneStyle(jTextPane1);
+
+        fileLoadingActions = new FileLoadingActions(this, jTree1, builder, domTree, root);
+
     }
 
     /** This method is called from within the constructor to
@@ -138,9 +152,13 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        fileMenu = new javax.swing.JMenu();
         openFilesMenuItem = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        closeAllMenuItem = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        exitAppMenuItem = new javax.swing.JMenuItem();
+        toolsMenu = new javax.swing.JMenu();
         validateSelectedMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         filterMenuItem = new javax.swing.JMenuItem();
@@ -148,6 +166,10 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         bulkMenuItem = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         settingsMenuItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        helpMenuItem = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        aboutMenuItem = new javax.swing.JMenuItem();
 
         closeFileMenuItem.setText("Close File");
         closeFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -196,7 +218,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jMenu1.setText(bundle.getString("fileMenuItem")); // NOI18N
+        fileMenu.setText(bundle.getString("fileMenuItem")); // NOI18N
 
         openFilesMenuItem.setText("Open Files");
         openFilesMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -204,11 +226,29 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                 openFilesMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(openFilesMenuItem);
+        fileMenu.add(openFilesMenuItem);
+        fileMenu.add(jSeparator4);
 
-        jMenuBar1.add(jMenu1);
+        closeAllMenuItem.setText("Close All Files");
+        closeAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeAllMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(closeAllMenuItem);
+        fileMenu.add(jSeparator5);
 
-        jMenu2.setText("Tools");
+        exitAppMenuItem.setText("Exit");
+        exitAppMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitAppMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(exitAppMenuItem);
+
+        jMenuBar1.add(fileMenu);
+
+        toolsMenu.setText("Tools");
 
         validateSelectedMenuItem.setText("Validate Selected");
         validateSelectedMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -216,16 +256,21 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                 validateSelectedMenuItemActionPerformed(evt);
             }
         });
-        jMenu2.add(validateSelectedMenuItem);
-        jMenu2.add(jSeparator2);
+        toolsMenu.add(validateSelectedMenuItem);
+        toolsMenu.add(jSeparator2);
 
         filterMenuItem.setText("Filter Good Values");
-        jMenu2.add(filterMenuItem);
-        jMenu2.add(jSeparator1);
+        toolsMenu.add(filterMenuItem);
+        toolsMenu.add(jSeparator1);
 
         bulkMenuItem.setText("Bulk Validation");
-        jMenu2.add(bulkMenuItem);
-        jMenu2.add(jSeparator3);
+        bulkMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bulkMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(bulkMenuItem);
+        toolsMenu.add(jSeparator3);
 
         settingsMenuItem.setText("Settings");
         settingsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -233,9 +278,20 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                 settingsMenuItemActionPerformed(evt);
             }
         });
-        jMenu2.add(settingsMenuItem);
+        toolsMenu.add(settingsMenuItem);
 
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(toolsMenu);
+
+        helpMenu.setText("Help");
+
+        helpMenuItem.setText("Help Content");
+        helpMenu.add(helpMenuItem);
+        helpMenu.add(jSeparator6);
+
+        aboutMenuItem.setText("About");
+        helpMenu.add(aboutMenuItem);
+
+        jMenuBar1.add(helpMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -251,44 +307,6 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         ta.setSize(200, 100);
         dialogReportProblem.showMessageDialog(this, ta);
 
-   }
-
-
-    private void loadFiles() {
-        try {
-
-            //Reduce the file with NXConvert.
-            NXconvert convert = new NXconvert(nxsFile, true, nxconvertFile);
-            File reducedFile = convert.convert();
-
-            //Display reduced file
-            Document document = builder.parse(reducedFile);
-            NXNodeMapper node = new NXNodeMapper(
-                    document, true, nxsFile);
-            node.setReducedDoc(document);
-            if (nxdcFile != null) {
-                node.setSchematronFile(nxdcFile);
-            }
-            node.setReducedFile(reducedFile);
-            node.setRoot(root);
-            root.insert(node);
-            domTree.updateTree();
-            nxsFile = null;
-            nxdcFile = null;
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
-                    null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
-                    null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
-                    null, ex);
-        }
     }
 
     private boolean loadOpenFilesDialog() {
@@ -297,7 +315,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         loadFile.setModalityType(ModalityType.APPLICATION_MODAL);
         loadFile.setVisible(true);
         nxsFile = loadFile.getNXSFile();
-        nxdcFile = loadFile.getNXDCFile();
+        nxdlFile = loadFile.getNXDLFile();
         return loadFile.OKButtonUsed();
 
     }
@@ -306,11 +324,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         NXValidateDialog loadValidate = new NXValidateDialog(this, true);
         loadValidate.setModalityType(ModalityType.APPLICATION_MODAL);
-        if (nxdcFile != null) {
-            loadValidate.setNXDCFile(nxdcFile);
+        if (nxdlFile != null) {
+            loadValidate.setNXDLFile(nxdlFile);
         }
         loadValidate.setVisible(true);
-        nxdcFile = loadValidate.getNXDCFile();
+        nxdlFile = loadValidate.getNXDLFile();
         return loadValidate.OKButtonUsed();
 
     }
@@ -332,9 +350,9 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         if (evt.getSource() == openFilesMenuItem) {
 
-            if(!foundNXconvert){
+            if (!foundNXconvert) {
                 displayErrorMessage(
-                            bundle.getString("nxconvertMissingError"));
+                        bundle.getString("nxconvertMissingError"));
                 return;
             }
 
@@ -342,7 +360,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
             if (result) {
                 if (nxsFile != null) {
-                    loadFiles();
+                    fileLoadingActions.setWhich(1);
+                    fileLoadingActions.setNXSFile(nxsFile);
+                    fileLoadingActions.setNXConvertFile(nxconvertFile);
+                    fileLoadingActions.setNXDLFile(nxdlFile);
+                    (new Thread(fileLoadingActions)).start();
                 } else {
                     dialogReportProblem.showMessageDialog(this,
                             bundle.getString("openNexusFileMessage"));
@@ -358,8 +380,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             if (jTree1.getSelectionPath() != null) {
                 NXNodeMapper node =
                         (NXNodeMapper) jTree1.getSelectionPath().getLastPathComponent();
-                updateTextPane(node);
-
+                txtStyle.updateTextPane(node);
             }
         }
 
@@ -369,9 +390,23 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         if (evt.getSource() == validateSelectedMenuItem) {
 
-            if(!foundNXconvert){
+            //Nothing selected in tree
+            if (jTree1.isSelectionEmpty()) {
+                return;
+            }
+
+            //Root node selected in tree
+            TreePath selected = jTree1.getSelectionPath();
+            int size = selected.getPath().length;
+            NXNodeMapper endNode = (NXNodeMapper) selected.getPath()[size - 1];
+            if (endNode.isRoot()) {
+                return;
+            }
+
+            //No nxconvert binary found.
+            if (!foundNXconvert) {
                 displayErrorMessage(
-                            bundle.getString("nxconvertMissingError"));
+                        bundle.getString("nxconvertMissingError"));
                 return;
             }
 
@@ -382,7 +417,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             //been done, i.e. the files and documents already exist for the
             //current selected tree.
             if (treeUtils.getNXDCFile(jTree1) != null) {
-                nxdcFile = treeUtils.getNXDCFile(jTree1);
+                nxdlFile = treeUtils.getNXDCFile(jTree1);
             }
 
             if (treeUtils.getReducedFile(jTree1) != null) {
@@ -399,65 +434,25 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             boolean result = loadValidatFileDialog();
 
             if (result) {
-                if (nxdcFile != null) {
+                if (nxdlFile != null) {
 
-                    try {
+                    fileLoadingActions.setWhich(2);
+                    fileLoadingActions.setNXSFile(nxsFile);
+                    fileLoadingActions.setNXConvertFile(nxconvertFile);
+                    fileLoadingActions.setNXDLFile(nxdlFile);
+                    fileLoadingActions.setReducedFile(reducedFile);
+                    fileLoadingActions.setReducedDoc(reducedDoc);
+                    fileLoadingActions.setResultsDoc(resultsDoc);
 
-                        //Validation has already been done so we reset the tree
-                        //before doing the validation again.
-                        if (resultsDoc != null) {
-                            SVRLNodeFilter filter = new SVRLNodeFilter();
-                            filter.setFilterDocument(resultsDoc);
-                            filter.setDocument(reducedDoc);
-                            filter.resetBadNodes();
-                        }
+                    Thread thread = new Thread(fileLoadingActions);
 
-                        //Do the validation.
-                        if(nxconvertFile!=null){
-                            validator = new ValidatorUtils(nxconvertFile);
-                        }
-                        else{
-                             displayErrorMessage(
-                            bundle.getString("nxconvertMissingError"));
-                            return;
-                        }
-                        validator.setSchematron(nxdcFile);
-                        validator.setReduced(reducedFile);
-                        resultsFile = validator.validate();
-
-                        SVRLNodeFilter filter = new SVRLNodeFilter();
-
-                        resultsDoc = builder.parse(resultsFile);
-                        filter.setFilterDocument(resultsDoc);
-                        filter.setDocument(reducedDoc);
-                        filter.getBadNodeList();
-
-                        treeUtils.setResultsDoc(jTree1, resultsDoc);
-                        treeUtils.setResultsFile(jTree1, resultsFile);
-
-                        domTree.updateTree();
-                        Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                                Level.INFO, "Finished Validating.");
-                        dialogReportProblem.showMessageDialog(
-                                this,
-                                bundle.getString("validationCompleteMessage"));
-
-
-                    } catch (NXConvertpyException ex) {
-                        Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                                Level.SEVERE, null, ex);
-                    } catch (SAXException ex) {
-                        Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                                Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                                Level.SEVERE, null, ex);
-                    }
+                    thread.start();
 
                 } else {
                     dialogReportProblem.showMessageDialog(this,
                             bundle.getString("openSchemaFileMessage"));
 
+                    
                 }
             }
         }
@@ -478,9 +473,9 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                 }
             }
 
-            if(!foundNXconvert){
+            if (!foundNXconvert) {
                 displayErrorMessage(
-                            bundle.getString("nxconvertMissingError"));
+                        bundle.getString("nxconvertMissingError"));
                 return;
             }
 
@@ -489,188 +484,58 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_settingsMenuItemActionPerformed
 
     private void closeFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeFileMenuItemActionPerformed
-        
+
         if (evt.getSource() == closeFileMenuItem) {
 
             NXNodeMapper node = treeUtils.getBaseNode(jTree1);
-            if(node!=null){
-                if(!node.isRoot()){
+            if (node != null) {
+                if (!node.isRoot()) {
                     root.removeNode(node);
-                    domTree.removeNodeFromParent((MutableTreeNode)node);
+                    domTree.removeNodeFromParent((MutableTreeNode) node);
                     domTree.updateTree();
                 }
             }
-            
 
         }
     }//GEN-LAST:event_closeFileMenuItemActionPerformed
 
-    private void updateTextPane(NXNodeMapper node) {
+    private void exitAppMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitAppMenuItemActionPerformed
+        if (evt.getSource() == exitAppMenuItem) {
 
-        String newline = "\n";
-        String[] initString = {
-            "another ", //italic
-            "styled ", //bold
-            "text ", //small
-            "component, ", //large
-            "which supports embedded components..." + newline,//regular
-            " " + newline, //button
-            "...and embedded icons..." + newline, //regular
-            " ", //icon
-            newline + "JTextPane is a subclass of JEditorPane that "
-            + "uses a StyledEditorKit and StyledDocument, and provides "
-            + "cover methods for interacting with those objects."
-        };
+            this.dispose();
 
-        String[] initStyles = {"regular", "italic", "bold", "small", "large",
-            "regular", "button", "regular", "icon",
-            "regular"
-        };
+        }
+    }//GEN-LAST:event_exitAppMenuItemActionPerformed
 
+    private void closeAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAllMenuItemActionPerformed
+        if (evt.getSource() == closeAllMenuItem) {
 
-        StyledDocument doc = jTextPane1.getStyledDocument();
+            int result = dialogReportProblem.showConfirmDialog(this,
+                    bundle.getString("closeAllWarningMessage"), null,
+                    JOptionPane.OK_CANCEL_OPTION);
 
-        addStylesToDocument(
-                doc);
-        String[] atts = node.getAttributeList();
-
-
-
-        try {
-            doc.remove(0, doc.getLength());
-
-            doc.insertString(0, node.toString()
-                    + newline + newline, doc.getStyle("title"));
-
-            doc.insertString(doc.getLength(), "Attributes:"
-                    + newline + newline, doc.getStyle("heading"));
-
-
-
-            for (int i = 0; i
-                    < atts.length; i++) {
-                doc.insertString(doc.getLength(),
-                        "@ " + atts[i] + newline, doc.getStyle("bold"));
-
-
-            }
-
-            doc.insertString(doc.getLength(), newline + newline,
-                    doc.getStyle("heading"));
-
-            doc.insertString(doc.getLength(), "Node Value:"
-                    + newline + newline, doc.getStyle("heading"));
-
-            doc.insertString(doc.getLength(),
-                    node.getValue(), doc.getStyle("bold"));
-
-            doc.insertString(doc.getLength(), newline + newline,
-                    doc.getStyle("heading"));
-
-            doc.insertString(doc.getLength(), "Validation Tests:"
-                    + newline + newline, doc.getStyle("heading"));
-
-
-
-            if (node.getNodeTests() != null) {
-
-                for (int i = 0; i
-                        < node.getNodeTests().size();
-                        ++i) {
-                    doc.insertString(doc.getLength(),
-                            node.getNodeTests().get(i), doc.getStyle("bold"));
-
-                    doc.insertString(doc.getLength(), newline + newline,
-                            doc.getStyle("heading"));
-
-
+            if (result == 0) {
+                ArrayList<NXNodeMapper> nodes = root.getOpenNodes();
+                for (int i = 0; i < nodes.size(); ++i) {
+                    domTree.removeNodeFromParent((MutableTreeNode) nodes.get(i));
                 }
-
+                root.removeAllNodes();
+                domTree.updateTree();
             }
+        }
+    }//GEN-LAST:event_closeAllMenuItemActionPerformed
 
-            doc.insertString(doc.getLength(), "Validation Errors:"
-                    + newline + newline, doc.getStyle("errorheading"));
+    private void bulkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bulkMenuItemActionPerformed
 
-            if (node.getNodeTexts() != null) {
+        if (evt.getSource() == bulkMenuItem) {
 
-                for (int i = 0; i
-                        < node.getNodeTexts().size();
-                        ++i) {
-                    doc.insertString(doc.getLength(),
-                            node.getNodeTexts().get(i), doc.getStyle("error"));
+            fileLoadingActions.setNXConvertFile(nxconvertFile);
+            BulkLoadFilesFrame bulk = new BulkLoadFilesFrame(fileLoadingActions);
+            bulk.setVisible(true);
 
-                    doc.insertString(doc.getLength(), newline + newline,
-                            doc.getStyle("heading"));
-
-
-                }
-
-            }
-
-            doc.insertString(doc.getLength(), "Diagnostic Errors:"
-                    + newline + newline, doc.getStyle("errorheading"));
-
-            if (node.getNodeDiags() != null) {
-
-                for (int i = 0; i
-                        < node.getNodeDiags().size();
-                        ++i) {
-                    doc.insertString(doc.getLength(),
-                            node.getNodeDiags().get(i), doc.getStyle("error"));
-
-                    doc.insertString(doc.getLength(), newline + newline,
-                            doc.getStyle("heading"));
-
-                }
-
-            }
-
-        } catch (BadLocationException ex) {
-            Logger.getLogger(NXvalidateFrame.class.getName()).log(Level.SEVERE,
-                    null, ex);
         }
 
-    }
-
-    protected void addStylesToDocument(StyledDocument doc) {
-
-        //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().
-                getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "SansSerif");
-
-        Style s = doc.addStyle("italic", regular);
-        StyleConstants.setItalic(s, true);
-
-        s = doc.addStyle("bold", regular);
-        StyleConstants.setBold(s, true);
-
-        s = doc.addStyle("small", regular);
-        StyleConstants.setFontSize(s, 10);
-
-        s = doc.addStyle("large", regular);
-        StyleConstants.setFontSize(s, 16);
-
-        s = doc.addStyle("heading", regular);
-        StyleConstants.setFontSize(s, 16);
-        StyleConstants.setBold(s, true);
-
-        s = doc.addStyle("title", regular);
-        StyleConstants.setFontSize(s, 24);
-        StyleConstants.setBold(s, true);
-
-        s = doc.addStyle("errorheading", regular);
-        StyleConstants.setFontSize(s, 16);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setForeground(s, Color.red);
-
-        s = doc.addStyle("error", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setForeground(s, Color.red);
-
-    }
+    }//GEN-LAST:event_bulkMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -686,12 +551,16 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem bulkMenuItem;
+    private javax.swing.JMenuItem closeAllMenuItem;
     private javax.swing.JMenuItem closeFileMenuItem;
     private javax.swing.JOptionPane dialogReportProblem;
+    private javax.swing.JMenuItem exitAppMenuItem;
+    private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem filterMenuItem;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu helpMenu;
+    private javax.swing.JMenuItem helpMenuItem;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -699,11 +568,15 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTree jTree1;
     private javax.swing.JMenuItem openFilesMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
+    private javax.swing.JMenu toolsMenu;
     private javax.swing.JPopupMenu treePopupMenu;
     private javax.swing.JMenuItem validateSelectedMenuItem;
     // End of variables declaration//GEN-END:variables

@@ -373,6 +373,14 @@ public class NXNodeMapper implements MutableTreeNode {
         return "";
     }
 
+    public ArrayList<NXNodeMapper> getOpenNodes(){
+        return documents;
+    }
+
+    public void removeAllNodes(){
+        documents.clear();
+    }
+
     private class children implements Enumeration {
 
         private int count = 0;
