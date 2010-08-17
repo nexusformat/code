@@ -28,7 +28,7 @@
 
 #include <tclap/Arg.h>
 
-#ifdef HAVE_CONFIG_H
+#ifdef _____HAVE_CONFIG_H /* not needed */
 #include <config.h>
 #else
 #define HAVE_SSTREAM

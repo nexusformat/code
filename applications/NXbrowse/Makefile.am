@@ -32,7 +32,7 @@ LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I/usr/include/readline
 AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 
-EXTRA_DIST=SConscript
+EXTRA_DIST=SConscript $(man_MANS)
 
 if HAVE_F90
 F90_TARGETS = NXbrowse90

@@ -35,7 +35,7 @@ EXTRA_DIST=SConscript
 
 bin_PROGRAMS = nxvalidate
 
-nxvalidate_SOURCES = nxvalidate.cpp config.h
+nxvalidate_SOURCES = nxvalidate.cpp
 nxvalidate_LDADD = $(LIBNXCONVERT) $(LIBNEXUSCPP) $(LIBNEXUS)
 nxvalidate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
