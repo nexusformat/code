@@ -220,6 +220,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         fileMenu.setText(bundle.getString("fileMenuItem")); // NOI18N
 
+        openFilesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
         openFilesMenuItem.setText("Open Files");
         openFilesMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -250,6 +251,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         toolsMenu.setText("Tools");
 
+        validateSelectedMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_MASK));
         validateSelectedMenuItem.setText("Validate Selected");
         validateSelectedMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -259,10 +261,12 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         toolsMenu.add(validateSelectedMenuItem);
         toolsMenu.add(jSeparator2);
 
+        filterMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
         filterMenuItem.setText("Filter Good Values");
         toolsMenu.add(filterMenuItem);
         toolsMenu.add(jSeparator1);
 
+        bulkMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
         bulkMenuItem.setText("Bulk Validation");
         bulkMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -284,6 +288,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         helpMenu.setText("Help");
 
+        helpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
         helpMenuItem.setText("Help Content");
         helpMenu.add(helpMenuItem);
         helpMenu.add(jSeparator6);

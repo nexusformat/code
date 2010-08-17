@@ -31,6 +31,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="openFilesMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+F"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open Files"/>
               </Properties>
               <Events>
@@ -66,6 +69,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="validateSelectedMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+V"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Validate Selected"/>
               </Properties>
               <Events>
@@ -76,6 +82,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="filterMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+G"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Filter Good Values"/>
               </Properties>
             </MenuItem>
@@ -83,6 +92,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="bulkMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+B"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Bulk Validation"/>
               </Properties>
               <Events>
@@ -108,6 +120,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="helpMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+H"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Help Content"/>
               </Properties>
             </MenuItem>

@@ -8,20 +8,20 @@
  *
  * Created on 16-Jun-2010, 11:56:31
  */
-
 package org.nexusformat.nxvalidate;
 
 import java.io.File;
 
 /**
  *
- * @author ser65
+ * @author Stephen Rankin
  */
 public class NXLoadFilesDialog extends javax.swing.JDialog {
 
     private File nxs = null;
     private File nxdl = null;
     private boolean OKButtonUsed = false;
+
     /** Creates new form NXLoadFilesDialog */
     public NXLoadFilesDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -149,7 +149,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 
     private void openButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButton1ActionPerformed
 
-        if(evt.getSource() == openButton1){
+        if (evt.getSource() == openButton1) {
 
             int returnVal = jFileChooser1.showOpenDialog(this);
 
@@ -166,7 +166,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 
     private void openButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButton2ActionPerformed
 
-        if(evt.getSource() == openButton2){
+        if (evt.getSource() == openButton2) {
 
             int returnVal = jFileChooser1.showOpenDialog(this);
 
@@ -182,39 +182,41 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_openButton2ActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        if(evt.getSource() == cancelButton){
+        if (evt.getSource() == cancelButton) {
             OKButtonUsed = false;
             this.setVisible(false);
         }
 }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void OKButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKButtonActionPerformed
-
-        if(evt.getSource() == OKButton){
+        if (evt.getSource() == OKButton) {
             OKButtonUsed = true;
             this.setVisible(false);
         }
     }//GEN-LAST:event_OKButtonActionPerformed
 
-    public File getNXSFile(){
+    public File getNXSFile() {
         return nxs;
     }
-    public File getNXDLFile(){
+
+    public File getNXDLFile() {
         return nxdl;
     }
 
-    public boolean OKButtonUsed(){
+    public boolean OKButtonUsed() {
         return OKButtonUsed;
     }
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             public void run() {
                 NXLoadFilesDialog dialog = new NXLoadFilesDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -223,7 +225,6 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton OKButton;
     private javax.swing.JButton cancelButton;
@@ -236,5 +237,4 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     private javax.swing.JButton openButton1;
     private javax.swing.JButton openButton2;
     // End of variables declaration//GEN-END:variables
-
 }

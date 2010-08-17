@@ -73,7 +73,7 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
 
         jPanel1.setVerifyInputWhenFocusTarget(false);
 
-        loadNXDCButton.setText("Load NXDC");
+        loadNXDCButton.setText("Load NXDL");
         loadNXDCButton.setActionCommand("Load NXDL");
         loadNXDCButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -96,6 +96,11 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
         });
 
         cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
         jCheckBox1.setText("Load files only.");
         jCheckBox1.setToolTipText("Load files only, do not validate.");
@@ -124,7 +129,7 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
                         .addComponent(cancelButton)
                         .addGap(33, 33, 33)
                         .addComponent(validateButton)))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -341,6 +346,12 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        if (evt.getSource() == cancelButton) {
+            this.setVisible(false);
+        }
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
      * @param args the command line arguments

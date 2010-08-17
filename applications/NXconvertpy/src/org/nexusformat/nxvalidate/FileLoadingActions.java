@@ -296,9 +296,11 @@ public class FileLoadingActions implements Runnable {
         if (which == 1) {
             isNotBulk = true;
             loadFile();
+            domTree.updateTree();
         } else if (which == 2) {
             isNotBulk = true;
             validateFile();
+            domTree.updateTree();
         } else if (which == 3) {
             bulkCheck();
         } else if (which == 4) {

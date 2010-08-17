@@ -73,7 +73,7 @@
                               <Component id="validateButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="15" max="32767" attributes="0"/>
+                      <EmptySpace pref="17" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -100,7 +100,7 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="loadNXDCButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Load NXDC"/>
+                <Property name="text" type="java.lang.String" value="Load NXDL"/>
                 <Property name="actionCommand" type="java.lang.String" value="Load NXDL"/>
               </Properties>
               <Events>
@@ -129,6 +129,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cancel"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelButtonActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="jCheckBox1">
               <Properties>
