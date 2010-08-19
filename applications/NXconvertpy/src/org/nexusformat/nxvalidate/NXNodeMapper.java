@@ -1,6 +1,27 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* NeXus - Neutron & X-ray Common Data Format
+ *
+ * NeXus file validation GUI tool.
+ *
+ * Copyright (C) 2010 Stephen Rankin
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For further information, see <http://www.neutron.anl.gov/NeXus/>
+ *
+ * NXNodeMapper.java
+ *
  */
 package org.nexusformat.nxvalidate;
 
@@ -11,6 +32,7 @@ import java.util.NoSuchElementException;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -21,7 +43,7 @@ import org.w3c.dom.NodeList;
  */
 public class NXNodeMapper implements MutableTreeNode {
 
-    Node domNode = null;
+    private Node domNode = null;
     private String nodeName = null;
     private boolean isRoot = false;
     private boolean isLeaf = false;
@@ -79,31 +101,44 @@ public class NXNodeMapper implements MutableTreeNode {
         documents = new ArrayList<NXNodeMapper>();
     }
 
+    /**
+     * Check to see if this node is the root node.
+     * @return true is it is the root node, false otherwise.
+     */
     public boolean isRoot() {
         return isRoot;
     }
 
+    /**
+     * Check to see if this node is a document, i.e the list of nodes directly
+     * under the root note that are the open NXS documents.
+     *
+     * @return true if the node is a document node.
+     */
     public boolean isDocument() {
         return isDocument;
     }
 
+    /**
+     * Set the flag that says that this node is a documents node i.e. one of the
+     * list of nodes directly under the root note that are the open NXS documents.
+     * @param isDocument a flag which is true if the node is a document node.
+     */
     public void setDocument(boolean isDocument) {
         this.isDocument = isDocument;
     }
 
+    /**
+     * Set the root node that this node belongs to.
+     * @param the root node.
+     */
     public void setRoot(NXNodeMapper root) {
         this.root = root;
     }
 
-    public void insert(NXNodeMapper node) {
+    /*public void insert(NXNodeMapper node) {
         documents.add(node);
-    }
-
-    public void removeNode(NXNodeMapper node) {
-        if (!isRoot) {
-            documents.remove(node);
-        }
-    }
+    }*/
 
     public File getNXSFile() {
         return nxsFile;
@@ -155,6 +190,10 @@ public class NXNodeMapper implements MutableTreeNode {
 
     public boolean getBadNode() {
         return badNode;
+    }
+
+    public Node getDomNode() {
+        return domNode;
     }
 
     public void checkBadNode() {
@@ -271,6 +310,7 @@ public class NXNodeMapper implements MutableTreeNode {
             return documents.size();
 
         }
+
         return childCount;
 
     }
@@ -412,10 +452,19 @@ public class NXNodeMapper implements MutableTreeNode {
     }
 
     public void insert(MutableTreeNode child, int index) {
+
+        NXNodeMapper childNode = (NXNodeMapper) child;
+
         if (isRoot) {
+            documents.add(index, childNode);
+        } else{
+            NodeList list = domNode.getChildNodes();
 
-            documents.add(index, (NXNodeMapper) child);
-
+            for (int i = 0; i < list.getLength(); ++i) {
+                if(i == index){
+                    domNode.insertBefore(childNode.domNode, list.item(i));
+                }
+            }
         }
     }
 
@@ -424,20 +473,42 @@ public class NXNodeMapper implements MutableTreeNode {
 
             documents.remove(index);
 
+        } else{
+
+            NodeList list = domNode.getChildNodes();
+
+            for (int i = 0; i < list.getLength(); ++i) {
+                if(i == index){
+                    domNode.removeChild(list.item(index));
+                }
+            }
+
         }
     }
 
     public void remove(MutableTreeNode node) {
+
+        NXNodeMapper childNode = (NXNodeMapper) node;
+
         if (isRoot) {
-
             documents.remove((NXNodeMapper) node);
+        }else{
+            NodeList list = domNode.getChildNodes();
 
+            for (int i = 0; i < list.getLength(); ++i) {
+                if(list.item(i).isSameNode(childNode.domNode)){
+                    domNode.removeChild(childNode.domNode);
+                }
+            }
         }
     }
 
     public void removeFromParent() {
-        if (!isRoot) {
-          documents.remove(this);
+        if (isRoot) {
+           return;
+        } else{
+           NXNodeMapper parentNode = (NXNodeMapper)getParent();
+           parentNode.remove(this);
         }
     }
 

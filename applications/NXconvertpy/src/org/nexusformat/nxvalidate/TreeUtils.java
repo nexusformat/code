@@ -1,6 +1,27 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* NeXus - Neutron & X-ray Common Data Format
+ *
+ * NeXus file validation GUI tool.
+ *
+ * Copyright (C) 2010 Stephen Rankin
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For further information, see <http://www.neutron.anl.gov/NeXus/>
+ *
+ * TextPaneStyle.java
+ *
  */
 package org.nexusformat.nxvalidate;
 
@@ -14,6 +35,42 @@ import org.w3c.dom.Document;
  * @author Stephen Rankin
  */
 public class TreeUtils {
+
+    public void hideGoodNodes(JTree tree){
+
+        if (tree.isSelectionEmpty()) {
+            return;
+        }
+
+        NXNodeMapper baseNode = getBaseNode(tree);
+        NXNodeMapper node = null;
+        
+        int rows = tree.getRowCount();
+
+        for (int i = 0; i < rows; ++i) {
+            node = (NXNodeMapper) tree.getPathForRow(i).getLastPathComponent();
+            System.out.println("Node Name: " + node.toString() + ": " + node.getBadNode());
+        }
+
+    }
+
+    public void showGoodNodes(JTree tree){
+
+        if (tree.isSelectionEmpty()) {
+            return;
+        }
+
+        NXNodeMapper baseNode = getBaseNode(tree);
+        NXNodeMapper node = null;
+
+        int rows = tree.getRowCount();
+
+        for (int i = 0; i < rows; ++i) {
+            node = (NXNodeMapper) tree.getPathForRow(i).getLastPathComponent();
+            System.out.println("Node Name: " + node.toString());
+        }
+
+    }
 
     public String getTreePath(JTree tree) {
 
@@ -48,7 +105,7 @@ public class TreeUtils {
         }
     }
 
-    public File getNXDCFile(JTree tree) {
+    public File getNXDLFile(JTree tree) {
         if (getNode(tree) != null) {
             return getNode(tree).getSchematronFile();
         } else {
@@ -88,7 +145,7 @@ public class TreeUtils {
         }
     }
 
-    public void setNXDCFile(JTree tree, File file) {
+    public void setNXDLFile(JTree tree, File file) {
         if (getNode(tree) != null) {
             getNode(tree).setSchematronFile(file);
         }
@@ -141,4 +198,5 @@ public class TreeUtils {
         }
         return tmpNode;
     }
+
 }

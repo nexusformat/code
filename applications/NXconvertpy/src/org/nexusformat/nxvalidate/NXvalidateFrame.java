@@ -263,6 +263,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         filterMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
         filterMenuItem.setText("Filter Good Values");
+        filterMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterMenuItemActionPerformed(evt);
+            }
+        });
         toolsMenu.add(filterMenuItem);
         toolsMenu.add(jSeparator1);
 
@@ -354,7 +359,6 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private void openFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFilesMenuItemActionPerformed
 
         if (evt.getSource() == openFilesMenuItem) {
-
             if (!foundNXconvert) {
                 displayErrorMessage(
                         bundle.getString("nxconvertMissingError"));
@@ -421,8 +425,8 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             //Check to see if the reduction and validation have not already
             //been done, i.e. the files and documents already exist for the
             //current selected tree.
-            if (treeUtils.getNXDCFile(jTree1) != null) {
-                nxdlFile = treeUtils.getNXDCFile(jTree1);
+            if (treeUtils.getNXDLFile(jTree1) != null) {
+                nxdlFile = treeUtils.getNXDLFile(jTree1);
             }
 
             if (treeUtils.getReducedFile(jTree1) != null) {
@@ -495,7 +499,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             NXNodeMapper node = treeUtils.getBaseNode(jTree1);
             if (node != null) {
                 if (!node.isRoot()) {
-                    root.removeNode(node);
+                    root.remove(node);
                     domTree.removeNodeFromParent((MutableTreeNode) node);
                     domTree.updateTree();
                 }
@@ -541,6 +545,16 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_bulkMenuItemActionPerformed
+
+    private void filterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterMenuItemActionPerformed
+
+        if (evt.getSource() == filterMenuItem) {
+
+            treeUtils.hideGoodNodes(jTree1);
+
+        }
+
+    }//GEN-LAST:event_filterMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
