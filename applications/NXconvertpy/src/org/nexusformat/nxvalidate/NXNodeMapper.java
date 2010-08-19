@@ -55,7 +55,7 @@ public class NXNodeMapper implements MutableTreeNode {
     private ArrayList<Node> children = null;
     private NXNodeMapper root = null;
     private File nxsFile = null;
-    private File schematronFile = null;
+    private File nxdlFile = null;
     private File reducedFile = null;
     private File resultsFile = null;
     private Document reducedDoc = null;
@@ -136,42 +136,83 @@ public class NXNodeMapper implements MutableTreeNode {
         this.root = root;
     }
 
-    /*public void insert(NXNodeMapper node) {
-        documents.add(node);
-    }*/
-
+    /**
+     * Get the NXS file belonging to the root node. Any other node should return
+     * null
+     * @return the NXS file as a File object.
+     */
     public File getNXSFile() {
         return nxsFile;
     }
 
-    public File getSchematronFile() {
-        return schematronFile;
+    /**
+     * Get the NXDL file belonging to the root node. Any other node should return
+     * null
+     * @return the NXDL file as a File object.
+     */
+    public File getNXDLFile() {
+        return nxdlFile;
     }
 
-    public void setSchematronFile(File schematronFile) {
-        this.schematronFile = schematronFile;
+    /**
+     * Set the NXDL file belonging to the root node. Should not be set.
+     * @param the NXDL file as a File object.
+     */
+    public void setNXDLFile(File nxdlFile) {
+        this.nxdlFile = nxdlFile;
     }
 
+    /**
+     * Get the resultant file produced after NXConvert has been run on the
+     * NXS file
+     * (reduced to XML).
+     * @return the NXConvert reduced file.
+     */
     public File getReducedFile() {
         return reducedFile;
     }
 
+    /**
+     * Set the resultant file produced after NXConvert has been run on the
+     * NXS file.
+     * @param the NXConvert reduced file.
+     */
     public void setReducedFile(File reducedFile) {
         this.reducedFile = reducedFile;
     }
 
+    /**
+     * Get the resultant file produced after the validation procedure has been
+     * performed.
+     * @param the validation results file.
+     */
     public File getResultsFile() {
         return resultsFile;
     }
 
+    /**
+     * Get the resultant file produced after the validation procedure has been
+     * performed.
+     * @param the validation results file.
+     */
     public void setResultsFile(File resultsFile) {
         this.resultsFile = resultsFile;
     }
 
+    /**
+     * Get the resultant DOM document produced after the validation procedure
+     * has been performed.
+     * @return the validation results DOM document.
+     */
     public Document getResultsDoc() {
         return resultsDoc;
     }
 
+    /**
+     * Get the resultant DOM document produced after the validation procedure
+     * has been performed.
+     * @return the validation results DOM document.
+     */
     public void setResultsDoc(Document resultsDoc) {
         this.resultsDoc = resultsDoc;
     }
