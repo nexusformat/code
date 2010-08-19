@@ -26,7 +26,7 @@
 package org.nexusformat.nxvalidate;
 
 import java.io.File;
-import org.nexusformat.nxvalidate.exceptions.NXConvertpyException;
+import org.nexusformat.nxvalidate.exceptions.NXvalidateException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -132,9 +132,9 @@ public class ValidatorUtils {
      * This methods performs the validation using the NEXUS (or reduced) file
      * and the Schematron file. The returned file is the results file.
      * @return the results file as a File object.
-     * @throws NXConvertpyException
+     * @throws NXvalidateException
      */
-    public File validate() throws NXConvertpyException {
+    public File validate() throws NXvalidateException {
 
         File result = null;
 
@@ -147,7 +147,7 @@ public class ValidatorUtils {
                 Logger.getLogger(ValidatorUtils.class.getName()).log(Level.SEVERE,
                         "While converting \"" + nxsFile
                         + "\" to reduced xml format");
-                throw new NXConvertpyException("While converting \"" + nxsFile
+                throw new NXvalidateException("While converting \"" + nxsFile
                         + "\" to reduced xml format");
             }
         }
@@ -164,7 +164,7 @@ public class ValidatorUtils {
             } catch (Exception e) {
                 Logger.getLogger(ValidatorUtils.class.getName()).log(Level.SEVERE,
                         "While creating validation report");
-                throw new NXConvertpyException("While creating validation report");
+                throw new NXvalidateException("While creating validation report");
             }
         }
 

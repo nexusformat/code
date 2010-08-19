@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.nexusformat.nxvalidate.exceptions.NXConvertpyException;
+import org.nexusformat.nxvalidate.exceptions.NXvalidateException;
 
 public class NXconvert {
 
@@ -66,7 +66,7 @@ public class NXconvert {
 
     }
 
-    public File convert() throws IOException, InterruptedException, NXConvertpyException {
+    public File convert() throws IOException, InterruptedException, NXvalidateException {
 
         Logger.getLogger(NXconvert.class.getName()).log(
                 Level.INFO, "Creating " + redfile.getAbsolutePath());
@@ -98,7 +98,7 @@ public class NXconvert {
             buffer.append(command);
             buffer.append("\" failed. Returned ");
             buffer.append(exitValue);
-            throw new NXConvertpyException(buffer.toString());
+            throw new NXvalidateException(buffer.toString());
         }
         return redfile;
     }

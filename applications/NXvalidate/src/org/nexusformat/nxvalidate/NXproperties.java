@@ -56,7 +56,7 @@ public class NXproperties {
        userHome = systemProps.getProperty("user.home");
 
        String propsFileName =
-               userHome + File.pathSeparator + ".NXConvertpy.properties";
+               userHome + File.pathSeparator + ".NXvalidate.properties";
 
        File propsFile = new File(propsFileName);
 
@@ -76,7 +76,7 @@ public class NXproperties {
            URLClassLoader urlLoader =
                    new URLClassLoader(new java.net.URL[]{resourceURL});
 
-           userProps = ResourceBundle.getBundle(".NXConvertpy.properties",
+           userProps = ResourceBundle.getBundle(".NXvalidate.properties",
                 java.util.Locale.getDefault(), urlLoader );
 
        }

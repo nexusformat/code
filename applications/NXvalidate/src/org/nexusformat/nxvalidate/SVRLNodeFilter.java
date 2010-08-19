@@ -33,7 +33,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.nexusformat.nxvalidate.exceptions.NXConvertpyException;
+import org.nexusformat.nxvalidate.exceptions.NXvalidateException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -85,7 +85,7 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
             getXPathList();
 
-        } catch (NXConvertpyException ex) {
+        } catch (NXvalidateException ex) {
             Logger.getLogger(SVRLNodeFilter.class.getName()).log(
                     Level.SEVERE, null, ex);
         } catch (XPathExpressionException ex) {
@@ -104,7 +104,7 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
             resetNodes();
 
-        } catch (NXConvertpyException ex) {
+        } catch (NXvalidateException ex) {
             Logger.getLogger(SVRLNodeFilter.class.getName()).log(
                     Level.SEVERE, null, ex);
         } catch (XPathExpressionException ex) {
@@ -114,7 +114,7 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
     }
 
-    private void resetNodes() throws NXConvertpyException,
+    private void resetNodes() throws NXvalidateException,
             XPathExpressionException {
 
         NodeList failed = null;
@@ -179,7 +179,7 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
     }
 
-    private void getXPathList() throws NXConvertpyException,
+    private void getXPathList() throws NXvalidateException,
             XPathExpressionException {
 
         NodeList failed = null;

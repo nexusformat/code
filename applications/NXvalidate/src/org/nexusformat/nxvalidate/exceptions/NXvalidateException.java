@@ -30,20 +30,20 @@ package org.nexusformat.nxvalidate.exceptions;
  *
  * @author Stephen Rankin
  */
-public class NXConvertpyException extends Exception {
+public class NXvalidateException extends Exception {
 
     /**
-     * Creates a new instance of <code>NXConvertpyException</code> without detail message.
+     * Creates a new instance of <code>NXvalidateException</code> without detail message.
      */
-    public NXConvertpyException() {
+    public NXvalidateException() {
     }
 
 
     /**
-     * Constructs an instance of <code>NXConvertpyException</code> with the specified detail message.
+     * Constructs an instance of <code>NXvalidateException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public NXConvertpyException(String msg) {
+    public NXvalidateException(String msg) {
         super(msg);
     }
 }

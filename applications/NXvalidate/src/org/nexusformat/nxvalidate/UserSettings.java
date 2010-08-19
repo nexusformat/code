@@ -66,7 +66,7 @@ public class UserSettings {
 
         File settings = new File(System.getProperty("user.home")
                 + System.getProperty("file.separator")
-                + ".nxconvertpy.properties");
+                + ".nxvalidate.properties");
 
         if (settings.exists()) {
             props.load(new FileInputStream(settings));
@@ -91,17 +91,17 @@ public class UserSettings {
     public void saveUserSettings() {
 
         File settings = new File(System.getProperty("user.home")
-                + System.getProperty("file.separator") + ".nxconvertpy.properties");
+                + System.getProperty("file.separator") + ".nxvalidate.properties");
         try {
             if (settings.exists()) {
 
                 props.setProperty("nxconvert", nxconvertFile.getAbsolutePath());
-                props.store(new FileOutputStream(settings), "ISIS NXConvertpy");
+                props.store(new FileOutputStream(settings), "ISIS NXvalidate");
 
             } else {
                 settings.createNewFile();
                 props.setProperty("nxconvert", nxconvertFile.getAbsolutePath());
-                props.store(new FileOutputStream(settings), "ISIS NXConvertpy");
+                props.store(new FileOutputStream(settings), "ISIS NXvalidate");
 
             }
         } catch (FileNotFoundException ex) {

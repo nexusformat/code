@@ -37,7 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.nexusformat.nxvalidate.exceptions.NXConvertpyException;
+import org.nexusformat.nxvalidate.exceptions.NXvalidateException;
 
 /**
  *
@@ -187,7 +187,7 @@ public class FileLoadingActions implements Runnable {
                     frame,
                     bundle.getString("validationCompleteMessage"));
             }
-        } catch (NXConvertpyException ex) {
+        } catch (NXvalidateException ex) {
             Logger.getLogger(NXvalidateFrame.class.getName()).log(
                     Level.SEVERE, null, ex);
         } catch (SAXException ex) {
@@ -223,7 +223,7 @@ public class FileLoadingActions implements Runnable {
             root.insert(node,0);
             //domTree.updateTree();
 
-        } catch (NXConvertpyException ex) {
+        } catch (NXvalidateException ex) {
             conversionFail = true;
             badDataFileList.add(nxsFile.getAbsolutePath());
         } catch (InterruptedException ex) {
