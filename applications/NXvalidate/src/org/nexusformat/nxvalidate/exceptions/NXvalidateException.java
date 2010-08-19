@@ -20,7 +20,7 @@
  *
  * For further information, see <http://www.neutron.anl.gov/NeXus/>
  *
- * XMLTreeRenderer.java
+ * NXvalidateException.java
  *
  */
 
