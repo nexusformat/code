@@ -223,6 +223,7 @@ public class FileLoadingActions implements Runnable {
             root.insert(node,0);
             //domTree.updateTree();
 
+            
         } catch (NXvalidateException ex) {
             conversionFail = true;
             badDataFileList.add(nxsFile.getAbsolutePath());
@@ -307,6 +308,9 @@ public class FileLoadingActions implements Runnable {
                 validateFile();
             }
             domTree.updateTree();
+            dialogReportProblem.showMessageDialog(
+                    frame,
+                    bundle.getString("validationCompleteMessage"));
         }
 
     }
@@ -317,10 +321,12 @@ public class FileLoadingActions implements Runnable {
             isNotBulk = true;
             loadFile();
             domTree.updateTree();
+            isNotBulk = false;
         } else if (which == 2) {
             isNotBulk = true;
             validateFile();
             domTree.updateTree();
+            isNotBulk = false;
         } else if (which == 3) {
             bulkCheck();
         } else if (which == 4) {
