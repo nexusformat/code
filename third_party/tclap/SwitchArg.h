@@ -45,6 +45,11 @@ class SwitchArg : public Arg
 		 */
 		bool _value;
 
+		/**
+		 * Used to support the reset() method so that ValueArg can be
+		 * reset to their constructed value.
+		 */
+        bool _default;
 
 	public:
 
@@ -63,7 +68,7 @@ class SwitchArg : public Arg
 		SwitchArg(const std::string& flag, 
 			      const std::string& name, 
 			      const std::string& desc,
-			      bool def,
+			      bool def = false,
 				  Visitor* v = NULL);
 
 				  
@@ -83,8 +88,8 @@ class SwitchArg : public Arg
 		SwitchArg(const std::string& flag, 
 			      const std::string& name, 
 			      const std::string& desc,
-			      bool def,
 				  CmdLineInterface& parser,
+			      bool def = false,
 				  Visitor* v = NULL);
 				  
 				  
@@ -108,6 +113,9 @@ class SwitchArg : public Arg
 		 * Returns bool, whether or not the switch has been set.
 		 */
 		bool getValue();
+		
+		virtual void reset();
+
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -116,20 +124,22 @@ class SwitchArg : public Arg
 inline SwitchArg::SwitchArg(const std::string& flag, 
 	 		         const std::string& name, 
      		   		 const std::string& desc, 
-	     	    	 bool _default,
+	     	    	 bool default_val,
 					 Visitor* v )
 : Arg(flag, name, desc, false, false, v),
-  _value( _default )
+  _value( default_val ),
+  _default( default_val )
 { }
 
 inline SwitchArg::SwitchArg(const std::string& flag, 
 					const std::string& name, 
 					const std::string& desc, 
-					bool _default,
 					CmdLineInterface& parser,
+					bool default_val,
 					Visitor* v )
 : Arg(flag, name, desc, false, false, v),
-  _value( _default )
+  _value( default_val ),
+  _default(default_val)
 { 
 	parser.add( this );
 }
@@ -139,7 +149,8 @@ inline bool SwitchArg::getValue() { return _value; }
 inline bool SwitchArg::combinedSwitchesMatch(std::string& combinedSwitches )
 {
 	// make sure this is actually a combined switch
-	if ( combinedSwitches[0] != Arg::flagStartString()[0] )
+	if ( combinedSwitches.length() > 0 &&
+	     combinedSwitches[0] != Arg::flagStartString()[0] )
 		return false;
 
 	// make sure it isn't a long name 
@@ -147,10 +158,16 @@ inline bool SwitchArg::combinedSwitchesMatch(std::string& combinedSwitches )
 		 Arg::nameStartString() )
 		return false;
 
+	// make sure the delimiter isn't in the string 
+	if ( combinedSwitches.find_first_of( Arg::delimiter() ) != std::string::npos )
+		return false;
+
 	// ok, we're not specifying a ValueArg, so we know that we have
 	// a combined switch list.  
 	for ( unsigned int i = 1; i < combinedSwitches.length(); i++ )
-		if ( combinedSwitches[i] == _flag[0] ) 
+		if ( _flag.length() > 0 && 
+		     combinedSwitches[i] == _flag[0] &&
+		     _flag[0] != Arg::flagStartString()[0] ) 
 		{
 			// update the combined switches so this one is no longer present
 			// this is necessary so that no unlabeled args are matched
@@ -179,7 +196,7 @@ inline bool SwitchArg::processArg(int *i, std::vector<std::string>& args)
 		if ( argMatches( args[*i] ) )
 			ret = true;
 
-		if ( _alreadySet )
+		if ( _alreadySet || ( !ret && combinedSwitchesMatch( args[*i] ) ) )
 			throw(CmdLineParseException("Argument already set!", toString()));	
 
 		_alreadySet = true;
@@ -197,6 +214,11 @@ inline bool SwitchArg::processArg(int *i, std::vector<std::string>& args)
 		return false;
 }
 
+inline void SwitchArg::reset()
+{
+	Arg::reset();
+	_value = _default;  
+}
 //////////////////////////////////////////////////////////////////////
 //End SwitchArg.cpp
 //////////////////////////////////////////////////////////////////////

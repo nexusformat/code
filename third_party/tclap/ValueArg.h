@@ -27,135 +27,9 @@
 #include <vector>
 
 #include <tclap/Arg.h>
-
-#ifdef _____HAVE_CONFIG_H /* not needed */
-#include <config.h>
-#else
-#define HAVE_SSTREAM
-#endif
-
-#if defined(HAVE_SSTREAM)
-#include <sstream>
-#elif defined(HAVE_STRSTREAM)
-#include <strstream>
-#else
-#error "Need a stringstream (sstream or strstream) to compile!"
-#endif
+#include <tclap/Constraint.h>
 
 namespace TCLAP {
-
-template<class T> class ValueArg;
-
-namespace VALUE_ARG_HELPER {
-
-enum Error_e { EXTRACT_FAILURE = 1000, EXTRACT_TOO_MANY };
-
-/**
- * This class is used to extract a value from an argument. 
- * It is used because we need a special implementation to
- * deal with std::string and making a specialiced function
- * puts it in the T segment, thus generating link errors.
- * Having a specialiced class makes the symbols weak.
- * This is not pretty but I don't know how to make it
- * work any other way.
- */
-template<class T> class ValueExtractor 
-{
-	/**
-	 *
-	 */
-	friend class ValueArg<T>;
-
-	private:
-
-		/**
-		 * Reference to the value where the result of the extraction will 
-		 * be put.
-		 */
-        T &_value;
-
-		/**
-		 * Constructor.
-		 * \param value - Where the value extracted will be put.
-		 */
-        ValueExtractor(T &value) : _value(value) { }
-
-		/**
-		 * Method that will attempt to parse the input stream for a value
-		 * of type T.
-		 * \param val - Where the value parsed will be put.
-		 */
-        int extractValue( const std::string& val ) 
-		{
-
-#if defined(HAVE_SSTREAM)
-			std::istringstream is(val);
-#elif defined(HAVE_STRSTREAM)
-			std::istrstream is(val.c_str());
-#else
-#error "Need a stringstream (sstream or strstream) to compile!"
-#endif
-
-            int valuesRead = 0;
-            while ( is.good() ) 
-			{
-                if ( is.peek() != EOF )
-                    is >> _value;
-                else
-                    break;
-	
-                valuesRead++;
-            }
-      
-            if ( is.fail() ) 
-                return EXTRACT_FAILURE;
-
-            if ( valuesRead > 1 )
-                return EXTRACT_TOO_MANY;
-
-            return 0;
-        }
-};
-
-/**
- * Specialization for string.  This is necessary because istringstream
- * operator>> is not able to ignore spaces...  meaning -x "X Y" will only 
- * read 'X'... and thus the specialization.
- */
-template<> class ValueExtractor<std::string> 
-{
-	/**
-	 *
-	 */
-    friend class ValueArg<std::string>;
-
-    private:
-	
-		/**
-		 * Reference to the value where the result of the extraction will 
-		 * be put.
-		 */
-        std::string &_value;
-
-		/**
-		 * Constructor.
-		 * \param value - Where the value extracted will be put.
-		 */
-        ValueExtractor(std::string &value) : _value(value) {}
-
-		/**
-		 * Method that will attempt to parse the input stream for a value
-		 * of type std::string.
-		 * \param val - Where the string parsed will be put.
-		 */
-        int extractValue( const std::string& val ) 
-		{
-            _value = val;
-            return 0;
-        }
-};
-
-} //namespace VALUE_ARG_HELPER 
 
 /**
  * The basic labeled argument that parses a value.
@@ -177,13 +51,11 @@ class ValueArg : public Arg
          */
         T _value;
 
-        /**
-         * A list of allowed values.
-         * A list of values allowed for this argument. If the value parsed
-         * for this arg is not found in this list, then an exception is 
-         * thrown.  If the list is empty, then any value is allowed.
-         */
-        std::vector<T> _allowed;
+		/**
+		 * Used to support the reset() method so that ValueArg can be
+		 * reset to their constructed value.
+		 */
+        T _default;
 
         /**
          * A human readable description of the type to be parsed.
@@ -195,18 +67,17 @@ class ValueArg : public Arg
         std::string _typeDesc;
 
         /**
+         * A Constraint this Arg must conform to. 
+         */
+        Constraint<T>* _constraint;
+
+        /**
          * Extracts the value from the string.
          * Attempts to parse string as type T, if this fails an exception
          * is thrown.
          * \param val - value to be parsed. 
          */
         void _extractValue( const std::string& val );
-
-        /**
-         * Checks to see if parsed value is in allowed list.
-         * \param val - value parsed (only used in output). 
-         */
-        void _checkAllowed( const std::string& val );
 
 	public:
 
@@ -291,8 +162,8 @@ class ValueArg : public Arg
          * line.
          * \param value - The default value assigned to this argument if it
          * is not present on the command line.
-         * \param allowed - A vector of type T that where the values in the 
-         * vector are the only values allowed for the arg.
+         * \param constraint - A pointer to a Constraint object used
+		 * to constrain this Arg.
          * \param parser - A CmdLine parser object to add this Arg to.
          * \param v - An optional visitor.  You probably should not
          * use this unless you have a very good reason.
@@ -302,7 +173,7 @@ class ValueArg : public Arg
                   const std::string& desc, 
                   bool req, 
                   T value,
-                  const std::vector<T>& allowed,
+                  Constraint<T>* constraint,
                   CmdLineInterface& parser,
                   Visitor* v = NULL );
 	  
@@ -322,8 +193,8 @@ class ValueArg : public Arg
          * line.
          * \param value - The default value assigned to this argument if it
          * is not present on the command line.
-         * \param allowed - A vector of type T that where the values in the 
-         * vector are the only values allowed for the arg.
+         * \param constraint - A pointer to a Constraint object used
+		 * to constrain this Arg.
          * \param v - An optional visitor.  You probably should not
          * use this unless you have a very good reason.
          */
@@ -332,7 +203,7 @@ class ValueArg : public Arg
                   const std::string& desc, 
                   bool req, 
                   T value,
-                  const std::vector<T>& allowed,
+                  Constraint<T>* constraint,
                   Visitor* v = NULL );
 
         /**
@@ -362,40 +233,11 @@ class ValueArg : public Arg
          * \param val - value to be used.
          */
         virtual std::string longID(const std::string& val = "val") const;
-
-	private: 
-		
-        /**
-         * Common initialization code for constructors with allowed vectors.
-         */
-        void allowedInit();
+        
+        virtual void reset() ;
 
 };
 
-
-template<class T>
-void ValueArg<T>::allowedInit()
-{
-    for ( unsigned int i = 0; i < _allowed.size(); i++ )
-    {
-
-#if defined(HAVE_SSTREAM)
-        std::ostringstream os;
-#elif defined(HAVE_STRSTREAM)
-        std::ostrstream os;
-#else
-#error "Need a stringstream (sstream or strstream) to compile!"
-#endif
-
-        os << _allowed[i];
-
-        std::string temp( os.str() ); 
-
-        if ( i > 0 )
-			_typeDesc += "|";
-        _typeDesc += temp;
-    }
-}
 
 /**
  * Constructor implementation.
@@ -410,7 +252,9 @@ ValueArg<T>::ValueArg(const std::string& flag,
                       Visitor* v)
 : Arg(flag, name, desc, req, true, v),
   _value( val ),
-  _typeDesc( typeDesc )
+  _default( val ),
+  _typeDesc( typeDesc ),
+  _constraint( NULL )
 { }
 
 template<class T>
@@ -424,28 +268,27 @@ ValueArg<T>::ValueArg(const std::string& flag,
                       Visitor* v)
 : Arg(flag, name, desc, req, true, v),
   _value( val ),
-  _typeDesc( typeDesc )
+  _default( val ),
+  _typeDesc( typeDesc ),
+  _constraint( NULL )
 { 
     parser.add( this );
 }
 
-/**
- * Constructor with allowed list. 
- */
 template<class T>
 ValueArg<T>::ValueArg(const std::string& flag, 
                       const std::string& name, 
                       const std::string& desc, 
                       bool req, 
                       T val,
-                      const std::vector<T>& allowed,
+                      Constraint<T>* constraint,
                       Visitor* v)
 : Arg(flag, name, desc, req, true, v),
   _value( val ),
-  _allowed( allowed )
-{ 
-    allowedInit();
-}
+  _default( val ),
+  _typeDesc( constraint->shortID() ),
+  _constraint( constraint )
+{ }
 
 template<class T>
 ValueArg<T>::ValueArg(const std::string& flag, 
@@ -453,14 +296,15 @@ ValueArg<T>::ValueArg(const std::string& flag,
                       const std::string& desc, 
                       bool req, 
                       T val,
-                      const std::vector<T>& allowed,
+                      Constraint<T>* constraint,
                       CmdLineInterface& parser,
                       Visitor* v)
 : Arg(flag, name, desc, req, true, v),
-_value( val ),
-_allowed( allowed )
+  _value( val ),
+  _default( val ),
+  _typeDesc( constraint->shortID() ),
+  _constraint( constraint )
 { 
-    allowedInit();
     parser.add( this );
 }
 
@@ -501,7 +345,7 @@ bool ValueArg<T>::processArg(int *i, std::vector<std::string>& args)
         if ( value == "" )
         {
             (*i)++;
-            if ( (unsigned int)*i < args.size() ) 
+            if ( static_cast<unsigned int>(*i) < args.size() ) 
 				_extractValue( args[*i] );
             else
 				throw( ArgParseException("Missing a value for this argument!",
@@ -519,24 +363,13 @@ bool ValueArg<T>::processArg(int *i, std::vector<std::string>& args)
 }
 
 /**
- * Checks to see if the value parsed is in the allowed list.
- */
-template<class T>
-void ValueArg<T>::_checkAllowed( const std::string& val )
-{
-    if ( _allowed.size() > 0 )
-		if ( find(_allowed.begin(),_allowed.end(),_value) == _allowed.end() )
-            throw( CmdLineParseException( "Couldn't find '" + val + 
-                                          "' in allowed list.", toString() ) );
-}
-
-/**
  * Implementation of shortID.
  */
 template<class T>
 std::string ValueArg<T>::shortID(const std::string& val) const
 {
-    return Arg::shortID( _typeDesc );	
+	static_cast<void>(val); // Ignore input, don't warn
+	return Arg::shortID( _typeDesc ); 
 }
 
 /**
@@ -545,26 +378,32 @@ std::string ValueArg<T>::shortID(const std::string& val) const
 template<class T>
 std::string ValueArg<T>::longID(const std::string& val) const
 {
-    return Arg::longID( _typeDesc );	
+	static_cast<void>(val); // Ignore input, don't warn
+	return Arg::longID( _typeDesc ); 
 }
 
 template<class T>
 void ValueArg<T>::_extractValue( const std::string& val ) 
 {
-	VALUE_ARG_HELPER::ValueExtractor<T> ve(_value);
+    try {
+	ExtractValue(_value, val, typename ArgTraits<T>::ValueCategory());
+    } catch( ArgParseException &e) {
+	throw ArgParseException(e.error(), toString());
+    }
+    
+    if ( _constraint != NULL )
+	if ( ! _constraint->check( _value ) )
+	    throw( CmdLineParseException( "Value '" + val + 
+					  + "' does not meet constraint: " 
+					  + _constraint->description(),
+					  toString() ) );
+}
 
-	int err = ve.extractValue(val);
-
-	if ( err == VALUE_ARG_HELPER::EXTRACT_FAILURE )
-		throw( ArgParseException("Couldn't read argument value from string '" +
-	                             val + "'", toString() ) );
-
-	if ( err == VALUE_ARG_HELPER::EXTRACT_TOO_MANY )
-		throw( ArgParseException(
-					"More than one valid value parsed from string '" +
-				    val + "'", toString() ) );
-
-	_checkAllowed( val );		  
+template<class T>
+void ValueArg<T>::reset()
+{
+	Arg::reset();
+	_value = _default;
 }
 
 } // namespace TCLAP
