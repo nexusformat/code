@@ -779,6 +779,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXbrowse/Makefile
 		applications/NXconvert/Makefile
 		applications/NXvalidate/Makefile
+		applications/NXvalidate/nxvalidate
 		applications/NXdump/Makefile
 		applications/nxingest/Makefile
 		applications/NXsummary/Makefile

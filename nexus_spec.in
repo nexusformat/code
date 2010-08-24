@@ -70,7 +70,10 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %{_bindir}/*
 %{_datadir}/*
 %{_includedir}/*
-/usr/lib/python*/site-packages/nxs
+%ifarch x86_64
+/usr/lib/*
+#/usr/lib/python*/site-packages/nxs
+%endif
 #%files devel
 #%{_libdir}/*.a
 #%{_libdir}/*.so*
