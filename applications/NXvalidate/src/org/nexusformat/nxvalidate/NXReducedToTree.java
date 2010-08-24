@@ -59,14 +59,15 @@ public class NXReducedToTree extends DefaultTreeModel {
         fireTreeStructureChanged(evt);
     }
 
+    @Override
     public Object getRoot() {
 
         return root;
 
     }
 
+    @Override
     public boolean isLeaf(Object aNode) {
-
         // Determines whether the icon shows up to the left.
         // Return true for any node with no children
         NXNodeMapper node = (NXNodeMapper) aNode;
@@ -78,6 +79,7 @@ public class NXReducedToTree extends DefaultTreeModel {
         return true;
     }
 
+    @Override
     public int getChildCount(Object parent) {
 
         NXNodeMapper node = (NXNodeMapper) parent;

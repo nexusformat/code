@@ -20,12 +20,14 @@
  *
  * For further information, see <http://www.neutron.anl.gov/NeXus/>
  *
- * TextPaneStyle.java
+ * TreeUtils.java
  *
  */
 package org.nexusformat.nxvalidate;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.w3c.dom.Document;
@@ -42,15 +44,79 @@ public class TreeUtils {
             return;
         }
 
+        ArrayList<NXNodeMapper> nodes = new ArrayList<NXNodeMapper>();
+        ArrayList<TreePath> paths = new ArrayList<TreePath>();
         NXNodeMapper baseNode = getBaseNode(tree);
-        NXNodeMapper node = null;
-        
-        int rows = tree.getRowCount();
 
-        for (int i = 0; i < rows; ++i) {
-            node = (NXNodeMapper) tree.getPathForRow(i).getLastPathComponent();
-            System.out.println("Node Name: " + node.toString() + ": " + node.getBadNode());
+        if (baseNode==null) {
+            return;
         }
+
+        Enumeration children = baseNode.children();
+        NXNodeMapper tmpNode = null;
+
+        NXNodeMapper parent = null;
+        TreePath path = null;
+        ArrayList<NXNodeMapper> tmpPath = null;
+        ArrayList<NXNodeMapper> tmpPath2 = null;
+        nodes.add(baseNode);
+
+        while (children.hasMoreElements()) {
+
+            tmpNode = (NXNodeMapper)children.nextElement();
+            nodes.add(tmpNode);
+            nodes.addAll(getSubNodes(tmpNode));
+
+        }
+
+        for (int i = 0; i < nodes.size(); ++i) {
+           
+           nodes.get(i).checkBadNode();
+           
+           if(nodes.get(i).getBadNode()){
+
+               tmpPath = new ArrayList<NXNodeMapper>();
+               //tmpPath.add(nodes.get(i));
+
+               parent = (NXNodeMapper)nodes.get(i).getParent();
+
+               while(!parent.toString().equals(baseNode.toString()) && parent!=null){
+                   tmpPath.add(parent);
+                   parent = (NXNodeMapper)parent.getParent();
+               }
+               tmpPath.add(baseNode);
+               tmpPath.add((NXNodeMapper)baseNode.getParent());
+               
+               tmpPath2 = new ArrayList<NXNodeMapper>();
+               
+               int number = tmpPath.size() -1;
+               for(int j = 0; j < tmpPath.size();++j){
+                   tmpPath2.add(tmpPath.get(number -j));
+               }
+
+               paths.add(new TreePath(tmpPath2.toArray()));
+               tree.expandPath(new TreePath(tmpPath2.toArray()));
+           }
+        }
+
+    }
+
+    private ArrayList<NXNodeMapper> getSubNodes(NXNodeMapper node){
+
+        ArrayList<NXNodeMapper> nodes = new ArrayList<NXNodeMapper>();
+        NXNodeMapper tmpNode = null;
+
+        Enumeration children = node.children();
+
+        while (children.hasMoreElements()) {
+            
+            tmpNode = (NXNodeMapper)children.nextElement();
+            nodes.add(tmpNode);
+            nodes.addAll(getSubNodes(tmpNode));
+            
+        }
+
+        return nodes;
 
     }
 

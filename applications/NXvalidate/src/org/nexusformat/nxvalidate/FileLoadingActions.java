@@ -210,10 +210,12 @@ public class FileLoadingActions implements Runnable {
 
             //Display reduced file
             Document document = builder.parse(reducedFile);
+            document.setUserData("file", nxsFile, null);
             NXNodeMapper node = new NXNodeMapper(
                     document, true, nxsFile);
             node.setReducedDoc(document);
             this.reducedDoc = document;
+            
             if (nxdlFile != null) {
                 node.setNXDLFile(nxdlFile);
             }
