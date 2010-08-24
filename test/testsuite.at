@@ -1954,13 +1954,13 @@ AT_CLEANUP
 
 AT_BANNER([[Testing the NeXus File Converter.]])
 AT_SETUP([Checking HDF4 -> HDF4 ])
-AT_CHECK([$HAVE_HDF4 && nxconvert -h4 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF4 && nxconvert --hdf 4 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to HDF4 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF4 -> HDF5 ])
-AT_CHECK([$HAVE_HDF4 && $HAVE_HDF5 && nxconvert -h5 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF4 && $HAVE_HDF5 && nxconvert --hdf 5 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to HDF5 NeXus file a.a
 Convertion successful.
 ]])
@@ -1972,13 +1972,13 @@ Convertion successful.
 ]])
 AT_CLEANUP
 #AT_SETUP([Checking HDF5 -> HDF4 ])
-#AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert -h4 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
+#AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert --hdf 4 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 #[[Converting NXtest.h5 to HDF4 NeXus file a.a
 #Convertion successful.
 #]])
 #AT_CLEANUP
 AT_SETUP([Checking HDF5 -> HDF5 ])
-AT_CHECK([$HAVE_HDF5 && nxconvert -h5 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF5 && nxconvert --hdf 5 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to HDF5 NeXus file a.a
 Convertion successful.
 ]])
@@ -1990,13 +1990,13 @@ Convertion successful.
 ]])
 AT_CLEANUP
 #AT_SETUP([Checking XML -> HDF4 ])
-#AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert -h4 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
+#AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert --hdf 4 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 #[[Converting NXtest.xml to HDF4 NeXus file a.a
 #Convertion successful.
 #]])
 #AT_CLEANUP
 AT_SETUP([Checking XML -> HDF5 ])
-AT_CHECK([$HAVE_XML && $HAVE_HDF5 && nxconvert -h5 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_XML && $HAVE_HDF5 && nxconvert --hdf 5 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to HDF5 NeXus file a.a
 Convertion successful.
 ]])
