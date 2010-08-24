@@ -146,10 +146,10 @@ int main(int argc, char *argv[]) {
 
       // configure the arguments
       SwitchArg verboseArg("", "verbose", "Turn on verbose printing", 
-                           false, cmd);
+                           cmd, false);
       UnlabeledMultiArg<string> filenameArg("filename",
                                             "Name of a file to be viewed",
-                                            "filename",cmd);
+                                            false, "filename",cmd);
       ValueArg<string> configArg("", "config", "Specify configuration file",
                                  false, "", "config", cmd);
       ValueArg<string> writeConfigArg("", "writeconfig",
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
                                "Get value of the item pointed to by the label",
                                 false, "", "label", cmd);
       SwitchArg printXmlArg("", "xml", "Print results as xml",
-                            false, cmd);
+                            cmd, false);
 
       // parse the arguments
       cmd.parse(argc, argv);

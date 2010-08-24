@@ -57,17 +57,13 @@ int main(int argc, char *argv[])
   try {
     // set up the command line  arguments
     CmdLine cmd("Convert a NeXus file between different on disk file formats.",
-		' ', NXCONVERT_VERSION);
-    UnlabeledValueArg<string> inFileArg("inputFile", "Name of the input file.",
-					EMPTY, "inputFile");
-    cmd.add(inFileArg);
-    UnlabeledValueArg<string> outFileArg("outputFile",
-					 "Name of the output file.",
-					 EMPTY, "outputFile");
-    cmd.add(outFileArg);
+		' ', NXCONVERT_VERSION, false);
     SwitchArg xmlArg("x", "xml", "Output file in xml format", false);
-    SwitchArg hdf4Arg("4", "hdf4", "Output file in hdf4 format", false);
-    SwitchArg hdf5Arg("5", "hdf5", "Output file in hdf5 format", false);
+    vector<int> allowedHdf;
+    allowedHdf.push_back(4);
+    allowedHdf.push_back(5);
+    ValuesConstraint<int> allowedHdfC(allowedHdf);
+    ValueArg<int> hdfArg("h", "hdf", "Specify HDF version to write", false, 0, &allowedHdfC);
     SwitchArg defArg("d", "dfn",
 		     "Output definition file used for validating NeXus files",
 		     false);
@@ -77,18 +73,21 @@ int main(int argc, char *argv[])
     vector<string> allowedXml;
     allowedXml.push_back("keepws");
     allowedXml.push_back("table");
+    ValuesConstraint<string> allowedXmlC(allowedXml);
     ValueArg<string> xmlSpecialArg("o", "outputxml",
 				   "Special arguments for xml. keepws defines that the whitespace should be preserved. table specifies a format that is more easiliy imported into spreadsheet programs. Either option forces xml output",
-				   false, "", allowedXml);
+				   false, "", &allowedXmlC);
     vector<Arg*> outputformats;
-    outputformats.push_back(&hdf5Arg);
+    outputformats.push_back(&hdfArg);
     outputformats.push_back(&xmlArg);
-    outputformats.push_back(&hdf4Arg);
     outputformats.push_back(&defArg);
     outputformats.push_back(&defValueArg);
     outputformats.push_back(&xmlSpecialArg);
     cmd.xorAdd(outputformats);
 
+    UnlabeledMultiArg<string> FileArgs("Files", "Name of input and output files.",
+					false, EMPTY);
+    cmd.add(FileArgs);
     // parse the arguments and configure converting the file
     cmd.parse(argc, argv);
     int nx_format = -1; // output format
@@ -107,13 +106,15 @@ int main(int argc, char *argv[])
       if (defValueArg.isSet())
 	definition_name = defValueArg.getValue();
     }
-    if (hdf4Arg.isSet()) {
-      nx_format = NX_HDF4;
-      nx_write_access |= NXACC_CREATE4;
-    }
-    if (hdf5Arg.isSet()) {
-      nx_format = NX_HDF5;
-      nx_write_access |= NXACC_CREATE5;
+    if (hdfArg.isSet()) {
+      int hdf_type = hdfArg.getValue();
+      if (hdf_type == 4) {
+          nx_format = NX_HDF4;
+          nx_write_access |= NXACC_CREATE4;
+      } else if (hdf_type == 5) {
+          nx_format = NX_HDF5;
+          nx_write_access |= NXACC_CREATE5;
+      }
     }
     if (xmlSpecialArg.isSet()) {
       nx_format |= NX_XML;
@@ -127,8 +128,16 @@ int main(int argc, char *argv[])
 	nx_write_access |= NXACC_TABLE;
       }
     }
-    string inFile(inFileArg.getValue());
-    string outFile(outFileArg.getValue());
+    vector<string> file_args = FileArgs.getValue();
+    string inFile, outFile;
+    if (file_args.size() > 0)
+    {
+        inFile = file_args[0];
+    }
+    if (file_args.size() > 1)
+    {
+        outFile = file_args[1];
+    }
 
     // do the actual conversion
     std::cout << "Converting " << inFile << " to " << nx_formats[nx_format]
