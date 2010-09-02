@@ -20,14 +20,19 @@
  *
  * For further information, see <http://www.neutron.anl.gov/NeXus/>
  *
- * FileLoadingActions.java
+ * FileActions.java
  *
  */
 package org.nexusformat.nxvalidate;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.ResourceBundle;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -43,13 +48,14 @@ import org.nexusformat.nxvalidate.exceptions.NXvalidateException;
  *
  * @author Stephen Rankin
  */
-public class FileLoadingActions implements Runnable {
+public class FileActions implements Runnable {
 
     private File nxsFile = null;
     private File nxdlFile = null;
     private File reducedFile = null;
     private File resultsFile = null;
     private File nxconvertFile = null;
+    private File saveDirectory = null;
     private DocumentBuilderFactory factory = null;
     private DocumentBuilder builder = null;
     private NXReducedToTree domTree = null;
@@ -70,7 +76,7 @@ public class FileLoadingActions implements Runnable {
     private boolean conversionFail = false;
     private boolean isNotBulk = false;
 
-    public FileLoadingActions(NXvalidateFrame frame, JTree jTree,
+    public FileActions(NXvalidateFrame frame, JTree jTree,
             DocumentBuilder builder, NXReducedToTree domTree,
             NXNodeMapper root) {
 
@@ -135,6 +141,14 @@ public class FileLoadingActions implements Runnable {
         this.dataFileList = dataFileList;
     }
 
+    public File getSaveDirectory() {
+        return saveDirectory;
+    }
+
+    public void setSaveDirectory(File saveDirectory) {
+        this.saveDirectory = saveDirectory;
+    }
+
     public boolean getConversionResult() {
         return conversionFail;
     }
@@ -158,7 +172,7 @@ public class FileLoadingActions implements Runnable {
 
             //Do the validation.
             if (nxconvertFile != null) {
-                validator = new ValidatorUtils(nxconvertFile);
+                validator = new ValidatorUtils(nxsFile,nxconvertFile);
             } else {
                 dialogReportProblem.showMessageDialog(
                         frame,
@@ -231,15 +245,15 @@ public class FileLoadingActions implements Runnable {
             badDataFileList.add(nxsFile.getAbsolutePath());
         } catch (InterruptedException ex) {
             Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    FileActions.class.getName()).log(Level.SEVERE,
                     null, ex);
         } catch (SAXException ex) {
             Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    FileActions.class.getName()).log(Level.SEVERE,
                     null, ex);
         } catch (IOException ex) {
             Logger.getLogger(
-                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    FileActions.class.getName()).log(Level.SEVERE,
                     null, ex);
         }
     }
@@ -317,6 +331,47 @@ public class FileLoadingActions implements Runnable {
 
     }
 
+    private void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
+
+    public void saveResults(File directory){
+
+        NXNodeMapper tmpNode = null;
+        File tmpReduced = null;
+        File tmpResults = null;
+        Enumeration children = root.children();
+        
+        while(children.hasMoreElements()){
+
+            tmpNode = (NXNodeMapper)children.nextElement();
+            
+            if(tmpNode.getReducedFile()!=null){
+
+                tmpReduced = new File(directory.getAbsolutePath() +
+                        directory.separator + tmpNode.getReducedFile().getName());
+                tmpResults = new File(directory.getAbsolutePath() +
+                        directory.separator + tmpNode.getResultsFile().getName());
+                try{
+                    copy(tmpNode.getReducedFile(),tmpReduced);
+                    copy(tmpNode.getResultsFile(),tmpResults);
+                } catch (IOException ex) {
+                    Logger.getLogger(
+                    FileActions.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
     public void run() {
 
         if (which == 1) {
@@ -335,7 +390,8 @@ public class FileLoadingActions implements Runnable {
             bulkLoad();
         }else if (which == 5) {
             bulkValidate();
+        } else if (which == 6) {
+            saveResults(saveDirectory);
         }
-
     }
 }

@@ -44,17 +44,19 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
 
     private File nxdlFile = null;
     private ArrayList<String> dataFileList = null;
-    private FileLoadingActions fileLoadingActions = null;
+    private FileActions fileLoadingActions = null;
     private boolean badFiles = false;
     private ResourceBundle bundle = null;
     private ArrayList<String> dataFileSelectedList = null;
+    private CheckNexusFileType check = null;
 
     /** Creates new form BulkLoadFilesFrame */
-    public BulkLoadFilesFrame(FileLoadingActions fileLoadingActions) {
+    public BulkLoadFilesFrame(FileActions fileLoadingActions) {
         initComponents();
         this.fileLoadingActions = fileLoadingActions;
         bundle = ResourceBundle.getBundle(
                 "org/nexusformat/nxvalidate/resources/nxvalidate");
+        check = new CheckNexusFileType();
 
     }
 
@@ -62,6 +64,7 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
         initComponents();
         bundle = ResourceBundle.getBundle(
                 "org/nexusformat/nxvalidate/resources/nxvalidate");
+        check = new CheckNexusFileType();
     }
 
     /** This method is called from within the constructor to
@@ -212,8 +215,19 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
 
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
                 nxdlFile = jFileChooser1.getSelectedFile();
-                nxdcFileNameTextField.setText(nxdlFile.getAbsolutePath());
-                nxdcFileNameTextField.setToolTipText(nxdlFile.getAbsolutePath());
+
+                if(check.checkNXDLFile(nxdlFile)){
+
+                    nxdcFileNameTextField.setText(nxdlFile.getAbsolutePath());
+                    nxdcFileNameTextField.setToolTipText(nxdlFile.getAbsolutePath());
+
+                } else{
+                    nxdlFile = null;
+                    problemOptionPane.showMessageDialog(this,
+                        bundle.getString("notNXDLFileMessage"));
+                }
+
+               
             } else {
                 nxdlFile = null;
             }
@@ -252,9 +266,6 @@ public class BulkLoadFilesFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_loadDataFilesButtonActionPerformed
 
     private void updateTable() throws FileNotFoundException, IOException {
-
-
-        CheckNexusFileType check = new CheckNexusFileType();
 
         DefaultTableModel tableModel = new DefaultTableModel(new Object[][]{
                     {null, null}

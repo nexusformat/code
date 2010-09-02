@@ -121,7 +121,7 @@ public class NXNodeMapper implements MutableTreeNode {
 
     /**
      * Set the flag that says that this node is a documents node i.e. one of the
-     * list of nodes directly under the root note that are the open NXS documents.
+     * list of nodes directly under the root node that are the open NXS documents.
      * @param isDocument a flag which is true if the node is a document node.
      */
     public void setDocument(boolean isDocument) {
@@ -217,26 +217,58 @@ public class NXNodeMapper implements MutableTreeNode {
         this.resultsDoc = resultsDoc;
     }
 
+    /**
+     * Initially the Nexus file is converted to a reduced (all data removed)
+     * XML document via the Nexus convert command. This method gets the
+     * W3C DOM document of the reduced XML file.
+     * @return the W3C DOM document of the reduced XML file.
+     */
     public Document getReducedDoc() {
         return reducedDoc;
     }
 
+    /**
+     * Initially the Nexus file is converted to a reduced (all data removed)
+     * XML document via the Nexus convert command. This method sets the
+     * W3C DOM document of the reduced XML file.
+     * @param reducedDoc the W3C DOM document of the reduced XML file.
+     */
     public void setReducedDoc(Document reducedDoc) {
         this.reducedDoc = reducedDoc;
     }
 
+    /**
+     * If a node in the reduced XML document fails one of the schematron tests
+     * then the node can be marked as a bad node with a boolean flag. The flag
+     * is set to true if the node failed one of the tests.
+     * @param badNode true if the node failed one of the schematron tests.
+     */
     public void setBadNode(boolean badNode) {
         this.badNode = badNode;
     }
 
+    /**
+     * If a node in the reduced XML document fails one of the schematron tests
+     * then the node can be marked as a bad node with a boolean flag. The flag
+     * is set to true if the node failed one of the tests.
+     * @return true if the node failed one of the schematron tests.
+     */
     public boolean getBadNode() {
         return badNode;
     }
 
+    /**
+     * Get the W3C DOM node corresponding to this tree node.
+     * @return the W3C DOM node corresponding to this tree node.
+     */
     public Node getDomNode() {
         return domNode;
     }
 
+    /**
+     * A convenience method to force the checking if a node is bad
+     * (failed schematron tests). Sets the flag to indicate the node is bad.
+     */
     public void checkBadNode() {
         if (!isRoot) {
             Boolean bad = (Boolean) domNode.getUserData("bad");
@@ -246,10 +278,13 @@ public class NXNodeMapper implements MutableTreeNode {
         }
     }
 
+    /**
+     * Resets the various properties of a node, i.e flag to indicate that it
+     * is a bad node, the text for the tests that failed etc.
+     */
     public void resetNode() {
 
         badNode = false;
-
         domNode.setUserData("texts", null, null);
         domNode.setUserData("tests", null, null);
         domNode.setUserData("diags", null, null);
@@ -257,6 +292,11 @@ public class NXNodeMapper implements MutableTreeNode {
         domNode.setUserData("bad", new Boolean(false), null);
     }
 
+    /**
+     * This is a list of text strings which correspond to the error message
+     * results of the schematron tests.
+     * @return list of text strings corresponding to the schematron test results.
+     */
     public ArrayList<String> getNodeTexts() {
         if (!isRoot) {
             return (ArrayList<String>) domNode.getUserData("texts");
@@ -265,6 +305,12 @@ public class NXNodeMapper implements MutableTreeNode {
         }
     }
 
+    /**
+     * This is a list of text strings which correspond to the schematron
+     * test descriptions.
+     * @return list of text strings corresponding to the schematron test
+     *         descriptions.
+     */
     public ArrayList<String> getNodeTests() {
         if (!isRoot) {
             return (ArrayList<String>) domNode.getUserData("tests");
@@ -273,6 +319,12 @@ public class NXNodeMapper implements MutableTreeNode {
         }
     }
 
+    /**
+     * This is a list of text strings which correspond to the schematron
+     * diagnostic errors.
+     * @return list of text strings corresponding to the schematron
+     *         diagnostic errors.
+     */
     public ArrayList<String> getNodeDiags() {
         if (!isRoot) {
             return (ArrayList<String>) domNode.getUserData("diags");
@@ -377,26 +429,32 @@ public class NXNodeMapper implements MutableTreeNode {
 
             return root;
 
-        } else if(domNode.getParentNode()!=null ){
+        } else if (domNode.getParentNode() != null) {
 
-            if(domNode.getParentNode().getNodeType() == domNode.DOCUMENT_NODE){
+            if (domNode.getParentNode().getNodeType() == domNode.DOCUMENT_NODE) {
 
-                Document doc = (Document)domNode.getParentNode();
+                Document doc = (Document) domNode.getParentNode();
 
                 return new NXNodeMapper(domNode.getParentNode(), true,
-                    ((File)doc.getUserData("file")).getAbsolutePath());
+                        ((File) doc.getUserData("file")).getAbsolutePath());
 
-            } else{
+            } else {
 
                 return new NXNodeMapper(domNode.getParentNode(), false,
-                    domNode.getParentNode().getNodeName());
+                        domNode.getParentNode().getNodeName());
             }
-        }else{
-                return null;
+        } else {
+            return null;
         }
-        
+
     }
 
+    /**
+     * Each node of the reduced XML document may have attributes associated
+     * with it, this method provides a list of the attributes. Each string
+     * contains the attribute name and the value.
+     * @return a list of the attributes and their values.
+     */
     public String[] getAttributeList() {
 
         if (isRoot) {
@@ -411,13 +469,19 @@ public class NXNodeMapper implements MutableTreeNode {
             int na = domNode.getAttributes().getLength();
 
             for (int i = 0; i < na; ++i) {
-                atts.add(att.item(i).getNodeName() + " = " + att.item(i).getNodeValue());
+                atts.add(att.item(i).getNodeName() + " = " +
+                         att.item(i).getNodeValue());
             }
 
         }
         return atts.toArray(new String[0]);
     }
 
+    /**
+     * Each node of the reduced XML document may have a value associated with it.
+     * This method returns that value as a string.
+     * @return the value of the XML node.
+     */
     public String getValue() {
 
         if (isRoot) {
@@ -444,7 +508,6 @@ public class NXNodeMapper implements MutableTreeNode {
             Node node = domNode.getChildNodes().item(i);
 
             if (node.getNodeType() == ELEMENT_TYPE) {
-
                 nodes.add(node);
                 ++childCount;
             }
@@ -468,41 +531,88 @@ public class NXNodeMapper implements MutableTreeNode {
         return "";
     }
 
+    /**
+     * Returns a list of nodes that represent the Nexus documents that are open
+     * i.e. that have been reduced.
+     * @return a list of Nexus document nodes.
+     */
     public ArrayList<NXNodeMapper> getOpenNodes() {
         return documents;
     }
 
+     /**
+     * Removes the list of nodes that represent the Nexus documents that are
+     * open i.e. that have been reduced.
+     */
     public void removeAllNodes() {
         documents.clear();
     }
 
+    /**
+     * A class that represents the child nodes of a node from a
+     * reduced document. The child nodes are represented as an enumeration.
+     */
     private class children implements Enumeration {
 
         private int count = 0;
         private boolean more = true;
         private Node node = null;
+        private NXNodeMapper nxNode = null;
 
         public boolean hasMoreElements() {
-            
-            if (count < children.size()) {
-                more = true;
-            } else {
-                more = false;
-            }
 
+            if (isRoot) {
+
+                if (documents == null) {
+                    more = false;
+                    return more;
+                }
+
+                if (count < documents.size()) {
+                    more = true;
+                } else {
+                    more = false;
+                }
+            } else {
+
+                if (children == null) {
+                    more = false;
+                    return more;
+                }
+
+                if (count < children.size()) {
+                    more = true;
+                } else {
+                    more = false;
+                }
+
+            }
             return more;
         }
 
         public Object nextElement() {
-            
-            if (count < children.size()) {
-                node = children.get(count);
-                count++;
-                return new NXNodeMapper(node, false, node.getNodeName());
-            } else {
-                throw new NoSuchElementException();
-            }
 
+            if (isRoot) {
+
+                if (count < documents.size()) {
+                    nxNode = documents.get(count);
+                    count++;
+                    return nxNode;
+                } else {
+                    throw new NoSuchElementException();
+                }
+                
+            } else{
+
+                if (count < children.size()) {
+                    node = children.get(count);
+                    count++;
+                    return new NXNodeMapper(node, false, node.getNodeName());
+                } else {
+                    throw new NoSuchElementException();
+                }
+
+            }
         }
     }
 

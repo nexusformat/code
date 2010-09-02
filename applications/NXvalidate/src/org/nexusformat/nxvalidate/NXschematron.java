@@ -43,6 +43,7 @@ public class NXschematron {
 
     private File reducedNeXusFile;
     private File schematronFile;
+    private File inputNexusFile;
     private boolean keepTemp;
     private InputStream dsdlIncludeXSLTStream = null;
     private InputStream abstractExpandXSLTStream = null;
@@ -51,11 +52,12 @@ public class NXschematron {
     //protected String schematronxslt[] = new String[]{"iso_dsdl_include.xsl",
     //    "iso_abstract_expand.xsl", "iso_svrl_for_xslt2.xsl"};
 
-    public NXschematron(File reducedNeXusFile, File schematronFile,
+    public NXschematron(File inputNexusFile, File reducedNeXusFile, File schematronFile,
             final boolean keepTemp) {
 
         this.reducedNeXusFile = reducedNeXusFile;
         this.schematronFile = schematronFile;
+        this.inputNexusFile = inputNexusFile;
         this.keepTemp = keepTemp;
 
         // The Schematron files...
@@ -76,7 +78,7 @@ public class NXschematron {
     }
 
     /**
-     * Transform an XML file to somthing else given ans XSLT transformation.
+     * Transform an XML file to something else given an XSLT transformation.
      * @param inputFilename the XML input file name.
      * @param xslFilename the xslt file name.
      * @param outputFilename the filename to store the results
@@ -91,7 +93,7 @@ public class NXschematron {
     }
 
     /**
-     * Transform an XML file to somthing else given ans XSLT transformation.
+     * Transform an XML file to something else given an XSLT transformation.
      * @param inputFile the XML input file
      * @param xslFile the xslt file.
      * @param outputFile the result of the transformation.
@@ -177,7 +179,11 @@ public class NXschematron {
                 new FileOutputStream(schemaFile));
 
         // Now lets validate the actual reduced file.
-        File resultsFile = File.createTempFile("result", ".xml");
+        //File resultsFile = File.createTempFile(inputNexusFile.getName() + ".result", ".xml");
+
+        //File resultsFile = File.createTempFile(inputNexusFile.getName(). + ".result", ".xml");
+
+        File resultsFile = new File(reducedNeXusFile.getName().replaceAll(".reduced", "") + ".result");
 
         if (!this.keepTemp) {
             resultsFile.deleteOnExit();
@@ -191,13 +197,13 @@ public class NXschematron {
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Must specify two input files");
+        if (args.length != 3) {
+            System.out.println("Must specify three input files");
             return;
         }
         try {
-            NXschematron sch = new NXschematron(
-                    new File(args[0]), new File(args[1]), false);
+            NXschematron sch = new NXschematron(new File(args[0]),
+                    new File(args[1]), new File(args[2]), false);
             File results = sch.validate();
             System.out.println(results.getAbsolutePath());
         } catch (Exception e) {

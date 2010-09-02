@@ -129,16 +129,12 @@ public class TextPaneStyle {
 
             if (node.getNodeTexts() != null) {
 
-                for (int i = 0; i
-                        < node.getNodeTexts().size();
-                        ++i) {
+                for (int i = 0; i < node.getNodeTexts().size(); ++i) {
                     doc.insertString(doc.getLength(),
                             node.getNodeTexts().get(i), doc.getStyle("error"));
 
                     doc.insertString(doc.getLength(), newline + newline,
                             doc.getStyle("heading"));
-
-
                 }
 
             }

@@ -55,7 +55,8 @@ public class CheckNexusFileType {
         try {
             builder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CheckNexusFileType.class.getName()).log(
+                    Level.SEVERE, null, ex);
         }
     }
 
@@ -67,18 +68,21 @@ public class CheckNexusFileType {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public boolean checkNexusFile(File file) throws FileNotFoundException, IOException {
-
-        if (checkHDF5(file)) {
-            return true;
-        } else if (checkHDF4(file)) {
-            return true;
-        } else if (checkNexusXML(file)) {
-            return true;
+    public boolean checkNexusFile(File file) {
+        try {
+            if (checkHDF5(file)) {
+                return true;
+            } else if (checkHDF4(file)) {
+                return true;
+            } else if (checkNexusXML(file)) {
+                return true;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         return false;
-
     }
 
     /**
@@ -88,7 +92,8 @@ public class CheckNexusFileType {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public boolean checkHDF5(File file) throws FileNotFoundException, IOException {
+    public boolean checkHDF5(File file) throws FileNotFoundException,
+                                               IOException {
 
         byte[] b = new byte[7];
         FileInputStream stream = new FileInputStream(file);
@@ -120,7 +125,8 @@ public class CheckNexusFileType {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public boolean checkHDF4(File file) throws FileNotFoundException, IOException {
+    public boolean checkHDF4(File file) throws FileNotFoundException,
+                                               IOException {
 
         byte[] b = new byte[4];
         FileInputStream stream = new FileInputStream(file);
@@ -147,7 +153,7 @@ public class CheckNexusFileType {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private boolean checkNexusXML(File file) throws FileNotFoundException, IOException {
+    private boolean checkNexusXML(File file) {
 
         boolean result = false;
 
@@ -185,4 +191,52 @@ public class CheckNexusFileType {
         return result;
 
     }
+
+    /**
+     * Checks to see if a file is a Nexus definition file and returns true if
+     * it is.
+     * @param file the input file to check.
+     * @return boolean which is true if the file is a Nexus definition file.
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public boolean checkNXDLFile(File file) {
+
+        boolean result = false;
+
+        try {
+            Document resultsDoc = builder.parse(file);
+            if (resultsDoc.getDocumentElement().getNodeName().equals("definition")) {
+                result = true;
+            }
+        } catch (SAXException ex) {
+            //Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
+            //        "SAXException: " + file.getAbsolutePath(), ex);
+            return result;
+        } catch (MalformedByteSequenceException ex) {
+           // Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
+            //        "MalformedByteSequenceException: " + file.getAbsolutePath(), ex);
+            return result;
+        } catch (ConnectException ex) {
+            //Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
+            //        "ConnectException: " + file.getAbsolutePath(), ex);
+            return result;
+        } catch (MalformedURLException ex) {
+            //Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
+            //        "MalformedURLException: " + file.getAbsolutePath(), ex);
+            return result;
+        } catch (FileNotFoundException ex) {
+            //Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
+            //        "FileNotFoundException: " + file.getAbsolutePath(), ex);
+            return result;
+        } catch (IOException ex) {
+            //Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
+             //       "IOException: " + file.getAbsolutePath(), ex);
+            return result;
+        }
+
+        return result;
+
+    }
+
 }

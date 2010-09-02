@@ -43,10 +43,11 @@ public class ValidatorUtils {
     private boolean convertNxs = false;
     private File nxconvertFile = null;
 
-    public ValidatorUtils(File nxconvertFile) {
+
+    public ValidatorUtils(File nxsFile, File nxconvertFile) {
 
         this.nxconvertFile = nxconvertFile;
-
+        this.nxsFile = nxsFile;
     }
 
     /**
@@ -156,7 +157,7 @@ public class ValidatorUtils {
         if (reduced != null && schematronFile != null) {
 
             // create the validation setup
-            NXschematron schematron = new NXschematron(reduced,
+            NXschematron schematron = new NXschematron(nxsFile, reduced,
                     schematronFile, keepTemp);
 
             try {
@@ -164,7 +165,7 @@ public class ValidatorUtils {
             } catch (Exception e) {
                 Logger.getLogger(ValidatorUtils.class.getName()).log(Level.SEVERE,
                         "While creating validation report");
-                throw new NXvalidateException("While creating validation report");
+                throw new NXvalidateException("While creating validation report", e);
             }
         }
 

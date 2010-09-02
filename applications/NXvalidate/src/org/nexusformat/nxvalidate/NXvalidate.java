@@ -190,7 +190,7 @@ public class NXvalidate {
         if (reduced != null && schematronFile !=null) {
             
             // create the validation setup
-            NXschematron schematron = new NXschematron(reduced,
+            NXschematron schematron = new NXschematron(file,reduced,
                     schematronFile, keepTemp);
 
             try {

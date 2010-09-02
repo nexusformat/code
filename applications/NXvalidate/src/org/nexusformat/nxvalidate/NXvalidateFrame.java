@@ -63,10 +63,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private TreeUtils treeUtils = null;
     private UserSettings settings = null;
     private File nxconvertFile = null;
+    private File saveDirectory = null;
     private boolean foundNXconvert = false;
     private MouseListener popupListener = null;
     private TextPaneStyle txtStyle = null;
-    private FileLoadingActions fileLoadingActions = null;
+    private FileActions fileLoadingActions = null;
 
     /** Creates new form NXvalidateFrame */
     public NXvalidateFrame() {
@@ -129,7 +130,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         txtStyle = new TextPaneStyle(jTextPane1);
 
-        fileLoadingActions = new FileLoadingActions(this, jTree1, builder, domTree, root);
+        fileLoadingActions = new FileActions(this, jTree1, builder, domTree, root);
 
     }
 
@@ -145,6 +146,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         dialogReportProblem = new javax.swing.JOptionPane();
         treePopupMenu = new javax.swing.JPopupMenu();
         closeFileMenuItem = new javax.swing.JMenuItem();
+        jFileChooser1 = new javax.swing.JFileChooser();
         jPanel2 = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -155,6 +157,8 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         fileMenu = new javax.swing.JMenu();
         openFilesMenuItem = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        saveMenuItem = new javax.swing.JMenuItem();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
         closeAllMenuItem = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
         exitAppMenuItem = new javax.swing.JMenuItem();
@@ -229,6 +233,16 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         });
         fileMenu.add(openFilesMenuItem);
         fileMenu.add(jSeparator4);
+
+        saveMenuItem.setText("Save Results");
+        saveMenuItem.setToolTipText("Save results to files.");
+        saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveMenuItem);
+        fileMenu.add(jSeparator7);
 
         closeAllMenuItem.setText("Close All Files");
         closeAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -320,6 +334,17 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     }
 
     private boolean loadOpenFilesDialog() {
+
+        NXLoadFilesDialog loadFile = new NXLoadFilesDialog(this, true);
+        loadFile.setModalityType(ModalityType.APPLICATION_MODAL);
+        loadFile.setVisible(true);
+        nxsFile = loadFile.getNXSFile();
+        nxdlFile = loadFile.getNXDLFile();
+        return loadFile.OKButtonUsed();
+
+    }
+
+    private boolean saveResultsFilesDialog() {
 
         NXLoadFilesDialog loadFile = new NXLoadFilesDialog(this, true);
         loadFile.setModalityType(ModalityType.APPLICATION_MODAL);
@@ -460,8 +485,6 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                 } else {
                     dialogReportProblem.showMessageDialog(this,
                             bundle.getString("openSchemaFileMessage"));
-
-                    
                 }
             }
         }
@@ -510,9 +533,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
     private void exitAppMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitAppMenuItemActionPerformed
         if (evt.getSource() == exitAppMenuItem) {
-
             this.dispose();
-
         }
     }//GEN-LAST:event_exitAppMenuItemActionPerformed
 
@@ -549,12 +570,42 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private void filterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterMenuItemActionPerformed
 
         if (evt.getSource() == filterMenuItem) {
-
             treeUtils.hideGoodNodes(jTree1);
-
         }
 
     }//GEN-LAST:event_filterMenuItemActionPerformed
+
+    private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
+       if (evt.getSource() == saveMenuItem) {
+
+            jFileChooser1.setMultiSelectionEnabled(false);
+            jFileChooser1.setFileSelectionMode(jFileChooser1.DIRECTORIES_ONLY);
+            jFileChooser1.setApproveButtonText("Save");
+            int returnVal = jFileChooser1.showOpenDialog(this);
+
+            if (returnVal == jFileChooser1.APPROVE_OPTION) {
+
+                saveDirectory = jFileChooser1.getSelectedFile();
+
+                if(!saveDirectory.exists()){
+                    saveDirectory.mkdir();
+                }
+
+                fileLoadingActions.setSaveDirectory(saveDirectory);
+                fileLoadingActions.setWhich(6);
+                Thread thread = new Thread(fileLoadingActions);
+                thread.start();
+
+                dialogReportProblem.showMessageDialog(
+                    this,
+                    bundle.getString("savedResultsMessage"));
+
+            } else {
+                saveDirectory = null;
+            }
+
+        }
+    }//GEN-LAST:event_saveMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -580,6 +631,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem filterMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuItem helpMenuItem;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -590,10 +642,12 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTree jTree1;
     private javax.swing.JMenuItem openFilesMenuItem;
+    private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
     private javax.swing.JMenu toolsMenu;
     private javax.swing.JPopupMenu treePopupMenu;

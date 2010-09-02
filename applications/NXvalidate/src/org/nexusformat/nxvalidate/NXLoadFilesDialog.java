@@ -27,6 +27,7 @@
 package org.nexusformat.nxvalidate;
 
 import java.io.File;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -37,11 +38,15 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     private File nxs = null;
     private File nxdl = null;
     private boolean OKButtonUsed = false;
-
+    private CheckNexusFileType check = null;
+    private ResourceBundle bundle = null;
     /** Creates new form NXLoadFilesDialog */
     public NXLoadFilesDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        check = new CheckNexusFileType();
+        bundle = ResourceBundle.getBundle(
+                "org/nexusformat/nxvalidate/resources/nxvalidate");
     }
 
     /** This method is called from within the constructor to
@@ -54,6 +59,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
+        messageOptionPane = new javax.swing.JOptionPane();
         jPanel1 = new javax.swing.JPanel();
         nxsLabel = new javax.swing.JLabel();
         nxsTextField = new javax.swing.JTextField();
@@ -171,8 +177,17 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
                 nxs = jFileChooser1.getSelectedFile();
-                nxsTextField.setText(nxs.getAbsolutePath());
-                nxsTextField.setToolTipText(nxs.getAbsolutePath());
+
+                if(check.checkNexusFile(nxs)){
+                    nxsTextField.setText(nxs.getAbsolutePath());
+                    nxsTextField.setToolTipText(nxs.getAbsolutePath());
+                } else{
+                    nxs = null;
+                    messageOptionPane.showMessageDialog(this,
+                        bundle.getString("notNXDLFileMessage"));
+                }
+
+                
             } else {
                 nxs = null;
             }
@@ -188,8 +203,17 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
 
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
                 nxdl = jFileChooser1.getSelectedFile();
-                nxdcTextField.setText(nxdl.getAbsolutePath());
-                nxdcTextField.setToolTipText(nxdl.getAbsolutePath());
+
+                if(check.checkNXDLFile(nxdl)){
+                    nxdcTextField.setText(nxdl.getAbsolutePath());
+                    nxdcTextField.setToolTipText(nxdl.getAbsolutePath());
+                } else{
+                    nxdl = null;
+                    messageOptionPane.showMessageDialog(this,
+                        bundle.getString("notNXDLFileMessage"));
+                }
+                
+                
             } else {
                 nxdl = null;
             }
@@ -246,6 +270,7 @@ public class NXLoadFilesDialog extends javax.swing.JDialog {
     private javax.swing.JButton cancelButton;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JOptionPane messageOptionPane;
     private javax.swing.JTextField nxdcTextField;
     private javax.swing.JLabel nxdlLabel;
     private javax.swing.JLabel nxsLabel;

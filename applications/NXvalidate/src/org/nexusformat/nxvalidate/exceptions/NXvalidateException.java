@@ -46,4 +46,13 @@ public class NXvalidateException extends Exception {
     public NXvalidateException(String msg) {
         super(msg);
     }
+
+    public NXvalidateException(String msg, Throwable cause) {
+        super(msg,cause);
+    }
+
+    public NXvalidateException(Throwable cause) {
+        super(cause);
+    }
+
 }
