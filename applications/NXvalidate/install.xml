@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!-- 
+    A sample installation file.
+    Use it as a base for your own installers :-)
+    
+    To compile it :
+    - go in the bin directory where you installed IzPack
+    - call "compile ../sample/install.xml -b ../sample"
+-->
+
+<installation version="1.0">
+
+    <native type="izpack" name="ShellLink.dll"/>
+
+    <!-- 
+        The info section.
+        The meaning of the tags should be natural ...
+    -->
+    <info>
+        <appname>NXvalidate</appname>
+        <appversion>1.0 alpha</appversion>
+        <authors>
+            <author name="Stephen Rankin" email="stephen.rankin@stfc.ac.uk"/>
+            <author name="NeXus Team" email="nexus@nexusformat.org"/>
+        </authors>
+        <url>http://www.nexusformat.org</url>
+        <javaversion>1.6</javaversion>
+        <requiresjdk>no</requiresjdk>
+        <pack200/>
+        <summarylogfilepath>$INSTALL_PATH/installinfo/Summary.htm</summarylogfilepath>
+    </info>
+
+    <!-- 
+        The gui preferences indication. Sets the installer window to 640x480.
+        It will not be able to change the size.
+    -->
+    <guiprefs width="640" height="480" resizable="yes"/>
+
+    <!-- 
+        The locale section.
+        Asks here to include the English langpack.
+    -->
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <!-- 
+        The resources section.
+        The ids must be these ones if you want to use the LicencePanel and/or
+        the InfoPanel.
+    -->
+    <resources>
+        <res id="LicencePanel.licence" src="Licence.txt"/>
+        <res id="InfoPanel.info" src="Readme.txt"/>
+        <res src="scripts/shortcutSpec.xml" id="shortcutSpec.xml"/>
+        <res src="scripts/Unix_shortcutSpec.xml" id="Unix_shortcutSpec.xml"/>
+    </resources>
+
+    <!-- 
+        The panels section. We indicate here which panels we want to use.
+        The order will be respected.
+    -->
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="InfoPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="ShortcutPanel"/>
+        <panel classname="FinishPanel"/>
+    </panels>
+
+    <!-- 
+        The packs section.
+        We specify here our packs.
+    -->
+    <packs>
+        <pack name="Base" required="yes">
+            <description>The base files</description>
+            <file src="dist/lib" targetdir="$INSTALL_PATH"/>
+            <file src="dist/NXvalidate.jar" targetdir="$INSTALL_PATH"/>
+            <file src="Licence.txt" targetdir="$INSTALL_PATH"/>
+            <file os="unix" src="../NXconvert/nxconvert" targetdir="$INSTALL_PATH/bin"/>
+            <!--<file os="windows" src="../NXconvert/nxconvert.exe" targetdir="$INSTALL_PATH/bin"/>-->
+            <file src="src/org/nexusformat/nxvalidate/resources/nexus.png" targetdir="$INSTALL_PATH/share/icons"/>
+            <file src="src/org/nexusformat/nxvalidate/resources/nexus.ico" targetdir="$INSTALL_PATH/share/icons"/>
+            <file src="scripts/install_path" targetdir="$INSTALL_PATH"/>
+            <!-- The file will be parsed -->
+            <parsable targetfile="$INSTALL_PATH/install_path"/>
+        </pack>
+        <pack name="Docs" required="no">
+            <description>NXvalidate Tutorial and Documentation</description>
+            <file src="doc" targetdir="$INSTALL_PATH"/>
+            <file os="unix" src="../NXconvert/nxconvert.1" targetdir="$INSTALL_PATH/man"/>
+        </pack>
+    </packs>
+
+</installation>

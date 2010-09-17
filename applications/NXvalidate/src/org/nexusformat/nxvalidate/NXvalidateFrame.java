@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.help.CSH;
+import javax.help.HelpBroker;
+import javax.help.HelpSet;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.tree.MutableTreeNode;
@@ -68,6 +71,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private MouseListener popupListener = null;
     private TextPaneStyle txtStyle = null;
     private FileActions fileLoadingActions = null;
+    private HelpBroker hb = null;
 
     /** Creates new form NXvalidateFrame */
     public NXvalidateFrame() {
@@ -131,6 +135,22 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         txtStyle = new TextPaneStyle(jTextPane1);
 
         fileLoadingActions = new FileActions(this, jTree1, builder, domTree, root);
+
+        String helpHS = "help/jhelpset.hs";
+        HelpSet  hs = null;
+
+        try {
+            hs = new HelpSet(null, this.getClass().getResource(helpHS));
+        } catch (Exception ex) {
+            Logger.getLogger(
+                    NXvalidateFrame.class.getName()).log(Level.SEVERE,
+                    "The setting help file IO error.", ex);
+            return;
+        }
+        // Create a HelpBroker object:
+        hb = hs.createHelpBroker();
+
+        helpMenuItem.addActionListener(new CSH.DisplayHelpFromSource( hb ));
 
     }
 
