@@ -15,7 +15,23 @@
     <section>
       <title>What is NXvalidate for?</title>
 
-<para></para>
+      <para>
+      NXvalidate is a tools that allows the validation of NeXus files for their
+      correctness with respect to content for a given data model. Each data
+      model is specified in a NeXus Definition Language (NXDL) file and contains
+      assertions that define what and what should not be in a NeXus file.
+      For example, a NeXus file with a definition called NXgisas (grazing
+      incidence small angle diffractometer GISAS for either x-ray or neutrons)
+      defines a metadata element (key value pair) called integral (total
+      integral monitor counts) whose data type is NX_INT (an integer). Knowing
+      the type allows validation of the value in the data to ensure it is the
+      appropriate data type.
+      </para>
+      <para>
+      NXvalidate can validate single data files or multiple data files, the
+      results are displayed in a friendly way and errors found in the file are
+      highlighted to the user.
+      </para>
 
    </section>
 
@@ -23,10 +39,14 @@
        <title>NXvalidate Main Features</title>
 
        <orderedlist>
-           <listitem></listitem>
-           <listitem></listitem>
-           <listitem></listitem>
-           <listitem></listitem>
+          <listitem>Opens NeXus files in HDF4/5 or XML format. </listitem>
+          <listitem>Validates a single NeXus file against a user selected NXDL description. </listitem>
+          <listitem>Allows batch validation of a selection of NeXus files. </listitem>
+          <listitem>File structure displayed as a tree. </listitem>
+          <listitem>Metadata content of the file is displayed. </listitem>
+          <listitem>Results of the validation and the errors are displayed. </listitem>
+          <listitem>Results of the validation can be saved. </listitem>
+          <listitem>Integrated help and tutorial. </listitem>
        </orderedlist>
 
    </section>

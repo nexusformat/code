@@ -333,6 +333,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         helpMenu.add(jSeparator6);
 
         aboutMenuItem.setText("About");
+        aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutMenuItemActionPerformed(evt);
+            }
+        });
         helpMenu.add(aboutMenuItem);
 
         jMenuBar1.add(helpMenu);
@@ -626,6 +631,13 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_saveMenuItemActionPerformed
+
+    private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
+        if (evt.getSource() ==  aboutMenuItem) {
+            AboutDialog about = new AboutDialog(this,true);
+            about.setVisible(true);
+        }
+    }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     /**
      * @param args the command line arguments

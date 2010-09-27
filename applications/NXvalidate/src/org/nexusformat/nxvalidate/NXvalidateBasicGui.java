@@ -319,7 +319,8 @@ public class NXvalidateBasicGui extends JPanel implements ActionListener {
                 Report report = reports.get(0);
                 tree.setModel(report.getTree());
 
-                log.append("There were " + report.numErrors() + " errors found." + newline);
+                log.append("There were " + report.numErrors() + " errors found."
+                           + newline);
 
                 ArrayList<SVRLitem> messages = report.getReport();
 
