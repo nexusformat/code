@@ -1,6 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
           "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+
+<!-- -->
 <book>
   <bookinfo>
     <title>NXvalidata 1.0alpha - NeXus File Validator Tool.</title> 
@@ -10,7 +12,7 @@
     <title>Introduction</title>
 <screenshot>
         <screeninfo>100x200x256</screeninfo>
-        <graphic fileref="resources/nexus.png"></graphic>
+        <graphic fileref="nexus.png"></graphic>
     </screenshot>
     <section>
       <title>What is NXvalidate for?</title>
@@ -155,18 +157,28 @@
 
         <title>Running the NXvalidate GUI</title>
 
-         <para>On Linux move into the NXvalidate installation directory and you
-               can use a command like:
+         <para>
+             If you selected to create menu and desktop items during installation
+             then on Windows you can select to start the application from the
+             Start menu, i.e. Start->All Programs->NXvalidate->NXvalidate. On
+             Linux you can select it from the Applications menu, i.e.
+             Applications->NXvalidate->NXvalidate. On both systems, if you
+             selected to install desktop icons then you will be double-click on
+             the icon to start the application.
+         </para>
+
+         <para>
+             
+         </para>
+
+         <para>Alternatively you can start NXvalidate from the command line
+               by moving to its installation directory and issuing the
+               command:
          </para>
 
          <orderedlist>
              <listitem>java -jar NXvalidate-v1.0alpha.jar</listitem>
          </orderedlist>
-
-         <para>to invoke the application or invoke it in some other
-               system-dependent way such as by double-clicking on it from the
-               desktop or explorer (Windows).
-         </para>
 
      </section>
 
@@ -199,7 +211,7 @@
     <title>NXvalidate when first opened.</title>
     <screenshot>
         <!--<screeninfo>640x480x256</screeninfo>-->
-        <graphic fileref="resources/ISISNexusFileValidationTool_001.png"></graphic>
+        <graphic fileref="ISISNexusFileValidationTool_001.png"></graphic>
     </screenshot>
 </figure>
 
@@ -211,7 +223,7 @@
     <title>Tutorial</title>
 
       <section>
-        <title>Opening </title>
+        <title>Opening NeXus and NXDL Files</title>
 
         <para>Click on the File menu and then select Open Files <link linkend='shot02'>Figure 2.1
               </link>
@@ -221,7 +233,7 @@
     <title>Open Files</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="resources/ISISNexusFileValidationTool_002.png"></graphic>
+    <graphic fileref="ISISNexusFileValidationTool_002.png"></graphic>
 </screenshot>
 </figure>
 
@@ -233,7 +245,7 @@
     <title>Open Files Window</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="resources/OpenFiles_003.png"></graphic>
+    <graphic fileref="OpenFiles_003.png"></graphic>
 </screenshot>
 </figure>
 
@@ -243,7 +255,7 @@
               Open button next to the the "Load NXS" line which will show the Open
               file dialog as shown in <link linkend='shot04'>Figure 2.3</link>.
               You can use the dialog to open the NXmonopd.hdf file (or any
-              another NeXus file ). In a similar way you can select the
+              other NeXus file ). In a similar way you can select the
               definition file (NXmonopd.nxdl.xml) by clicking on the Open button
               next to the "Load NXDL" line.
         </para>
@@ -252,799 +264,33 @@
     <title>Selecting the NeXus File</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="resources/Open_004.png"></graphic>
+    <graphic fileref="Open_004.png"></graphic>
 </screenshot>
 </figure>
 
-        <para>After selecting the two files you sould have somthing that looks
+        <para>After selecting the two files you sould have something that looks
               like <link linkend='shot05'>Figure 2.4</link>.
         </para>
 
 <figure id="shot05">
-    <title>Selected files for the AIP</title>
+    <title>Selected NeXus Files</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/newAIP-full.png"></graphic>
+    <graphic fileref="Open_Files_005.png"></graphic>
 </screenshot>
 </figure>
 
-        <para>Next click OK and you should see the window in <link linkend='shot42'>Figure 2.5</link>.</para>
+        <para>Next click OK and you should see the window in <link linkend='shot06'>Figure 2.5</link>.</para>
 
-<figure id="shot42">
-    <title>A New Open AIP</title>
+<figure id="shot06">
+    <title>A New Open NeXus File</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-19.png"></graphic>
+    <graphic fileref="ISIS Nexus File Validation Tool_006.png"></graphic>
 </screenshot>
 </figure>     
 
       </section>
-
-      <section>
-        <title>Viewing the Structure Information</title>
-
-        <para>On the left in <link linkend='shot42'>Figure 2.5</link> is a tree view of the structure information. Double-clicking on ESRI_ASCII_Grid and any other element in the tree will expand it if it has any children, see <link linkend='shot44'>Figure 2.6</link>. When you click on an element the Physical Structure tab on the right updates with information about the low level structure information for that element, see <link linkend='shot44'>Figure 2.6</link>.</para>
-
-
-<figure id="shot44">
-    <title>Viewing the Physical Structure</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-2.png"></graphic>
-</screenshot>
-</figure>
-
-<para>The fields in the table mean:</para>
-<para>bitSize - the size in bits of the data values corresponding to the element.</para>
-<para>locationOfExponent - the bit locations of the bits required for the exponent of a floating point number.</para>
-<para>exponentBase - the base of the exponent.</para>
-<para>locationOfMantissa - the locations of the bits that make -up the mantissa of a real floating point number.</para>
-<para>bias - the bias applied to the real floating point number.</para>
-<para>signConvention - the sign convention, i.e. twos compliment etc, of the mantissa of a real floating pint number or an integer.</para>
-<para>maxOccurs - the maximum number of times values of the element occur in the data.</para>
-<para>minOccurs - the minimum number of times values of the element occur in the data.</para>
-<para>bitOrder - The bit order of an integer or a real floating point number, such as big-endian or little-endian.</para>
-<para>dataType - the data type for the data, this would be one of the XMLSchema types if DRB or XMLSchema are being used for the structure description.</para>
-<para>arrayStorage - the order in which numbers are stored in an array data type, i.e row major order or column major order.</para>
-<para>signBitNumber - the locations of the bit used for the sign of an integer or real floating point number.</para>
-<para>characterEncoding -  the encoding of data values are are text, i.e. ascii etc.</para>
-
-<para>Note, properties associated with XML Schema can also appear in the list and their definition is the same as in the XML Schema specification.</para>
-
-<para>For a more detailed explanation of the physical structure see <ulink url="http://downloads.sourceforge.net/project/digitalpreserve/Software%20Packages/RepInfoToolbox/DataStructure.pdf"><citetitle>DataStructure.pdf ().</citetitle></ulink></para>
-
-      </section>
-
-      <section>
-        <title>Listing the Data Pointers</title>
-        <para>From the tree structure a list of pointers can be calculated that point to each data element, the data pointers can be viewed by selecting List Data Pointers from the Tools menu, see <link linkend='shot47'>Figure 2.7</link>.</para>
-
-<figure id="shot47">
-    <title>List Data Pointers Menu Item</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-5.png"></graphic>
-</screenshot>
-</figure>
-
-        <para> <link linkend='shot17'>Figure 2.8</link> shows the list of data pointers for this structure description. The list can be selected and cut and pasted into other documents. Click Close to close the window.</para>
-
-<figure id="shot17">
-    <title>The List Data Pointers Window</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/OSCAR-ListDataPointers.png"></graphic>
-</screenshot>
-</figure>
-
-      </section>
-
-      <section>
-        <title>Viewing the Simple Semantic Information</title>
-        <para>If a DEDSL data dictionary is loaded that corresponds to the data structure then the semantics associated with each element is displayed in the semantics tab on the right, see <link linkend='shot45'>Figure 2.9</link>. In the tutorial we do not make use of this feature, and in future releases it will be remove in favour of an import export feature for DEDSL data dictionaries. Each key corresponds to an element from the data entity in the data dictionary and the value lists is its value in the dictionary.</para>
-
-<figure id="shot45">
-    <title>The Simple Semantics Panel</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-3.png"></graphic>
-</screenshot>
-</figure>
-
-      </section>
-
-      <section>
-        <title>Introduction to the Object View</title>
-        <para>The object view panel is where we create detailed semantic models of the data. In the object view you can see a white background and a button bar at the bottom of the window. Right clicking the mouse anywhere in the white background will show a menu, see <link linkend='shot49'>Figure 2.10</link>.</para>
-
-<figure id="shot49">
-    <title>The Object View Panel - Select New Object from menu.</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-7.png"></graphic>
-</screenshot>
-</figure>
-
-      </section>
-
-      <section>
-        <title>Creating a New Object</title>
-        <para>First we want to create a new object, so click the New Object menu item or click on the blue circle in the button bar. A new object will appear coloured blue, see <link linkend='shot46'>Figure 2.11</link>.</para>
-
-     <figure id="shot46">
-     <title>A New Object in the Object View</title>
-     <screenshot>
-     <!--<screeninfo>640x480x256</screeninfo>-->
-     <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-4.png"></graphic>
-     </screenshot>
-     </figure>
-
-      </section>
-
-      <section>
-        <title>Changing the Object Instance Name</title>
-        <para>Next we can annotate this object and change its name. First select the object by left clicking on it and then right click on the white background to bring up the menu. Select "Annotate Object", see <link linkend='shot48'>Figure 2.12</link>.</para>
-
-<figure id="shot48">
-    <title>Annotate Object Menu Item</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-6.png"></graphic>
-</screenshot>
-</figure>
-
-        <para>An annotation window will appear as in <link linkend='shot3'>Figure 2.13</link> where the Object Instance Name can be changed to UNESCO Elevation Grid, see <link linkend='shot16'>Figure 2.14</link>. Then you can click OK.</para>
-
-<figure id="shot3">
-    <title>Default Annotation Window</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Annotate-NEw-Object-Window.png"></graphic>
-</screenshot>
-</figure>
-
-<figure id="shot16">
-    <title>Annotation Window - Object Instance Name Change</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/OSCAR-Annotate-Object-Just-Name.png"></graphic>
-</screenshot>
-</figure>
-
-      </section>
-       
-      <section>
-        <title>Deselecting an Object</title>
-        <para>To deselect the object right click on the white background and select the Deselect Object menu item as shown in <link linkend='shot50'>Figure 2.15</link>.</para>
-
-<figure id="shot50">
-    <title>Deselect Object Menu Item</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-8.png"></graphic>
-</screenshot>
-</figure>
-
-      </section>
-
-      <section>
-        <title>Creating an Object Classification</title>
-        <para>To create an object classification we first need to right click on the white background (after we have deselected any objects) and select the Object Classifications menu item see <link linkend='shot51'>Figure 2.16</link>.</para>
-
-<figure id="shot51">
-    <title>The Object Classification Menu Item</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-9.png"></graphic>
-</screenshot>
-</figure>
-
-<para>A new window will pop-up displaying the object classifications defined for the description (currently there are none), see <link linkend='shot30'>Figure 2.17</link>.</para>
-
-<figure id="shot30">
-    <title>Object Classifications List Window</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Object Classification List.png"></graphic>
-</screenshot>
-</figure>
-
-<para>Next click on the Add New button to create a new object classification. A new window will pop-up allowing you to define your classification, see <link linkend='shot10'>Figure 2.18</link>.</para> 
-
-<figure id="shot10">
-    <title>Create Classification Window.</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/classification-new-edit.png"></graphic>
-</screenshot>
-</figure>
-
-<para>In the window fill in the Classification name as "Grid". Next click the Add button in the Comments section to add a comment describing the classification, a new comment window will appear as in <link linkend='shot20'>Figure 2.19</link>, type or cut and paste the  the text "A UNESCO elevation grid object used to record points of elevation on a heritage site. Used in conjunction with images of the site, then 3D models can be built up. "</para> 
-
-<figure id="shot20">
-    <title>Classification Comment</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Comment.png"></graphic>
-</screenshot>
-</figure>
-
-<para>Now click OK. You could also add more comments if you wanted by clicking the Add button. You can get rid of the new classification window by clicking OK. Next add two more classifications called:</para>
-
-       <para>Classification Name:  Header</para>
-       <para>Comment: The header contains the dimensions of the grid, its geospatial location, and the grid cell size, as well as a "special value" signifying the absence of data at a grid point.</para>
-       <para>Classification Name: Header Item</para>
-       <para>Comment: A header data item.</para>
-       <para>Note, spaces are automatically removed from classification names. Your list of classifications should now look like <link linkend='shot29'>Figure 2.20</link>.</para>
-
-<figure id="shot29">
-    <title>A Full List of Classifications</title>
-<screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Object Classification List-2.png"></graphic>
-</screenshot>
-</figure>
-
-
-
-
-<para>Associate Grid object to Grid Header object </para>
-
-<para>Give the Grid Header object the classification of Header</para>
-
-<para>Give each composing object (Number Of Rows etc) the classification of Header Item.</para>
-
-<para>isHeaderFor</para>
-<para>Comment: An association property that relates the grid object to its header object.</para>
-
-
-</section>
-
-<section>
-    <title>Adding a Header Object (Composing Objects)</title>
-
-<para>Next we need to add another Object Instance. To do this we use the same method as we used to add the UNESCO Elevation Grid object. The object to add is a UNESCO Grid Data Header object as shown in <link linkend='shot34'>Figure 2.21</link>.</para>
-
-    <figure id="shot34">
-    <title>Header Object Added.</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-11.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>Next, left click on the UNESCO Grid Data Header object making sure it is selected and then right click and select the Add Composing Object menu item see <link linkend='shot33'>Figure 2.22</link>. You can also click on the pyramid icon on the button bar.</para>
-
-    <figure id="shot33">
-    <title>Add Composing Object Menu Item.</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-10.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>In this case we will be adding several composing objects to the UNESCO Grid Data Header. A composing object is simply an object that the parent object is made up of, in this case the UNESCO Grid Data Header will composed of :</para>
-
-<para>Add Composing Object: Number Of Rows</para>
-<para>Comment: The number of rows in the grid. The minimum practical value is 1. There is no maximum.</para>
-
-<para>Add Composing Object: Number Of Columns</para>
-<para>Comment: The number of columns of the grid. The minimum practical value is 1. There is no maximum.</para>
-
-<para>Add Composing Object: Grid Cell Size</para>
-<para>Comment: The width and height of a grid cell, usually (but not necessarily) specified in meters.</para>
-
-<para>Add Composing Object: Missing Data Value</para>
-<para>Comment: A "special value" signifying the absence of data at a grid point. The NODATA_Value is typically -9999 (but can be any value)</para>
-
-<para>Add Composing Object: X Corner Coordinate</para>
-<para>Comment: The x coordinate of the lower left corner of the grid, in a geospatial coordinate system
-(which is not specified in the file format (!)).</para>
-
-<para>Add Composing Object: Y Corner Coordinate</para>
-<para>Comment: The y coordinate of the lower left corner of the grid, in a geospatial coordinate system (which is not specified in the file format (!))</para>
-
-<para>Once you have created a composing object it can be annotated in the same way as we annotated UNESCO Elevation Grid by selecting the object (left click) and then right clicking to bring up the menu and select Annotate Object (you can also use the Annotate Object button from the button menu, the pencil icon). Also above are the comments to add to each object annotation. The result should be as shown in <link linkend='shot35'>Figure 2.23</link>. </para>
-
-    <figure id="shot35">
-    <title>Final Header Object with Composing Objects.</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-12.png"></graphic>
-    </screenshot>
-    </figure>
-
-
-
-    <para></para>
-</section>
-
-<section>
-    <title>Creating Global Properties</title>
-
-<para>Next we need to add some properties. First deselect all objects and the right click on the white object view background and select Global Property List from the menu, see <link linkend='shot36'>Figure 2.24</link></para>
-
-    <figure id="shot36">
-    <title>Global Property List Menu Item.</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-13.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>You should now see the Global Property List Window shown in <link linkend='shot26'>Figure 2.25</link> which should be empty.</para>
-
-    <figure id="shot26">
-    <title>Empty Global Property List</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Global Property List.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>Click on the Add New Button to add a new property, you should now see the New Property Window.</para>
-
-<para>Type in the Property Name as “description” and select string as the Data Type from the drop-down menu. We will not be using the any sub-properties this time, but a property can be a sub-property of another property.</para>
-
-<para>Next click the Add button in the Comment section and you will be presented with a Add Comment window, add the comment: “Human readable description of the data items.” as the comment and click OK. You should now have a window as shown in <link linkend='shot22'>Figure 2.26</link>. Click OK to exit the window and the description property will be added to the global list. In the same way you can add a property called “units” with a comment “Physical data units of the data item.” the Data Type should be set to string.</para>
-
-
-    <figure id="shot22">
-    <title>Adding a Property Window</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Create-Edit Property-2.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>In exactly the same way we can add another property called isHeaderFor and a comment “An association property that relates the grid object to its header object.” This difference this time is that we set the Data Type to one of the classifications that we created, this then makes the property an Association Property. When this property is added to other classifications then an association can exist between instances of the classifications. In this case we will be adding the Data Type as Header, see <link linkend='shot21'>Figure 2.27</link>. </para>
-
-<para>Later we will add this property to the Grid classification so that later we can form an association between the UNESCO Elevation Grid object and The UNESCO Grid Data Header object.</para>
-
-
-    <figure id="shot21">
-    <title>Adding an Association Property Window</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Create-Edit Property-1.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>Finally you should see the list of global properties shown in <link linkend='shot25'>Figure 2.28</link>.</para>
-
-    <figure id="shot25">
-    <title>Final Global Property Window</title>
-    <screenshot>
-     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Global Property List-1.png"></graphic>
-    </screenshot>
-    </figure>
-
-
-    <para></para>
-</section>
-
-<section>
-    <title>Adding Properties to the Classifications</title>
-
-<para>Next deselect all object and then right click on the white background and select the Object Classifications list. Select the Grid classification by left clicking on it and then click the Edit button. In the Properties section click on the Add button to add a new property to the classification, you should see a window as shown in, <link linkend='shot53'>Figure 2.29</link>. From the drop-down menu select the description property and then click the OK button. The description property should have been added to the Property list. Do the same for the units and isHeaderFor properties and you should have a window looking like the window in <link linkend='shot14'>Figure 2.30</link></para>
-
-    <figure id="shot53">
-    <title>Selecting a Property</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Properties.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <figure id="shot14">
-    <title>Final Grid Classification with Properties</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/edit-classification-add-props.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>For the other two classifications we just need to add the description and unit properties not the isHeaderFor Association Property.</para>
-
-    <para></para>
-</section>
-
-<section>
-    <title>Adding a Classification to an Object Instance</title>
-
-<para>Click on the UNESCO Elevation Grid object instance and right click on the white background and select Annotate Object from the menu or click on the pencil icon in the button bar. Where it says Classification use the drop-down menu and select the Grid classification, see <link linkend='shot4'>Figure 2.31</link> . We have now assigned the UNESCO Elevation Grid the classification of a Grid object. Now click OK.</para>
-
-    <figure id="shot4">
-    <title>Add Classification</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/annotate-object-add-classification.png"></graphic>
-    </screenshot>
-    </figure>
-</section>
-
-<section>
-    <title>Adding a Data Pointer to an Object Instance</title>
-
-    <para>Click on the Number Of Rows object instance and right click on the white background and select Annotate Object from the menu or click on the pencil icon in the button bar. Where it says Data Pointer use the drop-down menu and select the /ESRI_ASCII_Grid/header/nrows, see <link linkend='shot5'>Figure 2.32</link> . We have now formally linked the structure information to the semantic information, i.e. we have defined the data and given it meaning.</para>
-
-    <figure id="shot5">
-    <title>Add Data Pointer</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/annotate-object-add-data-pointer.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <para>For the other object instances the Data Pointers are:</para>
-
-    <para>Object Instance: Number Of Columns</para>
-    <para>/ESRI_ASCII_Grid/header/ncols</para>
-
-    <para>Object Instance: Number Of Rows</para>
-    <para>/ESRI_ASCII_Grid/header/nrows</para>
-
-    <para>Object Instance: UNESCO Elevation Grid</para>
-    <para>/ESRI_ASCII_Grid/data/row/value</para>
-
-    <para>Object Instance: Grid Cell Size</para>
-    <para>/ESRI_ASCII_Grid/header/cellsize</para>
-
-    <para>Object Instance: Y Corner Coordinate</para>
-    <para>/ESRI_ASCII_Grid/header/yll_corner</para>
-
-    <para>Object Instance: Missing Data Value</para>
-    <para>/ESRI_ASCII_Grid/header/NODATA_Value</para>
-
-    <para>Object Instance: X Corner Coordinate</para>
-    <para>/ESRI_ASCII_Grid/header/xll_corner</para>
-
-
-</section>
-
-<section>
-    <title>Adding a Property Value</title>
-
-<para>Click on the Grid Cell size object instance and right click on the white background and select Annotate Object from the menu or click on the pencil icon in the button bar. Where it says  properties click on the description property and click on the Modify Property Value, see <link linkend='shot6'>Figure 2.33</link> .</para>
-
-    <figure id="shot6">
-    <title>Add Property Value</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/annotate-object-add-property-value.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>In the Modify Property Value window add the text “The width and height of a grid cell, usually (but not necessarily) specified in meters.”, see <link linkend='shot27'>Figure 2.34</link>. Then click OK. You can also add the value m for meters to the units property value</para>
-
-    <figure id="shot27">
-    <title>Modify Property Value</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Modify Property Value.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>For the other object instances you can add the description and unit values as follows:</para>
-
-<para>Object Instance: UNESCO Elevation Grid</para>
-<para>description: A UNESCO elevation grid object used to record points of elevation on a heritage site. Used in conjunction with images of the site, then 3D models can be built up.
-The actual grid point heights listed sequentially, in row-major order.</para>
-<para>units: m</para>
-
-<para>Object Instance: Number Of Rows</para>
-<para>description: The number of rows in the grid. The minimum practical value is 1. There is no maximum.</para>
-<para>units: </para>
-
-<para>Object Instance: Number Of Columns</para>
-<para>description: The number of columns of the grid. The minimum practical value is 1. There is no maximum.</para>
-<para>units: </para>
-
-<para>Object Instance: Grid Cell Size</para>
-<para>description: The width and height of a grid cell, usually (but not necessarily) specified in meters.</para>
-<para>units: m</para>
-
-<para>Object Instance: Missing Data Value</para>
-<para>description:  A "special value" signifying the absence of data at a grid point. The NODATA_Value is typically -9999 (but can be any value)</para>
-<para>units: </para>
-
-<para>Object Instance: X Corner Coordinate</para>
-<para>description: The x coordinate of the lower left corner of the grid, in a geospatial coordinate system (which is not specified in the file format (!)).</para>
-<para>units: </para>
-
-<para>Object Instance: Y Corner Coordinate</para>
-<para> description: The y coordinate of the lower left corner of the grid, in a geospatial coordinate system (which is not specified in the file format (!))</para>
-<para>units: </para>
-
-    <para></para>
-</section>
-
-<section>
-    <title>Displaying the Data for an Object</title>
-
-<para>Click on the Number Of Rows object instance and right click on the white background and select Annotate Object from the menu or click on the pencil icon in the button bar. Where it says Data Pointer click on the Display Data button, see <link linkend='shot7'>Figure 2.35</link>. . Note , the data pointer must be set for the display data to work.</para>
-
-    <figure id="shot7">
-    <title>Select Display Data</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/annotate-object-display-data.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>The Display Data Values window should now appear and in that window click Display, you should see the value 802 as shown in <link linkend='shot12'>Figure 2.36</link></para>
-
-    <figure id="shot12">
-    <title>Display Data Value</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/display-data-value2.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>Click on the UNESCO Elevation Grid object instance and right click on the white background and select Annotate Object from the menu or click on the pencil icon in the button bar. Where it says Data Pointer click on the Display Data button, see <link linkend='shot1'>Figure 2.37</link>. .</para>
-
-    <figure id="shot1">
-    <title>Grid Object Data</title>
-    <screenshot>
-        <!--<screeninfo>640x480x256</screeninfo>-->
-        <graphic fileref="images/annotate-grid-object-data-pointer.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>The Display Data Values window should now appear and in that window click Display, you should see a list of values as shown in <link linkend='shot5'>Figure 2.38</link></para>
-
-    <figure id="shot11">
-    <title>Display the Grid Data</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/diplay-data-grid.png"></graphic>
-    </screenshot>
-    </figure>
-
-
-    <para></para>
-</section>
-
-<section>
-    <title>Adding an Association Between Instances</title>
-
-<para>Hold down the shift key and click on and select the UNESCO Elevation Grid object instance and then while still holding down the shift key press click on and select the UNESCO Grid Data Header object instance then release the shift key. The two object instances should now be selected, see<link linkend='shot38'>Figure 2.39</link></para>
-
-    <figure id="shot38">
-    <title>Selecting Two Object Instances</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-15.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>Then on the white background rich click and select Add Association, see <link linkend='shot39'>Figure 2.40</link></para>
-
-    <figure id="shot39">
-    <title>Add Association Menu Item</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-16.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>The New Association Window should now appear. First make sure the Association Type is set to isHeaderFor. Using the From Instance drop-down box select UNESCO Elevation Grid as the from object instance. The To Instance box should automatically change to UNESCO Grid Data Header. Now add the comment in the comment box “Get the header data object for this grid.” Your window should look like the one in <link linkend='shot28'>Figure 2.41</link>. Finally click OK to finish.</para>
-
-    <figure id="shot28">
-    <title>New Association window</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-New Association.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>The Main window should now look like the this one, <link linkend='shot40'>Figure 2.42</link></para>
-
-    <figure id="shot40">
-    <title>Final Added Association</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-17.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <para></para>
-</section>
-
-<section>
-    <title>Adding Schema Namespace</title>
-
-<para>From the Tools menu select the Schema Namespace menu item, see <link linkend='shot37'>Figure 2.43</link></para>
-
-    <figure id="shot37">
-    <title>Schema Namespace Menu Item</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-14.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>You should see a Schema Namespace window. For the Schema Name use unesco.rdfs and for the schema URI use http://www.dcc.ac.uk/schema and for the Schema Prefix use unesco, see <link linkend='shot54'>Figure 2.44</link>. Now click OK.</para>
-
-    <figure id="shot54">
-    <title>Edit Schema Namespace Window</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Schema Namespace.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <para></para>
-</section>
-
-<section>
-    <title>Generating Access Code</title>
-
-<para>From the Tools menu select the Generate Access Code menu item, see <link linkend='shot41'>Figure 2.45</link></para>
-
-    <figure id="shot41">
-    <title>Generate Access Code Menu Item</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-OSCAR (Object Semantics Creation and Association Retool) V0.9-18.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>You should see a Generate Access Code window <link linkend='shot23'>Figure 2.46</link>.</para>
-
-    <figure id="shot23">
-    <title>Generate Access Code Window</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-generate-access-code1 .png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>For the package name use unesco. Next click the select button and you should be presented with an open file window, this allows you to select an output directory of the generated code, see <link linkend='shot31'>Figure 2.47</link>. Now click Open.</para>
-
-    <figure id="shot31">
-    <title>Select Output Directory</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Open-generated-code1.png"></graphic>
-    </screenshot>
-    </figure>
-
-<para>Check the Compile Java Code and Create Java Docs check buttons and then click Generate, see <link linkend='shot24'>Figure 2.48</link>. If all goes well the Java code should be output to your chosen directory along with a docs directory containing the Javadocs. Note, the code will not compile if you haven't installed the tools.jar file from the JDK.</para>
-
-    <figure id="shot24">
-    <title>Completed Generate Access Code Window</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-generated-code2 .png"></graphic>
-    </screenshot>
-    </figure>
-
-    <para></para>
-</section>
-
-<section>
-    <title>View of Generated Code AIP</title>
-
-    <para>The Javadocs are output to the docs directory which is a sub-directory of the output directory you selected to output the generated code. The index file is the root of the documentation which can be viewed with any html browser.</para>
-
-    <figure id="shot102">
-    <title>API View of Generated Javadocs - UNESCO Index of API</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-unesco - Mozilla Firefox.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <figure id="shot100">
-    <title>API View of Generated Javadocs - UNESCO Digital Object</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-DigitalObject - Mozilla Firefox.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <figure id="shot101">
-    <title>API View of Generated Javadocs - UNESCO Header Object</title>
-    <screenshot>
-    <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="images/Screenshot-Header - Mozilla Firefox.png"></graphic>
-    </screenshot>
-    </figure>
-
-    <para></para>
-</section>
-
-<section>
-    <title>Using the Generated Code</title>
-
-    <para>You can build and make a Jar file with the generated code just as you would with any other Java code. You must have the following on the classpath when running the example.</para>
-
-    <para>DSSLI.jar - found in the OSCAR distribution lib directory.</para>
-    <para>drb-2-3-rc-3.jar - found in the OSCAR distribution lib directory.</para>
-    <para>dssliAll.jar - found in the OSCAR distribution lib directory.</para>
-    <para>log4j.jar - found in the OSCAR distribution lib directory.</para>
-    <para>ehcache-1.6.0-beta5.jar - found in the OSCAR distribution lib directory.</para>
-    <para>xercesImpl.jar - found in the OSCAR distribution lib directory.</para>
-
-    <para>
-  Here's an example of using the generated code:
-    <programlisting>
-
-    <![CDATA[package unesco;
-
-    //We need to import File of the AIP file.
-    import java.io.File;
-
-    public class UNESCO {
-
-    public static void main(String args[]) {
-
-        //Create a new UNESCO Digital Object
-        DigitalObject unesco = new DigitalObject();
-
-        //Set the AIP which in this case is the example AIP.
-        unesco.setAIPFile(new File("/home/steve/Desktop/unesco.zip"));
-
-        //Get the UNESCO Grid Object
-        Grid grid = unesco.getUNESCOElevationGrid();
-
-        //Print the Grid Description
-        System.out.println("The Grid Description: " + grid.getDescription());
-
-        //Print the Grid Data Value Physical Units
-        System.out.println("The Grid Units: " + grid.getUnits());
-
-        //Print the Grid Data Values Data Type
-        System.out.println("The Grid Values Data Type: " + grid.getDataType());
-
-        //Print the Grid Data Values Data Size in bits
-        System.out.println("The Grid Values Data Size in Bits: " + grid.getDataSize());
-
-        //Get the Grid Data Values
-        String[] dataValues = grid.getDataValues();
-
-        //Display the Data Values
-        for(int i = 0; i<dataValues.length; ++i){
-            System.out.println("The Grid Data Value: "  + i + " : " + dataValues[i]);
-        }
-
-    }
-
-  }]]>
-
-
-    </programlisting>
-  </para>
-
-<para>
-  Here's the output listing:
-    <programlisting>
-    The Grid Description: A UNESCO elevation grid object used to record points of elevation on a heritage site. Used in conjunction with images of the site, then 3D models can be built up.  The actual grid point heights listed sequentially, in row-major order.
-    The Grid Units: m
-    The Grid Values Data Type: real
-    The Grid Values Data Size in Bits: 64
-    [INFO ] Caching system available. fr.gael.drb.impl.sds.SdfFactory.initializeXmlSchemaCache(SdfFactory.java:239)
-    [INFO ] XML Schema cache manager created. fr.gael.drb.impl.sds.SdfFactory.initializeXmlSchemaCache(SdfFactory.java:256)
-    [INFO ] Cache of XML Schema's created. fr.gael.drb.impl.sds.SdfFactory.initializeXmlSchemaCache(SdfFactory.java:274)
-    [INFO ] Putting in XML Schema cache: "/tmp/structure17288.xsd" fr.gael.drb.impl.sds.SdfFactory.putXmlSchemaInCache(SdfFactory.java:339)
-    The Grid Data Value: 0 : 20.943108
-    The Grid Data Value: 1 : 20.905954
-    The Grid Data Value: 2 : 20.869081
-    The Grid Data Value: 3 : 20.832487
-    The Grid Data Value: 4 : 20.796169
-    The Grid Data Value: 5 : 20.760124
-    The Grid Data Value: 6 : 20.72434
-    The Grid Data Value: 7 : 20.688808
-    ...
-    </programlisting>
-  </para>
-
-
-    <para></para>
-</section>
 
   </chapter>
 

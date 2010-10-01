@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 public class UserSettings {
 
     private Properties props = null;
-    private File nxconvertFile = null;
+    private String nxconvertCommand = null;
     private ResourceBundle bundle = null;
     private boolean foundNXconvert = false;
 
@@ -73,10 +73,12 @@ public class UserSettings {
             if (props.getProperty("nxconvert") != null) {
                 
                 if(chechExists(props.getProperty("nxconvert"))){
-                    nxconvertFile = new File(props.getProperty("nxconvert"));
+                    nxconvertCommand = props.getProperty("nxconvert");
                     foundNXconvert = true;
                 }
-                
+                else{
+                    defaultNXconvert();
+                }
             }
             else{
                 defaultNXconvert();
@@ -95,12 +97,12 @@ public class UserSettings {
         try {
             if (settings.exists()) {
 
-                props.setProperty("nxconvert", nxconvertFile.getAbsolutePath());
+                props.setProperty("nxconvert", nxconvertCommand);
                 props.store(new FileOutputStream(settings), "ISIS NXvalidate");
 
             } else {
                 settings.createNewFile();
-                props.setProperty("nxconvert", nxconvertFile.getAbsolutePath());
+                props.setProperty("nxconvert", nxconvertCommand);
                 props.store(new FileOutputStream(settings), "ISIS NXvalidate");
 
             }
@@ -115,14 +117,17 @@ public class UserSettings {
         }
     }
 
-    public File getNXconvert(){
-        return nxconvertFile;
+    public String getNXconvert(){
+        return nxconvertCommand;
     }
 
-    public void setNXconvert(File nxconvertFile){
-        this.nxconvertFile = nxconvertFile;
-        if(nxconvertFile.exists()){
+    public void setNXconvert(String nxconvertCommand){
+        this.nxconvertCommand = nxconvertCommand;
+        if(testPath(nxconvertCommand)){
             foundNXconvert = true;
+        }
+        else{
+            foundNXconvert = false;
         }
     }
 
@@ -133,30 +138,23 @@ public class UserSettings {
     private void defaultNXconvert(){
         OSValidator os = new OSValidator();
 
-        String command = null;
-
         if(os.isWindows()){
-            command = bundle.getString("defaultWindowsNXconvert");
+            nxconvertCommand = bundle.getString("defaultWindowsNXconvert");
         } else if(os.isMac()){
-            command = bundle.getString("defaultMacNXconvert");
+            nxconvertCommand = bundle.getString("defaultMacNXconvert");
         } else if(os.isUnix()){
-            command = bundle.getString("defaultUNIXNXconvert");
-            if(!chechExists(command)){
-                command = bundle.getString("defaultUNIXNXconvert2");
+            nxconvertCommand = bundle.getString("defaultUNIXNXconvert");
+            if(!chechExists(nxconvertCommand)){
+                nxconvertCommand = bundle.getString("defaultUNIXNXconvert2");
             }
         }
 
-        if(command!=null){
-            if(!command.equals("")){
-                nxconvertFile = new File(command);
-            }
+        if(!chechExists(nxconvertCommand)){
+            nxconvertCommand = "nxconvert";
         }
 
-        if(nxconvertFile==null){
-            nxconvertFile = new File("nxconvert");
-        }
-
-        if(nxconvertFile.exists()){
+        if(testPath(nxconvertCommand)){
+            System.out.println("defaultNXconvert foundNXconvert:" + foundNXconvert);
             foundNXconvert = true;
         }
 
@@ -171,6 +169,9 @@ public class UserSettings {
             if(!filename.equals("")){
                 file = new File(filename);
             }
+            else{
+                return false;
+            }
 
             if(file.exists()){
                 exists = true;
@@ -178,6 +179,29 @@ public class UserSettings {
             
         }
         return exists;
+
+    }
+
+    private boolean testPath(String path){
+
+        boolean result = false;
+
+        if(path == null){
+            return result;
+        }
+        if(path.equals("")){
+            return result;
+        }
+        
+        try {
+            // execute the command
+            Runtime rt = Runtime.getRuntime();
+            Process proc = rt.exec(path + " --help");
+            result = true;
+            return result;
+        } catch (IOException ex) {
+            return result;
+        }
 
     }
 

@@ -54,7 +54,7 @@ public class FileActions implements Runnable {
     private File nxdlFile = null;
     private File reducedFile = null;
     private File resultsFile = null;
-    private File nxconvertFile = null;
+    private String nxconvertCommand = null;
     private File saveDirectory = null;
     private DocumentBuilderFactory factory = null;
     private DocumentBuilder builder = null;
@@ -105,12 +105,12 @@ public class FileActions implements Runnable {
         this.nxdlFile = nxdlFile;
     }
 
-    public void setNXConvertFile(File nxconvertFile) {
-        this.nxconvertFile = nxconvertFile;
+    public void setNXConvertFile(String nxconvertCommand) {
+        this.nxconvertCommand = nxconvertCommand;
     }
 
-    public File getNXConvertFile() {
-        return nxconvertFile;
+    public String getNXConvertFile() {
+        return nxconvertCommand;
     }
 
     public void setReducedFile(File reducedFile) {
@@ -171,8 +171,8 @@ public class FileActions implements Runnable {
             }
 
             //Do the validation.
-            if (nxconvertFile != null) {
-                validator = new ValidatorUtils(nxsFile,nxconvertFile);
+            if (nxconvertCommand != null) {
+                validator = new ValidatorUtils(nxsFile,nxconvertCommand);
             } else {
                 dialogReportProblem.showMessageDialog(
                         frame,
@@ -219,8 +219,12 @@ public class FileActions implements Runnable {
         try {
 
             //Reduce the file with NXConvert.
-            NXconvert convert = new NXconvert(nxsFile, true, nxconvertFile);
+            NXconvert convert = new NXconvert(nxsFile, true, nxconvertCommand);
             File reducedFile = convert.convert();
+
+            if(reducedFile==null){
+                return;
+            }
 
             //Display reduced file
             Document document = builder.parse(reducedFile);

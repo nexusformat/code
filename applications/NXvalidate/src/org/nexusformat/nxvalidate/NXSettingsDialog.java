@@ -36,7 +36,7 @@ import java.io.File;
 public class NXSettingsDialog extends javax.swing.JDialog {
 
     
-    private File nxconvert = null;
+    private String nxconvert = null;
     private boolean OKButtonUsed = false;
     /** Creates new form NXLoadFilesDialog */
     public NXSettingsDialog(java.awt.Frame parent, boolean modal) {
@@ -68,8 +68,6 @@ public class NXSettingsDialog extends javax.swing.JDialog {
         jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5), javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED)));
 
         nxdcLabel.setText("Location of nxconvert binary file:");
-
-        nxdcTextField.setEditable(false);
 
         openButton2.setText("Open");
         openButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -149,9 +147,9 @@ public class NXSettingsDialog extends javax.swing.JDialog {
             int returnVal = jFileChooser1.showOpenDialog(this);
 
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
-                nxconvert = jFileChooser1.getSelectedFile();
-                nxdcTextField.setText(nxconvert.getAbsolutePath());
-                nxdcTextField.setToolTipText(nxconvert.getAbsolutePath());
+                nxconvert = jFileChooser1.getSelectedFile().getAbsolutePath();
+                nxdcTextField.setText(nxconvert);
+                nxdcTextField.setToolTipText(nxconvert);
             } else {
                 nxconvert = null;
             }
@@ -170,18 +168,19 @@ public class NXSettingsDialog extends javax.swing.JDialog {
 
         if(evt.getSource() == OKButton){
             OKButtonUsed = true;
+            nxconvert = nxdcTextField.getText();
             this.setVisible(false);
         }
     }//GEN-LAST:event_OKButtonActionPerformed
 
     
-    public File getNXConvertFile(){
+    public String getNXConvertFile(){
         return nxconvert;
     }
 
-    public void setNXConvertFile(File file){
-        nxconvert = file;
-        nxdcTextField.setText(nxconvert.getAbsolutePath());
+    public void setNXConvertCommand(String nxconvert){
+        nxconvert = nxconvert;
+        nxdcTextField.setText(nxconvert);
     }
 
     public boolean OKButtonUsed(){

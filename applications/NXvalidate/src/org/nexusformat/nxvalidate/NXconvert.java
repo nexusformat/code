@@ -38,10 +38,10 @@ public class NXconvert {
     private File rawfile;
     private File redfile;
     private NXproperties props = null;
-    private File convertFile = null;
+    private String convertCommand = null;
 
     public NXconvert(final File rawfile, final boolean keepTemp,
-            final File convertFile)
+            final String convertCommand)
             throws IOException, InterruptedException {
 
         this.rawfile = rawfile;
@@ -51,7 +51,7 @@ public class NXconvert {
             redfile.deleteOnExit();
         }
 
-        this.convertFile = convertFile;
+        this.convertCommand = convertCommand;
 
         props = new NXproperties();
 
@@ -72,8 +72,8 @@ public class NXconvert {
                 Level.INFO, "Creating " + redfile.getAbsolutePath());
 
         String command = "";
-        if(convertFile!=null){
-            command = convertFile.getAbsolutePath() +
+        if(convertCommand!=null){
+            command = convertCommand +
                 " -d " + this.rawfile + " " + redfile;;
         }
         else{
@@ -111,7 +111,7 @@ public class NXconvert {
             return;
         }
         try {
-            NXconvert convert = new NXconvert(new File(args[0]), false, new File(args[1]));
+            NXconvert convert = new NXconvert(new File(args[0]), false, args[1]);
             convert.convert();
         } catch (Exception e) {
             e.printStackTrace();

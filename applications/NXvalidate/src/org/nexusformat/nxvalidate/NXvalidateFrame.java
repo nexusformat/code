@@ -65,7 +65,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
     private File resultsFile = null;
     private TreeUtils treeUtils = null;
     private UserSettings settings = null;
-    private File nxconvertFile = null;
+    private String nxconvertCommand = null;
     private File saveDirectory = null;
     private boolean foundNXconvert = false;
     private MouseListener popupListener = null;
@@ -110,7 +110,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         try {
             settings.loadUserSettings();
-            nxconvertFile = settings.getNXconvert();
+            nxconvertCommand = settings.getNXconvert();
 
             if (!settings.foundNXconvert()) {
                 displayErrorMessage(
@@ -397,11 +397,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         NXSettingsDialog loadSettings = new NXSettingsDialog(this, true);
         loadSettings.setModalityType(ModalityType.APPLICATION_MODAL);
-        if (nxconvertFile != null) {
-            loadSettings.setNXConvertFile(nxconvertFile);
+        if (nxconvertCommand != null) {
+            loadSettings.setNXConvertCommand(nxconvertCommand);
         }
         loadSettings.setVisible(true);
-        nxconvertFile = loadSettings.getNXConvertFile();
+        nxconvertCommand = loadSettings.getNXConvertFile();
         return loadSettings.OKButtonUsed();
 
     }
@@ -421,7 +421,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
                 if (nxsFile != null) {
                     fileLoadingActions.setWhich(1);
                     fileLoadingActions.setNXSFile(nxsFile);
-                    fileLoadingActions.setNXConvertFile(nxconvertFile);
+                    fileLoadingActions.setNXConvertFile(nxconvertCommand);
                     fileLoadingActions.setNXDLFile(nxdlFile);
                     (new Thread(fileLoadingActions)).start();
                 } else {
@@ -497,7 +497,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
                     fileLoadingActions.setWhich(2);
                     fileLoadingActions.setNXSFile(nxsFile);
-                    fileLoadingActions.setNXConvertFile(nxconvertFile);
+                    fileLoadingActions.setNXConvertFile(nxconvertCommand);
                     fileLoadingActions.setNXDLFile(nxdlFile);
                     fileLoadingActions.setReducedFile(reducedFile);
                     fileLoadingActions.setReducedDoc(reducedDoc);
@@ -523,8 +523,9 @@ public class NXvalidateFrame extends javax.swing.JFrame {
             boolean result = loadSettingsFileDialog();
 
             if (result) {
-                if (nxconvertFile != null) {
-                    settings.setNXconvert(nxconvertFile);
+                if (nxconvertCommand != null) {
+                    System.out.println("settingsMenuItemActionPerformed: " + nxconvertCommand);
+                    settings.setNXconvert(nxconvertCommand);
                     settings.saveUserSettings();
                     foundNXconvert = settings.foundNXconvert();
                 }
@@ -584,7 +585,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
         if (evt.getSource() == bulkMenuItem) {
 
-            fileLoadingActions.setNXConvertFile(nxconvertFile);
+            fileLoadingActions.setNXConvertFile(nxconvertCommand);
             BulkLoadFilesFrame bulk = new BulkLoadFilesFrame(fileLoadingActions);
             bulk.setVisible(true);
 

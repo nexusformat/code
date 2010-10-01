@@ -41,12 +41,12 @@ public class ValidatorUtils {
     private boolean keepTemp = false;
     private File schematronFile = null;
     private boolean convertNxs = false;
-    private File nxconvertFile = null;
+    private String nxconvertCommand = null;
 
 
-    public ValidatorUtils(File nxsFile, File nxconvertFile) {
+    public ValidatorUtils(File nxsFile, String nxconvertCommand) {
 
-        this.nxconvertFile = nxconvertFile;
+        this.nxconvertCommand = nxconvertCommand;
         this.nxsFile = nxsFile;
     }
 
@@ -142,7 +142,7 @@ public class ValidatorUtils {
         //Do the conversion to the reduced format.
         if (convertNxs && nxsFile != null) {
             try {
-                NXconvert converter = new NXconvert(nxsFile, keepTemp, nxconvertFile);
+                NXconvert converter = new NXconvert(nxsFile, keepTemp, nxconvertCommand);
                 reduced = converter.convert();
             } catch (Exception e) {
                 Logger.getLogger(ValidatorUtils.class.getName()).log(Level.SEVERE,
