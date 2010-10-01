@@ -32,7 +32,9 @@ nxexampledir=$(NXEXAMPLEDIR)
 nxjavadocdir=$(NXDOCDIR)/java
 # jar file definitions
 javadir		= $(datadir)/java
-java_DATA = dist/NXvalidate.jar lib/saxon9he.jar
+javalibdir		= $(javadir)/lib
+java_DATA = dist/NXvalidate.jar
+javalib_DATA = lib/saxon9he.jar lib/jhall.jar
 bin_SCRIPTS = nxvalidate
 
 #nxjavadoc_DATA = README.JNEXUS COPYING.NCSA
