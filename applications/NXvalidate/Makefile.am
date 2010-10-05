@@ -46,18 +46,23 @@ dist/NXvalidate.jar ::
 	[ -d nbproject ] || ln -s $(srcdir)/nbproject .
 	ant
 
+#apidoc : $(noinst_JAVA)
+#	test -d apidoc || mkdir apidoc
+#	$(JAVADOC) -d apidoc -windowtitle jnexus -doctitle jnexus -classpath . \
+#                      -sourcepath $(srcdir) org.nexusformat ncsa.hdf.hdflib
+
 #dist-hook :
 #	if test -d $(srcdir)/apidoc; then \
 #	    cp -r $(srcdir)/apidoc $(distdir); \
 #	fi
 
-#install-data-local :
-#	$(mkinstalldirs) $(DESTDIR)$(nxjavadocdir)
-#	if test -d $(srcdir)/apidoc; then \
-#	  cp -r $(srcdir)/apidoc $(DESTDIR)$(nxjavadocdir); \
-#	  find $(DESTDIR)$(nxjavadocdir)/apidoc -type f -exec chmod 0644 {} \; ;\
-#	  find $(DESTDIR)$(nxjavadocdir)/apidoc -type d -exec chmod 0755 {} \; ;\
-#	fi
+install-data-local :
+	$(mkinstalldirs) $(DESTDIR)$(nxjavadocdir)
+	if test -d $(srcdir)/build/classes/org/nexusformat/nxvalidate/help; then \
+	  cp -r $(srcdir)/build/classes/org/nexusformat/nxvalidate/help $(DESTDIR)$(nxjavadocdir)/nxvalidate; \
+	  find $(DESTDIR)$(nxjavadocdir) -type f -exec chmod 0644 {} \; ;\
+	  find $(DESTDIR)$(nxjavadocdir) -type d -exec chmod 0755 {} \; ;\
+	fi
 
 #clean-local :
 #	rm -rf apidoc
