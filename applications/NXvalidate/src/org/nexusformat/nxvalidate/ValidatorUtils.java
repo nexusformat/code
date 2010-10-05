@@ -102,7 +102,7 @@ public class ValidatorUtils {
      * Get the File object pointing to the Schematron file that contains the
      * rules for checking the reduced document.
      *
-     * @param schematronFile the Schematron File object.
+     * @return the Schematron File object.
      */
     public File getSchematron() {
         return schematronFile;

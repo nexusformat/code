@@ -130,7 +130,7 @@ public class NXNodeMapper implements MutableTreeNode {
 
     /**
      * Set the root node that this node belongs to.
-     * @param the root node.
+     * @param root the root node.
      */
     public void setRoot(NXNodeMapper root) {
         this.root = root;
@@ -156,7 +156,7 @@ public class NXNodeMapper implements MutableTreeNode {
 
     /**
      * Set the NXDL file belonging to the root node. Should not be set.
-     * @param the NXDL file as a File object.
+     * @param nxdlFile the NXDL file as a File object.
      */
     public void setNXDLFile(File nxdlFile) {
         this.nxdlFile = nxdlFile;
@@ -175,7 +175,7 @@ public class NXNodeMapper implements MutableTreeNode {
     /**
      * Set the resultant file produced after NXConvert has been run on the
      * NXS file.
-     * @param the NXConvert reduced file.
+     * @param reducedFile the NXConvert reduced file.
      */
     public void setReducedFile(File reducedFile) {
         this.reducedFile = reducedFile;
@@ -184,7 +184,7 @@ public class NXNodeMapper implements MutableTreeNode {
     /**
      * Get the resultant file produced after the validation procedure has been
      * performed.
-     * @param the validation results file.
+     * @return the validation results file.
      */
     public File getResultsFile() {
         return resultsFile;
@@ -193,7 +193,7 @@ public class NXNodeMapper implements MutableTreeNode {
     /**
      * Get the resultant file produced after the validation procedure has been
      * performed.
-     * @param the validation results file.
+     * @param resultsFile the validation results file.
      */
     public void setResultsFile(File resultsFile) {
         this.resultsFile = resultsFile;
@@ -211,7 +211,7 @@ public class NXNodeMapper implements MutableTreeNode {
     /**
      * Get the resultant DOM document produced after the validation procedure
      * has been performed.
-     * @return the validation results DOM document.
+     * @param resultsDoc the validation results DOM document.
      */
     public void setResultsDoc(Document resultsDoc) {
         this.resultsDoc = resultsDoc;

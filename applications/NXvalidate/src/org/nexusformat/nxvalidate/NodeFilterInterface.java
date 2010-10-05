@@ -53,7 +53,7 @@ public interface NodeFilterInterface {
 
     /**
      * A list of nodes which are bad.
-     * @return
+     * @return the list of bad nodes
      */
     public ArrayList<Node> getBadNodeList();
 
