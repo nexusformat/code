@@ -380,6 +380,8 @@ fi
 
 HDF_EXT=a # library file extent to look for with HDF libraries
 HDF5_EXT=so # library file extent to look for with HDF5 libraries
+SHARED_EXT=so
+AC_SUBST(SHARED_EXT)
 
 AC_SUBST(LIBXML2_CFLAGS)
 LIBXML2_CFLAGS='`xml2-config --cflags`'
@@ -410,6 +412,7 @@ case $host in
 	MINGW_MSYS=yes
 	HDF_EXT=dll
 	HDF5_EXT=dll
+	SHARED_EXT=dll
 	LIBXML2_CFLAGS=-I/usr/local/include
 	java_host="win32"
 	;;
@@ -425,6 +428,7 @@ case $host in
 	CFLAGS="$CFLAGS -g"
 	FFLAGS="$FFLAGS -g"
 	HDF5_EXT=dylib
+	SHARED_EXT=dylib
 dnl This is a hack for libtool - for some reason the F77 tag
 dnl does not get set with the commands to create a shared library
 	AC_MSG_NOTICE([Patching libtool for F77 shared linking])
