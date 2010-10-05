@@ -98,12 +98,12 @@ public class UserSettings {
             if (settings.exists()) {
 
                 props.setProperty("nxconvert", nxconvertCommand);
-                props.store(new FileOutputStream(settings), "ISIS NXvalidate");
+                props.store(new FileOutputStream(settings), "NXvalidate");
 
             } else {
                 settings.createNewFile();
                 props.setProperty("nxconvert", nxconvertCommand);
-                props.store(new FileOutputStream(settings), "ISIS NXvalidate");
+                props.store(new FileOutputStream(settings), "NXvalidate");
 
             }
         } catch (FileNotFoundException ex) {

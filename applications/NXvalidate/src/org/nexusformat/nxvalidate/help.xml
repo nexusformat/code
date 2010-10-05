@@ -211,7 +211,7 @@
     <title>NXvalidate when first opened.</title>
     <screenshot>
         <!--<screeninfo>640x480x256</screeninfo>-->
-        <graphic fileref="ISISNexusFileValidationTool_001.png"></graphic>
+        <graphic fileref="NexusFileValidationTool_001.png"></graphic>
     </screenshot>
 </figure>
 
@@ -233,7 +233,7 @@
     <title>Open Files</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="ISISNexusFileValidationTool_002.png"></graphic>
+    <graphic fileref="NexusFileValidationTool_002.png"></graphic>
 </screenshot>
 </figure>
 
@@ -286,7 +286,7 @@
     <title>A New Open NeXus File</title>
 <screenshot>
     <!--<screeninfo>640x480x256</screeninfo>-->
-    <graphic fileref="ISIS Nexus File Validation Tool_006.png"></graphic>
+    <graphic fileref="NexusFileValidationTool_006.png"></graphic>
 </screenshot>
 </figure>     
 
