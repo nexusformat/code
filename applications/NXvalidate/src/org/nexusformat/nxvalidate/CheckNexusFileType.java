@@ -209,6 +209,9 @@ public class CheckNexusFileType {
             if (resultsDoc.getDocumentElement().getNodeName().equals("definition")) {
                 result = true;
             }
+            if (resultsDoc.getDocumentElement().getNodeName().equals("definitions")) {
+                result = true;
+            }
         } catch (SAXException ex) {
             //Logger.getLogger(CheckNexusFileType.class.getName()).log(Level.INFO,
             //        "SAXException: " + file.getAbsolutePath(), ex);
