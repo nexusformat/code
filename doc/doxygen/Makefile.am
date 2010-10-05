@@ -27,6 +27,8 @@ if HAVE_DOT
 	( cd latex-f90; ) # ( cd latex-f90; make pdf )
 	env TOPSRC=$(top_srcdir) $(DOXYGEN) $(srcdir)/Doxyfile_f77
 	( cd latex-f77; ) # ( cd latex-f77; make pdf )
+	env TOPSRC=$(top_srcdir) $(DOXYGEN) $(srcdir)/Doxyfile_nxvalidate
+	( cd latex-nxvalidate; ) # ( cd latex-nxvalidate; make pdf )
 	rm -f refman.pdf
 	ln -s latex-c/refman.pdf .
 endif
