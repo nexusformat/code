@@ -37,19 +37,42 @@
 #include "NeXusStream.hpp"
 #include "nxconvert_common.h"
 
+#include <vector>
+
 static int WriteGroup (int is_definition);
 static int WriteAttributes (int is_definition, int is_group);
 
-#define MAX_LINKS 1024
 struct link_to_make
 {
     char from[1024];   /* path of directory with link */
     char name[256];    /* name of link */
     char to[1024];     /* path of real item */
+    link_to_make(const char* _from, const char* _name, const char* _to)
+    {
+	strcpy(from, _from);
+	strcpy(name, _name);
+	strcpy(to, _to);
+    }
+    link_to_make(const link_to_make& val)
+    {
+	strcpy(from, val.from);
+	strcpy(name, val.name);
+	strcpy(to, val.to);
+    }
+    link_to_make& operator=(const link_to_make& val)
+    {
+	if (this != &val)
+	{
+	    strcpy(from, val.from);
+	    strcpy(name, val.name);
+	    strcpy(to, val.to);
+	}
+	return *this;
+    }
 };
 
-static struct link_to_make links_to_make[MAX_LINKS];
-static int links_count = 0;
+static std::vector<link_to_make> links_to_make;
+
 static char current_path[1024];
 
 static int add_path(const char* path)
@@ -87,7 +110,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
      definition_name = definition_name_;
    }
    char* tstr;
-   links_count = 0;
+   links_to_make.clear();
    current_path[0] = '\0';
    NXlink link;
    if (nx_format == NX_DEFINITION)
@@ -124,7 +147,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    if (nx_format != NXACC_CREATE && nx_format != NXACC_CREATE4)
    {
 /* now create any required links */
-       for(i=0; i<links_count; i++)
+       for(i=0; i<links_to_make.size(); i++)
        {
 	    if (NXopenpath(outId, links_to_make[i].to) != NX_OK) return NX_ERROR;
 	    if (NXgetdataID(outId, &link) == NX_OK  || NXgetgroupID(outId, &link) == NX_OK)
@@ -206,10 +229,7 @@ static int WriteGroup (int is_definition)
 	    else
 	    {
 	        remove_path(name);
-		strcpy(links_to_make[links_count].from, current_path); 
-		strcpy(links_to_make[links_count].to, link.targetPath); 
-		strcpy(links_to_make[links_count].name, name); 
-		links_count++;
+		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
          	if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
 	    }
          }
@@ -233,10 +253,7 @@ static int WriteGroup (int is_definition)
 	    else
 	    {
 	        remove_path(name);
-		strcpy(links_to_make[links_count].from, current_path); 
-		strcpy(links_to_make[links_count].to, link.targetPath); 
-		strcpy(links_to_make[links_count].name, name); 
-		links_count++;
+		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
 	    }
             if (NXclosedata (inId) != NX_OK) return NX_ERROR;
          }
