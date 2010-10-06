@@ -58,14 +58,14 @@ dist/NXvalidate.jar ::
 
 install-data-local :
 	$(mkinstalldirs) $(DESTDIR)$(nxjavadocdir)
-	if test -d $(srcdir)/build/classes/org/nexusformat/nxvalidate/help; then \
-	  cp -r $(srcdir)/build/classes/org/nexusformat/nxvalidate/help $(DESTDIR)$(nxjavadocdir)/nxvalidate; \
+	if test -d $(builddir)/dist/javadoc; then \
+	  cp -r $(builddir)/dist/javadoc $(DESTDIR)$(nxjavadocdir)/nxvalidate; \
 	  find $(DESTDIR)$(nxjavadocdir) -type f -exec chmod 0644 {} \; ;\
 	  find $(DESTDIR)$(nxjavadocdir) -type d -exec chmod 0755 {} \; ;\
 	fi
 
-#clean-local :
-#	rm -rf apidoc
+clean-local :
+	ant clean
 
 #uninstall-local :
 #	rm -fr $(DESTDIR)$(nxjavadocdir)/apidoc
