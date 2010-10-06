@@ -67,6 +67,10 @@ public class XMLTreeRenderer extends DefaultTreeCellRenderer {
         //Add the bad node error icon and tool tip text.
         NXNodeMapper node = (NXNodeMapper) value;
         node.checkBadNode();
+        boolean badKids = node.checkBadChildren();
+        if (badKids) {
+            setIcon(createImageIcon("resources/dialog-warning.png", "warningIcon"));
+        }
         if (node.getBadNode()) {
             setIcon(createImageIcon(path, "errorIcon"));
             setToolTipText(bundle.getString("elementError"));

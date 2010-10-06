@@ -279,6 +279,58 @@ public class NXNodeMapper implements MutableTreeNode {
     }
 
     /**
+     * A method to check to see if any of a nodes children are bad.
+     * @return true if there are any bad children
+     *
+     */
+    public boolean checkBadChildren() {
+
+        boolean result = false;
+        Boolean bad;
+
+
+        if (!isRoot) {
+
+            for (int i = 0; i < domNode.getChildNodes().getLength(); i++) {
+                Node node = domNode.getChildNodes().item(i);
+                bad = (Boolean) node.getUserData("bad");
+                if (bad != null) {
+                    result = true;
+                }
+
+                // Now let's check the grandkids... and beyond...
+                bad = (Boolean) checkChildren(node);
+                if (bad) {
+                    result = true;
+                }
+            }
+
+        }
+        return result;
+    }
+
+    /**
+     * Recursive method used by checkBadChildren() to recursively check down
+     * the tree.
+     * @param node
+     * @return true if a child anywhere in the tree is bad!
+     */
+    private boolean checkChildren(Node node) {
+        boolean result = false;
+        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+            Node tmpNode = node.getChildNodes().item(i);
+            if (tmpNode.hasChildNodes()) {
+                checkChildren(tmpNode);
+            }
+            Boolean bad = (Boolean) tmpNode.getUserData("bad");
+            if (bad != null) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Resets the various properties of a node, i.e flag to indicate that it
      * is a bad node, the text for the tests that failed etc.
      */
@@ -359,7 +411,8 @@ public class NXNodeMapper implements MutableTreeNode {
             }
 
         } else {
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i
+                    < count; i++) {
                 NXNodeMapper n = this.getChildAt(i);
 
                 if (child.domNode == n.domNode) {
@@ -383,7 +436,10 @@ public class NXNodeMapper implements MutableTreeNode {
             // Return Nth displayable node
             int elementNodeIndex = 0;
 
-            for (int i = 0; i < domNode.getChildNodes().getLength(); i++) {
+
+
+            for (int i = 0; i
+                    < domNode.getChildNodes().getLength(); i++) {
                 node = domNode.getChildNodes().item(i);
 
                 if ((node.getNodeType() == ELEMENT_TYPE)
@@ -402,9 +458,13 @@ public class NXNodeMapper implements MutableTreeNode {
 
             return documents.size();
 
+
+
         }
 
         return childCount;
+
+
 
     }
 
@@ -459,18 +519,30 @@ public class NXNodeMapper implements MutableTreeNode {
 
         if (isRoot) {
             return new String[0];
+
+
         }
 
         ArrayList<String> atts = new ArrayList<String>();
 
+
+
         if (domNode.hasAttributes()) {
 
             NamedNodeMap att = domNode.getAttributes();
+
+
             int na = domNode.getAttributes().getLength();
 
-            for (int i = 0; i < na; ++i) {
-                atts.add(att.item(i).getNodeName() + " = " +
-                         att.item(i).getNodeValue());
+
+
+            for (int i = 0; i
+                    < na;
+                    ++i) {
+                atts.add(att.item(i).getNodeName() + " = "
+                        + att.item(i).getNodeValue());
+
+
             }
 
         }
@@ -486,17 +558,25 @@ public class NXNodeMapper implements MutableTreeNode {
 
         if (isRoot) {
             return "";
+
+
         }
 
         if (domNode.getNodeType() == ELEMENT_TYPE) {
             return getTextValue(domNode);
+
+
         }
 
         if (domNode.getTextContent() != null) {
             return domNode.getTextContent().trim();
+
+
         }
 
         return "";
+
+
 
     }
 
@@ -504,15 +584,26 @@ public class NXNodeMapper implements MutableTreeNode {
 
         ArrayList<Node> nodes = new ArrayList<Node>();
 
-        for (int i = 0; i < domNode.getChildNodes().getLength(); i++) {
+
+
+        for (int i = 0; i
+                < domNode.getChildNodes().getLength(); i++) {
             Node node = domNode.getChildNodes().item(i);
+
+
 
             if (node.getNodeType() == ELEMENT_TYPE) {
                 nodes.add(node);
+
+
                 ++childCount;
+
+
             }
         }
         return nodes;
+
+
     }
 
     private String getTextValue(Node node) {
@@ -521,14 +612,22 @@ public class NXNodeMapper implements MutableTreeNode {
 
             NodeList nodes = node.getChildNodes();
 
-            for (int i = 0; i < nodes.getLength(); ++i) {
+
+
+            for (int i = 0; i
+                    < nodes.getLength();
+                    ++i) {
                 if (nodes.item(i).getNodeType() == Node.TEXT_NODE) {
                     return nodes.item(i).getTextContent().trim();
+
+
                 }
             }
 
         }
         return "";
+
+
     }
 
     /**
@@ -538,14 +637,20 @@ public class NXNodeMapper implements MutableTreeNode {
      */
     public ArrayList<NXNodeMapper> getOpenNodes() {
         return documents;
+
+
     }
 
-     /**
+    /**
      * Removes the list of nodes that represent the Nexus documents that are
      * open i.e. that have been reduced.
      */
     public void removeAllNodes() {
         documents.clear();
+
+
+
+
     }
 
     /**
@@ -601,8 +706,8 @@ public class NXNodeMapper implements MutableTreeNode {
                 } else {
                     throw new NoSuchElementException();
                 }
-                
-            } else{
+
+            } else {
 
                 if (count < children.size()) {
                     node = children.get(count);
@@ -620,14 +725,24 @@ public class NXNodeMapper implements MutableTreeNode {
 
         NXNodeMapper childNode = (NXNodeMapper) child;
 
+
+
         if (isRoot) {
             documents.add(index, childNode);
+
+
         } else {
             NodeList list = domNode.getChildNodes();
 
-            for (int i = 0; i < list.getLength(); ++i) {
+
+
+            for (int i = 0; i
+                    < list.getLength();
+                    ++i) {
                 if (i == index) {
                     domNode.insertBefore(childNode.domNode, list.item(i));
+
+
                 }
             }
         }
@@ -638,13 +753,21 @@ public class NXNodeMapper implements MutableTreeNode {
 
             documents.remove(index);
 
+
+
         } else {
 
             NodeList list = domNode.getChildNodes();
 
-            for (int i = 0; i < list.getLength(); ++i) {
+
+
+            for (int i = 0; i
+                    < list.getLength();
+                    ++i) {
                 if (i == index) {
                     domNode.removeChild(list.item(index));
+
+
                 }
             }
 
@@ -655,14 +778,24 @@ public class NXNodeMapper implements MutableTreeNode {
 
         NXNodeMapper childNode = (NXNodeMapper) node;
 
+
+
         if (isRoot) {
             documents.remove((NXNodeMapper) node);
+
+
         } else {
             NodeList list = domNode.getChildNodes();
 
-            for (int i = 0; i < list.getLength(); ++i) {
+
+
+            for (int i = 0; i
+                    < list.getLength();
+                    ++i) {
                 if (list.item(i).isSameNode(childNode.domNode)) {
                     domNode.removeChild(childNode.domNode);
+
+
                 }
             }
         }
@@ -671,9 +804,13 @@ public class NXNodeMapper implements MutableTreeNode {
     public void removeFromParent() {
         if (isRoot) {
             return;
+
+
         } else {
             NXNodeMapper parentNode = (NXNodeMapper) getParent();
             parentNode.remove(this);
+
+
         }
     }
 
@@ -683,6 +820,7 @@ public class NXNodeMapper implements MutableTreeNode {
     public void setUserObject(Object object) {
 
         userObject = object;
+
 
     }
 }
