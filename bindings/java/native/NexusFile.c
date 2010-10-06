@@ -117,7 +117,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_init
     }
 #endif    
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* extract the filename as a C char* */
     fileName = (char *) (*env)->GetStringUTFChars(env,filename,0);    
@@ -154,7 +154,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxflush
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -185,7 +185,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_close
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -209,7 +209,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakegroup
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -236,7 +236,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengroup
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -268,7 +268,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopenpath
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -298,7 +298,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengrouppath
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -326,7 +326,7 @@ JNIEXPORT jstring JNICALL Java_org_nexusformat_NexusFile_nxgetpath
     char path[1024];
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -346,7 +346,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosegroup
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -367,7 +367,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakedata
    int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -398,7 +398,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakecompdata
    int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -432,7 +432,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopendata
    int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -455,7 +455,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosedata
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -473,7 +473,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxcompress
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -494,7 +494,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputdata
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -526,7 +526,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputslab
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -557,7 +557,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
     int iRet, iDataLen, div = 1;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -610,7 +610,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdata
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -642,7 +642,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetslab
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -675,7 +675,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetattr
     int iLen, iType;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -720,7 +720,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
     jstring jstr;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -732,14 +732,14 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
         cls = (*env)->GetObjectClass(env, linki);
         if(cls == NULL)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate class in nxgetgroupid");
             return;
         }
         fid = (*env)->GetFieldID(env,cls,"tag","I");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate fieldID in nxgetgroupid");
             return;
         }
@@ -748,7 +748,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
         fid = (*env)->GetFieldID(env,cls,"ref","I");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate fieldID in nxgetgroupid");
             return;
         }
@@ -761,7 +761,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
         fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate targetPath in nxgetgroupid");
             return;
         }
@@ -771,7 +771,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
         fid = (*env)->GetFieldID(env,cls,"linkType","I");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate linkType in nxgetgroupid");
             return;
         }
@@ -781,7 +781,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetgroupid
         fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate targetPath in nxgetgroupid");
             return;
         }
@@ -803,7 +803,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
     jstring jstr;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -815,14 +815,14 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
         cls = (*env)->GetObjectClass(env, linki);
         if(cls == NULL)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate class in nxgetdataid");
             return;
         }
         fid = (*env)->GetFieldID(env,cls,"tag","I");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate fieldID in nxgetdataid");
             return;
         }
@@ -830,7 +830,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
         fid = (*env)->GetFieldID(env,cls,"ref","I");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate fieldID in nxgetdataid");
             return;
         }
@@ -843,7 +843,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
         fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate targetPath in nxgetgroupid");
             return;
         }
@@ -853,7 +853,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
         fid = (*env)->GetFieldID(env,cls,"linkType","I");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate linkType in nxgetgroupid");
             return;
         }
@@ -863,7 +863,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdataid
         fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
         if(fid == 0)
 	{
-	    NXIReportError(env,
+	    JapiError(env,
 	       "ERROR: failed to locate targetPath in nxgetdataid");
             return;
         }
@@ -887,7 +887,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
     const char *cData;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -896,14 +896,14 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
     cls = (*env)->GetObjectClass(env, target);
     if(cls == NULL)
     {
-	 NXIReportError(env,
+	 JapiError(env,
 	       "ERROR: failed to locate class in nxmakelink");
          return;
      }
      fid = (*env)->GetFieldID(env,cls,"tag","I");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate fieldID in nxmakelink");
           return;
      }
@@ -911,7 +911,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      fid = (*env)->GetFieldID(env,cls,"ref","I");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate fieldID in nxmakelink");
           return;
      }
@@ -924,7 +924,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate targetPath in nxmakelink");
           return;
      }
@@ -936,7 +936,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      fid = (*env)->GetFieldID(env,cls,"linkType","I");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate linkType in nxmakelink");
           return;
      }
@@ -946,7 +946,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate targetPath in nxmakelink");
           return;
      }
@@ -974,7 +974,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
     char *Name; 
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -986,14 +986,14 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
     cls = (*env)->GetObjectClass(env, target);
     if(cls == NULL)
     {
-	 NXIReportError(env,
+	 JapiError(env,
 	       "ERROR: failed to locate class in nxmakelink");
          return;
      }
      fid = (*env)->GetFieldID(env,cls,"tag","I");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate fieldID in nxmakelink");
           return;
      }
@@ -1001,7 +1001,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
      fid = (*env)->GetFieldID(env,cls,"ref","I");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate fieldID in nxmakelink");
           return;
      }
@@ -1014,7 +1014,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
      fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate targetPath in nxmakelink");
           return;
      }
@@ -1026,7 +1026,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
      fid = (*env)->GetFieldID(env,cls,"linkType","I");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate linkType in nxmakelink");
           return;
      }
@@ -1036,7 +1036,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
      fid = (*env)->GetFieldID(env,cls,"targetPath","Ljava/lang/String;");
      if(fid == 0)
      {
-	  NXIReportError(env,
+	  JapiError(env,
 	       "ERROR: failed to locate targetPath in nxmakelink");
           return;
      }
@@ -1060,7 +1060,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopensourcegroup
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1079,7 +1079,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxsetnumberformat
     int iRet;
 
    /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1109,7 +1109,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetinfo
     jint *jdata;
 
    /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1144,7 +1144,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextentry
     jstring rstring;
 
    /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1172,7 +1172,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextattr
     jstring rstring;
     jint *jarray;
    /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1199,7 +1199,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxinquirefile(JNIEnv *env,
     jstring rstring;
 
    /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1218,7 +1218,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxlinkexternal
     char *Name, *Nxclass, *Nxurl;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1244,7 +1244,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
     jstring rstring;
     
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1272,7 +1272,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initattrdir
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
@@ -1288,7 +1288,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
     int iRet;
 
     /* set error handler */
-    NXMSetError(env,JapiError);
+    NXMSetTError(env,JapiError);
 
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
