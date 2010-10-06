@@ -166,35 +166,8 @@ if test -d "$with_java_home"; then
 	AC_PATH_PROGS(JAVAH,javah gcjh,,[$JAVAROOT/bin])
 	AC_PATH_PROGS(JAVADOC,javadoc,,[$JAVAROOT/bin:$PATH])
 	AC_PATH_PROGS(JAR,jar fastjar,,[$JAVAROOT/bin:$PATH])
+	AX_CHECK_JUNIT
 fi
-
-
-#AC_ARG_WITH([java], AC_HELP_STRING([--with-java=java compiler], [Specify name of Java compiler]),
-#	[], [with_java=yes])
-#if test x$with_java != xno ; then
-#	if test -z "$javaroot"; then
-#	    javapath=`which java`
-#	    if test ! -z "$javapath"; then javaroot=`dirname $javapath`/..; fi
-#	fi
-#	if test -z "$javaroot"; then 
-#	    with_java=no
-#	    AC_MSG_ERROR([Unable to determine JAVA SDK directory - please specify this using  --with-java-home=/sdk/directory  or instead use  --without-java])
-#	fi
-#	AC_MSG_NOTICE([Java SDK home is $javaroot])
-#	if test x"$with_java" = x"yes" ; then
-#		AC_PATH_PROGS(JAVAC,javac,,[$javaroot/bin:$PATH])
-#	else
-#		AC_PATH_PROGS(JAVAC,["$with_java"],,[$javaroot/bin:$PATH])
-#	fi
-#	AC_PATH_PROGS(JAVADOC,javadoc,,[$javaroot/bin:$PATH])
-#	AC_PATH_PROGS(JAR,jar,,[$javaroot/bin:$PATH])
-#	AC_PATH_PROGS(JAVA,java,,[$javaroot/bin:$PATH])
-#	AC_PATH_PROGS(JAVAH,javah,,[$javaroot/bin:$PATH])
-#	JAVAINCLUDE="-I$javaroot/include"
-#else
-#	JAVAC=
-#	JAVAINCLUDE=
-#fi
 
 AC_ARG_WITH([contrib], AC_HELP_STRING([--with-contrib=names_of_apps_to_build], [Specify a list of targets from the contrib directory to build]),
 	[CONTRIB=$withval], [CONTRIB=no])
