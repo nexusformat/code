@@ -176,7 +176,7 @@ public class FileActions implements Runnable {
             } else {
                 dialogReportProblem.showMessageDialog(
                         frame,
-                        "Problem Validating");
+                        "Problem Validating file, nxconvert command is not set.");
             }
             validator.setSchematron(nxdlFile);
             validator.setReduced(reducedFile);
@@ -202,14 +202,29 @@ public class FileActions implements Runnable {
                     bundle.getString("validationCompleteMessage"));
             }
         } catch (NXvalidateException ex) {
-            Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                    Level.SEVERE, null, ex);
+            dialogReportProblem.showMessageDialog(
+                        frame,
+                        "Problem Validating file: " + nxsFile);
+            Logger.getLogger(FileActions.class.getName()).log(
+                    Level.WARNING, null, ex);
         } catch (SAXException ex) {
-            Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                    Level.SEVERE, null, ex);
+            dialogReportProblem.showMessageDialog(
+                        frame,
+                        "Problem Validating file: " + nxsFile);
+            Logger.getLogger(FileActions.class.getName()).log(
+                    Level.WARNING, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(NXvalidateFrame.class.getName()).log(
-                    Level.SEVERE, null, ex);
+            dialogReportProblem.showMessageDialog(
+                        frame,
+                        "Problem Validating file: " + nxsFile);
+            Logger.getLogger(FileActions.class.getName()).log(
+                    Level.WARNING, null, ex);
+        } catch (Exception ex) {
+            dialogReportProblem.showMessageDialog(
+                        frame,
+                        "Problem Validating file: " + nxsFile);
+            Logger.getLogger(FileActions.class.getName()).log(
+                    Level.WARNING, null, ex);
         }
 
     }
