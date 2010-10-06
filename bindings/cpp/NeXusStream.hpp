@@ -51,7 +51,9 @@ namespace NeXus
 {
 namespace Stream
 {
-    // interface implemented by all serialisable NeXus components
+  /**
+   * interface implemented by all serialisable NeXus components
+   */
     class NXDLL_EXPORT ISerialisable
     {
       public:
@@ -62,6 +64,9 @@ namespace Stream
     /// \ingroup cpp_stream
     enum StreamModifier { Close=0 };
 
+  /**
+   * Base class for serialisable named and typed parameter
+   */
     class NXDLL_EXPORT HolderBase : public ISerialisable
     {
       protected:
@@ -77,6 +82,9 @@ namespace Stream
 	virtual ~HolderBase() {}
     };
 
+  /**
+   * Serialisable NeXus attribute
+   */
     template<typename NumT>
     class NXDLL_EXPORT AttrHolder : public HolderBase
     {
@@ -98,7 +106,10 @@ namespace Stream
 	virtual ~AttrHolder() { m_value = NULL; m_c_value = NULL; }
     };
 
-    /// \ingroup cpp_stream
+  /**
+   * Serialisable attribute
+   * \ingroup cpp_stream
+   */
     class NXDLL_EXPORT Attr : public ISerialisable
     {
       protected:
@@ -124,7 +135,9 @@ namespace Stream
 	virtual ~Attr() { delete m_holder; m_holder = NULL; }
     };
 
-    
+  /**
+   * Serialisable NeXus class with associated attributes
+   */
     class NXDLL_EXPORT ObjectWithAttr : public ISerialisable
     {
        protected:
@@ -168,7 +181,10 @@ namespace Stream
 	virtual ~ObjectWithAttr() { }
     };
     
-    /// \ingroup cpp_stream
+  /**
+   * Serialisable NeXus group object
+   * \ingroup cpp_stream
+   */
     class NXDLL_EXPORT Group : public ObjectWithAttr
     {
       protected:
@@ -197,6 +213,9 @@ namespace Stream
 	virtual ~Group() {}
     };
 
+  /**
+   * Serialisable NeXus data
+   */
     template<typename NumT>
     class NXDLL_EXPORT DataHolder : public HolderBase
     {
@@ -219,7 +238,10 @@ namespace Stream
 	virtual ~DataHolder() {}
     };
 
-    /// \ingroup cpp_stream
+  /**
+   * Serialisable data object that contains attributes
+   * \ingroup cpp_stream
+   */
     class NXDLL_EXPORT Data : public ObjectWithAttr
     {
 	HolderBase* m_holder;
