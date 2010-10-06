@@ -103,7 +103,7 @@ static int NXcompress_size = 0;
 	 }
 	 else
 	 {
-		 NXIReportError(NXpData, "Invalid compression option");
+		 NXReportError( "Invalid compression option");
          status = NX_ERROR;
 	 }
 	 return status;

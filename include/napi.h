@@ -786,9 +786,16 @@ extern  void  NXMDisableErrorReporting();
    */
 extern  void  NXMEnableErrorReporting();
 
+ /**
+  * Dispatches the error message to the error function defined by NXMSetTError
+  */
+extern void NXReportError(char *text);
 
+ /**
+  * Do not use, first parameter should be set by NXMSetTError
+  */
 extern void NXIReportError(void *pData,char *text);
-extern void *NXpData;
+/* extern void *NXpData; */
 extern char *NXIformatNeXusTime();
 extern  NXstatus  NXIprintlink(NXhandle fid, NXlink* link);
 

@@ -207,7 +207,7 @@ int nx_makedata(void *ptr, char *name, int rank, int type,
   hfil = (NXhandle)ptr;
   dimData = (pNXDS)dimPtr;
   if(dimData->type != NX_INT32){
-    NXIReportError(NULL,"ERROR: dimension data not integer");
+    NXReportError("ERROR: dimension data not integer");
     return 0;
   }
   status = NXmakedata(hfil, name, type, rank, 
@@ -228,7 +228,7 @@ int nx_compmakedata(void *ptr, char *name, int rank, int type,
   hfil = (NXhandle)ptr;
   dimData = (pNXDS)dimPtr;
   if(dimData->type != NX_INT32){
-    NXIReportError(NULL,"ERROR: dimension data not integer");
+    NXReportError("ERROR: dimension data not integer");
     return 0;
   }
   bufData = (pNXDS)bufPtr;
@@ -415,7 +415,7 @@ int   nx_putdata(void *handle, void *dataset){
   data = (pNXDS)dataset;
 
   if(data == NULL){
-    NXIReportError(NULL,"ERROR: NULL data pointer in nx_putdata");
+    NXReportError("ERROR: NULL data pointer in nx_putdata");
     return 0;
   }
 

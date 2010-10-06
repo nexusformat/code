@@ -106,7 +106,7 @@ static mxml_node_t *getLinkTarget(pXMLNexus xmlHandle, const char *target){
       testNode = mxmlFindElement(node,node,path,NULL,NULL,MXML_DESCEND_FIRST);
     }
     if(testNode == NULL){
-      NXIReportError(NXpData,"Cannot follow broken link");
+      NXReportError("Cannot follow broken link");
       return NULL;
     } else {
       node = testNode;
@@ -116,7 +116,7 @@ static mxml_node_t *getLinkTarget(pXMLNexus xmlHandle, const char *target){
 }
 /*==================== file functions ===================================*/
 static void errorCallbackForMxml(const char *txt){
-  NXIReportError(NXpData,(char *)txt);
+  NXReportError((char *)txt);
 }
 /*-----------------------------------------------------------------------*/
 NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am, 
@@ -131,7 +131,7 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
   */
   xmlHandle = (pXMLNexus)malloc(sizeof(XMLNexus));
   if(!xmlHandle){
-    NXIReportError(NXpData, "Out of memory allocating XML file handle");
+    NXReportError( "Out of memory allocating XML file handle");
     return NX_ERROR;
   }
   memset(xmlHandle,0,sizeof(XMLNexus));
@@ -154,8 +154,8 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
   case NXACC_RDWR:
     fp = fopen(filename,"r");
     if(fp == NULL){
-      NXIReportError(NXpData,"Failed to open file:");
-      NXIReportError(NXpData,(char *)filename);
+      NXReportError("Failed to open file:");
+      NXReportError((char *)filename);
       free(xmlHandle);
       return NX_ERROR;
     }
@@ -192,11 +192,11 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
     xmlHandle->stack[0].options = 0;
     break;
   default:
-    NXIReportError(NXpData,"Bad access parameter specified in NXXopen");
+    NXReportError("Bad access parameter specified in NXXopen");
     return NX_ERROR;
   }
   if(xmlHandle->stack[0].current == NULL){
-      NXIReportError(NXpData,
+      NXReportError(
 		     "No NXroot element in XML-file, no NeXus-XML file");
       return NX_ERROR;
   }
@@ -215,7 +215,7 @@ NXstatus  NXXclose (NXhandle* fid){
   if(xmlHandle->readOnly == 0) {
     fp = fopen(xmlHandle->filename,"w");
     if(fp == NULL){
-      NXIReportError(NXpData,"Failed to open NeXus XML file for writing");
+      NXReportError("Failed to open NeXus XML file for writing");
       return NX_ERROR;
     }
     mxmlSaveFile(xmlHandle->root,fp,NXwhitespaceCallback);
@@ -237,7 +237,7 @@ NXstatus  NXXflush(NXhandle *fid){
   if(xmlHandle->readOnly == 0) {
     fp = fopen(xmlHandle->filename,"w");
     if(fp == NULL){
-      NXIReportError(NXpData,"Failed to open NeXus XML file for writing");
+      NXReportError("Failed to open NeXus XML file for writing");
       return NX_ERROR;
     }
     mxmlSaveFile(xmlHandle->root,fp,NXwhitespaceCallback);
@@ -257,14 +257,14 @@ NXstatus  NXXmakegroup (NXhandle fid, CONSTCHAR *name,
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"Close dataset before trying to create a group");
+    NXReportError("Close dataset before trying to create a group");
     return NX_ERROR;
   }
 
   newGroup = mxmlNewElement(xmlHandle->stack[xmlHandle->stackPointer].current,
 			    nxclass);
   if(!newGroup){
-    NXIReportError(NXpData,"failed to allocate new group");
+    NXReportError("failed to allocate new group");
     return NX_ERROR;
   }
   mxmlElementSetAttr(newGroup,"name",name);
@@ -317,7 +317,7 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"Close dataset before trying to open a group");
+    NXReportError("Close dataset before trying to open a group");
     return NX_ERROR;
   }
   newGroup = mxmlFindElement(xmlHandle->stack[xmlHandle->stackPointer].current,
@@ -331,7 +331,7 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
   }
   if(!newGroup){
     snprintf(error,1023,"Failed to open %s, %s",name,nxclass);
-    NXIReportError(NXpData,error);
+    NXReportError(error);
     return NX_ERROR;
   }
   xmlHandle->stackPointer++;
@@ -384,7 +384,7 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
   */
   typestring = (char *)malloc(132*sizeof(char));
   if(!typestring){
-    NXIReportError(NXpData,"Failed to allocate typestring");
+    NXReportError("Failed to allocate typestring");
     return NULL;
   }
   memset(typestring,0,132*sizeof(char));
@@ -419,7 +419,7 @@ NXstatus  NXXmakedatatable (NXhandle fid,
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"Close dataset before trying to create a dataset");
+    NXReportError("Close dataset before trying to create a dataset");
     return NX_ERROR;
   }
   if(dimensions[0] < 0){
@@ -440,7 +440,7 @@ NXstatus  NXXmakedatatable (NXhandle fid,
     mxmlElementSetAttr(dimsNode,TYPENAME,typestring);
     free(typestring);
   } else {
-    NXIReportError(NXpData,"Failed to allocate typestring");
+    NXReportError("Failed to allocate typestring");
     return NX_ERROR;
   }
   ndata = 1;
@@ -459,7 +459,7 @@ NXstatus  NXXmakedatatable (NXhandle fid,
       dataNode = mxmlNewElement(dataNodeRoot,name);
       newData = (mxml_node_t *)malloc(sizeof(mxml_node_t));
       if(!newData){
-        NXIReportError(NXpData,"Failed to allocate space for dataset");
+        NXReportError("Failed to allocate space for dataset");
         return NX_ERROR;
       }
       memset(newData,0,sizeof(mxml_node_t));
@@ -468,7 +468,7 @@ NXstatus  NXXmakedatatable (NXhandle fid,
 /*        newData->value.custom.data = createNXDataset(rank,datatype,dimensions); */
       newData->value.custom.data = createNXDataset(1,datatype,&one);
       if(!newData->value.custom.data){
-        NXIReportError(NXpData,"Failed to allocate space for dataset");
+        NXReportError("Failed to allocate space for dataset");
         return NX_ERROR;
       }
       newData->value.custom.destroy = destroyDataset;
@@ -495,7 +495,7 @@ NXstatus  NXXmakedata (NXhandle fid,
   }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"Close dataset before trying to create a dataset");
+    NXReportError("Close dataset before trying to create a dataset");
     return NX_ERROR;
   }
   if(dimensions[0] < 0){
@@ -509,7 +509,7 @@ NXstatus  NXXmakedata (NXhandle fid,
     mxmlElementSetAttr(dataNode,TYPENAME,typestring);
     free(typestring);
   } else {
-    NXIReportError(NXpData,"Failed to allocate typestring");
+    NXReportError("Failed to allocate typestring");
     return NX_ERROR;
   }
   /*
@@ -521,7 +521,7 @@ NXstatus  NXXmakedata (NXhandle fid,
   } else {
     newData = (mxml_node_t *)malloc(sizeof(mxml_node_t));
     if(!newData){
-      NXIReportError(NXpData,"Failed to allocate space for dataset");
+      NXReportError("Failed to allocate space for dataset");
       return NX_ERROR;
     }
     memset(newData,0,sizeof(mxml_node_t));
@@ -529,7 +529,7 @@ NXstatus  NXXmakedata (NXhandle fid,
     newData->type = MXML_CUSTOM;
     newData->value.custom.data = createNXDataset(rank,datatype,dimensions);
     if(!newData->value.custom.data){
-      NXIReportError(NXpData,"Failed to allocate space for dataset");
+      NXReportError("Failed to allocate space for dataset");
       return NX_ERROR;
     }
     newData->value.custom.destroy = destroyDataset;
@@ -596,7 +596,7 @@ NXstatus  NXXopendatatable (NXhandle fid, CONSTCHAR *name){
 
   if(!dimsNode){
     snprintf(error,1023,"Failed to open dataset %s",name);
-    NXIReportError(NXpData,error);
+    NXReportError(error);
     return NX_ERROR;
   }
 
@@ -611,7 +611,7 @@ NXstatus  NXXopendatatable (NXhandle fid, CONSTCHAR *name){
   }
   if(!dataNode){
     snprintf(error,1023,"Failed to open dataset %s",name);
-    NXIReportError(NXpData,error);
+    NXReportError(error);
     return NX_ERROR;
   }
   xmlHandle->stackPointer++;
@@ -674,7 +674,7 @@ NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name){
   }
   if(!dataNode){
     snprintf(error,1023,"Failed to open dataset %s",name);
-    NXIReportError(NXpData,error);
+    NXReportError(error);
     return NX_ERROR;
   }
   xmlHandle->stackPointer++;
@@ -772,7 +772,7 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
   }
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No dataset open");
+    NXReportError("No dataset open");
     return NX_ERROR;
   }
   
@@ -800,7 +800,7 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
     }
     else
     {
-        NXIReportError(NXpData,"Unable to determine size of character dataset");
+        NXReportError("Unable to determine size of character dataset");
         return NX_ERROR;
     }
   } else {
@@ -871,7 +871,7 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
   }
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No dataset open");
+    NXReportError("No dataset open");
     return NX_ERROR;
   }
   
@@ -915,7 +915,7 @@ NXstatus  NXXgetinfo (NXhandle fid, int *rank,
   assert(xmlHandle);
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No dataset open");
+    NXReportError("No dataset open");
     return NX_ERROR;
   }
   
@@ -1028,7 +1028,7 @@ static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset,
       mxmlElementSetAttr(node,TYPENAME,typestring);
       free(typestring);
     } else {
-      NXIReportError(NXpData,"Failed to allocate typestring");
+      NXReportError("Failed to allocate typestring");
       return 0;
     }
   }
@@ -1058,7 +1058,7 @@ NXstatus  NXXputslab (NXhandle fid, void *data,
   }
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No dataset open");
+    NXReportError("No dataset open");
     return NX_ERROR;
   }
   
@@ -1066,7 +1066,7 @@ NXstatus  NXXputslab (NXhandle fid, void *data,
   userData = findData(current);
   assert(userData != NULL);
   if(userData->type == MXML_OPAQUE){
-    NXIReportError(NXpData,"This API does not support slabs on text data");
+    NXReportError("This API does not support slabs on text data");
     return NX_ERROR;
   }
   dataset = (pNXDS)userData->value.custom.data;
@@ -1074,13 +1074,13 @@ NXstatus  NXXputslab (NXhandle fid, void *data,
 
   status = checkAndExtendDataset(current,dataset,iStart,iSize);
   if(status == 0){
-    NXIReportError(NXpData,"Out of memory extending dataset");
+    NXReportError("Out of memory extending dataset");
     return NX_ERROR;
   }
 
   slabData = makeSlabData(dataset, data, iSize);
   if(slabData == NULL){
-    NXIReportError(NXpData,"Failed to allocate slab data");
+    NXReportError("Failed to allocate slab data");
     return NX_ERROR;
   }
   
@@ -1130,7 +1130,7 @@ NXstatus  NXXgetslab (NXhandle fid, void *data,
   assert(xmlHandle);
 
   if(!isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No dataset open");
+    NXReportError("No dataset open");
     return NX_ERROR;
   }
   
@@ -1138,14 +1138,14 @@ NXstatus  NXXgetslab (NXhandle fid, void *data,
   userData = findData(current);
   assert(userData != NULL);
   if(userData->type == MXML_OPAQUE){
-    NXIReportError(NXpData,"This API does not support slabs on text data");
+    NXReportError("This API does not support slabs on text data");
     return NX_ERROR;
   }
   dataset = (pNXDS)userData->value.custom.data;
   assert(dataset);
   slabData = makeSlabData(dataset, data, iSize);
   if(slabData == NULL){
-    NXIReportError(NXpData,"Failed to allocate slab data");
+    NXReportError("Failed to allocate slab data");
     return NX_ERROR;
   }
   getSlabData(dataset,slabData,0,iStart,sourcePos,targetPos);
@@ -1202,7 +1202,7 @@ static char *formatAttributeData(void *data, int datalen, int iType){
 
   number = (char *)malloc(132*sizeof(char));
   if(!number){
-    NXIReportError(NXpData,"Failed to allocate attribute number buffer");
+    NXReportError("Failed to allocate attribute number buffer");
     return NULL;
   }
   
@@ -1272,14 +1272,14 @@ NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data,
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     if(strcmp(name,TYPENAME) == 0){
-      NXIReportError(NXpData,"type is a reserved attribute name, rejected");
+      NXReportError("type is a reserved attribute name, rejected");
       return  NX_ERROR;
     }
   }
 
   numberData = formatAttributeData(data,datalen,iType);
   if(numberData == NULL){
-    NXIReportError(NXpData,"This API does not support non number arrays");
+    NXReportError("This API does not support non number arrays");
     return NX_ERROR;
   } else {
     mxmlElementSetAttr(current,name,numberData);
@@ -1305,7 +1305,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
   attribute = mxmlElementGetAttr(current,name);
   if(!attribute){
     snprintf(error,1023,"Attribute %s not found", name);
-    NXIReportError(NXpData,error);
+    NXReportError(error);
     return NX_ERROR;
   }
   nx_type = translateTypeCode((char *)attribute);
@@ -1324,7 +1324,7 @@ NXstatus  NXXgetattr (NXhandle fid, char *name,
     } else {
       attData = strchr(attribute,(int)':');
       if(attData == NULL){
-	NXIReportError(NXpData,"ERROR: bad attribute string, : missing");
+	NXReportError("ERROR: bad attribute string, : missing");
 	return NX_ERROR;
       }
       attData++;
@@ -1479,12 +1479,12 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
     target = mxmlElementGetAttr(next,"target");
     linkName = mxmlElementGetAttr(next,"name");
     if(target == NULL){
-      NXIReportError(NXpData,"Corrupted file, NAPIlink without target");
+      NXReportError("Corrupted file, NAPIlink without target");
       return NX_ERROR;
     }
     next = getLinkTarget(xmlHandle,target);
     if(next == NULL){
-      NXIReportError(NXpData,"Corrupted file, broken link");
+      NXReportError("Corrupted file, broken link");
       return NX_ERROR;
     }
   }
@@ -1496,7 +1496,7 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
     if(userData == NULL){
 	snprintf(pBueffel,255,"Corrupted file, userData for %s not found",
 		 name);
-      NXIReportError(NXpData,pBueffel);
+      NXReportError(pBueffel);
       return NX_ERROR;
     }
     if(userData->type == MXML_OPAQUE){
@@ -1528,7 +1528,7 @@ extern  NXstatus NXXinitgroupdir(NXhandle fid){
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"Cannot search datasets");
+    NXReportError("Cannot search datasets");
     return NX_ERROR;
   }
 
@@ -1617,7 +1617,7 @@ NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No group open");
+    NXReportError("No group open");
     return NX_ERROR;
   } 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
@@ -1744,7 +1744,7 @@ static char *findLinkPath(mxml_node_t *node){
 
   path = (mxml_node_t **)malloc(NXMAXSTACK*sizeof(mxml_node_t *));
   if(path == NULL){
-    NXIReportError(NXpData,"ERROR: out of memory following link path");
+    NXReportError("ERROR: out of memory following link path");
     return NULL;
   }
   memset(path,0,NXMAXSTACK*sizeof(mxml_node_t *));
@@ -1786,7 +1786,7 @@ NXstatus  NXXgetdataID (NXhandle fid, NXlink* sRes){
   
   linkPath = findLinkPath(current);
   if(!linkPath){
-    NXIReportError(NXpData,"Failed to allocate link path string");
+    NXReportError("Failed to allocate link path string");
     return NX_ERROR;
   }
   strncpy(sRes->targetPath,linkPath,1023);
@@ -1803,7 +1803,7 @@ NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes){
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No group open");
+    NXReportError("No group open");
     return NX_ERROR;
   } 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
@@ -1814,7 +1814,7 @@ NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes){
 
   linkPath = findLinkPath(current);
   if(!linkPath){
-    NXIReportError(NXpData,"Failed to allocate link path string");
+    NXReportError("Failed to allocate link path string");
     return NX_ERROR;
   }
   strncpy(sRes->targetPath,linkPath,1023);
@@ -1843,13 +1843,13 @@ NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink){
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No group to link to open");
+    NXReportError("No group to link to open");
     return NX_ERROR;
   } 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   linkNode = mxmlNewElement(current,"NAPIlink");
   if(!linkNode){
-    NXIReportError(NXpData,"Failed to allocate new link element");
+    NXReportError("Failed to allocate new link element");
     return NX_ERROR;
   }
   mxmlElementSetAttr(linkNode,"target",sLink->targetPath);
@@ -1870,13 +1870,13 @@ NXstatus  NXXmakenamedlink (NXhandle fid, CONSTCHAR *name, NXlink* sLink){
   assert(xmlHandle);
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
-    NXIReportError(NXpData,"No group to link to open");
+    NXReportError("No group to link to open");
     return NX_ERROR;
   } 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   linkNode = mxmlNewElement(current,"NAPIlink");
   if(!linkNode){
-    NXIReportError(NXpData,"Failed to allocate new link element");
+    NXReportError("Failed to allocate new link element");
     return NX_ERROR;
   }
   mxmlElementSetAttr(linkNode,"target",sLink->targetPath);
@@ -1899,7 +1899,7 @@ NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID,
 /*--------------------------------------------------------------------*/
 int  NXXcompress(NXhandle fid, int comp){
   /* that will throw an exception in the Java API, errors have to be fatal */
-  /* NXIReportError(NXpData,"NXcompress is deprecated, IGNORED"); */
+  /* NXReportError("NXcompress is deprecated, IGNORED"); */
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/

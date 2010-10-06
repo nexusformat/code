@@ -195,7 +195,11 @@ static NXstatus NXisXML(CONSTCHAR *filename)
   __thread void (*NXEHIReportTError)(void *pData, char *string) = NULL;
 
   void NXIReportError(void *pData, char *string) {
+	fprintf(stderr, "Your application uses NXIReportError, but its first parameter is ignored now.");
+	NXReportError(string);
+  }
 
+  void NXReportError(char *string) {
 	if (NXEHIReportTError) {
 		(*NXEHIReportTError)(NXEHpTData, string);
 	} else {
@@ -330,7 +334,7 @@ NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   *gHandle = NULL;
   fileStack = makeFileStack();
   if(fileStack == NULL){
-    NXIReportError (NXpData,"ERROR: no memory to create filestack");
+    NXReportError("ERROR: no memory to create filestack");
       return NX_ERROR;
   }
   status = NXinternalopen(userfilename,am,fileStack);
@@ -364,7 +368,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     */
     fHandle = (pNexusFunction)malloc(sizeof(NexusFunction));
     if (fHandle == NULL) {
-      NXIReportError (NXpData,"ERROR: no memory to create Function structure");
+      NXReportError("ERROR: no memory to create Function structure");
       return NX_ERROR;
     }
     memset(fHandle, 0, sizeof(NexusFunction)); /* so any functions we miss are NULL */
@@ -397,7 +401,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     } else {
       filename = locateNexusFileInPath((char *)userfilename);
       if(filename == NULL){
-	NXIReportError(NXpData,"Out of memory in NeXus-API");
+	NXReportError("Out of memory in NeXus-API");
 	free(fHandle);
 	return NX_ERROR;
       }
@@ -406,14 +410,14 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
       if(iRet < 0) {
 	snprintf(error,1023,"failed to open %s for reading",
 		 filename);
-	NXIReportError(NXpData,error);
+	NXReportError(error);
 	free(filename);
 	return NX_ERROR;
       }
       if(iRet == 0){
 	snprintf(error,1023,"failed to determine filetype for %s ",
 		 filename);
-	NXIReportError(NXpData,error);
+	NXReportError(error);
 	free(filename);
 	free(fHandle);
 	return NX_ERROR;
@@ -421,7 +425,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
       hdf_type = iRet;
     }
     if(filename == NULL){
-	NXIReportError(NXpData,"Out of memory in NeXus-API");
+	NXReportError("Out of memory in NeXus-API");
 	return NX_ERROR;
     }
 
@@ -438,7 +442,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
       NX4assignFunctions(fHandle);
       pushFileStack(fileStack,fHandle,filename);
 #else
-      NXIReportError (NXpData,
+      NXReportError(
          "ERROR: Attempt to create HDF4 file when not linked with HDF4");
       retstat = NX_ERROR;
 #endif /* HDF4 */
@@ -457,7 +461,7 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
       NX5assignFunctions(fHandle);
       pushFileStack(fileStack,fHandle, filename);
 #else
-      NXIReportError (NXpData,
+      NXReportError(
 	 "ERROR: Attempt to create HDF5 file when not linked with HDF5");
       retstat = NX_ERROR;
 #endif /* HDF5 */
@@ -478,12 +482,12 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
       NXXassignFunctions(fHandle);
       pushFileStack(fileStack,fHandle, filename);
 #else
-      NXIReportError (NXpData,
+      NXReportError(
 	 "ERROR: Attempt to create XML file when not linked with XML");
       retstat = NX_ERROR;
 #endif
     } else {
-      NXIReportError (NXpData,
+      NXReportError(
           "ERROR: Format not readable by this NeXus library");
       retstat = NX_ERROR;
     }
@@ -547,7 +551,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   if(path == NULL){
     length = strlen(napiMount) - 9;
     if(length > extFileLen){
-      NXIReportError(NXpData,"ERROR: internal errro with external linking");
+      NXReportError("ERROR: internal errro with external linking");
       return NXBADURL;
     }
     memcpy(extFile,pPtr+9,length);
@@ -557,13 +561,13 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     pPtr += 9;
     length = path - pPtr;
     if(length > extFileLen){
-      NXIReportError(NXpData,"ERROR: internal errro with external linking");
+      NXReportError("ERROR: internal errro with external linking");
       return NXBADURL;
     }
     memcpy(extFile,pPtr,length);
     length = strlen(path-1);
     if(length > extPathLen){
-      NXIReportError(NXpData,"ERROR: internal error with external linking");
+      NXReportError("ERROR: internal error with external linking");
       return NXBADURL;
     }
     strcpy(extPath,path+1);
@@ -725,7 +729,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     pNexusFunction pFunc = handleToNexusFunc(fid);
     if (datalen > 1 && iType != NX_CHAR)
     {
-	NXIReportError(NXpData,"NXputattr: numeric arrays are not allowed as attributes - only character strings and single numbers");
+	NXReportError("NXputattr: numeric arrays are not allowed as attributes - only character strings and single numbers");
 	return NX_ERROR;
     }
     else
@@ -774,7 +778,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     status = NXgetattr(fid,"target",target_path,&length,&type);
     if(status != NX_OK)
     {
-      NXIReportError(NXpData,"ERROR: item not linked");
+      NXReportError("ERROR: item not linked");
       return NX_ERROR;
     }
     return NXopengrouppath(fid,target_path);
@@ -826,7 +830,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
         size *= 8;
       }
       else {
-        NXIReportError (NXpData,
+        NXReportError(
 			"ERROR: NXmalloc - unknown data type in array");
         return NX_ERROR;
     }
@@ -840,11 +844,11 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXfree (void** data)
   {
     if (data == NULL) {
-       NXIReportError (NXpData, "ERROR: passing NULL to NXfree");
+       NXReportError( "ERROR: passing NULL to NXfree");
        return NX_ERROR;
     }
     if (*data == NULL) {
-       NXIReportError (NXpData,"ERROR: passing already freed pointer to NXfree");
+       NXReportError("ERROR: passing already freed pointer to NXfree");
        return NX_ERROR;
     }
     free(*data);
@@ -1311,7 +1315,7 @@ static NXstatus stepOneUp(NXhandle hfil, char *name)
     }
   }
   snprintf(pBueffel,255,"ERROR: NXopenpath cannot step into %s",name);
-  NXIReportError (NXpData, pBueffel);
+  NXReportError( pBueffel);
   return NX_ERROR;              
 }
 /*--------------------------------------------------------------------*/
@@ -1347,7 +1351,7 @@ static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
     }
   }
   snprintf(pBueffel,255,"ERROR: NXopenpath cannot step into %s",name);
-  NXIReportError (NXpData, pBueffel);
+  NXReportError( pBueffel);
   return NX_ERROR;              
 }
 /*---------------------------------------------------------------------*/
@@ -1359,7 +1363,7 @@ NXstatus  NXopenpath(NXhandle hfil, CONSTCHAR *path)
 
   if(hfil == NULL || path == NULL)
   {
-    NXIReportError(NXpData,
+    NXReportError(
      "ERROR: NXopendata needs both a file handle and a path string");
     return NX_ERROR;
   }
@@ -1367,7 +1371,7 @@ NXstatus  NXopenpath(NXhandle hfil, CONSTCHAR *path)
   pPtr = moveDown(hfil,(char *)path,&status);
   if(status != NX_OK)
   {
-    NXIReportError (NXpData, 
+    NXReportError( 
 		    "ERROR: NXopendata failed to move down in hierarchy");
     return status;
   }
@@ -1396,7 +1400,7 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
 
   if(hfil == NULL || path == NULL)
   {
-    NXIReportError(NXpData,
+    NXReportError(
      "ERROR: NXopendata needs both a file handle and a path string");
     return NX_ERROR;
   }
@@ -1404,7 +1408,7 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
   pPtr = moveDown(hfil,(char *)path,&status);
   if(status != NX_OK)
   {
-    NXIReportError (NXpData, 
+    NXReportError( 
 		    "ERROR: NXopendata failed to move down in hierarchy");
     return status;
   }
@@ -1458,7 +1462,7 @@ char *NXIformatNeXusTime(){
 
     time_buffer = (char *)malloc(64*sizeof(char));
     if(!time_buffer){
-      NXIReportError(NXpData,"Failed to allocate buffer for time data");
+      NXReportError("Failed to allocate buffer for time data");
       return NULL;
     }
 
@@ -1481,7 +1485,7 @@ char *NXIformatNeXusTime(){
     }
     else
     {
-        NXIReportError (NXpData, 
+        NXReportError( 
         "Your gmtime() function does not work ... timezone information will be incorrect\n");
         gmt_offset = 0;
     }
@@ -1583,7 +1587,7 @@ char *NXIformatNeXusTime(){
         sprintf (buffer, 
         "ERROR: Cannot allocate space for array rank of %d in NXfmakedata", 
                 *pRank);
-        NXIReportError (NXpData, buffer);
+        NXReportError( buffer);
 	return NX_ERROR;
     }
 /*
@@ -1614,7 +1618,7 @@ char *NXIformatNeXusTime(){
         sprintf (buffer, 
       "ERROR: Cannot allocate space for array rank of %d in NXfcompmakedata", 
          *pRank);
-        NXIReportError (NXpData, buffer);
+        NXReportError( buffer);
 	return NX_ERROR;
     }
 /*
