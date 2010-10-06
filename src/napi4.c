@@ -1291,7 +1291,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   NXstatus  NX4getdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile pFile;
-    ErrFunc oldErr;
     int datalen, type = NX_CHAR;
 
     pFile = NXIassert (fid);
@@ -1302,15 +1301,14 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     } else {
       sRes->iTag = DFTAG_NDG;
       sRes->iRef = SDidtoref (pFile->iCurrentSDS);
-      oldErr = NXMGetError();
-      NXMSetError(NXpData, ignoreError);
+      NXMDisableErrorReporting();
       datalen = 1024;
       memset(&sRes->targetPath,0,1024);
       if(NX4getattr(fid,"target",&sRes->targetPath,&datalen,&type) != NX_OK)
       {
 	NXIbuildPath(pFile,sRes->targetPath,1024);
       }
-      NXMSetError(NXpData,oldErr);
+      NXMEnableErrorReporting();
       return NX_OK;
     }
     sRes->iTag = NX_ERROR;
