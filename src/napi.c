@@ -187,18 +187,43 @@ static NXstatus NXisXML(CONSTCHAR *filename)
     printf("%s \n",string);
   }
   /*---------------------------------------------------------------------*/
+
   void *NXpData = NULL;
-  void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
+  void *NXEHpData = NULL;
+  __thread void *NXEHpTData = NULL;
+  void (*NXEHIReportError)(void *pData, char *string) = NXNXNXReportError;
+  __thread void (*NXEHIReportTError)(void *pData, char *string) = NULL;
+
+  void NXIReportError(void *pData, char *string) {
+
+	if (NXEHIReportTError) {
+		(*NXEHIReportTError)(NXEHpTData, string);
+	} else {
+		(*NXEHIReportError)(NXEHpData, string);
+	}
+
+  }
+
   /*---------------------------------------------------------------------*/
   extern void NXMSetError(void *pData, 
 			      void (*NewError)(void *pD, char *text))
   {
-    NXpData = pData;
-    NXIReportError = NewError;
+    NXEHpData = pData;
+    NXEHIReportError = NewError;
+  }
+/*----------------------------------------------------------------------*/
+  extern void NXMSetTError(void *pData, 
+			      void (*NewError)(void *pD, char *text))
+  {
+    NXEHpTData = pData;
+    NXEHIReportTError = NewError;
   }
 /*----------------------------------------------------------------------*/
 extern ErrFunc NXMGetError(){
-  return NXIReportError;
+	if (NXEHIReportTError) {
+		return NXEHIReportTError;
+	}
+  return NXEHIReportError;
 }
 
 /*----------------------------------------------------------------------*/
@@ -207,17 +232,30 @@ void NXNXNoReport(void *pData, char *string){
 }  
 /*----------------------------------------------------------------------*/
 
-static ErrFunc last_errfunc = NXNXNXReportError;
+ErrFunc last_global_errfunc = NXNXNXReportError;
+__thread ErrFunc last_thread_errfunc = NULL;
 
 extern void NXMDisableErrorReporting()
 {
-    last_errfunc = NXMGetError();
-    NXMSetError(NXpData, NXNXNoReport);
+	if (NXEHIReportTError) {
+		last_thread_errfunc = NXEHIReportTError;
+		NXEHIReportTError = NXNXNoReport;
+	} else {
+		last_thread_errfunc = NULL;
+		last_global_errfunc = NXEHIReportError;
+		NXEHIReportError = NXNXNoReport;
+	}
 }
 
 extern void NXMEnableErrorReporting()
 {
-    NXMSetError(NXpData, last_errfunc);
+	if (last_thread_errfunc) {
+		NXEHIReportTError = last_thread_errfunc;
+		last_thread_errfunc = NULL;
+		return;
+	} else {
+		NXEHIReportError = last_global_errfunc;
+	}
 }
 
 /*----------------------------------------------------------------------*/
@@ -552,10 +590,10 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     if(status == NX_OK){
       pushPath(fileStack,name);
     }
-    oldError = NXMGetError();
-    NXIReportError = NXNXNoReport;
+    oldError = NXEHIReportTError;
+    NXEHIReportTError = NXNXNoReport;
     attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
-    NXIReportError = oldError;
+    NXEHIReportTError = oldError;
     if(attStatus == NX_OK){
       /*
 	this is an external linking group
@@ -1056,10 +1094,10 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   if(status != NX_OK){
     return status;
   }
-  oldError = NXMGetError();
-  NXIReportError = NXNXNoReport;
+  oldError = NXEHIReportTError;
+  NXEHIReportTError = NXNXNoReport;
   attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
-  NXIReportError = oldError;
+  NXEHIReportTError = oldError;
   pFunc->nxclosegroup(pFunc->pNexusData);
   if(attStatus == NX_OK){
     length = strlen(nxurl);

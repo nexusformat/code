@@ -752,16 +752,27 @@ extern  NXstatus  NXgetrawinfo(NXhandle handle, int* rank, int dimension[], int*
 typedef void (*ErrFunc)(void *data, char *text);
 
   /**
-   * Set an error function.
-   * \param pData A pointer to a user defined data structure which be passed opaquely to 
+   * Set a global error function.
+   * Not threadsafe.
+   * \param pData A pointer to a user defined data structure which be passed to 
    * the error display function.
    * \param newErr The new error display function.
    */
 extern  void  NXMSetError(void *pData, ErrFunc newErr);
 
   /**
+   * Set an error function for the current thread.
+   * When used this overrides anything set in NXMSetError (for the current thread).
+   * Use this method in threaded applications.
+   * \param pData A pointer to a user defined data structure which be passed to 
+   * the error display function.
+   * \param newErr The new error display function.
+   */
+extern  void  NXMSetTError(void *pData, ErrFunc newErr);
+
+  /**
    * Retrieve the current error display function
-   * \return The current erro display function.
+   * \return The current error display function.
    */
 extern ErrFunc NXMGetError();
 
@@ -776,7 +787,7 @@ extern  void  NXMDisableErrorReporting();
 extern  void  NXMEnableErrorReporting();
 
 
-extern void (*NXIReportError)(void *pData,char *text);
+extern void NXIReportError(void *pData,char *text);
 extern void *NXpData;
 extern char *NXIformatNeXusTime();
 extern  NXstatus  NXIprintlink(NXhandle fid, NXlink* link);
