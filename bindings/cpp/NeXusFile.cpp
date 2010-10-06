@@ -14,6 +14,11 @@ using std::stringstream;
 using std::vector;
 
 /**
+ * \file NeXusFile.cpp
+ * The implementation of the NeXus C++ API
+ */
+
+/**
  * \mainpage NeXus C++ API
  * @author Peter Peterson
  * @author Freddie Akeroyd
