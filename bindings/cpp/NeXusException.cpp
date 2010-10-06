@@ -1,5 +1,10 @@
 #include "NeXusException.hpp"
 
+/**
+ * \file NeXusException.cpp
+ * The implementation of the NeXus::Exception class
+ */
+
 namespace NeXus
 {
 
