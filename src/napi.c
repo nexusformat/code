@@ -184,7 +184,7 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 /*-------------------------------------------------------------------------*/
   static void NXNXNXReportError(void *pData, char *string)
   {
-    printf("%s \n",string);
+    fprintf(stderr, "%s \n", string);
   }
   /*---------------------------------------------------------------------*/
 
