@@ -73,7 +73,7 @@ public class NXschematron {
         //XSLT for NXDL to sch
         nxdl2schXSLTStream =
                 NXschematron.class.getResourceAsStream(
-                "resources/nxdl2sch.xsl");
+                "resources/xslt/nxdl2sch.xsl");
 
     }
 
