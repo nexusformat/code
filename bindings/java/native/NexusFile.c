@@ -51,7 +51,7 @@
 */
 #endif
 
-#define DEBUG 
+/* #define DEBUG */
 
 static JavaVM *jvm;  // Global variable
 
