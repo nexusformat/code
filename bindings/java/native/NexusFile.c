@@ -66,7 +66,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     jvm = vm;
 
     nexusException = (*env)->FindClass(env,"org/nexusformat/NexusException");
-    if (nexusException) {
+    if (nexusException == NULL) {
 	fprintf(stderr, "cannot find NexusException - this will not work. Terminating.");
 	assert(nexusException);
     }
