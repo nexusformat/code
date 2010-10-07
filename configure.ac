@@ -143,6 +143,15 @@ if test x"$MATLABROOT" = x -a x"$MATLAB" != x; then
     MATLABROOT=`dirname $MATLAB`/..
 fi
 
+dnl thread local storage
+AC_MSG_CHECKING([for __thread])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)) && ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC__MINOR__ < 1) || (__GNUC__ == 4 && __GNUC__MINOR__ == 1 && __GNUC_PATCHLEVEL__ < 2))
+#endif], [static __thread int p = 0])],
+               [AC_DEFINE(HAVE_TLS, 1,
+                      Define to 1 if compiler supports __thread)
+                AC_MSG_RESULT([yes])],
+               [AC_MSG_RESULT([no])])
+
 java_host="linux"
 JAVAROOT=""
 AC_ARG_WITH([java-home], AC_HELP_STRING([--with-java-home=JAVA SDK Home], [Specify location of top directory of JAVA SDK i.e. where the bin, lib and include directories live]),
