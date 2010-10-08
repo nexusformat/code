@@ -61,6 +61,8 @@ public class NXNodeMapper implements MutableTreeNode {
     private Document reducedDoc = null;
     private Document resultsDoc = null;
     private boolean badNode = false;
+    private boolean warnNode = false;
+    private boolean validatedNode = false;
     private Object userObject = null;
 
     // Construct an Adapter node from a DOM node
@@ -244,6 +246,7 @@ public class NXNodeMapper implements MutableTreeNode {
      * @param badNode true if the node failed one of the schematron tests.
      */
     public void setBadNode(boolean badNode) {
+        domNode.setUserData("bad", new Boolean(badNode),null);
         this.badNode = badNode;
     }
 
@@ -254,7 +257,50 @@ public class NXNodeMapper implements MutableTreeNode {
      * @return true if the node failed one of the schematron tests.
      */
     public boolean getBadNode() {
+        checkBadNode();
         return badNode;
+    }
+
+    /**
+     * If a node in the reduced XML document fails one of the schematron report tests
+     * then the node can be marked as a warning node with a boolean flag. The flag
+     * is set to true if the node failed one of the tests.
+     * @param warnNode true if the node failed one of the schematron tests.
+     */
+    public void setWarnNode(boolean warnNode) {
+        domNode.setUserData("warn", new Boolean(warnNode),null);
+        this.warnNode = warnNode;
+    }
+
+    /**
+     * If a node in the reduced XML document fails one of the schematron report tests
+     * then the node can be marked as a warning node with a boolean flag. The flag
+     * is set to true if the node failed one of the tests.
+     * @return true if the node failed one of the schematron tests.
+     */
+    public boolean getWarnNode() {
+        checkWarnNode();
+        return warnNode;
+    }
+
+    /**
+     * If a node has been validated then we can indicate the fact with a boolean flag. The flag
+     * is set to true if the node has been validated.
+     * @param validatedNode true if the node has been validated.
+     */
+    public void setValidatedNode(boolean validatedNode) {
+        domNode.setUserData("validated", new Boolean(validatedNode),null);
+        this.validatedNode = validatedNode;
+    }
+
+    /**
+     * If a node has been validated then we can indicate the fact with a boolean flag. The flag
+     * is set to true if the node has been validated.
+     * @return true if the node failed one of the schematron tests.
+     */
+    public boolean getValidatedNode() {
+        checkValidatedNode();
+        return validatedNode;
     }
 
     /**
@@ -274,6 +320,32 @@ public class NXNodeMapper implements MutableTreeNode {
             Boolean bad = (Boolean) domNode.getUserData("bad");
             if (bad != null) {
                 this.badNode = bad.booleanValue();
+            }
+        }
+    }
+
+    /**
+     * A convenience method to force the checking if a node has warnings
+     * . Sets the flag to indicate the node has warnings.
+     */
+    public void checkWarnNode() {
+        if (!isRoot) {
+            Boolean warn = (Boolean) domNode.getUserData("warn");
+            if (warn != null) {
+                this.warnNode = warn.booleanValue();
+            }
+        }
+    }
+
+    /**
+     * A convenience method to force the checking if a node has been validated
+     * . Sets the flag to indicate the node has warnings.
+     */
+    public void checkValidatedNode() {
+        if (!isRoot) {
+            Boolean validated = (Boolean) domNode.getUserData("validated");
+            if (validated != null) {
+                this.validatedNode = validated.booleanValue();
             }
         }
     }
