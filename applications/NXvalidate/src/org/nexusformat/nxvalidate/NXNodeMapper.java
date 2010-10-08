@@ -709,8 +709,6 @@ public class NXNodeMapper implements MutableTreeNode {
      */
     public ArrayList<NXNodeMapper> getOpenNodes() {
         return documents;
-
-
     }
 
     /**
@@ -719,11 +717,34 @@ public class NXNodeMapper implements MutableTreeNode {
      */
     public void removeAllNodes() {
         documents.clear();
+    }
 
 
+    /**
+     * Check to see if the node has any vary bad kids, return true if it has.
+     * @return true if the kids are bad.
+     */
+    public boolean hasBadChildren(){
+        
+        NXNodeMapper tmpNode = null;
+        boolean hasBad = false;
+        Enumeration kids = new children();
 
+        while (kids.hasMoreElements()) {
+
+            tmpNode = (NXNodeMapper)kids.nextElement();
+
+            if(tmpNode.getBadNode()){
+                hasBad = true;
+                break;
+            }
+
+        }
+
+        return hasBad;
 
     }
+
 
     /**
      * A class that represents the child nodes of a node from a
