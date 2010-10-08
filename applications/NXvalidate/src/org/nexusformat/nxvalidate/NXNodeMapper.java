@@ -581,6 +581,48 @@ public class NXNodeMapper implements MutableTreeNode {
 
     }
 
+    public NXNodeMapper getRoot() {
+
+        if(domNode==null){
+             return null;
+        }
+
+        Node tempNode = domNode.getParentNode();
+
+        boolean gotRoot = false;
+        NXNodeMapper rootNode = null;
+
+        if (isRoot) {
+            return null;
+        } else if (isDocument) {
+
+            return this;
+
+        } else if (tempNode != null) {
+
+            while(!gotRoot){
+
+                if (tempNode.getNodeType() == domNode.DOCUMENT_NODE) {
+
+                    Document doc = (Document) tempNode;
+
+                    rootNode = new NXNodeMapper(tempNode, true,
+                        ((File) doc.getUserData("file")).getAbsolutePath());
+                    gotRoot = true;
+                }
+                else{
+                    tempNode = tempNode.getParentNode();
+                }
+            }
+
+        } else {
+            return null;
+        }
+
+        return rootNode;
+
+    }
+
     /**
      * Each node of the reduced XML document may have attributes associated
      * with it, this method provides a list of the attributes. Each string
