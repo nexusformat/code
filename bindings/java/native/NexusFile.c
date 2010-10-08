@@ -88,7 +88,8 @@ static void JapiError(void *pData, char *text) {
     fprintf(stderr,"JapiError called with: %s\n", text); 
 #endif
 
-    /* (*jvm)->AttachCurrentThread (jvm, (void **) &env, NULL); */
+    /* ignore env passed in seems safer */
+    (*jvm)->AttachCurrentThread (jvm, (void **) &env, NULL);
 
     if (env == NULL) {
 	// if there is no thread environment we do not need to throw an exception
