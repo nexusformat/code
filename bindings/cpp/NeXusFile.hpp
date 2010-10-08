@@ -24,11 +24,8 @@
 #endif /* _WIN32 */
 
 /**
- * \file
- * Documentation for the NeXus C++ API.
- * 2000-2008 the NeXus group.
+ * \file NeXusFile.hpp Definition of the NeXus C++ API.
  * \defgroup cpp_types C++ Types
- * \ingroup cpp_main
  * \defgroup cpp_core C++ Core
  * \ingroup cpp_main
  */

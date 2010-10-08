@@ -18,38 +18,6 @@ using std::vector;
  * The implementation of the NeXus C++ API
  */
 
-/**
- * \mainpage NeXus C++ API
- * @author Peter Peterson
- * @author Freddie Akeroyd
- * \section sec_purpose Purpose of API
- *  This provides a C++ like interface to the NeXus C API. It adds:
- * - Exceptions
- * - suport for std::vector<type> and std::string
- * - can directly obtain a container of entry/attribute details rather than needing to iterate via getNext calls. 
- *
- *
- * \section sec_core Core C++ API
- * The core API provides the basic routines for reading, writing and navigating NeXus files. See the \b Modules tab.
- *
- * C++ programs that call the above routines should include the following header file: 
- * \code
- * #include "NeXusFile.hpp"
- * \endcode
- *
- * \sa napi_test_cpp.cxx
- *
- * For details of the C API see http://download.nexusformat.org/doxygen/html-c/
- *
- */
-
-/**
- * \example napi_test_cpp.cxx
- * Test program for the NeXus C++ Interface.
- * This illustrates calling most of the functions for reading and writing a file
- *
- */
-
 static const string NULL_STR = "NULL";
 
 template <typename NumT>
