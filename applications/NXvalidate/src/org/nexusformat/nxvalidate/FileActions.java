@@ -167,7 +167,7 @@ public class FileActions implements Runnable {
                 SVRLNodeFilter filter = new SVRLNodeFilter();
                 filter.setFilterDocument(resultsDoc);
                 filter.setDocument(reducedDoc);
-                filter.resetBadNodes();
+                filter.resetNodes();
             }
 
             //Do the validation.
@@ -191,6 +191,8 @@ public class FileActions implements Runnable {
 
             treeUtils.setResultsDoc(jTree, resultsDoc);
             treeUtils.setResultsFile(jTree, resultsFile);
+
+            treeUtils.setValidated(jTree, resultsFile);
 
             //domTree.updateTree();
             Logger.getLogger(NXvalidateFrame.class.getName()).log(
@@ -236,7 +238,7 @@ public class FileActions implements Runnable {
             //Reduce the file with NXConvert.
             NXconvert convert = new NXconvert(nxsFile, true, nxconvertCommand);
             File reducedFile = convert.convert();
-
+            
             if(reducedFile==null){
                 return;
             }

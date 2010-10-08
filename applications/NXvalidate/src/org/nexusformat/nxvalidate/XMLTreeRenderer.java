@@ -40,11 +40,27 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public class XMLTreeRenderer extends DefaultTreeCellRenderer {
 
-    private String path = "";
+    private String badPath = "";
+    private String goodPath = "";
+    private String warnPath = "";
+    private String rootPath = "";
+    private String newPath = "";
+    private String infoPath = "";
     private ResourceBundle bundle = null;
 
-    public XMLTreeRenderer(String path) {
-        this.path = path;
+    /**
+     * Setup a tree renderer with custom icons.
+     * @param path the relative path to the image icon.
+     */
+    public XMLTreeRenderer(String rootPath, String badPath,
+                           String goodPath, String warnPath,
+                           String newPath, String infoPath) {
+        this.badPath = badPath;
+        this.goodPath = goodPath;
+        this.warnPath = warnPath;
+        this.rootPath = rootPath;
+        this.newPath = newPath;
+        this.infoPath = infoPath;
         bundle = ResourceBundle.getBundle(
                 "org/nexusformat/nxvalidate/resources/nxvalidate");
     }
@@ -64,20 +80,53 @@ public class XMLTreeRenderer extends DefaultTreeCellRenderer {
                 expanded, leaf, row,
                 hasFocus);
 
+        boolean validated = false;
+
         //Add the bad node error icon and tool tip text.
         NXNodeMapper node = (NXNodeMapper) value;
-        node.checkBadNode();
+
+        if(node.getRoot()!=null){
+            validated = node.getRoot().getValidatedNode();
+        }
+        else{
+            validated = node.getValidatedNode();
+        }
+        
+        if(node.hasBadChildren()){
+
+        }
+
+
         boolean badKids = node.checkBadChildren();
         if (badKids) {
             setIcon(createImageIcon("resources/dialog-warning.png", "warningIcon"));
         }
         if (node.getBadNode()) {
-            setIcon(createImageIcon(path, "errorIcon"));
+            setIcon(createImageIcon(badPath, "errorIcon"));
             setToolTipText(bundle.getString("elementError"));
-        } else {
-            setToolTipText(null); //no tool tip
         }
-
+        else if(node.getWarnNode()){
+            setIcon(createImageIcon(warnPath, "warnIcon"));
+            setToolTipText(bundle.getString("warningError"));
+        }
+        else if(node.hasBadChildren())
+        {
+            setIcon(createImageIcon(infoPath, "infoIcon"));
+            setToolTipText("Child nodes have failed validation.");
+        }
+        else if (node.isRoot()){
+            setIcon(createImageIcon(rootPath, "rootIcon"));
+            setToolTipText("NeXus Files"); 
+        }
+        else if(!validated){
+            setIcon(createImageIcon(newPath, "newIcon"));
+            setToolTipText("Node Not Validated"); 
+        }
+        else{
+            setIcon(createImageIcon(goodPath, "goodIcon"));
+            setToolTipText("Node Passed All Tests"); 
+        }
+        
         return this;
     }
 

@@ -57,11 +57,16 @@ public interface NodeFilterInterface {
      */
     public ArrayList<Node> getBadNodeList();
 
-
     /**
-     * Reset the bad nodes to indicate that they are now good nodes, i.e.
-     * resets them back to there original state.
+     * A list of nodes which have a warning.
+     * @return
      */
-    public void resetBadNodes();
+    public ArrayList<Node> getWarnNodeList();
+    
+    /**
+     * Reset the nodes to indicate that they are now good nodes, i.e.
+     * resets them back to their original state.
+     */
+    public void resetNodes();
 
 }

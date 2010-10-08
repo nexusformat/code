@@ -164,84 +164,93 @@ public class TreeUtils {
     }
 
     public NXNodeMapper getBaseNode(JTree tree) {
-        if (getNode(tree) != null) {
-            return getNode(tree);
+        if (getRootNode(tree) != null) {
+            return getRootNode(tree);
         } else {
             return null;
         }
     }
 
     public File getNXDLFile(JTree tree) {
-        if (getNode(tree) != null) {
-            return getNode(tree).getNXDLFile();
+        if (getRootNode(tree) != null) {
+            return getRootNode(tree).getNXDLFile();
         } else {
             return null;
         }
     }
 
     public File getReducedFile(JTree tree) {
-        if (getNode(tree) != null) {
-            return getNode(tree).getReducedFile();
+        if (getRootNode(tree) != null) {
+            return getRootNode(tree).getReducedFile();
         } else {
             return null;
         }
     }
 
     public Document getReducedDoc(JTree tree) {
-        if (getNode(tree) != null) {
-            return getNode(tree).getReducedDoc();
+        if (getRootNode(tree) != null) {
+            return getRootNode(tree).getReducedDoc();
         } else {
             return null;
         }
     }
 
     public Document getResultsDoc(JTree tree) {
-        if (getNode(tree) != null) {
-            return getNode(tree).getResultsDoc();
+        if (getRootNode(tree) != null) {
+            return getRootNode(tree).getResultsDoc();
         } else {
             return null;
         }
     }
 
     public File getResultsFile(JTree tree) {
-        if (getNode(tree) != null) {
-            return getNode(tree).getResultsFile();
+        if (getRootNode(tree) != null) {
+            return getRootNode(tree).getResultsFile();
         } else {
             return null;
         }
     }
 
     public void setNXDLFile(JTree tree, File file) {
-        if (getNode(tree) != null) {
-            getNode(tree).setNXDLFile(file);
+        if (getRootNode(tree) != null) {
+            getRootNode(tree).setNXDLFile(file);
         }
     }
 
     public void setReducedFile(JTree tree, File file) {
-        if (getNode(tree) != null) {
-            getNode(tree).setReducedFile(file);
+        if (getRootNode(tree) != null) {
+            getRootNode(tree).setReducedFile(file);
         }
     }
 
     public void setReducedDoc(JTree tree, Document doc) {
-        if (getNode(tree) != null) {
-            getNode(tree).setReducedDoc(doc);
+        if (getRootNode(tree) != null) {
+            getRootNode(tree).setReducedDoc(doc);
         }
     }
 
     public void setResultsDoc(JTree tree, Document doc) {
-        if (getNode(tree) != null) {
-            getNode(tree).setResultsDoc(doc);
+        if (getRootNode(tree) != null) {
+            getRootNode(tree).setResultsDoc(doc);
         }
     }
 
     public void setResultsFile(JTree tree, File file) {
-        if (getNode(tree) != null) {
-            getNode(tree).setResultsFile(file);
+        if (getRootNode(tree) != null) {
+            getRootNode(tree).setResultsFile(file);
         }
     }
 
-    private NXNodeMapper getNode(JTree tree) {
+    public void setValidated(JTree tree, File file) {
+        NXNodeMapper tmpNode = getRootNode(tree);
+        if (tmpNode != null) {
+            if(tmpNode.getResultsFile().equals(file)){
+                tmpNode.setValidatedNode(true);
+            }
+        }
+    }
+    
+    private NXNodeMapper getRootNode(JTree tree) {
         if (tree.isSelectionEmpty()) {
             return null;
         }

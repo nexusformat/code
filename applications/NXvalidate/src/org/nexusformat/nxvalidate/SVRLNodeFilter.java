@@ -50,9 +50,13 @@ public class SVRLNodeFilter implements NodeFilterInterface {
     private Document filterDoc = null;
     private Document doc = null;
     private ArrayList<Node> nodes = null;
+    private ArrayList<Node> badNodes = null;
+    private ArrayList<Node> warnNodes = null;
 
     public SVRLNodeFilter() {
         nodes = new ArrayList<Node>();
+        badNodes = new ArrayList<Node>();
+        warnNodes = new ArrayList<Node>();
     }
 
     /**
@@ -67,7 +71,8 @@ public class SVRLNodeFilter implements NodeFilterInterface {
     }
 
     /**
-     * Sets the document to which to apply the filter.
+     * Sets the document to which to apply the filter. The document in this case
+     * is the reduced NeXus file.
      * @param doc a DOM document.
      */
     public void setDocument(Document doc) {
@@ -92,17 +97,37 @@ public class SVRLNodeFilter implements NodeFilterInterface {
             Logger.getLogger(SVRLNodeFilter.class.getName()).log(
                     Level.SEVERE, null, ex);
         }
-        return nodes;
+        return badNodes;
     }
 
     /**
-     * Reset the bad nodes to indicate that they are now good nodes, i.e.
-     * resets them back to a pre-validated state.
+     * A list of nodes which have a warning.
+     * @return
      */
-    public void resetBadNodes() {
+    public ArrayList<Node> getWarnNodeList(){
         try {
 
-            resetNodes();
+            getXPathList();
+
+        } catch (NXvalidateException ex) {
+            Logger.getLogger(SVRLNodeFilter.class.getName()).log(
+                    Level.SEVERE, null, ex);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(SVRLNodeFilter.class.getName()).log(
+                    Level.SEVERE, null, ex);
+        }
+        return warnNodes;
+    }
+
+    /**
+     * Reset the nodes to indicate that they are now good nodes, i.e.
+     * resets them back to a pre-validated state.
+     */
+    public void resetNodes() {
+        try {
+
+            resetNodes(0);
+            resetNodes(1);
 
         } catch (NXvalidateException ex) {
             Logger.getLogger(SVRLNodeFilter.class.getName()).log(
@@ -114,7 +139,8 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
     }
 
-    private void resetNodes() throws NXvalidateException,
+
+    private void resetNodes(int type) throws NXvalidateException,
             XPathExpressionException {
 
         NodeList failed = null;
@@ -126,10 +152,15 @@ public class SVRLNodeFilter implements NodeFilterInterface {
         if (filterDoc != null) {
             if (filterDoc.hasChildNodes()) {
 
-                //Get the xml elements svrl:failed-assert from the XML
+                //Get the xml elements svrl:failed-assert and
+                //svrl:successful-report from the XML
                 //validation results file.
-                failed = filterDoc.getElementsByTagName("svrl:failed-assert");
-
+                if(type == 0){
+                    failed = filterDoc.getElementsByTagName("svrl:failed-assert");
+                }
+                else if(type == 1){
+                    failed = filterDoc.getElementsByTagName("svrl:successful-report");
+                }
                 if (failed.getLength() > 0) {
 
                     for (int i = 0; i < failed.getLength(); ++i) {
@@ -155,8 +186,16 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
                             //Set the node back to its original state.
                             for (int j = 0; j < nodeList.getLength(); j++) {
-                                nodeList.item(j).setUserData(
-                                        "bad", null, null);
+                                
+                                nodeList.item(j).setUserData("validated", null, null);
+                                
+                                if(type == 0){
+                                    nodeList.item(j).setUserData("bad", null, null);
+                                }
+                                else if(type == 1){
+                                    nodeList.item(j).setUserData("warn", null, null);
+                                }
+
                                 nodeList.item(j).setUserData(
                                         "tests", null, null);
                                 nodeList.item(j).setUserData(
@@ -179,8 +218,139 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
     }
 
-    private void getXPathList() throws NXvalidateException,
+    private void getReportingNode(int type, NodeList nodeListInput) throws NXvalidateException,
             XPathExpressionException {
+
+        
+        String location = null;
+        String test = null;
+        String text = null;
+        String diag = null;
+        String diagAtt = null;
+        ArrayList<String> tests = null;
+        ArrayList<String> texts = null;
+        ArrayList<String> diags = null;
+        ArrayList<String> diagAtts = null;
+        Element element = null;
+        XPathFactory factory = XPathFactory.newInstance();
+        NodeList nodeList = null;
+
+        //Loop through the nodes and get
+        //the test, text diagnostic and diagnostic attribute.
+        for (int i = 0; i < nodeListInput.getLength(); ++i) {
+
+            test = null;
+            text = null;
+            diag = null;
+            diagAtt = null;
+
+            element = (Element) nodeListInput.item(i);
+
+            if (element.hasChildNodes()) {
+
+                //Each element has child element
+                //location which specifies the XPATH location of the
+                //bad nodes.
+                location = element.getAttribute("location");
+                test = element.getAttribute("test");
+                if (element.getElementsByTagName("svrl:text").getLength() > 0) {
+                    text = element.getElementsByTagName(
+                            "svrl:text").item(0).getTextContent().trim();
+                }
+
+                if (element.getElementsByTagName(
+                        "svrl:diagnostic-reference").getLength() > 0) {
+
+                    diag = element.getElementsByTagName(
+                            "svrl:diagnostic-reference").item(0).getTextContent().trim();
+
+                    diagAtt = ((Element) element.getElementsByTagName(
+                            "svrl:diagnostic-reference").item(0)).getAttribute("diagnostic");
+                }
+
+                XPath xpath = factory.newXPath();
+                location = location.replaceAll(
+                        "\\[namespace-uri\\(\\)="
+                        + "'http://definition.nexusformat.org/"
+                        + "schema/3.1'\\]", "");
+                XPathExpression expr = xpath.compile(location);
+
+                Object result = expr.evaluate(doc,
+                        XPathConstants.NODESET);
+                nodeList = (NodeList) result;
+
+                for (int j = 0; j < nodeList.getLength(); j++) {
+
+                    nodeList.item(j).setUserData("validated", new Boolean(true), null);
+                    if(type == 0){
+                        nodeList.item(j).setUserData("bad", new Boolean(true), null);
+                        badNodes.add(nodeList.item(j));
+                    }
+                    else if(type == 1){
+                        nodeList.item(j).setUserData("warn", new Boolean(true), null);
+                        warnNodes.add(nodeList.item(j));
+                    }
+
+                    if (nodeList.item(j).getUserData("tests")
+                            != null && test != null) {
+                        tests = (ArrayList<String>) nodeList.item(j).getUserData(
+                                "tests");
+                        tests.add(test);
+                    } else {
+                        tests = new ArrayList<String>();
+                        tests.add(test);
+                    }
+
+                    if (nodeList.item(j).getUserData("texts")
+                            != null && text != null) {
+                        texts = (ArrayList<String>) nodeList.item(j).getUserData(
+                                "texts");
+                        texts.add(text);
+                    } else {
+                        texts = new ArrayList<String>();
+                        texts.add(text);
+                    }
+
+                    if (nodeList.item(j).getUserData("diags")
+                            != null && diag != null) {
+                        diags = (ArrayList<String>) nodeList.item(j).getUserData(
+                                "diags");
+                        diags.add(diag);
+                    } else {
+                        diags = new ArrayList<String>();
+                        diags.add(diag);
+                    }
+
+                    if (nodeList.item(j).getUserData("diagatts")
+                            != null && diagAtt != null) {
+                        diagAtts = (ArrayList<String>) nodeList.item(j).getUserData(
+                                "diagatts");
+                        diagAtts.add(diagAtt);
+                    } else {
+                        diagAtts = new ArrayList<String>();
+                        diagAtts.add(diagAtt);
+                    }
+
+                    nodeList.item(j).setUserData(
+                            "tests", tests, null);
+                    nodeList.item(j).setUserData(
+                            "texts", texts, null);
+                    nodeList.item(j).setUserData(
+                            "diags", diags, null);
+                    nodeList.item(j).setUserData(
+                            "diagatts", diagAtts, null);
+                    
+                    nodes.add(nodeList.item(j));
+                }
+
+            }
+
+        }
+
+
+    }
+
+    private void getXPathList() throws NXvalidateException, XPathExpressionException {
 
         NodeList failed = null;
         String location = null;
@@ -204,111 +374,15 @@ public class SVRLNodeFilter implements NodeFilterInterface {
                 failed = filterDoc.getElementsByTagName("svrl:failed-assert");
 
                 if (failed.getLength() > 0) {
+                    getReportingNode(0, failed);
+                }
 
-                    for (int i = 0; i < failed.getLength(); ++i) {
+                //Get the xml elements successful-report from the XML
+                //validation results file.
+                failed = filterDoc.getElementsByTagName("svrl:successful-report");
 
-                        test = null;
-                        text = null;
-                        diag = null;
-                        diagAtt = null;
-
-                        element = (Element) failed.item(i);
-
-                        if (element.hasChildNodes()) {
-
-
-                            //Each svrl:failed-assert element has child element
-                            //location which specifies the XPATH location of the
-                            //bad nodes.
-                            location = element.getAttribute("location");
-                            test = element.getAttribute("test");
-                            if (element.getElementsByTagName(
-                                    "svrl:text").getLength() > 0) {
-                                text = element.getElementsByTagName(
-                                        "svrl:text").item(0).getTextContent().trim();
-                            }
-
-                            if (element.getElementsByTagName(
-                                    "svrl:diagnostic-reference").getLength() > 0) {
-
-                                diag = element.getElementsByTagName(
-                                        "svrl:diagnostic-reference").item(0).getTextContent().trim();
-
-                                diagAtt = ((Element) element.getElementsByTagName(
-                                        "svrl:diagnostic-reference").item(0)).getAttribute("diagnostic");
-                            }
-
-                            XPath xpath = factory.newXPath();
-                            location = location.replaceAll(
-                                    "\\[namespace-uri\\(\\)="
-                                    + "'http://definition.nexusformat.org/"
-                                    + "schema/3.1'\\]", "");
-                            XPathExpression expr = xpath.compile(location);
-
-                            Object result = expr.evaluate(doc,
-                                    XPathConstants.NODESET);
-                            nodeList = (NodeList) result;
-
-                            for (int j = 0; j < nodeList.getLength(); j++) {
-
-                                nodeList.item(j).setUserData("bad",
-                                        new Boolean(true), null);
-
-                                if (nodeList.item(j).getUserData("tests")
-                                        != null && test != null) {
-                                    tests = (ArrayList<String>) nodeList.item(j).getUserData(
-                                            "tests");
-                                    tests.add(test);
-                                } else {
-                                    tests = new ArrayList<String>();
-                                    tests.add(test);
-                                }
-
-                                if (nodeList.item(j).getUserData("texts")
-                                        != null && text != null) {
-                                    texts = (ArrayList<String>) nodeList.item(j).getUserData(
-                                            "texts");
-                                    texts.add(text);
-                                } else {
-                                    texts = new ArrayList<String>();
-                                    texts.add(text);
-                                }
-
-                                if (nodeList.item(j).getUserData("diags")
-                                        != null && diag != null) {
-                                    diags = (ArrayList<String>) nodeList.item(j).getUserData(
-                                            "diags");
-                                    diags.add(diag);
-                                } else {
-                                    diags = new ArrayList<String>();
-                                    diags.add(diag);
-                                }
-
-                                if (nodeList.item(j).getUserData("diagatts")
-                                        != null && diagAtt != null) {
-                                    diagAtts = (ArrayList<String>) nodeList.item(j).getUserData(
-                                            "diagatts");
-                                    diagAtts.add(diagAtt);
-                                } else {
-                                    diagAtts = new ArrayList<String>();
-                                    diagAtts.add(diagAtt);
-                                }
-
-                                nodeList.item(j).setUserData(
-                                        "tests", tests, null);
-                                nodeList.item(j).setUserData(
-                                        "texts", texts, null);
-                                nodeList.item(j).setUserData(
-                                        "diags", diags, null);
-                                nodeList.item(j).setUserData(
-                                        "diagatts", diagAtts, null);
-                                nodes.add(nodeList.item(j));
-                            }
-
-                        }
-
-                    }
-
+                if (failed.getLength() > 0) {
+                     getReportingNode(1, failed);
                 }
 
             }

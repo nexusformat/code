@@ -84,7 +84,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
 
-        root = new NXNodeMapper("NXS Files");
+        root = new NXNodeMapper("Files");
 
         domTree = new NXReducedToTree(root);
         jTree1.setModel(domTree);
@@ -102,7 +102,9 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         treeUtils = new TreeUtils();
 
         XMLTreeRenderer rend = new XMLTreeRenderer(
-                "resources/gtk-cancel.png");
+                "resources/nexus32x32.png", "resources/gtk-cancel.png",
+                "resources/green_check.png", "resources/important.png",
+                "resources/peg-e.png", "resources/alert.png");
 
         jTree1.setCellRenderer(rend);
 
@@ -524,7 +526,7 @@ public class NXvalidateFrame extends javax.swing.JFrame {
 
             if (result) {
                 if (nxconvertCommand != null) {
-                    System.out.println("settingsMenuItemActionPerformed: " + nxconvertCommand);
+                    
                     settings.setNXconvert(nxconvertCommand);
                     settings.saveUserSettings();
                     foundNXconvert = settings.foundNXconvert();
