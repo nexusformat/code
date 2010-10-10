@@ -33,7 +33,7 @@ pydoc_DATA	= README.html nxs.napi.html
 #nxspythondir	= $(pkgpythondir)/nxs
 nxspythondir	= $(pythondir)/nxs
 #pkgpython_PYTHON = nxstest.py
-nxspython_PYTHON = nxs/__init__.py nxs/napi.py
+nxspython_PYTHON = nxs/__init__.py nxs/napi.py nxs/tree.py nxs/unit.py
 EXTRA_DIST	= README.html nxs.napi.html nxstest.py run_nxstest setup.py
 
 nxs.napi.html : $(srcdir)/nxs/napi.py

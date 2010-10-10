@@ -18,3 +18,4 @@ searches for the libraries are recorded in `nxs.napi`.
 ## See nxs.napi on the Packages tab
 
 from nxs.napi import *
+from nxs.tree import *
