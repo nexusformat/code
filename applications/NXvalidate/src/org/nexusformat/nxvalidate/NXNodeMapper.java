@@ -767,11 +767,8 @@ public class NXNodeMapper implements MutableTreeNode {
      * @return true if the kids are bad.
      */
     public boolean hasBadChildren(){
-        
         TreeUtils treeUtils = new TreeUtils();
-
         return treeUtils.hasBadChildren(this);
-
     }
 
 
