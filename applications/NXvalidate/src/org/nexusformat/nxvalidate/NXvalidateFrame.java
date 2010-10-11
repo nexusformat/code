@@ -102,9 +102,11 @@ public class NXvalidateFrame extends javax.swing.JFrame {
         treeUtils = new TreeUtils();
 
         XMLTreeRenderer rend = new XMLTreeRenderer(
-                "resources/nexus32x32.png", "resources/gtk-cancel.png",
-                "resources/green_check.png", "resources/important.png",
-                "resources/peg-e.png", "resources/alert.png");
+                "resources/nexus32x32.png", "resources/bad.png",
+                "resources/good.png", "resources/warn.png",
+                "resources/peg-e.png", "resources/info.png",
+                "resources/info-good.png", "resources/info-bad.png",
+                "resources/info-warn.png");
 
         jTree1.setCellRenderer(rend);
 

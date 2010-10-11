@@ -38,6 +38,9 @@ import org.w3c.dom.Document;
  */
 public class TreeUtils {
 
+
+
+
     public void hideGoodNodes(JTree tree){
 
         if (tree.isSelectionEmpty()) {
@@ -118,6 +121,19 @@ public class TreeUtils {
 
         return nodes;
 
+    }
+
+    public boolean hasBadChildren(NXNodeMapper node){
+
+        ArrayList<NXNodeMapper> subNodes = getSubNodes(node);
+        boolean bad = false;
+        for(int i = 0;i<subNodes.size();++i){
+            if(subNodes.get(i).getBadNode()){
+                bad = true;
+                break;
+            }
+        }
+        return bad;
     }
 
     public void showGoodNodes(JTree tree){

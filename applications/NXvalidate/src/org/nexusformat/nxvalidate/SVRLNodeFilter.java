@@ -352,37 +352,25 @@ public class SVRLNodeFilter implements NodeFilterInterface {
 
     private void getXPathList() throws NXvalidateException, XPathExpressionException {
 
-        NodeList failed = null;
-        String location = null;
-        String test = null;
-        String text = null;
-        String diag = null;
-        String diagAtt = null;
-        ArrayList<String> tests = null;
-        ArrayList<String> texts = null;
-        ArrayList<String> diags = null;
-        ArrayList<String> diagAtts = null;
-        Element element = null;
-        XPathFactory factory = XPathFactory.newInstance();
-        NodeList nodeList = null;
-
+        NodeList list = null;
+        
         if (filterDoc != null) {
             if (filterDoc.hasChildNodes()) {
 
                 //Get the xml elements svrl:failed-assert from the XML
                 //validation results file.
-                failed = filterDoc.getElementsByTagName("svrl:failed-assert");
+                list = filterDoc.getElementsByTagName("svrl:failed-assert");
 
-                if (failed.getLength() > 0) {
-                    getReportingNode(0, failed);
+                if (list.getLength() > 0) {
+                    getReportingNode(0, list);
                 }
 
                 //Get the xml elements successful-report from the XML
                 //validation results file.
-                failed = filterDoc.getElementsByTagName("svrl:successful-report");
+                list = filterDoc.getElementsByTagName("svrl:successful-report");
 
-                if (failed.getLength() > 0) {
-                     getReportingNode(1, failed);
+                if (list.getLength() > 0) {
+                     getReportingNode(1, list);
                 }
 
             }

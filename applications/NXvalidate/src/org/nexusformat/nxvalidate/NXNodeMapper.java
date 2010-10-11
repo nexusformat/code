@@ -113,7 +113,7 @@ public class NXNodeMapper implements MutableTreeNode {
 
     /**
      * Check to see if this node is a document, i.e the list of nodes directly
-     * under the root note that are the open NXS documents.
+     * under the root node that are the open NXS documents.
      *
      * @return true if the node is a document node.
      */
@@ -768,22 +768,9 @@ public class NXNodeMapper implements MutableTreeNode {
      */
     public boolean hasBadChildren(){
         
-        NXNodeMapper tmpNode = null;
-        boolean hasBad = false;
-        Enumeration kids = new children();
+        TreeUtils treeUtils = new TreeUtils();
 
-        while (kids.hasMoreElements()) {
-
-            tmpNode = (NXNodeMapper)kids.nextElement();
-
-            if(tmpNode.getBadNode()){
-                hasBad = true;
-                break;
-            }
-
-        }
-
-        return hasBad;
+        return treeUtils.hasBadChildren(this);
 
     }
 
