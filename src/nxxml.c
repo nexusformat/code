@@ -1744,7 +1744,7 @@ static char *findLinkPath(mxml_node_t *node){
 
   path = (mxml_node_t **)malloc(NXMAXSTACK*sizeof(mxml_node_t *));
   if(path == NULL){
-    NXIReportError(NXpData,"ERROR: out of memory follwoing link path");
+    NXIReportError(NXpData,"ERROR: out of memory following link path");
     return NULL;
   }
   memset(path,0,NXMAXSTACK*sizeof(mxml_node_t *));
@@ -1898,7 +1898,8 @@ NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID,
 }
 /*--------------------------------------------------------------------*/
 int  NXXcompress(NXhandle fid, int comp){
-  NXIReportError(NXpData,"NXcompress is deprecated, IGNORED");
+  /* that will throw an exception in the Java API, errors have to be fatal */
+  /* NXIReportError(NXpData,"NXcompress is deprecated, IGNORED"); */
   return NX_OK;
 }
 /*----------------------------------------------------------------------*/

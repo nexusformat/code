@@ -109,7 +109,7 @@ int fileStackDepth(pFileStack self){
   return self->fileStackPointer;
 }
 /*----------------------------------------------------------------------*/
-void pushPath(pFileStack self, char *name){
+void pushPath(pFileStack self, const char *name){
   self->pathPointer++;
   strncpy(self->pathStack[self->pathPointer],name,NX_MAXNAMELEN-1);
 }

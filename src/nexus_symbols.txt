@@ -46,6 +46,7 @@ nxilinkexternal_
 nxiinquirefile_
 nxiisexternalgroup_
 NXMSetError
+NXMSetTError
 NXIReportError
 NXIprintlink
 nxiinquirefile_

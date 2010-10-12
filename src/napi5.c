@@ -1049,7 +1049,6 @@ static void killAttVID(pNexusFile5 pFile, int vid){
   NXstatus  NX5getdataID (NXhandle fid, NXlink* sRes)
   {
     pNexusFile5 pFile;
-    ErrFunc oldErr;
     int datalen, type = NX_CHAR;
   
     pFile = NXI5assert (fid);
@@ -1065,15 +1064,14 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       this means: if the item is already linked: use the target attribute else, 
       the path to the current node
     */
-    oldErr = NXMGetError();
-    NXMSetError(NXpData, ignoreError);
+    NXMDisableErrorReporting();
     datalen = 1024;
     memset(&sRes->targetPath,0,datalen*sizeof(char));
     if(NX5getattr(fid,"target",&sRes->targetPath,&datalen,&type) != NX_OK)
     {
       buildCurrentPath(pFile, sRes->targetPath, 1024);
     }
-    NXMSetError(NXpData,oldErr);
+    NXMEnableErrorReporting();
     sRes->linkType = 1;
     return NX_OK;
   }
@@ -2030,7 +2028,6 @@ static int countObjectsInGroup(hid_t loc_id)
   {
     pNexusFile5 pFile;
     int datalen, type = NX_CHAR;
-    ErrFunc oldErr;
   
     pFile = NXI5assert (fileid);
     if (pFile->iCurrentG == 0) {
@@ -2041,14 +2038,13 @@ static int countObjectsInGroup(hid_t loc_id)
 	this means: if the item is already linked: use the target attribute, else 
 	the path to the current node
       */
-      oldErr = NXMGetError();
-      NXMSetError(NXpData, ignoreError);
+      NXMDisableErrorReporting();
       datalen = 1024;
       memset(sRes->targetPath,0,datalen*sizeof(char));
       if(NX5getattr(fileid,"target",sRes->targetPath,&datalen,&type) != NX_OK){
 	buildCurrentPath(pFile,sRes->targetPath,1024);
       }
-      NXMSetError(NXpData,oldErr);
+      NXMEnableErrorReporting();
       sRes->linkType = 0;
       return NX_OK;
     }

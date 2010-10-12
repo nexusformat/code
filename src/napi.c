@@ -177,21 +177,53 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 /*-------------------------------------------------------------------------*/
   static void NXNXNXReportError(void *pData, char *string)
   {
-    printf("%s \n",string);
+    fprintf(stderr, "%s \n", string);
   }
   /*---------------------------------------------------------------------*/
+
   void *NXpData = NULL;
-  void (*NXIReportError)(void *pData, char *string) = NXNXNXReportError;
+  void *NXEHpData = NULL;
+  void (*NXEHIReportError)(void *pData, char *string) = NXNXNXReportError;
+#ifdef HAVE_TLS
+  __thread void *NXEHpTData = NULL;
+  __thread void (*NXEHIReportTError)(void *pData, char *string) = NULL;
+#endif
+
+  void NXIReportError(void *pData, char *string) {
+#ifdef HAVE_TLS
+	if (NXEHIReportTError) {
+		(*NXEHIReportTError)(NXEHpTData, string);
+		return;
+	} 
+#endif
+
+	(*NXEHIReportError)(NXEHpData, string);
+  }
+
   /*---------------------------------------------------------------------*/
-  extern void NXMSetError(void *pData, 
-			      void (*NewError)(void *pD, char *text))
+  extern void NXMSetError(void *pData, void (*NewError)(void *pD, char *text))
   {
-    NXpData = pData;
-    NXIReportError = NewError;
+    NXEHpData = pData;
+    NXEHIReportError = NewError;
+  }
+/*----------------------------------------------------------------------*/
+  extern void NXMSetTError(void *pData, void (*NewError)(void *pD, char *text))
+  {
+#ifdef HAVE_TLS
+    NXEHpTData = pData;
+    NXEHIReportTError = NewError;
+#else
+    NXMSetError(pData, NewError);
+#endif
   }
 /*----------------------------------------------------------------------*/
 extern ErrFunc NXMGetError(){
-  return NXIReportError;
+#ifdef HAVE_TLS
+	if (NXEHIReportTError) {
+		return NXEHIReportTError;
+	}
+#endif
+  return NXEHIReportError;
 }
 
 /*----------------------------------------------------------------------*/
@@ -200,17 +232,35 @@ void NXNXNoReport(void *pData, char *string){
 }  
 /*----------------------------------------------------------------------*/
 
-static ErrFunc last_errfunc = NXNXNXReportError;
+ErrFunc last_global_errfunc = NXNXNXReportError;
+#ifdef HAVE_TLS
+__thread ErrFunc last_thread_errfunc = NULL;
+#endif
 
 extern void NXMDisableErrorReporting()
 {
-    last_errfunc = NXMGetError();
-    NXMSetError(NXpData, NXNXNoReport);
+#ifdef HAVE_TLS
+	if (NXEHIReportTError) {
+		last_thread_errfunc = NXEHIReportTError;
+		NXEHIReportTError = NXNXNoReport;
+		return;
+	} 
+	last_thread_errfunc = NULL;
+#endif
+	last_global_errfunc = NXEHIReportError;
+	NXEHIReportError = NXNXNoReport;
 }
 
 extern void NXMEnableErrorReporting()
 {
-    NXMSetError(NXpData, last_errfunc);
+#ifdef HAVE_TLS
+	if (last_thread_errfunc) {
+		NXEHIReportTError = last_thread_errfunc;
+		last_thread_errfunc = NULL;
+		return;
+	} 
+#endif
+	NXEHIReportError = last_global_errfunc;
 }
 
 /*----------------------------------------------------------------------*/
@@ -535,7 +585,6 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     NXlink breakID;
     pFileStack fileStack;    
     char nxurl[1024], exfile[512], expath[512];
-    ErrFunc oldError;
     pNexusFunction pFunc = NULL;
 
     fileStack = (pFileStack)fid;
@@ -545,10 +594,9 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
     if(status == NX_OK){
       pushPath(fileStack,name);
     }
-    oldError = NXMGetError();
-    NXIReportError = NXNXNoReport;
+    NXMDisableErrorReporting();
     attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
-    NXIReportError = oldError;
+    NXMEnableErrorReporting();
     if(attStatus == NX_OK){
       /*
 	this is an external linking group
@@ -1049,10 +1097,9 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   if(status != NX_OK){
     return status;
   }
-  oldError = NXMGetError();
-  NXIReportError = NXNXNoReport;
+  NXMDisableErrorReporting();
   attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
-  NXIReportError = oldError;
+  NXMEnableErrorReporting();
   pFunc->nxclosegroup(pFunc->pNexusData);
   if(attStatus == NX_OK){
     length = strlen(nxurl);
