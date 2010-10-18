@@ -29,12 +29,12 @@
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include 
 
-EXTRA_DIST=SConscript
+#EXTRA_DIST=SConscript
 
 
 bin_PROGRAMS = nxtraverse
 
-nxtraverse_SOURCES = nxtraverse.cpp main.cpp
+nxtraverse_SOURCES = nxtraverse.cpp main.cpp nxtraverse.h
 nxtraverse_LDADD = $(LIBNEXUS)
 nxtraverse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
