@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN" "http://java.sun.com/products/javahelp/toc_1_0.dtd">
 <toc version="1.0">
-  <tocitem target="id469492" text="NXvalidata 1.0alpha - NeXus File Validator Tool.">
+  <tocitem target="id469492" text="NXvalidate 1.0alpha - NeXus File Validator Tool.">
     <tocitem target="id469511" text="Introduction">
       <tocitem target="id469536" text="What is NXvalidate for?"/>
       <tocitem target="id439043" text="NXvalidate Main Features"/>

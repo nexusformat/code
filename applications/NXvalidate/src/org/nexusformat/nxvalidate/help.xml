@@ -5,7 +5,7 @@
 <!-- -->
 <book>
   <bookinfo>
-    <title>NXvalidata 1.0alpha - NeXus File Validator Tool.</title> 
+    <title>NXvalidate 1.0alpha - NeXus File Validator Tool.</title> 
  
   </bookinfo>
   <chapter>
@@ -86,8 +86,8 @@
    </section>-->
  
    <section>
-       <title>Requirements for the NXvalidata Application</title>
-       <para>NXvalidata GUI is written in the Java language using the Java 2
+       <title>Requirements for the NXvalidate Application</title>
+       <para>NXvalidate GUI is written in the Java language using the Java 2
              Standard Edition version 1.6 and should run on any J2SE 1.6 system.
              This means it can be run on a wide range of platforms, without
              requiring any recompilation. If you don't have Java installed,
@@ -96,7 +96,7 @@
              <ulink url="http://java.sun.com/javase/downloads/index.jsp"><citetitle>Sun's web site</citetitle></ulink>.
              J2SE Runtime Environments (sometimes called JVM or Java Virtual
              Machines) for other platforms may be available from operating
-             system vendors; in particular NXvalidata is known to run (though
+             system vendors; in particular NXvalidate is known to run (though
              not currently exhaustively tested) on MacOS X
              <ulink url="http://developer.apple.com/java/download/"><citetitle>(see here)</citetitle></ulink>.
              Note Various open-source Java implementations (GNU's gij,
