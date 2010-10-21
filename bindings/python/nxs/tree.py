@@ -129,9 +129,9 @@ __all__ = ['NeXusTree', 'SDS', 'NXgroup', 'NXattr',
            'load', 'save', 'tree', 'centers']
 
 
-from copy import copy, deepcopy
+from copy import copy
 
-import os, numpy as np
+import numpy as np
 import napi
 import unit
 from napi import NeXusError
@@ -219,20 +219,6 @@ class NeXusTree(napi.NeXus):
         except ValueError:
             return None
 
-    def _readattrs(self):
-        """
-        Return the attributes for the currently open group/data or for
-        the file if no group or data object is open.
-        """
-        attrs = dict()
-        for i in range(self.getattrinfo()):
-            name,length,nxtype = self.getnextattr()
-            value = self.getattr(name, length, nxtype)
-            pair = self.NXattr(value,nxtype)
-            attrs[name] = pair
-            #print "read attr",name,pair.nxdata, pair.nxtype
-        return attrs
-
     def _readdata(self, name):
         """
         Read a data node, returning SDS or NXlink depending on the
@@ -241,7 +227,7 @@ class NeXusTree(napi.NeXus):
         # Finally some data, but don't read it if it is big
         # Instead record the location, type and size
         self.opendata(name)
-        attrs = self._readattrs()
+        attrs = self.getattrs()
         if 'target' in attrs and attrs['target'].nxdata != self.path:
             # This is a linked dataset; don't try to load it.
             #print "read link %s->%s"%(path,attrs['target'].nxdata)
@@ -267,7 +253,7 @@ class NeXusTree(napi.NeXus):
 
     def _readchildren(self,n):
         children = {}
-        for i in range(n):
+        for dummy in range(n):
             name,nxclass = self.getnextentry()
             #print "name,class,path",name,nxclass,self.path
             if nxclass in self._skipgroups:
@@ -293,7 +279,7 @@ class NeXusTree(napi.NeXus):
         # TODO: can we specify which NXclasses we are interested
         # in and skip those of different classes?
         n,name,nxclass = self.getgroupinfo()
-        attrs = self._readattrs()
+        attrs = self.getattrs()
         if 'target' in attrs and attrs['target'].nxdata != self.path:
             # This is a linked group; don't try to load it.
             #print "read group link %s->%s"%(attrs['target'].nxdata,self.path)
@@ -653,7 +639,6 @@ class NXnode(object):
         return ""
 
     def _str_attrs(self,indent=0):
-        result = ""
         attrs = self.nxattrs
         names = attrs.keys()
         names.sort()
@@ -1240,7 +1225,7 @@ class SDS(NXnode):
         return self._converter(self._value,units)
     
     def nxdata_set(self, value):
-        nxtype, nxdims = _gettype(value)
+        dummy_nxtype, nxdims = _gettype(value)
         if nxdims == self.nxdims:
             self._value = _settype(value, self.nxtype)
         else:
@@ -1308,7 +1293,7 @@ class PylabPlotter(object):
                 data = signal.nxdata
             else:
                 slab = [slice(None), slice(None)]
-                for dim in signal.nxdims[2:]:
+                for dummy in signal.nxdims[2:]:
                     slab.append(0)
                 data = signal[slab].nxreshape(signal.nxdims[:2]).nxdata
                 print "Warning: Only the top 2D slice of the data is plotted"
@@ -1660,7 +1645,7 @@ class NXgroup(NXnode):
         """
         Find all child nodes that have a particular class.
         """
-        return [E for name,E in self.nxentries.items() if E.nxclass==nxclass]
+        return [E for dummy_name,E in self.nxentries.items() if E.nxclass==nxclass]
 
     def nxsignals(self):
         """
@@ -2625,7 +2610,7 @@ def label(field):
 
 def imshow_irregular(x,y,z):
     import pylab
-    from matplotlib.ticker import FormatStrFormatter
+    #from matplotlib.ticker import FormatStrFormatter
     ax = pylab.gca()
     im = pylab.mpl.image.NonUniformImage(ax, extent=(x[0],x[-1],y[0],y[-1]), origin=None)
     im.set_data(x,y,z)

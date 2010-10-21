@@ -255,7 +255,7 @@ def _libnexus():
             return ctypes.cdll[file]
         except:
             raise OSError, \
-                "NeXus library %s could not be loaded: %s"%(file,sys.exc_info()[0])
+                "NeXus library %s could not be loaded: %s"%(file,sys.exc_info())
     raise OSError, "Set NEXUSLIB or move NeXus to one of: %s"%(", ".join(files))
 
 def _init():
@@ -504,7 +504,7 @@ class NeXus(object):
             elif self._path[i] != name:
                 #print "target and current differ at",name
                 up = self._path[i:]
-		down = target[i:]
+                down = target[i:]
                 break
         else:
             #print "target shorter than current"
@@ -724,7 +724,7 @@ class NeXus(object):
         self.initgroupdir()
         n,_,_ = self.getgroupinfo()
         L = []
-        for i in range(n):
+        for dummy in range(n):
             name,nxclass = self.getnextentry()
             if nxclass not in H4SKIP:
                 L.append((name,nxclass))
@@ -924,7 +924,7 @@ class NeXus(object):
         """
         # TODO: consider accepting preallocated data so we don't thrash memory
         shape,dtype = self.getinfo()
-        data,pdata,size,datafn = self._poutput(dtype,shape)
+        dummy_data,pdata,dummy_size,datafn = self._poutput(dtype,shape)
         status = nxlib.nxigetdata_(self.handle,pdata)
         if status == ERROR:
             raise ValueError, "Could not read data: %s"%(self._loc())
@@ -945,8 +945,8 @@ class NeXus(object):
         Corresponds to NXgetslab(handle,data,offset,shape)
         """
         # TODO: consider accepting preallocated data so we don't thrash memory
-        shape,dtype = self.getrawinfo()
-        data,pdata,size,datafn = self._poutput(dtype,slab_shape)
+        dummy_shape,dtype = self.getrawinfo()
+        dummy_data,pdata,dummy_size,datafn = self._poutput(dtype,slab_shape)
         slab_offset = numpy.array(slab_offset,'i')
         slab_shape = numpy.array(slab_shape,'i')
         status = nxlib.nxigetslab_(self.handle,pdata,
@@ -987,7 +987,7 @@ class NeXus(object):
 
         Corresponds to NXputslab(handle,data,offset,shape)
         """
-        shape,dtype = self.getrawinfo()
+        dummy_shape,dtype = self.getrawinfo()
         data,pdata = self._pinput(data,dtype,slab_shape)
         slab_offset = numpy.array(slab_offset,'i')
         slab_shape = numpy.array(slab_shape,'i')
@@ -1079,7 +1079,7 @@ class NeXus(object):
         Corresponds to NXgetattr(handle,name,data,&length,&storage)
         """
         if dtype is 'char': length += 1  # HDF4 needs zero-terminator
-        data,pdata,size,datafn = self._poutput(str(dtype),[length])
+        dummy_data,pdata,size,datafn = self._poutput(str(dtype),[length])
         storage = c_int(_nxtype_code[str(dtype)])
         #print "getattr",self._loc(),name,length,size,dtype
         size = c_int(size)
@@ -1165,7 +1165,7 @@ class NeXus(object):
         """
         self.initattrdir()
         n = self.getattrinfo()
-        for i in range(n):
+        for dummy in range(n):
             name,length,dtype = self.getnextattr()
             value = self.getattr(name,length,dtype)
             yield name,value
@@ -1276,7 +1276,7 @@ class NeXus(object):
         """
         n = self.getattrinfo()
         self.initattrdir()
-        for i in range(n):
+        for dummy in range(n):
             name,length,dtype = self.getnextattr()
             if name == "target":
                 target = self.getattr(name,length,dtype)
@@ -1364,6 +1364,8 @@ class NeXus(object):
         Note that datafn can return a string, a scalar or an array depending
         on the data type and shape of the data group.
         """
+        if isinstance(shape, int):
+            shape = [shape]
         if len(shape) == 1 and dtype == 'char':
             # string - use ctypes allocator
             size = int(shape[0])
@@ -1394,6 +1396,8 @@ class NeXus(object):
         Note that you must hold a reference to data for as long 
         as you need pdata to keep the memory from being released to the heap.
         """
+        if isinstance(shape, int):
+            shape = [shape]
         if dtype == "char":
             data = numpy.asarray(data, dtype='S%d'%(shape[-1]))
         else:
@@ -1408,7 +1412,7 @@ class NeXus(object):
             if len(input_shape) != len(target_shape) \
                     or (input_shape != target_shape).any():
                 raise ValueError,\
-                    "Shape mismatch %s!=%s: %s"%(data_shape,shape,self._loc())
+                    "Shape mismatch %s!=%s: %s"%(data.shape,shape,self._loc())
             # Check data type
             if str(data.dtype) != dtype:
                 raise ValueError,\
