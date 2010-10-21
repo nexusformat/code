@@ -39,7 +39,7 @@ bin_SCRIPTS = nxvalidate
 
 #nxjavadoc_DATA = README.JNEXUS COPYING.NCSA
 
-EXTRA_DIST	= src lib build.xml manifest.mf nbproject
+EXTRA_DIST	= src lib build.xml manifest.mf nbproject/*
 
 dist/NXvalidate.jar ::
 	[ -r build.xml ] || ln -s $(srcdir)/build.xml .
