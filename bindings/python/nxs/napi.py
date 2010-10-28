@@ -895,7 +895,7 @@ class NeXus(object):
         # with the c int type sort themselves out.
         dims = numpy.array(shape,'i')
         if chunks == None:
-            chunks = numpy.ones(dims.shape)
+            chunks = numpy.ones(dims.shape,'i')
             chunks[-1] = shape[-1]
         else:
             chunks = numpy.array(chunks,'i')
