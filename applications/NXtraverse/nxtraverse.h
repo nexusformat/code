@@ -27,12 +27,8 @@
 #ifndef NX_TRAVERSE_H
 #define NX_TRAVERSE_H
 
-#include <stdint.h>
 #include "napi.h"
-#if defined (DO_TIMING)
-#include "timing.h"
-#endif
-
+#include "napiconfig.h"
 
 
 //command line options
@@ -55,14 +51,6 @@ typedef struct
 class CNXTraverse
 {
 private:
-
-#if defined (DO_TIMING)
-    //timing class
-    CTiming timing;
-
-    //BIFF file name
-    std::string biff_fname;
-#endif
 
     //traverse file
     int traverse( NXhandle handle, const char *grp_name  );

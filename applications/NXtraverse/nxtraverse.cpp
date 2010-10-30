@@ -51,12 +51,6 @@ CNXTraverse::CNXTraverse ()
     options.all       = 0; //default: do not print all elements
 
 
-#if defined (DO_TIMING)
-    timing.AddColumn(40, "where" );
-    timing.AddColumn(20, "time (millisec)" );
-    timing.StartTime();
-#endif
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,12 +60,6 @@ CNXTraverse::CNXTraverse ()
 CNXTraverse::~CNXTraverse ()
 {
 
-#if defined (DO_TIMING)
-    biff_fname += ".xls";
-    timing.SetFile( biff_fname.c_str() );
-    timing.CloseTime();
-#endif
-   
 }
 
 
@@ -87,31 +75,6 @@ CNXTraverse::~CNXTraverse ()
 int CNXTraverse::show_objects(const char* file_name)
 {
     NXhandle handle;
-
-#if defined (DO_TIMING)
-    //initialize biff file name with the same name as HDF5/nexus file name
-    biff_fname = file_name; 
-
-    //append options to BIFF file name
-    if ( options.read_data )
-        biff_fname += ".r"; 
-
-    if ( options.read_attr )
-        biff_fname += ".a"; 
-
-    if ( options.all )
-        biff_fname += ".all";
-    
-    if ( options.nelmts )
-    {
-        std::stringstream sstr;
-        sstr << options.nelmts;
-        biff_fname += "."; 
-        biff_fname += sstr.str(); 
-
-    }
-#endif
-
   
    // open file to traverse
    if  (NXopen ( file_name, NXACC_READ, &handle) != NX_OK) 
@@ -128,11 +91,6 @@ int CNXTraverse::show_objects(const char* file_name)
     //close file
     if ( NXclose (&handle) != NX_OK) 
         return NX_ERROR;
-
-
-#if defined (DO_TIMING)
-    timing.WriteTime( "traversed file" );
-#endif
 
     return NX_OK;
 
