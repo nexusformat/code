@@ -56,7 +56,7 @@ Known issues include:
 * There is an issue using NXgetslab on 64 bit operating systems; expect a fix for this pretty soon.
 
 ===Python Interface===
-There is now, thanks to David Kienzle, a supported interface for the python scripting language. Arrays are stored in numpy arrays and thus allow for efficient data manipulations.
+There is now, thanks to Paul Kienzle, a supported interface for the python scripting language. Arrays are stored in numpy arrays and thus allow for efficient data manipulations.
 
 ==Changed Features==
 
