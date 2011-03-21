@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-VERSION = "1.4.1"
+VERSION = "1.4.2"
 
 import nxs
 import numpy
@@ -132,6 +132,10 @@ class Diff:
         if numpy.alltrue(left.data == right.data):
             return
         else:
+            if left.data.size == 1 and right.data.size == 1:
+                self.details.append("DATA MISMATCH %s != %s" \
+                                    % (str(left.data), str(right.data)))
+                return
             diffs = getPercentDiff(left.data, right.data)
             if numpy.nanmax(diffs) <= 0.:
                 return
@@ -278,11 +282,18 @@ def getStats(array, **kwargs):
     myarray = removeNaN(myarray)
     myarray.sort()
     length = myarray.size
-    avg = numpy.average(myarray)
-    minimum = numpy.nanmin(myarray)
-    maximum = numpy.nanmax(myarray)
-    median = myarray[(length/2)-1]
-    stddev = myarray.std()
+    if length ==0 and length < origLength:
+        avg = NAN
+        minimum = NAN
+        maximum  = NAN
+        median = NAN
+        stddev = NAN
+    else:
+        avg = numpy.average(myarray)
+        minimum = numpy.nanmin(myarray)
+        maximum = numpy.nanmax(myarray)
+        median = myarray[(length/2)-1]
+        stddev = myarray.std()
     result = map(lambda x: "%.2f%%" % x,
                  (minimum, maximum, median, avg, stddev))
     result.append(origLength) # add the number of elements
