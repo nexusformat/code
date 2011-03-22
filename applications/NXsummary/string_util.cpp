@@ -119,9 +119,37 @@ namespace nxsum {
       {
         return toString((double *)data, dims, rank);
       }
+    else if (type == NX_INT8)
+      {
+        return toString((int8_t *)data, dims, rank);
+      }
+    else if (type == NX_UINT8)
+      {
+	return toString((uint8_t *)data, dims, rank);
+      }
+    else if (type == NX_INT16)
+      {
+        return toString((int16_t *)data, dims, rank);
+      }
+    else if (type == NX_UINT16)
+      {
+	return toString((uint16_t *)data, dims, rank);
+      }
     else if (type == NX_INT32)
       {
         return toString((int32_t *)data, dims, rank);
+      }
+    else if (type == NX_UINT32)
+      {
+	return toString((uint32_t *)data, dims, rank);
+      }
+    else if (type == NX_INT64)
+      {
+        return toString((int64_t *)data, dims, rank);
+      }
+    else if (type == NX_UINT64)
+      {
+	return toString((uint64_t *)data, dims, rank);
       }
     else
       {
