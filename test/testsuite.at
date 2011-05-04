@@ -588,6 +588,7 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.hdf
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.hdf#entry1
+TypeMap is correct size
 ]])
 AT_CLEANUP
 AT_SETUP([Check the C++ binding with HDF5.])
@@ -626,6 +627,7 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.h5
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.h5#entry1
+TypeMap is correct size
 ]])
 AT_CLEANUP
 AT_SETUP([Check the C++ binding with xml.])
@@ -667,6 +669,7 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#entry1
+TypeMap is correct size
 ]])
 AT_CLEANUP
 
