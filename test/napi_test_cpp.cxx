@@ -5,12 +5,14 @@
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
+#include <map>
 #include "napiconfig.h"
 #include "NeXusFile.hpp"
 
 using std::cout;
 using std::endl;
 using std::map;
+using std::multimap;
 using std::string;
 using std::vector;
 
@@ -426,6 +428,32 @@ static int streamTest(const std::string& fname, NXaccess create_mode)
     return 0;
 }
 
+int testTypeMap(const std::string &fname)
+{
+	NeXus::File file(fname);
+	multimap<string, string> *map = file.getTypeMap();
+	int mapsize = 21;
+	// HDF4 does not have int64 capability, so resulting map is one shorter than HDF5 and XML files
+	if (fname == string("napi_test_cpp.hdf")) {
+		if (map->size() != (mapsize - 1))
+		{
+			cout << "TypeMap is incorrect" << endl;
+			return 1;
+		}
+	}
+	else {
+		if (map->size() != mapsize)
+		{
+			cout << "TypeMap is incorrect" << endl;
+			return 1;
+		}
+	}
+
+	cout << "TypeMap is correct size" << endl;
+
+	return 0;
+}
+
 int main(int argc, char** argv)
 {
   NXaccess nx_creation_code;
@@ -490,7 +518,14 @@ int main(int argc, char** argv)
     cout << "streamTest failed" << endl;
     return result;
   }
-    
+
+  // test of typemap generation
+  result = testTypeMap(filename);
+  if (result) {
+	  cout << "testTypeMap failed" << endl;
+	  return result;
+  }
+
   // everything went ok
   return 0;
 }
