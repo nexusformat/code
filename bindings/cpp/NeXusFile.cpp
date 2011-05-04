@@ -968,6 +968,42 @@ void File::linkExternal(const string& name, const string& type,
   }
 }
 
+const string File::makeCurrentPath(const string currpath, const string subpath) {
+	std::ostringstream temp;
+	temp << currpath << "/" << subpath;
+	return temp.str();
+}
+
+void File::walkFileForTypeMap(const string path, const string class_name, TypeMap& tmap) {
+	if (!path.empty()) {
+		tmap.insert(std::make_pair(class_name, path));
+	}
+	map<string, string> dirents = this->getEntries();
+	map<string, string>::iterator pos;
+	for (pos = dirents.begin(); pos != dirents.end(); ++pos) {
+		if (pos->second == "SDS") {
+			tmap.insert(std::make_pair(pos->second, this->makeCurrentPath(path, pos->first)));
+		}
+		else if (pos->second == "CDF0.0") {
+			// Do nothing with this
+			;
+		}
+		else {
+			this->openGroup(pos->first, pos->second);
+			this->walkFileForTypeMap(this->makeCurrentPath(path, pos->first), pos->second, tmap);
+		}
+	}
+	this->closeGroup();
+}
+
+TypeMap *File::getTypeMap() {
+	TypeMap *tmap = new TypeMap();
+	// Ensure that we're at the top of the file.
+	this->openPath("/");
+	this->walkFileForTypeMap("", "", *tmap);
+	return tmap;
+}
+
 template<typename NumT>
 void File::malloc(NumT*& data, const Info& info)
 {

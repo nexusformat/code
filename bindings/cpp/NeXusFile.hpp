@@ -78,6 +78,11 @@ namespace NeXus {
   };
 
   /**
+   * Type definition for a type-keyed multimap
+   */
+  typedef std::multimap<std::string, std::string> TypeMap;
+
+  /**
    * This structure holds the type and dimensions of a primative field/array.
    */
   struct Info{
@@ -131,6 +136,23 @@ namespace NeXus {
      * Initialize the pending attribute search to start again.
      */
     void initAttrDir();
+
+    /**
+     * Function to walk the file tree and fill in the TypeMap.
+     *
+     * \param path the current path in the file
+     * \param class_name the current NX class name
+     * \param tmap the typemap being constructed
+     */
+    void walkFileForTypeMap(const std::string path, const std::string class_name, TypeMap &tmap);
+
+    /**
+     * Function to append new path to current one.
+     * \param currpath the current path to append to
+     * \param subpath the path to append to the current path
+     * \return the newly joined path
+     */
+    const std::string makeCurrentPath(const std::string currpath, const std::string subpath);
 
   public:
     /**
@@ -597,6 +619,13 @@ namespace NeXus {
      * \returns true if we are currently in an open dataset else false
      */
     bool isDataSetOpen();
+
+    /**
+     * Create a multimap with the data types as keys and the associated paths as values.
+     *
+     * \return The multimap of the opened file.
+     */
+    TypeMap *getTypeMap();
   };
 
   /**
