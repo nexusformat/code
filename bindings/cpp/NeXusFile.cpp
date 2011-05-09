@@ -144,10 +144,17 @@ static void inner_free(void* & data) {
 
 namespace NeXus {
 File::File(NXhandle handle, bool close_handle) : m_file_id(handle), m_close_handle(close_handle) {
-
 }
 
 File::File(const string& filename, const NXaccess access) : m_close_handle (true) {
+  this->initOpenFile(filename, access);
+}
+
+File::File(char *filename, const NXaccess access) : m_close_handle (true) {
+  this->initOpenFile(string(filename), access);
+}
+
+void File::initOpenFile(const string& filename, const NXaccess access) {
   if (filename.empty()) {
     throw Exception("Filename specified is empty constructor");
   }

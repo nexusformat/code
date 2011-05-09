@@ -154,6 +154,13 @@ namespace NeXus {
      */
     const std::string makeCurrentPath(const std::string currpath, const std::string subpath);
 
+    /**
+     * Function to consolidate the file opening code for the various constructors
+     * \param filename The name of the file to open.
+     * \param access How to access the file.
+     */
+    void initOpenFile(const std::string& filename, const NXaccess access = NXACC_READ);
+
   public:
     /**
      * Create a new File.
@@ -162,6 +169,14 @@ namespace NeXus {
      * \param access How to access the file.
      */
     File(const std::string& filename, const NXaccess access = NXACC_READ);
+
+    /**
+     * Create a new File.
+     *
+     * \param filename The name of the file to open.
+     * \param access How to access the file.
+     */
+    File(char *filename, const NXaccess access = NXACC_READ);
 
     /**
      * Use an existing handle returned from NXopen()
