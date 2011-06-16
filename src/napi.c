@@ -58,10 +58,10 @@ static int iFortifyScope;
 
 #ifdef _WIN32
 /*
- *  HDF5 on windoes does not do locking for multiple threads conveniently
- *  so we will implement it ourselves.
+ *  HDF5 on windows does not do locking for multiple threads conveniently so we will implement it ourselves.
  *  Freddie Akeroyd, 16/06/2011
  */
+#include <windows.h>
 
 static CRITICAL_SECTION nx_critical;
 
@@ -88,7 +88,8 @@ static int nxiunlock(int ret)
 
 #else
 
-#define LOCKED_CALL(__call) 	__call
+#define LOCKED_CALL(__call) \
+	__call
 
 #endif /* _WIN32 */
 
@@ -287,7 +288,7 @@ extern void NXMEnableErrorReporting()
                           Definition of NeXus API
 
    ---------------------------------------------------------------------*/
-static int determineFileTypeImp(CONSTCHAR *filename)
+static int determineFileTypeImpl(CONSTCHAR *filename)
 {
   FILE *fd = NULL;
   int iRet;
@@ -326,7 +327,7 @@ static int determineFileTypeImp(CONSTCHAR *filename)
 
 static int determineFileType(CONSTCHAR *filename)
 {
-    return LOCKED_CALL(determineFileType(filename));
+    return LOCKED_CALL(determineFileTypeImpl(filename));
 }
 /*---------------------------------------------------------------------*/
 static pNexusFunction handleToNexusFunc(NXhandle fid){
@@ -360,7 +361,7 @@ NXstatus   NXopen(CONSTCHAR *userfilename, NXaccess am, NXhandle *gHandle){
   return status;
 }
 /*-----------------------------------------------------------------------*/
-static NXstatus   NXinternalopenImp(CONSTCHAR *userfilename, NXaccess am, pFileStack fileStack)
+static NXstatus   NXinternalopenImpl(CONSTCHAR *userfilename, NXaccess am, pFileStack fileStack)
   {
     int hdf_type=0;
     int iRet=0;
@@ -514,7 +515,7 @@ static NXstatus   NXinternalopenImp(CONSTCHAR *userfilename, NXaccess am, pFileS
 
 static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStack fileStack)
 {
-    return LOCKED_CALL(NXinternalopenImp(userfilename, am, fileStack));
+    return LOCKED_CALL(NXinternalopenImpl(userfilename, am, fileStack));
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1107,7 +1108,6 @@ char *nxitrim(char *str)
 NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, 
 			    char *url, int urlLen){
   int status, attStatus, length = 1023, type = NX_CHAR;
-  ErrFunc oldError;
   char nxurl[1024];
 
   pNexusFunction pFunc = handleToNexusFunc(fid);
