@@ -33,7 +33,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-//#include "nxconfig.h"
+#include "nxconfig.h" // needed for HAVE_STDINT_H
 #include "data_util.hpp"
 
 // use STDINT if possible, otherwise define the types here
