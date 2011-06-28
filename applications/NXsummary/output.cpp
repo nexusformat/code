@@ -66,7 +66,7 @@ namespace nxsum {
       }
     else
       {
-        node = xmlNewChild(parent, NULL, item_name, BAD_CAST value.c_str());
+        node = xmlNewTextChild(parent, NULL, item_name, BAD_CAST value.c_str());
       }
     if (!path.empty())
       {

@@ -48,7 +48,7 @@ using std::vector;
 using namespace TCLAP;
 using namespace nxsum;
 
-static const string NXSUM_VERSION("0.1.0");
+static const string NXSUM_VERSION("0.1.1");
 static const string EMPTY("");
 
 static void openFile(const string &file, NXhandle &handle) {
