@@ -625,7 +625,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
       if(status == NXBADURL){
 	return NX_ERROR;
       }
-      status = NXinternalopen(exfile,access, fileStack);
+      status = NXinternalopen(exfile, access, fileStack);
       if(status == NX_ERROR){
 	return status;
       }
@@ -703,33 +703,76 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   
   NXstatus  NXopendata (NXhandle fid, CONSTCHAR *name)
   {
-    int status;
-    pFileStack fileStack = NULL;
+    int status, attStatus, type = NX_CHAR, length = 1023;
+    NXaccess access = NXACC_RDWR;
+    NXlink breakID;
+    pFileStack fileStack;
+    char nxurl[1024], exfile[512], expath[512];
+    pNexusFunction pFunc = NULL;
 
-    pNexusFunction pFunc = handleToNexusFunc(fid); 
     fileStack = (pFileStack)fid;
+    pFunc = handleToNexusFunc(fid);
     status = LOCKED_CALL(pFunc->nxopendata(pFunc->pNexusData, name)); 
+
     if(status == NX_OK){
       pushPath(fileStack,name);
     }
+
+    NXMDisableErrorReporting();
+    attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
+    NXMEnableErrorReporting();
+    if(attStatus == NX_OK){
+      /*
+        this is an external linking group
+      */
+      status = analyzeNapimount(nxurl,exfile,511,expath,511);
+      if(status == NXBADURL){
+        return NX_ERROR;
+      }
+      status = NXinternalopen(exfile, access, fileStack);
+      if(status == NX_ERROR){
+        return status;
+      }
+      status = NXopenpath(fid,expath);
+      NXgetgroupID(fid,&breakID);
+      setCloseID(fileStack,breakID);
+    }
+
     return status;
   } 
 
-
   /* ----------------------------------------------------------------- */
     
-  NXstatus  NXclosedata (NXhandle fid)
+  NXstatus NXclosedata (NXhandle fid)
   { 
     int status;
     pFileStack fileStack = NULL;
+    NXlink closeID, currentID;
 
     pNexusFunction pFunc = handleToNexusFunc(fid);
     fileStack = (pFileStack)fid;
-    status = LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
-    if(status == NX_OK){
-      popPath(fileStack);
+
+    if(fileStackDepth(fileStack) == 0){
+      status = LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
+      if(status == NX_OK){
+        popPath(fileStack);
+      }
+      return status;
+    } else {
+      /* we have to check for leaving an external file */
+      NXgetgroupID(fid,&currentID);
+      peekIDOnStack(fileStack,&closeID);
+      if(NXsameID(fid,&closeID,&currentID) == NX_OK){
+        NXclose(&fid);
+        status = NXclosedata(fid);
+      } else {
+        status = LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
+        if(status == NX_OK){
+          popPath(fileStack);
+        }
+      }
+      return status;
     }
-    return status;
   }
 
   /* ------------------------------------------------------------------- */
