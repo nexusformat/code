@@ -644,6 +644,126 @@ void File::getData(vector<NumT>& data) {
   this->getData(&(data[0]));
 }
 
+
+void File::getDataCoerce(vector<int> &data)
+{
+  Info info = this->getInfo();
+  if (info.type == INT8)
+  {
+    vector<int8_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == UINT8)
+  {
+    vector<uint8_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == INT16)
+  {
+    vector<int16_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == UINT16)
+  {
+    vector<uint16_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == INT32)
+  {
+    vector<int32_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == UINT32)
+  {
+    vector<uint32_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else
+  {
+    throw Exception("NexusFile::getDataCoerce(): Could not coerce to int.");
+  }
+}
+
+void File::getDataCoerce(vector<double> &data)
+{
+  Info info = this->getInfo();
+  if (info.type == INT8)
+  {
+    vector<int8_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == UINT8)
+  {
+    vector<uint8_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == INT16)
+  {
+    vector<int16_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == UINT16)
+  {
+    vector<uint16_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == INT32)
+  {
+    vector<int32_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == UINT32)
+  {
+    vector<uint32_t> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == FLOAT32)
+  {
+    vector<float> result;
+    this->getData(result);
+    data.assign(result.begin(), result.end());
+  }
+  else if (info.type == FLOAT64)
+  {
+    this->getData(data);
+  }
+  else
+  {
+    throw Exception("NexusFile::getDataCoerce(): Could not coerce to double.");
+  }
+}
+
+bool File::isDataInt()
+{
+  Info info = this->getInfo();
+  switch(info.type)
+  {
+  case INT8:
+  case UINT8:
+  case INT16:
+  case UINT16:
+  case INT32:
+  case UINT32:
+    return true;
+  default:
+    return false;
+  }
+}
+
+
+
 string File::getStrData() {
   string res;
   Info info = this->getInfo();

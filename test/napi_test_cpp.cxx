@@ -284,6 +284,66 @@ int readTest(const string & filename) {
       cout << ":" << it->second << endl;
     }
   }
+
+	// Test getDataCoerce() -------------------
+	std::vector<int> ints;
+	std::vector<double> doubles;
+	
+	ints.clear();
+	file.openData("i1_data");
+	file.getDataCoerce(ints);
+	if (ints.size() != 4) return 1;
+	if (ints[0] != 1) return 1;
+	file.closeData();
+
+	ints.clear();
+	file.openData("i2_data");
+	file.getDataCoerce(ints);
+	if (ints.size() != 4) return 1;
+	if (ints[0] != 1000) return 1;
+	file.closeData();
+
+	ints.clear();
+	file.openData("i4_data");
+	file.getDataCoerce(ints);
+	if (ints.size() != 4) return 1;
+	if (ints[0] != 1000000) return 1;
+	file.closeData();
+
+	doubles.clear();
+	file.openData("r4_data");
+	file.getDataCoerce(doubles);
+	if (doubles.size() != 20) return 1;
+	if (doubles[1] != 1.0) return 1;
+	file.closeData();
+
+	doubles.clear();
+	file.openData("r8_data");
+	file.getDataCoerce(doubles);
+	if (doubles.size() != 20) return 1;
+	if (doubles[1] != 21.0) return 1;
+	file.closeData();
+
+	// Throws when you coerce to int from a real/double source
+	bool didThrow = false;
+	try 
+	{
+		ints.clear();
+		file.openData("r8_data");
+		file.getDataCoerce(ints);
+		file.closeData();
+		cout << "getDataCoerce(int) of doubles did not throw (it is supposed to throw)." << endl;
+	}
+	catch (...)
+	{
+		// Good! It is supposed to throw
+		didThrow = true;
+		file.closeData();
+	}
+	if (!didThrow) return 1;
+
+
+  // Close the "entry" group
   file.closeGroup();
 
   // check links
