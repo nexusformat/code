@@ -233,7 +233,7 @@ static char** nxbrowse_complete(const char* text, int start, int end)
 
 int main(int argc, char *argv[])
 {
-   char fileName[80], path[80], *command, *dimensions, *stringPtr;
+   char fileName[800], path[800], *command, *dimensions, *stringPtr;
    char prompt[512];
    char *inputText;
    NXname groupName, dataName;
