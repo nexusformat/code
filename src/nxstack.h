@@ -44,7 +44,7 @@ void setCloseID(pFileStack self, NXlink id);
  
 int fileStackDepth(pFileStack self);
 
-void pushPath(pFileStack self, char *name);
+void pushPath(pFileStack self, const char *name);
 void popPath(pFileStack self);
 int buildPath(pFileStack self, char *path, int pathlen);
 
