@@ -47,9 +47,11 @@ MAINTAINERCLEANFILES = \
  ChangeLog \
  INSTALL \
  aclocal.m4 \
- config \
  configure \
  doc/tech_ref/NeXus_definitions.pdf \
  doc/tech_ref/NeXus_definitions.txt \
  include/nxconfig_h.in \
  `find "$(srcdir)" -type f -name Makefile.in -print`
+
+maintainer-clean-local:
+	-rm -rf config
