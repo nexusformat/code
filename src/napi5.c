@@ -180,14 +180,14 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
 	H5Pset_fclose_degree(fapl,H5F_CLOSE_STRONG);
         pNew->iFID = H5Fopen (filename, am1, fapl);
     }  
+    if(fapl != -1) {
+      H5Pclose(fapl);
+    }
     if (pNew->iFID <= 0) {
       sprintf (pBuffer, "ERROR: cannot open file: %s", filename);
       NXIReportError (NXpData, pBuffer);
       free (pNew);
       return NX_ERROR;
-    }
-    if(fapl != -1) {
-      H5Pclose(fapl);
     }
 
 /*
