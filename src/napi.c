@@ -601,7 +601,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXopengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
     int status, attStatus, type = NX_CHAR, length = 1023;
-    NXaccess access = NXACC_RDWR;
+    NXaccess access = NXACC_READ;
     NXlink breakID;
     pFileStack fileStack;    
     char nxurl[1024], exfile[512], expath[512];
@@ -704,7 +704,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXopendata (NXhandle fid, CONSTCHAR *name)
   {
     int status, attStatus, type = NX_CHAR, length = 1023;
-    NXaccess access = NXACC_RDWR;
+    NXaccess access = NXACC_READ;
     NXlink breakID;
     pFileStack fileStack;
     char nxurl[1024], exfile[512], expath[512];
