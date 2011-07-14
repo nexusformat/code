@@ -1,0 +1,11 @@
+# Recurse into the subdirectories.
+add_subdirectory (cpp)
+if (CMAKE_Fortran_COMPILER_WORKS)
+    add_subdirectory (f77)
+    add_subdirectory (f90)
+endif (CMAKE_Fortran_COMPILER_WORKS)
+#add_subdirectory (idl)
+add_subdirectory (java)
+#add_subdirectory (matlab)
+add_subdirectory (python)
+#add_subdirectory (swig)
