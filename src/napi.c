@@ -740,7 +740,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
       return status;
     } else {
       /* we have to check for leaving an external file */
-      NXgetgroupID(fid,&currentID);
+      NXgetdataID(fid,&currentID);
       peekIDOnStack(fileStack,&closeID);
       if(NXsameID(fid,&closeID,&currentID) == NX_OK){
         NXclose(&fid);
