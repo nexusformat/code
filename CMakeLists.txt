@@ -108,7 +108,7 @@ set(HISTORY_LINK "")
 endif(HISTORY)
 
 if (HDF5_FOUND)
-  set (HDF5_CPP "-DHDF5")
+  set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
 endif (HDF5_FOUND)
 
 #Options
