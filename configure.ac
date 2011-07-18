@@ -547,7 +547,7 @@ fi
 if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
-	1.[[68]]*)
+	1.[[689]]*)
     		HDF5_LDFLAGS=""
 		for j in lib lib64; do
 		    if test -d $H5ROOT/$j; then 
