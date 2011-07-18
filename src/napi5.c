@@ -780,7 +780,7 @@ static hid_t nxToHDF5Type(int datatype)
       if (dimensions[0] == NX_UNLIMITED)
       {      
           size[0]   = 1; 
-          iNew = H5Dextend (pFile->iCurrentD, size);
+          iNew = H5Dset_extent  (pFile->iCurrentD, size);
           if (iNew < 0) 
           {
               sprintf (pBuffer, "ERROR: cannot create Dataset %s, check arguments",
@@ -1029,7 +1029,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     if (maxdims[0] == NX_UNLIMITED)
     {
        size[0]=iStart[0] + iSize[0];
-       iRet = H5Dextend(pFile->iCurrentD, size);
+       iRet = H5Dset_extent (pFile->iCurrentD, size);
        if (iRet < 0) 
        {
            NXReportError( "ERROR: extend slab failed");
