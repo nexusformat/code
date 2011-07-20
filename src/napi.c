@@ -714,7 +714,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
         return status;
       }
       status = NXopenpath(fid,expath);
-      NXgetgroupID(fid,&breakID);
+      NXgetdataID(fid,&breakID);
       setCloseID(fileStack,breakID);
     }
 
