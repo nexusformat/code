@@ -16,27 +16,27 @@ owner_email="UNKNOWN" owner_address="UNKNOWN">
         </NXsource>
         <NXcrystal name="Monochromator">
           <type>Pyrolithic Graphite 002</type>
-          <theta type="NX_FLOAT32">22.430000</theta>
-          <two_theta type="NX_FLOAT32">44.869999</two_theta>
-          <lambda type="NX_FLOAT32" units="Angstroem">2.566600</lambda>
-          <curvature type="NX_FLOAT32">14.000000</curvature>
-          <x_translation type="NX_FLOAT32">0.940000</x_translation>
-          <y_translation type="NX_FLOAT32">0.210000</y_translation>
-          <chi type="NX_FLOAT32">0.356000</chi>
-          <phi type="NX_FLOAT32">-0.002000</phi>
-          <d_spacing type="NX_FLOAT32" units="Angstroem">3.353700</d_spacing>
+          <theta NAPItype="NX_FLOAT32">22.430000</theta>
+          <two_theta NAPItype="NX_FLOAT32">44.869999</two_theta>
+          <lambda NAPItype="NX_FLOAT32" units="Angstroem">2.566600</lambda>
+          <curvature NAPItype="NX_FLOAT32">14.000000</curvature>
+          <x_translation NAPItype="NX_FLOAT32">0.940000</x_translation>
+          <y_translation NAPItype="NX_FLOAT32">0.210000</y_translation>
+          <chi NAPItype="NX_FLOAT32">0.356000</chi>
+          <phi NAPItype="NX_FLOAT32">-0.002000</phi>
+          <d_spacing NAPItype="NX_FLOAT32" units="Angstroem">3.353700</d_spacing>
         </NXcrystal>
         <NXpsd name="DMC-BF3-Detector">
-          <Preset type="NX_INT32">1094713344</Preset>
+          <Preset NAPItype="NX_INT32">1094713344</Preset>
           <CounterMode>monitor</CounterMode>
-          <time type="NX_FLOAT32">267.199005</time>
-          <beam_monitor type="NX_INT32" units="counts">2328990</beam_monitor>
-          <Monitor type="NX_INT32" units="counts">12000</Monitor>
-          <proton_monitor type="NX_INT32" units="counts">32704151</proton_monitor>
-          <two_theta_start type="NX_FLOAT32" units="degree">18.400000</two_theta_start>
-          <Step type="NX_FLOAT32" units="degree">0.200000</Step>
-          <no_of_steps type="NX_INT32">400</no_of_steps>
-          <two_theta type="NX_FLOAT32[400]" axis="1" units="degree">
+          <time NAPItype="NX_FLOAT32">267.199005</time>
+          <beam_monitor NAPItype="NX_INT32" units="counts">2328990</beam_monitor>
+          <Monitor NAPItype="NX_INT32" units="counts">12000</Monitor>
+          <proton_monitor NAPItype="NX_INT32" units="counts">32704151</proton_monitor>
+          <two_theta_start NAPItype="NX_FLOAT32" units="degree">18.400000</two_theta_start>
+          <Step NAPItype="NX_FLOAT32" units="degree">0.200000</Step>
+          <no_of_steps NAPItype="NX_INT32">400</no_of_steps>
+          <two_theta NAPItype="NX_FLOAT32[400]" axis="1" units="degree">
              18.400000 18.600000 18.799999 19.000000 19.200001 19.400000 19.600000 19.799999
              20.000000 20.200001 20.400000 20.600000 20.799999 21.000000 21.200001 21.400000
              21.600000 21.799999 22.000000 22.200001 22.400000 22.600000 22.799999 23.000000
@@ -88,7 +88,7 @@ owner_email="UNKNOWN" owner_address="UNKNOWN">
              95.199997 95.400002 95.599998 95.800003 96.000000 96.199997 96.400002 96.599998
              96.800003 97.000000 97.199997 97.400002 97.599998 97.800003 98.000000 98.199997
             </two_theta>
-          <counts type="NX_INT32[400]" signal="1">
+          <counts NAPItype="NX_INT32[400]" signal="1">
              114 102 107 106 90 102 99 95 80 104
              119 101 100 109 101 98 90 93 102 112
              104 84 87 98 95 86 100 104 90 99
@@ -134,15 +134,15 @@ owner_email="UNKNOWN" owner_address="UNKNOWN">
       </NXinstrument>
       <NXsample name="sample">
         <sample_name>Ga0.94Mn0.04Sb_8mm</sample_name>
-        <sample_table_rotation type="NX_FLOAT32" units="degree">297.209991</sample_table_rotation>
-        <sample_temperature type="NX_FLOAT32" units="K">4.001050</sample_temperature>
+        <sample_table_rotation NAPItype="NX_FLOAT32" units="degree">297.209991</sample_table_rotation>
+        <sample_temperature NAPItype="NX_FLOAT32" units="K">4.001050</sample_temperature>
         <device_name>ccr4k</device_name>
-        <temperature_mean type="NX_FLOAT32" units="K">4.000000</temperature_mean>
-        <temperature_stddev type="NX_FLOAT32" units="K">0.000000</temperature_stddev>
-        <sample_mur type="NX_FLOAT32" units="degree">0.000000</sample_mur>
+        <temperature_mean NAPItype="NX_FLOAT32" units="K">4.000000</temperature_mean>
+        <temperature_stddev NAPItype="NX_FLOAT32" units="K">0.000000</temperature_stddev>
+        <sample_mur NAPItype="NX_FLOAT32" units="degree">0.000000</sample_mur>
       </NXsample>
       <NXdata name="data1">
-        <counts type="NX_INT32[400]" signal="1">
+        <counts NAPItype="NX_INT32[400]" signal="1">
           114 102 107 106 90 102 99 95 80 104
           119 101 100 109 101 98 90 93 102 112
           104 84 87 98 95 86 100 104 90 99
@@ -184,7 +184,7 @@ owner_email="UNKNOWN" owner_address="UNKNOWN">
           125 104 123 102 126 112 85 114 115 102
           103 116 101 130 106 99 99 112 105 116
          </counts>
-        <two_theta type="NX_FLOAT32[400]" axis="1" units="degree">
+        <two_theta NAPItype="NX_FLOAT32[400]" axis="1" units="degree">
           18.400000 18.600000 18.799999 19.000000 19.200001 19.400000 19.600000 19.799999
           20.000000 20.200001 20.400000 20.600000 20.799999 21.000000 21.200001 21.400000
           21.600000 21.799999 22.000000 22.200001 22.400000 22.600000 22.799999 23.000000
@@ -236,10 +236,10 @@ owner_email="UNKNOWN" owner_address="UNKNOWN">
           95.199997 95.400002 95.599998 95.800003 96.000000 96.199997 96.400002 96.599998
           96.800003 97.000000 97.199997 97.400002 97.599998 97.800003 98.000000 98.199997
          </two_theta>
-        <two_theta_start type="NX_FLOAT32" units="degree">18.400000</two_theta_start>
-        <Step type="NX_FLOAT32" units="degree">0.200000</Step>
-        <no_of_steps type="NX_INT32">400</no_of_steps>
-        <lambda type="NX_FLOAT32" units="Angstroem">2.566600</lambda>
+        <two_theta_start NAPItype="NX_FLOAT32" units="degree">18.400000</two_theta_start>
+        <Step NAPItype="NX_FLOAT32" units="degree">0.200000</Step>
+        <no_of_steps NAPItype="NX_INT32">400</no_of_steps>
+        <lambda NAPItype="NX_FLOAT32" units="Angstroem">2.566600</lambda>
       </NXdata>
     </NXentry>
   </NXroot>
