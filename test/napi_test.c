@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------
   NeXus - Neutron & X-ray Common Data Format
   
-  Test program for C API (HDF4 Version)
+  Test program for C API 
   
-  Copyright (C) 1997-2002 Freddie Akeroyd
+  Copyright (C) 1997-2011 Freddie Akeroyd
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -459,6 +459,9 @@ static int testExternal(char *progName){
   char nxfile[255], ext[5], testFile[80], time[132], filename[256];
   int create;
   NXhandle hfil;
+  int dummylen = 1;
+  float dummyfloat = 1;
+  float temperature;
 
   if(strstr(progName,"hdf4") != NULL){
     strcpy(ext,"hdf");
@@ -496,6 +499,17 @@ static int testExternal(char *progName){
   if(NXlinkexternal(hfil,"entry2","NXentry",nxfile) != NX_OK){
     return 1;
   }
+  if(NXmakegroup(hfil,"entry3","NXentry") != NX_OK){
+    return 1;
+  }
+  if(NXopengroup(hfil,"entry3","NXentry") != NX_OK){
+    return 1;
+  }
+  if (NXmakedata (hfil, "extlinkdata", NX_FLOAT32, 1, &dummylen) != NX_OK) return 1;
+  if (NXopendata (hfil, "extlinkdata") != NX_OK) return 1;
+  if (NXputdata (hfil, &dummyfloat) != NX_OK) return 1;
+  sprintf(nxfile,"nxfile://data/dmc01.%s#/entry1/sample/temperature_mean",ext);
+  if(NXputattr(hfil,"napimount",nxfile,strlen(nxfile), NX_CHAR) != NX_OK) return 1;
   if(NXclose(&hfil) != NX_OK){
     return 1;
   }
@@ -506,7 +520,6 @@ static int testExternal(char *progName){
   if(NXopen(testFile,NXACC_RDWR,&hfil) != NX_OK){
     return 1;
   }
-
   if(NXopenpath(hfil,"/entry1/start_time") != NX_OK){
     return 1;
   }
@@ -548,6 +561,17 @@ static int testExternal(char *progName){
   } else {
     printf("entry1 external URL = %s\n", filename);
   }
+
+  printf("testing link to external data set\n");
+  if(NXopenpath(hfil,"/entry3") != NX_OK){
+    return 1;
+  }
+  if (NXopendata (hfil, "extlinkdata") != NX_OK) return 1;
+  memset(&temperature,0,4);
+  if(NXgetdata(hfil,&temperature) != NX_OK){
+    return 1;
+  }
+  printf("value retrieved: %4.2f\n", temperature);
 
   NXclose(&hfil);
   printf("External File Linking tested OK\n");

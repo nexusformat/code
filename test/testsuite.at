@@ -77,6 +77,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.hdf
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.hdf#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
@@ -134,6 +136,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.h5
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.h5#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
@@ -189,6 +193,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.hdf
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.hdf#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
@@ -246,6 +252,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.h5
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.h5#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
@@ -306,6 +314,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
@@ -366,6 +376,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
@@ -426,6 +438,8 @@ Second file sample: Ga0.94Mn0.04Sb_8mm
 NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#/entry1
+testing link to external data set
+value retrieved: 4.00
 External File Linking tested OK
 ]])
 AT_CLEANUP
