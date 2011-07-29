@@ -113,6 +113,8 @@ namespace NeXus {
     NXhandle m_file_id;
     /** should be close handle on exit */
     bool m_close_handle;
+
+  public:
     /**
      * \return A pair of the next entry available in a listing.
      */
@@ -121,6 +123,8 @@ namespace NeXus {
      * \return Information about the next attribute.
      */
     AttrInfo getNextAttr();
+
+  private:
     /**
      * This is a deprecated function.
      * \param com The compression type.
@@ -512,6 +516,31 @@ namespace NeXus {
      * int data types, 32 bits or less.
      */
     bool isDataInt();
+
+    /** Put data into the supplied vector. The vector does not need to
+     * be the correct size, just the correct type as it is resized to
+     * the appropriate value.
+     *
+     * The named data object is opened, loaded, then closed.
+     *
+     * @param dataName :: name of the data to open.
+     * @param data :: Where to put the data.
+     * \tparam NumT numeric data type of \a data
+     */
+    template <typename NumT>
+    void readData(const std::string & dataName, std::vector<NumT>& data);
+
+    /** Put data into the supplied vector. The vector does not need to
+     * be the correct size, just the correct type as it is resized to
+     * the appropriate value.
+     *
+     * The named data object is opened, loaded, then closed.
+     *
+     * @param dataName :: name of the data to open.
+     * @param data :: Where to put the data.
+     * \tparam NumT numeric data type of \a data
+     */
+    void readData(const std::string & dataName, std::string & data);
 
     /**
      * \return String data from the file.
