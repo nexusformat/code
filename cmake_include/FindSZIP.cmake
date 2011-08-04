@@ -28,11 +28,12 @@
 
 find_library(SZIP_LIB NAMES sz szip PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
 
-find_library(ZIP_LIB NAMES z zlib zdll zlib1 zlibd zlibd1 PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
-
 find_path(SZIP_INCLUDE NAMES sz.h szlib.h PATHS $ENV{HDF5_ROOT}/include)
 
-find_path(ZIP_INCLUDE zlib.h PATHS $ENV{HDF5_ROOT}/include)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    find_library(ZIP_LIB NAMES z zlib zdll zlib1 zlibd zlibd1 PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
+    find_path(ZIP_INCLUDE zlib.h PATHS $ENV{HDF5_ROOT}/include)
+endif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
 if(SZIP_INCLUDE)
     include_directories(${SZIP_INCLUDE})
