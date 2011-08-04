@@ -33,7 +33,7 @@ if(DEFINED PYTHONINTERP_FOUND)
     SET (NXSPYTHON_SOURCE ${CMAKE_SOURCE_DIR}/bindings/python/nxs/napi.py)
 
     GET_TARGET_PROPERTY(LIB_NAME NeXus_Shared_Library LOCATION)
-    SET (ENV{NEXUSLIB} ${LIB_NAME})
+#    SET (ENV{NEXUSLIB} ${LIB_NAME})
 
     FILE(READ ${NXSPYTHON_SOURCE} TEMP_SOURCE_IN)
 
@@ -46,10 +46,9 @@ if(DEFINED PYTHONINTERP_FOUND)
     #and DESTDIR is not available as a variable in CMAKE
     #(more googleing needed).
 
-
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${PYDOC_OUTPUT}
-        COMMAND   ${PYTHON_DOC}
+        COMMAND   ${CMAKE_COMMAND} -E env "NEXUSLIB=${LIB_NAME}" ${PYTHON_DOC}
         ARGS      -w ${NXSPYTHON_SOURCE}
         COMMENT   "Build NXS Python Docs"
     )
