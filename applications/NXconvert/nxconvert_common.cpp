@@ -28,7 +28,6 @@
 #include <string.h>
 #include <stdlib.h>
 #ifdef _MSC_VER
-#include "getopt.h"
 #else
 #include <unistd.h>
 #endif

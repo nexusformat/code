@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <vector>
 #ifdef _MSC_VER
-#include "getopt.h"
 #else
 #include <unistd.h>
 #endif
