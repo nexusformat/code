@@ -45,7 +45,7 @@ find_package(JPEG)
 find_package(Java)
 find_package(JNI)
 find_package(XMLRPC)
-find_package(ZLIB)
+#find_package(ZLIB)
 find_package(LibXml2)
 find_package(Doxygen)
 
@@ -63,6 +63,7 @@ include(cmake_include/FindMXML.cmake)
 include(cmake_include/FindOpenGenie.cmake)
 include(cmake_include/FindDocbookUtils.cmake)
 include(cmake_include/FindSystemConfig.cmake)
+include(cmake_include/FindSZIP.cmake)
 
 #Find the libraries for the build.
 
@@ -70,8 +71,6 @@ find_library(M m)
 #find_library(RPC rpc)
 find_library(DL dl)
 find_library(PTHREAD pthread)
-#find_library(ZIP z)
-find_library(SZIP sz)
 find_library(TERMCAP termcap)
 find_library(READLINE readline)
 find_library(HISTORY history)
@@ -80,35 +79,35 @@ find_library(HISTORY history)
 SET(CPACK_SET_DESTDIR "ON")
 
 if(M)
-set(M_LINK "-lm")
+   set(M_LINK "-lm")
 endif(M)
 
 if(DL)
-set(DL_LINK "-ldl")
+   set(DL_LINK "-ldl")
 endif(DL)
 
 if(PTHREAD)
-set(PTHREAD_LINK "-lpthread")
+   set(PTHREAD_LINK "-lpthread")
 endif(PTHREAD)
 
-if(SZIP)
-set(SZIP_LINK "-lsz")
-endif(SZIP)
+if(SZIPLIB_FOUND)
+   set(SZIP_LINK "-lsz")
+endif(SZIPLIB_FOUND)
 
 if(TERMCAP)
-set(TERMCAP_LINK "")
+   set(TERMCAP_LINK "")
 endif(TERMCAP)
 
 if(READLINE)
-set(READLINE_LINK "")
+   set(READLINE_LINK "")
 endif(READLINE)
 
 if(HISTORY)
-set(HISTORY_LINK "")
+   set(HISTORY_LINK "")
 endif(HISTORY)
 
 if (HDF5_FOUND)
-  set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
+   set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
 endif (HDF5_FOUND)
 
 #Options
@@ -189,7 +188,9 @@ if (CXX_HAS_NO_COMMENT)
 endif(CXX_HAS_NO_COMMENT)
 
 #We need to be able to check for Fortran F77/90 - but how do we do this?
-enable_language(Fortran)
+if (BUILD_FORTRAN_BINDINGS)
+    enable_language(Fortran)
+endif (BUILD_FORTRAN_BINDINGS)
 
 #We need a NXDOCDIR as a place to install the docs for various packages.
 set(NXDOCDIR "share/nexus/doc")
@@ -217,7 +218,7 @@ add_subdirectory (include)
 #add_subdirectory (macosx_install_kit)
 #add_subdirectory (scripts)
 add_subdirectory (test)
-#add_subdirectory (third_party)
+add_subdirectory (third_party)
 #add_subdirectory (vms)
 #add_subdirectory (windows)
 #add_subdirectory (Windows_extra)

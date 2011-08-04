@@ -4,7 +4,7 @@
 #
 #  CMakeLists for building the NeXus library and applications.
 #
-#  Copyright (C) 2011 Stephen Rankin
+#  Copyright (C) 2010 Stephen Rankin
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -26,19 +26,27 @@
 #
 #====================================================================
 
-add_executable (nxingest nxingest_main.cpp nxingest_utils.cpp
-                         nxingest_debug.cpp nxingest_nexus.cpp
-                         nxingest_parse.cpp nxingest_time.cpp
-                         nxingest_debug.h nxingest.h nxingest_main.h
-                         nxingest_nexus.h nxingest_parse.h
-                         nxingest_time.h nxingest_utils.h)
+include_directories(vcnet .)
 
-target_link_libraries(nxingest NeXus_Shared_Library ${HDF5_LIBRARIES}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK}
-                      ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+set (SOURCE mxml-attr.c mxml-file.c mxml-private.c mxml-string.c 
+mxml-index.c mxml-search.c mxml-entity.c mxml-node.c mxml-set.c)
 
+set (HEADER mxml.h mxml-private.h)
 
-install (PROGRAMS nxingest DESTINATION bin)
-install (FILES nxingest.txt gpl.txt DESTINATION ${NXDOCDIR}/nxingest)
+add_executable (testmxml testmxml.c ${HEADER})
+
+add_executable (mxmldoc mxmldoc.c ${HEADER})
+
+add_library (MXML_Static_Library STATIC ${HEADER} ${SOURCE})
+
+#add_library (MXML_Shared_Library SHARED ${HEADER} ${SOURCE})
+
+set_target_properties(MXML_Static_Library PROPERTIES OUTPUT_NAME mxml1)
+
+#set_target_properties(MXML_Shared_Library PROPERTIES OUTPUT_NAME mxml1)
+
+target_link_libraries(testmxml MXML_Static_Library)
+
+target_link_libraries(mxmldoc MXML_Static_Library)
+
 

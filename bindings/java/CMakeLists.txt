@@ -136,11 +136,11 @@ if(DEFINED JAVA_COMPILE)
         TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library ${HDF5_LIBRARIES}
                       ${MXML_LINK} ${READLINE_LINK} ${M_LINK} ${DF_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${TERMCAP_LINK} ${HDF4_LINK}
-                      ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES} 
-                      ${LIBXML2_LIBRARIES})
+                      ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB}
+                      )
 
         INSTALL(TARGETS jnexus
-            LIBRARY DESTINATION lib COMPONENT Runtime
+            LIBRARY DESTINATION lib COMPONENT Runtime ARCHIVE DESTINATION lib COMPONENT Runtime
         )
 
         INSTALL(FILES ${JAR_ARCHIVE} DESTINATION lib)

@@ -39,14 +39,14 @@ target_link_libraries(NXconvert_Static_Library NeXus_CPP_Static_Library
                       NeXus_Static_Library ${HDF5_LIBRARIES} ${MXML_LINK}
                       ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK}
                       ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
+                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
 
 target_link_libraries(nxconvert NXconvert_Static_Library
                       NeXus_CPP_Static_Library NeXus_Static_Library
                       ${HDF5_LIBRARIES} ${MXML_LINK} ${HDF4_LINK}
                       ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK}
                       ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
+                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
 
 install (TARGETS NXconvert_Static_Library nxconvert
          RUNTIME DESTINATION bin COMPONENT Runtime

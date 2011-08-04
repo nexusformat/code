@@ -42,9 +42,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (NXdump)
 endif(CMAKE_Fortran_COMPILER_WORKS)
 
-if(MXML_FOUND)
-    add_subdirectory (nxingest)
-endif(MXML_FOUND)
+add_subdirectory (nxingest)
 
 if(Java_FOUND)
     add_subdirectory (NXvalidate)
