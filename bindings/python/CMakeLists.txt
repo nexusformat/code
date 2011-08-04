@@ -49,7 +49,7 @@ if(DEFINED PYTHONINTERP_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${PYDOC_OUTPUT}
         COMMAND   ${CMAKE_COMMAND} 
-        ARGS      -D NEXUSLIB="${LIB_NAME}" -D NXSPYTHON_SOURCE="${NXSPYTHON_SOURCE}" -D PYTHON_DOC="${PYTHON_DOC}" -P pythondoc.cmake
+        ARGS      -D NEXUSLIB="${LIB_NAME}" -D NXSPYTHON_SOURCE="${NXSPYTHON_SOURCE}" -D PYTHON_DOC="${PYTHON_DOC}" -P "${CMAKE_SOURCE_DIR}/bindings/python/pythondoc.cmake"
         COMMENT   "Build NXS Python Docs"
     )
 
