@@ -26,7 +26,9 @@
 #
 #====================================================================
 
-include_directories(vcnet .)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    include_directories(vcnet)
+endif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
 set (SOURCE mxml-attr.c mxml-file.c mxml-private.c mxml-string.c 
 mxml-index.c mxml-search.c mxml-entity.c mxml-node.c mxml-set.c)

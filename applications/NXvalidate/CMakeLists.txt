@@ -26,15 +26,9 @@
 #
 #====================================================================
 
-find_program(ANT ant)
-
-if(ANT)
-
 configure_file(nxvalidate.in nxvalidate)
 
 execute_process(COMMAND ${ANT})
-
-#execute_process(COMMAND ${ANT})
 
 install (PROGRAMS nxvalidate DESTINATION bin)
 install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
@@ -49,9 +43,5 @@ install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
 
 install (LIBRARY dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION lib/lib)
 install (LIBRARY dist/NXvalidate.jar DESTINATION lib)
-
-
-endif(ANT)
-
 
 

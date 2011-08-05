@@ -26,24 +26,9 @@
 #
 #====================================================================
 
-find_library(SZIP_LIB NAMES sz szip PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
-
-find_path(SZIP_INCLUDE NAMES sz.h szlib.h PATHS $ENV{HDF5_ROOT}/include)
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_library(ZIP_LIB NAMES z zlib zdll zlib1 zlibd zlibd1 PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
-    find_path(ZIP_INCLUDE zlib.h PATHS $ENV{HDF5_ROOT}/include)
-endif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-
-if(SZIP_INCLUDE)
-    include_directories(${SZIP_INCLUDE})
-endif(SZIP_INCLUDE)
-
-if(ZIP_INCLUDE)
-    include_directories(${ZIP_INCLUDE})
-endif(ZIP_INCLUDE)
+find_file(ANT NAMES ant ant.sh ant.bat PATHS $ENV{ANT_HOME}/bin)
 
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SZIPLIB DEFAULT_MSG SZIP_LIB ZIP_LIB)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(ANTEXEC DEFAULT_MSG ANT)
 
-MARK_AS_ADVANCED(SZIP_LIB)
+MARK_AS_ADVANCED(ANT)

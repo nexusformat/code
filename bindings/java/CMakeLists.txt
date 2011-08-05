@@ -102,7 +102,7 @@ if(DEFINED JAVA_COMPILE)
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JNI_HEADER}
-            COMMAND   ${JAVA_NATIVE}
+            COMMAND   ${Java_JNI_EXECUTABLE}
             ARGS      -jni -d native -classpath . org.nexusformat.NexusFile
             DEPENDS   ${JAR_ARCHIVE}
             COMMENT   "Build JNI Header"
@@ -110,7 +110,7 @@ if(DEFINED JAVA_COMPILE)
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JAVA_DOCS}
-            COMMAND   ${JAVA_DOC}
+            COMMAND   ${Java_DOC_EXECUTABLE}
             ARGS      -d ${JAVA_DOCS} -windowtitle jnexus -doctitle jnexus -classpath . 
                       -sourcepath ${CMAKE_SOURCE_DIR}/bindings/java org.nexusformat ncsa.hdf.hdflib
             DEPENDS   ${JNI_HEADER}
@@ -134,7 +134,7 @@ if(DEFINED JAVA_COMPILE)
         SET_TARGET_PROPERTIES(jnexus PROPERTIES VERSION 1.0 SOVERSION 4)
 
         TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library ${HDF5_LIBRARIES}
-                      ${MXML_LINK} ${READLINE_LINK} ${M_LINK} ${DF_LINK}
+                      ${READLINE_LINK} ${M_LINK} ${DF_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${TERMCAP_LINK} ${HDF4_LINK}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB}
                       )

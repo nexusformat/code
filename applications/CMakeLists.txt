@@ -44,9 +44,11 @@ endif(CMAKE_Fortran_COMPILER_WORKS)
 
 add_subdirectory (nxingest)
 
-if(Java_FOUND)
+add_subdirectory (NXtraverse)
+
+if(Java_FOUND AND ANTEXEC_FOUND)
     add_subdirectory (NXvalidate)
-endif(Java_FOUND)
+endif(Java_FOUND AND ANTEXEC_FOUND)
 
 if(LIBXML2_FOUND)
     add_subdirectory (NXsummary)
