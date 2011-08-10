@@ -16,7 +16,7 @@ if HAVE_PDFLATEX
 if HAVE_DOT
 	rm -fr latex html latex-* html-*
 	env TOPSRC=$(top_srcdir) $(DOXYGEN) $(srcdir)/Doxyfile_c
-	( cd latex-c; ) # ( cd latex-c; make pdf )
+	( cd latex-c; make pdf )
 	env TOPSRC=$(top_srcdir) $(DOXYGEN) $(srcdir)/Doxyfile_cpp
 	( cd latex-cpp; ) # ( cd latex-cpp; make pdf )
 	env TOPSRC=$(top_srcdir) $(DOXYGEN) $(srcdir)/Doxyfile_java
