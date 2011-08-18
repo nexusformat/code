@@ -30,7 +30,7 @@ configure_file(nxvalidate.in nxvalidate)
 
 execute_process(COMMAND ${ANT})
 
-install (PROGRAMS nxvalidate DESTINATION bin)
+install (TARGETS nxvalidate DESTINATION bin)
 install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
          FILE_PERMISSIONS
             OWNER_READ OWNER_EXECUTE OWNER_WRITE

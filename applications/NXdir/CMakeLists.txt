@@ -34,7 +34,7 @@ target_link_libraries(nxdir NeXus_Shared_Library ${HDF5_LIBRARIES}
                       ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
 
-install (PROGRAMS nxdir DESTINATION bin)
+install (TARGETS nxdir DESTINATION bin)
 install (FILES nxdir.1 DESTINATION man/man1)
 
 

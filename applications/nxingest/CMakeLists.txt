@@ -39,6 +39,6 @@ target_link_libraries(nxingest NeXus_Shared_Library ${HDF5_LIBRARIES}
                       ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
 
 
-install (PROGRAMS nxingest DESTINATION bin)
+install (TARGETS nxingest DESTINATION bin)
 install (FILES nxingest.txt gpl.txt DESTINATION ${NXDOCDIR}/nxingest)
 

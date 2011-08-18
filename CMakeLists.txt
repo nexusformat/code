@@ -222,3 +222,9 @@ add_subdirectory (third_party)
 #add_subdirectory (vms)
 #add_subdirectory (windows)
 #add_subdirectory (Windows_extra)
+
+# this must always be last
+set(CPACK_BINARY_NSIS OFF)
+set(CPACK_BINARY_ZIP ON)
+
+include(CPack)

@@ -57,5 +57,5 @@ target_link_libraries(nxtranslate NeXus_Static_Library ${HDF5_LIBRARIES}
                       Loopy SNShistogram Spec TextCollist TextPlain TextXML
                       )
 
-install (PROGRAMS nxtranslate DESTINATION bin)
+install (TARGETS nxtranslate DESTINATION bin)
 
