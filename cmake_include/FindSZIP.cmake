@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-find_library(SZIP_LIB NAMES sz szip PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
+find_library(SZIP_LIB NAMES sz szip PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib $ENV{HDF5_ROOT}/dll)
 
 find_path(SZIP_INCLUDE NAMES sz.h szlib.h PATHS $ENV{HDF5_ROOT}/include)
 

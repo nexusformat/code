@@ -57,10 +57,14 @@ file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 #  file(WRITE ${PROJECT_SOURCE_DIR}/src/nexus_symbols.sym ${NEXUS_SYMBOLS})
 #endif (MINGW_MSYS)
 
-#Make NeXus Static Library
+# need napi_exports2.c  on win32 but not win64
+if (WIN32)
+    set(WINSRC napi_exports.c napi_exports.h)
+endif (WIN32)
 
+#Make NeXus Static Library
 add_library (NeXus_Static_Library STATIC napi.c napiu.c nxstack.c nxstack.h
-             stptok.c  nxdataset.c nxdataset.h nx_stptok.h ${H4SRC} ${H5SRC}
+             stptok.c  nxdataset.c nxdataset.h nx_stptok.h ${WINSRC} ${H4SRC} ${H5SRC}
              ${XMLSRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES OUTPUT_NAME NeXus)
@@ -72,12 +76,12 @@ target_link_libraries(NeXus_Static_Library ${HDF5_LIBRARIES}
 #Make NeXus Shared Library
 
 add_library (NeXus_Shared_Library SHARED napi.c napiu.c nxstack.c nxstack.h
-             stptok.c  nxdataset.c nxdataset.h nx_stptok.h ${H4SRC} ${H5SRC}
+             stptok.c  nxdataset.c nxdataset.h nx_stptok.h ${WINSRC} ${H4SRC} ${H5SRC}
              ${XMLSRC})
 
 #Note - library version needs to be got from somewhere?
 set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
-                      VERSION 1.0 SOVERSION 4)
+                      VERSION 1.0 SOVERSION 4 LINK_FLAGS /def:${PROJECT_SOURCE_DIR}\\windows_extra\\libnexus-0-x64.def)
 
 target_link_libraries(NeXus_Shared_Library ${HDF5_LIBRARIES}
                       ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
