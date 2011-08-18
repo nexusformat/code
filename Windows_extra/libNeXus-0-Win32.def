@@ -110,3 +110,4 @@ nxisetcache_
 nxisetnumberformat_
 putNXDatasetValue
 putNXDatasetValueAt
+nxigetpath_
