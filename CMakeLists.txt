@@ -200,7 +200,7 @@ set(NXEXAMPLEDIR  "share/nexus/examples")
 
 #We need a NXINCLUDE and NX_INCLUDE as a place to install the include files.
 set(NXINCLUDE  "include")
-set(NX_INCLUDE  "include/nexus")
+set(NX_INCLUDE "include/nexus")
 
 file(WRITE ${CMAKE_SOURCE_DIR}/include/nxconfig.h "/*A dummy config*/")
 
@@ -226,5 +226,8 @@ add_subdirectory (third_party)
 # this must always be last
 set(CPACK_BINARY_NSIS OFF)
 set(CPACK_BINARY_ZIP ON)
+
+set(CPACK_SOURCE_IGNORE_FILES
+  "/nexus_spec.in;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)

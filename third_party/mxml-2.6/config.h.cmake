@@ -1,10 +1,10 @@
-## Process this file with cmake
+/*# Process this file with cmake
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #
 #  CMakeLists for building the NeXus library and applications.
 #
-#  Copyright (C) 2010 Stephen Rankin
+#  Copyright (C) 2011 Stephen Rankin
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -24,32 +24,35 @@
 #  For further information, see <http://www.neutron.anl.gov/NeXus/>
 #
 #
-#====================================================================
-include(FindAllIncludes.cmake)
+#====================================================================*/
+#define MXML_VERSION "Mini-XML v2.6"
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    include_directories(vcnet)
-endif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+#cmakedefine01 HAVE_PTHREAD_H
 
-set (SOURCE mxml-attr.c mxml-file.c mxml-private.c mxml-string.c 
-mxml-index.c mxml-search.c mxml-entity.c mxml-node.c mxml-set.c)
+#cmakedefine01 HAVE_SNPRINTF
+#cmakedefine01 HAVE_VSNPRINTF
+#cmakedefine01 HAVE_STRDUP
+#cmakedefine01 HAVE_LONG_LONG
+#define inline
 
-set (HEADER mxml.h mxml-private.h)
+/*
+ * Define prototypes for string functions as needed...
+ */
 
-add_executable (testmxml testmxml.c ${HEADER})
+#  ifndef HAVE_STRDUP
+extern char	*_mxml_strdup(const char *)\;
+#    define strdup _mxml_strdup
+#  endif /* !HAVE_STRDUP */
 
-add_executable (mxmldoc mxmldoc.c ${HEADER})
+extern char	*_mxml_strdupf(const char *, ...)\; 
+extern char	*_mxml_vstrdupf(const char *, va_list)\; 
 
-add_library (MXML_Static_Library STATIC ${HEADER} ${SOURCE})
+#  ifndef HAVE_SNPRINTF
+extern int	_mxml_snprintf(char *, size_t, const char *, ...)\; 
+#    define snprintf _mxml_snprintf
+#  endif /* !HAVE_SNPRINTF */
 
-#add_library (MXML_Shared_Library SHARED ${HEADER} ${SOURCE})
-
-set_target_properties(MXML_Static_Library PROPERTIES OUTPUT_NAME mxml1)
-
-#set_target_properties(MXML_Shared_Library PROPERTIES OUTPUT_NAME mxml1)
-
-target_link_libraries(testmxml MXML_Static_Library ${PTHREAD_LINK})
-
-target_link_libraries(mxmldoc MXML_Static_Library ${PTHREAD_LINK})
-
-
+#  ifndef HAVE_VSNPRINTF
+extern int	_mxml_vsnprintf(char *, size_t, const char *, va_list)\; 
+#    define vsnprintf _mxml_vsnprintf
+#  endif /* !HAVE_VSNPRINTF */

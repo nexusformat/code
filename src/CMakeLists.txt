@@ -80,8 +80,13 @@ add_library (NeXus_Shared_Library SHARED napi.c napiu.c nxstack.c nxstack.h
              ${XMLSRC})
 
 #Note - library version needs to be got from somewhere?
-set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
-                      VERSION 1.0 SOVERSION 4 LINK_FLAGS /def:${PROJECT_SOURCE_DIR}\\windows_extra\\libnexus-0-x64.def)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
+                      VERSION 1.0 SOVERSION 4 LINK_FLAGS /def:${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-x64.def)
+else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
+                      VERSION 1.0 SOVERSION 4)
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 target_link_libraries(NeXus_Shared_Library ${HDF5_LIBRARIES}
                       ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
