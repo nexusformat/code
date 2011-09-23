@@ -66,7 +66,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
         OUTPUT    html-f90 latex-f90
         COMMAND   ${DOXYGEN_EXECUTABLE}
         ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_f90
-        DEPENDS   html-java latex-java
+        DEPENDS   html-python latex-python
         COMMENT   "F90 DOXYGEN"
     )
 
@@ -82,7 +82,13 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
         DEPENDS   html-f77 latex-f77
     )
 
-    install (DIRECTORY html-c html-cpp html-java html-python html-f90 html-f77 DESTINATION ${NXDOCDIR}/doxygen)
+    install (DIRECTORY ${CMAKE_BINARY_DIR}/doc/doxygen/html-c
+                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-cpp
+                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-java
+                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-python
+                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-f90
+                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-f77
+                       DESTINATION ${NXDOCDIR}/doxygen)
 
 endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
