@@ -46,6 +46,9 @@ find_package(XMLRPC)
 #find_package(ZLIB)
 find_package(LibXml2)
 find_package(Doxygen)
+find_package(SWIG)
+find_package(TCL)
+find_package(LATEX)
 
 #CMake includes 
 
@@ -56,6 +59,7 @@ include(cmake_include/FindCBFLib.cmake)
 include(cmake_include/FindJava.cmake)
 include(cmake_include/FindJNI.cmake)
 include(cmake_include/FindGuile.cmake)
+include(cmake_include/FindMZScheme.cmake)
 include(cmake_include/FindHDF4.cmake)
 include(cmake_include/FindIDL.cmake)
 include(cmake_include/FindMXML.cmake)
