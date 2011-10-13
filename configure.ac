@@ -482,7 +482,6 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     for i in $HDF4SEARCH; do
         for j in lib64 lib; do
 	    if test -z "$H4ROOT" -a -r ${i}/$j/libdf.$HDF_EXT; then H4ROOT=$i; fi
-
         done
     done
     for i in lib64 lib; do

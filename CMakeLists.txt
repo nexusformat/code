@@ -231,4 +231,7 @@ add_subdirectory (third_party)
 set(CPACK_BINARY_NSIS OFF)
 set(CPACK_BINARY_ZIP ON)
 
+set(CPACK_SOURCE_IGNORE_FILES 
+	  "nexus_spec.in;~$;/.svn/;/.cvsignore/;/CMakeFiles/;/nbproject/;autogen.sh;cmake_install.cmake;Makefile;${CPACK_SOURCE_IGNORE_FILES}") 
+
 include(CPack)
