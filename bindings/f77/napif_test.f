@@ -19,7 +19,7 @@ C You should have received a copy of the GNU Lesser General Public
 C License along with this library; if not, write to the Free Software
 C Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 C
-C For further information, see <http://www.neutron.anl.gov/NeXus/>
+C  For further information, see <http://www.nexusformat.org>
 C
 C $Id$
 C------------------------------------------------------------------------------

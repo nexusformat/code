@@ -22,7 +22,7 @@ dnl  License along with this library; if not, write to the Free
 dnl  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
 dnl  MA  02111-1307  USA
 dnl             
-dnl  For further information, see <http://www.neutron.anl.gov/NeXus/>
+dnl  For further information, see <http://www.nexusformat.org>
 dnl
 dnl                       -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
@@ -482,6 +482,7 @@ if test "$with_hdf4" != "no" -a -z "$H4ROOT"; then
     for i in $HDF4SEARCH; do
         for j in lib64 lib; do
 	    if test -z "$H4ROOT" -a -r ${i}/$j/libdf.$HDF_EXT; then H4ROOT=$i; fi
+
         done
     done
     for i in lib64 lib; do

@@ -25,7 +25,7 @@
 !           Argonne, IL 60439-4845
 !           USA
 !
-! For further information, see <http://www.neutron.anl.gov/NeXus/>
+!  For further information, see <http://www.nexusformat.org>
 !
 !$Id$
 !------------------------------------------------------------------------------

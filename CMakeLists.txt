@@ -21,7 +21,7 @@
 #  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
 #  MA  02111-1307  USA
 #             
-#  For further information, see <http://www.neutron.anl.gov/NeXus/>
+#  For further information, see <http://www.nexusformat.org>
 #
 #
 #====================================================================
@@ -230,8 +230,5 @@ add_subdirectory (third_party)
 # this must always be last
 set(CPACK_BINARY_NSIS OFF)
 set(CPACK_BINARY_ZIP ON)
-
-set(CPACK_SOURCE_IGNORE_FILES
-  "nexus_spec.in;~$;/.svn/;/.cvsignore/;/CMakeFiles/;/nbproject/;autogen.sh;cmake_install.cmake;Makefile;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)

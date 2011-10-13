@@ -25,7 +25,7 @@
 !           Argonne, IL 60439-4845
 !           USA
 !
-! For further information, see <http://www.neutron.anl.gov/NeXus/>
+!  For further information, see <http://www.nexusformat.org>
 !
 !$Id$
 !------------------------------------------------------------------------------
@@ -289,6 +289,7 @@ program NXbrowse
                         deallocate (dble_3Darray, stat = status)
                   end select
             end select
+
             if (single_element) cycle
             !Check for attributes
             do
