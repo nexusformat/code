@@ -67,9 +67,9 @@ if(DEFINED JAVA_COMPILE)
 
         SET(JNI_HEADER native/org_nexusformat_NexusFile.h)
 
-        SET(JAR_ARCHIVE jnexus.jar)
+        SET(JAR_ARCHIVE ${CMAKE_BINARY_DIR}/bindings/java/jnexus.jar)
 
-        SET(JAVA_DOCS apidoc)
+        SET(JAVA_DOCS ${CMAKE_BINARY_DIR}/bindings/java/apidoc)
 
         FIND_PROGRAM(JAVA_NATIVE
            NAMES javah
