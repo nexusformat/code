@@ -96,6 +96,8 @@ endif(PTHREAD)
 
 if(SZIPLIB_FOUND)
    set(SZIP_LINK "-lsz")
+else(SZIPLIB_FOUND)
+   set(SZIP_LIB "")
 endif(SZIPLIB_FOUND)
 
 if(TERMCAP)
@@ -119,6 +121,10 @@ endif (HDF5_FOUND)
 #Build user contributions
 option (BUILD_CONTRIB 
         "Should I build the user contributions?" OFF)
+
+#Build user contributions
+option (BUILD_FORTRAN_BINDINGS 
+        "Should I build the fortran bindings?" OFF)
 
 #Use HDF4 in build
 option (HAVE_HDF4 
@@ -192,9 +198,9 @@ if (CXX_HAS_NO_COMMENT)
 endif(CXX_HAS_NO_COMMENT)
 
 #We need to be able to check for Fortran F77/90 - but how do we do this?
-if (BUILD_FORTRAN_BINDINGS)
+#if (BUILD_FORTRAN_BINDINGS)
     enable_language(Fortran)
-endif (BUILD_FORTRAN_BINDINGS)
+#endif (BUILD_FORTRAN_BINDINGS)
 
 #We need a NXDOCDIR as a place to install the docs for various packages.
 set(NXDOCDIR "share/nexus/doc")

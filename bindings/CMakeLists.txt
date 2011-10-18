@@ -27,10 +27,10 @@
 #====================================================================
 # Recurse into the subdirectories.
 add_subdirectory (cpp)
-if (CMAKE_Fortran_COMPILER_WORKS)
+if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (f77)
     add_subdirectory (f90)
-endif (CMAKE_Fortran_COMPILER_WORKS)
+endif ()
 #add_subdirectory (idl)
 if (NOT(Java_JAVAC_EXECUTABLE MATCHES NOTFOUND))
     add_subdirectory (java)

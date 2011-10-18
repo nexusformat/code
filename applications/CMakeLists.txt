@@ -38,9 +38,9 @@ add_subdirectory (NXbrowse)
 add_subdirectory (NXdir)
 add_subdirectory (NXconvert)
 
-if (CMAKE_Fortran_COMPILER_WORKS)
+if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (NXdump)
-endif(CMAKE_Fortran_COMPILER_WORKS)
+endif()
 
 add_subdirectory (nxingest)
 

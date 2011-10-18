@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-if (CMAKE_Fortran_COMPILER_WORKS)
+if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
 
     include_directories(${CMAKE_BINARY_DIR}/bindings/f90)
 
@@ -40,7 +40,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
 
     install (PROGRAMS NXbrowse90 DESTINATION bin)
 
-endif(CMAKE_Fortran_COMPILER_WORKS)
+endif()
 
 add_executable (nxbrowse NXbrowse.c)
 
