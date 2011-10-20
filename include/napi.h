@@ -862,7 +862,7 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxopengroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
         NXstatus ( *nxclosegroup)(NXhandle handle);
         NXstatus ( *nxmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[]);
-        NXstatus ( *nxcompmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int bufsize[]);
+        NXstatus ( *nxcompmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int64_t bufsize[]);
         NXstatus ( *nxcompress) (NXhandle handle, int compr_type);
         NXstatus ( *nxopendata) (NXhandle handle, CONSTCHAR* label);
         NXstatus ( *nxclosedata)(NXhandle handle);
