@@ -25,9 +25,10 @@
 #ifdef NXXML 
 
 #include <stdio.h>
-#include <napi.h>
 #include <assert.h>
+#include <stdint.h>
 #include <mxml.h>
+#include <napi.h>
 #include <nxxml.h>
 #include "nxio.h"
 #include "nxdataset.h"
@@ -1909,21 +1910,21 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxmakegroup=NXXmakegroup;
       fHandle->nxopengroup=NXXopengroup;
       fHandle->nxclosegroup=NXXclosegroup;
-      fHandle->nxmakedata=NXXmakedata;
-      fHandle->nxcompmakedata=NXXcompmakedata;
+      fHandle->nxmakedata64=NXXmakedata64;
+      fHandle->nxcompmakedata64=NXXcompmakedata64;
       fHandle->nxcompress=NXXcompress;
       fHandle->nxopendata=NXXopendata;
       fHandle->nxclosedata=NXXclosedata;
       fHandle->nxputdata=NXXputdata;
       fHandle->nxputattr=NXXputattr;
-      fHandle->nxputslab=NXXputslab;    
+      fHandle->nxputslab64=NXXputslab64;    
       fHandle->nxgetdataID=NXXgetdataID;
       fHandle->nxmakelink=NXXmakelink;
       fHandle->nxmakenamedlink=NXXmakenamedlink;
       fHandle->nxgetdata=NXXgetdata;
-      fHandle->nxgetinfo=NXXgetinfo;
+      fHandle->nxgetinfo64=NXXgetinfo64;
       fHandle->nxgetnextentry=NXXgetnextentry;
-      fHandle->nxgetslab=NXXgetslab;
+      fHandle->nxgetslab64=NXXgetslab64;
       fHandle->nxgetnextattr=NXXgetnextattr;
       fHandle->nxgetattr=NXXgetattr;
       fHandle->nxgetattrinfo=NXXgetattrinfo;

@@ -665,8 +665,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   
   /* --------------------------------------------------------------------- */
   
-  NXstatus  NX4makedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
-              int dimensions[])
+  NXstatus  NX4makedata64 (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
+              int64_t dimensions[])
   {
     pNexusFile pFile;
     int32 iNew;
@@ -1984,21 +1984,21 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxmakegroup=NX4makegroup;
       fHandle->nxopengroup=NX4opengroup;
       fHandle->nxclosegroup=NX4closegroup;
-      fHandle->nxmakedata=NX4makedata;
-      fHandle->nxcompmakedata=NX4compmakedata;
+      fHandle->nxmakedata64=NX4makedata64;
+      fHandle->nxcompmakedata64=NX4compmakedata64;
       fHandle->nxcompress=NX4compress;
       fHandle->nxopendata=NX4opendata;
       fHandle->nxclosedata=NX4closedata;
       fHandle->nxputdata=NX4putdata;
       fHandle->nxputattr=NX4putattr;
-      fHandle->nxputslab=NX4putslab;    
+      fHandle->nxputslab64=NX4putslab64;    
       fHandle->nxgetdataID=NX4getdataID;
       fHandle->nxmakelink=NX4makelink;
       fHandle->nxmakenamedlink=NX4makenamedlink;
       fHandle->nxgetdata=NX4getdata;
-      fHandle->nxgetinfo=NX4getinfo;
+      fHandle->nxgetinfo64=NX4getinfo64;
       fHandle->nxgetnextentry=NX4getnextentry;
-      fHandle->nxgetslab=NX4getslab;
+      fHandle->nxgetslab64=NX4getslab64;
       fHandle->nxgetnextattr=NX4getnextattr;
       fHandle->nxgetattr=NX4getattr;
       fHandle->nxgetattrinfo=NX4getattrinfo;

@@ -34,24 +34,24 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
 				     CONSTCHAR *nxclass);
 NXstatus  NXXclosegroup (NXhandle fid);
 
-NXstatus  NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXcompmakedata64 (NXhandle fid, CONSTCHAR *name, 
 					int datatype, 
 					int rank, 
-					int dimensions[],
-					int compress_type, int chunk_size[]);
-NXstatus  NXXmakedata (NXhandle fid, 
+					int64_t dimensions[],
+					int compress_type, int64_t chunk_size[]);
+NXstatus  NXXmakedata64 (NXhandle fid, 
 				    CONSTCHAR *name, int datatype, 
-				    int rank, int dimensions[]);
+				    int rank, int64_t dimensions[]);
 NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name);
 NXstatus  NXXclosedata (NXhandle fid);
 NXstatus  NXXputdata (NXhandle fid, void *data);
 NXstatus  NXXgetdata (NXhandle fid, void *data);
-NXstatus  NXXgetinfo (NXhandle fid, int *rank, 
-				   int dimension[], int *iType);
-NXstatus  NXXputslab (NXhandle fid, void *data, 
-				   int iStart[], int iSize[]);
-NXstatus  NXXgetslab (NXhandle fid, void *data, 
-				   int iStart[], int iSize[]);
+NXstatus  NXXgetinfo64 (NXhandle fid, int *rank, 
+				   int64_t dimension[], int *iType);
+NXstatus  NXXputslab64 (NXhandle fid, void *data, 
+				   int64_t iStart[], int64_t iSize[]);
+NXstatus  NXXgetslab64 (NXhandle fid, void *data, 
+				   int64_t iStart[], int64_t iSize[]);
 NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
 				   int datalen, int iType);
 NXstatus  NXXgetattr (NXhandle fid, char *name, 
