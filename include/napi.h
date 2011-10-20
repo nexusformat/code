@@ -787,7 +787,7 @@ extern  NXstatus  NXgetrawinfo(NXhandle handle, int* rank, int dimension[], int*
  /**
   * @copydoc NXgetrawinfo
   */
-extern  NXstatus  NXgetrawinfo(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
+extern  NXstatus  NXgetrawinfo64(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
 
 /** \typedef void (*ErrFunc)(void *data, char *text)
  * All NeXus error reporting happens through this special function, the 
