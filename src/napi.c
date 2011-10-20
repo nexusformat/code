@@ -32,6 +32,7 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include "napi.h"
 #include "nxstack.h"
 
@@ -92,6 +93,17 @@ static int nxiunlock(int ret)
 	__call
 
 #endif /* _WIN32 */
+
+static int64_t* dupDimsArray(int* dims_array, int rank)
+{
+	int i;
+	int64_t* dims64 = (int64_t*)malloc(rank * sizeof(int64_t));
+	for(i=0; i<rank; ++i)
+	{
+	    dims64[i] = dims_array[i];
+	}
+	return dims64;
+}
 
 /*---------------------------------------------------------------------
  wrapper for getenv. This is a future proofing thing for porting to OS
@@ -329,6 +341,7 @@ static int determineFileType(CONSTCHAR *filename)
 {
     return LOCKED_CALL(determineFileTypeImpl(filename));
 }
+
 /*---------------------------------------------------------------------*/
 static pNexusFunction handleToNexusFunc(NXhandle fid){
   pFileStack fileStack = NULL;
@@ -675,20 +688,40 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int dimensions[])
   {
-    pNexusFunction pFunc = handleToNexusFunc(fid);
-    return LOCKED_CALL(pFunc->nxmakedata(pFunc->pNexusData, name, datatype, rank, dimensions)); 
+	  int status;
+	  int64_t* dims64 = dupDimsArray(dimensions, rank);
+      status = NXmakedata64(fid, name, datatype, rank, dims64);
+	  free(dims64);
+	  return status;
   }
 
+  NXstatus  NXmakedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
+                                  int rank, int64_t dimensions[])
+  {
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    return LOCKED_CALL(pFunc->nxmakedata64(pFunc->pNexusData, name, datatype, rank, dimensions)); 
+  }
 
  /* --------------------------------------------------------------------- */
   
   NXstatus  NXcompmakedata (NXhandle fid, CONSTCHAR *name, int datatype, 
-                           int rank, int dimensions[],int compress_type, int chunk_size[])
+                           int rank, int dimensions[], int compress_type, int chunk_size[])
   {
-    pNexusFunction pFunc = handleToNexusFunc(fid); 
-    return LOCKED_CALL(pFunc->nxcompmakedata (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size)); 
+	  int status;
+	  int64_t* dims64 = dupDimsArray(dimensions, rank);
+	  int64_t* chunk64 = dupDimsArray(chunk_size, rank);
+      status = NXcompmakedata64(fid, name, datatype, rank, dims64, compress_type, chunk64);
+	  free(dims64);
+	  free(chunk64);
+	  return status;
   } 
   
+  NXstatus  NXcompmakedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
+                           int rank, int64_t dimensions[], int compress_type, int64_t chunk_size[])
+  {
+    pNexusFunction pFunc = handleToNexusFunc(fid); 
+    return LOCKED_CALL(pFunc->nxcompmakedata64 (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size)); 
+  } 
  
   /* --------------------------------------------------------------------- */
 
@@ -804,8 +837,24 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   NXstatus  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
+	  int i, status, iType, rank;
+	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];
+	  if (NXgetinfo64(fid, &rank, iStart64, &iType) != NX_OK)
+	  {
+		  return NX_ERROR;
+	  }
+	  for(i=0; i < rank; ++i)
+	  {
+		  iStart64[i] = iStart[i];
+		  iSize64[i] = iSize[i];
+	  }
+	  return NXputslab64(fid, data, iStart64, iSize64);
+  }
+
+  NXstatus  NXputslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+  {
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    return LOCKED_CALL(pFunc->nxputslab(pFunc->pNexusData, data, iStart, iSize));
+    return LOCKED_CALL(pFunc->nxputslab64(pFunc->pNexusData, data, iStart, iSize));
   }
 
   /* ------------------------------------------------------------------- */
@@ -865,16 +914,29 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   /*-------------------------------------------------------------------------*/
   
+  
   NXstatus  NXmalloc (void** data, int rank, 
 				   int dimensions[], int datatype)
+  {
+	  int i, status;
+	  int64_t* dims64 = dupDimsArray(dimensions, rank);
+	  status = NXmalloc64(data, rank, dims64, datatype);
+	  free(dims64);
+	  return status;
+  }
+
+  NXstatus  NXmalloc64 (void** data, int rank, 
+				   int64_t dimensions[], int datatype)
   {
     int i;
     size_t size = 1;
     *data = NULL;
     for(i=0; i<rank; i++)
-    size *= dimensions[i];
+	{
+        size *= dimensions[i];
+	}
     if ((datatype == NX_CHAR) || (datatype == NX_INT8) 
-	|| (datatype == NX_UINT8)) {
+	    || (datatype == NX_UINT8)) {
         /* allow for terminating \0 */
       size += 2;
       }
@@ -970,20 +1032,21 @@ char *nxitrim(char *str)
 
   NXstatus  NXgetdata (NXhandle fid, void *data)
   {
-    int status, type, rank, iDim[NX_MAXRANK];
+    int status, type, rank;
+	int64_t iDim[NX_MAXRANK];
     char *pPtr, *pPtr2;
 
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    status = LOCKED_CALL(pFunc->nxgetinfo(pFunc->pNexusData, &rank, iDim, &type)); /* unstripped size if string */
+    status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, &rank, iDim, &type)); /* unstripped size if string */
     /* only strip one dimensional strings */
     if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) && (rank == 1) )
     {
-	pPtr = (char*)malloc(iDim[0]+5);
+		pPtr = (char*)malloc(iDim[0]+5);
         memset(pPtr, 0, iDim[0]+5);
         status = LOCKED_CALL(pFunc->nxgetdata(pFunc->pNexusData, pPtr)); 
-	pPtr2 = nxitrim(pPtr);
-	strncpy((char*)data, pPtr2, strlen(pPtr2)); /* not NULL terminated by default */
-	free(pPtr);
+		pPtr2 = nxitrim(pPtr);
+		strncpy((char*)data, pPtr2, strlen(pPtr2)); /* not NULL terminated by default */
+		free(pPtr);
     }
     else
     {
@@ -992,14 +1055,26 @@ char *nxitrim(char *str)
     return status;
   }
 /*---------------------------------------------------------------------------*/
+  NXstatus  NXgetrawinfo64 (NXhandle fid, int *rank, 
+				    int64_t dimension[], int *iType)
+  {
+    char *pPtr = NULL;
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    return LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dimension, iType));
+  }
+
   NXstatus  NXgetrawinfo (NXhandle fid, int *rank, 
 				    int dimension[], int *iType)
   {
-    int status;
+    int i, status;
     char *pPtr = NULL;
-
+	int64_t dims64[NX_MAXRANK];
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    status = LOCKED_CALL(pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType));
+    status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dims64, iType));
+	for(i=0; i < *rank; ++i)
+	{
+		dimension[i] = dims64[i];
+	}
     return status;
   }
   /*-------------------------------------------------------------------------*/
@@ -1007,11 +1082,25 @@ char *nxitrim(char *str)
   NXstatus  NXgetinfo (NXhandle fid, int *rank, 
 				    int dimension[], int *iType)
   {
+	  int i, status;
+	  int64_t dims64[NX_MAXRANK];
+	  status = NXgetinfo64(fid, rank, dims64, iType);
+	  for(i=0; i < *rank; ++i)
+	  {
+		  dimension[i] = dims64[i];
+	  }
+	  return status;
+  }
+
+  NXstatus  NXgetinfo64 (NXhandle fid, int *rank, 
+				    int64_t dimension[], int *iType)
+  {
     int status;
     char *pPtr = NULL;
+	*rank = 0;
 
     pNexusFunction pFunc = handleToNexusFunc(fid);
-    status = LOCKED_CALL(pFunc->nxgetinfo(pFunc->pNexusData, rank, dimension, iType));
+    status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dimension, iType));
     /*
       the length of a string may be trimmed....
     */
@@ -1033,10 +1122,26 @@ char *nxitrim(char *str)
   NXstatus  NXgetslab (NXhandle fid, void *data, 
 				    int iStart[], int iSize[])
   {
-    pNexusFunction pFunc = handleToNexusFunc(fid);
-    return LOCKED_CALL(pFunc->nxgetslab(pFunc->pNexusData, data, iStart, iSize));
+	  int i, status, iType, rank;
+	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];
+	  if (NXgetinfo64(fid, &rank, iStart64, &iType) != NX_OK)
+	  {
+		  return NX_ERROR;
+	  }
+	  for(i=0; i < rank; ++i)
+	  {
+		  iStart64[i] = iStart[i];
+		  iSize64[i] = iSize[i];
+	  }
+	  return NXgetslab64(fid, data, iStart64, iSize64);
   }
   
+  NXstatus  NXgetslab64 (NXhandle fid, void *data, 
+				    int64_t iStart[], int64_t iSize[])
+  {
+    pNexusFunction pFunc = handleToNexusFunc(fid);
+    return LOCKED_CALL(pFunc->nxgetslab64(pFunc->pNexusData, data, iStart, iSize));
+  }
   
   /*-------------------------------------------------------------------------*/
 

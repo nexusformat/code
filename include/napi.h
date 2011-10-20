@@ -417,7 +417,7 @@ extern  NXstatus  NXcompmakedata (NXhandle handle, CONSTCHAR* label, int datatyp
 /**
   * @copydoc NXcompmakedata() 
   */
-extern  NXstatus NXcompmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int bufsize[]);
+extern  NXstatus NXcompmakedata64 (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int64_t chunk_size[]);
 
 
   /**
@@ -861,25 +861,20 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxmakegroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
         NXstatus ( *nxopengroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
         NXstatus ( *nxclosegroup)(NXhandle handle);
-        NXstatus ( *nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
         NXstatus ( *nxmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[]);
-        NXstatus ( *nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
         NXstatus ( *nxcompmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int bufsize[]);
         NXstatus ( *nxcompress) (NXhandle handle, int compr_type);
         NXstatus ( *nxopendata) (NXhandle handle, CONSTCHAR* label);
         NXstatus ( *nxclosedata)(NXhandle handle);
         NXstatus ( *nxputdata)(NXhandle handle, void* data);
         NXstatus ( *nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
-        NXstatus ( *nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
         NXstatus ( *nxputslab64)(NXhandle handle, void* data, int64_t start[], int64_t size[]);    
         NXstatus ( *nxgetdataID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakelink)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakenamedlink)(NXhandle handle, CONSTCHAR *newname, NXlink* pLink);
         NXstatus ( *nxgetdata)(NXhandle handle, void* data);
-        NXstatus ( *nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
         NXstatus ( *nxgetinfo64)(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
         NXstatus ( *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
-        NXstatus ( *nxgetslab)(NXhandle handle, void* data, int start[], int size[]);
         NXstatus ( *nxgetslab64)(NXhandle handle, void* data, int64_t start[], int64_t size[]);
         NXstatus ( *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
         NXstatus ( *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
