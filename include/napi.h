@@ -203,27 +203,34 @@ typedef struct {
 #    define NXopengrouppath     MANGLE(nxiopengrouppath)
 #    define NXclosegroup        MANGLE(nxiclosegroup)
 #    define NXmakedata          MANGLE(nximakedata)
+#    define NXmakedata64        MANGLE(nximakedata64)
 #    define NXcompmakedata      MANGLE(nxicompmakedata)
+#    define NXcompmakedata64    MANGLE(nxicompmakedata64)
 #    define NXcompress          MANGLE(nxicompress)
 #    define NXopendata          MANGLE(nxiopendata)
 #    define NXclosedata         MANGLE(nxiclosedata)
 #    define NXputdata           MANGLE(nxiputdata)
 #    define NXputslab           MANGLE(nxiputslab)
+#    define NXputslab64         MANGLE(nxiputslab64)
 #    define NXputattr           MANGLE(nxiputattr)
 #    define NXgetdataID         MANGLE(nxigetdataid)
 #    define NXmakelink          MANGLE(nximakelink)
 #    define NXmakenamedlink     MANGLE(nximakenamedlink)
 #    define NXopensourcegroup   MANGLE(nxiopensourcegroup)
 #    define NXmalloc            MANGLE(nximalloc)
+#    define NXmalloc64          MANGLE(nximalloc64)
 #    define NXfree              MANGLE(nxifree)
 #    define NXflush             MANGLE(nxiflush)
 
 #    define NXgetinfo           MANGLE(nxigetinfo)
+#    define NXgetinfo64         MANGLE(nxigetinfo64)
 #    define NXgetrawinfo        MANGLE(nxigetrawinfo)
+#    define NXgetrawinfo64      MANGLE(nxigetrawinfo64)
 #    define NXgetnextentry      MANGLE(nxigetnextentry)
 #    define NXgetdata           MANGLE(nxigetdata)
 
 #    define NXgetslab           MANGLE(nxigetslab)
+#    define NXgetslab64         MANGLE(nxigetslab64)
 #    define NXgetnextattr       MANGLE(nxigetnextattr)
 #    define NXgetattr           MANGLE(nxigetattr)
 #    define NXgetattrinfo       MANGLE(nxigetattrinfo)
@@ -855,20 +862,25 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxopengroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);
         NXstatus ( *nxclosegroup)(NXhandle handle);
         NXstatus ( *nxmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
+        NXstatus ( *nxmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[]);
         NXstatus ( *nxcompmakedata) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
+        NXstatus ( *nxcompmakedata64) (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int bufsize[]);
         NXstatus ( *nxcompress) (NXhandle handle, int compr_type);
         NXstatus ( *nxopendata) (NXhandle handle, CONSTCHAR* label);
         NXstatus ( *nxclosedata)(NXhandle handle);
         NXstatus ( *nxputdata)(NXhandle handle, void* data);
         NXstatus ( *nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
         NXstatus ( *nxputslab)(NXhandle handle, void* data, int start[], int size[]);    
+        NXstatus ( *nxputslab64)(NXhandle handle, void* data, int64_t start[], int64_t size[]);    
         NXstatus ( *nxgetdataID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakelink)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakenamedlink)(NXhandle handle, CONSTCHAR *newname, NXlink* pLink);
         NXstatus ( *nxgetdata)(NXhandle handle, void* data);
         NXstatus ( *nxgetinfo)(NXhandle handle, int* rank, int dimension[], int* datatype);
+        NXstatus ( *nxgetinfo64)(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
         NXstatus ( *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
         NXstatus ( *nxgetslab)(NXhandle handle, void* data, int start[], int size[]);
+        NXstatus ( *nxgetslab64)(NXhandle handle, void* data, int64_t start[], int64_t size[]);
         NXstatus ( *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
         NXstatus ( *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
         NXstatus ( *nxgetattrinfo)(NXhandle handle, int* no_items);
