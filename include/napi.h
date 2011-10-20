@@ -377,7 +377,14 @@ extern  NXstatus  NXclosegroup(NXhandle handle);
    */
 extern  NXstatus  NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[]);
 
+
   /**
+   * @copydoc NXmakedata()
+   */
+extern  NXstatus  NXmakedata64 (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[]);
+
+
+/**
    * Create a compressed dataset. The dataset is NOT opened. Data from this set will automatically be compressed when 
    * writing and decompressed on reading. 
    * \param handle A NeXus file handle as initialized by NXopen. 
@@ -398,6 +405,13 @@ extern  NXstatus  NXmakedata (NXhandle handle, CONSTCHAR* label, int datatype, i
    * \ingroup c_readwrite
    */
 extern  NXstatus  NXcompmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int dim[], int comp_typ, int bufsize[]);
+
+
+/**
+  * @copydoc NXcompmakedata() 
+  */
+extern  NXstatus NXcompmakedata (NXhandle handle, CONSTCHAR* label, int datatype, int rank, int64_t dim[], int comp_typ, int bufsize[]);
+
 
   /**
    * Switch compression on. This routine is superseeded by NXcompmakedata and thus 
@@ -468,6 +482,11 @@ extern  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iD
 extern  NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]);    
 
   /**
+   * @copydoc NXputdata()
+   */
+extern  NXstatus  NXputslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);    
+
+  /**
    * Retrieve link data for a dataset. This link data can later on be used to link this 
    * dataset into a different group. 
    * \param handle A NeXus file handle as initialized by NXopen.
@@ -535,6 +554,11 @@ extern  NXstatus  NXgetdata(NXhandle handle, void* data);
 extern  NXstatus  NXgetinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
 
   /**
+   * @copydoc NXgetinfo()
+   */
+extern  NXstatus  NXgetinfo64(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
+
+  /**
    * Get the next entry in the currently open group. This is for retrieving infromation about the 
    * content of a NeXus group. In order to search a group #NXgetnextentry is called in a loop until 
    * #NXgetnextentry returns NX_EOD which indicates that there are no further items in the group.
@@ -560,7 +584,13 @@ extern  NXstatus  NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, i
    */
 extern  NXstatus  NXgetslab(NXhandle handle, void* data, int start[], int size[]);
 
+
   /**
+   * @copydoc NXgetslab()
+   */
+extern  NXstatus  NXgetslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);
+
+/**
    * Iterate over global, group or dataset attributes depending on the currently open group or 
    * dataset. In order to search attributes multiple calls to #NXgetnextattr are performed in a loop 
    * until #NXgetnextattr returns NX_EOD which indicates that there are no further attributes.
@@ -708,6 +738,12 @@ extern  NXstatus  NXlinkexternal(NXhandle handle, CONSTCHAR *name, CONSTCHAR *nx
 extern  NXstatus  NXmalloc(void** data, int rank, int dimensions[], int datatype);
 
   /**
+   * @copydoc NXmalloc()
+   */ 
+extern  NXstatus  NXmalloc64(void** data, int rank, int64_t dimensions[], int datatype);
+
+
+  /**
    * Utility function to return NeXus version
    * \return pointer to string in static storage. Version in
    * same format as NEXUS_VERSION string in napi.h i.e. "major.minor.patch"
@@ -740,6 +776,11 @@ extern  NXstatus  NXfree(void** data);
    * \ingroup c_metadata
    */
 extern  NXstatus  NXgetrawinfo(NXhandle handle, int* rank, int dimension[], int* datatype);
+
+ /**
+  * @copydoc NXgetrawinfo
+  */
+extern  NXstatus  NXgetrawinfo(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
 
 /** \typedef void (*ErrFunc)(void *data, char *text)
  * All NeXus error reporting happens through this special function, the 
