@@ -623,6 +623,7 @@ static hid_t nxToHDF5Type(int datatype)
       hsize_t size[H5S_MAX_RANK];
       hsize_t maxdims[H5S_MAX_RANK];
       int compress_level;
+      int unlimiteddim = 0;
 
       pFile = NXI5assert (fid);
       if (pFile->iCurrentG <= 0)
@@ -651,18 +652,16 @@ static hid_t nxToHDF5Type(int datatype)
           return NX_ERROR;
       }
       /*
-      Check dimensions for consistency. The first dimension may be -1
+      Check dimensions for consistency. Dimension may be -1
       thus denoting an unlimited dimension.
       */
       for (i = 1; i < rank; i++) 
       {
           if (dimensions[i] <= 0) 
           {
-              sprintf (pBuffer,
-                  "ERROR: invalid dimension %d, value %d given for Dataset %s",
-                  i, dimensions[i], name);
-              NXReportError( pBuffer);
-              return NX_ERROR;
+		dimensions[i] = -1;
+		chunkdims[i] = 1;
+		unlimiteddim = 1;
           }
       }
       if (datatype == NX_CHAR)
@@ -677,6 +676,12 @@ static hid_t nxToHDF5Type(int datatype)
           for(i = 0; i < rank; i++)
           {
               mydim1[i] = dimensions[i];
+		if (dimensions[i] <= 0) 
+		  {
+	              mydim1[0] = 1;
+       		       maxdims[0] = H5S_UNLIMITED;
+		 }
+
           }
           mydim1[rank-1] = 1;
           if (dimensions[rank-1] > 1)
@@ -687,20 +692,18 @@ static hid_t nxToHDF5Type(int datatype)
           { 
               chunkdims[rank-1] = 1; 
           }
-          if (dimensions[0] == NX_UNLIMITED)
-          {
-              mydim1[0] = 1;
-              maxdims[0] = H5S_UNLIMITED;
-          }
           dataspace=H5Screate_simple(rank,mydim1,maxdims);
       } 
       else 
       {
-          if (dimensions[0] == NX_UNLIMITED)
+          if (unlimiteddim)
           {
-              mydim[0] = 1;
-              maxdims[0] = H5S_UNLIMITED;
+		  for(i = 0; i < rank; i++) {
+		      mydim[i] = 1;
+		      maxdims[i] = H5S_UNLIMITED;
+		}
               dataspace=H5Screate_simple(rank, mydim, maxdims);
+		
           } 
           else 
           {
@@ -734,7 +737,7 @@ static hid_t nxToHDF5Type(int datatype)
       } 
       else if (compress_type == NX_COMP_NONE) 
       {
-          if (dimensions[0] == NX_UNLIMITED) 
+          if (unlimiteddim)
           {
               cparms = H5Pcreate(H5P_DATASET_CREATE);
               iNew = H5Pset_chunk(cparms,rank,chunkdims);
@@ -1004,6 +1007,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     hsize_t mySize[H5S_MAX_RANK];
     hsize_t size[H5S_MAX_RANK],maxdims[H5S_MAX_RANK];
     hid_t   filespace,dataspace; 
+    int unlimiteddim = 0;
   
     pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
@@ -1018,6 +1022,10 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
        size[i]    = iSize[i];
+       if (maxdims[1] == NX_UNLIMITED) {
+	unlimiteddim = 1;
+	size[i] = iStart[i] + iSize[i];
+       }
     }
     if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
     {
@@ -1026,10 +1034,9 @@ static void killAttVID(pNexusFile5 pFile, int vid){
         myStart[rank - 1] = 0;
     }
     dataspace = H5Screate_simple (rank, mySize, NULL);
-    if (maxdims[0] == NX_UNLIMITED)
+    if (unlimiteddim)
     {
-       size[0]=iStart[0] + iSize[0];
-       iRet = H5Dset_extent (pFile->iCurrentD, size);
+       iRet = H5Dset_extent(pFile->iCurrentD, size);
        if (iRet < 0) 
        {
            NXReportError( "ERROR: extend slab failed");
