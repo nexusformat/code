@@ -134,10 +134,11 @@ __all__ = ['UNLIMITED', 'MAXRANK', 'MAXNAMELEN','MAXPATHLEN','H4SKIP',
 import sys, os, numpy, ctypes
 
 # Defined ctypes
-from ctypes import c_void_p, c_int, c_long, c_char, c_char_p
+from ctypes import c_void_p, c_int, c_int64, c_long, c_char, c_char_p
 from ctypes import byref as _ref
 c_void_pp = ctypes.POINTER(c_void_p)
 c_int_p = ctypes.POINTER(c_int)
+c_int64_p = ctypes.POINTER(c_int64)
 class _NXlink(ctypes.Structure):
     _fields_ = [("iTag", c_long),
                 ("iRef", c_long),
