@@ -607,10 +607,10 @@ static hid_t nxToHDF5Type(int datatype)
   
  /* --------------------------------------------------------------------- */
 
-  NXstatus  NX5compmakedata (NXhandle fid, CONSTCHAR *name, 
+  NXstatus  NX5compmakedata64 (NXhandle fid, CONSTCHAR *name, 
 					  int datatype, 
-					  int rank, int dimensions[],
-					  int compress_type, int chunk_size[])
+					  int rank, int64_t dimensions[],
+					  int compress_type, int64_t chunk_size[])
   {
       hid_t datatype1, dataspace, iNew;
       herr_t iRet;
@@ -811,8 +811,8 @@ static hid_t nxToHDF5Type(int datatype)
 
   /* --------------------------------------------------------------------- */
 
-  NXstatus  NX5makedata (NXhandle fid, CONSTCHAR *name, int datatype, 
-                                  int rank, int dimensions[])
+  NXstatus  NX5makedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
+                                  int rank, int64_t dimensions[])
   {
   pNexusFile5 pFile;
   int chunk_size[H5S_MAX_RANK];
@@ -823,7 +823,7 @@ static hid_t nxToHDF5Type(int datatype)
   if (dimensions[0] == NX_UNLIMITED){
          chunk_size[0]= 1;
   }    
-  return NX5compmakedata (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
+  return NX5compmakedata64 (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
     
   return NX_OK;
   }
@@ -998,7 +998,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
   
   /* ------------------------------------------------------------------- */
  
-  NXstatus  NX5putslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NX5putslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
   {
     pNexusFile5 pFile;
     int iRet, i;
@@ -1761,7 +1761,7 @@ static int countObjectsInGroup(hid_t loc_id)
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus  NX5getinfo (NXhandle fid, int *rank, int dimension[], int *iType)
+   NXstatus  NX5getinfo64 (NXhandle fid, int *rank, int64_t dimension[], int *iType)
    {
      pNexusFile5 pFile;
      int i, iRank, mType, iRet;
@@ -1795,7 +1795,7 @@ static int countObjectsInGroup(hid_t loc_id)
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus  NX5getslab (NXhandle fid, void *data, int iStart[], int iSize[])
+   NXstatus  NX5getslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
    {
      pNexusFile5 pFile;
      hsize_t myStart[H5S_MAX_RANK];

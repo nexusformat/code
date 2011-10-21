@@ -364,15 +364,15 @@ NXstatus  NXXclosegroup (NXhandle fid){
 /*=========================================================================
          dataset functions
 =========================================================================*/
-NXstatus  NXXcompmakedata (NXhandle fid, CONSTCHAR *name, 
+NXstatus  NXXcompmakedata64 (NXhandle fid, CONSTCHAR *name, 
 					int datatype, 
 					int rank, 
-					int dimensions[],
-					int compress_type, int chunk_size[]){
+					int64_t dimensions[],
+					int compress_type, int64_t chunk_size[]){
   /*
     compression does not relly make sense with XML
   */
-  return NXXmakedata(fid,name,datatype,rank,dimensions);
+  return NXXmakedata64(fid,name,datatype,rank,dimensions);
 }
 /*-----------------------------------------------------------------------*/
 static char *buildTypeString(int datatype, int rank, int dimensions[]){
@@ -405,9 +405,9 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
 }
 
 /*------------------------------------------------------------------------*/
-NXstatus  NXXmakedatatable (NXhandle fid, 
+NXstatus  NXXmakedatatable64 (NXhandle fid, 
 				    CONSTCHAR *name, int datatype, 
-				    int rank, int dimensions[]){
+				    int rank, int64_t dimensions[]){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *dataNode = NULL, *dataNodeRoot = NULL, *dimsNode = NULL, *dimsNodeRoot = NULL;
   mxml_node_t *newData = NULL;
@@ -477,9 +477,9 @@ NXstatus  NXXmakedatatable (NXhandle fid,
   return NX_OK;
 }
 
-NXstatus  NXXmakedata (NXhandle fid, 
+NXstatus  NXXmakedata64 (NXhandle fid, 
 				    CONSTCHAR *name, int datatype, 
-				    int rank, int dimensions[]){
+				    int rank, int64_t dimensions[]){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *dataNode = NULL;
   mxml_node_t *newData = NULL;
@@ -492,7 +492,7 @@ NXstatus  NXXmakedata (NXhandle fid,
 
   if (xmlHandle->tableStyle && datatype != NX_CHAR && dimensions[0] != NX_UNLIMITED && rank == 1)
   {
-      return NXXmakedatatable(fid,name,datatype,rank,dimensions);
+      return NXXmakedatatable64(fid,name,datatype,rank,dimensions);
   }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
@@ -785,7 +785,7 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
       Text data. We have to make sure that the text is \0 terminated. 
       Some language bindings do not ensure that this is the case.
     */
-    if(NXXgetinfo(fid,&rank, dim, &type) == NX_OK){
+    if(NXXgetinfo64(fid,&rank, dim, &type) == NX_OK){
       length = 1;
       for(i=0; i<rank; i++)
       {
@@ -883,7 +883,7 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
     /*
       text data
     */
-    if(NXXgetinfo(fid,&rank, dim, &type) == NX_OK){
+    if(NXXgetinfo64(fid,&rank, dim, &type) == NX_OK){
       length = 1;
       for(i=0; i<rank; i++)
       {
@@ -903,8 +903,8 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
   return NX_OK;
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NXXgetinfo (NXhandle fid, int *rank, 
-				   int dimension[], int *iType){
+NXstatus  NXXgetinfo64 (NXhandle fid, int *rank, 
+				   int64_t dimension[], int *iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
@@ -1037,12 +1037,12 @@ static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset,
 }
 
 NXstatus  NXXputslabtable (NXhandle fid, void *data, 
-				   int iStart[], int iSize[]){
+				   int64_t iStart[], int64_t iSize[]){
     return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus  NXXputslab (NXhandle fid, void *data, 
-				   int iStart[], int iSize[]){
+NXstatus  NXXputslab64 (NXhandle fid, void *data, 
+				   int64_t iStart[], int64_t iSize[]){
   
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
@@ -1119,8 +1119,8 @@ static void getSlabData(pNXDS dataset, pNXDS slabData, int dim,
   }
 }
 /*----------------------------------------------------------------------*/
-NXstatus  NXXgetslab (NXhandle fid, void *data, 
-				   int iStart[], int iSize[]){
+NXstatus  NXXgetslab64 (NXhandle fid, void *data, 
+				   int64_t iStart[], int64_t iSize[]){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;

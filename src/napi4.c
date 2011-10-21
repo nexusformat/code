@@ -795,8 +795,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
  /* --------------------------------------------------------------------- */
   
    
-  NXstatus  NX4compmakedata (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
-              int dimensions[],int compress_type, int chunk_size[])
+  NXstatus  NX4compmakedata64 (NXhandle fid, CONSTCHAR *name, int datatype, int rank,
+              int64_t dimensions[],int compress_type, int64_t chunk_size[])
   {
     pNexusFile pFile;
     int32 iNew, iRet, type;
@@ -1231,7 +1231,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
    /* ------------------------------------------------------------------- */
 
    
-  NXstatus  NX4putslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NX4putslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
   {
     pNexusFile pFile;
     int iRet;
@@ -1253,11 +1253,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       iStride[i] = 1;
     }
 
-    /* if an int is not 32-bit we have to cast them properly in order
-       to kill a bug.
-    */
-    if(sizeof(int) != 4)
-    {
          SDgetinfo (pFile->iCurrentSDS, pBuffer, 
             &iRank, myStart, &iType, &iAtt);
          for(i = 0; i < iRank; i++)
@@ -1269,13 +1264,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
          iRet = SDwritedata (pFile->iCurrentSDS, myStart, 
                         iStride, mySize, data);
 
-    }
-    else
-    {
-       /* write directly */ 
-       
-       iRet = SDwritedata (pFile->iCurrentSDS,(int32*)iStart, iStride, (int32*)iSize, data);
-    }
 
     /* deal with HDF errors */
     if (iRet < 0) {
@@ -1374,7 +1362,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
        sLink->iTag == DFTAG_SDS)
     {
       iDim[0] = 1;
-      NX4makedata(fid,newname, dataType,rank,iDim);
+      NX4makedata64(fid,newname, dataType,rank,iDim);
       NX4opendata(fid,newname);
       NX4putattr(fid,"NAPIlink",tags, 2, attType);
       NX4closedata(fid); 
@@ -1601,7 +1589,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   /*-------------------------------------------------------------------------*/
 
   NXstatus
-   NX4getinfo (NXhandle fid, int *rank, int dimension[], 
+   NX4getinfo64 (NXhandle fid, int *rank, int64_t dimension[], 
 			    int *iType)
   {
     pNexusFile pFile;
@@ -1633,7 +1621,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   /*-------------------------------------------------------------------------*/
 
   
-  NXstatus  NX4getslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NX4getslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
   {
     pNexusFile pFile;
     int32 myStart[H4_MAX_VAR_DIMS], mySize[H4_MAX_VAR_DIMS];
@@ -1648,11 +1636,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       return NX_ERROR;
     }
 
-    /* if an int is not 32-bit we have to cast them properly in order
-       to kill a bug.
-    */
-    if(sizeof(int) != 4)
-    {
          SDgetinfo (pFile->iCurrentSDS, pBuffer, 
             &iRank, myStart, &iType, &iAtt);
          for(i = 0; i < iRank; i++)
@@ -1664,14 +1647,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
         SDreaddata (pFile->iCurrentSDS, myStart, NULL, 
                    mySize, data);
         return NX_OK;
-    }
-    else
-    {
-        /* read directly  */
-        SDreaddata (pFile->iCurrentSDS, (int32*)iStart, NULL, 
-                   (int32*)iSize, data);
-        return NX_OK;
-    }
   }
   
   /*-------------------------------------------------------------------------*/
