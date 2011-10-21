@@ -445,6 +445,14 @@ if test ! -z "$JAVAINCLUDE" -a ! -z "$java_host"; then
     fi
 fi
 
+if test "x$JAVAROOT" != x; then
+    echo "looking for ant"
+    AC_PATH_PROG(ANT_PROG,ant)
+else
+    ANT_PROG=""
+fi
+AC_SUBST(ANT_PROG)
+
 dnl
 dnl * locate path to HDF libraries *
 dnl
@@ -893,7 +901,7 @@ build:
 	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
 
 	application tools:
-	     ant:	       UNKNOWN
+	     ant:	       ${ANT_PROG}
 	     readline:	       ${HAVE_READLINE}
 
 	documentation:

@@ -44,7 +44,7 @@ EXTRA_DIST	= src lib build.xml manifest.mf nbproject/*
 dist/NXvalidate.jar ::
 	[ -r build.xml ] || ln -s $(srcdir)/build.xml .
 	[ -d nbproject ] || ln -s $(srcdir)/nbproject .
-	ant
+	$(ANT_PROG)
 
 #apidoc : $(noinst_JAVA)
 #	test -d apidoc || mkdir apidoc
@@ -65,7 +65,7 @@ install-data-local :
 	fi
 
 clean-local :
-	ant clean
+	$(ANT_PROG) clean
 
 #uninstall-local :
 #	rm -fr $(DESTDIR)$(nxjavadocdir)/apidoc
