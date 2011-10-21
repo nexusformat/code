@@ -2,6 +2,7 @@ nxiclose_
 nxiclosedata_
 nxiclosegroup_
 nxicompmakedata_
+nxicompmakedata64_
 nxicompress_
 nxifclose_
 nxifcompmakedata_
@@ -20,15 +21,19 @@ nxigetdataid_
 nxigetgroupid_
 nxigetgroupinfo_
 nxigetinfo_
+nxigetinfo64_
 nxigetnextattr_
 nxigetnextentry_
 nxigetslab_
+nxigetslab64_
 nxiinitattrdir_
 nxiinitgroupdir_
 nximakedata_
+nximakedata64_
 nximakegroup_
 nximakelink_
 nximalloc_
+nximalloc64_
 nxiopen_
 nxiopendata_
 nxiopengroup_
@@ -39,6 +44,7 @@ nxiopensourcegroup_
 nxiputattr_
 nxiputdata_
 nxiputslab_
+nxiputslab64_
 nxisameid_
 nxisetcache_
 nxisetnumberformat_
@@ -71,3 +77,4 @@ getNXDatasetValueAt
 putNXDatasetValue
 putNXDatasetValueAt
 nxigetrawinfo_
+nxigetrawinfo64_
