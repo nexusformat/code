@@ -147,7 +147,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
 
     pNew = (pNexusFile5) malloc (sizeof (NexusFile5));
     if (!pNew) {
-      NXReportError("ERROR: no memory to create File datastructure");
+      NXReportError("ERROR: not enough memory to create file structure");
       return NX_ERROR;
     }
     memset (pNew, 0, sizeof (NexusFile5));
@@ -376,7 +376,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
        iRet = H5Gcreate(pFile->iFID,(const char*)pBuffer, 0);
     }   
     if (iRet < 0) {
-      NXReportError( "ERROR: HDF could not create Group");
+      NXReportError( "ERROR: could not create Group");
       return NX_ERROR;
     }
     iVID = iRet;
@@ -386,12 +386,12 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     attr1= H5Acreate(iVID, "NX_class", aid1, aid2, H5P_DEFAULT);
     if (attr1 < 0)
        {
-       NXReportError( "ERROR: HDF failed to store class name!");
+       NXReportError( "ERROR: failed to store class name");
        return NX_ERROR;
        }
     if (H5Awrite(attr1, aid1, (char*)nxclass) < 0)
       {
-      NXReportError( "ERROR: HDF failed to store class name!");
+      NXReportError( "ERROR: failed to store class name");
       return NX_ERROR;
       }
     /* close group */
@@ -432,7 +432,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     }
     iRet = H5Gopen (pFile->iFID,(const char *)pBuffer);
     if (iRet < 0) {
-      sprintf (pBuffer, "ERROR: Group %s does not exist!", pFile->name_tmp);
+      sprintf (pBuffer, "ERROR: group %s does not exist", pFile->name_tmp);
       NXReportError( pBuffer);
       return NX_ERROR;  
     }
@@ -445,20 +445,20 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         /* check group attribute */
         iRet=H5Aiterate(pFile->iCurrentG,NULL,attr_check,NULL);
         if (iRet < 0) {
-          NXReportError( "ERROR iterating through group!");
+          NXReportError( "ERROR: iterating through group");
           return NX_ERROR;  
         } else if (iRet == 1) {
          /* group attribute was found */
         } else {
          /* no group attribute available */
-         NXReportError( "No group attribute available");
+         NXReportError( "ERROR: no group attribute available");
          return NX_ERROR;
         }
         /* check contents of group attribute */
         attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
         if (attr1 < 0)
         {
-              NXReportError( "Error opening NX_class group attribute!");
+              NXReportError( "ERROR: opening NX_class group attribute");
               return NX_ERROR; 
         }
         atype=H5Tcopy(H5T_C_S1);
@@ -467,7 +467,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         if (strcmp(data, nxclass) == 0) {
               /* test OK */
         } else {
-              NXReportError( "Group class is not identical!");
+              NXReportError( "ERROR: group class is not identical");
               iRet = H5Tclose(atype);
               iRet = H5Aclose(attr1); 
               return NX_ERROR; 
@@ -631,16 +631,6 @@ static hid_t nxToHDF5Type(int datatype)
           return NX_ERROR;
       }
 
-      for (i = 0; i < rank; i++)
-      {
-          chunkdims[i] = chunk_size[i];
-          mydim[i] = dimensions[i];
-          maxdims[i] = dimensions[i];
-          size[i] = dimensions[i];
-      }   
-
-      type = nxToHDF5Type(datatype);
-
       if (rank <= 0) 
       {
           sprintf (pBuffer, "ERROR: invalid rank specified %s",
@@ -648,20 +638,32 @@ static hid_t nxToHDF5Type(int datatype)
           NXReportError( pBuffer);
           return NX_ERROR;
       }
+
+      type = nxToHDF5Type(datatype);
+
       /*
       Check dimensions for consistency. Dimension may be -1
       thus denoting an unlimited dimension.
       */
-      for (i = 0; i < rank; i++) 
+      for (i = 0; i < rank; i++)
       {
+          chunkdims[i] = chunk_size[i];
+          mydim[i] = dimensions[i];
+          maxdims[i] = dimensions[i];
+          size[i] = dimensions[i];
           if (dimensions[i] <= 0) 
           {
 		mydim[i] = 1;
 		maxdims[i] = H5S_UNLIMITED;
                 size[i] = 1;
 		unlimiteddim = 1;
+          } else {
+                mydim[i] = dimensions[i];
+                maxdims[i] = dimensions[i];
+                size[i] = dimensions[i];
           }
       }
+
       if (datatype == NX_CHAR)
       {
           /* 
@@ -722,7 +724,7 @@ static hid_t nxToHDF5Type(int datatype)
           iNew = H5Pset_chunk(cparms,rank,chunkdims);
           if (iNew < 0) 
           {
-              NXReportError( "ERROR: Size of chunks could not be set!");
+              NXReportError( "ERROR: size of chunks could not be set");
               return NX_ERROR;
           }
           H5Pset_deflate(cparms,compress_level); 
@@ -736,7 +738,7 @@ static hid_t nxToHDF5Type(int datatype)
               iNew = H5Pset_chunk(cparms,rank,chunkdims);
               if (iNew < 0) 
               {
-                  NXReportError( "ERROR: Size of chunks could not be set!");
+                  NXReportError( "ERROR: size of chunks could not be set");
                   return NX_ERROR;
               }
               iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
@@ -752,7 +754,7 @@ static hid_t nxToHDF5Type(int datatype)
           iNew = H5Pset_chunk(cparms,rank,chunkdims);
           if (iNew < 0) 
           {
-              NXReportError( "ERROR: Size of chunks could not be set!");
+              NXReportError( "ERROR: size of chunks could not be set");
               return NX_ERROR;
           }
           iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
@@ -766,7 +768,7 @@ static hid_t nxToHDF5Type(int datatype)
       }
       if (iRet < 0) 
       {
-          NXReportError( "ERROR: Creating chunked dataset failed!");
+          NXReportError( "ERROR: creating chunked dataset failed");
           return NX_ERROR;
       } 
       else 
@@ -778,7 +780,7 @@ static hid_t nxToHDF5Type(int datatype)
           iNew = H5Dset_extent  (pFile->iCurrentD, size);
           if (iNew < 0) 
           {
-              sprintf (pBuffer, "ERROR: cannot create Dataset %s, check arguments",
+              sprintf (pBuffer, "ERROR: cannot create Dataset %s",
                   name);
               NXReportError( pBuffer);
               return NX_ERROR;
@@ -808,14 +810,17 @@ static hid_t nxToHDF5Type(int datatype)
   {
   pNexusFile5 pFile;
   int64_t chunk_size[H5S_MAX_RANK];
+  int i;
    
   pFile = NXI5assert (fid);
     
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
   memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
-  if (dimensions[0] == NX_UNLIMITED){
-         chunk_size[0]= 1;
+  for(i = 0; i< rank; i++) {
+  if (dimensions[i] == NX_UNLIMITED){
+         chunk_size[i]= 1;
   }    
+  }
   return NX5compmakedata64 (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
   }
 
@@ -853,7 +858,7 @@ static hid_t nxToHDF5Type(int datatype)
      /* find the ID number of datatype */
     pFile->iCurrentT = H5Dget_type(pFile->iCurrentD);
     if (pFile->iCurrentT < 0) {
-      NXReportError( "ERROR:HDF error opening Dataset");
+      NXReportError( "ERROR: error opening Dataset");
       pFile->iCurrentT=0;
       return NX_ERROR;
     }
@@ -883,7 +888,7 @@ static hid_t nxToHDF5Type(int datatype)
     iRet = H5Tclose(pFile->iCurrentT);
     iRet = H5Dclose(pFile->iCurrentD);
     if (iRet < 0) {
-        NXReportError( "ERROR: HDF cannot end access to Dataset");
+        NXReportError( "ERROR: cannot end access to Dataset");
         return NX_ERROR;
      }
     pFile->iCurrentD=0;
@@ -962,19 +967,19 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       H5Aclose(iRet);
       iRet=H5Adelete(vid,name);
       if (iRet<0) {
-	NXReportError( "ERROR: Old attribute cannot be removed! ");
+	NXReportError( "ERROR: old attribute cannot be removed! ");
 	killAttVID(pFile,vid);
 	return NX_ERROR;
       }
     }    
     attr1 = H5Acreate(vid, name, aid1, aid2, H5P_DEFAULT);
     if (attr1 < 0) {
-      NXReportError( "ERROR: Attribute cannot created! ");
+      NXReportError( "ERROR: attribute cannot created! ");
       killAttVID(pFile,vid);
       return NX_ERROR;
     }   
     if (H5Awrite(attr1,aid1,data) < 0) {
-      NXReportError( "ERROR: HDF failed to store attribute ");
+      NXReportError( "ERROR: failed to store attribute ");
       killAttVID(pFile,vid);
       return NX_ERROR;
     }
@@ -1024,7 +1029,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
         size[rank - 1] = 1;
         myStart[rank - 1] = 0;
     }
-    dataspace = H5Screate_simple (rank, mySize, NULL);
+    dataspace = H5Screate_simple(rank, mySize, NULL);
     if (unlimiteddim)
     {
        iRet = H5Dset_extent(pFile->iCurrentD, size);
@@ -1039,7 +1044,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        /* define slab */
        iRet = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, myStart,
                                NULL, mySize, NULL);
-        /* deal with HDF errors */
+       /* deal with HDF errors */
        if (iRet < 0) 
        {
        NXReportError( "ERROR: selecting slab failed");
@@ -1047,7 +1052,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        }
        /* write slab */ 
        iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, dataspace, 
-                    filespace, H5P_DEFAULT,data);
+                    filespace, H5P_DEFAULT, data);
        if (iRet < 0)
        {
            NXReportError( "ERROR: writing slab failed");
@@ -1646,7 +1651,7 @@ static int countObjectsInGroup(hid_t loc_id)
            strcat(ph_name,name);
            grp=H5Gopen(pFile->iFID,ph_name);
            if (grp < 0) {
-              sprintf (pBuffer, "ERROR: Group %s does not exist!", ph_name);
+              sprintf (pBuffer, "ERROR: group %s does not exist", ph_name);
               NXReportError( pBuffer);
               return NX_ERROR;  
            }
@@ -1762,7 +1767,7 @@ static int countObjectsInGroup(hid_t loc_id)
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
      if (pFile->iCurrentD == 0) {
-       NXReportError( "ERROR: no Dataset open");
+       NXReportError( "ERROR: no dataset open");
        return NX_ERROR;
      }
 
@@ -1803,7 +1808,7 @@ static int countObjectsInGroup(hid_t loc_id)
      /* check if there is an Dataset open */
      if (pFile->iCurrentD == 0) 
        {
-	 NXReportError( "ERROR: no Dataset open");
+	 NXReportError( "ERROR: no dataset open");
 	 return NX_ERROR;
        }
      iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS); 
@@ -1845,7 +1850,7 @@ static int countObjectsInGroup(hid_t loc_id)
 				NULL, mySize, NULL);
       if (iRet < 0) 
 	{
-	  NXReportError( "ERROR: Select memspace failed");
+	  NXReportError( "ERROR: selecting memspace failed");
 	  return NX_ERROR;
 	}
        /* map datatypes of other plateforms */
@@ -1880,7 +1885,7 @@ static int countObjectsInGroup(hid_t loc_id)
       if (iRet < 0) 
 
 	{
-	  NXReportError( "ERROR: Reading slab failed");
+	  NXReportError( "ERROR: reading slab failed");
 	  return NX_ERROR;
 	}
       return NX_OK;
@@ -1930,7 +1935,7 @@ static int countObjectsInGroup(hid_t loc_id)
      } 
      intern_idx=-1;
      if (iRet < 0) {
-	   NXReportError( "ERROR iterating through attribute list!");
+	   NXReportError( "ERROR: iterating through attribute list");
 	   killAttVID(pFile,vid);
 	   return NX_ERROR;  
      } 
@@ -2018,7 +2023,7 @@ static int countObjectsInGroup(hid_t loc_id)
      }
 
      if (iRet < 0) {
-       sprintf (pBuffer, "ERROR: HDF could not read attribute data");
+       sprintf (pBuffer, "ERROR: could not read attribute data");
        NXReportError( pBuffer);
        killAttVID(pFile,vid);
        return NX_ERROR;
