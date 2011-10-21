@@ -1097,9 +1097,8 @@ char *nxitrim(char *str)
   {
     int status;
     char *pPtr = NULL;
-	*rank = 0;
-
     pNexusFunction pFunc = handleToNexusFunc(fid);
+	*rank = 0;
     status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dimension, iType));
     /*
       the length of a string may be trimmed....

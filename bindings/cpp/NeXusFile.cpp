@@ -36,15 +36,15 @@ static string toString(const vector<NumT>& data) {
   return result.str();
 }
 
-static vector<int64_t> toInt64(const vector<int> & small) {
+static vector<int64_t> toInt64(const vector<int> & small_v) {
   // copy the dims over to call the int64_t version
-  vector<int64_t> big;
-  big.reserve(small.size());
-  for (vector<int>::const_iterator it = small.begin(); it != small.end(); ++it)
+  vector<int64_t> big_v;
+  big_v.reserve(small_v.size());
+  for (vector<int>::const_iterator it = small_v.begin(); it != small_v.end(); ++it)
   {
-    big.push_back(static_cast<int64_t>(*it));
+    big_v.push_back(static_cast<int64_t>(*it));
   }
-  return big;
+  return big_v;
 }
 
 } // end of anonymous namespace
