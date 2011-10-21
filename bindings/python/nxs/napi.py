@@ -737,8 +737,8 @@ class NeXus(object):
             yield name,nxclass
 
     # ==== Data ====
-    nxlib.nxigetrawinfo_.restype = c_int
-    nxlib.nxigetrawinfo_.argtypes = [c_void_p, c_int_p, c_void_p, c_int_p]
+    nxlib.nxigetrawinfo64_.restype = c_int
+    nxlib.nxigetrawinfo64_.argtypes = [c_void_p, c_int_p, c_void_p, c_int_p]
     def getrawinfo(self):
         """
         Returns the tuple dimensions,type for the currently open dataset.
@@ -759,10 +759,10 @@ class NeXus(object):
         strings, and rank implicit in the length of the returned dimensions.
         """
         rank = c_int(0)
-        shape = numpy.zeros(MAXRANK, 'i')
+        shape = numpy.zeros(MAXRANK, 'int64')
         storage = c_int(0)
-        status = nxlib.nxigetrawinfo_(self.handle, _ref(rank), shape.ctypes.data,
-                                     _ref(storage))
+        status = nxlib.nxigetrawinfo64_(self.handle, _ref(rank), 
+                                        shape.ctypes.data, _ref(storage))
         if status == ERROR:
             raise NeXusError, "Could not get data info: %s"%(self._loc())
         shape = shape[:rank.value]+0
@@ -770,8 +770,8 @@ class NeXus(object):
         #print "getrawinfo",self._loc(),"->",shape,dtype
         return shape,dtype
 
-    nxlib.nxigetinfo_.restype = c_int
-    nxlib.nxigetinfo_.argtypes = [c_void_p, c_int_p, c_void_p, c_int_p]
+    nxlib.nxigetinfo64_.restype = c_int
+    nxlib.nxigetinfo64_.argtypes = [c_void_p, c_int_p, c_void_p, c_int_p]
     def getinfo(self):
         """
         Returns the tuple dimensions,type for the currently open dataset.
@@ -795,9 +795,10 @@ class NeXus(object):
         strings, and rank implicit in the length of the returned dimensions.
         """
         rank = c_int(0)
-        shape = numpy.zeros(MAXRANK, 'i')
+        shape = numpy.zeros(MAXRANK, 'int64')
         storage = c_int(0)
-        status = nxlib.nxigetinfo_(self.handle, _ref(rank), shape.ctypes.data,
+        status = nxlib.nxigetinfo64_(self.handle, _ref(rank), 
+                                     shape.ctypes.data,
                                      _ref(storage))
         if status == ERROR:
             raise NeXusError, "Could not get data info: %s"%(self._loc())
@@ -845,8 +846,8 @@ class NeXus(object):
         self._path.pop()
         self._indata = False
 
-    nxlib.nximakedata_.restype = c_int
-    nxlib.nximakedata_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int_p]
+    nxlib.nximakedata64_.restype = c_int
+    nxlib.nximakedata64_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int64_p]
     def makedata(self, name, dtype=None, shape=None):
         """
         Create a data element of the given type and shape.  See getinfo
@@ -865,15 +866,15 @@ class NeXus(object):
         # TODO: makedata, opendata, putdata, putattr, putattr, ..., closedata
         #print "makedata",self._loc(),name,shape,dtype
         storage = _nxtype_code[str(dtype)]
-        shape = numpy.array(shape,'i')
-        status = nxlib.nximakedata_(self.handle,name,storage,len(shape),
-                                  shape.ctypes.data_as(c_int_p))
+        shape = numpy.asarray(shape,'int64')
+        status = nxlib.nximakedata64_(self.handle,name,storage,len(shape),
+                                      shape.ctypes.data_as(c_int64_p))
         if status == ERROR:
             raise ValueError, "Could not create data %s: %s"%(name,self._loc())
 
-    nxlib.nxicompmakedata_.restype = c_int
-    nxlib.nxicompmakedata_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int_p,
-                                      c_int, c_int_p]
+    nxlib.nxicompmakedata64_.restype = c_int
+    nxlib.nxicompmakedata64_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int64_p,
+                                          c_int, c_int64_p]
     def compmakedata(self, name, dtype=None, shape=None, mode='lzw',
                      chunks=None):
         """
@@ -893,16 +894,16 @@ class NeXus(object):
         storage = _nxtype_code[str(dtype)]
         # Make sure shape/chunk_shape are integers; hope that 32/64 bit issues
         # with the c int type sort themselves out.
-        dims = numpy.array(shape,'i')
+        dims = numpy.asarray(shape,'int64')
         if chunks == None:
-            chunks = numpy.ones(dims.shape,'i')
+            chunks = numpy.ones(dims.shape,'int64')
             chunks[-1] = shape[-1]
         else:
-            chunks = numpy.array(chunks,'i')
-        status = nxlib.nxicompmakedata_(self.handle,name,storage,len(dims),
-                                      dims.ctypes.data_as(c_int_p),
-                                      _compression_code[mode],
-                                      chunks.ctypes.data_as(c_int_p))
+            chunks = numpy.array(chunks,'int64')
+        status = nxlib.nxicompmakedata64_(self.handle,name,storage,len(dims),
+                                          dims.ctypes.data_as(c_int64_p),
+                                          _compression_code[mode],
+                                          chunks.ctypes.data_as(c_int64_p))
         if status == ERROR:
             raise ValueError, \
                 "Could not create compressed data %s: %s"%(name,self._loc())
@@ -931,8 +932,8 @@ class NeXus(object):
         #print "getdata",self._loc(),shape,dtype
         return datafn()
 
-    nxlib.nxigetslab_.restype = c_int
-    nxlib.nxigetslab_.argtypes = [c_void_p, c_void_p, c_int_p, c_int_p]
+    nxlib.nxigetslab64_.restype = c_int
+    nxlib.nxigetslab64_.argtypes = [c_void_p, c_void_p, c_int64_p, c_int64_p]
     def getslab(self, slab_offset, slab_shape):
         """
         Get a slab from the data array.
@@ -947,11 +948,11 @@ class NeXus(object):
         # TODO: consider accepting preallocated data so we don't thrash memory
         dummy_shape,dtype = self.getrawinfo()
         dummy_data,pdata,dummy_size,datafn = self._poutput(dtype,slab_shape)
-        slab_offset = numpy.array(slab_offset,'i')
-        slab_shape = numpy.array(slab_shape,'i')
-        status = nxlib.nxigetslab_(self.handle,pdata,
-                                      slab_offset.ctypes.data_as(c_int_p),
-                                      slab_shape.ctypes.data_as(c_int_p))
+        slab_offset = numpy.asarray(slab_offset,'int64')
+        slab_shape = numpy.asarray(slab_shape,'int64')
+        status = nxlib.nxigetslab64_(self.handle,pdata,
+                                     slab_offset.ctypes.data_as(c_int64_p),
+                                     slab_shape.ctypes.data_as(c_int64_p))
         #print "slab",offset,size,data
         if status == ERROR:
             raise ValueError, "Could not read slab: %s"%(self._loc())
@@ -974,8 +975,8 @@ class NeXus(object):
         if status == ERROR:
             raise ValueError, "Could not write data: %s"%(self._loc())
 
-    nxlib.nxiputslab_.restype = c_int
-    nxlib.nxiputslab_.argtypes = [c_void_p, c_void_p, c_int_p, c_int_p]
+    nxlib.nxiputslab64_.restype = c_int
+    nxlib.nxiputslab64_.argtypes = [c_void_p, c_void_p, c_int64_p, c_int64_p]
     def putslab(self, data, slab_offset, slab_shape):
         """
         Put a slab into the data array.
@@ -989,12 +990,12 @@ class NeXus(object):
         """
         dummy_shape,dtype = self.getrawinfo()
         data,pdata = self._pinput(data,dtype,slab_shape)
-        slab_offset = numpy.array(slab_offset,'i')
-        slab_shape = numpy.array(slab_shape,'i')
+        slab_offset = numpy.asarray(slab_offset,'int64')
+        slab_shape = numpy.asarray(slab_shape,'int64')
         #print "slab",offset,size,data
         status = nxlib.nxiputslab_(self.handle,pdata,
-                                      slab_offset.ctypes.data_as(c_int_p),
-                                      slab_shape.ctypes.data_as(c_int_p))
+                                      slab_offset.ctypes.data_as(c_int64_p),
+                                      slab_shape.ctypes.data_as(c_int64_p))
         if status == ERROR:
             raise ValueError, "Could not write slab: %s"%(self._loc())
 
