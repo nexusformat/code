@@ -182,10 +182,15 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 
   fd = fopen(filename,"r");
   if(fd) {
-    fgets(line,131,fd);
+    int fgets_ok = (fgets(line,131,fd) != NULL);
     fclose(fd);
-    if(strstr(line,"?xml") != NULL){
-      return NX_OK;
+    if (fgets_ok) {
+      if(strstr(line,"?xml") != NULL){
+	return NX_OK;
+      }
+    }
+    else {
+      return NX_ERROR;
     }
   }
   return NX_ERROR;
