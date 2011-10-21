@@ -188,12 +188,18 @@ extern long read_int_attr(NXhandle handle, const Path &path){
     result=static_cast<long>(((int16_t *)data)[0]);
   else if(attr_type==NX_INT32)
     result=static_cast<long>(((int32_t *)data)[0]);
+  else if(attr_type==NX_INT64)
+    result=static_cast<long>(((int64_t *)data)[0]);
   else if(attr_type==NX_UINT8)
     result=static_cast<long>(((uint8_t *)data)[0]);
   else if(attr_type==NX_UINT16)
     result=static_cast<long>(((uint16_t *)data)[0]);
   else if(attr_type==NX_UINT32)
     result=static_cast<long>(((uint32_t *)data)[0]);
+  else if(attr_type==NX_UINT64)
+    result=static_cast<long>(((uint64_t *)data)[0]);
+  else
+    throw "Unsupported type cast in read_int_attr";
 
   // release memory
   if(NXfree(&data)!=NX_OK)
