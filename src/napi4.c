@@ -741,7 +741,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       if (dimensions[i] <= 0) {
         sprintf (pBuffer,
                  "ERROR: invalid dimension %d, value %lld given for SDS %s",
-                 i, dimensions[i], name);
+                 i, (long long)dimensions[i], name);
         NXReportError( pBuffer);
         return NX_ERROR;
       }
@@ -872,7 +872,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       if (dimensions[i] <= 0) {
         sprintf (pBuffer,
                  "ERROR: invalid dimension %d, value %lld given for SDS %s",
-                 i, dimensions[i], name);
+                 i, (long long)dimensions[i], name);
         NXReportError( pBuffer);
         return NX_ERROR;
       }

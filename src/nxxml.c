@@ -393,10 +393,10 @@ static char *buildTypeString(int datatype, int rank, int64_t dimensions[]){
   getNumberText(datatype,typestring,130);
   if(rank > 1 || datatype == NX_CHAR || dimensions[0] > 1) {
     strcat(typestring,"[");
-    snprintf(pNumber,19,"%lld",dimensions[0]);
+    snprintf(pNumber,19,"%lld", (long long)dimensions[0]);
     strncat(typestring,pNumber,130-strlen(typestring));
     for(i = 1; i < rank; i++){
-      snprintf(pNumber,19,",%d",dimensions[i]);
+      snprintf(pNumber,19,",%lld", (long long)dimensions[i]);
       strncat(typestring,pNumber,130-strlen(typestring));
     }
     strcat(typestring,"]");
@@ -414,7 +414,7 @@ NXstatus  NXXmakedatatable64 (NXhandle fid,
   mxml_node_t *current;
   char *typestring;
   int i, ndata; 
-  static int one = 1;
+  static int64_t one = 1;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -761,7 +761,8 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset;
-  int i, length, type, rank, dim[NX_MAXRANK];
+  int i, length, type, rank; 
+  int64_t dim[NX_MAXRANK];
   char *pPtr = NULL;
 
   xmlHandle = (pXMLNexus)fid;
@@ -861,7 +862,8 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset;
-  int i, length, type, rank, dim[NX_MAXRANK];
+  int i, length, type, rank; 
+  int64_t dim[NX_MAXRANK];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -957,7 +959,7 @@ NXstatus  NXXgetinfo64 (NXhandle fid, int *rank,
   clone the dataset and set the data pointer. This in order to use
   the addressing and type conversion implemented in nxdataset
 ---------------------------------------------------------------------*/ 
-static pNXDS makeSlabData(pNXDS dataset, void *data, int size[]){
+static pNXDS makeSlabData(pNXDS dataset, void *data, int64_t size[]){
   pNXDS slabData = NULL;
   int rank, i;
   
@@ -968,7 +970,7 @@ static pNXDS makeSlabData(pNXDS dataset, void *data, int size[]){
 
   rank = getNXDatasetRank(dataset);
   slabData->rank = rank;
-  slabData->dim = (int *)malloc(rank*sizeof(int));
+  slabData->dim = (int64_t *)malloc(rank*sizeof(int64_t));
   for(i = 0; i < rank; i++){
     slabData->dim[i] = size[i];
   }
@@ -981,9 +983,9 @@ static pNXDS makeSlabData(pNXDS dataset, void *data, int size[]){
   This goes by recursion
 ----------------------------------------------------------------------*/
 static void putSlabData(pNXDS dataset, pNXDS slabData, int dim,
-			int start[], 
-			int sourcePos[],int targetPos[]){
-  int i, rank, length;
+			int64_t start[], 
+			int64_t sourcePos[],int64_t targetPos[]){
+  int64_t i, rank, length;
 
   rank = getNXDatasetRank(slabData);
   length = getNXDatasetDim(slabData,dim);
@@ -1007,8 +1009,8 @@ static void putSlabData(pNXDS dataset, pNXDS slabData, int dim,
  This is in order to support unlimited dimensions along the first axis
  -----------------------------------------------------------------------*/
 static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset, 
-				 int start[], int size[]){
-  int dim0, byteLength;
+				 int64_t start[], int64_t size[]){
+  int64_t dim0, byteLength;
   void *oldData = NULL;
   char *typestring = NULL;
 
@@ -1048,7 +1050,8 @@ NXstatus  NXXputslab64 (NXhandle fid, void *data,
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset, slabData;
-  int sourcePos[NX_MAXRANK], targetPos[NX_MAXRANK], status;
+  int64_t sourcePos[NX_MAXRANK], targetPos[NX_MAXRANK];
+  int status;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1096,9 +1099,9 @@ NXstatus  NXXputslab64 (NXhandle fid, void *data,
   This goes by recursion
 ----------------------------------------------------------------------*/
 static void getSlabData(pNXDS dataset, pNXDS slabData, int dim,
-			int start[], 
-			int sourcePos[],int targetPos[]){
-  int i, rank, length;
+			int64_t start[], 
+			int64_t sourcePos[],int64_t targetPos[]){
+  int64_t i, rank, length;
 
   rank = getNXDatasetRank(slabData);
   length = getNXDatasetDim(slabData,dim);
@@ -1125,7 +1128,7 @@ NXstatus  NXXgetslab64 (NXhandle fid, void *data,
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
   pNXDS dataset, slabData;
-  int sourcePos[NX_MAXRANK], targetPos[NX_MAXRANK];
+  int64_t sourcePos[NX_MAXRANK], targetPos[NX_MAXRANK];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
