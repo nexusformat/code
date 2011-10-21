@@ -439,7 +439,7 @@ namespace NeXus {
     void putAttr(const std::string& name, const std::string value);
 
     /**
-     * \copydocs NeXus::File::putSlab(void* data, std::vector<int64_t>& start,
+     * \copydoc NeXus::File::putSlab(void* data, std::vector<int64_t>& start,
      *                                std::vector<int64_t>& size)
      */
     void putSlab(void* data, std::vector<int>& start,
