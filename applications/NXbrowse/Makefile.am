@@ -34,20 +34,11 @@ AM_FCFLAGS=-I$(top_builddir)/bindings/f90
 
 EXTRA_DIST=SConscript $(man_MANS)
 
-if HAVE_F90
-F90_TARGETS = NXbrowse90
-endif
-
-bin_PROGRAMS = nxbrowse $(F90_TARGETS)
+bin_PROGRAMS = nxbrowse
 man_MANS = nxbrowse.1
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
 nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
-
-NXbrowse90_SOURCES = NXbrowse90.f90
-NXbrowse90_LDADD = $(LIBNEXUS90)
-NXbrowse90_LINK = $(FCLINK)
-NXbrowse90_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
 include $(top_srcdir)/build_rules.am

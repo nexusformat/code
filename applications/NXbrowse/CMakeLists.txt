@@ -26,22 +26,6 @@
 #
 #====================================================================
 
-if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
-
-    include_directories(${CMAKE_BINARY_DIR}/bindings/f90)
-
-    add_executable (NXbrowse90 NXbrowse90.f90)
-
-    target_link_libraries(NXbrowse90 NeXus_Shared_Library NeXus_F90_Shared_Library
-                      ${HDF5_LIBRARIES}
-                      ${MXML_LINK} ${HDF4_LINK} ${READLINE_LINK} ${M_LINK}
-                      ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
-                      ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
-
-    install (PROGRAMS NXbrowse90 DESTINATION bin)
-
-endif()
-
 add_executable (nxbrowse NXbrowse.c)
 
 target_link_libraries(nxbrowse NeXus_Shared_Library ${HDF5_LIBRARIES}
