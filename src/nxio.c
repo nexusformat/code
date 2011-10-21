@@ -325,7 +325,7 @@ static mxml_node_t* findDimsNode(mxml_node_t *node)
 
 /*---------------------------------------------------------------------*/
 /*return 1 if in table mode , 0 if not */
-static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
+static void analyzeDataType(mxml_node_t *parent, int *rank, int *type,
 			    int64_t *iDim){
   const char *typeString;
   mxml_node_t* tnode;
@@ -347,7 +347,7 @@ static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
   }
   typeString = mxmlElementGetAttr(parent,TYPENAME);
   if(typeString == NULL){
-    return table_mode;
+    return;
   }
 
   nx_type = translateTypeCode((char *)typeString);
@@ -360,7 +360,7 @@ static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
      "ERROR: %s is an invalid NeXus type, I try to continue but may fail",
      typeString);
     *type =NX_CHAR;
-    return table_mode;
+    return;
   }
 
   *type = nx_type;
@@ -371,7 +371,7 @@ static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
 	*rank = 1;
 	iDim[0] = 1;
   }
-  return table_mode;
+  return;
 }
 /*-------------------------------------------------------------------*/
 void destroyDataset(void *data){
@@ -444,10 +444,9 @@ int nexusLoadCallback(mxml_node_t *node, const char *buffer){
   char pNumber[80], *pStart;
   long address, maxAddress;
   pNXDS dataset = NULL;
-  int table_mode;
 
   parent = node->parent;
-  table_mode = analyzeDataType(parent,&rank,&type,iDim);
+  analyzeDataType(parent,&rank,&type,iDim);
   if(iDim[0] == -1 || !strcmp(parent->parent->value.element.name, DIMS_NODE_NAME)){
     iDim[0] = strlen(buffer);
     node->value.custom.data = strdup(buffer);
