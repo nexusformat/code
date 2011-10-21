@@ -633,7 +633,7 @@ static hid_t nxToHDF5Type(int datatype)
 
       for (i = 0; i < rank; i++)
       {
-          chunkdims[i]=chunk_size[i];
+          chunkdims[i] = chunk_size[i];
           mydim[i] = dimensions[i];
           maxdims[i] = dimensions[i];
           size[i] = dimensions[i];
@@ -652,12 +652,13 @@ static hid_t nxToHDF5Type(int datatype)
       Check dimensions for consistency. Dimension may be -1
       thus denoting an unlimited dimension.
       */
-      for (i = 1; i < rank; i++) 
+      for (i = 0; i < rank; i++) 
       {
           if (dimensions[i] <= 0) 
           {
-		dimensions[i] = -1;
-		chunkdims[i] = 1;
+		mydim[i] = 1;
+		maxdims[i] = H5S_UNLIMITED;
+                size[i] = 1;
 		unlimiteddim = 1;
           }
       }
@@ -669,10 +670,10 @@ static hid_t nxToHDF5Type(int datatype)
           *
           *  search for tests on H5T_STRING
           */
-          byte_zahl=dimensions[rank-1]; 
+          byte_zahl=mydim[rank-1]; 
           for(i = 0; i < rank; i++)
           {
-              mydim1[i] = dimensions[i];
+              mydim1[i] = mydim[i];
 		if (dimensions[i] <= 0) 
 		  {
 	              mydim1[0] = 1;
@@ -681,7 +682,7 @@ static hid_t nxToHDF5Type(int datatype)
 
           }
           mydim1[rank-1] = 1;
-          if (dimensions[rank-1] > 1)
+          if (mydim[rank-1] > 1)
           {
               mydim[rank-1] = maxdims[rank-1] = size[rank-1] = 1;
           }
@@ -693,14 +694,9 @@ static hid_t nxToHDF5Type(int datatype)
       } 
       else 
       {
-          if (unlimiteddim)
-          {
-		  for(i = 0; i < rank; i++) {
-		      mydim[i] = 1;
-		      maxdims[i] = H5S_UNLIMITED;
-		}
+	  if (unlimiteddim)
+	  {
               dataspace=H5Screate_simple(rank, mydim, maxdims);
-		
           } 
           else 
           {
@@ -777,9 +773,8 @@ static hid_t nxToHDF5Type(int datatype)
       {
           pFile->iCurrentD = iRet;
       }
-      if (dimensions[0] == NX_UNLIMITED)
+      if (unlimiteddim)
       {      
-          size[0]   = 1; 
           iNew = H5Dset_extent  (pFile->iCurrentD, size);
           if (iNew < 0) 
           {
@@ -1018,7 +1013,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
        size[i]    = iSize[i];
-       if (maxdims[1] == NX_UNLIMITED) {
+       if (maxdims[i] == NX_UNLIMITED) {
 	unlimiteddim = 1;
 	size[i] = iStart[i] + iSize[i];
        }
