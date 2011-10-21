@@ -112,6 +112,7 @@ COMMAND commands[] = {
     { NULL, NULL }
 };
 
+#if HAVE_LIBREADLINE
 static char* command_generator(const char* text, int state)
 {
     static int len, list_index;
@@ -131,8 +132,9 @@ static char* command_generator(const char* text, int state)
     }
     return NULL;
 }
+#endif
 
-struct name_item;
+struct name_item; /* forward declaration for a linked list */
 
 struct name_item
 {
@@ -140,6 +142,7 @@ struct name_item
     struct name_item* next;
 };
     
+#if HAVE_LIBREADLINE
 static char* field_generator(const char* text, int state)
 {
     static int len;
@@ -211,7 +214,9 @@ static char* field_generator(const char* text, int state)
     }
     return res;
 }
+#endif
 
+#if HAVE_LIBREADLINE
 static char** nxbrowse_complete(const char* text, int start, int end)
 {
     char** matches = NULL;
@@ -228,7 +233,7 @@ static char** nxbrowse_complete(const char* text, int start, int end)
     }
     return matches;
 }
-
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -260,7 +265,11 @@ int main(int argc, char *argv[])
       else ask for a filename */
    if (argc < 2) {
       printf ("Give name of NeXus file : ");
-      fgets (fileName, sizeof(fileName), stdin);
+      if (fgets (fileName, sizeof(fileName), stdin) == NULL)
+      {
+	printf("Failed to open %s\n", fileName);
+	return NX_ERROR;
+      }
       if ((stringPtr = strchr(fileName, '\n')) != NULL) 
          *stringPtr = '\0';
    }
