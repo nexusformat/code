@@ -861,10 +861,10 @@ if test -z "$JAVAROOT"; then
     JAVAROOT="not specified"
 fi
 
-if test -z "$HAVE_LIBREADLINE"; then
-    HAVE_READLINE="no (optional)"
-else
+if test "x$ac_cv_lib_readline_readline" = xyes; then
     HAVE_READLINE="yes"
+else
+    HAVE_READLINE="no (optional)"
 fi
 
 AC_MSG_RESULT([
