@@ -191,6 +191,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_close
 
     /* kill handle */
     HHRemoveHandle(handle);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXclose failed");
+    }
 }
 /*------------------------------------------------------------------------
                      nxmakegroup
@@ -218,6 +222,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakegroup
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseStringUTFChars(env,nxclass, Nxclass);
 
+    if (iRet != NX_OK) {
+      JapiError(env, "NXmakegroup failed");
+    }
 }
 /*------------------------------------------------------------------------
                      nxopengroup
@@ -250,6 +257,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengroup
     /* release strings */
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseStringUTFChars(env,nxclass, Nxclass);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXopengroup failed");
+    }
 }
 /*------------------------------------------------------------------------
                      nxopenpath
@@ -280,6 +291,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopenpath
 #endif
     /* release strings */
     (*env)->ReleaseStringUTFChars(env,path, nxpath);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXopenpath failed");
+    }
 }
 /*------------------------------------------------------------------------
                      nxopengrouppath
@@ -310,6 +325,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopengrouppath
 #endif
     /* release strings */
     (*env)->ReleaseStringUTFChars(env,path, nxpath);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXopengrouppath failed");
+    }
 }
 /*-----------------------------------------------------------------------*/
 JNIEXPORT jstring JNICALL Java_org_nexusformat_NexusFile_nxgetpath
@@ -325,8 +344,10 @@ JNIEXPORT jstring JNICALL Java_org_nexusformat_NexusFile_nxgetpath
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
-    iRet = NXgetpath(nxhandle, path,1024);
-    
+    if (NXgetpath(nxhandle, path,1024) != NX_OK) {
+      JapiError(env, "NXgetpath failed");
+    }
+
     return (*env)->NewStringUTF(env,path);
 }
 
@@ -345,8 +366,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosegroup
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
-    iRet = NXclosegroup(nxhandle);
-
+    if (NXclosegroup(nxhandle) != NX_OK) {
+      JapiError(env, "NXclosegroup failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxmakedata
@@ -378,6 +400,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakedata
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseIntArrayElements(env,dim,iDim,0);  
 
+    if (iRet != NX_OK) {
+      JapiError(env, "NXmakedata failed");
+    }
 }
 /*-----------------------------------------------------------------------
                                nxcompmakedata
@@ -413,6 +438,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakecompdata
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseIntArrayElements(env,dim,iDim,0);  
     (*env)->ReleaseIntArrayElements(env,chunk,iChunk,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXcompmakedata failed");
+    }
 }
 
 /*------------------------------------------------------------------------
@@ -438,6 +467,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopendata
 
     /* clean up */ 
     (*env)->ReleaseStringUTFChars(env,name, Name);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXopendata failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxclosedata
@@ -454,8 +487,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosedata
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
-    iRet = NXclosedata(nxhandle);
-
+    if (NXclosedata(nxhandle) != NX_OK) {
+      JapiError(env, "NXclosedata failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxcompress
@@ -475,7 +509,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxcompress
 #ifdef DEBUG
     fprintf(stderr,"Compressing at %d with type %d\n", nxhandle, comp_type);
 #endif
-    iRet = NXcompress(nxhandle,comp_type);
+
+    if (NXcompress(nxhandle,comp_type) != NX_OK) {
+      JapiError(env, "NXcompress failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxputdata
@@ -500,12 +537,14 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputdata
 
     /* cleanup */
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
-#ifdef DEBUG
     if(iRet != NX_OK)
     {
-	HEprint(stderr,0);
-    }
+#ifdef DEBUG
+      HEprint(stderr,0);
+#else
+      JapiError(env, "NXputdata failed");
 #endif
+    }
 }
 /*------------------------------------------------------------------------
                                nxputslab
@@ -537,6 +576,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputslab
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
     (*env)->ReleaseIntArrayElements(env,start,iStart,0);  
     (*env)->ReleaseIntArrayElements(env,end,iEnd,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXputslab failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxputattr
@@ -592,6 +635,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
     /* cleanup */
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
     (*env)->ReleaseStringUTFChars(env,name, Name);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXputattr failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxgetdata
@@ -616,12 +663,14 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetdata
 
     /* cleanup */
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
-#ifdef DEBUG
     if(iRet != NX_OK)
     {
-	HEprint(stderr,0);
-    }
+#ifdef DEBUG
+      HEprint(stderr,0);
+#else
+      JapiError(env, "NXgetdata failed");
 #endif
+    }
 }
 /*------------------------------------------------------------------------
                                nxgetslab
@@ -646,13 +695,16 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetslab
     iStart = (*env)->GetIntArrayElements(env,start,0);
     iEnd = (*env)->GetIntArrayElements(env,end,0);
 
-
     iRet = NXgetslab(nxhandle, bdata, iStart, iEnd);
 
     /* cleanup */
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
     (*env)->ReleaseIntArrayElements(env,start,iStart,0);  
     (*env)->ReleaseIntArrayElements(env,end,iEnd,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXgetslab failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxgetattr
@@ -699,6 +751,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetattr
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseIntArrayElements(env,args,iargs,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXgetattr failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxgetgroupid
@@ -874,7 +930,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
 {
     NXhandle nxhandle;
     NXlink myLink;
-    int iRet;
     jclass cls;
     jfieldID fid;
     jstring jstr;
@@ -950,7 +1005,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakelink
      (*env)->ReleaseStringUTFChars(env, jstr, cData);
 
      // do actually link
-     iRet = NXmakelink(nxhandle, &myLink);
+     if (NXmakelink(nxhandle, &myLink) != NX_OK) {
+       JapiError(env, "NXmakelink failed");
+     }
 }
 /*------------------------------------------------------------------------
                                nxmakenamedlink
@@ -960,7 +1017,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
 {
     NXhandle nxhandle;
     NXlink myLink;
-    int iRet;
     jclass cls;
     jfieldID fid;
     jstring jstr;
@@ -1039,9 +1095,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakenamedlink
      strcpy(myLink.targetPath,cData);
      (*env)->ReleaseStringUTFChars(env, jstr, cData);
 
-
      // do actually link
-     iRet = NXmakenamedlink(nxhandle, Name,  &myLink);
+     if (NXmakenamedlink(nxhandle, Name,  &myLink) != NX_OK) {
+       JapiError(env, "NXmakenamedlink failed");
+     }
 }
 
 /*------------------------------------------------------------------------
@@ -1051,7 +1108,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopensourcegroup
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
-    int iRet;
 
     /* set error handler */
     NXMSetTError(env,JapiError);
@@ -1059,9 +1115,11 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxopensourcegroup
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
-    iRet = NXopensourcegroup(nxhandle);
-
+    if (NXopensourcegroup(nxhandle) != NX_OK) {
+       JapiError(env, "NXopensourcegroup failed");
+     }
 }
+
 /*----------------------------------------------------------------------
                            nxsetnumberformat
 -----------------------------------------------------------------------*/
@@ -1091,6 +1149,10 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxsetnumberformat
       release format string
     */ 
     (*env)->ReleaseStringUTFChars(env,format, cformat);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXsetnumberformat failed");
+    }
 }
 /*------------------------------------------------------------------------
                                nxgetinfo
@@ -1207,7 +1269,7 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxinquirefile(JNIEnv *env,
 JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxlinkexternal
 (JNIEnv *env, jobject obj, jint handle, jstring name, 
  jstring nxclass, jstring nxurl){
-    int status;
+    int iRet;
     NXhandle nxhandle;
     char *Name, *Nxclass, *Nxurl;
 
@@ -1221,12 +1283,16 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxlinkexternal
     Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
     Nxclass = (char *) (*env)->GetStringUTFChars(env,nxclass,0);    
     Nxurl = (char *) (*env)->GetStringUTFChars(env,nxurl,0);    
-    status = NXlinkexternal(nxhandle,Name,Nxclass,Nxurl);
+    iRet = NXlinkexternal(nxhandle,Name,Nxclass,Nxurl);
     
     /* release strings */
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseStringUTFChars(env,nxclass, Nxclass);
     (*env)->ReleaseStringUTFChars(env,nxurl, Nxurl);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXlinkexternal failed");
+    }
 }
 /*------------------------------------------------------------------------*/
 JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
@@ -1257,6 +1323,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
       rstring = (*env)->NewStringUTF(env,nxurl);
       (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
     }
+    return status;
 }
 /*---------------------------------------------------------------------*/
 JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initattrdir
@@ -1271,8 +1338,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initattrdir
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
-    iRet = NXinitattrdir(nxhandle);
-
+    if (NXinitattrdir(nxhandle) != NX_OK) {
+      JapiError(env, "NXinitattrdir failed");
+    }
 }
 /*---------------------------------------------------------------------*/
 JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
@@ -1287,7 +1355,9 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
     /* exchange the Java handler to a NXhandle */
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
-    iRet = NXinitgroupdir(nxhandle);
+    if (NXinitgroupdir(nxhandle) != NX_OK) {
+      JapiError(env, "NXinitgroupdir failed");
+    }
 }
 /*------------------------------------------------------------------------
                                debugstop
