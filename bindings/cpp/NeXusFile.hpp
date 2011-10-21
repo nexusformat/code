@@ -456,6 +456,14 @@ namespace NeXus {
                  std::vector<int64_t>& size);
 
     /**
+     * \copydoc NeXus::File::putSlab(std::vector<NumT>& data, std::vector<int64_t>&,
+     *                               std::vector<int64_t>&)
+     */
+    template <typename NumT>
+    void putSlab(std::vector<NumT>& data, std::vector<int>& start,
+                 std::vector<int>& size);
+
+    /**
      * Insert an array as part of a data in the final file.
      *
      * \param data The array to put in the file.
@@ -464,9 +472,14 @@ namespace NeXus {
      * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
-    void putSlab(std::vector<NumT>& data, std::vector<int>& start,
-                 std::vector<int>& size);
-    // TODO int64_t
+    void putSlab(std::vector<NumT>& data, std::vector<int64_t>& start,
+                 std::vector<int64_t>& size);
+
+    /**
+     * \copydoc NeXus::File::putSlab(std::vector<NumT>&, int64_t, int64_t)
+     */
+    template <typename NumT>
+    void putSlab(std::vector<NumT>& data, int start, int size);
 
     /**
      * Insert a number as part of a data in the final file.
@@ -477,8 +490,7 @@ namespace NeXus {
      * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
-    void putSlab(std::vector<NumT>& data, int start, int size);
-    // TODO int64_t
+    void putSlab(std::vector<NumT>& data, int64_t start, int64_t size);
 
     /**
      * \return The id of the data used for linking.
@@ -596,6 +608,13 @@ namespace NeXus {
     std::map<std::string, std::string> getEntries();
 
     /**
+     * \copydoc NeXus::File::getSlab(void*, const std::vector<int64_t>&,
+     *                               const std::vector<int64_t>&)
+     */
+    void getSlab(void* data, const std::vector<int>& start,
+                 const std::vector<int>& size);
+
+    /**
      * Get a section of data from the file.
      *
      * \param data The pointer to insert that data into.
@@ -603,9 +622,8 @@ namespace NeXus {
      * from.
      * \param size The size of the block to read from the file.
      */
-    void getSlab(void* data, const std::vector<int>& start,
-                 std::vector<int>& size);
-    // TODO int64_t
+    void getSlab(void* data, const std::vector<int64_t>& start,
+                 const std::vector<int64_t>& size);
 
     /**
      * \return Information about all attributes on the data that is

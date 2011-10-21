@@ -560,6 +560,14 @@ void File::putSlab(void* data, vector<int64_t>& start, vector<int64_t>& size) {
 template <typename NumT>
 void File::putSlab(vector<NumT>& data, vector<int>& start,
                    vector<int>& size) {
+  vector<int64_t> start_big = toInt64(start);
+  vector<int64_t> size_big = toInt64(size);
+  this->putSlab(data, start_big, size_big);
+}
+
+template <typename NumT>
+void File::putSlab(vector<NumT>& data, vector<int64_t>& start,
+                   vector<int64_t>& size) {
   if (data.empty()) {
     throw Exception("Supplied empty data to putSlab");
   }
@@ -568,6 +576,11 @@ void File::putSlab(vector<NumT>& data, vector<int>& start,
 
 template <typename NumT>
 void File::putSlab(vector<NumT>& data, int start, int size) {
+  this->putSlab(data, static_cast<int64_t>(start), static_cast<int64_t>(size));
+}
+
+template <typename NumT>
+void File::putSlab(vector<NumT>& data, int64_t start, int64_t size) {
   vector<int> start_v;
   start_v.push_back(start);
   vector<int> size_v;
@@ -899,7 +912,12 @@ map<string, string> File::getEntries() {
 }
 
 void File::getSlab(void* data, const vector<int>& start,
-                   vector<int>& size) {
+                   const vector<int>& size) {
+  this->getSlab(data, toInt64(start), toInt64(size));
+}
+
+void File::getSlab(void* data, const vector<int64_t>& start,
+                   const vector<int64_t>& size) {
   if (data == NULL) {
     throw Exception("Supplied null pointer to getSlab");
   }
