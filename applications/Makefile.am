@@ -46,7 +46,11 @@ if HAVE_LIBXML2
 NXTRANSLATE=NXtranslate
 NXSUMMARY=NXsummary
 endif
-SUBDIRS = NXbrowse NXdir NXtraverse NXconvert NXvalidate \
+if HAVE_ANT
+NXVALIDATE = NXvalidate
+endif
+
+SUBDIRS = NXbrowse NXdir NXtraverse NXconvert $(NXVALIDATE) \
 	$(NXDUMP) $(NXTRANSLATE) $(NXSUMMARY) $(NXINGEST)
 
 include $(top_srcdir)/build_rules.am

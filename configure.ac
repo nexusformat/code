@@ -452,6 +452,7 @@ else
     ANT_PROG=""
 fi
 AC_SUBST(ANT_PROG)
+AM_CONDITIONAL(HAVE_ANT, [ test "x$ANT_PROG" != "x" ])
 
 dnl
 dnl * locate path to HDF libraries *
