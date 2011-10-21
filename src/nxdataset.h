@@ -53,7 +53,7 @@ typedef struct {
 #endif
 
 
-pNXDS createNXDataset(int rank, int typecode, int dim[]);
+pNXDS createNXDataset(int rank, int typecode, int64_t dim[]);
 pNXDS createTextNXDataset(char *name);
 
 void  dropNXDataset(pNXDS dataset);

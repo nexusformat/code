@@ -44,7 +44,7 @@ void destroyDataset(void *data);
 int translateTypeCode(const char *code);
 int isDataNode(mxml_node_t *node);
 void analyzeDim(const char *typeString, int *rank, 
-		int *iDim, int *type);
+		int64_t *iDim, int *type);
 
 
 #endif

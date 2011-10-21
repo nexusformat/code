@@ -66,9 +66,6 @@ extern  void *NXpData;
 */
 NXstatus  NX5closegroup (NXhandle fid);
 /*-------------------------------------------------------------------*/
-static void ignoreError(void *data, char *text){
-}
-  /*--------------------------------------------------------------------*/
 
   static pNexusFile5 NXI5assert(NXhandle fid)
   {
@@ -125,10 +122,10 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   char pBuffer[512];
   char *time_buffer = NULL;
   char version_nr[10];
-  herr_t iRet;
   unsigned int vers_major, vers_minor, vers_release, am1 ;
   hid_t fapl = -1;     
   int mdc_nelmts;
+  herr_t iRet;
 #ifdef H5_WANT_H5_V1_4_COMPAT
   int rdcc_nelmts;
 #else
@@ -815,17 +812,16 @@ static hid_t nxToHDF5Type(int datatype)
                                   int rank, int64_t dimensions[])
   {
   pNexusFile5 pFile;
-  int chunk_size[H5S_MAX_RANK];
+  int64_t chunk_size[H5S_MAX_RANK];
    
   pFile = NXI5assert (fid);
-  memset(chunk_size,0,H5S_MAX_RANK*sizeof(int));
-  memcpy(chunk_size,dimensions,rank*sizeof(int));
+    
+  memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
+  memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
   if (dimensions[0] == NX_UNLIMITED){
          chunk_size[0]= 1;
   }    
   return NX5compmakedata64 (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
-    
-  return NX_OK;
   }
 
   

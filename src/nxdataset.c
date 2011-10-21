@@ -33,7 +33,7 @@ static int getTypeSize(int typecode){
   }
 }
 /*-----------------------------------------------------------------------*/
-pNXDS createNXDataset(int rank, int typecode, int dim[]){
+pNXDS createNXDataset(int rank, int typecode, int64_t dim[]){
   pNXDS pNew = NULL;
   int i, length;
 

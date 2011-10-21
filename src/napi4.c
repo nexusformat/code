@@ -56,9 +56,6 @@ extern	void *NXpData;
     char iAccess[2];
   } NexusFile, *pNexusFile;
    /*-------------------------------------------------------------------*/
-   static void ignoreError(void *data, char *text){
-   }
-   /*--------------------------------------------------------------------*/
 
   static pNexusFile NXIassert(NXhandle fid)
   {
@@ -743,7 +740,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     for (i = 1; i < rank; i++) {
       if (dimensions[i] <= 0) {
         sprintf (pBuffer,
-                 "ERROR: invalid dimension %d, value %d given for SDS %s",
+                 "ERROR: invalid dimension %d, value %lld given for SDS %s",
                  i, dimensions[i], name);
         NXReportError( pBuffer);
         return NX_ERROR;
@@ -874,7 +871,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     for (i = 1; i < rank; i++) {
       if (dimensions[i] <= 0) {
         sprintf (pBuffer,
-                 "ERROR: invalid dimension %d, value %d given for SDS %s",
+                 "ERROR: invalid dimension %d, value %lld given for SDS %s",
                  i, dimensions[i], name);
         NXReportError( pBuffer);
         return NX_ERROR;
@@ -1344,7 +1341,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     pNexusFile pFile;
     int32 dataID, type = DFNT_CHAR8, length, dataType = NX_CHAR, 
       rank = 1, attType = NX_INT32;
-    int iDim[1];
+    int64_t iDim[1];
     char name[] = "target";
     int tags[2];  
 
@@ -1386,8 +1383,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   
   NXstatus  NX4printlink (NXhandle fid, NXlink* sLink)
   {
-    pNexusFile pFile;
-    pFile = NXIassert (fid);
+     NXIassert (fid);
      printf("HDF4 link: iTag = %ld, iRef = %ld, target=\"%s\"\n", sLink->iTag, sLink->iRef, sLink->targetPath);
     return NX_OK;
   }
@@ -1906,9 +1902,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
 
   NXstatus  NX4sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
-    pNexusFile pFile;
-
-    pFile = NXIassert (fileid);
+    NXIassert (fileid);
     if ((pFirstID->iTag == pSecondID->iTag) & (pFirstID->iRef == pSecondID->iRef)) {
        return NX_OK;
     } else {

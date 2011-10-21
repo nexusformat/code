@@ -375,7 +375,7 @@ NXstatus  NXXcompmakedata64 (NXhandle fid, CONSTCHAR *name,
   return NXXmakedata64(fid,name,datatype,rank,dimensions);
 }
 /*-----------------------------------------------------------------------*/
-static char *buildTypeString(int datatype, int rank, int dimensions[]){
+static char *buildTypeString(int datatype, int rank, int64_t dimensions[]){
   char *typestring = NULL;
   char pNumber[20];
   int i;
@@ -393,7 +393,7 @@ static char *buildTypeString(int datatype, int rank, int dimensions[]){
   getNumberText(datatype,typestring,130);
   if(rank > 1 || datatype == NX_CHAR || dimensions[0] > 1) {
     strcat(typestring,"[");
-    snprintf(pNumber,19,"%d",dimensions[0]);
+    snprintf(pNumber,19,"%lld",dimensions[0]);
     strncat(typestring,pNumber,130-strlen(typestring));
     for(i = 1; i < rank; i++){
       snprintf(pNumber,19,",%d",dimensions[i]);

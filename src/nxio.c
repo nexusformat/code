@@ -236,7 +236,7 @@ extern char *stptok(char *s, char *tok, size_t toklen, char *brk);
  * needs to do a strlen() or equivalent 
  */
 void analyzeDim(const char *typeString, int *rank, 
-			    int *iDim, int *type){
+			    int64_t *iDim, int *type){
   char dimString[132];
   char dim[20];
   const char *dimStart, *dimEnd;
@@ -326,7 +326,7 @@ static mxml_node_t* findDimsNode(mxml_node_t *node)
 /*---------------------------------------------------------------------*/
 /*return 1 if in table mode , 0 if not */
 static int analyzeDataType(mxml_node_t *parent, int *rank, int *type,
-			    int *iDim){
+			    int64_t *iDim){
   const char *typeString;
   mxml_node_t* tnode;
   int nx_type = -1;
@@ -439,7 +439,8 @@ mxml_type_t nexusTypeCallback(mxml_node_t *parent){
 /*----------------------------------------------------------------------*/
 int nexusLoadCallback(mxml_node_t *node, const char *buffer){
   mxml_node_t *parent = NULL;
-  int rank, type, iDim[NX_MAXRANK];
+  int rank, type; 
+  int64_t iDim[NX_MAXRANK];
   char pNumber[80], *pStart;
   long address, maxAddress;
   pNXDS dataset = NULL;
