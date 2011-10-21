@@ -860,6 +860,13 @@ fi
 if test -z "$JAVAROOT"; then
     JAVAROOT="not specified"
 fi
+
+if test -z "$HAVE_LIBREADLINE"; then
+    HAVE_READLINE="no (optional)"
+else
+    HAVE_READLINE="yes"
+fi
+
 AC_MSG_RESULT([
 
 Configuration (NeXus):
@@ -884,6 +891,10 @@ build:
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
 		 MATLAB:	       ${MATLABBINDING} (--with-matlabroot=${MATLABROOT})
 	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
+
+	application tools:
+	     ant:	       UNKNOWN
+	     readline:	       ${HAVE_READLINE}
 
 	documentation:
 	     Doxygen:	       ${DOXYGENDOCS}
