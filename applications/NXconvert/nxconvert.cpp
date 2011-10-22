@@ -46,11 +46,6 @@ using namespace TCLAP;
 static const string NXCONVERT_VERSION("1.0");
 static const string EMPTY("");
 
-static void print_usage()
-{
-    printf("Usage: nxconvert [ -x | -h4 | -h5 | -d | -Dfile | -o keepws | -o table ] [ infile ] [ outfile ]\n");
-}
-
 int main(int argc, char *argv[])
 {
   try {

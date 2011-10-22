@@ -119,7 +119,8 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    if (nx_format == NX_DEFINITION)
    {
 	nx_is_definition = 1;
-	putenv("NX_IS_DEFINITION=1");
+	char env_var[] = "NX_IS_DEFINITION=1";
+	putenv(env_var);
    }
 /* Open NeXus input file and NeXus output file */
    if (NXopen (inFile, nx_read_access, &inId) != NX_OK) {
