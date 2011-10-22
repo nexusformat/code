@@ -61,8 +61,8 @@ int main (int argc, char *argv[])
 	Log log;
 	FILE *inFp = 0;
 	FILE *outFp = 0; 
-	mxml_node_t 	*outTree;	// hold the xml input to ICAT
-	mxml_node_t 	*inTree;	// Hold the parameter list
+	mxml_node_t 	*outTree = 0;	// hold the xml input to ICAT
+	mxml_node_t 	*inTree = 0;	// Hold the parameter list
 	try
 	{
 		// Check if my assumption of type size are correct. 

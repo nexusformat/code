@@ -66,7 +66,7 @@ mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx)
 {
 	
 	Log log;
-	mxml_node_t 	*inNextNode;
+	mxml_node_t 	*inNextNode = 0;
 	mxml_node_t 	*outNextNode;
 	mxml_node_t 	*userInNode;
 	mxml_node_t 	**userOutNode;
