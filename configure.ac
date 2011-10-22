@@ -684,14 +684,6 @@ case "$ac_cv_sys_file_offset_bits" in
     ;;
 esac
 
-if test $MINGW_MSYS = yes; then
-AC_DEFINE([PRINTF_INT64],["I64d"],[Set to printf format for int64_t])
-AC_DEFINE([PRINTF_UINT64],["I64u"],[Set to printf format for uint64_t])
-else
-AC_DEFINE([PRINTF_INT64],["lld"],[Set to printf format for int64_t])
-AC_DEFINE([PRINTF_UINT64],["llu"],[Set to printf format for uint64_t])
-fi
-
 dnl Checks for library functions.
 #this can cause link errors with rpl_malloc undefined
 #AC_FUNC_MALLOC

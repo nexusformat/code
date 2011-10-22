@@ -606,7 +606,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   
     iRef = NXIFindVgroup (pFile, (char*)name, nxclass);
     if (iRef < 0) {
-      sprintf (pBuffer, "ERROR: Vgroup %s, class %s NOT found", name, nxclass);
+      sprintf (pBuffer, "ERROR: Vgroup \"%s\", class \"%s\" NOT found", name, nxclass);
       NXReportError( pBuffer);
       return NX_ERROR;
     }
@@ -1053,7 +1053,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     /* First find the reference number of the SDS */
     iNew = NXIFindSDS (fid, name);
     if (iNew < 0) {
-      sprintf (pBuffer, "ERROR: SDS %s not found at this level", name);
+      sprintf (pBuffer, "ERROR: SDS \"%s\" not found at this level", name);
       NXReportError( pBuffer);
       return NX_ERROR;
     }
@@ -1761,7 +1761,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       }
     }
     if (iNew < 0) {
-      sprintf (pBuffer, "ERROR: attribute %s not found", name);
+      sprintf (pBuffer, "ERROR: attribute \"%s\" not found", name);
       NXReportError( pBuffer);
       return NX_ERROR;
     }

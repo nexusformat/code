@@ -35,7 +35,7 @@
 
 
 extern  void *NXpData;
-
+extern int validNXName(const char* name); /* from napi.c */
 char *nxitrim(char *str); /* from napi.c */
 
 /*----------------------- our data structures --------------------------
@@ -251,11 +251,19 @@ NXstatus  NXXflush(NXhandle *fid){
 =========================================================================*/
 NXstatus  NXXmakegroup (NXhandle fid, CONSTCHAR *name, 
 				     CONSTCHAR *nxclass){
+  char buffer[256];
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *newGroup = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+
+  if (!validNXName(name))
+  {
+    sprintf(buffer, "ERROR: invalid characters in group name \"%s\"", name);
+    NXReportError(buffer);
+    return NX_ERROR;
+  }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXReportError("Close dataset before trying to create a group");
@@ -414,10 +422,17 @@ NXstatus  NXXmakedatatable64 (NXhandle fid,
   mxml_node_t *current;
   char *typestring;
   int i, ndata; 
+  char buffer[256];
   static int64_t one = 1;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+  if (!validNXName(name))
+  {
+    sprintf(buffer, "ERROR: invalid characters in dataset name \"%s\"", name);
+    NXReportError(buffer);
+    return NX_ERROR;
+  }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXReportError("Close dataset before trying to create a dataset");
@@ -485,10 +500,17 @@ NXstatus  NXXmakedata64 (NXhandle fid,
   mxml_node_t *newData = NULL;
   mxml_node_t *current;
   char *typestring;
+  char buffer[256];
 
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+  if (!validNXName(name))
+  {
+    sprintf(buffer, "ERROR: invalid characters in dataset name \"%s\"", name);
+    NXReportError(buffer);
+    return NX_ERROR;
+  }
 
   if (xmlHandle->tableStyle && datatype != NX_CHAR && dimensions[0] != NX_UNLIMITED && rank == 1)
   {
@@ -1869,9 +1891,16 @@ NXstatus  NXXmakenamedlink (NXhandle fid, CONSTCHAR *name, NXlink* sLink){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL, *linkNode = NULL;
   mxml_node_t *linkedNode = NULL;
+  char buffer[256];
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+  if (!validNXName(name))
+  {
+    sprintf(buffer, "ERROR: invalid characters in link name \"%s\"", name);
+    NXReportError(buffer);
+    return NX_ERROR;
+  }
 
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
     NXReportError("No group to link to open");

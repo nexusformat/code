@@ -77,8 +77,11 @@ static char current_path[1024];
 static int add_path(const char* path)
 {
     int i;
-    i = strlen(current_path);
-    sprintf(current_path + i, "/%s", path);
+    if (path != NULL)
+    {
+        i = strlen(current_path);
+        sprintf(current_path + i, "/%s", path);
+    }
     return 0;
 }
 
@@ -86,7 +89,7 @@ static int remove_path(const char* path)
 {
     char *tstr; 
     tstr = strrchr(current_path, '/');
-    if (tstr != NULL && !strcmp(path, tstr+1))
+    if (path != NULL && tstr != NULL && !strcmp(path, tstr+1))
     {
 	*tstr = '\0';
     }
@@ -110,6 +113,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    }
    char* tstr;
    links_to_make.clear();
+   links_to_make.reserve(2000);
    current_path[0] = '\0';
    NXlink link;
    if (nx_format == NX_DEFINITION)
@@ -153,14 +157,17 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 	    {	
 	        if (NXopenpath(outId, links_to_make[i].from) != NX_OK) return NX_ERROR;
 	        tstr = strrchr(links_to_make[i].to, '/');
-	        if (!strcmp(links_to_make[i].name, tstr+1))
-	        {
-	            if (NXmakelink(outId, &link) != NX_OK) return NX_ERROR;
-	        }
-	        else
-	        {
-	            if (NXmakenamedlink(outId, links_to_make[i].name, &link) != NX_OK) return NX_ERROR;
-	        }
+		if (tstr != NULL)
+		{
+	            if (!strcmp(links_to_make[i].name, tstr+1))
+	            {
+	                if (NXmakelink(outId, &link) != NX_OK) return NX_ERROR;
+	            }
+	            else
+	            {
+	                if (NXmakenamedlink(outId, links_to_make[i].name, &link) != NX_OK) return NX_ERROR;
+	            }
+		}
 	    }
 	    else
 	    {

@@ -45,4 +45,4 @@ javadir="@datadir@/java"
 #pkgincludedir=$(includedir)/@PACKAGE@
 #top_builddir=..
 export PATH=${bindir}:${PATH} LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH}
-java -jar ${javadir}/NXvalidate.jar
+java -jar ${javadir}/NXvalidate.jar $*

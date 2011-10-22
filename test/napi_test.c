@@ -602,11 +602,11 @@ print_data (const char *prefix, void *data, int type, int num)
            break;
 
         case NX_INT64:
-           printf (" %" PRINTF_INT64 , ((int64_t *) data)[i]);
+           printf (" %lld", (long long)((int64_t *) data)[i]);
            break;
 
         case NX_UINT64:
-           printf (" %" PRINTF_UINT64 , ((uint64_t *) data)[i]);
+           printf (" %llu", (unsigned long long)((uint64_t *) data)[i]);
            break;
 
         case NX_FLOAT32:

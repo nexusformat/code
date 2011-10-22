@@ -851,7 +851,7 @@ static hid_t nxToHDF5Type(int datatype)
     /* find the ID number and open the dataset */
     pFile->iCurrentD = H5Dopen(pFile->iCurrentG, name);
     if (pFile->iCurrentD < 0) {
-      sprintf (pBuffer, "ERROR: Dataset %s not found at this level", name);
+      sprintf (pBuffer, "ERROR: Dataset \"%s\" not found at this level", name);
       NXReportError( pBuffer);
       return NX_ERROR;
     }
@@ -2004,7 +2004,7 @@ static int countObjectsInGroup(hid_t loc_id)
      vid = getAttVID(pFile);
      iNew = H5Aopen_name(vid, name);
      if (iNew < 0) {
-       sprintf (pBuffer, "ERROR: attribute %s not found", name);
+       sprintf (pBuffer, "ERROR: attribute \"%s\" not found", name);
        killAttVID(pFile,vid);
        NXReportError( pBuffer);
        return NX_ERROR;

@@ -94,13 +94,43 @@ static int nxiunlock(int ret)
 
 #endif /* _WIN32 */
 
+/**
+ * valid NeXus names
+ */
+int validNXName(const char* name)
+{
+    int i;
+    if (name == NULL)
+    {
+	return 0;
+    }
+    for(i=0; i<strlen(name); ++i)
+    {
+	if ( (name[i] >= 'a' && name[i] <= 'z') ||
+	     (name[i] >= 'A' && name[i] <= 'Z') ||
+	     (name[i] >= '0' && name[i] <= '9') ||
+	     (name[i] == '_') )
+	{
+	    ;
+	}
+	else
+	{
+	    return 0;
+	}
+    }
+    return 1;
+}
+
 static int64_t* dupDimsArray(int* dims_array, int rank)
 {
 	int i;
 	int64_t* dims64 = (int64_t*)malloc(rank * sizeof(int64_t));
-	for(i=0; i<rank; ++i)
+	if (dims64 != NULL)
 	{
-	    dims64[i] = dims_array[i];
+		for(i=0; i<rank; ++i)
+		{
+	    		dims64[i] = dims_array[i];
+		}
 	}
 	return dims64;
 }
@@ -571,7 +601,14 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
 
   NXstatus  NXmakegroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass) 
   {
+     char buffer[256];
      pNexusFunction pFunc = handleToNexusFunc(fid);
+     if ( (nxclass != NULL) && !strncmp("NX", nxclass, 2) && !validNXName(name) )
+     {
+        sprintf(buffer, "ERROR: invalid characters in group name \"%s\"", name);
+        NXReportError(buffer);
+	return NX_ERROR;
+     }
      return LOCKED_CALL(pFunc->nxmakegroup(pFunc->pNexusData, name, nxclass));   
   }
   /*------------------------------------------------------------------------*/

@@ -39,7 +39,7 @@ bin_SCRIPTS = nxvalidate
 
 #nxjavadoc_DATA = README.JNEXUS COPYING.NCSA
 
-EXTRA_DIST	= src lib build.xml manifest.mf nbproject/*
+EXTRA_DIST	= src lib build.xml manifest.mf $(srcdir)/nbproject/*
 
 dist/NXvalidate.jar ::
 	[ -r build.xml ] || ln -s $(srcdir)/build.xml .
@@ -65,7 +65,9 @@ install-data-local :
 	fi
 
 clean-local :
+if HAVE_ANT
 	$(ANT_PROG) clean
+endif
 
 #uninstall-local :
 #	rm -fr $(DESTDIR)$(nxjavadocdir)/apidoc
