@@ -57,3 +57,4 @@ EXPORTS
  mxmlSetWrapMargin
  mxmlWalkNext
  mxmlWalkPrev
+ mxml_error
