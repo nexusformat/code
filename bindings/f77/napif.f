@@ -24,6 +24,35 @@ C
 C $Id$
 C------------------------------------------------------------------------------
 
+C------------------------------------------------------------------------------
+C Doxygen comments follow
+C for help, see: http://www.stack.nl/~dimitri/doxygen/docblocks.html#fortranblocks
+C
+C> The Fortran routines have the same names and argument lists as the corresponding C routines, which they call using wrappers. Some extra routines for handling input/output of character data and attributes have been added. Care must be taken to ensure enough space is allocated for the input/output operations being performed.
+C>
+C> It is necessary to reverse the order of indices in multidimensional arrays, compared to an equivalent C program, so that data are stored in the same order in the NeXus file.
+C>
+C> Any program using the F77 API needs to include the following line near the top in order to define the required constants (NXHANDLESIZE, NXLINKSIZE, etc.): 
+C>
+C>       include 'NAPIF.INC'
+C>
+C> Use this table to convert from the C data types listed with each routine to the F77 data types: 
+C>
+C> ==========================  ================================================
+C> C                           FORTRAN 77
+C> ==========================  ================================================
+C> int a, int* a               INTEGER A
+C> char* a                     CHARACTER*(*) A
+C> NXhandle a, NXhandle* a     INTEGER A(NXHANDLESIZE)
+C> NXstatus                    INTEGER
+C> int[] a                     INTEGER A(*)
+C> void* a                     REAL A(*) or DOUBLE A(*) or INTEGER A(*)
+C> NXlink a, NXlink* a         INTEGER A(NXLINKSIZE)
+C> ==========================  ================================================
+C------------------------------------------------------------------------------
+
+
+
 C *** Return length of a string, ignoring trailing blanks
       INTEGER FUNCTION TRUELEN(STRING)
       CHARACTER*(*) STRING
