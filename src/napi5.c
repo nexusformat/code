@@ -133,7 +133,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   am = (NXaccess)(am & NXACCMASK_REMOVEFLAGS);
 
   /* turn off the automatic HDF error handling */  
-     H5Eset_auto(NULL,NULL); 
+     H5Eset_auto(H5E_DEFAULT, NULL, NULL); 
 #ifdef USE_FTIME
     struct timeb timeb_struct;
 #endif 
@@ -183,7 +183,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
  */
     if (am1 != H5F_ACC_RDONLY) 
     {
-        iVID=H5Gopen(pNew->iFID,"/");
+        iVID = H5Gopen(pNew->iFID,"/", H5P_DEFAULT);
         aid2 = H5Screate(H5S_SCALAR);
         aid1 = H5Tcopy(H5T_C_S1);
         H5Tset_size(aid1, strlen(NEXUS_VERSION));
@@ -213,8 +213,8 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     }
     if (am1 == H5F_ACC_TRUNC) 
     {
-        iVID=H5Gopen(pNew->iFID,"/");
-        aid2=H5Screate(H5S_SCALAR);
+        iVID = H5Gopen(pNew->iFID,"/", H5P_DEFAULT);
+        aid2 = H5Screate(H5S_SCALAR);
         aid1 = H5Tcopy(H5T_C_S1);
         H5Tset_size(aid1, strlen(filename));
         attr1= H5Acreate(iVID, "file_name", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
@@ -358,12 +358,12 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     /* create and configure the group */
     if (pFile->iCurrentG==0)
     {
-       iRet = H5Gcreate(pFile->iFID,(const char*)name, 0);
+       iRet = H5Gcreate(pFile->iFID,(const char*)name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
        snprintf(pBuffer,1023,"/%s",name);
     } else
     {
        snprintf(pBuffer,1023,"/%s/%s",pFile->name_ref,name);
-       iRet = H5Gcreate(pFile->iFID,(const char*)pBuffer, 0);
+       iRet = H5Gcreate(pFile->iFID,(const char*)pBuffer, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     }   
     if (iRet < 0) {
       NXReportError( "ERROR: could not create Group");
@@ -420,7 +420,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     {
        sprintf(pBuffer,"%s/%s",pFile->name_tmp,name);
     }
-    iRet = H5Gopen (pFile->iFID,(const char *)pBuffer);
+    iRet = H5Gopen(pFile->iFID,(const char *)pBuffer, H5P_DEFAULT);
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: group %s does not exist", pFile->name_tmp);
       NXReportError( pBuffer);
@@ -912,7 +912,7 @@ static int getAttVID(pNexusFile5 pFile){
   int vid;
      if(pFile->iCurrentG == 0 && pFile->iCurrentD == 0){
        /* global attribute */
-       vid = H5Gopen(pFile->iFID,"/");
+       vid = H5Gopen(pFile->iFID,"/", H5P_DEFAULT);
      } else if(pFile->iCurrentD != 0) {
        /* dataset attribute */
        vid = pFile->iCurrentD;
@@ -1136,7 +1136,7 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
     {
       dataID = H5Dopen(pFile->iFID,sLink->targetPath, H5P_DEFAULT);
     } else {
-      dataID = H5Gopen(pFile->iFID,sLink->targetPath);
+      dataID = H5Gopen(pFile->iFID,sLink->targetPath, H5P_DEFAULT);
     }
     if(dataID < 0)
     {
@@ -1400,7 +1400,7 @@ static int countObjectsInGroup(hid_t loc_id)
     if (pFile->iCurrentG == 0) {
        strcpy (pName, "root");
        strcpy (pClass, "NXroot");
-       gid = H5Gopen(pFile->iFID,"/");
+       gid = H5Gopen(pFile->iFID,"/", H5P_DEFAULT);
        *iN = countObjectsInGroup(gid);
        H5Gclose(gid);
     }
@@ -1638,7 +1638,7 @@ static int countObjectsInGroup(hid_t loc_id)
               strcat(ph_name,"/");
            }
            strcat(ph_name,name);
-           grp=H5Gopen(pFile->iFID,ph_name);
+           grp = H5Gopen(pFile->iFID,ph_name, H5P_DEFAULT);
            if (grp < 0) {
               sprintf (pBuffer, "ERROR: group %s does not exist", ph_name);
               NXReportError( pBuffer);
