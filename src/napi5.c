@@ -718,7 +718,7 @@ static hid_t nxToHDF5Type(int datatype)
               return NX_ERROR;
           }
           H5Pset_deflate(cparms,compress_level); 
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
+          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
       } 
       else if (compress_type == NX_COMP_NONE) 
       {
@@ -731,11 +731,11 @@ static hid_t nxToHDF5Type(int datatype)
                   NXReportError( "ERROR: size of chunks could not be set");
                   return NX_ERROR;
               }
-              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
+              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
           } 
           else 
           {
-              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT);
+              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
           }               
       } 
       else if (compress_type == NX_CHUNK) 
@@ -747,14 +747,14 @@ static hid_t nxToHDF5Type(int datatype)
               NXReportError( "ERROR: size of chunks could not be set");
               return NX_ERROR;
           }
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, cparms);   
+          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 
       } 
       else 
       {
           NXReportError( 
               "HDF5 doesn't support selected compression method! Dataset was saved without compression");
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT); 
+          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
       }
       if (iRet < 0) 
       {
