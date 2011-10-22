@@ -73,7 +73,7 @@ public class NXschematron {
         //XSLT for NXDL to sch
         nxdl2schXSLTStream =
                 NXschematron.class.getResourceAsStream(
-                "resources/nxdl2sch.xsl");
+                "resources/xslt/nxdl2sch.xsl");
 
     }
 
@@ -148,7 +148,7 @@ public class NXschematron {
         // Step 0
         File schematron0 = File.createTempFile("nxdlFile", ".step0");
         if (!this.keepTemp) {
-        //    schematron0.deleteOnExit();
+            schematron0.deleteOnExit();
         }
         TransformoMatic(new FileInputStream(schematronFile), nxdl2schXSLTStream,
                 new FileOutputStream(schematron0));
@@ -156,7 +156,7 @@ public class NXschematron {
         // Step 1
         File schematron1 = File.createTempFile("schematron", ".step1");
         if (!this.keepTemp) {
-        //    schematron1.deleteOnExit();
+            schematron1.deleteOnExit();
         }
         TransformoMatic(new FileInputStream(schematron0), dsdlIncludeXSLTStream,
                 new FileOutputStream(schematron1));
@@ -164,7 +164,7 @@ public class NXschematron {
         // Step 2
         File schematron2 = File.createTempFile("schematron", ".step2");
         if (!this.keepTemp) {
-        //    schematron2.deleteOnExit();
+            schematron2.deleteOnExit();
         }
         TransformoMatic(new FileInputStream(schematron1),
                 abstractExpandXSLTStream,
@@ -173,7 +173,7 @@ public class NXschematron {
         // Step 3
         File schemaFile = File.createTempFile("schema", ".xslt");
         if (!this.keepTemp) {
-        //    schemaFile.deleteOnExit();
+            schemaFile.deleteOnExit();
         }
         TransformoMatic(new FileInputStream(schematron2),svrlForXslt2XSLTStream,
                 new FileOutputStream(schemaFile));
@@ -186,7 +186,7 @@ public class NXschematron {
         File resultsFile = new File(reducedNeXusFile.getName().replaceAll(".reduced", "") + ".result");
 
         if (!this.keepTemp) {
-        //    resultsFile.deleteOnExit();
+            resultsFile.deleteOnExit();
         }
         TransformoMatic(new FileInputStream(reducedNeXusFile),
                 new FileInputStream(schemaFile),
