@@ -53,7 +53,7 @@ C------------------------------------------------------------------------------
 
 
 
-C *** Return length of a string, ignoring trailing blanks
+C> Return length of a string, ignoring trailing blanks
       INTEGER FUNCTION TRUELEN(STRING)
       CHARACTER*(*) STRING
       DO TRUELEN=LEN(STRING),1,-1
