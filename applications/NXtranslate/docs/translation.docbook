@@ -398,50 +398,6 @@ mention, the path separator is a forward slash, "/".
 
 </sect2>
 
-<sect2 id="ipns"><title>IPNS Runfile</title>
-
-<para>The &mime-type for the IPNS retriever is
-<parameter>application/x-IPNS</parameter>. Currently the IPNS retriever only provides access to a small portion of the runfile. The targets
-
-<variablelist><title>IPNS retriever location strings</title>
-<varlistentry><term>header.runTitle</term>
-<listitem><para>A string for the title of the measurement.</para></listitem></varlistentry>
-<varlistentry><term>header.userName</term>
-<listitem><para>A string for the user name</para></listitem></varlistentry>
-<varlistentry><term>header.startDateTime</term>
-<listitem><para>A string for time of the start of the measurement.</para></listitem></varlistentry>
-<varlistentry><term>header.endDateTime</term>
-<listitem><para>A string for the time of the end of the measurement.</para></listitem></varlistentry>
-</variablelist>
-
-<!--
-<table frame="all"><title>IPNS Retriever location strings</title>
-<tgroup cols="2" align="left" colsep="1" rowsep="1">
-<thead><row>
-<entry>Location String</entry> <entry>Data</entry>
-</row></thead>
-<tbody>
-<row>
-<entry>header.runTitle</entry> <entry>A string for the title of the measurement.</entry>
-</row>
-<row>
-<entry>header.userName</entry> <entry>A string for the user name</entry>
-</row>
-<row>
-<entry>header.startDateTime</entry> <entry>A string for time of the start of the measurement.</entry>
-</row>
-<row>
-<entry>header.endDateTime</entry> <entry>A string for the time of the end of the measurement.</entry>
-</row>
-</tbody>
-</tgroup>
-</table>
--->
-
-</para>
-
-</sect2>
-
 <sect2 id="text-plain"><title>Simple ASCII</title>
 
 <para>The &mime-type for the simple ASCII retriever is
