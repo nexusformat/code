@@ -39,6 +39,7 @@ SUBDIRS=text_collist text_plain text_xml sns_histogram docs \
 	FRM2 loopy binary spec esrf_edf $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
+man_MANS = nxtranslate.1
 
 nxtranslate_SOURCES = \
 	attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp \
@@ -68,7 +69,7 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 
 nxtranslate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
 
-EXTRA_DIST = $(srcdir)/*.xml $(srcdir)/*.nxt $(srcdir)/*.dat $(srcdir)/*.run
+EXTRA_DIST = $(srcdir)/*.xml $(srcdir)/*.nxt $(srcdir)/*.dat $(srcdir)/*.run $(man_MANS)
 
 include $(top_srcdir)/build_rules.am
 

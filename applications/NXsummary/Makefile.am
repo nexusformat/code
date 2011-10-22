@@ -30,6 +30,7 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/third_party @LIBXML2_CFLAGS@
+man_MANS = nxsummary.1
 
 bin_PROGRAMS = nxsummary
 noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp output.hpp xml_util.hpp
@@ -37,5 +38,5 @@ noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp out
 nxsummary_SOURCES = data_util.cpp main.cpp string_util.cpp preferences.cpp output.cpp
 nxsummary_LDADD = $(LIBNEXUS)
 nxsummary_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
-EXTRA_DIST = LICENSE
+EXTRA_DIST = LICENSE $(man_MANS)
 include $(top_srcdir)/build_rules.am

@@ -31,10 +31,11 @@ LIBNEXUS77=$(top_builddir)/bindings/f77/libNeXus77.la
 LIBNEXUS90=$(top_builddir)/bindings/f90/libNeXus90.la
 AM_CPPFLAGS=-I. -I$(top_srcdir)/include
 AM_FCFLAGS=-I$(top_builddir)/bindings/f90
+man_MANS = nxdiff.1
 
 dist_bin_SCRIPTS=nxdiff
 
-EXTRA_DIST=SConscript
+EXTRA_DIST=SConscript $(man_MANS)
 
 if HAVE_F90
 NXDUMP = NXdump

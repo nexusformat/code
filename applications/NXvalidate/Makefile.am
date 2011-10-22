@@ -36,10 +36,11 @@ javalibdir		= $(javadir)/lib
 java_DATA = dist/NXvalidate.jar
 javalib_DATA = lib/saxon9he.jar lib/jhall.jar
 bin_SCRIPTS = nxvalidate
+man_MANS = nxvalidate.1
 
 #nxjavadoc_DATA = README.JNEXUS COPYING.NCSA
 
-EXTRA_DIST	= src lib build.xml manifest.mf $(srcdir)/nbproject/*
+EXTRA_DIST	= $(man_MANS) src lib build.xml manifest.mf $(srcdir)/nbproject/*
 
 dist/NXvalidate.jar ::
 	[ -r build.xml ] || ln -s $(srcdir)/build.xml .
