@@ -29,11 +29,20 @@ C Doxygen comments follow
 C for help, see: http://www.stack.nl/~dimitri/doxygen/docblocks.html#fortranblocks
 C
 !> \mainpage Fortan 77 NeXus API
-!! The Fortran routines have the same names and argument lists as the corresponding C routines, which they call using wrappers. Some extra routines for handling input/output of character data and attributes have been added. Care must be taken to ensure enough space is allocated for the input/output operations being performed.
 !!
-!! It is necessary to reverse the order of indices in multidimensional arrays, compared to an equivalent C program, so that data are stored in the same order in the NeXus file.
+!! The Fortran routines have the same names and argument lists as the 
+!! corresponding C routines, which they call using wrappers. Some extra 
+!! routines for handling input/output of character data and attributes 
+!! have been added. Care must be taken to ensure enough space is allocated
+!! for the input/output operations being performed.
 !!
-!! Any program using the F77 API needs to include the following line near the top in order to define the required constants (NXHANDLESIZE, NXLINKSIZE, etc.): 
+!! It is necessary to reverse the order of indices in multidimensional 
+!! arrays, compared to an equivalent C program, so that data are stored in
+!! the same order in the NeXus file.
+!!
+!! Any program using the F77 API needs to include the following line near
+!! the top in order to define the required constants (NXHANDLESIZE,
+!! NXLINKSIZE, etc.): 
 !!
 !!       include 'NAPIF.INC'
 !!
