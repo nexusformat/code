@@ -41,7 +41,7 @@ extern  void *NXpData;
         struct iStack5 {
           char irefn[1024];
           int iVref;
-          int iCurrentIDX;
+          hsize_t iCurrentIDX;
         } iStack5[NXMAXSTACK];
         struct iStack5 iAtt5;
         int iFID;
@@ -404,7 +404,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   
   /*------------------------------------------------------------------------*/
 
-  herr_t attr_check (hid_t loc_id, const char *member_name, void *opdata)
+  herr_t attr_check (hid_t loc_id, const char *member_name, const H5A_info_t *unused, void *opdata)
   {
     char attr_name[8+1];   /* need to leave space for \0 as well */
     
@@ -443,9 +443,9 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     if ((nxclass != NULL) && (strcmp(nxclass, NX_UNKNOWN_GROUP) != 0))
     {
         /* check group attribute */
-        iRet=H5Aiterate(pFile->iCurrentG,NULL,attr_check,NULL);
+        iRet=H5Aiterate(pFile->iCurrentG,H5_INDEX_CRT_ORDER,H5_ITER_INC,0,attr_check,NULL);
         if (iRet < 0) {
-          NXReportError( "ERROR: iterating through group");
+          NXReportError( "ERROR: iterating through attribute list");
           return NX_ERROR;  
         } else if (iRet == 1) {
          /* group attribute was found */
@@ -1901,14 +1901,13 @@ static int countObjectsInGroup(hid_t loc_id)
 
    /* Operator function. */
 
-   herr_t attr_info(hid_t loc_id, const char *name, void *opdata)
+   herr_t attr_info(hid_t loc_id, const char *name, const H5A_info_t *unused, void *opdata)
    {
      *((char**)opdata)=strdup(name);
      return 1;
    }
 
-   NXstatus  NX5getnextattr (NXhandle fileid, NXname pName,
-				       int *iLength, int *iType)
+   NXstatus  NX5getnextattr (NXhandle fileid, NXname pName, int *iLength, int *iType)
    {
      pNexusFile5 pFile;
      hid_t attr_id;
@@ -1916,10 +1915,8 @@ static int countObjectsInGroup(hid_t loc_id)
      herr_t iRet;
      int iPType,rank;
      char *iname = NULL; 
-     unsigned int idx;
-     int intern_idx=-1;
+     hsize_t idx, intern_idx=-1;
      int vid;
-
 
      pFile = NXI5assert (fileid);
 
@@ -1928,6 +1925,7 @@ static int countObjectsInGroup(hid_t loc_id)
      pName[0] = '\0';
      idx=pFile->iAtt5.iCurrentIDX;
      iRet=0;
+     // TODO replace
      intern_idx=H5Aget_num_attrs(vid);
      if(intern_idx == idx) {
        killAttVID(pFile,vid);
@@ -1935,7 +1933,8 @@ static int countObjectsInGroup(hid_t loc_id)
      }
 
      if (intern_idx > idx) {
-       iRet=H5Aiterate(vid,&idx,attr_info,&iname);
+       /* iRet=H5Aiterate(vid,&idx,attr_info,&iname); */
+       iRet=H5Aiterate(vid,H5_INDEX_CRT_ORDER,H5_ITER_INC,&idx,attr_info,&iname);
      } else {
        iRet=0;
      } 

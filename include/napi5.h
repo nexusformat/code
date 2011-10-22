@@ -46,7 +46,7 @@ extern  NXstatus  NX5initattrdir(NXhandle handle);
 void NX5assignFunctions(pNexusFunction fHandle);
 
 herr_t nxgroup_info(hid_t loc_id, const char *name, void *op_data);
-herr_t attr_info(hid_t loc_id, const char *name, void *opdata);
+herr_t attr_info(hid_t loc_id, const char *name, const H5A_info_t *unused, void *opdata);
 herr_t group_info(hid_t loc_id, const char *name, void *opdata);
 
 #endif /* NAPI5_H */
