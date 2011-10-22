@@ -125,12 +125,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   unsigned int vers_major, vers_minor, vers_release, am1 ;
   hid_t fapl = -1;     
   int mdc_nelmts;
-  herr_t iRet;
-#ifdef H5_WANT_H5_V1_4_COMPAT
-  int rdcc_nelmts;
-#else
   size_t rdcc_nelmts;
-#endif
   size_t rdcc_nbytes;
   double rdcc_w0;
 
@@ -156,14 +151,9 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     /* start HDF5 interface */
     if (am == NXACC_CREATE5) {  
        fapl = H5Pcreate(H5P_FILE_ACCESS);
-       iRet=H5Pget_cache(fapl,&mdc_nelmts,&rdcc_nelmts,&rdcc_nbytes,&rdcc_w0);
+       H5Pget_cache(fapl,&mdc_nelmts,&rdcc_nelmts,&rdcc_nbytes,&rdcc_w0);
        rdcc_nbytes=(size_t)nx_cacheSize;
-       iRet = H5Pset_cache(fapl,mdc_nelmts,rdcc_nelmts,rdcc_nbytes,rdcc_w0);
-       /*
-	 setting the close degree is absolutely necessary in HDF5 
-         versions > 1.6. If you use a lessere version and the compiler 
-        complains, comment it out but keep this in mind.
-       */
+       H5Pset_cache(fapl,mdc_nelmts,rdcc_nelmts,rdcc_nbytes,rdcc_w0);
        H5Pset_fclose_degree(fapl,H5F_CLOSE_STRONG);
        am1 = H5F_ACC_TRUNC;
        pNew->iFID = H5Fcreate (filename, am1, H5P_DEFAULT, fapl);
@@ -205,20 +195,20 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         if (attr1<0)
         {
           NXReportError( 
-                         "ERROR: HDF failed to store NeXus_version attribute ");
+                         "ERROR: failed to store NeXus_version attribute ");
           return NX_ERROR;
         } 
         if (H5Awrite(attr1, aid1,NEXUS_VERSION)<0)
         {
           NXReportError( 
-                         "ERROR: HDF failed to store NeXus_version attribute ");
+                         "ERROR: failed to store NeXus_version attribute ");
           return NX_ERROR;
         }
        /* Close attribute dataspace  */
-       iRet = H5Tclose(aid1);
-       iRet = H5Sclose(aid2); 
+       H5Tclose(aid1);
+       H5Sclose(aid2); 
        /* Close attribute */
-       iRet = H5Aclose(attr1); 
+       H5Aclose(attr1); 
        H5Gclose(iVID); 
     }
     if (am1 == H5F_ACC_TRUNC) 
@@ -231,18 +221,18 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         if (attr1 < 0)
         {
           NXReportError( 
-			  "ERROR: HDF failed to store file_name attribute ");
+			  "ERROR: failed to store file_name attribute ");
           return NX_ERROR;
         }
         if (H5Awrite(attr1, aid1, (char*)filename) < 0)
         {
           NXReportError( 
-			  "ERROR: HDF failed to store file_name attribute ");
+			  "ERROR: failed to store file_name attribute ");
           return NX_ERROR;
         }
-	iRet = H5Tclose(aid1);
-	iRet = H5Sclose(aid2); 
-        iRet = H5Aclose(attr1);
+	H5Tclose(aid1);
+	H5Sclose(aid2); 
+        H5Aclose(attr1);
 	/*  ------- library version ------*/
         H5get_libversion(&vers_major, &vers_minor, &vers_release);
         sprintf (version_nr, "%d.%d.%d", vers_major,vers_minor,vers_release);
@@ -253,18 +243,18 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         if (attr1 < 0)
         {
           NXReportError( 
-			  "ERROR: HDF failed to store file_name attribute ");
+			  "ERROR: failed to store file_name attribute ");
           return NX_ERROR;
         }
         if (H5Awrite(attr1, aid1, (char*)version_nr) < 0)
         {
           NXReportError( 
-			  "ERROR: HDF failed to store file_name attribute ");
+			  "ERROR: failed to store file_name attribute ");
           return NX_ERROR;
         }
-	iRet = H5Tclose(aid1);
-	iRet = H5Sclose(aid2); 
-        iRet = H5Aclose(attr1);
+	H5Tclose(aid1);
+	H5Sclose(aid2); 
+        H5Aclose(attr1);
 	/*----------- file time */
 	time_buffer = NXIformatNeXusTime();
 	if(time_buffer != NULL){
@@ -275,22 +265,22 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
 	  if (attr1 < 0)
 	  {
 	      NXReportError( 
-			  "ERROR: HDF failed to store file_time attribute ");
+			  "ERROR: failed to store file_time attribute ");
 	      free(time_buffer);
 	      return NX_ERROR;
 	  }
 	  if (H5Awrite(attr1, aid1, time_buffer) < 0)
 	  {
 	      NXReportError( 
-			  "ERROR: HDF failed to store file_time attribute ");
+			  "ERROR: failed to store file_time attribute ");
 	      free(time_buffer);
 	      return NX_ERROR;
 	  }
 	  /* Close attribute dataspace */
-	  iRet = H5Tclose(aid1);
-	  iRet = H5Sclose(aid2); 
+	  H5Tclose(aid1);
+	  H5Sclose(aid2); 
 	  /* Close attribute */
-	  iRet = H5Aclose(attr1); 
+	  H5Aclose(attr1); 
 	  free(time_buffer);
 	}
 	H5Gclose(iVID); 
@@ -338,7 +328,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     */
 
     if (iRet < 0) {
-      NXReportError( "ERROR: HDF cannot close HDF file");
+      NXReportError( "ERROR: cannot close HDF file");
     }
     /* release memory */
     NXI5KillDir (pFile);
@@ -808,11 +798,10 @@ static hid_t nxToHDF5Type(int datatype)
   NXstatus  NX5makedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int64_t dimensions[])
   {
-  pNexusFile5 pFile;
   int64_t chunk_size[H5S_MAX_RANK];
   int i;
    
-  pFile = NXI5assert (fid);
+  NXI5assert(fid);
     
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
   memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
@@ -1128,21 +1117,18 @@ static void killAttVID(pNexusFile5 pFile, int vid){
  
   NXstatus  NX5printlink (NXhandle fid, NXlink* sLink)
   {
-    pNexusFile5 pFile;
-    pFile = NXI5assert (fid);
-     printf("HDF5 link: targetPath = \"%s\", linkType = \"%d\"\n", sLink->targetPath, sLink->linkType);
+    NXI5assert(fid);
+    printf("HDF5 link: targetPath = \"%s\", linkType = \"%d\"\n", sLink->targetPath, sLink->linkType);
     return NX_OK;
   }
 /*--------------------------------------------------------------------*/
 static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
 {
-  size_t length;
   hid_t  dataID, aid2, aid1, attID;
   herr_t status;
   int type = NX_CHAR;
   char name[] = "target";
 
-    length = strlen(sLink->targetPath);
     /*
       set the target attribute
     */
@@ -1192,7 +1178,6 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     pNexusFile5 pFile;
     char        linkTarget[1024];
     int         type = NX_CHAR;
-    herr_t      status;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1212,11 +1197,11 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     }
     else 
     {
-      NXReportError("Path string to long");
+      NXReportError("ERROR: path string to long");
       return NX_ERROR;
     } 
 
-    status = H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->targetPath, linkTarget);
+    H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->targetPath, linkTarget);
 
     return NX5settargetattribute(pFile,sLink);
 }
@@ -1228,7 +1213,6 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     char        linkTarget[1024];
     int         type = NX_CHAR;
     char        *itemName = NULL;
-    herr_t      status;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1240,7 +1224,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     */
     itemName = strrchr(sLink->targetPath,'/');
     if(itemName == NULL){
-      NXReportError("Bad link structure");
+      NXReportError("ERROR: bad link structure");
       return NX_ERROR;
     }
     itemName++;
@@ -1258,11 +1242,11 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     }
     else 
     {
-      NXReportError("Path string to long");
+      NXReportError("ERROR: path string to long");
       return NX_ERROR;
     } 
 
-    status = H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->targetPath, linkTarget);
+    H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->targetPath, linkTarget);
 
     return NX5settargetattribute(pFile,sLink);
    }
@@ -1354,7 +1338,6 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     pNexusFile5 pFile;
     hid_t       atype, attr_id;
     char        data[64];
-    herr_t      iRet;
         
     pFile = NXI5assert (fid);
     /* check if there is a group open */
@@ -1362,7 +1345,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
        strcpy (pName, "root");
        strcpy (pClass, "NXroot");
        pFile->iNX=0;
-       iRet=H5Giterate(pFile->iFID,"/",0,group_info1,&pFile->iNX);
+       H5Giterate(pFile->iFID,"/",0,group_info1,&pFile->iNX);
        *iN=pFile->iNX;
     }
     else {
@@ -1376,7 +1359,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
         H5Aread(attr_id, atype, data);
         strcpy(pClass,data);
         pFile->iNX=0;
-        iRet=H5Giterate(pFile->iFID,pFile->name_ref,0,group_info1, &pFile->iNX);
+        H5Giterate(pFile->iFID,pFile->name_ref,0,group_info1, &pFile->iNX);
         *iN=pFile->iNX;
         H5Aclose(attr_id);
       }
@@ -1766,7 +1749,7 @@ static int countObjectsInGroup(hid_t loc_id)
    NXstatus  NX5getinfo64 (NXhandle fid, int *rank, int64_t dimension[], int *iType)
    {
      pNexusFile5 pFile;
-     int i, iRank, mType, iRet;
+     int i, iRank, mType;
      hsize_t myDim[H5S_MAX_RANK]; 
      H5T_class_t tclass;
 
@@ -1781,7 +1764,7 @@ static int countObjectsInGroup(hid_t loc_id)
      tclass = H5Tget_class(pFile->iCurrentT);
      mType = hdf5ToNXType(tclass,pFile->iCurrentT);
      iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS);
-     iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
+     H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
      /* conversion to proper ints for the platform */ 
      *iType = (int)mType;
      if (tclass==H5T_STRING && myDim[iRank-1] == 1) {
@@ -1989,16 +1972,14 @@ static int countObjectsInGroup(hid_t loc_id)
 			 void *data, int* datalen, int* iType)
    {
      pNexusFile5 pFile;
-     int iNew, vid, asize;
+     int iNew, vid;
      herr_t iRet;
-     hid_t type, atype = -1, glob;
+     hid_t type, atype = -1;
      char pBuffer[256];
 
      pFile = NXI5assert (fid);
-     type = *iType;
-     glob = 0;  
 
-     type = nxToHDF5Type(type);
+     type = nxToHDF5Type(*iType);
 
      vid = getAttVID(pFile);
      iNew = H5Aopen_name(vid, name);
@@ -2013,13 +1994,9 @@ static int countObjectsInGroup(hid_t loc_id)
      if (type==H5T_C_S1)
      {
 	atype = H5Aget_type(pFile->iCurrentA);
-	asize = H5Tget_size(atype);
 	H5Tclose(atype);
 	atype=H5Tcopy(type);
 	H5Tset_size(atype,*datalen);  
-	// use these two lines and remove the strlen one to not force NULL termination
-	// H5Tset_strpad(atype, H5T_STR_NULLPAD);
-	// *datalen = asize;
 	iRet = H5Aread(pFile->iCurrentA, atype, data);
 	*datalen = strlen((char*)data);
      } else {
@@ -2107,9 +2084,7 @@ static int countObjectsInGroup(hid_t loc_id)
 
   NXstatus  NX5sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
-    pNexusFile5 pFile;
-
-    pFile = NXI5assert (fileid);
+    NXI5assert(fileid);
     if ((strcmp(pFirstID->targetPath,pSecondID->targetPath) == 0)){
        return NX_OK;
     } else {
