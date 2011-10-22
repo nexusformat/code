@@ -168,25 +168,6 @@ static Path copy_path(const Path old){
 }
 
 /*
- * Open the supplied node.
- */
-static void open_node(NXhandle handle, const Node node){
-  char name[GROUP_STRING_LEN];
-  char type[GROUP_STRING_LEN];
-
-  strcpy(name,node.name.c_str());
-  strcpy(type,node.type.c_str());
-
-  if(node.type==SDS){
-    if(NXopendata(handle,name)!=NX_OK)
-      throw "NXopendata failed";
-  }else{
-    if(NXopengroup(handle,name,type)!=NX_OK)
-      throw "NXopengroup failed";
-  }
-}
-
-/*
  * Returns true if the named attribute is at the current level. Also
  * has the side effect of setting the length and type parameters.
  */

@@ -69,55 +69,6 @@ typedef struct{
   PathMap unknown;
 }Axis;
 
-static void print_data_struct(const Data &data,const PrintConfig &config){
-  cout << "PATH   : " << path_to_str(data.path,config.path_mode) << endl
-       << "NAME   : " << data.name << endl
-       << "UNITS  : " << data.units << endl
-       << "TYPE   : " << data.type << endl
-       << "RANK   : " << data.rank << endl
-       << "DIMS   : ";
-  if(data.rank==1)
-    cout << "[";
-  cout << oneD_to_string(data.dims,data.rank,NX_INT16,config);
-  if(data.rank==1)
-    cout << "]";
-  cout << endl
-       << "SIGNAL : " << data.signal << endl
-       << "UNKNOWN: ";
-  int unknown_size=data.unknown.size();
-  if(unknown_size<=0){
-    cout << endl;
-  }else{
-    PathMap::const_iterator pair=data.unknown.begin();
-    cout << pair->first << " : " << pair->second << endl;
-    pair++;
-    for( ; pair!=data.unknown.end() ; pair++ )
-      cout << "         " << pair->first << " : " << pair->second << endl;
-  }
-}
-
-static void print_axis_struct(const Axis &axis, const PrintConfig &config){
-  cout << "PATH   : " << path_to_str(axis.path,config.path_mode) << endl
-       << "NAME   : " << axis.name << endl
-       << "UNITS  : " << axis.units << endl
-       << "TYPE   : " << axis.type << endl
-       << "DIMS   : [" << oneD_to_string(axis.dims,1,NX_INT16,config) << "]"
-                                                                        << endl
-       << "AXIS   : " << axis.axis << endl
-       << "PRIMARY: " << axis.primary << endl
-       << "UNKNOWN: ";
-  int unknown_size=axis.unknown.size();
-  if(unknown_size<=0){
-    cout << endl;
-  }else{
-    PathMap::const_iterator pair=axis.unknown.begin();
-    cout << pair->first << " : " << pair->second << endl;
-    pair++;
-    for( ; pair!=axis.unknown.end() ; pair++ )
-      cout << "         " << pair->first << " : " << pair->second << endl;
-  }
-}
-
 static bool path_is_okay(const Path &path){
   if(path.rbegin()->type==NXDATA)
     return true;
