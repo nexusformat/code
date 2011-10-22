@@ -66,14 +66,6 @@ static string get_type(const string &location){
   throw invalid_argument("Cannot determine type in location: "+location);
 }
 
-static string xmlChar_to_str(const xmlChar *ch, int len){
-  string result((char *)ch);
-  if( (len>0) && ((unsigned int)len<result.size()) )
-    result.erase(result.begin()+len,result.end());
-
-  return string_util::trim(result);
-}
-
 static bool is_right_square_bracket(const char c){
   static const string RIGHT="]";
   return find(RIGHT.begin(),RIGHT.end(),c)!=RIGHT.end();
@@ -263,48 +255,6 @@ static Node convertFromNumeric(const Node &node, vector<int> &dims, const string
   value=NULL;
 
   // return the result of the cast
-  return result;
-}
-
-static Node convertFromFloat32(const Node &node, vector<int> &dims, const string &type){
-  cout << "convertFromFloat32(" << node.name() << "....)" << endl; // REMOVE
-  // get the name of the resulting node
-  string name=node.name();
-
-  // get the result type
-  Node::NXtype int_type=node_type(type);
-
-  // create the dimension and rank information
-  int rank=dims.size();
-  int int_dims[rank];
-  int tot_num=1;
-  for( int i=0 ; i<rank ; i++ ){
-    int_dims[i]=dims[i];
-    tot_num*=dims[i];
-  }
-
-  // allocate space for the data array
-  void *value(NULL);
-  NXmalloc(&value,rank,int_dims,int_type);
-
-  // make the cast
-  bool worked=void_copy::from_float(((float*)(node.data())),value,tot_num,int_type);
-
-  // throw an exception if the casting did not work
-  if(!worked){
-    NXfree(&value);
-    value=NULL;
-    throw("Cannot convert "+node.type()+" to "+type);
-  }
-
-  // package up the result
-  Node result(name,"EMPTY");
-  result.set_data(value,rank,int_dims,int_type);
-
-  // free up temporary memory
-  NXfree(&value);
-
-  // return the result
   return result;
 }
 

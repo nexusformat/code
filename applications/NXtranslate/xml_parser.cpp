@@ -114,6 +114,7 @@ static void map_string(map<string,string> &map,string &key){
     key=it->second;
 }
 
+/* unused code
 static bool is_left(char c){
   static const string LEFT="[";
   return find(LEFT.begin(),LEFT.end(),c)!=LEFT.end();
@@ -145,6 +146,7 @@ static StrVector split_on_bracket(const string str){
   result.push_back(str.substr(i+1,j-i-1));
   return result;
 }
+*/
 
 #ifdef DEBUG1_XML_PARSER
 static void print_strvec(const StrVector &vec){
@@ -351,11 +353,13 @@ static void my_startElement(void *user_data, const xmlChar *name,
   }
 
   // mutate the attributes if necessary
-  if(node_attrs.size()>0)
-    if(node_from_retriever)
+  if(node_attrs.size()>0) {
+    if(node_from_retriever) {
       tree.begin()->update_attrs(node_attrs);
-    else
+    } else {
       node.update_attrs(node_attrs);
+    }
+  }
 
   // add the node to the end of the vector
   ((UserData *)user_data)->nodes.push_back(node);

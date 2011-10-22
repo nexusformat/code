@@ -207,7 +207,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
     }
 
   // confirm that the size doesn't have a zero component
-  for( size_t i ; i<rank ; ++i )
+  for( size_t i=0 ; i<rank ; ++i )
     {
       if( size[i]<=0 )
         {
@@ -216,7 +216,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
     }
 
   // check that the request doesn't seek past the end of the file
-  for( size_t i ; i<rank ; ++i )
+  for( size_t i=0 ; i<rank ; ++i )
     {
       if(file_size[i]<start[i]+size[i])
         {

@@ -114,6 +114,7 @@ edf_reader::edf_reader(ifstream &in){
 		while(in.peek()==' ')in.ignore(1,'\n');
                 in >> value;
 		dim1 = (int)value;
+		(void)dim1; // TODO unused varable - quiet warnings
 		key_double.insert(pair<string, double>(key, value));	            
 	    }
 	    
@@ -126,6 +127,7 @@ edf_reader::edf_reader(ifstream &in){
 		while(in.peek()==' ')in.ignore(1,'\n');
                 in >> value;
 		dim2 = (int)value;
+		(void)dim2; // TODO unused varable - quiet warnings
 		key_double.insert(pair<string, double>(key, value));	            
 	    }
 	    

@@ -249,7 +249,7 @@ static SimpleNodeVec get_groups(NXhandle *handle){
     throw runtime_error("NXinitgroupdir failed");
 
   // determine the number of groups at the current location
-  int num_groups;
+  int num_groups = 0;
   try{
     num_groups=num_group(handle);
   }catch(runtime_error &e){
@@ -423,14 +423,12 @@ extern void nexus_util::make_link(NXhandle *handle, const vector<string> &link, 
   nexus_util::open_path(handle,source,num_group,num_data);
 
   // get the link_id
-  bool is_group=false;
   if(num_data>0){
     if(NXgetdataID(*handle,link_id)!=NX_OK)
       throw new runtime_error("could not get data ID for linking");
   }else{
     if(NXgetgroupID(*handle,link_id)!=NX_OK)
       throw new runtime_error("could not get group ID for linking");
-    is_group=true;
   }
 
   // return to the root node in the file

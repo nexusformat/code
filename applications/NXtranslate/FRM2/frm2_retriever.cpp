@@ -1623,7 +1623,8 @@ printf("psi extracted:%s\n",psi_str.c_str());
   y       =xyz[1];
   schi0   =xyz[2];
 
-  printf("vl:%f, xyz: %f %f %f, psi:%f\n", vl, xyz[0], xyz[1], xyz[2]);
+  //printf("vl:%f, xyz: %f %f %f, psi:%f\n", vl, xyz[0], xyz[1], xyz[2]);
+  printf("vl:%f, xyz: %f %f %f\n", vl, xyz[0], xyz[1], xyz[2]);
   angle[2]=arsin(0.5*vl*wl);
   angle[1]=2.0*angle[2];
   angle[3]=arsin(schi0);
