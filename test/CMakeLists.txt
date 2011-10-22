@@ -30,3 +30,5 @@ SET (NXEXAMPLE_FILES napif4_test.f  napif5_test.f  napif_test.f  napi_test.c  na
 
 INSTALL (FILES ${NXEXAMPLE_FILES} DESTINATION ${NXEXAMPLEDIR})
 
+add_executable(napi_test_hdf5 napi_test.c)
+target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)

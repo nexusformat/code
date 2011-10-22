@@ -42,12 +42,24 @@ add_executable (mxmldoc mxmldoc.c ${HEADER})
 
 add_library (MXML_Static_Library STATIC ${HEADER} ${SOURCE})
 
-#add_library (MXML_Shared_Library SHARED ${HEADER} ${SOURCE})
+add_library (MXML_Shared_Library SHARED ${HEADER} ${SOURCE})
 
-set_target_properties(MXML_Static_Library PROPERTIES OUTPUT_NAME mxml1)
+#set_target_properties(MXML_Static_Library PROPERTIES OUTPUT_NAME mxml1)
 
-#set_target_properties(MXML_Shared_Library PROPERTIES OUTPUT_NAME mxml1)
+#if (WIN32)
+#if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+#set_property(TARGET MXML_Static_Library APPEND PROPERTY COMPILE_FLAGS  /MDd)
+#else ()
+#set_property(TARGET MXML_Static_Library APPEND PROPERTY COMPILE_FLAGS  /MD)
+#endif()
+#endif (WIN32)
 
+if (WIN32)
+set_property(TARGET MXML_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${CMAKE_CURRENT_SOURCE_DIR}/vcnet/mxml1.def)
+endif (WIN32)
+
+set_target_properties(MXML_Shared_Library PROPERTIES OUTPUT_NAME mxml1
+                      VERSION 1.0 SOVERSION 4)
 target_link_libraries(testmxml MXML_Static_Library ${PTHREAD_LINK})
 
 target_link_libraries(mxmldoc MXML_Static_Library ${PTHREAD_LINK})

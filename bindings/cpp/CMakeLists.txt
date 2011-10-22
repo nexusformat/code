@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-add_definitions(-DIN_NEXUS_CPP_LIBRARY=1)
+add_definitions(-DIN_NEXUS_CPP_LIBRARY=1 )
 
 #Make NeXus CPP Bindings Static Library
 
@@ -37,8 +37,8 @@ add_library (NeXus_CPP_Static_Library STATIC ${HEADERS} ${SOURCES})
 
 set_target_properties(NeXus_CPP_Static_Library PROPERTIES OUTPUT_NAME NeXusCPP)
 
-target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library ${HDF5_LIBRARIES} ${MXML_LINK}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
+target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library 
+					${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
                       ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
 
 #Make NeXus CPP Bindings Shared Library
@@ -49,8 +49,8 @@ add_library (NeXus_CPP_Shared_Library SHARED ${HEADERS} ${SOURCES})
 set_target_properties(NeXus_CPP_Shared_Library PROPERTIES OUTPUT_NAME NeXusCPP
                       VERSION 1.0 SOVERSION 4)
 
-target_link_libraries(NeXus_CPP_Shared_Library NeXus_Shared_Library ${HDF5_LIBRARIES} ${MXML_LINK}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
+target_link_libraries(NeXus_CPP_Shared_Library NeXus_Shared_Library 
+                       ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
                       ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
 
 install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library

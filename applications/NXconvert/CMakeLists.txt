@@ -28,27 +28,31 @@
 
 include_directories(../../third_party ../../bindings/cpp)
 
-add_executable (nxconvert nxconvert.cpp nxconvert_common.h)
+add_executable (nxconvert nxconvert.cpp nxconvert_common.h )
 
-add_library (NXconvert_Static_Library STATIC nxconvert_common.cpp
-             nxconvert_common.h)
+set(NXCONVERT_LIB_SRC nxconvert_common.cpp nxconvert_common.h )
 
-set_target_properties(NXconvert_Static_Library PROPERTIES OUTPUT_NAME NXconvert)
+add_library (NXconvert_Static_Library STATIC ${NXCONVERT_LIB_SRC} )
+
+add_library (NXconvert_Shared_Library SHARED ${NXCONVERT_LIB_SRC} )
+
+#set_target_properties(NXconvert_Static_Library PROPERTIES OUTPUT_NAME NXconvert)
 
 target_link_libraries(NXconvert_Static_Library NeXus_CPP_Static_Library
-                      NeXus_Static_Library ${HDF5_LIBRARIES} ${MXML_LINK}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK}
-                      ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+                       ${READLINE_LINK} ${M_LINK} ${DL_LINK}
+                      ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
 
-target_link_libraries(nxconvert NXconvert_Static_Library
-                      NeXus_CPP_Static_Library NeXus_Static_Library
-                      ${HDF5_LIBRARIES} ${MXML_LINK} ${HDF4_LINK}
+target_link_libraries(NXconvert_Shared_Library NeXus_CPP_Shared_Library
+                       ${READLINE_LINK} ${M_LINK} ${DL_LINK}
+                      ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
+
+target_link_libraries(nxconvert NXconvert_Shared_Library
                       ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK}
-                      ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+                      ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
 
-install (TARGETS NXconvert_Static_Library nxconvert
+set_property(TARGET NXconvert_Shared_Library PROPERTY ENABLE_EXPORTS YES) 
+
+install (TARGETS NXconvert_Static_Library NXconvert_Shared_Library nxconvert
          RUNTIME DESTINATION bin COMPONENT Runtime
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)

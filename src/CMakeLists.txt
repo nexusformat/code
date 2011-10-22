@@ -28,18 +28,27 @@
 
 add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP})
 
+set (NAPISRC napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c nxdataset.h nx_stptok.h)
+
 if (HDF4_FOUND)
-  set (H4SRC napi4.c)
+  set (NAPISRC ${NAPISRC} napi4.c)
 endif (HDF4_FOUND)
 
 if (HDF5_FOUND)
-  set (H5SRC napi5.c)
+  set (NAPISRC ${NAPISRC} napi5.c)
 endif (HDF5_FOUND)
 
-set (XMLSRC nxxml.c nxio.c nxio.h)
+# need napi_exports2.c  on win32 but not win64
+if (WIN32)
+    set(NAPISRC ${NAPISRC} napi_exports.c napi_exports.h)
+endif (WIN32)
+
+set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
 
 file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 
+set (NX_LIBS  ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
+                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB} )
 #if (MINGW_MSYS)
 #  set (MINGW_SRC napi_exports.c napi_exports2.c napi_exports.h)
 #  file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols_win.txt
@@ -57,47 +66,38 @@ file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 #  file(WRITE ${PROJECT_SOURCE_DIR}/src/nexus_symbols.sym ${NEXUS_SYMBOLS})
 #endif (MINGW_MSYS)
 
-# need napi_exports2.c  on win32 but not win64
-if (WIN32)
-    set(WINSRC napi_exports.c napi_exports.h)
-endif (WIN32)
 
 #Make NeXus Static Library
-add_library (NeXus_Static_Library STATIC napi.c napiu.c nxstack.c nxstack.h
-             stptok.c  nxdataset.c nxdataset.h nx_stptok.h ${WINSRC} ${H4SRC} ${H5SRC}
-             ${XMLSRC})
+add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
-set_target_properties(NeXus_Static_Library PROPERTIES OUTPUT_NAME NeXus)
+set_target_properties(NeXus_Static_Library PROPERTIES OUTPUT_NAME NeXusStatic)
 
-target_link_libraries(NeXus_Static_Library ${HDF5_LIBRARIES}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${NX_LIBS})
 
 #Make NeXus Shared Library
 
-add_library (NeXus_Shared_Library SHARED napi.c napiu.c nxstack.c nxstack.h
-             stptok.c  nxdataset.c nxdataset.h nx_stptok.h ${WINSRC} ${H4SRC} ${H5SRC}
-             ${XMLSRC})
+add_library (NeXus_Shared_Library SHARED ${NAPISRC})
+
+set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS _HDF5USEDLL_)
 
 #Note - library version needs to be got from somewhere?
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
-                      VERSION 1.0 SOVERSION 4 LINK_FLAGS /def:${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-x64.def)
+    set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME libNeXus-0
+                      VERSION 1.0 SOVERSION 4 )
+	set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-x64.def)
 else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
                       VERSION 1.0 SOVERSION 4)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-target_link_libraries(NeXus_Shared_Library ${HDF5_LIBRARIES}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+target_link_libraries(NeXus_Shared_Library ${HDF5_SHARED_LIBRARIES} ${HDF4_SHARED_LIBRARIES} ${NX_LIBS})
 
 if(MXMLLIB_FOUND)
     target_link_libraries(NeXus_Static_Library ${MXML})
     target_link_libraries(NeXus_Shared_Library ${MXML})
 else()
     target_link_libraries(NeXus_Static_Library MXML_Static_Library)
-    target_link_libraries(NeXus_Shared_Library MXML_Static_Library)
+    target_link_libraries(NeXus_Shared_Library MXML_Shared_Library)
 endif(MXMLLIB_FOUND)
 
 install (TARGETS NeXus_Static_Library NeXus_Shared_Library

@@ -33,10 +33,8 @@ add_executable (nxingest nxingest_main.cpp nxingest_utils.cpp
                          nxingest_nexus.h nxingest_parse.h
                          nxingest_time.h nxingest_utils.h)
 
-target_link_libraries(nxingest NeXus_Shared_Library ${HDF5_LIBRARIES}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK}
-                      ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+target_link_libraries(nxingest NeXus_Shared_Library ${READLINE_LINK} ${M_LINK} ${DL_LINK}
+                      ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
 
 
 install (TARGETS nxingest DESTINATION bin)

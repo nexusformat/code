@@ -133,7 +133,7 @@ if(DEFINED JAVA_COMPILE)
 
         SET_TARGET_PROPERTIES(jnexus PROPERTIES VERSION 1.0 SOVERSION 4)
 
-        TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library ${HDF5_LIBRARIES}
+        TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library 
                       ${READLINE_LINK} ${M_LINK} ${DF_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${TERMCAP_LINK} ${HDF4_LINK}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB}

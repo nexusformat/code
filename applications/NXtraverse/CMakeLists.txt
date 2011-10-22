@@ -31,11 +31,9 @@ include_directories(../../third_party ../../bindings/cpp)
 add_executable (nxtraverse nxtraverse.cpp main.cpp nxtraverse.h)
 
 target_link_libraries(nxtraverse
-                      NeXus_CPP_Static_Library NeXus_Static_Library
-                      ${HDF5_LIBRARIES} ${MXML_LINK} ${HDF4_LINK}
+                      NeXus_CPP_Shared_Library 
                       ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK}
-                      ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK}
-                      ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB})
+                      ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
 
 install (TARGETS nxtraverse
          RUNTIME DESTINATION bin COMPONENT Runtime

@@ -40,6 +40,13 @@ set (NXLTVERSINFO '4:3:4')
 
 #Packages to find that are required for the build
 
+set(HDF5_SEARCH "" CACHE PATH "Where to search for HDF5")
+if (HDF5_SEARCH)
+    set(ENV{HDF5_ROOT} "${HDF5_SEARCH}")    # findHDF5 uses HDF5_ROOT environment variable
+endif (HDF5_SEARCH)
+
+set(HDF4_SEARCH "" CACHE PATH "Where to search for HDF4")
+
 find_package(HDF5 REQUIRED)
 find_package(JPEG)
 find_package(XMLRPC)
@@ -49,6 +56,19 @@ find_package(Doxygen)
 find_package(SWIG)
 find_package(TCL)
 find_package(LATEX)
+
+if (WIN32)
+    set(HDF5_STATIC_LIBRARIES ${HDF5_SEARCH}/lib/hdf5.lib )
+    set(HDF5_SHARED_LIBRARIES ${HDF5_SEARCH}/dll/hdf5dll.lib )
+    set(HDF4_STATIC_LIBRARIES ${HDF4_SEARCH}/lib/hd426.lib ${HDF4_SEARCH}/lib/hm426.lib )
+    set(HDF4_SHARED_LIBRARIES ${HDF4_SEARCH}/dll/hd426m.lib ${HDF4_SEARCH}/dll/hm426m.lib )
+	set(HDF4_CPP "-I\"${HDF4_SEARCH}/include\" -DHDF4")
+	set(HDF4_FOUND YES)
+	set(MXML_CPP "-DNXXML")
+else(WIN32)
+    set(HDF5_STATIC_LIBRARIES ${HDF5_SEARCH}/lib/libhdf5.a )
+    set(HDF5_SHARED_LIBRARIES ${HDF5_SEARCH}/lib/libhdf5.so )
+endif(WIN32)
 
 #CMake includes 
 
@@ -198,9 +218,9 @@ if (CXX_HAS_NO_COMMENT)
 endif(CXX_HAS_NO_COMMENT)
 
 #We need to be able to check for Fortran F77/90 - but how do we do this?
-#if (BUILD_FORTRAN_BINDINGS)
+if (BUILD_FORTRAN_BINDINGS)
     enable_language(Fortran)
-#endif (BUILD_FORTRAN_BINDINGS)
+endif (BUILD_FORTRAN_BINDINGS)
 
 #We need a NXDOCDIR as a place to install the docs for various packages.
 set(NXDOCDIR "share/nexus/doc")
@@ -234,8 +254,8 @@ add_subdirectory (third_party)
 #add_subdirectory (Windows_extra)
 
 # this must always be last
-set(CPACK_BINARY_NSIS OFF)
-set(CPACK_BINARY_ZIP ON)
+set(CPACK_BINARY_NSIS ON)
+set(CPACK_BINARY_ZIP OFF)
 
 set(CPACK_SOURCE_IGNORE_FILES 
 	  "nexus_spec.in;~$;/.svn/;/.cvsignore/;/CMakeFiles/;/nbproject/;autogen.sh;cmake_install.cmake;Makefile;${CPACK_SOURCE_IGNORE_FILES}") 

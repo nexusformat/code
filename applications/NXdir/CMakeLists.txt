@@ -29,10 +29,10 @@
 add_executable (nxdir main.cpp string_util.cpp tree.cpp data.cpp
                 data_writer.cpp nxdir.h nxdir_help.h)
 
-target_link_libraries(nxdir NeXus_Shared_Library ${HDF5_LIBRARIES}
-                      ${MXML_LINK} ${HDF4_LINK} ${READLINE_LINK} ${M_LINK}
+target_link_libraries(nxdir NeXus_Shared_Library 
+                      ${MXML_LINK} ${READLINE_LINK} ${M_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
-                      ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
+                      ${HISTORY_LINK} )
 
 install (TARGETS nxdir DESTINATION bin)
 install (FILES nxdir.1 DESTINATION man/man1)
