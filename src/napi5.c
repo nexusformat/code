@@ -3,7 +3,7 @@
   
   Application Program Interface (HDF5) Routines
   
-  Copyright (C) 1997-2006 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2011 Mark Koennecke, Przemek Klosowski
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -201,7 +201,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         {
         H5Adelete(iVID, "NeXus_version"); 
         }
-        attr1= H5Acreate(iVID, "NeXus_version", aid1, aid2, H5P_DEFAULT);
+        attr1= H5Acreate(iVID, "NeXus_version", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
         if (attr1<0)
         {
           NXReportError( 
@@ -227,7 +227,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         aid2=H5Screate(H5S_SCALAR);
         aid1 = H5Tcopy(H5T_C_S1);
         H5Tset_size(aid1, strlen(filename));
-        attr1= H5Acreate(iVID, "file_name", aid1, aid2, H5P_DEFAULT);
+        attr1= H5Acreate(iVID, "file_name", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
         if (attr1 < 0)
         {
           NXReportError( 
@@ -249,7 +249,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
         aid2=H5Screate(H5S_SCALAR);
         aid1 = H5Tcopy(H5T_C_S1);
         H5Tset_size(aid1, strlen(version_nr));
-        attr1= H5Acreate(iVID, "HDF5_Version", aid1, aid2, H5P_DEFAULT);
+        attr1= H5Acreate(iVID, "HDF5_Version", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
         if (attr1 < 0)
         {
           NXReportError( 
@@ -271,7 +271,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
 	  aid2=H5Screate(H5S_SCALAR);
 	  aid1 = H5Tcopy(H5T_C_S1);
 	  H5Tset_size(aid1, strlen(time_buffer));
-	  attr1=H5Acreate(iVID, "file_time", aid1, aid2, H5P_DEFAULT);
+	  attr1=H5Acreate(iVID, "file_time", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
 	  if (attr1 < 0)
 	  {
 	      NXReportError( 
@@ -383,7 +383,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     aid2 = H5Screate(H5S_SCALAR);
     aid1 = H5Tcopy(H5T_C_S1);
     H5Tset_size(aid1, strlen(nxclass));
-    attr1= H5Acreate(iVID, "NX_class", aid1, aid2, H5P_DEFAULT);
+    attr1= H5Acreate(iVID, "NX_class", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
     if (attr1 < 0)
        {
        NXReportError( "ERROR: failed to store class name");
@@ -972,7 +972,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 	return NX_ERROR;
       }
     }    
-    attr1 = H5Acreate(vid, name, aid1, aid2, H5P_DEFAULT);
+    attr1 = H5Acreate(vid, name, aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
     if (attr1 < 0) {
       NXReportError( "ERROR: attribute cannot created! ");
       killAttVID(pFile,vid);
@@ -1170,7 +1170,7 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
     aid2 = H5Screate(H5S_SCALAR);
     aid1 = H5Tcopy(H5T_C_S1);
     H5Tset_size(aid1,strlen(sLink->targetPath));
-    attID = H5Acreate(dataID,name,aid1,aid2,H5P_DEFAULT);
+    attID = H5Acreate(dataID,name,aid1,aid2,H5P_DEFAULT, H5P_DEFAULT);
     if(attID < 0)
     {
 	return NX_OK;
