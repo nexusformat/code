@@ -77,13 +77,15 @@ static void getAttrAsNode(NXhandle *handle, NodeTree &tree, string &name){
   bool found=false;
   for( int i=0 ; i<num_attr ; i++ ){
     if(NXgetnextattr(*handle,attr_name,&attr_len,&attr_type)!=NX_OK)
-      throw runtime_error("NXmalloc failed");
+      throw runtime_error("NXgetnextattr failed");
     if(name==attr_name){
       found=true;
       break;
     }
   }
-
+  if (!found) {
+    throw runtime_error("failed to find attribute");
+  }
   // get the value
   int attr_dims[1]={attr_len+1};
   void *attr_value;
