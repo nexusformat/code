@@ -28,7 +28,8 @@ C------------------------------------------------------------------------------
 C Doxygen comments follow
 C for help, see: http://www.stack.nl/~dimitri/doxygen/docblocks.html#fortranblocks
 C
-C> \file The Fortran routines have the same names and argument lists as the corresponding C routines, which they call using wrappers. Some extra routines for handling input/output of character data and attributes have been added. Care must be taken to ensure enough space is allocated for the input/output operations being performed.
+C> \mainpage Fortan 77 NeXus API
+C> The Fortran routines have the same names and argument lists as the corresponding C routines, which they call using wrappers. Some extra routines for handling input/output of character data and attributes have been added. Care must be taken to ensure enough space is allocated for the input/output operations being performed.
 C>
 C> It is necessary to reverse the order of indices in multidimensional arrays, compared to an equivalent C program, so that data are stored in the same order in the NeXus file.
 C>
