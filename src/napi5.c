@@ -138,7 +138,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   am = (NXaccess)(am & NXACCMASK_REMOVEFLAGS);
 
   /* turn off the automatic HDF error handling */  
-    H5Eset_auto(NULL,NULL); 
+     H5Eset_auto(NULL,NULL); 
 #ifdef USE_FTIME
     struct timeb timeb_struct;
 #endif 
@@ -1001,7 +1001,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     int rank;
     hsize_t myStart[H5S_MAX_RANK];
     hsize_t mySize[H5S_MAX_RANK];
-    hsize_t size[H5S_MAX_RANK],maxdims[H5S_MAX_RANK];
+    hsize_t size[H5S_MAX_RANK],thedims[H5S_MAX_RANK],maxdims[H5S_MAX_RANK];
     hid_t   filespace,dataspace; 
     int unlimiteddim = 0;
   
@@ -1012,7 +1012,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       return NX_ERROR;
     }
     rank = H5Sget_simple_extent_ndims(pFile->iCurrentS);    
-    iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, NULL, maxdims);
+    iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, thedims, maxdims);
     for(i = 0; i < rank; i++)
     {
        myStart[i] = iStart[i];
@@ -1026,12 +1026,18 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
     {
         mySize[rank - 1] = 1;
-        size[rank - 1] = 1;
         myStart[rank - 1] = 0;
+        size[rank - 1] = 1;
     }
     dataspace = H5Screate_simple(rank, mySize, NULL);
     if (unlimiteddim)
     {
+       for(i = 0; i < rank; i++)
+       {
+	if (size[i] < thedims[i]) {
+		size[i] = thedims[i];
+	}
+	} 
        iRet = H5Dset_extent(pFile->iCurrentD, size);
        if (iRet < 0) 
        {
@@ -1070,7 +1076,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        }
        /* write slab */ 
        iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, dataspace, 
-                    pFile->iCurrentS, H5P_DEFAULT,data);
+                    pFile->iCurrentS, H5P_DEFAULT, data);
        if (iRet < 0)
        {
            NXReportError( "ERROR: writing slab failed");
