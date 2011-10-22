@@ -58,6 +58,7 @@ NXIReportError
 NXIprintlink
 nxiinquirefile_
 nxilinkexternal_
+nxilinkexternaldataset_
 nxiisexternalgroup_
 NXMGetError
 NXMDisableErrorReporting

@@ -1339,6 +1339,30 @@ NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   LOCKED_CALL(pFunc->nxclosegroup(pFunc->pNexusData));
   return NX_OK;
 }
+/*------------------------------------------------------------------------*/
+NXstatus  NXlinkexternaldataset(NXhandle fid, CONSTCHAR *name, 
+			 CONSTCHAR *url){
+  int status, type = NX_CHAR, length;
+  pNexusFunction pFunc = handleToNexusFunc(fid);
+  int64_t rank = 1;
+  int64_t dims[1] = {1};
+  
+  status = LOCKED_CALL(pFunc->nxmakedata64(pFunc->pNexusData, name, NX_CHAR, rank, dims));
+  if(status != NX_OK){
+    return status;
+  }
+  status = LOCKED_CALL(pFunc->nxopendata(pFunc->pNexusData, name));
+  if(status != NX_OK){
+    return status;
+  }
+  length = strlen(url);
+  status = NXputattr(fid, "napimount",(void *)url,length, type);
+  if(status != NX_OK){
+    return status;
+  }
+  LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
+  return NX_OK;
+}
 /*------------------------------------------------------------------------
   Implementation of NXopenpath 
   --------------------------------------------------------------------------*/

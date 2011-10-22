@@ -133,7 +133,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
   am = (NXaccess)(am & NXACCMASK_REMOVEFLAGS);
 
   /* turn off the automatic HDF error handling */  
-     H5Eset_auto(H5E_DEFAULT, NULL, NULL); 
+      H5Eset_auto(H5E_DEFAULT, NULL, NULL);  
 #ifdef USE_FTIME
     struct timeb timeb_struct;
 #endif 
@@ -770,7 +770,7 @@ static hid_t nxToHDF5Type(int datatype)
           iNew = H5Dset_extent  (pFile->iCurrentD, size);
           if (iNew < 0) 
           {
-              sprintf (pBuffer, "ERROR: cannot create Dataset %s",
+              sprintf (pBuffer, "ERROR: cannot create dataset %s",
                   name);
               NXReportError( pBuffer);
               return NX_ERROR;
@@ -786,7 +786,7 @@ static hid_t nxToHDF5Type(int datatype)
       pFile->iCurrentD = 0;
       if (iRet < 0)
       {
-          NXReportError( "ERROR: HDF cannot close Dataset");
+          NXReportError( "ERROR: HDF cannot close dataset");
           return NX_ERROR;
       }
       return NX_OK;
@@ -840,21 +840,21 @@ static hid_t nxToHDF5Type(int datatype)
     /* find the ID number and open the dataset */
     pFile->iCurrentD = H5Dopen(pFile->iCurrentG, name, H5P_DEFAULT);
     if (pFile->iCurrentD < 0) {
-      sprintf (pBuffer, "ERROR: Dataset \"%s\" not found at this level", name);
+      sprintf (pBuffer, "ERROR: dataset \"%s\" not found at this level", name);
       NXReportError( pBuffer);
       return NX_ERROR;
     }
      /* find the ID number of datatype */
     pFile->iCurrentT = H5Dget_type(pFile->iCurrentD);
     if (pFile->iCurrentT < 0) {
-      NXReportError( "ERROR: error opening Dataset");
+      NXReportError( "ERROR: error opening dataset");
       pFile->iCurrentT=0;
       return NX_ERROR;
     }
     /* find the ID number of dataspace */
     pFile->iCurrentS = H5Dget_space(pFile->iCurrentD);
     if (pFile->iCurrentS < 0) {
-      NXReportError( "ERROR:HDF error opening Dataset");
+      NXReportError( "ERROR:HDF error opening dataset");
       pFile->iCurrentS=0;
       return NX_ERROR;
     }
@@ -877,7 +877,7 @@ static hid_t nxToHDF5Type(int datatype)
     iRet = H5Tclose(pFile->iCurrentT);
     iRet = H5Dclose(pFile->iCurrentD);
     if (iRet < 0) {
-        NXReportError( "ERROR: cannot end access to Dataset");
+        NXReportError( "ERROR: cannot end access to dataset");
         return NX_ERROR;
      }
     pFile->iCurrentD=0;
@@ -1711,7 +1711,7 @@ static int countObjectsInGroup(hid_t loc_id)
      /* check if there is an Dataset open */
      if (pFile->iCurrentD == 0) 
      {
-	NXReportError( "ERROR: no Dataset open");
+	NXReportError( "ERROR: no dataset open");
 	return NX_ERROR;
      }
      memset (iStart, 0, H5S_MAX_RANK * sizeof(int));

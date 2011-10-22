@@ -246,6 +246,7 @@ typedef struct {
 #    define NXinquirefile       MANGLE(nxiinquirefile) 
 #    define NXisexternalgroup   MANGLE(nxiisexternalgroup)
 #    define NXlinkexternal      MANGLE(nxilinkexternal)
+#    define NXlinkexternaldataset      MANGLE(nxilinkexternaldataset)
 #    define NXgetversion        MANGLE(nxigetversion)
 
 /* 
@@ -722,10 +723,10 @@ extern  NXstatus  NXinquirefile(NXhandle handle, char *filename, int filenameBuf
 extern  NXstatus  NXisexternalgroup(NXhandle handle, CONSTCHAR *name, CONSTCHAR *nxclass, char *url, int urlLen); 
 
   /**
-   * Create a link to an external file. This works by creating a NeXus group under the current level in 
+   * Create a link to a group in an external file. This works by creating a NeXus group under the current level in 
    * the hierarchy which actually points to a group in  another file. 
    * \param handle A NeXus file handle as initialized by NXopen.
-   * \param name The name of the group which points to the xternal file.
+   * \param name The name of the group which points to the external file.
    * \param nxclass The class name of the group which points to the external file.
    * \param url The URL of the external file. Currently only one URL format is supported: nxfile://path-tofile\#path-in-file. 
    * This consists of two parts: the first part is of course the path to the file. The second part, path-in-file, is the 
@@ -734,6 +735,20 @@ extern  NXstatus  NXisexternalgroup(NXhandle handle, CONSTCHAR *name, CONSTCHAR 
    * \ingroup c_external
    */
 extern  NXstatus  NXlinkexternal(NXhandle handle, CONSTCHAR *name, CONSTCHAR *nxclass, CONSTCHAR *url);
+
+
+  /**
+   * Create a link to a dataset in an external file. This works by creating a dataset under the current level in 
+   * the hierarchy which actually points to a dataset in another file. 
+   * \param handle A NeXus file handle as initialized by NXopen.
+   * \param name The name of the dataset which points to the external file.
+   * \param url The URL of the external file. Currently only one URL format is supported: nxfile://path-tofile\#path-in-file. 
+   * This consists of two parts: the first part is of course the path to the file. The second part, path-in-file, is the 
+   * path to the dataset in the external file which appears in the first file.  
+   * \return NX_OK on success, NX_ERROR in the case of an error.   
+   * \ingroup c_external
+   */
+extern  NXstatus  NXlinkexternaldataset(NXhandle handle, CONSTCHAR *name, CONSTCHAR *url);
 
   /**
    * Utility function which allocates a suitably sized memory area for the dataset characteristics specified.
