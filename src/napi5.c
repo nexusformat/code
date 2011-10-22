@@ -838,7 +838,7 @@ static hid_t nxToHDF5Type(int datatype)
 
 
     /* find the ID number and open the dataset */
-    pFile->iCurrentD = H5Dopen(pFile->iCurrentG, name);
+    pFile->iCurrentD = H5Dopen(pFile->iCurrentG, name, H5P_DEFAULT);
     if (pFile->iCurrentD < 0) {
       sprintf (pBuffer, "ERROR: Dataset \"%s\" not found at this level", name);
       NXReportError( pBuffer);
@@ -1134,7 +1134,7 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
     */
     if(sLink->linkType > 0)
     {
-      dataID = H5Dopen(pFile->iFID,sLink->targetPath);
+      dataID = H5Dopen(pFile->iFID,sLink->targetPath, H5P_DEFAULT);
     } else {
       dataID = H5Gopen(pFile->iFID,sLink->targetPath);
     }
@@ -1662,7 +1662,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	  /*
 	    open dataset and find type
 	  */
-           grp=H5Dopen(pFile->iCurrentG,name);
+           grp=H5Dopen(pFile->iCurrentG,name, H5P_DEFAULT);
            type=H5Dget_type(grp);
            atype=H5Tcopy(type);
            tclass = H5Tget_class(atype);
