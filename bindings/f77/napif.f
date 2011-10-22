@@ -75,7 +75,8 @@ C------------------------------------------------------------------------------
       TRUELEN = 0
       END
 
-C *** Convert FORTRAN string STRING into NULL terminated C string ISTRING
+!> Convert FORTRAN string STRING into NULL terminated C string ISTRING
+!<
       SUBROUTINE EXTRACT_STRING(ISTRING, LENMAX, STRING)
       CHARACTER*(*) STRING
       INTEGER I,ILEN,TRUELEN,LENMAX
@@ -95,7 +96,8 @@ C *** Convert FORTRAN string STRING into NULL terminated C string ISTRING
      +       'buffer needs increasing from ', i4,' to at least ',i4)
       END
 
-C *** Convert NULL terminated C string ISTRING to FORTRAN string STRING
+!> Convert NULL terminated C string ISTRING to FORTRAN string STRING
+!<
       SUBROUTINE REPLACE_STRING(STRING, ISTRING)
       INTEGER*1 ISTRING(*)
       CHARACTER*(*) STRING
@@ -111,7 +113,8 @@ C *** Convert NULL terminated C string ISTRING to FORTRAN string STRING
      +  'buffer needs to be > ', I4)
       END
 
-C *** Wrapper routines for NXAPI interface
+!> Wrapper routines for NXAPI interface
+!<
       INTEGER FUNCTION NXOPEN(FILENAME, ACCESS_METHOD, FILEID)
       CHARACTER*(*) FILENAME
       INTEGER*1 IFILENAME(256)
