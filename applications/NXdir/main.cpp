@@ -394,15 +394,6 @@ static int set_int(const string arg1, const string arg2, int *val){
 
 }
 
-/*
- * Set the recursion level.
- */
-static int set_recurse(const string arg1, const string arg2, const string flag, int *recurse){
-  *recurse=-1;
-  string result=trim_arg(arg1,flag);
-  return set_int(result,arg2,recurse);
-}
-
 int main(int argc, char *argv[]){
   // define the default options
   StringVector files;
