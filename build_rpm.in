@@ -22,8 +22,15 @@ nxtop=`pwd`
 rm -fr $nxtop/installroot
 mkdir $nxtop/installroot
 # 
+make dist
 ln -sf $nxtop/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.gz $topdir/SOURCES
 cp $nxtop/nexus.spec $topdir/SPECS
 cd $topdir/SPECS
+#
+if test -z "$1"; then
+    build_args="--with-python --with-java-home=/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/ --with-doxygen"
+else
+    build_args="$1"
+fi
 # buildroot is actually where we install to
-env NEXUS_CONFIG_OPTIONS="$1" rpmbuild -ba --buildroot $nxtop/installroot nexus.spec
+env NEXUS_CONFIG_OPTIONS="$build_args" rpmbuild -ba --buildroot $nxtop/installroot nexus.spec
