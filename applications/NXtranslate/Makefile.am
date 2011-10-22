@@ -30,12 +30,12 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER -DEDF_RETRIEVER -DSPEC_RETRIEVER @LIBXML2_CFLAGS@ @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
+AM_CPPFLAGS=-I. -I$(top_srcdir)/include -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER -DEDF_RETRIEVER -DSPEC_RETRIEVER @LIBXML2_CFLAGS@ @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@
 
 if HAVE_OPENGENIE
 GENIESUBDIR=opengenie
 endif
-SUBDIRS=IPNS_CPP text_collist text_plain text_xml sns_histogram docs \
+SUBDIRS=text_collist text_plain text_xml sns_histogram docs \
 	FRM2 loopy binary spec esrf_edf $(GENIESUBDIR)
 
 bin_PROGRAMS = nxtranslate
@@ -48,7 +48,7 @@ nxtranslate_SOURCES = \
 	nxtranslate_debug.h Ptr.h retriever.h string_util.h xml_parser.h \
 	tree.hh dynamic_retriever.cpp dynamic_retriever.h
 
-EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
+EXTRA_nxtranslate_SOURCES= \
 	text_collist/collist_retriever.h \
 	text_plain/retriever.h \
 	text_xml/retriever.h \
@@ -57,7 +57,7 @@ EXTRA_nxtranslate_SOURCES=IPNS_CPP/ipns_retriever.h \
         loopy/retriever.h
 
 nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
-	IPNS_CPP/libIPNSRunfile.la text_collist/libTextCollist.la \
+	text_collist/libTextCollist.la \
 	text_plain/libTextPlain.la text_xml/libTextXML.la \
 	sns_histogram/libSNShistogram.la \
 	FRM2/libFRM2.la \

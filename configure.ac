@@ -781,7 +781,6 @@ AC_CONFIG_FILES([Makefile
 		applications/nxingest/Makefile
 		applications/NXsummary/Makefile
 		applications/NXtranslate/Makefile
-		applications/NXtranslate/IPNS_CPP/Makefile
 		applications/NXtranslate/FRM2/Makefile
 		applications/NXtranslate/opengenie/Makefile
 		applications/NXtranslate/text_collist/Makefile
