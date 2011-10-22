@@ -365,8 +365,15 @@ HDF5_EXT=so # library file extent to look for with HDF5 libraries
 SHARED_EXT=so
 AC_SUBST(SHARED_EXT)
 
+AC_CHECK_LIB(xml2, [xml_parse_file, xmlParseFile])
+if test "x$ac_cv_lib_xml2_xml_parse_file__xmlParseFile" = xyes; then
+    LIBXML2_CFLAGS='`xml2-config --cflags`'
+    HAVE_LIBXML2="yes"
+else
+    LIBXML2_CFLAGS=''
+    HAVE_LIBXML2="no (will not build NXsummary or NXtranslate)"
+fi
 AC_SUBST(LIBXML2_CFLAGS)
-LIBXML2_CFLAGS='`xml2-config --cflags`'
 
 # set up for linux here - mac is covered in the case $host statement
 AS_CASE([$build_cpu], [x86|i386|i686], [IDLCPU=x86], [IDLCPU=$build_cpu])
@@ -897,6 +904,7 @@ build:
 
 	application tools:
 	     ant:	       ${ANT_PROG}
+	     libxml2:          ${HAVE_LIBXML2}
 	     readline:	       ${HAVE_READLINE}
 
 	documentation:
