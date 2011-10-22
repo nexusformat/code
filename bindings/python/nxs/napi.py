@@ -995,8 +995,8 @@ class NeXus(object):
         slab_shape = numpy.asarray(slab_shape,'int64')
         #print "slab",offset,size,data
         status = nxlib.nxiputslab64_(self.handle,pdata,
-                                      slab_offset.ctypes.data_as(c_int64_p),
-                                      slab_shape.ctypes.data_as(c_int64_p))
+                                     slab_offset.ctypes.data_as(c_int64_p),
+                                     slab_shape.ctypes.data_as(c_int64_p))
         if status == ERROR:
             raise ValueError, "Could not write slab: %s"%(self._loc())
 
