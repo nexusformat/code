@@ -88,6 +88,7 @@ include(cmake_include/FindDocbookUtils.cmake)
 include(cmake_include/FindSystemConfig.cmake)
 include(cmake_include/FindSZIP.cmake)
 include(cmake_include/FindAnt.cmake)
+include(cmake_include/nexus_package_details.cmake)
 
 #Find the libraries for the build.
 
