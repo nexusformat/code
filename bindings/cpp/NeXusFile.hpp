@@ -255,7 +255,7 @@ namespace NeXus {
 
     /**
      * \copydoc NeXus::File::makeData(const std::string&, NXnumtype,
-     *                              const std::vector<int>&, bool);
+     *                              const std::vector<int64_t>&, bool);
      */
     void makeData(const std::string& name, NXnumtype type,
                   const std::vector<int>& dims, bool open_data = false);
@@ -357,8 +357,8 @@ namespace NeXus {
     /**
      * \copydoc writeCompData(const std::string & name,
      *                        const std::vector<NumT> & value,
-     *                        const std::vector<int> & dims, const NXcompression comp,
-     *                        const std::vector<int> & bufsize)
+     *                        const std::vector<int64_t> & dims, const NXcompression comp,
+     *                        const std::vector<int64_t> & bufsize)
      */
     template <typename NumT>
     void writeCompData(const std::string & name,
