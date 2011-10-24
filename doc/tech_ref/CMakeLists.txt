@@ -53,7 +53,7 @@ if(DOCBOOKUTILS_FOUND)
 
 	install (FILES ${CMAKE_BINARY_DIR}/doc/tech_ref/NeXus_definitions.pdf
                        ${CMAKE_BINARY_DIR}/doc/tech_ref/NeXus_definitions.txt
-                       DESTINATION ${NXDOCDIR}/tech_ref)
+                       DESTINATION ${NXDOCDIR}/tech_ref COMPONENT Documentation)
 
 endif(DOCBOOKUTILS_FOUND)
 

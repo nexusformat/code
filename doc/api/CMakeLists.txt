@@ -26,5 +26,5 @@
 #
 #====================================================================
 
-install (FILES napi.tex DESTINATION ${NXDOCDIR}/api)
+install (FILES napi.tex DESTINATION ${NXDOCDIR}/api COMPONENT Documentation)
 

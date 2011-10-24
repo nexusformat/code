@@ -26,5 +26,5 @@
 #
 #====================================================================
 
-install (FILES NXdict.tex DESTINATION ${NXDOCDIR}/nxdict)
+install (FILES NXdict.tex DESTINATION ${NXDOCDIR}/nxdict COMPONENT Documentation)
 

@@ -33,5 +33,5 @@ add_subdirectory (nxdict)
 add_subdirectory (tech_ref)
 #add_subdirectory (tutorial)
 
-install (FILES README.doc DESTINATION ${NXDOCDIR})
+install (FILES README.doc DESTINATION ${NXDOCDIR} COMPONENT Documentation)
 

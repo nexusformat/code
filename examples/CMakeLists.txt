@@ -27,5 +27,5 @@
 #====================================================================
 
 
-install (FILES README.examples DESTINATION ${NXEXAMPLEDIR}/)
+install (FILES README.examples DESTINATION ${NXEXAMPLEDIR}/ COMPONENT Examples)
 

@@ -88,7 +88,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
                        ${CMAKE_BINARY_DIR}/doc/doxygen/html-python
                        ${CMAKE_BINARY_DIR}/doc/doxygen/html-f90
                        ${CMAKE_BINARY_DIR}/doc/doxygen/html-f77
-                       DESTINATION ${NXDOCDIR}/doxygen)
+                       DESTINATION ${NXDOCDIR}/doxygen COMPONENT Documentation)
 
 endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
