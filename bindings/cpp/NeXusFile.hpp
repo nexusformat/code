@@ -331,6 +331,61 @@ namespace NeXus {
     void writeData(const std::string& name, const std::vector<NumT>& value,
                    const std::vector<int>& dims);
 
+
+    /** Create a 1D data field with an unlimited dimension, insert the data, and close the data.
+     *
+     * \tparam NumT numeric data type of \a value
+     * \param name :: The name of the field to create.
+     * \param value :: The vector to put into the file.
+     */
+    template <typename NumT>
+    void writeExtendibleData(const std::string& name, std::vector<NumT>& value);
+
+    /** Create a 1D data field with an unlimited dimension, insert the data, and close the data.
+     *
+     * \tparam NumT numeric data type of \a value
+     * \param name :: The name of the field to create.
+     * \param value :: The vector to put into the file.
+     * \param chunkSize :: chunk size to use when writing
+     */
+    template <typename NumT>
+    void writeExtendibleData(const std::string& name, std::vector<NumT>& value, const int64_t chunk);
+
+    /** Create a 1D data field with an unlimited dimension, insert the data, and close the data.
+     *
+     * \tparam NumT numeric data type of \a value
+     * \param name :: The name of the field to create.
+     * \param value :: The vector to put into the file.
+     * \param dims :: The dimensions of the data.
+     * \param chunk :: chunk size to use when writing
+     */
+    template <typename NumT>
+    void writeExtendibleData(const std::string& name, std::vector<NumT>& value,
+                             std::vector<int64_t>& dims, std::vector<int64_t> & chunk);
+
+
+    /** Updates the data written into an already-created
+     * data vector. If the data was created as extendible, it will be resized.
+     *
+     * \tparam NumT numeric data type of \a value
+     * \param name :: The name of the field to create.
+     * \param value :: The vector to put into the file.
+     */
+    template <typename NumT>
+    void writeUpdatedData(const std::string& name, std::vector<NumT>& value);
+
+    /** Updates the data written into an already-created
+     * data vector. If the data was created as extendible, it will be resized.
+     *
+     * \tparam NumT numeric data type of \a value
+     * \param name :: The name of the field to create.
+     * \param value :: The vector to put into the file.
+     * \param dims :: The dimensions of the data.
+     */
+    template <typename NumT>
+    void writeUpdatedData(const std::string& name, std::vector<NumT>& value,
+                          std::vector<int64_t>& dims);
+
     /**
      * \copydoc makeCompData(const std::string&, const NXnumtype,
      *                       const std::vector<int64_t>&, const NXcompression,
@@ -580,7 +635,18 @@ namespace NeXus {
     template <typename NumT>
     void readData(const std::string & dataName, std::vector<NumT>& data);
 
-    /** Put data into the supplied vector. The vector does not need to
+    /** Put data into the supplied value.
+     *
+     * The named data object is opened, loaded, then closed.
+     *
+     * \param dataName :: name of the data to open.
+     * \param data :: Where to put the data.
+     * \tparam NumT numeric data type of \a data
+     */
+    template <typename NumT>
+    void readData(const std::string & dataName, NumT & data);
+
+    /** Put data into the supplied string. The vector does not need to
      * be the correct size, just the correct type as it is resized to
      * the appropriate value.
      *
@@ -588,7 +654,6 @@ namespace NeXus {
      *
      * @param dataName :: name of the data to open.
      * @param data :: Where to put the data.
-     * \tparam NumT numeric data type of \a data
      */
     void readData(const std::string & dataName, std::string & data);
 

@@ -130,6 +130,37 @@ int writeTest(const string& filename, NXaccess create_code) {
   cdims.push_back(20);
   file.writeCompData("comp_data", comp_array, array_dims, NeXus::LZW, cdims);
 
+  // ---------- Test write Extendible Data --------------------------
+  std::vector<int> data(10, 123);
+  file.makeGroup("extendible_data", "NXdata", 1);
+  file.writeExtendibleData("mydata1", data);
+  file.writeExtendibleData("mydata2", data, 1000);
+  std::vector<int64_t> dims(2);
+  dims[0] = 5;
+  dims[1] = 2;
+  std::vector<int64_t> chunk(2, 2);
+  file.writeExtendibleData("my2Ddata", data, dims, chunk);
+  file.putAttr("string_attrib", "some short string");
+
+  // Data vector can grow
+  for (size_t i=0; i<6; i++)
+    data.push_back(456);
+  data[0]=789;
+  file.writeUpdatedData("mydata1", data);
+
+  dims[0] = 8;
+  dims[1] = 2;
+  file.writeUpdatedData("my2Ddata", data, dims);
+
+  // Data vector can also shrink!
+  data.clear();
+  data.resize(5, 234);
+  file.writeUpdatedData("mydata2", data);
+
+  // Exit the group
+  file.closeGroup();
+  // ---------- End Test write Extendible Data --------------------------
+
   // simple flush test
   file.flush();
 
@@ -492,7 +523,7 @@ int testTypeMap(const std::string &fname)
 {
 	NeXus::File file(fname);
 	multimap<string, string> *map = file.getTypeMap();
-	int mapsize = 21;
+	int mapsize = 25;
 	// HDF4 does not have int64 capability, so resulting map is one shorter than HDF5 and XML files
 	if (fname == string("napi_test_cpp.hdf")) {
 		if (map->size() != (mapsize - 1))
