@@ -38,7 +38,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
                       ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
 
-    install (PROGRAMS NXdump DESTINATION bin)
+    install (PROGRAMS NXdump DESTINATION bin COMPONENT Runtime)
 
 endif(CMAKE_Fortran_COMPILER_WORKS)
 

@@ -57,5 +57,5 @@ install (TARGETS NXconvert_Static_Library NXconvert_Shared_Library nxconvert
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
 
-install (FILES nxconvert.1 DESTINATION man/man1)
+install (FILES nxconvert.1 DESTINATION man/man1 COMPONENT Documentation)
 

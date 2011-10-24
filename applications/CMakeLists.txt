@@ -55,5 +55,5 @@ if(LIBXML2_FOUND)
     add_subdirectory (NXtranslate)
 endif(LIBXML2_FOUND)
 
-install (PROGRAMS nxdiff DESTINATION bin)
+install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)
 

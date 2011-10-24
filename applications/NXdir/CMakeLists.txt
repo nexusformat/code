@@ -34,7 +34,7 @@ target_link_libraries(nxdir NeXus_Shared_Library
                       ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
                       ${HISTORY_LINK} )
 
-install (TARGETS nxdir DESTINATION bin)
-install (FILES nxdir.1 DESTINATION man/man1)
+install (TARGETS nxdir DESTINATION bin COMPONENT Runtime)
+install (FILES nxdir.1 DESTINATION man/man1 COMPONENT Documentation)
 
 

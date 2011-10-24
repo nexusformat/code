@@ -37,6 +37,6 @@ target_link_libraries(nxingest NeXus_Shared_Library ${READLINE_LINK} ${M_LINK} $
                       ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
 
 
-install (TARGETS nxingest DESTINATION bin)
-install (FILES nxingest.txt gpl.txt DESTINATION ${NXDOCDIR}/nxingest)
+install (TARGETS nxingest DESTINATION bin COMPONENT Runtime)
+install (FILES nxingest.txt gpl.txt DESTINATION ${NXDOCDIR}/nxingest COMPONENT Documentation)
 

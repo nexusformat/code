@@ -41,7 +41,7 @@ install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
             GROUP_READ GROUP_EXECUTE 
             WORLD_READ WORLD_EXECUTE)
 
-install (LIBRARY dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION lib/lib)
-install (LIBRARY dist/NXvalidate.jar DESTINATION lib)
+install (LIBRARY dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION lib/lib COMPONENT Runtime)
+install (LIBRARY dist/NXvalidate.jar DESTINATION lib COMPONENT Development)
 
 

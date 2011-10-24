@@ -38,5 +38,5 @@ target_link_libraries(nxsummary NeXus_Shared_Library ${HDF5_LIBRARIES}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES} 
                       ${LIBXML2_LIBRARIES})
 
-install (TARGETS nxsummary DESTINATION bin)
+install (TARGETS nxsummary DESTINATION bin COMPONENT Runtime)
 
