@@ -36,11 +36,12 @@ set (CPACK_SOURCE_PACKAGE_FILE_NAME "nexus-source-${CPACK_PACKAGE_VERSION_MAJOR}
 #set (CPACK_SOURCE_GENERATOR)
 #set (CPACK_SOURCE_OUTPUT_CONFIG_FILE)
 #set (CPACK_SOURCE_IGNORE_FILES)
+set(CPACK_RPM_COMPONENT_INSTALL ON)
 
 
 cpack_add_component(Runtime
                     DISPLAY_NAME "Binary Applications"
-                    DESCRIPTION "Binary applications such as nxconvert, nx brows etc..."
+                    DESCRIPTION "Binary applications such as nxconvert, nxbrows etc..."
                     )
 
 cpack_add_component(Documentation
