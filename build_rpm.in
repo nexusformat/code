@@ -26,4 +26,4 @@ ln -sf $nxtop/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.gz $topdir/SOURCES
 cp $nxtop/nexus.spec $topdir/SPECS
 cd $topdir/SPECS
 # buildroot is actually where we install to
-env NEXUS_CONFIG_OPTIONS="$1" rpmbuild -ba --buildroot $nxtop/installroot nexus.spec
+env NEXUS_CONFIG_OPTIONS="$1" rpmbuild -ba --buildroot $nxtop/installroot nexus.spec --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5"
