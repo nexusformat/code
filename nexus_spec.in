@@ -1,7 +1,7 @@
 # @configure_input@
 # $Id$
 # Template for NeXus RPM SPEC file
-# Copyright (C) 2004 Freddie Akeroyd
+# Copyright (C) 2004 Freddie Akeroyd <freddie.akeroyd@stfc.ac.uk>
 #
 Summary: Libraries and utilities for using NeXus format data files
 Name: @PACKAGE_TARNAME@
@@ -36,14 +36,50 @@ among Neutron, Muon and X-ray science facilities. The underlying
 data is stored using the HDF format from NCSA. This package provides
 access routines, documentation, examples and a basic NeXus file browser.
 
-#%package devel
-#Summary: Libraries and utilities for using NeXus format data files
-#Group: Development/Libraries
-#
-#%description devel
-#NeXus is an international standard for exchanging data files
-#among Neutron, Muon and X-ray science facilities. The underlying
-#data is stored using the HDF format from NCSA. This package provides
+%package devel
+Summary: Libraries and utilities for using NeXus format data files
+Group: Development/Libraries
+
+%description devel
+NeXus is an international standard for exchanging data files
+among Neutron, Muon and X-ray science facilities. The underlying
+data is stored using the HDF format from NCSA. This package provides
+
+%package tools
+Summary: Libraries and utilities for using NeXus format data files
+Group: Development/Libraries
+
+%description tools
+NeXus is an international standard for exchanging data files
+among Neutron, Muon and X-ray science facilities. The underlying
+data is stored using the HDF format from NCSA. This package provides
+
+%package doc
+Summary: Libraries and utilities for using NeXus format data files
+Group: Development/Libraries
+
+%description doc
+NeXus is an international standard for exchanging data files
+among Neutron, Muon and X-ray science facilities. The underlying
+data is stored using the HDF format from NCSA. This package provides
+
+%package python
+Summary: Libraries and utilities for using NeXus format data files
+Group: Development/Libraries
+
+%description python
+NeXus is an international standard for exchanging data files
+among Neutron, Muon and X-ray science facilities. The underlying
+data is stored using the HDF format from NCSA. This package provides
+
+%package java
+Summary: Libraries and utilities for using NeXus format data files
+Group: Development/Libraries
+
+%description java
+NeXus is an international standard for exchanging data files
+among Neutron, Muon and X-ray science facilities. The underlying
+data is stored using the HDF format from NCSA. This package provides
 
 %prep
 %setup -q
@@ -61,32 +97,56 @@ make
 # RPM_BUILD_ROOT is where to install software to
 if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
 make DESTDIR="$RPM_BUILD_ROOT" install
+find "$RPM_BUILD_ROOT" -name '*.la' -exec rm -f {} \;
 
 %files
 %defattr(-,root,root)
 %doc README NEWS ChangeLog AUTHORS COPYING INSTALL
 # %docdir /usr/local/doc
-%{_libdir}/*
-%{_bindir}/*
-%{_datadir}/*
+%{_libdir}/libNeXus*.so*
+#%ifarch x86_64
+#/usr/lib/*.so*
+#%endif
+
+%files devel
+%defattr(-,root,root)
+%{_libdir}/libNeXus*.a
+%{_libdir}/pkgconfig
 %{_includedir}/*
+
+%files tools
+%defattr(-,root,root)
+%{_bindir}/*
+
+%files doc
+%defattr(-,root,root)
+%{_datadir}/nexus
+
+%files python
+%defattr(-,root,root)
 /usr/lib/python*/site-packages/nxs
-#%files devel
-#%{_libdir}/*.a
-#%{_libdir}/*.so*
+
+%files java
+%defattr(-,root,root)
+%{_datadir}/java
+%{_libdir}/libjnexus.so*
+%{_libdir}/libjnexus.a
 
 %clean
 if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
 
 %post
+if test `whoami` = root; then ldconfig; fi
+
+%post tools
 if [ "$RPM_INSTALL_PREFIX" != "" ]; then
     INSTALL_PREFIX=$RPM_INSTALL_PREFIX
 else
     INSTALL_PREFIX=%{_prefix}
 fi
+
 ( cd $INSTALL_PREFIX/bin; for i in nxbuild; do \
   sed -i -e "s|^prefix=.*|prefix=$INSTALL_PREFIX|" $i; done )
-if test `whoami` = root; then ldconfig; fi
 
 %postun
 if test `whoami` = root; then ldconfig; fi
@@ -94,6 +154,8 @@ if test `whoami` = root; then ldconfig; fi
 # %changelog date format as per  `date +"%a %d %b %Y"`
 # first line should be   date  user  email
 %changelog
+* Sat Oct 22 2011 Freddie Akeroyd <freddie.akeroyd@stfc.ac.uk> - 4.3.0
+- Split into subpackages
 * Thu May 24 2007 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> - 4.0.0
 - Tag and build 4.0.0
 * Wed May 16 2007 Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> - 4.0rc3
