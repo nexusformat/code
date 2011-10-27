@@ -672,6 +672,13 @@ namespace NeXus {
      */
     std::map<std::string, std::string> getEntries();
 
+    /** Return the entries available in the current place in the file,
+     * but avoids the map copy of getEntries().
+     *
+     * \param map The map that will be filled with the entries
+     */
+    void getEntries(std::map<std::string, std::string> & map);
+
     /**
      * \copydoc NeXus::File::getSlab(void*, const std::vector<int64_t>&,
      *                               const std::vector<int64_t>&)
@@ -695,6 +702,12 @@ namespace NeXus {
      * currently open.
      */
     std::vector<AttrInfo> getAttrInfos();
+
+    /**
+     *  \return true if the current point in the file has the named attribute
+     *  \param name the name of the attribute to look for.
+     */
+    bool hasAttr(const std::string & name);
 
     /**
      * Get the value of the attribute specified by the AttrInfo supplied.

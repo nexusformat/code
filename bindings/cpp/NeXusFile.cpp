@@ -569,13 +569,12 @@ void File::putAttr(const char* name, const char* value) {
 }
 
 void File::putAttr(const std::string& name, const std::string value) {
-  if (value.empty()) {
-    throw Exception("Supplied empty value to putAttr");
-  }
   string my_value(value);
+  if (my_value.empty())
+    my_value = " "; // Make a default "space" to avoid errors.
   AttrInfo info;
   info.name = name;
-  info.length = my_value.size();
+  info.length = static_cast<int>(my_value.size());
   info.type = CHAR;
   this->putAttr(info, &(my_value[0]));
 }
@@ -959,11 +958,16 @@ pair<string, string> File::getNextEntry() {
   }
 }
 
-map<string, string> File::getEntries() {
-  this->initGroupDir();
-
+map<string, string> File::getEntries()
+{
   map<string, string> result;
+  this->getEntries(result);
+  return result;
+}
 
+void File::getEntries(std::map<std::string, std::string> & map)
+{
+  this->initGroupDir();
   pair<string,string> temp;
   while (true) {
     temp = this->getNextEntry();
@@ -971,12 +975,11 @@ map<string, string> File::getEntries() {
       break;
     }
     else {
-      result.insert(temp);
+      map.insert(temp);
     }
   }
-
-  return result;
 }
+
 
 void File::getSlab(void* data, const vector<int>& start,
                    const vector<int>& size) {
@@ -1126,6 +1129,22 @@ vector<AttrInfo> File::getAttrInfos() {
   }
   return infos;
 }
+
+bool File::hasAttr(const std::string & name)
+{
+  this->initAttrDir();
+  AttrInfo temp;
+  while(true) {
+    temp = this->getNextAttr();
+    if (temp.name == NULL_STR) {
+      break;
+    }
+    if (temp.name == name)
+      return true;
+  }
+  return false;
+}
+
 
 NXlink File::getGroupID() {
   NXlink link;
@@ -1718,6 +1737,27 @@ template
 NXDLL_EXPORT void File::putSlab(std::vector<int64_t>& data, int start, int size);
 template
 NXDLL_EXPORT void File::putSlab(std::vector<uint64_t>& data, int start, int size);
+
+template
+NXDLL_EXPORT void File::putSlab(std::vector<float>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<double>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<int8_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<uint8_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<int16_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<uint16_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<int32_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<uint32_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<int64_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+template
+NXDLL_EXPORT void File::putSlab(std::vector<uint64_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
 
 template 
 NXDLL_EXPORT void File::getAttr(const std::string& name, double& value);
