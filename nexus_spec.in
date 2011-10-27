@@ -103,24 +103,26 @@ find "$RPM_BUILD_ROOT" -name '*.la' -exec rm -f {} \;
 %defattr(-,root,root)
 %doc README NEWS ChangeLog AUTHORS COPYING INSTALL
 # %docdir /usr/local/doc
-%{_libdir}/*.so*
+%{_libdir}/libNeXus*.so*
+%{_libdir}/libnxconvert*.so*
 #%ifarch x86_64
 #/usr/lib/*.so*
 #%endif
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/*.a
+%{_libdir}/libNeXus*.a
+%{_libdir}/libnxconvert*.a
 %{_libdir}/pkgconfig
 %{_includedir}/*
 
 %files tools
 %defattr(-,root,root)
 %{_bindir}/*
+%{_datadir}/man
 
 %files doc
 %defattr(-,root,root)
-%{_datadir}/man
 %{_datadir}/nexus
 
 %files python
@@ -130,21 +132,24 @@ find "$RPM_BUILD_ROOT" -name '*.la' -exec rm -f {} \;
 %files java
 %defattr(-,root,root)
 %{_datadir}/java
+%{_libdir}/libjnexus.so*
+%{_libdir}/libjnexus.a
 
 %clean
 if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
 
 %post
+if test `whoami` = root; then ldconfig; fi
+
+%post tools
 if [ "$RPM_INSTALL_PREFIX" != "" ]; then
     INSTALL_PREFIX=$RPM_INSTALL_PREFIX
 else
     INSTALL_PREFIX=%{_prefix}
 fi
 
-%post tools
 ( cd $INSTALL_PREFIX/bin; for i in nxbuild; do \
   sed -i -e "s|^prefix=.*|prefix=$INSTALL_PREFIX|" $i; done )
-if test `whoami` = root; then ldconfig; fi
 
 %postun
 if test `whoami` = root; then ldconfig; fi

@@ -33,4 +33,4 @@ else
     build_args="$1"
 fi
 # buildroot is actually where we install to
-env NEXUS_CONFIG_OPTIONS="$build_args" rpmbuild -ba --buildroot $nxtop/installroot nexus.spec --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5"
+env NEXUS_CONFIG_OPTIONS="$build_args" rpmbuild -ba --buildroot $nxtop/installroot --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5" nexus.spec
