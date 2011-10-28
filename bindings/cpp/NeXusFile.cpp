@@ -62,11 +62,15 @@ namespace NeXus {
 #ifndef _MSC_VER
   template<>
   NXDLL_EXPORT NXnumtype getType(char number) {
+    return CHAR;
+    /* This causes runtime errors for getAttr(string, string).
     stringstream msg;
     msg << "NeXus::getType() does not know type of \"char\" " << number;
     throw Exception(msg.str());
+     */
   }
-#endif /* _MSC_VER */
+#endif
+ /* _MSC_VER */
 
   // template specialisations for types we know 
   template<>
@@ -339,19 +343,21 @@ void File::writeData(const string& name, const char* value) {
   this->writeData(name, std::string(value));
 }
 
-void File::writeData(const string& name, const string& value) {
-  if (value.empty()) {
-    throw Exception("Supplied empty value to makeData");
-  }
+void File::writeData(const string& name, const string& value)
+{
+  string my_value(value);
+  // Allow empty strings by defaulting to a space
+  if (my_value.empty())
+    my_value = " ";
   vector<int> dims;
-  dims.push_back(value.size());
+  dims.push_back(static_cast<int>(my_value.size()));
   this->makeData(name, CHAR, dims, true);
 
-  string my_value(value);
   this->putData(&(my_value[0]));
 
   this->closeData();
 }
+
 
 
 template <typename NumT>
@@ -1110,9 +1116,22 @@ string File::getStrAttr(const AttrInfo & info) {
     throw Exception(msg.str());
   }
   char* value = new char[info.length + 1];
-  this->getAttr(info, value, info.length+1);
-  res = string(value, info.length);
-  delete[] value;
+  try
+  {
+    this->getAttr(info, value, info.length+1);
+  }
+  catch (Exception& e)
+  {
+    //Avoid memory leak
+    delete [] value;
+    throw e; //re-throw
+  }
+
+  //res = string(value, info.length);
+  //allow the constructor to find the ending point of the string. Janik Zikovsky, sep 22, 2010
+  res = string(value);
+  delete [] value;
+
   return res;
 }
 
