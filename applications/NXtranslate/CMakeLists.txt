@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-add_subdirectory (IPNS_CPP)
+#add_subdirectory (IPNS_CPP)
 add_subdirectory (text_collist)
 add_subdirectory (text_plain)
 add_subdirectory (text_xml)
