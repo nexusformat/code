@@ -29,7 +29,7 @@
 # The name of our project is "NeXus". CMakeLists files in this project can
 # refer to the root source directory of the project as ${NeXus_SOURCE_DIR} and
 # to the root binary directory of the project as ${NeXus_BINARY_DIR}.
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.4)
 
 #The name of our project
 project (NeXus)
@@ -88,7 +88,6 @@ include(cmake_include/FindDocbookUtils.cmake)
 include(cmake_include/FindSystemConfig.cmake)
 include(cmake_include/FindSZIP.cmake)
 include(cmake_include/FindAnt.cmake)
-include(cmake_include/nexus_package_details.cmake)
 
 #Find the libraries for the build.
 
@@ -254,11 +253,11 @@ add_subdirectory (third_party)
 #add_subdirectory (windows)
 #add_subdirectory (Windows_extra)
 
-# this must always be last
+# CPack must always be last
 set(CPACK_BINARY_NSIS ON)
 set(CPACK_BINARY_ZIP OFF)
 
 set(CPACK_SOURCE_IGNORE_FILES 
 	  "nexus_spec.in;~$;/.svn/;/.cvsignore/;/CMakeFiles/;/nbproject/;autogen.sh;cmake_install.cmake;Makefile;${CPACK_SOURCE_IGNORE_FILES}") 
 
-include(CPack)
+include(cmake_include/nexus_package_details.cmake)
