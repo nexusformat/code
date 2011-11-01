@@ -260,4 +260,8 @@ set(CPACK_BINARY_ZIP OFF)
 set(CPACK_SOURCE_IGNORE_FILES 
 	  "nexus_spec.in;~$;/.svn/;/.cvsignore/;/CMakeFiles/;/nbproject/;autogen.sh;cmake_install.cmake;Makefile;${CPACK_SOURCE_IGNORE_FILES}") 
 
-include(cmake_include/nexus_package_details.cmake)
+include(CPack)
+configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" 
+				"${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake"
+				@ONLY)
+set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake")
