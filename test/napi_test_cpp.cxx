@@ -466,9 +466,7 @@ int testExternal(const string & fileext, NXaccess create_code){
 
   // create the external link
   NeXus::File fileout(filename, create_code);
-  fileout.makeGroup("entry1", "NXentry");
   fileout.linkExternal("entry1", "NXentry", exturl1);
-  fileout.makeGroup("entry2", "NXentry");
   fileout.linkExternal("entry2", "NXentry", exturl2);
   fileout.close();
 

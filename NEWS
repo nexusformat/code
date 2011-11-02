@@ -1,3 +1,11 @@
+Version 4.3.0
+=============
+
+If creating an external link you are no longer supposed to create the group 
+beforehand. As HDF5 can handle groups natively, that is counterproductive 
+and we would have to remove the empty group again (hoping that it is actually 
+empty that is). It is easier to create the group in the API if required.
+
 Version 4.2.0
 =============
 

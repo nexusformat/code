@@ -2168,8 +2168,8 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitgroupdir=NX5initgroupdir;
       fHandle->nxinitattrdir=NX5initattrdir;
       fHandle->nxprintlink=NX5printlink;
-//      fHandle->nxnativeexternallink=NX5nativeexternallink;
-      fHandle->nxnativeexternallink=NULL;
+      fHandle->nxnativeexternallink=NX5nativeexternallink;
+//      fHandle->nxnativeexternallink=NULL;
 }
 
 #endif /* HDF5 */

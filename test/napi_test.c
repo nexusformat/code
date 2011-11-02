@@ -485,16 +485,16 @@ static int testExternal(char *progName){
   if(NXopen(testFile,create,&hfil) != NX_OK){
     return 1;
   }
-  if(NXmakegroup(hfil,"entry1","NXentry") != NX_OK){
+  /*if(NXmakegroup(hfil,"entry1","NXentry") != NX_OK){
     return 1;
-  }
+  }*/
   sprintf(nxfile,"nxfile://data/dmc01.%s#/entry1",ext);
   if(NXlinkexternal(hfil,"entry1","NXentry",nxfile) != NX_OK){
     return 1;
   }
-  if(NXmakegroup(hfil,"entry2","NXentry") != NX_OK){
+  /*if(NXmakegroup(hfil,"entry2","NXentry") != NX_OK){
     return 1;
-  }
+  }*/
   sprintf(nxfile,"nxfile://data/dmc02.%s#/entry1",ext);
   if(NXlinkexternal(hfil,"entry2","NXentry",nxfile) != NX_OK){
     return 1;
