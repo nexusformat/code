@@ -684,7 +684,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
       if(status == NX_ERROR){
 	return status;
       }
-      status = NXopenpath(fid,expath);
+      status = NXopenpath(fid, expath);
       NXgetgroupID(fid,&breakID);
       setCloseID(fileStack,breakID);
     }
@@ -1569,23 +1569,20 @@ static NXstatus stepOneUp(NXhandle hfil, char *name)
     catch the case when we are there: i.e. no further stepping
     necessary. This can happen with paths like ../
   */
-  if(strlen(name) < 1)
-  {
+  if (strlen(name) < 1) {
       return NX_OK;
   }
   
   NXinitgroupdir(hfil);
-  while(NXgetnextentry(hfil,name2,xclass,&datatype) != NX_EOD)
+
+  while(NXgetnextentry(hfil, name2, xclass, &datatype) != NX_EOD)
   {
-    
     if(strcmp(name2,name) == 0)
     {
       if(strcmp(xclass,"SDS") == 0)
       {
 	return NXopendata(hfil,name);
-      } 
-      else
-      {
+      } else {
 	return NXopengroup(hfil,name,xclass);
       }
     }
@@ -1616,8 +1613,7 @@ static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
     
     if(strcmp(name2,name) == 0)
     {
-      if(strcmp(xclass,"SDS") == 0)
-      {
+      if(strcmp(xclass,"SDS") == 0) {
 	return NX_EOD;
       } 
       else

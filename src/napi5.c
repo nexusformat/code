@@ -402,7 +402,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     return strstr(member_name, attr_name) ? 1 : 0;
   }
   /*------------------------------------------------------------------------*/
-  NXstatus  NX5opengroup (NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
+  NXstatus  NX5opengroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass)
   {
 
     pNexusFile5 pFile;
@@ -412,15 +412,12 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
     char data[128];
           
     pFile = NXI5assert (fid);
-    if (pFile->iCurrentG == 0)
-    {
+    if (pFile->iCurrentG == 0) {
       strcpy(pBuffer,name);
-    } 
-    else 
-    {
+    } else {
        sprintf(pBuffer,"%s/%s",pFile->name_tmp,name);
     }
-    iRet = H5Gopen(pFile->iFID,(const char *)pBuffer, H5P_DEFAULT);
+    iRet = H5Gopen(pFile->iFID, (const char *)pBuffer, H5P_DEFAULT);
     if (iRet < 0) {
       sprintf (pBuffer, "ERROR: group %s does not exist", pFile->name_tmp);
       NXReportError( pBuffer);
@@ -445,7 +442,7 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
          return NX_ERROR;
         }
         /* check contents of group attribute */
-        attr1 = H5Aopen_name(pFile->iCurrentG, "NX_class");
+        attr1 = H5Aopen_by_name(pFile->iCurrentG, ".", "NX_class", H5P_DEFAULT, H5P_DEFAULT);
         if (attr1 < 0)
         {
               NXReportError( "ERROR: opening NX_class group attribute");
@@ -951,7 +948,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     if (iType == NX_CHAR){
       H5Tset_size(aid1,datalen); 
     }         
-    iRet = H5Aopen_name(vid, name);
+    iRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
     if (iRet>0) {
       H5Aclose(iRet);
       iRet=H5Adelete(vid,name);
@@ -1143,7 +1140,7 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
       NXReportError("Internal error, path to link does not exist");
       return NX_ERROR;
     }
-    status = H5Aopen_name(dataID,name);
+    status = H5Aopen_by_name(dataID,".", name, H5P_DEFAULT, H5P_DEFAULT);
     if(status > 0)
     {
       H5Aclose(status);
@@ -1178,6 +1175,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     pNexusFile5 pFile;
     char        linkTarget[1024];
     int         type = NX_CHAR;
+    hid_t 	targetid;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1201,7 +1199,9 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
       return NX_ERROR;
     } 
 
-    H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->targetPath, linkTarget);
+    //targetid = H5Oopen(pFile->iFID, sLink->targetPath, H5P_DEFAULT);
+    H5Lcreate_hard(pFile->iFID, sLink->targetPath, H5L_SAME_LOC, linkTarget, H5P_DEFAULT, H5P_DEFAULT);
+    //H5Oclose(targetid);
 
     return NX5settargetattribute(pFile,sLink);
 }
@@ -1213,6 +1213,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
     char        linkTarget[1024];
     int         type = NX_CHAR;
     char        *itemName = NULL;
+    hid_t 	targetid;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1246,7 +1247,9 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
       return NX_ERROR;
     } 
 
-    H5Glink(pFile->iFID, H5G_LINK_HARD, sLink->targetPath, linkTarget);
+    //targetid = H5Oopen(pFile->iFID, sLink->targetPath, H5P_DEFAULT);
+    H5Lcreate_hard(pFile->iFID, sLink->targetPath, H5L_SAME_LOC, linkTarget, H5P_DEFAULT, H5P_DEFAULT);
+    //H5Oclose(targetid);
 
     return NX5settargetattribute(pFile,sLink);
    }
@@ -1282,24 +1285,22 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   
   /* Operator function. */
            
-  herr_t nxgroup_info(hid_t loc_id, const char *name, void *op_data)
+  herr_t nxgroup_info(hid_t loc_id, const char *name, const H5L_info_t *statbuf, void *op_data)
   {
-    H5G_stat_t statbuf;
-    pinfo self;
-    
-    self = (pinfo)op_data;
-    H5Gget_objinfo(loc_id, name, 0, &statbuf);
-    switch (statbuf.type) 
-    {
-      case H5G_GROUP: 
+    pinfo self = (pinfo) op_data;
+    H5O_info_t object_info;
+    H5Oget_info_by_name(loc_id, name, &object_info, H5P_DEFAULT);
+    switch ((object_info).type) {
+      case H5O_TYPE_GROUP: 
          self->iname = strdup(name);
-         self->type = H5G_GROUP;
+         self->type = H5O_TYPE_GROUP;
          break;
-      case H5G_DATASET: 
+      case H5O_TYPE_DATASET: 
          self->iname = strdup(name);
-         self->type = H5G_DATASET;
+         self->type = H5O_TYPE_DATASET;
          break;
       default:
+         // TODO defaults to group. not what we would want?
          self->type=0;
          break;     
     }
@@ -1309,19 +1310,17 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 
   /* Operator function. */
 
-  herr_t group_info1(hid_t loc_id, const char *name, void *opdata)
+  herr_t group_info1(hid_t loc_id, const char *name, const H5L_info_t *statbuf, void *opdata)
   {
-    H5G_stat_t statbuf;
     int iNX = *((int*)opdata);
-    H5Gget_objinfo(loc_id, name, 0, &statbuf);
-    
-    switch (statbuf.type) 
-    {
-      case H5G_GROUP: 
+    H5O_info_t object_info;
+    H5Oget_info_by_name(loc_id, name, &object_info, H5P_DEFAULT);
+    switch ((object_info).type) {
+      case H5O_TYPE_GROUP: 
         iNX++;
         *((int*)opdata)=iNX;
         break;
-      case H5G_DATASET:
+      case H5O_TYPE_DATASET:
         iNX++;
         *((int*)opdata)=iNX;
         break;
@@ -1333,10 +1332,10 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   
   /*-------------------------------------------------------------------------*/
 
-  NXstatus  NX5getgroupinfo_recurse (NXhandle fid, int *iN, NXname pName, NXname pClass)
+  NXstatus  NX5getgroupinfo_recurse(NXhandle fid, int *iN, NXname pName, NXname pClass)
   {
     pNexusFile5 pFile;
-    hid_t       atype, attr_id;
+    hid_t       atype, attr_id, grp;
     char        data[64];
         
     pFile = NXI5assert (fid);
@@ -1345,12 +1344,14 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
        strcpy (pName, "root");
        strcpy (pClass, "NXroot");
        pFile->iNX=0;
-       H5Giterate(pFile->iFID,"/",0,group_info1,&pFile->iNX);
+       grp = H5Gopen(pFile->iFID,"/",H5P_DEFAULT);
+       H5Literate(grp, H5_INDEX_NAME, H5_ITER_INC, 0, group_info1, &pFile->iNX);
+       H5Gclose(grp);
        *iN=pFile->iNX;
     }
     else {
       strcpy (pName,pFile->name_ref);
-      attr_id = H5Aopen_name(pFile->iCurrentG,"NX_class");
+      attr_id = H5Aopen_by_name(pFile->iCurrentG,".", "NX_class", H5P_DEFAULT, H5P_DEFAULT);
       if (attr_id<0) {
          strcpy(pClass, NX_UNKNOWN_GROUP);
       } else {
@@ -1359,7 +1360,9 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
         H5Aread(attr_id, atype, data);
         strcpy(pClass,data);
         pFile->iNX=0;
-        H5Giterate(pFile->iFID,pFile->name_ref,0,group_info1, &pFile->iNX);
+        grp = H5Gopen(pFile->iFID,pFile->name_ref,H5P_DEFAULT);
+        H5Literate(grp, H5_INDEX_NAME, H5_ITER_INC, 0, group_info1, &pFile->iNX);
+        H5Gclose(grp);
         *iN=pFile->iNX;
         H5Aclose(attr_id);
       }
@@ -1370,22 +1373,17 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 static int countObjectsInGroup(hid_t loc_id)
 {
   int count = 0, type;
-  hsize_t numobj, i;
+  H5G_info_t numobj;
   
   herr_t status;
 
-  status = H5Gget_num_objs(loc_id, &numobj);
+  status = H5Gget_info(loc_id, &numobj);
   if(status < 0) {
     NXReportError("Internal error, failed to retrive no of objects");
     return 0;
   }
 
-  for(i = 0; i < numobj; i++){
-    type = H5Gget_objtype_by_idx(loc_id,i);
-    if(type == H5G_GROUP || type == H5G_DATASET){
-      count++;
-    }
-  }
+  count = numobj.nlinks;
   return count;
 }
 /*----------------------------------------------------------------------------*/
@@ -1394,7 +1392,7 @@ static int countObjectsInGroup(hid_t loc_id)
     pNexusFile5 pFile;
     hid_t atype, attr_id, gid;
     char data[64];
-        
+
     pFile = NXI5assert (fid);
     /* check if there is a group open */
     if (pFile->iCurrentG == 0) {
@@ -1406,7 +1404,7 @@ static int countObjectsInGroup(hid_t loc_id)
     }
     else {
       strcpy (pName,pFile->name_ref);
-      attr_id = H5Aopen_name(pFile->iCurrentG,"NX_class");
+      attr_id = H5Aopen_by_name(pFile->iCurrentG,".", "NX_class", H5P_DEFAULT, H5P_DEFAULT);
       if (attr_id<0) {
          strcpy(pClass, NX_UNKNOWN_GROUP);
       } else {
@@ -1573,13 +1571,13 @@ static int countObjectsInGroup(hid_t loc_id)
   }
   /*-------------------------------------------------------------------------*/
 
-  NXstatus  NX5getnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype)
+  NXstatus  NX5getnextentry(NXhandle fid, NXname name, NXname nxclass, int *datatype)
   {
     pNexusFile5 pFile;
     hid_t       grp, attr1,type,atype;
     herr_t      iRet;
     int         iPtype, i;
-    int         idx;
+    hsize_t     idx;
     H5T_class_t tclass;
     char        data[128];
     char        ph_name[1024];
@@ -1598,7 +1596,10 @@ static int countObjectsInGroup(hid_t loc_id)
        /* root group */
        strcpy(pFile->name_ref,"/");
     }  
-    iRet=H5Giterate(pFile->iFID,pFile->name_ref,&idx,nxgroup_info,&op_data);
+    grp = H5Gopen(pFile->iFID, pFile->name_ref, H5P_DEFAULT);
+    // index can be wrong here
+    iRet=H5Literate(grp, H5_INDEX_NAME, H5_ITER_INC, &idx, nxgroup_info, &op_data);
+    H5Gclose(grp);
     strcpy(nxclass, NX_UNKNOWN_GROUP);
    
     /*
@@ -1606,13 +1607,20 @@ static int countObjectsInGroup(hid_t loc_id)
       find out if we are at the end of the search. 
     */
     if (pFile->iCurrentG == 0) {
+	// if pFile->iCurrentG == 0 would not pFile->name_ref be "/" already, so we could skip that if statement ?
        pFile->iNX=0;
-       iRet_iNX = H5Giterate(pFile->iFID,"/",0,group_info1,&pFile->iNX);
+       grp = H5Gopen(pFile->iFID, "/", H5P_DEFAULT);
+       iRet_iNX=H5Literate(grp, H5_INDEX_NAME, H5_ITER_INC, 0, group_info1, &pFile->iNX);
+       H5Gclose(grp);
     } else {
       pFile->iNX=0;
-      iRet_iNX = H5Giterate(pFile->iFID,pFile->name_ref,0,group_info1, &pFile->iNX);
+      grp = H5Gopen(pFile->iFID, pFile->name_ref, H5P_DEFAULT);
+	// index can be wrong here
+      iRet_iNX=H5Literate(grp, H5_INDEX_NAME, H5_ITER_INC, 0, group_info1, &pFile->iNX);
+      H5Gclose(grp);
     }
     if (idx == pFile->iNX) {
+	// why 2?
        iRet_iNX = 2;   
     } 
          
@@ -1626,8 +1634,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	  pFile->iStack5[pFile->iStackPtr].iCurrentIDX = 0;   
 	  return NX_EOD;
 	}	  
-        if (op_data.type == H5G_GROUP)
-        {
+        if (op_data.type == H5O_TYPE_GROUP) {
 	  /*
 	    open group and find class name attribute 
 	  */
@@ -1640,11 +1647,11 @@ static int countObjectsInGroup(hid_t loc_id)
            strcat(ph_name,name);
            grp = H5Gopen(pFile->iFID,ph_name, H5P_DEFAULT);
            if (grp < 0) {
-              sprintf (pBuffer, "ERROR: group %s does not exist", ph_name);
-              NXReportError( pBuffer);
+              sprintf(pBuffer, "ERROR: group %s does not exist", ph_name);
+              NXReportError(pBuffer);
               return NX_ERROR;  
            }
-           attr1 = H5Aopen_name(grp, "NX_class");
+           attr1 = H5Aopen_by_name(grp,".",  "NX_class", H5P_DEFAULT, H5P_DEFAULT);
            if (attr1 < 0) {
 	      strcpy(nxclass, NX_UNKNOWN_GROUP);
            } else {
@@ -1657,8 +1664,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	       H5Aclose(attr1);
            }
            H5Gclose(grp);
-        } else if (op_data.type==H5G_DATASET)
-        {
+        } else if (op_data.type==H5O_TYPE_DATASET) {
 	  /*
 	    open dataset and find type
 	  */
@@ -1674,9 +1680,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	    H5Dclose(grp);
 	 }
 	  return NX_OK;
-       } 
-       else
-       { 
+       } else { 
 	 /*
 	   we are at the end of the search: clear the data structure and reset 
 	   iCurrentIDX to 0
@@ -1691,8 +1695,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	 if (op_data.iname != NULL) {
 	    free(op_data.iname);
 	 } 
-	 NXReportError( 
-			    "ERROR: Iteration (directory) was not successful");
+	 NXReportError("ERROR: iterating through group not successful");
 	 return NX_ERROR;              
        }
    }
@@ -1900,6 +1903,7 @@ static int countObjectsInGroup(hid_t loc_id)
      char *iname = NULL; 
      hsize_t idx, intern_idx=-1;
      int vid;
+     H5O_info_t oinfo;
 
      pFile = NXI5assert (fileid);
 
@@ -1908,15 +1912,15 @@ static int countObjectsInGroup(hid_t loc_id)
      pName[0] = '\0';
      idx=pFile->iAtt5.iCurrentIDX;
      iRet=0;
-     // TODO replace
-     intern_idx=H5Aget_num_attrs(vid);
+ 
+     H5Oget_info(vid, &oinfo);
+     intern_idx=oinfo.num_attrs;
      if(intern_idx == idx) {
        killAttVID(pFile,vid);
        return NX_EOD;
      }
 
      if (intern_idx > idx) {
-       /* iRet=H5Aiterate(vid,&idx,attr_info,&iname); */
        iRet=H5Aiterate(vid,H5_INDEX_CRT_ORDER,H5_ITER_INC,&idx,attr_info,&iname);
      } else {
        iRet=0;
@@ -1942,7 +1946,7 @@ static int countObjectsInGroup(hid_t loc_id)
      } else {
        strcpy(pName,"What is this?");
      }
-     pFile->iCurrentA = H5Aopen_name(vid, pName);
+     pFile->iCurrentA = H5Aopen_by_name(vid, ".", pName, H5P_DEFAULT, H5P_DEFAULT);
      atype  = H5Aget_type(pFile->iCurrentA);
      aspace = H5Aget_space(pFile->iCurrentA);
      rank = H5Sget_simple_extent_ndims(aspace);
@@ -1961,7 +1965,8 @@ static int countObjectsInGroup(hid_t loc_id)
      H5Sclose(aspace);
      H5Aclose(pFile->iCurrentA);
   
-     intern_idx=H5Aget_num_attrs(vid);
+     H5Oget_info(vid, &oinfo);
+     intern_idx=oinfo.num_attrs;
 
      killAttVID(pFile,vid);
      return NX_OK;
@@ -1982,7 +1987,7 @@ static int countObjectsInGroup(hid_t loc_id)
      type = nxToHDF5Type(*iType);
 
      vid = getAttVID(pFile);
-     iNew = H5Aopen_name(vid, name);
+     iNew = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
      if (iNew < 0) {
        sprintf (pBuffer, "ERROR: attribute \"%s\" not found", name);
        killAttVID(pFile,vid);
@@ -2027,8 +2032,9 @@ static int countObjectsInGroup(hid_t loc_id)
    {
      pNexusFile5 pFile;
      char *iname = NULL; 
-     unsigned int idx;
+     hid_t idx;
      int vid;
+     H5O_info_t oinfo;
     
      pFile = NXI5assert (fid);
      idx=0;
@@ -2036,7 +2042,8 @@ static int countObjectsInGroup(hid_t loc_id)
 
      vid = getAttVID(pFile);
 
-     idx=H5Aget_num_attrs(vid);
+     H5Oget_info(vid, &oinfo);
+     idx=oinfo.num_attrs;
      if (idx > 0) {
        if(pFile->iCurrentG > 0 && pFile->iCurrentD == 0){
 	 *iN = idx -1; 
@@ -2161,7 +2168,8 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitgroupdir=NX5initgroupdir;
       fHandle->nxinitattrdir=NX5initattrdir;
       fHandle->nxprintlink=NX5printlink;
-      fHandle->nxnativeexternallink=NX5nativeexternallink;
+//      fHandle->nxnativeexternallink=NX5nativeexternallink;
+      fHandle->nxnativeexternallink=NULL;
 }
 
 #endif /* HDF5 */
