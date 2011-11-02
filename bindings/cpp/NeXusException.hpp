@@ -17,7 +17,7 @@ namespace NeXus{
    * \ingroup cpp_core
    */
 
-  class Exception : public std::runtime_error
+  class NXDLL_EXPORT Exception : public std::runtime_error
   {
   public:
     /**

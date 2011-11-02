@@ -1087,7 +1087,7 @@ NumT File::getAttr(const AttrInfo& info) {
 }
 
 template <>
-void File::getAttr(const std::string& name, std::string& value)
+NXDLL_EXPORT void File::getAttr(const std::string& name, std::string& value)
 {
     AttrInfo info;
     info.type = getType<char>();
