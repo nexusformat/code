@@ -2011,7 +2011,7 @@ static int countObjectsInGroup(hid_t loc_id)
        return NX_ERROR;
      }
 
-     iRet = H5Aclose(pFile->iCurrentA);
+     H5Aclose(pFile->iCurrentA);
 
      killAttVID(pFile,vid);
      if (type==H5T_C_S1)
@@ -2082,6 +2082,21 @@ static int countObjectsInGroup(hid_t loc_id)
  
   /* ------------------------------------------------------------------- */
 
+   NXstatus  NX5nativeexternallink(NXhandle fileid, const char* name, const char* externalfile, const char* remotetarget)
+  {
+     herr_t iRet;
+     pNexusFile5 pFile;
+
+     pFile = NXI5assert(fileid);
+     iRet = H5Lcreate_external(externalfile, remotetarget, pFile->iFID, name, H5P_DEFAULT, H5P_DEFAULT);
+     if (iRet < 0) {
+       NXReportError("ERROR: making external link failed");
+       return NX_ERROR;
+     }
+     return NX_OK;
+  }
+  /* ------------------------------------------------------------------- */
+
   NXstatus  NX5sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
     NXI5assert(fileid);
@@ -2146,6 +2161,7 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitgroupdir=NX5initgroupdir;
       fHandle->nxinitattrdir=NX5initattrdir;
       fHandle->nxprintlink=NX5printlink;
+      fHandle->nxnativeexternallink=NX5nativeexternallink;
 }
 
 #endif /* HDF5 */

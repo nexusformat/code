@@ -3,7 +3,7 @@
   
   Application Program Interface Header File
   
-  Copyright (C) 2000-2007 Mark Koennecke, Uwe Filges
+  Copyright (C) 2000-2011 Mark Koennecke, Uwe Filges
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -903,6 +903,7 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxinitattrdir)(NXhandle handle);
         NXstatus ( *nxsetnumberformat)(NXhandle handle, int type, char *format);
         NXstatus ( *nxprintlink)(NXhandle handle, NXlink* link);
+        NXstatus ( *nxnativeexternallink)(NXhandle handle, CONSTCHAR* name, CONSTCHAR* externalfile, CONSTCHAR* remotetarget);
   } NexusFunction, *pNexusFunction;
   /*---------------------*/
   extern long nx_cacheSize;

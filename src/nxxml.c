@@ -1967,6 +1967,7 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxinitattrdir=NXXinitattrdir;
       fHandle->nxsetnumberformat=NXXsetnumberformat;
       fHandle->nxprintlink=NXXprintlink;
+      fHandle->nxnativeexternallink=NULL;
 }
 
 

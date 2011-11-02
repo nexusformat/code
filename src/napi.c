@@ -1322,10 +1322,33 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   }
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, 
-			 CONSTCHAR *url){
-  int status, type = NX_CHAR, length;
+NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, CONSTCHAR *url){
+  int status, type = NX_CHAR, length=1024, urllen;
+  char nxurl[1024], exfile[512], expath[512];
   pNexusFunction pFunc = handleToNexusFunc(fid);
+
+  // in HDF5 we support external linking natively
+  if (pFunc->nxnativeexternallink != NULL) {
+        urllen = strlen(url);
+        memset(nxurl, 0, length);
+        if(urllen > length){
+          urllen = length - 1;
+        }
+        memcpy(nxurl, url, urllen);
+        status = analyzeNapimount(nxurl,exfile,511,expath,511);
+        if(status != NX_OK){
+           return status;
+        }
+	status = LOCKED_CALL(pFunc->nxnativeexternallink(pFunc->pNexusData, name, exfile, expath));
+        if(status != NX_OK){
+           return status;
+        }
+        return NX_OK;
+  }
+
+  NXMDisableErrorReporting();
+  LOCKED_CALL(pFunc->nxmakegroup(pFunc->pNexusData,name,nxclass));
+  NXMEnableErrorReporting();
 
   status = LOCKED_CALL(pFunc->nxopengroup(pFunc->pNexusData,name,nxclass));
   if(status != NX_OK){
@@ -1342,11 +1365,34 @@ NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
 /*------------------------------------------------------------------------*/
 NXstatus  NXlinkexternaldataset(NXhandle fid, CONSTCHAR *name, 
 			 CONSTCHAR *url){
-  int status, type = NX_CHAR, length;
+  int status, type = NX_CHAR, length=1024, urllen;
+  char nxurl[1024], exfile[512], expath[512];
   pNexusFunction pFunc = handleToNexusFunc(fid);
   int64_t rank = 1;
   int64_t dims[1] = {1};
   
+  //TODO cut and paste
+
+  // in HDF5 we support external linking natively
+  if (pFunc->nxnativeexternallink != NULL) {
+        urllen = strlen(url);
+        memset(nxurl, 0, length);
+        if(urllen > length){
+          urllen = length - 1;
+        }
+        memcpy(nxurl, url, urllen);
+        status = analyzeNapimount(nxurl,exfile,511,expath,511);
+        if(status != NX_OK){
+           return status;
+        }
+	status = LOCKED_CALL(pFunc->nxnativeexternallink(pFunc->pNexusData, name, exfile, expath));
+        if(status != NX_OK){
+           return status;
+        }
+        return NX_OK;
+  }
+
+
   status = LOCKED_CALL(pFunc->nxmakedata64(pFunc->pNexusData, name, NX_CHAR, rank, dims));
   if(status != NX_OK){
     return status;

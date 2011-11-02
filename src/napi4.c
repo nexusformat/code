@@ -1977,6 +1977,7 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitgroupdir=NX4initgroupdir;
       fHandle->nxinitattrdir=NX4initattrdir;
       fHandle->nxprintlink=NX4printlink;
+      fHandle->nxnativeexternallink=NULL;
 }
 
 #endif /*HDF4*/
