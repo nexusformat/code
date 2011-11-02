@@ -1277,7 +1277,19 @@ char *nxitrim(char *str)
 				int filenameBufferLength){
   pFileStack fileStack;
   char *pPtr = NULL;
-  int length;
+  int length, status;
+
+  pNexusFunction pFunc = handleToNexusFunc(handle);
+   if (pFunc->nxnativeinquirefile != NULL) {
+
+  	status = LOCKED_CALL(pFunc->nxnativeinquirefile(pFunc->pNexusData, filename, filenameBufferLength));
+	if (status < 0) {
+		return NX_ERROR;
+	} else {
+		return NX_OK;
+	}
+
+   }
 
   fileStack = (pFileStack)handle;
   pPtr = peekFilenameOnStack(fileStack);
@@ -1301,7 +1313,15 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
 
   pNexusFunction pFunc = handleToNexusFunc(fid);
 
-  status = LOCKED_CALL(pFunc->nxopengroup(pFunc->pNexusData, name,nxclass));
+   if (pFunc->nxnativeisexternallink != NULL) {
+  	status = LOCKED_CALL(pFunc->nxnativeisexternallink(pFunc->pNexusData, name, url, urlLen));
+	if (status == NX_OK) {
+		return NX_OK;
+	}
+	// need to continue, could still be old style link
+   }
+
+  status = LOCKED_CALL(pFunc->nxopengroup(pFunc->pNexusData, name, nxclass));
   if(status != NX_OK){
     return status;
   }
@@ -1322,7 +1342,43 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   }
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, CONSTCHAR *url){
+NXstatus  NXisexternaldataset(NXhandle fid, CONSTCHAR *name,
+			    char *url, int urlLen){
+  int status, attStatus, length = 1023, type = NX_CHAR;
+  char nxurl[1024];
+
+  pNexusFunction pFunc = handleToNexusFunc(fid);
+
+   if (pFunc->nxnativeisexternallink != NULL) {
+  	status = LOCKED_CALL(pFunc->nxnativeisexternallink(pFunc->pNexusData, name, url, urlLen));
+	if (status == NX_OK) {
+		return NX_OK;
+	}
+	// need to continue, could still be old style link
+   }
+
+  status = LOCKED_CALL(pFunc->nxopendata(pFunc->pNexusData, name));
+  if(status != NX_OK){
+    return status;
+  }
+  NXMDisableErrorReporting();
+  attStatus = NXgetattr(fid,"napimount",nxurl,&length, &type);
+  NXMEnableErrorReporting();
+  LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
+  if(attStatus == NX_OK){
+    length = strlen(nxurl);
+    if(length > urlLen){
+      length = urlLen - 1;
+    }
+    memset(url,0,urlLen);
+    memcpy(url,nxurl,length);
+    return attStatus;
+  } else {
+    return NX_ERROR;
+  }
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, CONSTCHAR *url) {
   int status, type = NX_CHAR, length=1024, urllen;
   char nxurl[1024], exfile[512], expath[512];
   pNexusFunction pFunc = handleToNexusFunc(fid);

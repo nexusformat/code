@@ -245,6 +245,7 @@ typedef struct {
 #    define NXsetcache          MANGLE(nxisetcache)
 #    define NXinquirefile       MANGLE(nxiinquirefile) 
 #    define NXisexternalgroup   MANGLE(nxiisexternalgroup)
+#    define NXisexternaldataset   MANGLE(nxiisexternaldataset)
 #    define NXlinkexternal      MANGLE(nxilinkexternal)
 #    define NXlinkexternaldataset      MANGLE(nxilinkexternaldataset)
 #    define NXgetversion        MANGLE(nxigetversion)
@@ -722,9 +723,22 @@ extern  NXstatus  NXinquirefile(NXhandle handle, char *filename, int filenameBuf
    */
 extern  NXstatus  NXisexternalgroup(NXhandle handle, CONSTCHAR *name, CONSTCHAR *nxclass, char *url, int urlLen); 
 
+
+  /**
+   * Test if a dataset is actually pointing to an external file. If so, retrieve the URL of the 
+   * external file.
+   * \param handle A NeXus file handle as initialized by NXopen.
+   * \param name The name of the dataset to test.
+   * \param url A buffer to copy the URL too.
+   * \param urlLen The length of the Url buffer. At maximum urlLen bytes will be copied to url.
+   * \return NX_OK when the dataset is pointing to an external file, NX_ERROR else.
+   * \ingroup c_external
+   */
+extern  NXstatus  NXisexternaldataset(NXhandle handle, CONSTCHAR *name, char *url, int urlLen); 
+
   /**
    * Create a link to a group in an external file. This works by creating a NeXus group under the current level in 
-   * the hierarchy which actually points to a group in  another file. 
+   * the hierarchy which actually points to a group in another file. 
    * \param handle A NeXus file handle as initialized by NXopen.
    * \param name The name of the group which points to the external file.
    * \param nxclass The class name of the group which points to the external file.
@@ -904,6 +918,8 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxsetnumberformat)(NXhandle handle, int type, char *format);
         NXstatus ( *nxprintlink)(NXhandle handle, NXlink* link);
         NXstatus ( *nxnativeexternallink)(NXhandle handle, CONSTCHAR* name, CONSTCHAR* externalfile, CONSTCHAR* remotetarget);
+        NXstatus ( *nxnativeinquirefile)(NXhandle handle, char* externalfile, const int filenamelength);
+        NXstatus ( *nxnativeisexternallink)(NXhandle handle, CONSTCHAR* name, char* url, int urllen);
   } NexusFunction, *pNexusFunction;
   /*---------------------*/
   extern long nx_cacheSize;

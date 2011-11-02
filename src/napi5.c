@@ -2104,6 +2104,56 @@ static int countObjectsInGroup(hid_t loc_id)
   }
   /* ------------------------------------------------------------------- */
 
+   NXstatus  NX5nativeinquirefile(NXhandle fileid, char* externalfile, const int filenamelen)
+  {
+     pNexusFile5 pFile;
+     ssize_t name_size;
+
+     pFile = NXI5assert(fileid);
+
+     name_size = H5Fget_name(pFile->iFID, externalfile, filenamelen);
+
+     // Check for failure again
+     if( name_size < 0 ) {
+         NXReportError("ERROR: retrieving file name");
+         return NX_ERROR;
+     }
+     return NX_OK;
+  }
+  /* ------------------------------------------------------------------- */
+
+   NXstatus  NX5nativeisexternallink(NXhandle fileid, const char* name, char* url, const int urllen)
+  {
+     pNexusFile5 pFile;
+     herr_t ret;
+     H5L_info_t link_buff;
+     int size=1024;
+     char linkval_buff[size];
+     const char *filepath, *objpath;
+
+     pFile = NXI5assert(fileid);
+
+     ret = H5Lget_info(pFile->iFID, name, &link_buff, H5P_DEFAULT);
+     if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
+       return NX_ERROR;
+     }
+
+     ret = H5Lget_val(pFile->iFID, name, linkval_buff, size, H5P_DEFAULT);
+     if (ret < 0) {
+       return NX_ERROR;
+     }
+
+     ret = H5Lunpack_elink_val(linkval_buff, size, 0, &filepath, &objpath);
+     if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
+       return NX_ERROR;
+     }
+
+    snprintf(url, urllen, "nxfile://%s#%s", filepath, objpath);
+    return NX_OK;
+     
+  }
+  /* ------------------------------------------------------------------- */
+
   NXstatus  NX5sameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID)
   {
     NXI5assert(fileid);
@@ -2169,7 +2219,8 @@ void NX5assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX5initattrdir;
       fHandle->nxprintlink=NX5printlink;
       fHandle->nxnativeexternallink=NX5nativeexternallink;
-//      fHandle->nxnativeexternallink=NULL;
+      fHandle->nxnativeinquirefile=NX5nativeinquirefile;
+      fHandle->nxnativeisexternallink=NX5nativeisexternallink;
 }
 
 #endif /* HDF5 */

@@ -51,6 +51,7 @@ nxisetnumberformat_
 nxilinkexternal_
 nxiinquirefile_
 nxiisexternalgroup_
+nxiisexternaldataset_
 NXMSetError
 NXMSetTError
 NXReportError
