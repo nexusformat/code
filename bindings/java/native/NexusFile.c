@@ -2,28 +2,7 @@
    This is the implementation file for the native methods used by the NeXus
    Java API.
 
-   Mark Koennecke, October 2000
-
-   Version: 1.0
-
-   Version 1.1
-
-   Updated for using both HDF5 and HDF4 
-
-   Mark Koennecke, August 2001
-
-   Updated for the NeXus XML-API, Mark Koennecke, October 2004
-
-   Updated for NXopengrouppath, NXopensourcepath
-   Mark Koennecke, December 2004
-
-   Updated for external linking, Mark Koennecke, April 2006
-
-   Updated for 64 bit types, Mark Koennecke, August 2007
-
-   Added NXinitattrdir and NXinitgroupdir, Mark Koennecke, October 2009
-
-   Added NXgetpath, Mark Koennecke, October 2009
+   Mark Koennecke, 2000 -- 2011
 
    IMPLEMENTATION NOTES
 
@@ -404,6 +383,40 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakedata
       JapiError(env, "NXmakedata failed");
     }
 }
+/*------------------------------------------------------------------------
+                               nxmakedata64
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakedata64
+  (JNIEnv *env, jobject obj, jint handle, jstring name, jint type, 
+  jint rank, jlongArray dim)
+{
+   char *Name;
+   NXhandle nxhandle;
+   jlong *iDim;
+   int iRet;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    /* access dim array */
+    iDim = (*env)->GetLongArrayElements(env,dim,0);
+
+    iRet = NXmakedata64(nxhandle,Name,type,rank,iDim);
+
+    /* clean up */ 
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseLongArrayElements(env,dim,iDim,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXmakedata failed");
+    }
+}
 /*-----------------------------------------------------------------------
                                nxcompmakedata
 -------------------------------------------------------------------------*/
@@ -438,6 +451,46 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakecompdata
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseIntArrayElements(env,dim,iDim,0);  
     (*env)->ReleaseIntArrayElements(env,chunk,iChunk,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXcompmakedata failed");
+    }
+}
+
+/*-----------------------------------------------------------------------
+                               nxcompmakedata64
+-------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxmakecompdata64
+  (JNIEnv *env, jobject obj, jint handle, jstring name, jint type, 
+   jint rank, jlongArray dim, jint compression_type, jlongArray chunk)
+{
+   char *Name;
+   NXhandle nxhandle;
+   jlong *iDim, *iChunk;
+   int iRet;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    /* access dim array */
+    iDim = (*env)->GetLongArrayElements(env,dim,0);
+
+    /* access the chunksize array */
+    iChunk = (*env)->GetLongArrayElements(env,chunk,0);
+
+    iRet = NXcompmakedata64(nxhandle,Name,type,rank,iDim,
+                          compression_type,iChunk);
+
+    /* clean up */ 
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseLongArrayElements(env,dim,iDim,0);  
+    (*env)->ReleaseLongArrayElements(env,chunk,iChunk,0);  
 
     if (iRet != NX_OK) {
       JapiError(env, "NXcompmakedata failed");
@@ -582,6 +635,41 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputslab
     }
 }
 /*------------------------------------------------------------------------
+                               nxputslab64
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputslab64
+  (JNIEnv *env, jobject obj, jint handle, jbyteArray data, 
+   jlongArray start, jlongArray end)
+{
+    NXhandle nxhandle;
+    jbyte *bdata;
+    jlong *iStart, *iEnd;
+    int iRet;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* convert arrays to C types  */
+    bdata = (*env)->GetByteArrayElements(env,data,0);
+    iStart = (*env)->GetLongArrayElements(env,start,0);
+    iEnd = (*env)->GetLongArrayElements(env,end,0);
+
+
+    iRet = NXputslab64(nxhandle, bdata, iStart, iEnd);
+
+    /* cleanup */
+    (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
+    (*env)->ReleaseLongArrayElements(env,start,iStart,0);  
+    (*env)->ReleaseLongArrayElements(env,end,iEnd,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXputslab failed");
+    }
+}
+/*------------------------------------------------------------------------
                                nxputattr
 --------------------------------------------------------------------------*/
 JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattr
@@ -701,6 +789,40 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetslab
     (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
     (*env)->ReleaseIntArrayElements(env,start,iStart,0);  
     (*env)->ReleaseIntArrayElements(env,end,iEnd,0);  
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXgetslab failed");
+    }
+}
+/*------------------------------------------------------------------------
+                               nxgetslab64
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetslab64
+  (JNIEnv *env, jobject obj, jint handle, jlongArray start, 
+   jlongArray end, jbyteArray data)
+{
+    NXhandle nxhandle;
+    jbyte *bdata;
+    jlong *iStart, *iEnd;
+    int iRet;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* convert arrays to C types  */
+    bdata = (*env)->GetByteArrayElements(env,data,0);
+    iStart = (*env)->GetLongArrayElements(env,start,0);
+    iEnd = (*env)->GetLongArrayElements(env,end,0);
+
+    iRet = NXgetslab64(nxhandle, bdata, iStart, iEnd);
+
+    /* cleanup */
+    (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
+    (*env)->ReleaseLongArrayElements(env,start,iStart,0);  
+    (*env)->ReleaseLongArrayElements(env,end,iEnd,0);  
 
     if (iRet != NX_OK) {
       JapiError(env, "NXgetslab failed");
@@ -1189,6 +1311,43 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetinfo
     }
 }
 /*------------------------------------------------------------------------
+                               nxgetinfo64
+--------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetinfo64
+    (JNIEnv *env, jobject obj, jint handle, jlongArray dim, jintArray args)
+{
+    int rank, type, iRet, i;
+    jlong iDim[NX_MAXRANK];
+    NXhandle nxhandle;
+    jlong *jdata;
+    jint *jargsdata;
+
+   /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* call */
+    iRet = NXgetinfo64(nxhandle, &rank, iDim, &type);
+
+    /* copy data to Java types */
+    if(iRet == NX_OK)
+    {
+	jdata = (*env)->GetLongArrayElements(env,dim,0);
+        for(i = 0; i < rank; i++)
+	{
+           jdata[i] = iDim[i];
+        }
+        (*env)->ReleaseLongArrayElements(env,dim,jdata,0);
+
+	jargsdata = (*env)->GetIntArrayElements(env,args,0);
+        jargsdata[0] = rank;
+        jargsdata[1] = type;
+        (*env)->ReleaseIntArrayElements(env,args,jargsdata,0);
+    }
+}
+/*------------------------------------------------------------------------
                                nextentry
 --------------------------------------------------------------------------*/
 JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextentry
@@ -1295,6 +1454,32 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxlinkexternal
     }
 }
 /*------------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxlinkexternaldataset
+(JNIEnv *env, jobject obj, jint handle, jstring name, jstring nxurl){
+    int iRet;
+    NXhandle nxhandle;
+    char *Name, *Nxurl;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+  
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+    Nxurl = (char *) (*env)->GetStringUTFChars(env,nxurl,0);    
+    iRet = NXlinkexternaldataset(nxhandle,Name,Nxurl);
+    
+    /* release strings */
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseStringUTFChars(env,nxurl, Nxurl);
+
+    if (iRet != NX_OK) {
+      JapiError(env, "NXlinkexternaldataset failed");
+    }
+}
+/*------------------------------------------------------------------------*/
 JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
 (JNIEnv *env, jobject obj, jint handle, jstring name, jstring nxclass, 
  jobjectArray jnames){
@@ -1318,6 +1503,34 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternalgroup
     /* release strings */
     (*env)->ReleaseStringUTFChars(env,name, Name);
     (*env)->ReleaseStringUTFChars(env,nxclass, Nxclass);
+    
+    if(status == NX_OK){
+      rstring = (*env)->NewStringUTF(env,nxurl);
+      (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
+    }
+    return status;
+}
+/*------------------------------------------------------------------------*/
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxisexternaldataset
+(JNIEnv *env, jobject obj, jint handle, jstring name, jobjectArray jnames){
+    int status, length = 1024;
+    NXhandle nxhandle;
+    char *Name, nxurl[1024];
+    jstring rstring;
+    
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+  
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    status = NXisexternaldataset(nxhandle,Name,nxurl,length);
+
+    /* release strings */
+    (*env)->ReleaseStringUTFChars(env,name, Name);
     
     if(status == NX_OK){
       rstring = (*env)->NewStringUTF(env,nxurl);

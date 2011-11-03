@@ -25,8 +25,8 @@
 
  ----------------------------------------------------------------------------*/
 /** \file 
- * Documentation for the NeXus-API version 4.2
- * 2000-2007, the NeXus group
+ * Documentation for the NeXus-API version 4.3
+ * 2000-2011, the NeXus International Advisory Commitee
  * \defgroup c_main C API 
  * \defgroup c_types Data Types
  * \ingroup c_main

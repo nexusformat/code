@@ -10,13 +10,7 @@
   * different calling standards between C and Java. 
   *
   *
-  * @author Mark Koennecke, October 2000
-  *
-  * updated for NAPI-2.0, including HDF-5 support
-  * @author Mark Koennecke, August 2001
-  *
-  * updated for NXopengrouppath, NXopensourcepath, XML
-  * @author Mark Koennecke, December 2004
+  * @author Mark Koennecke, 2000 -- 2011
   *
   * copyright: see accompanying COPYRIGHT file
   */
@@ -33,6 +27,7 @@ public interface NeXusFileInterface {
       * @exception NexusException if an HDF error occurs.
       */
     public void flush() throws NexusException;
+
     /**
       * finalize closes the file. It is supposed to be called by the
       * garbage collector when the object is collected. As this happens
@@ -43,11 +38,13 @@ public interface NeXusFileInterface {
       * finalize. 
       */
     public void finalize() throws Throwable;
+
     /**
      * close the NeXus file. To make javalint and diamond happy
      * @throws NexusException
      */
     public void close() throws NexusException;
+
     // group functions
     /** 
       * makegroup creates a new group below the current group within
@@ -76,8 +73,8 @@ public interface NeXusFileInterface {
       * @param path The path string
       * @exception NexusException when something goes wrong.
       */   
-    public void openpath(String path) throws 
-                           NexusException;
+    public void openpath(String path) throws NexusException;
+
     /**
       * opengrouppath opens groups and datsets accroding to the path string
       * given. The path syntax follows unix conventions. Both absolute
@@ -86,22 +83,22 @@ public interface NeXusFileInterface {
       * @param path The path string
       * @exception NexusException when something goes wrong.
       */   
-    public void opengrouppath(String path) throws 
-                           NexusException;
+    public void opengrouppath(String path) throws NexusException;
+
     /**
      * return the current path into the NeXus file in the 
      * form of a Unix path string.
      * @return A unix path string
      */
     public String getpath() throws NexusException;
+
     /**
       * closegroup closes access to the current group and steps down one
       * step in group hierarchy.
       * @exception NexusException when an HDF error occurs during this
       * operation.
       */ 
-    public void closegroup() throws 
-                             NexusException;
+    public void closegroup() throws NexusException;
 
     // data set handling
     /**
@@ -112,12 +109,28 @@ public interface NeXusFileInterface {
       * a selection of values.
       * @param rank The rank or number of dimensions of the dataset.
       * @param dim An array containing the length of each dimension. dim must
-      * have at least rank entries. The first dimension can be -1 which
-      * means it is an unlimited dimension.
+      * have at least rank entries. Dimension passed as -1 denote an
+      * unlimited dimension.
       * @exception NexusException when the dataset could not be created.
       */ 
     public void makedata(String name, int type, int rank, int dim[]) 
 	throws NexusException;
+
+    /**
+      * makedata creates a new dataset with the specified characteristics 
+      * in the current group.
+      * @param name The name of the dataset.
+      * @param type The number type of the dataset. Usually a constant from
+      * a selection of values.
+      * @param rank The rank or number of dimensions of the dataset.
+      * @param dim An array containing the length of each dimension. dim must
+      * have at least rank entries. Dimension passed as -1 denote an
+      * unlimited dimension.
+      * @exception NexusException when the dataset could not be created.
+      */ 
+    public void makedata(String name, int type, int rank, long dim[]) 
+	throws NexusException;
+
     /**
       * compmakedata creates a new dataset with the specified characteristics 
       * in the current group. This data set will be compressed.
@@ -126,8 +139,8 @@ public interface NeXusFileInterface {
       * a selection of values.
       * @param rank The rank or number of dimensions of the dataset.
       * @param dim An array containing the length of each dimension. dim must
-      * have at least rank entries. The first dimension can be -1 which
-      * means it is an unlimited dimension.
+      * have at least rank entries. Dimension passed as -1 denote an
+      * unlimited dimension.
       * @param compression_type determines the compression type. 
       * @param iChunk With HDF-5, slabs can be written to compressed data 
       * sets. The size of these slabs is specified through the chunk array.
@@ -136,8 +149,28 @@ public interface NeXusFileInterface {
       * @exception NexusException when the dataset could not be created.
       */ 
     public void compmakedata(String name, int type, int rank, int dim[],
-                             int compression_type, int iChunk[]) throws
-	                   NexusException; 
+             int compression_type, int iChunk[]) throws NexusException; 
+
+    /**
+      * compmakedata creates a new dataset with the specified characteristics 
+      * in the current group. This data set will be compressed.
+      * @param name The name of the dataset.
+      * @param type The number type of the dataset. Usually a constant from
+      * a selection of values.
+      * @param rank The rank or number of dimensions of the dataset.
+      * @param dim An array containing the length of each dimension. dim must
+      * have at least rank entries. Dimension passed as -1 denote an
+      * unlimited dimension.
+      * @param compression_type determines the compression type. 
+      * @param iChunk With HDF-5, slabs can be written to compressed data 
+      * sets. The size of these slabs is specified through the chunk array.
+      * This must have the rank values for the size of the chunk to
+      * be written in each dimension. 
+      * @exception NexusException when the dataset could not be created.
+      */ 
+    public void compmakedata(String name, int type, int rank, long dim[],
+             int compression_type, long iChunk[]) throws NexusException; 
+
     /**
       * opendata opens an existing dataset for access. For instance for 
       * reading or writing.
@@ -145,15 +178,15 @@ public interface NeXusFileInterface {
       * @exception NexusException when the dataset does not exist or 
       * something else is wrong.
       */
-    public void opendata(String name)throws 
-                           NexusException;
+    public void opendata(String name)throws NexusException;
+
     /**
       * closedata closes an opened dataset. Then no further access is 
       * possible without a call to opendata.
       * @exception NexusException when an HDF error occurrs.
       */
-    public void closedata() throws
-                           NexusException;
+    public void closedata() throws NexusException;
+
     /**
       * causes the currently open dataset to be compressed on file.
       * This must be called after makedata and before writing to the
@@ -163,8 +196,7 @@ public interface NeXusFileInterface {
       * @exception NexusException when no dataset is open or an HDF error 
       * occurs.
       */ 
-    public void compress(int compression_type) throws 
-                           NexusException;
+    public void compress(int compression_type) throws NexusException;
 
     // data set reading
     /**
@@ -177,8 +209,8 @@ public interface NeXusFileInterface {
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
-    public void getdata(Object array)throws 
-                          NexusException;
+    public void getdata(Object array) throws NexusException;
+
     /**
       * getslab reads a subset of a large dataset into array.
       * @param start An array of dimension rank which contains the start 
@@ -190,8 +222,23 @@ public interface NeXusFileInterface {
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
-    public void getslab(int start[], int size[],Object array)throws
+    public void getslab(int start[], int size[], Object array) throws
                           NexusException;
+
+    /**
+      * getslab reads a subset of a large dataset into array.
+      * @param start An array of dimension rank which contains the start 
+      * position in the dataset from where to start reading.
+      * @param size An array of dimension rank which contains the size
+      * in each dimension of the data subset to read.
+      * @param array An array for holding the returned data values.
+      * @exception NexusException when either an HDF error occurs or 
+      * no dataset is open or array is not of the right type to hold
+      * the data.
+      */
+    public void getslab(long start[], long size[], Object array) throws
+                          NexusException;
+
     /**
       * getattr retrieves the data associated with the attribute 
       * name. 
@@ -204,7 +251,7 @@ public interface NeXusFileInterface {
       * @exception NexusException when either an HDF error occurs or 
       * the attribute could not be found.
       */
-    public void getattr(String name,Object data, int args[])throws
+    public void getattr(String name, Object data, int args[]) throws
                           NexusException;
 
     // data set writing
@@ -214,8 +261,8 @@ public interface NeXusFileInterface {
       * @param array The data to write.
       * @exception NexusException when an HDF error occurs.
       */
-    public void putdata(Object array) throws 
-	                  NexusException;
+    public void putdata(Object array) throws NexusException;
+
     /**
       * putslab writes a subset of a larger dataset to a previously opened
       * dataset.
@@ -228,6 +275,20 @@ public interface NeXusFileInterface {
       */ 
     public void putslab(Object array, int start[], int size[]) throws
                           NexusException;
+
+    /**
+      * putslab writes a subset of a larger dataset to a previously opened
+      * dataset.
+      * @param array The data to write.
+      * @param start An integer array of dimension rank which holds the
+      * startcoordinates of the data subset in the larger dataset.
+      * @param size An integer array of dimension rank whidh holds the
+      * size in each dimension of the data subset to write.
+      * @exception NexusException when an HDF error occurs.
+      */ 
+    public void putslab(Object array, long start[], long size[]) throws
+                          NexusException;
+
     /**
       * putattr adds a named attribute to a previously opened dataset or
       * a global attribute if no dataset is open.
@@ -249,8 +310,19 @@ public interface NeXusFileInterface {
       * the number type.
       * @exception NexusException when  an HDF error occurs.
       */ 
-    public void getinfo(int iDim[], int args[]) throws 
-                          NexusException;
+    public void getinfo(int iDim[], int args[]) throws NexusException;
+
+    /**
+      * getinfo retrieves information about a previously opened dataset.
+      * @param iDim An array which will be filled with the size of
+      * the dataset in each dimension.
+      * @param args An integer array which will hold more information about
+      * the dataset after return. The fields: args[0] is the rank, args[1] is
+      * the number type.
+      * @exception NexusException when  an HDF error occurs.
+      */ 
+    public void getinfo(long iDim[], int args[]) throws NexusException;
+
     /**
      * setnumberformat sets the number format for printing number when
      * using the XML-NeXus format. For HDF4 and HDF5 this is ignored.
@@ -260,8 +332,8 @@ public interface NeXusFileInterface {
      * @param type The NeXus type to set the format for. 
      * @param format The new format to use.
      */
-    public void setnumberformat(int type, String format) 
-	throws NexusException;
+    public void setnumberformat(int type, String format) throws NexusException;
+
     /**
       * groupdir will retrieve the content of the currently open vGroup.
       * groupdir is similar to an ls in unix. 
@@ -270,8 +342,8 @@ public interface NeXusFileInterface {
       * string 'SDS' for datasets as values. 
       * @exception NexusException if an HDF error occurs
       */
-    public Hashtable groupdir()throws
-                          NexusException;
+    public Hashtable groupdir() throws NexusException;
+
     /**
       * attrdir returns the attributes of the currently open dataset or
       * the file global attributes if no dataset is open.
@@ -279,8 +351,7 @@ public interface NeXusFileInterface {
       * as keys. For each key there is an AttributeEntry class as value.
       * @exception NexusException when an HDF error occurs.
       */ 
-    public Hashtable attrdir()throws
-                          NexusException;
+    public Hashtable attrdir() throws NexusException;
     
     // linking 
     /**
@@ -289,24 +360,23 @@ public interface NeXusFileInterface {
       * @return A NXlink object holding the link data.
       * @exception NexusException if an HDF error occurs.
       */
-    public NXlink getgroupID() throws
-                          NexusException;
+    public NXlink getgroupID() throws NexusException;
+
     /**
       * getdataID gets the data necessary for linking the current dataset
       * somewhere else.
       * @return A NXlink object holding the link data.
       * @exception NexusException if an HDF error occurs.
       */
-    public NXlink getdataID()throws
-                          NexusException;
+    public NXlink getdataID()throws NexusException;
+
     /**
       * makelink links the object described by target into the current
       * vGroup.
       * @param target The Object to link into the current group.
       * @exception NexusException if an error occurs.
       */
-    public void   makelink(NXlink target)throws
-                          NexusException;     
+    public void makelink(NXlink target)throws NexusException;     
     /**
       * makenamedlink links the object described by target into the current
       * vGroup. The object will have a new name in the group into which it is 
@@ -315,15 +385,15 @@ public interface NeXusFileInterface {
       * @param name The name of this object in the current group
       * @exception NexusException if an error occurs.
       */
-    public void   makenamedlink(String name, NXlink target)throws
-                          NexusException;     
+    public void makenamedlink(String name, NXlink target) throws NexusException;     
+
     /**
       * opensourcepath opens the group from which the current item was linked
       * Returns an error if the current item is not linked.
       * @exception NexusException if an error occurs.
       */
-    public void   opensourcepath()throws
-                          NexusException;     
+    public void opensourcepath() throws NexusException;     
+
     /**
      * inquirefile inquires which file we are currently in. This is
      * a support function for external linking
@@ -331,6 +401,7 @@ public interface NeXusFileInterface {
      * @throws NexusException when things are wrong
      */
     public String inquirefile() throws NexusException;
+
     /** 
      * linkexternal links group name, nxclass to the URL nxurl
      * @param name The name of the vgroup to link to
@@ -339,14 +410,31 @@ public interface NeXusFileInterface {
      * @throws NexusException if things are wrong
      */
     public void linkexternal(String name, String nxclass, String nxurl) throws NexusException;
+
+    /** 
+     * linkexternaldataset links dataset name to the URL nxurl
+     * @param name The name of the dataset to link to
+     * @param nxurl The URL to the linked external file
+     * @throws NexusException if things are wrong
+     */
+    public void linkexternaldataset(String name, String nxurl) throws NexusException;
+
     /**
-     * nxisexternalgroup test the group name, nxclass if it is linked externally.
+     * nxisexternalgroup test the group name, nxclass if it is linked externally
      * @param name of the group to test
      * @param  nxclass class of the group to test
      * @return null when the group is not linked, else a string giving the URL of the
-     * linked file.
+     * linked resource
      * @throws NexusException if things are wrong
      */
     public String isexternalgroup(String name, String nxclass) throws NexusException;
+
+    /**
+     * nxisexternaldataset if the named dataset is is linked externally
+     * @param name of the dataset to test
+     * @return null when the it is not linked, else a string giving the URL of the
+     * linked resource
+     * @throws NexusException if things are wrong
+     */
+    public String isexternaldataset(String name) throws NexusException;
 }
-  
