@@ -1,3 +1,4 @@
+#include "NeXusFile.hpp"
 #include "NeXusException.hpp"
 
 /**
