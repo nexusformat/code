@@ -143,7 +143,7 @@ static int check_char_too_big[1 - sizeof(char) + ARRAY_OFFSET]; // error if char
 namespace {
 
 static void inner_malloc(void* & data, const std::vector<int64_t>& dims, NXnumtype type) {
-  size_t rank = dims.size();
+  int rank = dims.size();
   int64_t c_dims[NX_MAXRANK];
   for (size_t i = 0; i < rank; i++) {
     c_dims[i] = dims[i];
@@ -362,7 +362,7 @@ void File::writeData(const string& name, const string& value)
 
 template <typename NumT>
 void File::writeData(const string& name, const vector<NumT>& value) {
-  vector<int> dims(1, value.size());
+  vector<int64_t> dims(1, value.size());
   this->writeData(name, value, dims);
 }
 
@@ -374,6 +374,13 @@ void File::writeData(const string& name, const vector<NumT>& value,
   this->closeData();
 }
 
+template <typename NumT>
+void File::writeData(const string& name, const vector<NumT>& value,
+                     const vector<int64_t>& dims) {
+  this->makeData(name, getType<NumT>(), dims, true);
+  this->putData(value);
+  this->closeData();
+}
 
 
 template <typename NumT>
@@ -641,9 +648,9 @@ void File::putSlab(vector<NumT>& data, int start, int size) {
 
 template <typename NumT>
 void File::putSlab(vector<NumT>& data, int64_t start, int64_t size) {
-  vector<int> start_v;
+  vector<int64_t> start_v;
   start_v.push_back(start);
-  vector<int> size_v;
+  vector<int64_t> size_v;
   size_v.push_back(size);
   this->putSlab(data, start_v, size_v);
 }
@@ -1011,16 +1018,8 @@ void File::getSlab(void* data, const vector<int64_t>& start,
   }
 
   int rank = start.size();
-  int i_start[NX_MAXRANK];
-  for (int i = 0; i < rank; i++) {
-    i_start[i] = start[i];
-  }
-  int i_size[NX_MAXRANK];
-  for (int i = 0; i < rank; i++) {
-    i_size[i] = size[i];
-  }
 
-  NXstatus status = NXgetslab(this->m_file_id, data, i_start, i_size);
+  NXstatus status = NXgetslab64(this->m_file_id, data, &(start[0]), &(size[0]));
   if (status != NX_OK) {
     throw Exception("NXgetslab failed", status);
   }

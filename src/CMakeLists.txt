@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP})
+add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP} ${NX_CPP})
 
 set (NAPISRC napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c nxdataset.h nx_stptok.h)
 
@@ -44,6 +44,8 @@ if (WIN32)
 endif (WIN32)
 
 set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
+
+set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 
 file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 
@@ -65,7 +67,6 @@ set (NX_LIBS  ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK}
 #else (MINGW_MSYS)
 #  file(WRITE ${PROJECT_SOURCE_DIR}/src/nexus_symbols.sym ${NEXUS_SYMBOLS})
 #endif (MINGW_MSYS)
-
 
 #Make NeXus Static Library
 add_library (NeXus_Static_Library STATIC ${NAPISRC})

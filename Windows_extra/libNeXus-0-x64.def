@@ -75,3 +75,5 @@ nxisetnumberformat_
 putNXDatasetValue
 putNXDatasetValueAt
 nxigetpath_
+nxilinkexternaldataset_
+nxiisexternaldataset_

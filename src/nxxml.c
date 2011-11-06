@@ -1145,7 +1145,7 @@ static void getSlabData(pNXDS dataset, pNXDS slabData, int dim,
 }
 /*----------------------------------------------------------------------*/
 NXstatus  NXXgetslab64 (NXhandle fid, void *data, 
-				   int64_t iStart[], int64_t iSize[]){
+				   const int64_t iStart[], const int64_t iSize[]){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;

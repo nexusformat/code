@@ -1783,7 +1783,7 @@ static int countObjectsInGroup(hid_t loc_id)
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus  NX5getslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+   NXstatus  NX5getslab64 (NXhandle fid, void *data, const int64_t iStart[], const int64_t iSize[])
    {
      pNexusFile5 pFile;
      hsize_t myStart[H5S_MAX_RANK];
@@ -2031,7 +2031,6 @@ static int countObjectsInGroup(hid_t loc_id)
    NXstatus  NX5getattrinfo (NXhandle fid, int *iN)
    {
      pNexusFile5 pFile;
-     char *iname = NULL; 
      hid_t idx;
      int vid;
      H5O_info_t oinfo;
@@ -2127,8 +2126,7 @@ static int countObjectsInGroup(hid_t loc_id)
      pNexusFile5 pFile;
      herr_t ret;
      H5L_info_t link_buff;
-     int size=1024;
-     char linkval_buff[size];
+     char linkval_buff[1024];
      const char *filepath, *objpath;
 
      pFile = NXI5assert(fileid);
@@ -2138,12 +2136,12 @@ static int countObjectsInGroup(hid_t loc_id)
        return NX_ERROR;
      }
 
-     ret = H5Lget_val(pFile->iFID, name, linkval_buff, size, H5P_DEFAULT);
+     ret = H5Lget_val(pFile->iFID, name, linkval_buff, sizeof(linkval_buff), H5P_DEFAULT);
      if (ret < 0) {
        return NX_ERROR;
      }
 
-     ret = H5Lunpack_elink_val(linkval_buff, size, 0, &filepath, &objpath);
+     ret = H5Lunpack_elink_val(linkval_buff, sizeof(linkval_buff), 0, &filepath, &objpath);
      if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
        return NX_ERROR;
      }

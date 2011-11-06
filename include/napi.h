@@ -599,7 +599,7 @@ extern  NXstatus  NXgetslab(NXhandle handle, void* data, int start[], int size[]
   /**
    * @copydoc NXgetslab()
    */
-extern  NXstatus  NXgetslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);
+extern  NXstatus  NXgetslab64(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
 
 /**
    * Iterate over global, group or dataset attributes depending on the currently open group or 
@@ -906,7 +906,7 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxgetdata)(NXhandle handle, void* data);
         NXstatus ( *nxgetinfo64)(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
         NXstatus ( *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
-        NXstatus ( *nxgetslab64)(NXhandle handle, void* data, int64_t start[], int64_t size[]);
+        NXstatus ( *nxgetslab64)(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
         NXstatus ( *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
         NXstatus ( *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
         NXstatus ( *nxgetattrinfo)(NXhandle handle, int* no_items);

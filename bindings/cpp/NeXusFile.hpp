@@ -331,6 +331,17 @@ namespace NeXus {
     void writeData(const std::string& name, const std::vector<NumT>& value,
                    const std::vector<int>& dims);
 
+	/**
+     * Create a n-dimension data field, insert the data, and close the data.
+     *
+     * \param name The name of the field to create.
+     * \param value The data to put into the file.
+     * \param dims The dimensions of the data.
+     * \tparam NumT numeric data type of \a value
+     */
+    template <typename NumT>
+    void writeData(const std::string& name, const std::vector<NumT>& value,
+                   const std::vector<int64_t>& dims);
 
     /** Create a 1D data field with an unlimited dimension, insert the data, and close the data.
      *

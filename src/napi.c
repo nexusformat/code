@@ -879,7 +879,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   NXstatus  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
   {
-	  int i, status, iType, rank;
+	  int i, iType, rank;
 	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];
 	  if (NXgetinfo64(fid, &rank, iStart64, &iType) != NX_OK)
 	  {
@@ -960,7 +960,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXmalloc (void** data, int rank, 
 				   int dimensions[], int datatype)
   {
-	  int i, status;
+	  int status;
 	  int64_t* dims64 = dupDimsArray(dimensions, rank);
 	  status = NXmalloc64(data, rank, dims64, datatype);
 	  free(dims64);
@@ -1040,8 +1040,8 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
 char *nxitrim(char *str)
 {
-      char *ibuf = str, *obuf = str;
-      int i = 0, cnt = 0;
+      char *ibuf = str;
+      int i = 0;
 
       /*
       **  Trap NULL
@@ -1100,7 +1100,6 @@ char *nxitrim(char *str)
   NXstatus  NXgetrawinfo64 (NXhandle fid, int *rank, 
 				    int64_t dimension[], int *iType)
   {
-    char *pPtr = NULL;
     pNexusFunction pFunc = handleToNexusFunc(fid);
     return LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dimension, iType));
   }
@@ -1109,7 +1108,6 @@ char *nxitrim(char *str)
 				    int dimension[], int *iType)
   {
     int i, status;
-    char *pPtr = NULL;
 	int64_t dims64[NX_MAXRANK];
     pNexusFunction pFunc = handleToNexusFunc(fid);
     status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dims64, iType));
@@ -1163,7 +1161,7 @@ char *nxitrim(char *str)
   NXstatus  NXgetslab (NXhandle fid, void *data, 
 				    int iStart[], int iSize[])
   {
-	  int i, status, iType, rank;
+	  int i, iType, rank;
 	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];
 	  if (NXgetinfo64(fid, &rank, iStart64, &iType) != NX_OK)
 	  {
@@ -1178,7 +1176,7 @@ char *nxitrim(char *str)
   }
   
   NXstatus  NXgetslab64 (NXhandle fid, void *data, 
-				    int64_t iStart[], int64_t iSize[])
+				    const int64_t iStart[], const int64_t iSize[])
   {
     pNexusFunction pFunc = handleToNexusFunc(fid);
     return LOCKED_CALL(pFunc->nxgetslab64(pFunc->pNexusData, data, iStart, iSize));
@@ -1424,7 +1422,7 @@ NXstatus  NXlinkexternaldataset(NXhandle fid, CONSTCHAR *name,
   int status, type = NX_CHAR, length=1024, urllen;
   char nxurl[1024], exfile[512], expath[512];
   pNexusFunction pFunc = handleToNexusFunc(fid);
-  int64_t rank = 1;
+  int rank = 1;
   int64_t dims[1] = {1};
   
   //TODO cut and paste

@@ -1617,7 +1617,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   /*-------------------------------------------------------------------------*/
 
   
-  NXstatus  NX4getslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+  NXstatus  NX4getslab64 (NXhandle fid, void *data, const int64_t iStart[], const int64_t iSize[])
   {
     pNexusFile pFile;
     int32 myStart[H4_MAX_VAR_DIMS], mySize[H4_MAX_VAR_DIMS];

@@ -26,12 +26,14 @@
 #
 #====================================================================
 
-add_definitions(-DIN_NEXUS_CPP_LIBRARY=1 )
+add_definitions(-DIN_NEXUS_CPP_LIBRARY=1 ${NX_CPP})
 
 #Make NeXus CPP Bindings Static Library
 
 set (HEADERS NeXusFile.hpp NeXusException.hpp NeXusStream.hpp)
 set (SOURCES NeXusFile.hpp NeXusFile.cpp NeXusException.hpp NeXusException.cpp NeXusStream.hpp NeXusStream.cpp)
+
+set_property(SOURCE ${SOURCES} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 
 add_library (NeXus_CPP_Static_Library STATIC ${HEADERS} ${SOURCES})
 

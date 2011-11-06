@@ -133,7 +133,8 @@ if(HISTORY)
 endif(HISTORY)
 
 if (HDF5_FOUND)
-   set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
+#   set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
+   set (HDF5_CPP "-DHDF5 -DH5_NO_DEPRECATED_SYMBOLS -DH5Acreate_vers=2 -DH5Aiterate_vers=2 -DH5Dcreate_vers=2 -DH5Dopen_vers=2 -DH5Eclear_vers=2 -DH5Eprint_vers=2 -DH5Epush_vers=2 -DH5Eset_auto_vers=2 -DH5Eget_auto_vers=2 -DH5Ewalk_vers=2 -DH5Gcreate_vers=2 -DH5Gopen_vers=2 -DH5Pget_filter_vers=2 -DH5Pget_filter_by_id_vers=2 -DH5Pinsert_vers=2 -DH5Pregister_vers=2 -DH5Rget_obj_type_vers=2 -DH5Tarray_create_vers=2 -DH5Tcommit_vers=2 -DH5Tget_array_dims_vers=2 -DH5Topen_vers=2")
 endif (HDF5_FOUND)
 
 #Options
@@ -233,6 +234,12 @@ set(NXINCLUDE  "include")
 set(NX_INCLUDE "include/nexus")
 
 file(WRITE ${CMAKE_SOURCE_DIR}/include/nxconfig.h "/*A dummy config*/")
+
+# warning 4820 is byte padding in structures
+# warning 4996 is about using _strdup ratherthan strdup etc
+# /W4 rather than /Wall
+set(NX_CFLAGS "/W4 /wd4820 /wd4996")
+set(NX_CPP -D_CRT_SECURE_NO_WARNINGS)
 
 # Recurse into the subdirectories.
 add_subdirectory (src)
