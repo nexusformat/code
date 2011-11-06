@@ -51,7 +51,7 @@ NXstatus  NXXgetinfo64 (NXhandle fid, int *rank,
 NXstatus  NXXputslab64 (NXhandle fid, void *data, 
 				   int64_t iStart[], int64_t iSize[]);
 NXstatus  NXXgetslab64 (NXhandle fid, void *data, 
-				   int64_t iStart[], int64_t iSize[]);
+				   const int64_t iStart[], const int64_t iSize[]);
 NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
 				   int datalen, int iType);
 NXstatus  NXXgetattr (NXhandle fid, char *name, 

@@ -33,7 +33,7 @@ extern  NXstatus  NX5getdata(NXhandle handle, void* data);
 extern  NXstatus  NX5getinfo64(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
 extern  NXstatus  NX5getnextentry(NXhandle handle, NXname name, NXname nxclass, int* datatype);
 
-extern  NXstatus  NX5getslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);
+extern  NXstatus  NX5getslab64(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
 extern  NXstatus  NX5getnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
 extern  NXstatus  NX5getattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
 extern  NXstatus  NX5getattrinfo(NXhandle handle, int* no_items);

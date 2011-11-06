@@ -26,7 +26,7 @@ extern  NXstatus  NX4opendata (NXhandle handle, CONSTCHAR* label);
 extern  NXstatus  NX4closedata(NXhandle handle);
   
 extern  NXstatus  NX4getdata(NXhandle handle, void* data);
-extern  NXstatus  NX4getslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);
+extern  NXstatus  NX4getslab64(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
 extern  NXstatus  NX4getattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
   
 extern  NXstatus  NX4putdata(NXhandle handle, void* data);
