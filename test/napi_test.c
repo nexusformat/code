@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
   char c1_array[5][4] = {{'a', 'b', 'c' ,'d'}, {'e', 'f', 'g' ,'h'}, 
      {'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'}, {'q', 'r', 's' , 't'}};
   int unlimited_cdims[2] = {NX_UNLIMITED, 4};
-  NXhandle fileid;
+  NXhandle fileid, clone_fileid;
   NXlink glink, dlink, blink;
   int comp_array[100][20];
   int dims[2];
@@ -93,6 +93,10 @@ int main (int argc, char *argv[])
 
 /* create file */
   if (NXopen (nxFile, nx_creation_code, &fileid) != NX_OK) return 1;
+  if (nx_creation_code == NXACC_CREATE5)
+  {
+    if (NXreopen (fileid, &clone_fileid) != NX_OK) return 1;
+  }
   NXsetnumberformat(fileid,NX_FLOAT32,"%9.3f");
   if (NXmakegroup (fileid, "entry", "NXentry") != NX_OK) return 1;
   if (NXopengroup (fileid, "entry", "NXentry") != NX_OK) return 1;

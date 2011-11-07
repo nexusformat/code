@@ -80,3 +80,4 @@ putNXDatasetValue
 putNXDatasetValueAt
 nxigetrawinfo_
 nxigetrawinfo64_
+nxireopen_

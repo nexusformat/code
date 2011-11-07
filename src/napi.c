@@ -1421,7 +1421,7 @@ NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, CONS
   if (pFunc->nxnativeexternallink != NULL) {
         urllen = strlen(url);
         memset(nxurl, 0, length);
-        if(urllen > length){
+        if(urllen >= length){
           urllen = length - 1;
         }
         memcpy(nxurl, url, urllen);
