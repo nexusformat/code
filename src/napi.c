@@ -566,6 +566,42 @@ static NXstatus   NXinternalopen(CONSTCHAR *userfilename, NXaccess am, pFileStac
     return LOCKED_CALL(NXinternalopenImpl(userfilename, am, fileStack));
 }
 
+
+NXstatus  NXreopen(NXhandle pOrigHandle, NXhandle* pNewHandle)
+{
+      pFileStack newFileStack;
+	  pFileStack origFileStack = (pFileStack)pOrigHandle;
+	pNexusFunction fOrigHandle = NULL, fNewHandle = NULL;
+	  *pNewHandle = NULL;
+	  newFileStack = makeFileStack();
+	  if(newFileStack == NULL){
+          NXReportError ("ERROR: no memory to create filestack");
+          return NX_ERROR;
+      }
+	  // The code below will only open the last file on a stack
+	  // for the moment raise an error, but this behaviour may be OK
+	  if (fileStackDepth(origFileStack) > 0)    
+	  {
+		NXReportError (
+          "ERROR: handle stack referes to many files - cannot reopen");
+		  return NX_ERROR;
+	  }
+	  fOrigHandle = peekFileOnStack(origFileStack);
+	  if (fOrigHandle->nxreopen == NULL)
+	  {
+		NXReportError (
+          "ERROR: NXreopen not implemented for this underlying file format");
+		  return NX_ERROR;
+	  }
+	  fNewHandle = (NexusFunction*)malloc(sizeof(NexusFunction));
+	  memcpy(fNewHandle, fOrigHandle, sizeof(NexusFunction));
+	  LOCKED_CALL(fNewHandle->nxreopen( fOrigHandle->pNexusData, &(fNewHandle->pNexusData) ));
+	  pushFileStack( newFileStack, fNewHandle, peekFilenameOnStack(origFileStack) );
+	  *pNewHandle = newFileStack;
+	  return NX_OK;
+}
+
+
 /* ------------------------------------------------------------------------- */
 
   NXstatus  NXclose (NXhandle *fid)

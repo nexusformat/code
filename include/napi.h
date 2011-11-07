@@ -197,6 +197,7 @@ typedef struct {
 #    endif
 
 #    define NXopen              MANGLE(nxiopen)
+#    define NXreopen            MANGLE(nxireopen)
 #    define NXclose             MANGLE(nxiclose)
 #    define NXmakegroup         MANGLE(nximakegroup)
 #    define NXopengroup         MANGLE(nxiopengroup)
@@ -296,6 +297,13 @@ extern "C" {
    * \ingroup c_init
    */
 extern  NXstatus  NXopen(CONSTCHAR * filename, NXaccess access_method, NXhandle* pHandle);
+
+  /** 
+   * Opens an existing NeXus file a second time for e.g. access from another thread.
+   * \return NX_OK on success, NX_ERROR in the case of an error.   
+   * \ingroup c_init
+   */
+extern  NXstatus  NXreopen(NXhandle pOrigHandle, NXhandle* pNewHandle);
 
   /**
    * close a NeXus file
@@ -887,6 +895,7 @@ extern  NXstatus  NXsetcache(long newVal);
   typedef struct {
         NXhandle pNexusData;   
         int stripFlag;
+        NXstatus ( *nxreopen)(NXhandle pOrigHandle, NXhandle* pNewHandle);
         NXstatus ( *nxclose)(NXhandle* pHandle);
         NXstatus ( *nxflush)(NXhandle* pHandle);
         NXstatus ( *nxmakegroup) (NXhandle handle, CONSTCHAR *name, CONSTCHAR* NXclass);

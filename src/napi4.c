@@ -1949,6 +1949,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
 void NX4assignFunctions(pNexusFunction fHandle)
 {
       fHandle->nxclose=NX4close;
+	  fHandle->nxreopen=NULL;
       fHandle->nxflush=NX4flush;
       fHandle->nxmakegroup=NX4makegroup;
       fHandle->nxopengroup=NX4opengroup;

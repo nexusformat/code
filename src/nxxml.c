@@ -1938,6 +1938,7 @@ int  NXXcompress(NXhandle fid, int comp){
 /*----------------------------------------------------------------------*/
 void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxclose=NXXclose;
+	  fHandle->nxreopen=NULL;
       fHandle->nxflush=NXXflush;
       fHandle->nxmakegroup=NXXmakegroup;
       fHandle->nxopengroup=NXXopengroup;

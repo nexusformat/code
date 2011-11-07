@@ -114,7 +114,31 @@ static void buildCurrentPath(pNexusFile5 self, char *pathBuffer,
 
    ---------------------------------------------------------------------*/
 
-  NXstatus  NX5open(CONSTCHAR *filename, NXaccess am, 
+  NXstatus  NX5reopen(NXhandle pOrigHandle, NXhandle* pNewHandle)  
+{
+        pNexusFile5 pNew = NULL, pOrig = NULL;
+    *pNewHandle = NULL;
+       pOrig = (pNexusFile5)pOrigHandle;
+    pNew = (pNexusFile5) malloc (sizeof (NexusFile5));
+    if (!pNew) {
+      NXReportError ("ERROR: no memory to create File datastructure");
+      return NX_ERROR;
+    }
+    memset (pNew, 0, sizeof (NexusFile5));
+    pNew->iFID = H5Freopen (pOrig->iFID);
+    if (pNew->iFID <= 0) {
+        NXReportError ("cannot clone file");
+		free (pNew);
+      return NX_ERROR;
+       }
+       strcpy(pNew->iAccess, pOrig->iAccess);
+    pNew->iNXID = NX5SIGNATURE;
+    pNew->iStack5[0].iVref = 0;    /* root! */
+    *pNewHandle = (NXhandle)pNew;
+    return NX_OK;
+}
+
+NXstatus  NX5open(CONSTCHAR *filename, NXaccess am, 
 				 NXhandle* pHandle)
   {
   hid_t attr1,aid1, aid2, iVID;
@@ -2198,8 +2222,9 @@ static int countObjectsInGroup(hid_t loc_id)
 /*------------------------------------------------------------------------*/
 void NX5assignFunctions(pNexusFunction fHandle)
 {
-
+		
       fHandle->nxclose=NX5close;
+      fHandle->nxreopen=NX5reopen;
       fHandle->nxflush=NX5flush;
       fHandle->nxmakegroup=NX5makegroup;
       fHandle->nxopengroup=NX5opengroup;
