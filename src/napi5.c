@@ -610,18 +610,14 @@ static hid_t nxToHDF5Type(int datatype)
       int unlimiteddim = 0;
 
       pFile = NXI5assert (fid);
-      if (pFile->iCurrentG <= 0)
-      {
-          sprintf (pBuffer, "ERROR: no group open for makedata on %s",
-              name);
+      if (pFile->iCurrentG <= 0) {
+          sprintf(pBuffer, "ERROR: no group open for makedata on %s", name);
           NXReportError( pBuffer);
           return NX_ERROR;
       }
 
-      if (rank <= 0) 
-      {
-          sprintf (pBuffer, "ERROR: invalid rank specified %s",
-              name);
+      if (rank <= 0) {
+          sprintf (pBuffer, "ERROR: invalid rank specified %s", name);
           NXReportError( pBuffer);
           return NX_ERROR;
       }
@@ -715,7 +711,7 @@ static hid_t nxToHDF5Type(int datatype)
               return NX_ERROR;
           }
           H5Pset_deflate(cparms,compress_level); 
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
+          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
       } 
       else if (compress_type == NX_COMP_NONE) 
       {
@@ -728,11 +724,11 @@ static hid_t nxToHDF5Type(int datatype)
                   NXReportError( "ERROR: size of chunks could not be set");
                   return NX_ERROR;
               }
-              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
+              iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
           } 
           else 
           {
-              iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+              iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
           }               
       } 
       else if (compress_type == NX_CHUNK) 
@@ -741,10 +737,10 @@ static hid_t nxToHDF5Type(int datatype)
           iNew = H5Pset_chunk(cparms,rank,chunkdims);
           if (iNew < 0) 
           {
-              NXReportError( "ERROR: size of chunks could not be set");
+              NXReportError("ERROR: size of chunks could not be set");
               return NX_ERROR;
           }
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
+          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 
       } 
       else 
@@ -2092,8 +2088,16 @@ static int countObjectsInGroup(hid_t loc_id)
   {
      herr_t iRet;
      pNexusFile5 pFile;
+     /* char pBuffer[256]; */
 
      pFile = NXI5assert(fileid);
+/*
+      if (pFile->iCurrentG <= 0) {
+          sprintf(pBuffer, "ERROR: no group open for making external link on %s", name);
+          NXReportError(pBuffer);
+          return NX_ERROR;
+      }
+*/
      iRet = H5Lcreate_external(externalfile, remotetarget, pFile->iFID, name, H5P_DEFAULT, H5P_DEFAULT);
      if (iRet < 0) {
        NXReportError("ERROR: making external link failed");
@@ -2107,10 +2111,18 @@ static int countObjectsInGroup(hid_t loc_id)
   {
      pNexusFile5 pFile;
      ssize_t name_size;
+     hid_t openthing;
 
      pFile = NXI5assert(fileid);
+      if (pFile->iCurrentD > 0) {
+          openthing = pFile->iCurrentD;
+      } else if (pFile->iCurrentG) {
+          openthing = pFile->iCurrentG;
+      } else {
+          openthing = pFile->iFID;
+      }
 
-     name_size = H5Fget_name(pFile->iFID, externalfile, filenamelen);
+     name_size = H5Fget_name(openthing, externalfile, filenamelen);
 
      // Check for failure again
      if( name_size < 0 ) {
