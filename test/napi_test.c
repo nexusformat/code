@@ -27,12 +27,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "napi.h"
 #include "napiconfig.h"
 
 static void print_data (const char *prefix, void *data, int type, int num);
 static int testLoadPath();
 static int testExternal(char *progName);
+
+char *relativePathOf(const char* filename) {
+  char cwd[1024];
+  char *pointer;
+
+  getcwd(cwd, sizeof(cwd));
+  
+  if (strncmp(filename, cwd, strlen(cwd)) == 0) {
+	return filename+strlen(cwd)+1;
+  }
+  return filename;
+}
 
 int main (int argc, char *argv[])
 {
@@ -220,7 +233,7 @@ int main (int argc, char *argv[])
   if(NXinquirefile(fileid,filename,256) != NX_OK){
     return 1;
   }
-  printf("NXinquirefile found: %s\n", filename);
+  printf("NXinquirefile found: %s\n", relativePathOf(filename));
   NXgetattrinfo (fileid, &i);
   if (i > 0) {
      printf ("Number of global attributes: %d\n", i);
@@ -536,7 +549,7 @@ static int testExternal(char *progName){
   if(NXinquirefile(hfil,filename,256) != NX_OK){
     return 1;
   }
-  printf("NXinquirefile found: %s\n", filename);
+  printf("NXinquirefile found: %s\n", relativePathOf(filename));
 
   if(NXopenpath(hfil,"/entry2/sample/sample_name") != NX_OK){
     return 1;
@@ -549,7 +562,7 @@ static int testExternal(char *progName){
   if(NXinquirefile(hfil,filename,256) != NX_OK){
     return 1;
   }
-  printf("NXinquirefile found: %s\n", filename);
+  printf("NXinquirefile found: %s\n", relativePathOf(filename));
 
   if(NXopenpath(hfil,"/entry2/start_time") != NX_OK){
     return 1;

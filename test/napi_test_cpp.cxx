@@ -16,6 +16,21 @@ using std::multimap;
 using std::string;
 using std::vector;
 
+char *relativePathOf(std::string filenamestr) {
+  char cwd[1024];
+  char *filename;
+
+  filename = strdup(filenamestr.c_str());
+
+  getcwd(cwd, sizeof(cwd));
+  
+//fprintf(stderr, "filename %s cwd %s\n", filename, cwd);
+  if (strncmp(filename, cwd, strlen(cwd)) == 0) {
+        return filename + strlen(cwd) + 1;
+  }
+  return filename;
+}
+
 int writeTest(const string& filename, NXaccess create_code) {
   NeXus::File file(filename, create_code);
   // create group
@@ -211,7 +226,7 @@ int readTest(const string & filename) {
   const string SDS("SDS");
   // top level file information
   NeXus::File file(filename);
-  cout << "NXinquirefile found: " << file.inquireFile() << endl;
+  cout << "NXinquirefile found: " << relativePathOf(file.inquireFile()) << endl;
   vector<NeXus::AttrInfo> attr_infos = file.getAttrInfos();
   cout << "Number of global attributes: " << attr_infos.size() << endl;
   for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
@@ -474,10 +489,10 @@ int testExternal(const string & fileext, NXaccess create_code){
   NeXus::File filein(filename);
   filein.openPath("/entry1/start_time");
   cout << "First file time: " << filein.getStrData() << endl;
-  cout << "NXinquirefile found: " << filein.inquireFile() << endl;
+  cout << "NXinquirefile found: " << relativePathOf(filein.inquireFile()) << endl;
   filein.openPath("/entry2/sample/sample_name");
   cout << "Second file sample: " << filein.getStrData() << endl;
-  cout << "NXinquirefile found: " << filein.inquireFile() << endl;
+  cout << "NXinquirefile found: " << relativePathOf(filein.inquireFile()) << endl;
   filein.openPath("/entry2/start_time");
   cout << "Second file time: " << filein.getStrData() << endl;
   filein.openPath("/");

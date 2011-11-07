@@ -380,15 +380,12 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
     
     pFile = NXI5assert (fid);
     /* create and configure the group */
-    if (pFile->iCurrentG==0)
-    {
-       iRet = H5Gcreate(pFile->iFID,(const char*)name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if (pFile->iCurrentG==0) {
        snprintf(pBuffer,1023,"/%s",name);
-    } else
-    {
+    } else {
        snprintf(pBuffer,1023,"/%s/%s",pFile->name_ref,name);
-       iRet = H5Gcreate(pFile->iFID,(const char*)pBuffer, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     }   
+    iRet = H5Gcreate(pFile->iFID,(const char*)pBuffer, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     if (iRet < 0) {
       NXReportError( "ERROR: could not create Group");
       return NX_ERROR;
@@ -398,16 +395,14 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
     aid1 = H5Tcopy(H5T_C_S1);
     H5Tset_size(aid1, strlen(nxclass));
     attr1= H5Acreate(iVID, "NX_class", aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
-    if (attr1 < 0)
-       {
+    if (attr1 < 0) {
        NXReportError( "ERROR: failed to store class name");
        return NX_ERROR;
-       }
-    if (H5Awrite(attr1, aid1, (char*)nxclass) < 0)
-      {
+    }
+    if (H5Awrite(attr1, aid1, (char*)nxclass) < 0) {
       NXReportError( "ERROR: failed to store class name");
       return NX_ERROR;
-      }
+    }
     /* close group */
     iRet=H5Sclose(aid2);
     iRet=H5Tclose(aid1);
@@ -451,8 +446,7 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
     strcpy(pFile->name_tmp,pBuffer);
     strcpy(pFile->name_ref,pBuffer);
 
-    if ((nxclass != NULL) && (strcmp(nxclass, NX_UNKNOWN_GROUP) != 0))
-    {
+    if ((nxclass != NULL) && (strcmp(nxclass, NX_UNKNOWN_GROUP) != 0)) {
         /* check group attribute */
         iRet=H5Aiterate(pFile->iCurrentG,H5_INDEX_CRT_ORDER,H5_ITER_INC,0,attr_check,NULL);
         if (iRet < 0) {
@@ -467,8 +461,7 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
         }
         /* check contents of group attribute */
         attr1 = H5Aopen_by_name(pFile->iCurrentG, ".", "NX_class", H5P_DEFAULT, H5P_DEFAULT);
-        if (attr1 < 0)
-        {
+        if (attr1 < 0) {
               NXReportError( "ERROR: opening NX_class group attribute");
               return NX_ERROR; 
         }
@@ -561,52 +554,29 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
 static hid_t nxToHDF5Type(int datatype)
 {
   hid_t type;
-    if (datatype == NX_CHAR)
-    {
+    if (datatype == NX_CHAR) {
         type=H5T_C_S1;
-    }
-    else if (datatype == NX_INT8)
-    {
+    } else if (datatype == NX_INT8) {
         type=H5T_NATIVE_CHAR;
-    }
-    else if (datatype == NX_UINT8)
-    {
+    } else if (datatype == NX_UINT8) {
         type=H5T_NATIVE_UCHAR;
-    }
-    else if (datatype == NX_INT16)
-    {
+    } else if (datatype == NX_INT16) {
         type=H5T_NATIVE_SHORT;
-    }
-    else if (datatype == NX_UINT16)
-    {
+    } else if (datatype == NX_UINT16) {
         type=H5T_NATIVE_USHORT;
-    }
-    else if (datatype == NX_INT32)
-    {
+    } else if (datatype == NX_INT32) {
         type=H5T_NATIVE_INT;
-    }
-    else if (datatype == NX_UINT32)
-    {
+    } else if (datatype == NX_UINT32) {
         type=H5T_NATIVE_UINT;
-    }
-    else if (datatype == NX_INT64)
-    {
+    } else if (datatype == NX_INT64) {
 	type = H5T_NATIVE_INT64;
-    }
-    else if (datatype == NX_UINT64)
-    {
+    } else if (datatype == NX_UINT64) {
 	type = H5T_NATIVE_UINT64;
-    }
-    else if (datatype == NX_FLOAT32)
-    {
+    } else if (datatype == NX_FLOAT32) {
         type=H5T_NATIVE_FLOAT;
-    }
-    else if (datatype == NX_FLOAT64)
-    {
+    } else if (datatype == NX_FLOAT64) {
         type=H5T_NATIVE_DOUBLE;
-    }
-    else
-    {
+    } else {
       NXReportError( "ERROR: nxToHDF5Type: unknown type");
       type = -1;
     }
@@ -2112,17 +2082,18 @@ static int countObjectsInGroup(hid_t loc_id)
   {
      herr_t iRet;
      pNexusFile5 pFile;
-     /* char pBuffer[256]; */
+     char pBuffer[256]; 
+     hid_t openwhere;
 
      pFile = NXI5assert(fileid);
-/*
+
       if (pFile->iCurrentG <= 0) {
-          sprintf(pBuffer, "ERROR: no group open for making external link on %s", name);
-          NXReportError(pBuffer);
-          return NX_ERROR;
+          openwhere = pFile->iFID;
+      } else {
+          openwhere = pFile->iCurrentG;
       }
-*/
-     iRet = H5Lcreate_external(externalfile, remotetarget, pFile->iFID, name, H5P_DEFAULT, H5P_DEFAULT);
+
+     iRet = H5Lcreate_external(externalfile, remotetarget, openwhere, name, H5P_DEFAULT, H5P_DEFAULT);
      if (iRet < 0) {
        NXReportError("ERROR: making external link failed");
        return NX_ERROR;
@@ -2140,7 +2111,7 @@ static int countObjectsInGroup(hid_t loc_id)
      pFile = NXI5assert(fileid);
       if (pFile->iCurrentD > 0) {
           openthing = pFile->iCurrentD;
-      } else if (pFile->iCurrentG) {
+      } else if (pFile->iCurrentG > 0) {
           openthing = pFile->iCurrentG;
       } else {
           openthing = pFile->iFID;
