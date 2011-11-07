@@ -77,3 +77,4 @@ putNXDatasetValueAt
 nxigetpath_
 nxilinkexternaldataset_
 nxiisexternaldataset_
+nxireopen_
