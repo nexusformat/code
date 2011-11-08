@@ -35,16 +35,19 @@ static void print_data (const char *prefix, void *data, int type, int num);
 static int testLoadPath();
 static int testExternal(char *progName);
 
-char *relativePathOf(const char* filename) {
+static const char *relativePathOf(const char* filename) {
   char cwd[1024];
-  char *pointer;
 
   getcwd(cwd, sizeof(cwd));
   
-  if (strncmp(filename, cwd, strlen(cwd)) == 0) {
+  if (strncmp(filename, cwd, strlen(cwd)) == 0) 
+  {
 	return filename+strlen(cwd)+1;
   }
-  return filename;
+  else
+  {
+  	return filename;
+  }
 }
 
 int main (int argc, char *argv[])

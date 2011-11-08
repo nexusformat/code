@@ -16,22 +16,22 @@ using std::multimap;
 using std::string;
 using std::vector;
 
-char *relativePathOf(std::string filenamestr) {
+static std::string relativePathOf(const std::string& filenamestr) {
   char cwd[1024];
-  char *filename;
-
-  filename = strdup(filenamestr.c_str());
 
   getcwd(cwd, sizeof(cwd));
   
-//fprintf(stderr, "filename %s cwd %s\n", filename, cwd);
-  if (strncmp(filename, cwd, strlen(cwd)) == 0) {
-        return filename + strlen(cwd) + 1;
+  if ( filenamestr.compare(0, strlen(cwd), cwd) == 0 )
+  {
+      return filenamestr.substr(strlen(cwd)+1);  // +1 to skip trailing /
   }
-  return filename;
+  else
+  {
+      return filenamestr;
+  }
 }
 
-int writeTest(const string& filename, NXaccess create_code) {
+static int writeTest(const string& filename, NXaccess create_code) {
   NeXus::File file(filename, create_code);
   // create group
   file.makeGroup("entry", "NXentry", true);

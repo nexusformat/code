@@ -118,6 +118,7 @@ typedef struct {
 
 #define NX_MAXRANK 32
 #define NX_MAXNAMELEN 64
+#define NX_MAXPATHLEN 1024
 
 
 /**

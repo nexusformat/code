@@ -800,7 +800,7 @@ namespace NeXus {
      *
      * \return The name of the file.
      */
-    std::string inquireFile(const int buff_length = NX_MAXNAMELEN);
+    std::string inquireFile(const int buff_length = NX_MAXPATHLEN);
 
     /**
      * Determine Whether or not a supplied group is external.
