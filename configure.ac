@@ -365,13 +365,13 @@ HDF5_EXT=so # library file extent to look for with HDF5 libraries
 SHARED_EXT=so
 AC_SUBST(SHARED_EXT)
 
-AC_CHECK_LIB(xml2, [xml_parse_file, xmlParseFile])
-if test "x$ac_cv_lib_xml2_xml_parse_file__xmlParseFile" = xyes; then
+AC_CHECK_LIB(xml2, [xmlParseFile])
+if test "x$ac_cv_lib_xml2_xmlParseFile" = xyes; then
     LIBXML2_CFLAGS='`xml2-config --cflags`'
-    HAVE_LIBXML2="yes"
+    LIBXML2_MESSAGE="yes"
 else
     LIBXML2_CFLAGS=''
-    HAVE_LIBXML2="no (will not build NXsummary or NXtranslate)"
+    LIBXML2_MESSAGE="no (will not build NXsummary or NXtranslate)"
 fi
 AC_SUBST(LIBXML2_CFLAGS)
 
@@ -554,6 +554,11 @@ if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
 	    if test -z "$H5ROOT" -a -r ${i}/$j/libhdf5.$HDF5_EXT; then H5ROOT=$i; fi
         done
     done
+    for i in $HDF5SEARCH; do
+	for j in lib lib64; do
+	    if test -z "$H5ROOT" -a -r ${i}/$j/libhdf5.a; then H5ROOT=$i; fi
+        done
+    done
     if test -z "$H5ROOT"; then 
 	AC_MSG_RESULT(unknown)
     else 
@@ -651,7 +656,6 @@ AC_CHECK_LIB(sz, SZ_Compress)
 AC_CHECK_LIB(df, Hopen)
 AC_CHECK_LIB(mfhdf, SDcreate)
 AC_CHECK_LIB(hdf5, H5open)
-AC_CHECK_LIB(xml2, xmlParseDocument)
 AC_CHECK_LIB(termcap, tputs)
 AC_CHECK_LIB(readline, readline)
 AC_CHECK_LIB(history, add_history)
@@ -717,7 +721,7 @@ AM_CONDITIONAL(HAVE_JAVADOC, [test ! -z "$JAVADOC" -a ! -z "$JAVAROOT"])
 AM_CONDITIONAL(HAVE_HDF4, [test ! -z "$H4ROOT"])
 AM_CONDITIONAL(HAVE_HDF5, [test ! -z "$H5ROOT"])
 AM_CONDITIONAL(HAVE_XML, [test ! -z "$MXMLROOT"])
-AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseDocument" = "yes" ])
+AM_CONDITIONAL(HAVE_LIBXML2, [ test "$ac_cv_lib_xml2_xmlParseFile" = "yes" ])
 dnl AM_CONDITIONAL(HAVE_LIBMXMLPLUS, [ test "$ac_cv_lib_mxmlplus__ZN4MXML4NodeD2Ev" = "yes" ])
 AM_CONDITIONAL(HAVE_DOCBOOK, [test ! -z "$DOCBOOK2TXT" -a ! -z "$DOCBOOK2PDF"])
 AM_CONDITIONAL(HAVE_LATEX, [test ! -z "$LATEX"])
@@ -902,7 +906,7 @@ build:
 
 	application tools:
 	     ant:	       ${ANT_PROG}
-	     libxml2:          ${HAVE_LIBXML2}
+	     libxml2:          ${LIBXML2_MESSAGE}
 	     readline:	       ${HAVE_READLINE}
 
 	documentation:
