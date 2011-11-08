@@ -33,6 +33,8 @@ static const char* rscid = "$Id$";	/* Revision inserted by CVS */
 #include <time.h>
 #include <stdarg.h>
 #include <stdint.h>
+
+#include "nxconfig.h"
 #include "napi.h"
 #include "nxstack.h"
 
@@ -57,7 +59,7 @@ static int iFortifyScope;
 
 #include "nx_stptok.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 /*
  *  HDF5 on windows does not do locking for multiple threads conveniently so we will implement it ourselves.
  *  Freddie Akeroyd, 16/06/2011
@@ -87,10 +89,53 @@ static int nxiunlock(int ret)
 #define LOCKED_CALL(__call) \
     ( nxilock() , nxiunlock(__call) )
 
+#elif HAVE_LIBPTHREAD
+
+#include <pthread.h>
+
+static pthread_mutex_t nx_mutex;
+
+static void nx_pthread_init()
+{
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&nx_mutex, &attr);
+}
+
+static int nxilock()
+{
+    static pthread_once_t once_control = PTHREAD_ONCE_INIT;
+    if (pthread_once(&once_control, nx_pthread_init) != 0)
+    {
+        NXReportError("pthread_once failed");
+	return NX_ERROR;
+    }
+    if (pthread_mutex_lock(&nx_mutex) != 0)
+    {
+        NXReportError("pthread_mutex_lock failed");
+        return NX_ERROR;
+    }
+    return NX_OK;
+}
+
+static int nxiunlock(int ret)
+{
+    if (pthread_mutex_unlock(&nx_mutex) != 0)
+    {
+        NXReportError("pthread_mutex_unlock failed");
+        return NX_ERROR;
+    }
+    return ret;
+}
+
+#define LOCKED_CALL(__call) \
+    ( nxilock() , nxiunlock(__call) )
+
 #else
 
 #define LOCKED_CALL(__call) \
-	__call
+	   __call
 
 #endif /* _WIN32 */
 
