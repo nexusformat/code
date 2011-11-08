@@ -142,7 +142,7 @@ static int nxiunlock(int ret)
 /**
  * valid NeXus names
  */
-int validNXName(const char* name)
+int validNXName(const char* name, int allow_colon)
 {
     int i;
     if (name == NULL)
@@ -155,6 +155,10 @@ int validNXName(const char* name)
 	     (name[i] >= 'A' && name[i] <= 'Z') ||
 	     (name[i] >= '0' && name[i] <= '9') ||
 	     (name[i] == '_') )
+	{
+	    ;
+	}
+	else if (allow_colon && name[i] == ':')
 	{
 	    ;
 	}
@@ -490,6 +494,12 @@ static NXstatus   NXinternalopenImpl(CONSTCHAR *userfilename, NXaccess am, pFile
       fHandle->stripFlag = 0;
       am = (NXaccess)(am & ~NXACC_NOSTRIP);
     }
+    fHandle->checkNameSyntax = 0;
+    if (am & NXACC_CHECKNAMESYNTAX) {
+        fHandle->checkNameSyntax = 1;
+        am = (NXaccess)(am & ~NXACC_CHECKNAMESYNTAX);
+    }
+
 
     if (my_am==NXACC_CREATE) {
       /* HDF4 will be used ! */
@@ -684,7 +694,7 @@ NXstatus  NXreopen(NXhandle pOrigHandle, NXhandle* pNewHandle)
   {
      char buffer[256];
      pNexusFunction pFunc = handleToNexusFunc(fid);
-     if ( (nxclass != NULL) && !strncmp("NX", nxclass, 2) && !validNXName(name) )
+     if ( pFunc->checkNameSyntax && (nxclass != NULL) /* && !strncmp("NX", nxclass, 2) */ && !validNXName(name, 0) )
      {
         sprintf(buffer, "ERROR: invalid characters in group name \"%s\"", name);
         NXReportError(buffer);
@@ -821,7 +831,14 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXmakedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int64_t dimensions[])
   {
+    char buffer[256];
     pNexusFunction pFunc = handleToNexusFunc(fid);
+    if ( pFunc->checkNameSyntax && !validNXName(name, 0) )
+    {
+        sprintf(buffer, "ERROR: invalid characters in dataset name \"%s\"", name);
+        NXReportError(buffer);
+	return NX_ERROR;
+    }
     return LOCKED_CALL(pFunc->nxmakedata64(pFunc->pNexusData, name, datatype, rank, dimensions)); 
   }
 
@@ -842,7 +859,14 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXcompmakedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
                            int rank, int64_t dimensions[], int compress_type, int64_t chunk_size[])
   {
+    char buffer[256];
     pNexusFunction pFunc = handleToNexusFunc(fid); 
+    if ( pFunc->checkNameSyntax && !validNXName(name, 0) )
+    {
+        sprintf(buffer, "ERROR: invalid characters in dataset name \"%s\"", name);
+        NXReportError(buffer);
+	return NX_ERROR;
+    }
     return LOCKED_CALL(pFunc->nxcompmakedata64 (pFunc->pNexusData, name, datatype, rank, dimensions, compress_type, chunk_size)); 
   } 
  
@@ -944,16 +968,20 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   NXstatus  NXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
                                   int datalen, int iType)
   {
+    char buffer[256];
     pNexusFunction pFunc = handleToNexusFunc(fid);
     if (datalen > 1 && iType != NX_CHAR)
     {
 	NXReportError("NXputattr: numeric arrays are not allowed as attributes - only character strings and single numbers");
 	return NX_ERROR;
     }
-    else
+    if ( pFunc->checkNameSyntax && !validNXName(name, 0) )
     {
-        return LOCKED_CALL(pFunc->nxputattr(pFunc->pNexusData, name, data, datalen, iType));
+        sprintf(buffer, "ERROR: invalid characters in attribute name \"%s\"", name);
+        NXReportError(buffer);
+	return NX_ERROR;
     }
+    return LOCKED_CALL(pFunc->nxputattr(pFunc->pNexusData, name, data, datalen, iType));
   }
 
   /* ------------------------------------------------------------------- */
@@ -1000,7 +1028,14 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   NXstatus  NXmakenamedlink (NXhandle fid, CONSTCHAR *newname,  NXlink* sLink)
   {
+    char buffer[256];
     pNexusFunction pFunc = handleToNexusFunc(fid);
+    if ( pFunc->checkNameSyntax && !validNXName(newname, 0) )
+    {
+        sprintf(buffer, "ERROR: invalid characters in link name \"%s\"", newname);
+        NXReportError(buffer);
+	return NX_ERROR;
+    }
     return LOCKED_CALL(pFunc->nxmakenamedlink(pFunc->pNexusData, newname, sLink));
   }
   /* --------------------------------------------------------------------*/

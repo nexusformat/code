@@ -96,9 +96,10 @@ typedef char NXname[128];
  * \li NXACC_CREATE4 create a NeXus HDF-4 file
  * \li NXACC_CREATE5 create a NeXus HDF-5 file.
  * \li NXACC_CREATEXML create a NeXus XML file.
+ * \li NXACC_CHECKNAMESYNTAX Check names conform to NeXus allowed characters.
  */
 typedef enum {NXACC_READ=1, NXACC_RDWR=2, NXACC_CREATE=3, NXACC_CREATE4=4, 
-	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_TABLE=8, NXACC_NOSTRIP=128} NXaccess_mode;
+	      NXACC_CREATE5=5, NXACC_CREATEXML=6, NXACC_TABLE=8, NXACC_NOSTRIP=128, NXACC_CHECKNAMESYNTAX=256 } NXaccess_mode;
 
 /**
  * A combination of options from #NXaccess_mode
@@ -895,7 +896,6 @@ extern  NXstatus  NXsetcache(long newVal);
 
   typedef struct {
         NXhandle pNexusData;   
-        int stripFlag;
         NXstatus ( *nxreopen)(NXhandle pOrigHandle, NXhandle* pNewHandle);
         NXstatus ( *nxclose)(NXhandle* pHandle);
         NXstatus ( *nxflush)(NXhandle* pHandle);
@@ -930,6 +930,8 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxnativeexternallink)(NXhandle handle, CONSTCHAR* name, CONSTCHAR* externalfile, CONSTCHAR* remotetarget);
         NXstatus ( *nxnativeinquirefile)(NXhandle handle, char* externalfile, const int filenamelength);
         NXstatus ( *nxnativeisexternallink)(NXhandle handle, CONSTCHAR* name, char* url, int urllen);
+        int stripFlag;
+        int checkNameSyntax;
   } NexusFunction, *pNexusFunction;
   /*---------------------*/
   extern long nx_cacheSize;

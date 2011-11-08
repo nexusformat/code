@@ -35,7 +35,7 @@
 
 
 extern  void *NXpData;
-extern int validNXName(const char* name); /* from napi.c */
+extern int validNXName(const char* name, int allow_colon); /* from napi.c */
 char *nxitrim(char *str); /* from napi.c */
 
 /*----------------------- our data structures --------------------------
@@ -258,7 +258,7 @@ NXstatus  NXXmakegroup (NXhandle fid, CONSTCHAR *name,
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
 
-  if (!validNXName(name))
+  if (!validNXName(name, 0))
   {
     sprintf(buffer, "ERROR: invalid characters in group name \"%s\"", name);
     NXReportError(buffer);
@@ -427,7 +427,7 @@ NXstatus  NXXmakedatatable64 (NXhandle fid,
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
-  if (!validNXName(name))
+  if (!validNXName(name, 0))
   {
     sprintf(buffer, "ERROR: invalid characters in dataset name \"%s\"", name);
     NXReportError(buffer);
@@ -505,7 +505,7 @@ NXstatus  NXXmakedata64 (NXhandle fid,
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
-  if (!validNXName(name))
+  if (!validNXName(name, 0))
   {
     sprintf(buffer, "ERROR: invalid characters in dataset name \"%s\"", name);
     NXReportError(buffer);
@@ -1288,12 +1288,19 @@ static char *formatAttributeData(void *data, int datalen, int iType){
 /*---------------------------------------------------------------------*/
 NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
 				   int datalen, int iType){
+  char buffer[256];
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
   char *numberData = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
+  if (!validNXName(name, 1))
+  {
+    sprintf(buffer, "ERROR: invalid characters in attribute name \"%s\"", name);
+    NXReportError(buffer);
+    return NX_ERROR;
+  }
 
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   if(isDataNode(xmlHandle->stack[xmlHandle->stackPointer].current)){
@@ -1895,7 +1902,7 @@ NXstatus  NXXmakenamedlink (NXhandle fid, CONSTCHAR *name, NXlink* sLink){
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
-  if (!validNXName(name))
+  if (!validNXName(name, 0))
   {
     sprintf(buffer, "ERROR: invalid characters in link name \"%s\"", name);
     NXReportError(buffer);
