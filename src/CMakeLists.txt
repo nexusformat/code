@@ -40,8 +40,13 @@ endif (HDF5_FOUND)
 
 # need napi_exports2.c  on win32 but not win64
 if (WIN32)
-    set(NAPISRC ${NAPISRC} napi_exports.c napi_exports.h)
+    if (CMAKE_CL_64)
+        set(NAPISRC ${NAPISRC} napi_exports2.c napi_exports.h)
+    else()
+        set(NAPISRC ${NAPISRC} napi_exports.c napi_exports2.c napi_exports.h)
+	endif()
 endif (WIN32)
+
 
 set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
 
@@ -81,11 +86,17 @@ add_library (NeXus_Shared_Library SHARED ${NAPISRC})
 
 set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS _HDF5USEDLL_)
 
+if (CMAKE_CL_64)
+   set(DEF_FILE ${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-x64.def)
+else()
+   set(DEF_FILE ${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-Win32.def)
+endif()
+
 #Note - library version needs to be got from somewhere?
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME libNeXus-0
                       VERSION 1.0 SOVERSION 4 )
-	set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-x64.def)
+	set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${DEF_FILE})
 else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
                       VERSION 1.0 SOVERSION 4)

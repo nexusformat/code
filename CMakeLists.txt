@@ -249,6 +249,12 @@ set(NX_CPP -D_CRT_SECURE_NO_WARNINGS)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 
+if (CMAKE_SIZEOF_VOID_P MATCHES "8")
+    set(ARCH64 1)
+else()
+    set(ARCH64 0)
+endif()
+
 # Recurse into the subdirectories.
 add_subdirectory (src)
 add_subdirectory (bindings)
