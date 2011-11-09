@@ -37,7 +37,7 @@ set_property(SOURCE ${SOURCES} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 
 add_library (NeXus_CPP_Static_Library STATIC ${HEADERS} ${SOURCES})
 
-set_target_properties(NeXus_CPP_Static_Library PROPERTIES OUTPUT_NAME NeXusCPP)
+set_target_properties(NeXus_CPP_Static_Library PROPERTIES OUTPUT_NAME NeXusCPPStatic)
 
 target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library 
 					${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
