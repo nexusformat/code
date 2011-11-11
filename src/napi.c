@@ -95,11 +95,17 @@ static int nxiunlock(int ret)
 
 static pthread_mutex_t nx_mutex;
 
+#ifdef PTHREAD_MUTEX_RECURSIVE
+#define RECURSIVE_LOCK PTHREAD_MUTEX_RECURSIVE
+#else
+#define RECURSIVE_LOCK PTHREAD_MUTEX_RECURSIVE_NP
+#endif /* PTHREAD_MUTEX_RECURSIVE */
+
 static void nx_pthread_init()
 {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutexattr_settype(&attr, RECURSIVE_LOCK);
     pthread_mutex_init(&nx_mutex, &attr);
 }
 
