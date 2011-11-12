@@ -37,6 +37,6 @@ noinst_HEADERS = data_util.hpp nxsummary.hpp string_util.hpp preferences.hpp out
    
 nxsummary_SOURCES = data_util.cpp main.cpp string_util.cpp preferences.cpp output.cpp
 nxsummary_LDADD = $(LIBNEXUS)
-nxsummary_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+nxsummary_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ @LIBXML2_LDFLAGS@ $(LDFLAGS)
 EXTRA_DIST = LICENSE $(man_MANS)
 include $(top_srcdir)/build_rules.am

@@ -39,6 +39,6 @@ man_MANS = nxbrowse.1
 
 nxbrowse_SOURCES = NXbrowse.c
 nxbrowse_LDADD = $(LIBNEXUS)
-nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+nxbrowse_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ @READLINE_LDFLAGS@ $(LDFLAGS)
 
 include $(top_srcdir)/build_rules.am

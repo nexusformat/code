@@ -67,7 +67,7 @@ nxtranslate_LDADD = $(LIBNEXUS) -lxml2 \
 	spec/libSpec.la \
 	esrf_edf/libEdf.la
 
-nxtranslate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+nxtranslate_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ @LIBXML2_LDFLAGS@ $(LDFLAGS)
 
 EXTRA_DIST = $(srcdir)/*.xml $(srcdir)/*.nxt $(srcdir)/*.dat $(srcdir)/*.run $(man_MANS)
 

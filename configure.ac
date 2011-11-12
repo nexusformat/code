@@ -365,15 +365,20 @@ HDF5_EXT=so # library file extent to look for with HDF5 libraries
 SHARED_EXT=so
 AC_SUBST(SHARED_EXT)
 
+SAVE_LIBS="$LIBS"
 AC_CHECK_LIB(xml2, [xmlParseFile])
 if test "x$ac_cv_lib_xml2_xmlParseFile" = xyes; then
     LIBXML2_CFLAGS='`xml2-config --cflags`'
+    LIBXML2_LDFLAGS='`xml2-config --libs`'
     LIBXML2_MESSAGE="yes"
 else
     LIBXML2_CFLAGS=''
+    LIBXML2_LDFLAGS=''
     LIBXML2_MESSAGE="no (will not build NXsummary or NXtranslate)"
 fi
+LIBS="$SAVE_LIBS"
 AC_SUBST(LIBXML2_CFLAGS)
+AC_SUBST(LIBXML2_LDFLAGS)
 
 # set up for linux here - mac is covered in the case $host statement
 AS_CASE([$build_cpu], [x86|i386|i686], [IDLCPU=x86], [IDLCPU=$build_cpu])
@@ -656,9 +661,15 @@ AC_CHECK_LIB(sz, SZ_Compress)
 AC_CHECK_LIB(df, Hopen)
 AC_CHECK_LIB(mfhdf, SDcreate)
 AC_CHECK_LIB(hdf5, H5open)
+SAVE_LIBS="$LIBS"
 AC_CHECK_LIB(termcap, tputs)
 AC_CHECK_LIB(readline, readline)
 AC_CHECK_LIB(history, add_history)
+if test x$ac_cv_lib_termcap_tputs = xyes; then READLINE_LDFLAGS="-ltermcap $READLINE_LDFLAGS"; fi
+if test x$ac_cv_lib_readline_readline = xyes; then READLINE_LDFLAGS="-lreadline $READLINE_LDFLAGS"; fi
+if test x$ac_cv_lib_history_add_history = xyes; then READLINE_LDFLAGS="-lhistory $READLINE_LDFLAGS"; fi
+AC_SUBST(READLINE_LDFLAGS)
+LIBS="$SAVE_LIBS"
 dnl AC_LANG_PUSH([C++])
 dnl AC_CHECK_LIB(mxmlplus, _ZN4MXML4NodeD2Ev)
 dnl AC_LANG_POP([C++])
