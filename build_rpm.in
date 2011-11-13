@@ -28,7 +28,7 @@ cp $nxtop/nexus.spec $topdir/SPECS
 cd $topdir/SPECS
 #
 if test -z "$1"; then
-    build_args="--with-python --with-java-home=/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/ --with-doxygen"
+    build_args='@CONFIGURE_ARGS@'
 else
     build_args="$1"
 fi

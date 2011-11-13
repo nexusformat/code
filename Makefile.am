@@ -42,7 +42,8 @@ EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autoversion.sh \
 
 # Add any flags here that you want passed to configure when you do 
 # a "make distcheck"
-# DISTCHECK_CONFIGURE_FLAGS=--without-java
+DISTCHECK_CONFIGURE_FLAGS=@CONFIGURE_ARGS@
+
 MAINTAINERCLEANFILES = \
  ChangeLog \
  INSTALL \

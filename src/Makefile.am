@@ -29,7 +29,6 @@
 #====================================================================
 
 AM_CPPFLAGS=-I$(top_srcdir)/include @HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ @XML_CPPFLAGS@ -DIN_NEXUS_LIBRARY
-AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 AM_CFLAGS=-prefer-pic
 
 if HAVE_HDF4
@@ -77,7 +76,7 @@ endif
 #SUBDIRS=nxdict
 
 libNeXus_la_SOURCES = napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c nxdataset.h nx_stptok.h $(H4SRC) $(H5SRC) $(XMLSRC) $(MINGW_SRC)
-libNeXus_la_LDFLAGS = -export-symbols nexus_symbols.sym @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+libNeXus_la_LDFLAGS = -export-symbols nexus_symbols.sym @SHARED_LDFLAGS@ @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ -version-info $(NXLTVERSINFO)
 libNeXus_la_DEPENDENCIES = nexus_symbols.sym
 
 ## The following part is the solution for automake >= 1.7

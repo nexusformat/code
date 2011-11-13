@@ -28,11 +28,10 @@
 #
 #====================================================================
 lib_LTLIBRARIES = libNeXus90.la
-AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 
 libNeXus90_la_SOURCES = NXmodule.f90 NXUmodule.f90
 libNeXus90_la_LIBADD = $(top_builddir)/src/libNeXus.la
-libNeXus90_la_LDFLAGS = @SHARED_LDFLAGS@ $(LDFLAGS)
+libNeXus90_la_LDFLAGS = @SHARED_LDFLAGS@ -version-info $(NXLTVERSINFO)
 libNeXus90_la_LINK = $(FCLINK)
 
 NXUmodule.o: NXUmodule.f90 NXmodule.o

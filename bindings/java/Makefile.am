@@ -57,14 +57,13 @@ jnexus_jar_CLASS = ncsa/hdf/hdflib/HDFException.class \
 
 # jni definitions
 lib_LTLIBRARIES		= libjnexus.la
-AM_LDFLAGS=-version-info $(NXLTVERSINFO)
 libjnexus_la_SOURCES 	= native/hdfnativeImp.c \
                        native/hdfexceptionImp.c \
                        native/handle.c \
                        native/NexusFile.c \
 		       native/hdfexceptionImp.h
 libjnexus_la_LIBADD 	= $(top_builddir)/src/libNeXus.la
-libjnexus_la_LDFLAGS 	= @SHARED_LDFLAGS@ $(LDFLAGS) $(JNEXUS_LDFLAGS)
+libjnexus_la_LDFLAGS 	= @SHARED_LDFLAGS@ -version-info $(NXLTVERSINFO) $(JNEXUS_LDFLAGS)
 libjnexus_la_CFLAGS 	= -I$(top_srcdir)/include -Inative @JAVAINCLUDE@ \
      			@HDF4_CPPFLAGS@ @HDF5_CPPFLAGS@ $(JNEXUS_CFLAGS)
 

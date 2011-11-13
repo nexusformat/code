@@ -36,7 +36,9 @@ This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
 
 # used by libtool - need to get if from 4.3.0 better
-NXLTVERSINFO="4:3:4"
+#NXLTVERSINFO="1:0:1"
+#NXLTVERSINFO="4:3:4"
+NXLTVERSINFO="5:0:5"
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/napi.c])
@@ -778,6 +780,9 @@ if test X$MATLAB != X; then
 fi
 
 LINUX_DISTRIBUTION
+
+CONFIGURE_ARGS="$ac_configure_args"
+AC_SUBST(CONFIGURE_ARGS)
 
 AC_CONFIG_FILES([Makefile
 		nexus.spec:nexus_spec.in
