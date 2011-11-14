@@ -124,6 +124,7 @@ AC_DEFUN([LINUX_DISTRIBUTION],
 # $3 = list of root paths to try. If the path is a file, assume it is 
 #                                 path/bin/files and then work out path
 # $4 = file in path to locate
+# $5 = default withval
 #
 # e.g. AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
 #
@@ -135,7 +136,7 @@ AC_DEFUN(
 	AC_HELP_STRING([--with-$1=/path/to/$1_install_directory],
                        [Specify absolute path to root of $1 install directory.]),
 	[if test x$withval != xno -a x$withval != xyes; then $2=$withval; fi], 
-        [with_$1=no])
+        [with_$1=$5])
     if test x$with_$1 != xno; then
         AC_MSG_CHECKING(for $1 root installation directory)
 # if --with secified a file, assume it is ROOT/bin/file

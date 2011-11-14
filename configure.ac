@@ -243,16 +243,16 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 if test x$with_tcl != xno; then
-    AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h])
+    AC_CHECK_ROOT([tcl],[TCLROOT],[/usr /usr/local],[include/tcl.h],[no])
 fi
 if test x$with_guile != xno; then
-    AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h])
+    AC_CHECK_ROOT([guile],[GUILEROOT],[/usr /usr/local],[include/libguile.h],[no])
 fi
 if test x$with_opengenie != xno; then
-    AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so])
+    AC_CHECK_ROOT([opengenie],[OPENGENIEROOT],[/usr/local],[genie/genie.so],[no])
 fi
 if test x$with_python != xno; then
-    AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[bin/python])
+    AC_CHECK_ROOT([python],[PYTHONROOT],[/usr /usr/local],[bin/python],[yes])
     if test x$PYTHONROOT != x; then
 	if test -r "$PYTHONROOT/bin/python"; then PYTHON="$PYTHONROOT/bin/python"; fi
 	if test -r "$PYTHONROOT/python"; then PYTHON="$PYTHONROOT/python"; fi
@@ -724,7 +724,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
-AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy" -eq 1])
+AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy_found"  = "yes"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
