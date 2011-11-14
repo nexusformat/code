@@ -63,23 +63,23 @@ NeXus is an international standard for exchanging data files
 among Neutron, Muon and X-ray science facilities. The underlying
 data is stored using the HDF format from NCSA. This package provides
 
-%package python
-Summary: Libraries and utilities for using NeXus format data files
-Group: Development/Libraries
+@HAVE_PYTHON_TRUE@%package python
+@HAVE_PYTHON_TRUE@Summary: Libraries and utilities for using NeXus format data files
+@HAVE_PYTHON_TRUE@Group: Development/Libraries
+@HAVE_PYTHON_TRUE@
+@HAVE_PYTHON_TRUE@%description python
+@HAVE_PYTHON_TRUE@NeXus is an international standard for exchanging data files
+@HAVE_PYTHON_TRUE@among Neutron, Muon and X-ray science facilities. The underlying
+@HAVE_PYTHON_TRUE@data is stored using the HDF format from NCSA. This package provides
 
-%description python
-NeXus is an international standard for exchanging data files
-among Neutron, Muon and X-ray science facilities. The underlying
-data is stored using the HDF format from NCSA. This package provides
-
-%package java
-Summary: Libraries and utilities for using NeXus format data files
-Group: Development/Libraries
-
-%description java
-NeXus is an international standard for exchanging data files
-among Neutron, Muon and X-ray science facilities. The underlying
-data is stored using the HDF format from NCSA. This package provides
+@HAVE_JAVAC_TRUE@%package java
+@HAVE_JAVAC_TRUE@Summary: Libraries and utilities for using NeXus format data files
+@HAVE_JAVAC_TRUE@Group: Development/Libraries
+@HAVE_JAVAC_TRUE@
+@HAVE_JAVAC_TRUE@%description java
+@HAVE_JAVAC_TRUE@NeXus is an international standard for exchanging data files
+@HAVE_JAVAC_TRUE@among Neutron, Muon and X-ray science facilities. The underlying
+@HAVE_JAVAC_TRUE@data is stored using the HDF format from NCSA. This package provides
 
 %prep
 %setup -q
@@ -125,15 +125,15 @@ find "$RPM_BUILD_ROOT" -name '*.la' -exec rm -f {} \;
 %defattr(-,root,root)
 %{_datadir}/nexus
 
-%files python
-%defattr(-,root,root)
-/usr/lib/python*/site-packages/nxs
+@HAVE_PYTHON_TRUE@%files python
+@HAVE_PYTHON_TRUE@%defattr(-,root,root)
+@HAVE_PYTHON_TRUE@/usr/lib/python*/site-packages/nxs
 
-%files java
-%defattr(-,root,root)
-%{_datadir}/java
-%{_libdir}/libjnexus.so*
-%{_libdir}/libjnexus.a
+@HAVE_JAVAC_TRUE@%files java
+@HAVE_JAVAC_TRUE@%defattr(-,root,root)
+@HAVE_JAVAC_TRUE@%{_datadir}/java
+@HAVE_JAVAC_TRUE@%{_libdir}/libjnexus.so*
+@HAVE_JAVAC_TRUE@%{_libdir}/libjnexus.a
 
 %clean
 if test "$RPM_BUILD_ROOT" != "/"; then rm -fr "$RPM_BUILD_ROOT"; fi
