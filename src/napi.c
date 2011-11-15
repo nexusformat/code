@@ -288,16 +288,15 @@ static NXstatus NXisXML(CONSTCHAR *filename)
   }
   /*---------------------------------------------------------------------*/
 
-  void *NXpData = NULL;
-  void *NXEHpData = NULL;
-  void (*NXEHIReportError)(void *pData, char *string) = NXNXNXReportError;
+  static void *NXEHpData = NULL;
+  static void (*NXEHIReportError)(void *pData, char *string) = NXNXNXReportError;
 #ifdef HAVE_TLS
-  __thread void *NXEHpTData = NULL;
-  __thread void (*NXEHIReportTError)(void *pData, char *string) = NULL;
+  static __thread void *NXEHpTData = NULL;
+  static __thread void (*NXEHIReportTError)(void *pData, char *string) = NULL;
 #endif
 
   void NXIReportError(void *pData, char *string) {
-	fprintf(stderr, "Your application uses NXIReportError, but its first parameter is ignored now.");
+	fprintf(stderr, "Your application uses NXIReportError, but its first parameter is ignored now - you should use NXReportError.");
 	NXReportError(string);
   }
 
@@ -308,8 +307,9 @@ static NXstatus NXisXML(CONSTCHAR *filename)
 		return;
 	} 
 #endif
-
-	(*NXEHIReportError)(NXEHpData, string);
+	if (NXEHIReportError) {
+	    (*NXEHIReportError)(NXEHpData, string);
+	}
   }
 
   /*---------------------------------------------------------------------*/
@@ -339,14 +339,14 @@ extern ErrFunc NXMGetError(){
 }
 
 /*----------------------------------------------------------------------*/
-void NXNXNoReport(void *pData, char *string){
+static void NXNXNoReport(void *pData, char *string){
   /* do nothing */
 }  
 /*----------------------------------------------------------------------*/
 
-ErrFunc last_global_errfunc = NXNXNXReportError;
+static ErrFunc last_global_errfunc = NXNXNXReportError;
 #ifdef HAVE_TLS
-__thread ErrFunc last_thread_errfunc = NULL;
+static __thread ErrFunc last_thread_errfunc = NULL;
 #endif
 
 extern void NXMDisableErrorReporting()
@@ -355,12 +355,13 @@ extern void NXMDisableErrorReporting()
 	if (NXEHIReportTError) {
 		last_thread_errfunc = NXEHIReportTError;
 		NXEHIReportTError = NXNXNoReport;
-		return;
+	 	return;
 	} 
-	last_thread_errfunc = NULL;
 #endif
-	last_global_errfunc = NXEHIReportError;
-	NXEHIReportError = NXNXNoReport;
+	if (NXEHIReportError) {
+	    last_global_errfunc = NXEHIReportError;
+	    NXEHIReportError = NXNXNoReport;
+	}
 }
 
 extern void NXMEnableErrorReporting()
@@ -369,10 +370,13 @@ extern void NXMEnableErrorReporting()
 	if (last_thread_errfunc) {
 		NXEHIReportTError = last_thread_errfunc;
 		last_thread_errfunc = NULL;
-		return;
+	 	return;
 	} 
 #endif
-	NXEHIReportError = last_global_errfunc;
+	if (last_global_errfunc) {
+	    NXEHIReportError = last_global_errfunc;
+	    last_global_errfunc = NULL;
+	}
 }
 
 /*----------------------------------------------------------------------*/
