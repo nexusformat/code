@@ -33,6 +33,10 @@
 #include "napi.h"
 #include "napi5.h"
 
+#if !H5_VERSION_GE(1,8,0)
+#error HDF5 Version must be 1.8.0 or higher
+#endif
+
 #define NX_UNKNOWN_GROUP "" /* for when no NX_class attr */
 
 extern  void *NXpData;
@@ -152,6 +156,20 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
   size_t rdcc_nelmts;
   size_t rdcc_nbytes;
   double rdcc_w0;
+  unsigned hdf5_majnum, hdf5_minnum, hdf5_relnum;
+
+  *pHandle = NULL;
+
+  if (H5get_libversion(&hdf5_majnum, &hdf5_minnum, &hdf5_relnum) < 0)
+  {
+      NXReportError("ERROR: cannot determine HDF5 library version");
+      return NX_ERROR;
+  }
+  if (hdf5_majnum == 1 && hdf5_minnum < 8)
+  {
+      NXReportError("ERROR: HDF5 library 1.8.0 or higher required");
+      return NX_ERROR;
+  }
 
   /* mask of any options for now */
   am = (NXaccess)(am & NXACCMASK_REMOVEFLAGS);
@@ -162,7 +180,6 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
     struct timeb timeb_struct;
 #endif 
 
-    *pHandle = NULL;
 
     pNew = (pNexusFile5) malloc (sizeof (NexusFile5));
     if (!pNew) {
