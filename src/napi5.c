@@ -1011,7 +1011,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
        size[i]    = iSize[i];
-       if (maxdims[i] == NX_UNLIMITED) {
+       if (maxdims[i] == H5S_UNLIMITED) {
 	unlimiteddim = 1;
 	size[i] = iStart[i] + iSize[i];
        }
@@ -1030,7 +1030,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 	if (size[i] < thedims[i]) {
 		size[i] = thedims[i];
 	}
-	} 
+       } 
        iRet = H5Dset_extent(pFile->iCurrentD, size);
        if (iRet < 0) 
        {
