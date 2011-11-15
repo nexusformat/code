@@ -139,7 +139,9 @@ endif(HISTORY)
 
 if (HDF5_FOUND)
 #   set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
-   set (HDF5_CPP "-DHDF5 -DH5_NO_DEPRECATED_SYMBOLS")
+#   these are needed if HDF5 1.8 has been instaleld with H5_USE_16_API_DEFAULT 
+  set(HDF5_API_DEFS "-DH5Acreate_vers=2 -DH5Aiterate_vers=2 -DH5Dcreate_vers=2 -DH5Dopen_vers=2 -DH5Eclear_vers=2 -DH5Eprint_vers=2 -DH5Epush_vers=2 -DH5Eset_auto_vers=2 -DH5Eget_auto_vers=2 -DH5Ewalk_vers=2 -DH5Gcreate_vers=2 -DH5Gopen_vers=2 -DH5Pget_filter_vers=2 -DH5Pget_filter_by_id_vers=2 -DH5Pinsert_vers=2 -DH5Pregister_vers=2 -DH5Rget_obj_type_vers=2 -DH5Tarray_create_vers=2 -DH5Tcommit_vers=2 -DH5Tget_array_dims_vers=2 -DH5Topen_vers=2")
+   set (HDF5_CPP "-DHDF5 -DH5_NO_DEPRECATED_SYMBOLS ${HDF5_API_DEFS}")
 endif (HDF5_FOUND)
 
 #Options

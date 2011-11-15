@@ -572,6 +572,8 @@ if test "$with_hdf5" != "no" -a -z "$H5ROOT"; then
 	AC_MSG_RESULT($H5ROOT)
     fi
 fi
+# these are needed if HDF5 1.8 has been instaleld with H5_USE_16_API_DEFAULT 
+HDF5_API_DEFS="-DH5Acreate_vers=2 -DH5Aiterate_vers=2 -DH5Dcreate_vers=2 -DH5Dopen_vers=2 -DH5Eclear_vers=2 -DH5Eprint_vers=2 -DH5Epush_vers=2 -DH5Eset_auto_vers=2 -DH5Eget_auto_vers=2 -DH5Ewalk_vers=2 -DH5Gcreate_vers=2 -DH5Gopen_vers=2 -DH5Pget_filter_vers=2 -DH5Pget_filter_by_id_vers=2 -DH5Pinsert_vers=2 -DH5Pregister_vers=2 -DH5Rget_obj_type_vers=2 -DH5Tarray_create_vers=2 -DH5Tcommit_vers=2 -DH5Tget_array_dims_vers=2 -DH5Topen_vers=2"
 if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
@@ -585,7 +587,7 @@ if test "$H5ROOT"; then
 		done
 		EXTRA_LDPATH="$EXTRA_LDPATH $HDF5_LDFLAGS"
     		HDF5_LDFLAGS="$HDF5_LDFLAGS -lhdf5 -lz"
-    		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5 -DH5_NO_DEPRECATED_SYMBOLS"
+    		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5 -DH5_NO_DEPRECATED_SYMBOLS ${HDF5_API_DEFS}"
 		;;
 	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
 		H5ROOT="";;
