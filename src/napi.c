@@ -52,9 +52,11 @@ static int iFortifyScope;
 #ifdef _WIN32
 #define LIBSEP ";"
 #define PATHSEP "\\"
+#define THREAD_LOCAL __declspec(thread)
 #else
 #define LIBSEP ":"
 #define PATHSEP "/"
+#define THREAD_LOCAL __thread
 #endif
 
 #include "nx_stptok.h"
@@ -65,6 +67,7 @@ static int iFortifyScope;
  *  Freddie Akeroyd, 16/06/2011
  */
 #include <windows.h>
+
 
 static CRITICAL_SECTION nx_critical;
 
@@ -291,8 +294,8 @@ static NXstatus NXisXML(CONSTCHAR *filename)
   static void *NXEHpData = NULL;
   static void (*NXEHIReportError)(void *pData, char *string) = NXNXNXReportError;
 #ifdef HAVE_TLS
-  static __thread void *NXEHpTData = NULL;
-  static __thread void (*NXEHIReportTError)(void *pData, char *string) = NULL;
+  static THREAD_LOCAL void *NXEHpTData = NULL;
+  static THREAD_LOCAL void (*NXEHIReportTError)(void *pData, char *string) = NULL;
 #endif
 
   void NXIReportError(void *pData, char *string) {
@@ -346,7 +349,7 @@ static void NXNXNoReport(void *pData, char *string){
 
 static ErrFunc last_global_errfunc = NXNXNXReportError;
 #ifdef HAVE_TLS
-static __thread ErrFunc last_thread_errfunc = NULL;
+static THREAD_LOCAL ErrFunc last_thread_errfunc = NULL;
 #endif
 
 extern void NXMDisableErrorReporting()
