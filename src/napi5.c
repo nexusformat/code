@@ -896,18 +896,51 @@ static hid_t nxToHDF5Type(int datatype)
   {
     pNexusFile5 pFile;
     herr_t iRet;
+    int64_t myStart[H5S_MAX_RANK];
+    int64_t mySize[H5S_MAX_RANK];
+    hsize_t thedims[H5S_MAX_RANK],maxdims[H5S_MAX_RANK];
+    int i, rank, unlimiteddim = 0;
     
     char pError[512] = "";
       
     pFile = NXI5assert (fid);
-    
-    /* actually write */
-    iRet = H5Dwrite (pFile->iCurrentD, pFile->iCurrentT, H5S_ALL, H5S_ALL, 
+    rank = H5Sget_simple_extent_ndims(pFile->iCurrentS);    
+    if (rank < 0)
+    {
+        NXReportError("ERROR: Cannot determine dataset rank");
+	return NX_ERROR;
+    }
+    iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, thedims, maxdims);
+    if (iRet < 0)
+    {
+        NXReportError("ERROR: Cannot determine dataset dimensions");
+	return NX_ERROR;
+    }
+    for(i=0; i<rank; ++i)
+    {
+	myStart[i] = 0;
+	mySize[i] = thedims[i];
+	if (maxdims[i] == H5S_UNLIMITED)
+	{
+	    unlimiteddim = 1;
+	    myStart[i] = thedims[i] + 1;
+	    mySize[i] = 1;
+	}
+    }
+    /* If we are using putdata on an unlimied dimesnion dataset, assume we want to append one single new slab */
+    if ( unlimiteddim )
+    {
+	return NX5putslab64(fid, data, myStart, mySize);
+    }
+    else
+    {
+        iRet = H5Dwrite (pFile->iCurrentD, pFile->iCurrentT, H5S_ALL, H5S_ALL, 
                      H5P_DEFAULT, data);
-    if (iRet < 0) {
-      snprintf (pError,511, "ERROR: failure to write data");
-      NXReportError( pError);
-      return NX_ERROR;
+        if (iRet < 0) {
+          snprintf (pError,sizeof(pError)-1, "ERROR: failure to write data");
+          NXReportError( pError);
+          return NX_ERROR;
+        }
     }
     return NX_OK;
   }
@@ -990,8 +1023,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
   NXstatus  NX5putslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
   {
     pNexusFile5 pFile;
-    int iRet, i;
-    int rank;
+    int iRet, rank, i;
     hsize_t myStart[H5S_MAX_RANK];
     hsize_t mySize[H5S_MAX_RANK];
     hsize_t size[H5S_MAX_RANK],thedims[H5S_MAX_RANK],maxdims[H5S_MAX_RANK];
@@ -1005,15 +1037,23 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       return NX_ERROR;
     }
     rank = H5Sget_simple_extent_ndims(pFile->iCurrentS);    
+    if (rank < 0) {
+      NXReportError( "ERROR: cannot get rank");
+      return NX_ERROR;
+    }
     iRet = H5Sget_simple_extent_dims(pFile->iCurrentS, thedims, maxdims);
+    if (iRet < 0) {
+      NXReportError( "ERROR: cannot get dimensions");
+      return NX_ERROR;
+    }
+
     for(i = 0; i < rank; i++)
     {
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
-       size[i]    = iSize[i];
+       size[i]    =  iStart[i] + iSize[i];
        if (maxdims[i] == H5S_UNLIMITED) {
 	unlimiteddim = 1;
-	size[i] = iStart[i] + iSize[i];
        }
     }
     if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
@@ -1056,7 +1096,9 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        {
            NXReportError( "ERROR: writing slab failed");
        }
-       iRet = H5Sclose(filespace);             
+       /* update with new size */
+       iRet = H5Sclose(pFile->iCurrentS);             
+       pFile->iCurrentS = filespace;
    } else {
        /* define slab */
        iRet = H5Sselect_hyperslab(pFile->iCurrentS, H5S_SELECT_SET, myStart,
