@@ -86,10 +86,11 @@ data is stored using the HDF format from NCSA. This package provides
 
 %build
 # RPM_INSTALL_PREFIX - where to install software
+# do --prefix last in case also present in passed config options
 if ! test -z "$RPM_INSTALL_PREFIX"; then
-    ./configure --prefix="$RPM_INSTALL_PREFIX" $NEXUS_CONFIG_OPTIONS
+    ./configure $NEXUS_CONFIG_OPTIONS --prefix="$RPM_INSTALL_PREFIX"
 else
-    ./configure --prefix=%{_prefix} --libdir=%{_libdir} $NEXUS_CONFIG_OPTIONS
+    ./configure $NEXUS_CONFIG_OPTIONS --prefix=%{_prefix} --libdir=%{_libdir}
 fi
 make
 

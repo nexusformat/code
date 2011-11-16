@@ -33,5 +33,4 @@ else
     build_args="$1"
 fi
 # buildroot is actually where we install to
-# need to make sure either there is no --prefix in $build_args or it is /usr
-env NEXUS_CONFIG_OPTIONS="$build_args --prefix=/usr" rpmbuild -ba --buildroot $nxtop/installroot --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5" nexus.spec
+env NEXUS_CONFIG_OPTIONS="$build_args" rpmbuild -ba --buildroot $nxtop/installroot --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5" nexus.spec
