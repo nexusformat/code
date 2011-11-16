@@ -30,12 +30,16 @@ static string convert_type(int type){
     return "NX_INT16";
   else if(type==Node::INT32)
     return "NX_INT32";
+  else if(type==Node::INT64)
+    return "NX_INT64";
   else if(type==Node::UINT8)
     return "NX_UINT8";
   else if(type==Node::UINT16)
     return "NX_UINT16";
   else if(type==Node::UINT32)
     return "NX_UINT32";
+  else if(type==Node::UINT64)
+    return "NX_UINT64";
   else
     throw runtime_error("Did not understand type in set_data");
 }
@@ -153,12 +157,16 @@ const Node::NXtype Node::int_type() const{
     return INT16;
   else if(__type=="NX_INT32")
     return INT32;
+  else if(__type=="NX_INT64")
+    return INT64;
   else if(__type=="NX_UINT8")
     return UINT8;
   else if(__type=="NX_UINT16")
     return UINT16;
   else if(__type=="NX_UINT32")
     return UINT32;
+  else if(__type=="NX_UINT64")
+    return UINT64;
   else
     throw runtime_error("do not understand type");
 }

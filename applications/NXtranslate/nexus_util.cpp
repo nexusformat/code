@@ -393,7 +393,7 @@ extern size_t nexus_util::calc_size(int rank, int *dims, int type){
     size*=2;
   }else if(type==NX_INT32 || type==NX_UINT32 || type==NX_FLOAT32){
     size*=4;
-  }else if(type==NX_FLOAT64){
+  }else if(type==NX_FLOAT64 || type==NX_UINT64 || type==NX_INT64){
     size*=8;
   }else{
     throw invalid_argument("Did not understand type in nexus_util::calc_size");

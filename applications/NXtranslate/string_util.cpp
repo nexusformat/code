@@ -103,8 +103,28 @@ extern long string_util::str_to_int(const string &str){
   return atol(str.c_str());
 }
 
+extern long long string_util::str_to_int64(const string &str){
+  if(str.substr(0,1)=="-")
+    return -1*str_to_int64(str.substr(1,str.size()));
+
+  string::const_iterator it=str.begin();
+  it=find_if(it,str.end(),my_isnotdigit);
+
+  if(it!=str.end())
+    throw invalid_argument("str_to_int(string) argument is not an integer");
+
+  return atoll(str.c_str());
+}
+
 extern unsigned long string_util::str_to_uint(const string &str){
   long num=str_to_int(str);
+  if(num<0)
+    throw invalid_argument("str_to_uint(string) argument is not an integer");
+  return num;
+}
+
+extern unsigned long long string_util::str_to_uint64(const string &str){
+  long long num=str_to_int64(str);
   if(num<0)
     throw invalid_argument("str_to_uint(string) argument is not an integer");
   return num;
@@ -305,6 +325,19 @@ extern void string_util::str_to_shortArray(std::string & str,short *array, const
     *(array+i)=(short)str_to_int(*(strIt+i));
 }
 
+extern void string_util::str_to_int64Array(std::string & str,long long *array, const unsigned int len){
+  // break it up into a string vector
+  StrVec splitted=shrink_and_split(str);
+
+  if(splitted.size()!=len)
+    throw runtime_error("array and string not same size");
+
+  // turn each string into a short
+  StrVecIter strIt=splitted.begin();
+  for( unsigned int i=0 ; i<len ; i++ )
+    *(array+i)=(long long)str_to_int64(*(strIt+i));
+}
+
 extern void string_util::str_to_intArray(std::string & str,int *array, const unsigned int len){
   // break it up into a string vector
   StrVec splitted=shrink_and_split(str);
@@ -355,6 +388,19 @@ extern void string_util::str_to_ushortArray(std::string & str,unsigned short *ar
   StrVecIter strIt=splitted.begin();
   for( unsigned int i=0 ; i<len ; i++ )
     *(array+i)=(unsigned short)str_to_uint(*(strIt+i));
+}
+
+extern void string_util::str_to_uint64Array(std::string & str,unsigned long long *array, const unsigned int len){
+  // break it up into a string vector
+  StrVec splitted=shrink_and_split(str);
+
+  if(splitted.size()!=len)
+    throw runtime_error("array and string not same size");
+
+  // turn each string into a short
+  StrVecIter strIt=splitted.begin();
+  for( unsigned int i=0 ; i<len ; i++ )
+    *(array+i)=(unsigned long long)str_to_uint64(*(strIt+i));
 }
 
 extern void string_util::str_to_uintArray(std::string & str,unsigned int *array, const unsigned int len){

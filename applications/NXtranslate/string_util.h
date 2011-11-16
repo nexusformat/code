@@ -13,7 +13,9 @@ namespace string_util{
   extern bool   starts_with(const std::string &, const std::string &);
   extern std::string trim(const std::string &);
   extern long   str_to_int(const std::string &);
+  extern long long  str_to_int64(const std::string &);
   extern unsigned long  str_to_uint(const std::string &);
+  extern unsigned long long  str_to_uint64(const std::string &);
   extern double str_to_float(const std::string &);
   extern std::vector<std::string> string_to_path(const std::string &);
   extern std::string int_to_str(const int);
@@ -21,9 +23,11 @@ namespace string_util{
   extern void str_to_ucharArray(std::string &,unsigned char *, const unsigned int);
   extern void str_to_shortArray(std::string &,short *, const unsigned int);
   extern void str_to_intArray(std::string &,int *, const unsigned int);
+  extern void str_to_int64Array(std::string &,long long *, const unsigned int);
   extern void str_to_longArray(std::string &,long *, const unsigned int);
   extern void str_to_ushortArray(std::string &,unsigned short *, const unsigned int);
   extern void str_to_uintArray(std::string &,unsigned int *, const unsigned int);
+  extern void str_to_uint64Array(std::string &,unsigned long long *, const unsigned int);
   extern void str_to_ulongArray(std::string &,unsigned long *, const unsigned int);
   extern void str_to_floatArray(std::string &,float *, const unsigned int);
   extern void str_to_doubleArray(std::string &,double *, const unsigned int);

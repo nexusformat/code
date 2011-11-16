@@ -59,12 +59,16 @@ extern void void_ptr_from_string(void *&value, string &char_data, int rank,
     string_util::str_to_shortArray(char_data,(short int *)value,len);
   }else if(type==NX_INT32){
     string_util::str_to_intArray(char_data,(int *)value,len);
+  }else if(type==NX_INT64){
+    string_util::str_to_int64Array(char_data,(long long*)value,len);
   }else if(type==NX_UINT8){
     string_util::str_to_ucharArray(char_data,(unsigned char *)value,len);
   }else if(type==NX_UINT16){ // something got gobbled
     string_util::str_to_ushortArray(char_data,(unsigned short *)value,len);
   }else if(type==NX_UINT32){
     string_util::str_to_uintArray(char_data,(unsigned int *)value,len);
+  }else if(type==NX_UINT64){
+    string_util::str_to_uint64Array(char_data,(unsigned long long*)value,len);
   }else{
     throw runtime_error("unknown type in end_add_char()");
   }
@@ -115,12 +119,16 @@ extern Node::NXtype node_type(const std::string &str){
     return Node::INT16;
   else if(str=="NX_INT32")
     return Node::INT32;
+  else if(str=="NX_INT64")
+    return Node::INT64;
   else if(str=="NX_UINT8")
     return Node::UINT8;
   else if(str=="NX_UINT16")
     return Node::UINT16;
   else if(str=="NX_UINT32")
     return Node::UINT32;
+  else if(str=="NX_UINT64")
+    return Node::UINT64;
   else
     throw runtime_error("Could not understand type in node_type("+str+")");
 }
