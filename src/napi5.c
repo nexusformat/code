@@ -33,8 +33,10 @@
 #include "napi.h"
 #include "napi5.h"
 
+#ifdef H5_VERSION_GE
 #if !H5_VERSION_GE(1,8,0)
 #error HDF5 Version must be 1.8.0 or higher
+#endif
 #endif
 
 #define NX_UNKNOWN_GROUP "" /* for when no NX_class attr */
