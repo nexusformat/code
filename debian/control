@@ -1,0 +1,82 @@
+Source: nexus
+Priority: extra
+Maintainer: Tobias Stefan Richter <tsr-debian@achos.com>
+Uploaders: Carlo Segre <segre@debian.org>
+Build-Depends: autoconf, automake, debhelper (>= 7), autotools-dev, libtool, 
+ libmxml-dev, libhdf5-serial-dev | libhdf5-dev, libhdf4g-dev, 
+ default-jdk | java2-sdk, python-all-dev, python-support, python-numpy, 
+ libxml2-dev
+Standards-Version: 3.9.2
+Section: libs
+
+Package: libnexus0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Homepage: http://www.nexusformat.org/
+Description: NeXus scientific data file format - runtime libraries
+ NeXus is a common data format for neutron, x-ray, and muon science. It
+ is being developed as an international standard by scientists and
+ programmers representing major scientific facilities in Europe, Asia,
+ Australia, and North America in order to facilitate greater cooperation
+ in the analysis and visualization of neutron, x-ray, and muon data.
+ .
+ This is the package containing the runtime libraries.
+
+Package: libnexus0-dev
+Section: libdevel
+Architecture: any
+Depends: libnexus0 (= ${binary:Version}), ${misc:Depends} 
+Homepage: http://www.nexusformat.org/
+Description: NeXus scientific data file format - development libraries
+ NeXus is a common data format for neutron, x-ray, and muon science. It
+ is being developed as an international standard by scientists and
+ programmers representing major scientific facilities in Europe, Asia,
+ Australia, and North America in order to facilitate greater cooperation
+ in the analysis and visualization of neutron, x-ray, and muon data.
+ .
+ This is the package containing the development libraries.
+
+Package: libnexus0-java
+Section: java
+Architecture: any
+Depends: libnexus0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Homepage: http://www.nexusformat.org/
+Description: NeXus scientific data file format - java libraries
+ NeXus is a common data format for neutron, x-ray, and muon science. It
+ is being developed as an international standard by scientists and
+ programmers representing major scientific facilities in Europe, Asia,
+ Australia, and North America in order to facilitate greater cooperation
+ in the analysis and visualization of neutron, x-ray, and muon data.
+ .
+ This is the package containing the java libraries.
+
+Package: libnexus0-python
+Section: python
+Architecture: any
+Depends: libnexus0 (= ${binary:Version}), python-all (>= 2.6.6-3~),
+ ${shlibs:Depends}, ${misc:Depends}
+Homepage: http://www.nexusformat.org/
+Description: NeXus scientific data file format - python binding
+ NeXus is a common data format for neutron, x-ray, and muon science. It
+ is being developed as an international standard by scientists and
+ programmers representing major scientific facilities in Europe, Asia,
+ Australia, and North America in order to facilitate greater cooperation
+ in the analysis and visualization of neutron, x-ray, and muon data.
+ .
+ This is the package containing the Python bindings.
+
+Package: nexus-tools
+Section: science
+Architecture: any
+Depends: libnexus0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends} 
+Homepage: http://www.nexusformat.org/
+Description: NeXus scientific data file format - applications
+ NeXus is a common data format for neutron, x-ray, and muon science. It
+ is being developed as an international standard by scientists and
+ programmers representing major scientific facilities in Europe, Asia,
+ Australia, and North America in order to facilitate greater cooperation
+ in the analysis and visualization of neutron, x-ray, and muon data.
+ .
+ This is the package containing some applications for reading and writing
+ NeXus files.

@@ -1,0 +1,12 @@
+nexus (4.2.1-svn1614-2) unstable; urgency=low
+
+  * better solution for finding JAVA_HOME (Closes: #636203)
+  * provide build-arch and build build-indep targets
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Tue, 02 Aug 2011 11:37:59 +0100
+
+nexus (4.2.1-svn1614-1) unstable; urgency=low
+
+  * Initial release (Closes: #411053) 
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Thu, 21 Jul 2011 11:52:11 +0100

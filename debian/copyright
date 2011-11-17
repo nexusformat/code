@@ -1,0 +1,124 @@
+This package was debianized by Tobias Stefan Richter <tsr-debian@achos.com> on
+Fri, 22 Jan 2010 10:43:50 +0100.
+
+It was retrieved from https://svn.nexusformat.org/code/
+
+Upstream Authors: 
+
+	Uwe Filges <Uwe.Filges@psi.ch> 
+	Przemek Klosowski <przemek@nist.gov> 
+	Mark Koennecke <Mark.Koennecke@psi.ch> 
+	Nick Maliszewskyj <nickm@nist.gov> 
+	Chris Moreton-Smith <C.M.Moreton-Smith@rl.ac.uk> 
+	Ray Osborn <ROsborn@anl.gov> 
+	Jon Tischler <tischlerjz@ornl.gov> 
+	Freddie Akeroyd <F.A.Akeroyd@rl.ac.uk> 
+	Jens Krueger <jens.krueger@frm2.tum.de> 
+	Joern Beckmann <joern.beckmann@frm2.tum.de> 
+	Peter Peterson <petersonpf@ornl.gov> 
+	Hartmut Gilde <Hartmut.Gilde@frm2.tum.de> 
+
+Copyright: 
+
+	Copyright (c) 1997 -- 2010 
+
+License:
+
+	This package is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2 of the License, or (at your option) any later version.
+
+	This package is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
+
+	You should have received a copy of the GNU Lesser General Public
+	License along with this package; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+On Debian systems, the complete text of the GNU Lesser General
+Public License can be found in `/usr/share/common-licenses/LGPL'.
+
+The applications nxtranslate, nxsummary and nxdir have the following License:
+
+	Permission is hereby granted, free of charge, to any person
+	obtaining a copy of this software and associated documentation
+	files (the "Software"), to deal in the Software without
+	restriction, including without limitation the rights to use, copy,
+	modify, merge, publish, distribute, sublicense, and/or sell copies
+	of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be
+	included in all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+	NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+	BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+	ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+	CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+
+The java library contains the ncsa.hdf.hdflib package which is distributed under 
+the following license:
+
+	Copyright Notice and Statement for NCSA Hierarchical Data Format (HDF) 
+	Software Library and Utilities
+
+	Copyright 1988-2000 The Board of Trustees of the University of Illinois
+
+	All rights reserved.
+
+	Contributors:   National Center for Supercomputing Applications 
+	(NCSA) at the University of Illinois, Fortner Software, Unidata 
+	Program Center (netCDF), The Independent JPEG Group (JPEG), 
+	Jean-loup Gailly and Mark Adler (gzip), and Digital Equipment 
+	Corporation (DEC). Macintosh support contributed by Gregory L. Guerin.
+
+	The package 'glguerin':
+	Copyright 1998, 1999 by Gregory L. Guerin.
+	Redistribute or reuse only as described below.
+	These files are from the MacBinary Toolkit for Java:
+	   <http://www.amug.org/~glguerin/sw/#macbinary>
+	and are redistributed by NCSA with permission of the 
+	author.
+
+	Redistribution and use in source and binary forms, with or without 
+	modification, are permitted for any purpose (including commercial 
+	purposes) provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright 
+	notice, this list of conditions, and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright 
+	notice, this list of conditions, and the following disclaimer in the 
+	documentation and/or materials provided with the distribution.
+
+	3. In addition, redistributions of modified forms of the source or 
+	binary code must carry prominent notices stating that the original 
+	code was changed and the date of the change.
+
+	4. All publications or advertising materials mentioning features or use 
+	of this software must acknowledge that it was developed by the National 
+	Center for Supercomputing Applications at the University of Illinois, 
+	and credit the Contributors.
+
+	5. Neither the name of the University nor the names of the Contributors 
+	may be used to endorse or promote products derived from this software 
+	without specific prior written permission from the University or the 
+	Contributors.
+
+	DISCLAIMER
+
+	THIS SOFTWARE IS PROVIDED BY THE UNIVERSITY AND THE CONTRIBUTORS "AS IS" 
+	WITH NO WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED.  In no event 
+	shall the University or the Contributors be liable for any damages 
+	suffered by the users arising out of the use of this software, even if 
+	advised of the possibility of such damage. 
+
+The Debian packaging is (C) 2008, Tobias Stefan Richter <tsr-debian@achos.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.

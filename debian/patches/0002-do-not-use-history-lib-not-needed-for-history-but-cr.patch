@@ -1,0 +1,21 @@
+From: Tobias Richter <Tobias.Richter@diamond.ac.uk>
+Date: Tue, 11 May 2010 10:28:28 +0100
+Subject: do not use history lib - not needed for history but crashes
+
+---
+ configure.ac |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2500527..7f1119b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -657,7 +657,6 @@ AC_CHECK_LIB(mfhdf, SDcreate)
+ AC_CHECK_LIB(hdf5, H5open)
+ AC_CHECK_LIB(xml2, xmlParseDocument)
+ AC_CHECK_LIB(readline, readline)
+-AC_CHECK_LIB(history, add_history)
+ dnl AC_LANG_PUSH([C++])
+ dnl AC_CHECK_LIB(mxmlplus, _ZN4MXML4NodeD2Ev)
+ dnl AC_LANG_POP([C++])
+-- 
