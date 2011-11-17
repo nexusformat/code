@@ -33,6 +33,9 @@
 #include "nxio.h"
 #include "nxdataset.h"
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif /* _MSC_VER */
 
 extern  void *NXpData;
 extern int validNXName(const char* name, int allow_colon); /* from napi.c */

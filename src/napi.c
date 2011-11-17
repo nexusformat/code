@@ -59,6 +59,10 @@ static int iFortifyScope;
 #define THREAD_LOCAL __thread
 #endif
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif /* _MSC_VER */
+
 #include "nx_stptok.h"
 
 #if defined(_WIN32)

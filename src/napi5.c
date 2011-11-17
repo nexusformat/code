@@ -39,6 +39,10 @@
 #endif
 #endif
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif /* _MSC_VER */
+
 #define NX_UNKNOWN_GROUP "" /* for when no NX_class attr */
 
 extern  void *NXpData;

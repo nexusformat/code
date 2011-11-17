@@ -38,6 +38,10 @@
 #define MXML_WRAP 79
 #endif
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif /* _MSC_VER */
+
 /* #define TESTMAIN 1 */
 /*=================== type code handling ================================= */
 typedef struct {
