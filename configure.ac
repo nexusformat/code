@@ -668,10 +668,10 @@ AC_CHECK_LIB(hdf5, H5open)
 SAVE_LIBS="$LIBS"
 AC_CHECK_LIB(termcap, tputs)
 AC_CHECK_LIB(readline, readline)
-AC_CHECK_LIB(history, add_history)
+#AC_CHECK_LIB(history, add_history)
 if test x$ac_cv_lib_termcap_tputs = xyes; then READLINE_LDFLAGS="-ltermcap $READLINE_LDFLAGS"; fi
+#if test x$ac_cv_lib_history_add_history = xyes; then READLINE_LDFLAGS="-lhistory $READLINE_LDFLAGS"; fi
 if test x$ac_cv_lib_readline_readline = xyes; then READLINE_LDFLAGS="-lreadline $READLINE_LDFLAGS"; fi
-if test x$ac_cv_lib_history_add_history = xyes; then READLINE_LDFLAGS="-lhistory $READLINE_LDFLAGS"; fi
 AC_SUBST(READLINE_LDFLAGS)
 LIBS="$SAVE_LIBS"
 dnl AC_LANG_PUSH([C++])

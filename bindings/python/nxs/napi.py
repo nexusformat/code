@@ -25,8 +25,8 @@ looks in the following places in order::
 @endverbatim
 
 - On Windows it looks for one of libNeXus.dll or libNeXus-0.dll.
-- On OS X it looks for libNeXus.dylib
-- On Unix it looks for libNeXus.so
+- On OS X it looks for libNeXus.0.dylib
+- On Unix it looks for libNeXus.so.0
 - NEXUSDIR defaults to 'C:\\Program Files\\NeXus Data Format'.
 - PREFIX defaults to /usr/local, but is replaced by the value of --prefix during configure.
 
@@ -234,15 +234,15 @@ def _libnexus():
         else:
             winnxdir =  'C:/Program Files/NeXus Data Format'
 
-        files += [filedir+"/libNeXus.dll",
-                  filedir+"/libNeXus-0.dll",
-                  winnxdir + '/bin/libNeXus-0.dll']
+        files += [filedir+"/libNeXus-0.dll",
+                  winnxdir + '/bin/libNeXus-0.dll',
+                  filedir+"/libNeXus.dll"]
     else:
         if sys.platform in ('darwin'):
-            lib = 'libNeXus.dylib'
+            lib = 'libNeXus.0.dylib'
             ldenv = 'DYLD_LIBRARY_PATH'
         else:
-            lib = 'libNeXus.so'
+            lib = 'libNeXus.so.0'
             ldenv = 'LD_LIBRARY_PATH'
         # Search the load library path as well as the standard locations
         ldpath = [p for p in os.environ.get(ldenv,'').split(':') if p != '']
