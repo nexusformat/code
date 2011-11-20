@@ -55,22 +55,14 @@ namespace NeXus {
   template <typename NumT>
   NXnumtype getType(NumT number) {
     stringstream msg;
-    msg << "NeXus::getType() does not know type of " << number;
+	msg << "NeXus::getType() does not know type of " << typeid(number).name();
     throw Exception(msg.str());
   }
 
-#ifndef _MSC_VER
   template<>
   NXDLL_EXPORT NXnumtype getType(char number) {
     return CHAR;
-    /* This causes runtime errors for getAttr(string, string).
-    stringstream msg;
-    msg << "NeXus::getType() does not know type of \"char\" " << number;
-    throw Exception(msg.str());
-     */
   }
-#endif
- /* _MSC_VER */
 
   // template specialisations for types we know 
   template<>
