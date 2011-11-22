@@ -164,7 +164,7 @@ File::File(const string& filename, const NXaccess access) : m_close_handle (true
   this->initOpenFile(filename, access);
 }
 
-File::File(char *filename, const NXaccess access) : m_close_handle (true) {
+File::File(const char *filename, const NXaccess access) : m_close_handle (true) {
   this->initOpenFile(string(filename), access);
 }
 
@@ -268,10 +268,10 @@ void File::openGroupPath(const string& path) {
 }
 
 std::string File::getPath(){
-  char cPath[1024];
+  char cPath[2048];
 
-  memset(cPath,0,1024*sizeof(char));
-  NXstatus status = NXgetpath(this->m_file_id,cPath, 1024);
+  memset(cPath,0,sizeof(cPath));
+  NXstatus status = NXgetpath(this->m_file_id,cPath, sizeof(cPath)-1);
   if (status != NX_OK) {
     stringstream msg;
     msg << "NXgetpath() failed";
@@ -554,6 +554,8 @@ void File::putAttr(const AttrInfo& info, const void* data) {
 
 template <typename NumT>
 void File::putAttr(const std::string& name, const NumT value) {
+  NumT data[1];
+  data[0] = value;
   AttrInfo info;
   info.name = name;
   info.length = 1;
@@ -919,7 +921,14 @@ string File::getStrData() {
     throw Exception(msg.str());
   }
   char* value = new char[info.dims[0]+1]; // probably do not need +1, but being safe
-  this->getData(value);
+  try{
+     this->getData(value);
+  }
+  catch (const Exception& e)
+  {
+    delete[] value;
+    throw e;
+  }
   res = string(value, info.dims[0]);
   delete[] value;
   return res;
@@ -970,8 +979,9 @@ map<string, string> File::getEntries()
   return result;
 }
 
-void File::getEntries(std::map<std::string, std::string> & map)
+void File::getEntries(std::map<std::string, std::string> & result)
 {
+  result.clear();
   this->initGroupDir();
   pair<string,string> temp;
   while (true) {
@@ -980,7 +990,7 @@ void File::getEntries(std::map<std::string, std::string> & map)
       break;
     }
     else {
-      map.insert(temp);
+	    result.insert(temp);
     }
   }
 }

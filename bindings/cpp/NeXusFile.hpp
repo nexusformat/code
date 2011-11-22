@@ -180,7 +180,7 @@ namespace NeXus {
      * \param filename The name of the file to open.
      * \param access How to access the file.
      */
-    File(char *filename, const NXaccess access = NXACC_READ);
+    File(const char *filename, const NXaccess access = NXACC_READ);
 
     /**
      * Use an existing handle returned from NXopen()
@@ -686,9 +686,9 @@ namespace NeXus {
     /** Return the entries available in the current place in the file,
      * but avoids the map copy of getEntries().
      *
-     * \param map The map that will be filled with the entries
+     * \param result The map that will be filled with the entries
      */
-    void getEntries(std::map<std::string, std::string> & map);
+    void getEntries(std::map<std::string, std::string> & result);
 
     /**
      * \copydoc NeXus::File::getSlab(void*, const std::vector<int64_t>&,
