@@ -34,8 +34,7 @@ endif
 ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
-	## -D_FILE_OFFSET_BITS=64 for large file support (will be default in next version)
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="-D_FILE_OFFSET_BITS=64 $(CFLAGS)" LDFLAGS="-Wl,-z,defs" --with-java-home=/usr/lib/jvm/default-java --with-python=/usr
+	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs" --with-java-home=/usr/lib/jvm/default-java --with-python=/usr
 	sed < libtool > libtool-2 -e 's/^hardcode_libdir_flag_spec.*$$/hardcode_libdir_flag_spec=" -D__LIBTOOL_IS_A_FOOL__ "/' -e '/^archive_cmds="/s/"$$/ \\$$deplibs"/'
 	mv libtool-2 libtool
 	chmod 755 libtool
@@ -88,7 +87,7 @@ binary-arch: build-arch install
 	dh_strip
 	dh_compress
 	dh_fixperms
-	dh_python2
+	dh_python
 	dh_makeshlibs -X /usr/lib/jni
 	dh_installdeb
 	dh_shlibdeps
