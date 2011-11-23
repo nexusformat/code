@@ -2,6 +2,7 @@
 // REMOVE
 #include <iostream>
 #include <sstream>
+#include <typeinfo>
 #include "napiconfig.h"
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
@@ -554,8 +555,6 @@ void File::putAttr(const AttrInfo& info, const void* data) {
 
 template <typename NumT>
 void File::putAttr(const std::string& name, const NumT value) {
-  NumT data[1];
-  data[0] = value;
   AttrInfo info;
   info.name = name;
   info.length = 1;
