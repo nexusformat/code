@@ -15,7 +15,8 @@ LIBTOOLIZE="$libtoolize --force --copy --automake"
 # to be done in configure.ac to maintain consistancy
 . ./autoversion.sh
 
-touch AUTHORS ChangeLog NEWS README
+touch AUTHORS NEWS README
+rm -f ChangeLog
 
 # Discover what version of autoconf we are using.
 autoconfversion=`$AUTOCONF --version | head -n 1`

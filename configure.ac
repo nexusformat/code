@@ -31,9 +31,9 @@ dnl
 AC_PREREQ(2.61)
 AC_REVISION($Revision$)
 
-m4_define([ISODATE],m4_esyscmd_s([date +%Y%m%d]))dnl
+m4_define([ISODATE],m4_esyscmd([date +%Y%m%d | tr -d '\n' ]))dnl
 dnl m4_define([SVNREV],m4_esyscmd_s([`svnversion`]))
-m4_define([SVNREV],m4_esyscmd_s([svn info | grep Revision | awk '{print $2}']))dnl
+m4_define([SVNREV],m4_esyscmd([svn info | grep Revision | awk '{print $2}' | tr -d '\n' ]))dnl
 m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
 
 m4_define([NEXUS_VERSION],[4.3.0])dnl main version we are based on
@@ -53,10 +53,10 @@ AC_SUBST([NEXUS_VERSION])
 AC_SUBST([NEXUS_RELEASE])
 AC_SUBST([SVN_REVISION])
 AC_SUBST([PACKAGE_RELEASE])
-AC_DEFINE([[NEXUS_VERSION]], "NEXUS_VERSION", [NeXus Version])dnl
-AC_DEFINE([[NEXUS_RELEASE]], "NEXUS_RELEASE", [NeXus Release])dnl
-AC_DEFINE([[PACKAGE_RELEASE]], "PACKAGE_RELEASE", [Package Release])dnl
-AC_DEFINE([[SVN_REVISION]], "SVNREV", [SVN Revision])dnl
+# AC_DEFINE([NEXUS_VERSION], "NEXUS_VERSION", [NeXus Version])dnl
+# AC_DEFINE([NEXUS_RELEASE], "NEXUS_RELEASE", [NeXus Release])dnl
+# AC_DEFINE([PACKAGE_RELEASE], "PACKAGE_RELEASE", [Package Release])dnl
+AC_DEFINE([SVN_REVISION], "SVNREV", [SVN Revision])dnl
 
 
 # used by libtool - need to get if from 4.3.0 better
@@ -300,6 +300,7 @@ AC_CHECK_PROGS(GUILE,[guile])
 AC_CHECK_PROGS(LATEX,[latex])
 AC_CHECK_PROGS(WGET,[wget])
 AC_CHECK_PROGS(XMLLINT,[xmllint])
+AC_CHECK_PROGS(SVN2CL,[svn2cl])
 
 
 dnl  flags for building swig guile bindings
@@ -773,6 +774,7 @@ AM_CONDITIONAL(HAVE_DOT, [test ! -z "$DOT"])
 
 AM_CONDITIONAL(HAVE_WGET, [test ! -z "$WGET"])
 AM_CONDITIONAL(HAVE_XMLLINT, [test ! -z "$XMLLINT"])
+AM_CONDITIONAL(HAVE_SVN2CL, [test ! -z "$SVN2CL"])
 
 AC_CONFIG_TESTDIR(test)
 AC_CONFIG_FILES(test/Makefile test/atlocal)

@@ -55,7 +55,13 @@ MAINTAINERCLEANFILES = \
  `find "$(srcdir)" -type f -name Makefile.in -print`
 
 ChangeLog :
-	svn2cl --non-interactive --authors=svn2cl_nexus_authors.xml .
+	touch $@
+if HAVE_SVN2CL
+	@echo "Generating ChangeLog from svn via svn2cl"
+	$(SVN2CL) --non-interactive --authors=svn2cl_nexus_authors.xml .
+endif
+
+#dist-hook : ChangeLog
 
 maintainer-clean-local:
 	-rm -rf config
