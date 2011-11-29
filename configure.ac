@@ -40,8 +40,8 @@ m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
 m4_define([NEXUS_VERSION],[4.3.0])dnl
 
 ## things like  rc1   or  20100903svn1734
-m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl
-#m4_define([NEXUS_RELEASE],[rc1])dnl
+#m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl
+m4_define([NEXUS_RELEASE],[rc1])dnl
 
 # 0.* for pre release; 1, 2, ... post releas
 m4_define([PACKAGE_RELEASE],[0.1])dnl
