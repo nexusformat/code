@@ -36,9 +36,15 @@ dnl m4_define([SVNREV],m4_esyscmd_s([`svnversion`]))
 m4_define([SVNREV],m4_esyscmd([svn info | grep Revision | awk '{print $2}' | tr -d '\n' ]))dnl
 m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
 
-m4_define([NEXUS_VERSION],[4.3.0])dnl main version we are based on
-m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl things like  rc1   or  20100903svn1734
-m4_define([PACKAGE_RELEASE],[0.1])dnl 0.* for pre release; 1, 2, ... post release
+## main version we are based on
+m4_define([NEXUS_VERSION],[4.3.0])dnl
+
+## things like  rc1   or  20100903svn1734
+m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl
+#m4_define([NEXUS_RELEASE],[rc1])dnl
+
+# 0.* for pre release; 1, 2, ... post releas
+m4_define([PACKAGE_RELEASE],[0.1])dnl
 
 AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,[-],NEXUS_RELEASE), [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
