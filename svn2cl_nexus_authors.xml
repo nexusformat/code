@@ -1,0 +1,63 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<authors>
+  <author uid="faa59">
+    Freddie Akeroyd &lt;freddie.akeroyd@stfc.ac.uk&gt;
+  </author>
+  <author uid="faa">
+    Freddie Akeroyd &lt;freddie.akeroyd@stfc.ac.uk&gt;
+  </author>
+  <author uid="Freddie Akeroyd">
+    Freddie Akeroyd &lt;freddie.akeroyd@stfc.ac.uk&gt;
+  </author>
+  <author uid="pfp">
+    Peter Peterson &lt;petersonpf@ornl.gov&gt;
+  </author>
+  <author uid="Peter Peterson">
+    Peter Peterson &lt;petersonpf@ornl.gov&gt;
+  </author>
+  <author uid="mk">
+    Mark Koennecke &lt;Mark.Koennecke@psi.ch&gt;
+  </author>
+  <author uid="Mark Koennecke">
+    Mark Koennecke &lt;Mark.Koennecke@psi.ch&gt;
+  </author>
+  <author uid="rio">
+    Ray Osborn &lt;ROsborn@anl.gov&gt;
+  </author>
+  <author uid="Ray Osborn">
+    Ray Osborn &lt;ROsborn@anl.gov&gt;
+  </author>
+  <author uid="jk">
+    Jens Krueger &lt;jens.krueger@frm2.tum.de&gt;
+  </author>
+  <author uid="Jens Krueger">
+    Jens Krueger &lt;jens.krueger@frm2.tum.de&gt;
+  </author>
+  <author uid="ncm">
+    Nick Maliszewskyj &lt;nickm@nist.gov&gt;
+  </author>
+  <author uid="Nick Maliszewskyj">
+    Nick Maliszewskyj &lt;nickm@nist.gov&gt;
+  </author>
+  <author uid="hg">
+    Hartmut Gilde &lt;Hartmut.Gilde@frm2.tum.de&gt;
+  </author>
+  <author uid="Hartmut Gilde">
+    Hartmut Gilde &lt;Hartmut.Gilde@frm2.tum.de&gt;
+  </author>
+  <author uid="uf">
+    Uwe Filges &lt;Uwe.Filges@psi.ch&gt;
+  </author>
+  <author uid="jcb">
+    Jean-Christophe Bilheux &lt;bilheuxjm@ornl.gov&gt;
+  </author>
+  <author uid="ag">
+    Andy Gotz &lt;Andy.Gotz@esrf.fr&gt;
+  </author>
+  <author uid="jph">
+    John Hammonds &lt;jphammonds@anl.gov&gt;
+  </author>
+  <author uid="nexus">
+    NeXus Developers &lt;nexus-developers@nexusformat.org&gt;
+  </author>
+</authors>

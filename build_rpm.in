@@ -10,8 +10,8 @@
 # get topdir - must find a better way ...
 topdir=`rpm --showrc|grep topdir| awk '{print $3}' | tail -1`
 if test ! -e "$topdir"; then
-    echo "Unable to determine RPM topdir from rpmrc; assuming /usr/src/redhat"
-    topdir="/usr/src/redhat"
+    echo "Unable to determine RPM topdir from rpmrc; assuming $HOME/rpmbuild"
+    topdir="$HOME/rpmbuild"
 fi
 if test ! -w "$topdir"; then
     echo "ERROR: RPM build directory not writable - check README.rpm"

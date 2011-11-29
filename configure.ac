@@ -30,10 +30,34 @@ dnl
 
 AC_PREREQ(2.61)
 AC_REVISION($Revision$)
-AC_INIT([NeXus Library], [4.3.0], [nexus-developers@nexusformat.org], [nexus])
+
+m4_define([ISODATE],m4_esyscmd_s([date +%Y%m%d]))dnl
+dnl m4_define([SVNREV],m4_esyscmd_s([`svnversion`]))
+m4_define([SVNREV],m4_esyscmd_s([svn info | grep Revision | awk '{print $2}']))dnl
+m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
+
+m4_define([NEXUS_VERSION],[4.3.0])dnl main version we are based on
+m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl things like  rc1   or  20100903svn1734
+m4_define([PACKAGE_RELEASE],[0.1])dnl 0.* for pre release; 1, 2, ... post release
+
+AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,[-],NEXUS_RELEASE), [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
+
+m4_join([],[NEXUS_VERSION=],"NEXUS_VERSION")
+m4_join([],[NEXUS_RELEASE=],"NEXUS_RELEASE")
+m4_join([],[SVN_REVISION=],"SVN_REVISION")
+m4_join([],[PACKAGE_RELEASE=],"PACKAGE_RELEASE")
+AC_SUBST([NEXUS_VERSION])
+AC_SUBST([NEXUS_RELEASE])
+AC_SUBST([SVN_REVISION])
+AC_SUBST([PACKAGE_RELEASE])
+AC_DEFINE([[NEXUS_VERSION]], "NEXUS_VERSION", [NeXus Version])dnl
+AC_DEFINE([[NEXUS_RELEASE]], "NEXUS_RELEASE", [NeXus Release])dnl
+AC_DEFINE([[PACKAGE_RELEASE]], "PACKAGE_RELEASE", [Package Release])dnl
+AC_DEFINE([[SVN_REVISION]], "SVNREV", [SVN Revision])dnl
+
 
 # used by libtool - need to get if from 4.3.0 better
 #NXLTVERSINFO="1:0:1"
@@ -221,8 +245,6 @@ AC_SUBST(FCFLAGS)
 AC_SUBST(JAVACFLAGS)
 AC_SUBST(SHARED_LDFLAGS)
 AC_SUBST(JAVAINCLUDE)
-AC_SUBST(PACKAGE_RELEASE)
-test -z "$PACKAGE_RELEASE" && PACKAGE_RELEASE=1
 
 SHARED_LDFLAGS=""
 

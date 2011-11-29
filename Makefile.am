@@ -54,5 +54,8 @@ MAINTAINERCLEANFILES = \
  include/nxconfig_h.in \
  `find "$(srcdir)" -type f -name Makefile.in -print`
 
+ChangeLog :
+	svn2cl --non-interactive --authors=svn2cl_nexus_authors.xml .
+
 maintainer-clean-local:
 	-rm -rf config
