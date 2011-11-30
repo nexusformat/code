@@ -102,23 +102,19 @@ if test ! -w "$topdir"; then
     exit
 fi
 #
+rpm_match="${package_tarname}*-${nexus_version}-${package_release}.${nexus_release}*.rpm"
+
 my_rpm_build_root="$topdir"
-rm -f $my_rpm_build_root/SRPMS/${rpm_base}*.src.rpm
-rm -f $my_rpm_build_root/RPMS/*/${rpm_base}*.rpm
-rm -f $my_rpm_build_root/RPMS/*/${rpm_debuginfo_base}*.rpm
+for i in SRPMS RPMS; do
+    find $my_rpm_build_root/$i -name "${rpm_match}" -exec rm -f {} \;
+done
 rm -fr $my_rpm_build_root/BUILD/${rpm_base}*
 rm -f $my_rpm_build_root/SOURCES/${tar_file} 
 
 sh build_rpm "$CONFIGURE_OPTS"
 
-rpm_src_file=${rpm_base}.src.rpm
-rpm_i386_file=${rpm_base}.i386.rpm
-rpm_i386_debuginfo_file=${rpm_debuginfo_base}.i386.rpm
-rpm_x64_file=${rpm_base}.x86_64.rpm
-rpm_x64_debuginfo_file=${rpm_debuginfo_base}.x86_64.rpm
-
-for i in $rpm_src_file $rpm_i386_file $rpm_i386_debuginfo_file $rpm_x64_file $rpm_x64_debuginfo_file; do
-    if test -r $i; then cp -f $i $OUTPUT_DIR; fi
+for i in SRPMS RPMS; do
+    find $my_rpm_build_root/$i -name "${rpm_match}" -exec cp -f {} $OUTPUT_DIR \;
 done
 cd ..
 rm -fr "$NXDIR"
