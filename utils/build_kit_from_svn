@@ -1,0 +1,124 @@
+#!/bin/bash
+#
+#  $Id$
+#
+#  Copyright (C) 2011 Freddie Akeroyd, STFC ISIS Facility
+#  
+# $1 is tags, branches or trunk
+# $2 is version e.g. 4.0rc1
+# 
+# -o options for configure
+# -r build rpms with this release number
+# -t svn parent directory (tags, branches or trunk)
+# -v svn sub directory (e.g. 4.0) - not needed for trunk
+# -d temporary directory for building (/tmp if not specified)
+# -s svn revision to check out
+
+WORK_DIR="/tmp"
+OUTPUT_DIR="/tmp"
+CONFIGURE_OPTS=""
+AUTOGEN_ARGS=""
+REP_TOP="trunk"
+REP_SUB=""
+BUILD_RPM="no"
+SVN_REVISION="HEAD"
+PACKAGE_RELEASE=""
+while getopts "a:c:o:d:t:v:s:r" opt; do
+  case $opt in
+    a)
+      AUTOGEN_ARGS="$OPTARG"
+      ;;
+    c)
+      CONFIGURE_OPTS="$OPTARG"
+      ;;
+    o)
+      OUTPUT_DIR="$OPTARG"
+      ;;
+    d)
+      WORK_DIR="$OPTARG"
+      ;;
+    t)
+      REP_TOP="$OPTARG"
+      ;;
+    v)
+      REP_SUB="$OPTARG"
+      ;;
+    s)
+      SVN_REVISION="$OPTARG"
+      ;;
+    r)
+      BUILD_RPM="yes"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+cd "$WORK_DIR"
+NXDIR=nexus-$$
+rep_url="http://svn.nexusformat.org/code/$REP_TOP"
+if test ! -z "$REP_SUB"; then 
+    rep_url="$rep_url/$REP_SUB"
+fi
+svn co --non-interactive -r "$SVN_REVISION" -q "$rep_url" "$NXDIR"
+cd "$NXDIR"
+SVN_REVISION=`svnversion`
+iso_date=`date +%Y%m%d`
+
+sh ./autogen.sh $AUTOGEN_ARGS
+sh ./configure $CONFIGURE_OPTS
+
+package_tarname=`grep "PACKAGE_TARNAME" include/nxconfig.h | awk '{print $3}' | sed -e 's/\"//g'`
+package_version=`grep "PACKAGE_VERSION" include/nxconfig.h | awk '{print $3}' | sed -e 's/\"//g'`
+tar_file="${package_tarname}-${package_version}.tar.gz"
+
+nexus_version=`grep "NEXUS_VERSION=" configure | awk -F= '{print $2}' | sed -e 's/\"//g'`
+nexus_release=`grep "NEXUS_RELEASE=" configure | awk -F= '{print $2}' | sed -e 's/\"//g'`
+package_release=`grep "PACKAGE_RELEASE=" configure | awk -F= '{print $2}' | sed -e 's/\"//g'`
+rpm_base="${package_tarname}-${nexus_version}-${package_release}.${nexus_release}"
+rpm_debuginfo_base="${package_tarname}-debuginfo-${nexus_version}-${package_release}.${nexus_release}"
+
+make
+make dist
+
+cp -f $tar_file $OUTPUT_DIR
+
+if test "$BUILD_RPM" = "no"; then
+    cd ..
+    rm -fr "$NXDIR"
+    exit
+fi
+
+topdir=`rpm --showrc|grep topdir| awk '{print $3}' | tail -1`
+if test ! -e "$topdir"; then
+    echo "Unable to determine RPM topdir from rpmrc; assuming $HOME/rpmbuild"
+    topdir="$HOME/rpmbuild"
+fi
+if test ! -w "$topdir"; then
+    echo "ERROR: RPM build directory not writable - check README.rpm"
+    cd ..
+    rm -fr "$NXDIR"
+    exit
+fi
+#
+my_rpm_build_root="$topdir"
+rm -f $my_rpm_build_root/SRPMS/${rpm_base}*.src.rpm
+rm -f $my_rpm_build_root/RPMS/*/${rpm_base}*.rpm
+rm -f $my_rpm_build_root/RPMS/*/${rpm_debuginfo_base}*.rpm
+rm -fr $my_rpm_build_root/BUILD/${rpm_base}*
+rm -f $my_rpm_build_root/SOURCES/${tar_file} 
+
+sh build_rpm "$CONFIGURE_OPTS"
+
+rpm_src_file=${rpm_base}.src.rpm
+rpm_i386_file=${rpm_base}.i386.rpm
+rpm_i386_debuginfo_file=${rpm_debuginfo_base}.i386.rpm
+rpm_x64_file=${rpm_base}.x86_64.rpm
+rpm_x64_debuginfo_file=${rpm_debuginfo_base}.x86_64.rpm
+
+for i in $rpm_src_file $rpm_i386_file $rpm_i386_debuginfo_file $rpm_x64_file $rpm_x64_debuginfo_file; do
+    if test -r $i; then cp -f $i $OUTPUT_DIR; fi
+done
+cd ..
+rm -fr "$NXDIR"
