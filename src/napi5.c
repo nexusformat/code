@@ -2147,7 +2147,6 @@ static int countObjectsInGroup(hid_t loc_id)
   {
      herr_t iRet;
      pNexusFile5 pFile;
-     char pBuffer[256]; 
      hid_t openwhere;
 
      pFile = NXI5assert(fileid);
@@ -2199,26 +2198,36 @@ static int countObjectsInGroup(hid_t loc_id)
      herr_t ret;
      H5L_info_t link_buff;
      char linkval_buff[1024];
-     const char *filepath, *objpath;
+     const char *filepath = NULL, *objpath = NULL;
+     size_t val_size;
 
      pFile = NXI5assert(fileid);
+     memset(url, 0, urllen);
 
      ret = H5Lget_info(pFile->iFID, name, &link_buff, H5P_DEFAULT);
      if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
        return NX_ERROR;
      }
 
-     ret = H5Lget_val(pFile->iFID, name, linkval_buff, sizeof(linkval_buff), H5P_DEFAULT);
+     val_size = link_buff.u.val_size;
+     if (val_size > sizeof(linkval_buff)) {
+       NXReportError("ERROR: linkval_buff too small");
+       return NX_ERROR;
+     }
+
+     ret = H5Lget_val(pFile->iFID, name, linkval_buff, val_size, H5P_DEFAULT);
      if (ret < 0) {
+       NXReportError("ERROR: H5Lget_val failed");
        return NX_ERROR;
      }
 
-     ret = H5Lunpack_elink_val(linkval_buff, sizeof(linkval_buff), 0, &filepath, &objpath);
-     if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
+     ret = H5Lunpack_elink_val(linkval_buff, val_size, NULL, &filepath, &objpath);
+     if (ret < 0) {
+       NXReportError("ERROR: H5Lunpack_elink_val failed");
        return NX_ERROR;
      }
 
-    snprintf(url, urllen, "nxfile://%s#%s", filepath, objpath);
+    snprintf(url, urllen-1, "nxfile://%s#%s", filepath, objpath);
     return NX_OK;
      
   }

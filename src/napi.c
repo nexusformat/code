@@ -1462,7 +1462,7 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   LOCKED_CALL(pFunc->nxclosegroup(pFunc->pNexusData));
   if(attStatus == NX_OK){
     length = strlen(nxurl);
-    if(length > urlLen){
+    if(length >= urlLen){
       length = urlLen - 1;
     }
     memset(url,0,urlLen);
@@ -1498,7 +1498,7 @@ NXstatus  NXisexternaldataset(NXhandle fid, CONSTCHAR *name,
   LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
   if(attStatus == NX_OK){
     length = strlen(nxurl);
-    if(length > urlLen){
+    if(length >= urlLen){
       length = urlLen - 1;
     }
     memset(url,0,urlLen);
