@@ -57,7 +57,7 @@ static char* my_readline(const char* prompt)
 #define rl_completion_matches(a,b) NULL
 #define rl_outstream stdout
 #define readline my_readline
-#endif
+#endif /* HAVE_LIBREADLINE */
 
 #define StrEq(s1, s2) (strcmp((s1), (s2)) == 0)
 
@@ -260,6 +260,9 @@ int main(int argc, char *argv[])
 #endif
 
    printf ("NXBrowse %s Copyright (C) 2009 NeXus Data Format\n", NEXUS_VERSION);
+#if HAVE_LIBREADLINE
+   printf ("Built with readline support - use <TAB> to complete commands and paths\n");
+#endif /* HAVE_LIBREADLINE */
 
 /* if there is a filename given on the command line use that,
       else ask for a filename */
@@ -791,8 +794,6 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
         fprintf(fd,"\n");
         dataSize -= lineSize;
         dataPtr += lineSize * nxTypeSize(dataType);
-        printf("%p\n", dataPtr);
-
       }
    }
 }
@@ -927,7 +928,7 @@ static int nxTypeSize(int dataType)
             type_size = 2;
          } else if ((dataType == NX_INT32) || (dataType == NX_UINT32) || (dataType == NX_FLOAT32)) {
             type_size = 4;
-         } else if (dataType == NX_FLOAT64) {
+         } else if (dataType == NX_FLOAT64 || dataType == NX_INT64 || dataType == NX_UINT64) {
             type_size = 8;
          }
 	 else

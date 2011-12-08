@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <iostream>
 #ifdef _MSC_VER
 #else
 #include <unistd.h>
@@ -201,7 +202,36 @@ static int WriteGroup (int is_definition)
       status = NXgetnextentry (inId, name, nxclass, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
-         if (!strncmp(nxclass,"NX",2)) {
+//         std::cerr << "WriteGroup: " << name << "(" << nxclass << ")" << std::endl;
+         if (!strncmp(nxclass,"SDS",3)) {
+	    add_path(name);
+            if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
+	    if (NXgetdataID(inId, &link) != NX_OK) return NX_ERROR;
+	    if (!strcmp(current_path, link.targetPath))
+	    {
+                if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
+                if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
+                if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
+                if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
+                if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
+                if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
+                if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
+                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
+                if (NXclosedata (outId) != NX_OK) return NX_ERROR;
+	        remove_path(name);
+	    }
+	    else
+	    {
+	        remove_path(name);
+		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
+	    }
+            if (NXclosedata (inId) != NX_OK) return NX_ERROR;
+         }
+         /* napi4.c returns UNKNOWN for DFTAG_VH in groups */
+         else if (!strcmp(nxclass, "UNKNOWN") || !strncmp(nxclass, "CDF", 3)) {
+             ;
+         }
+         else {
             if (NXopengroup (inId, name, nxclass) != NX_OK) return NX_ERROR;
 	    add_path(name);
 	    if (NXgetgroupID(inId, &link) != NX_OK) return NX_ERROR;
@@ -239,30 +269,6 @@ static int WriteGroup (int is_definition)
 		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
          	if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
 	    }
-         }
-         else if (!strncmp(nxclass,"SDS",3)) {
-	    add_path(name);
-            if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
-	    if (NXgetdataID(inId, &link) != NX_OK) return NX_ERROR;
-	    if (!strcmp(current_path, link.targetPath))
-	    {
-                if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
-                if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
-                if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
-                if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
-                if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
-                if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
-                if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
-                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
-                if (NXclosedata (outId) != NX_OK) return NX_ERROR;
-	        remove_path(name);
-	    }
-	    else
-	    {
-	        remove_path(name);
-		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
-	    }
-            if (NXclosedata (inId) != NX_OK) return NX_ERROR;
          }
       }
       else if (status == NX_EOD) {

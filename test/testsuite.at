@@ -2044,7 +2044,7 @@ AT_CLEANUP
 
 AT_BANNER([[Testing NXbrowse Tool.]])
 AT_SETUP([Checking HDF4 test file])
-AT_CHECK([$HAVE_HDF4 && env NO_READLINE=1 nxbrowse NXtest.hdf  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF_version = ' | grep -v 'file_time = ' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
+AT_CHECK([$HAVE_HDF4 && env NO_READLINE=1 nxbrowse NXtest.hdf  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF_version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
 [[NXBrowse 4.3.0 Copyright (C) 2009 NeXus Data Format
     NeXus_version = 4.3.0
     file_name = NXtest.hdf
@@ -2056,7 +2056,7 @@ NX>
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF5 test file])
-AT_CHECK([$HAVE_HDF5 && env NO_READLINE=1 nxbrowse NXtest.h5  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF5_Version = ' | grep -v 'file_time = ' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
+AT_CHECK([$HAVE_HDF5 && env NO_READLINE=1 nxbrowse NXtest.h5  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF5_Version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
 [[NXBrowse 4.3.0 Copyright (C) 2009 NeXus Data Format
     NeXus_version = 4.3.0
     file_name = NXtest.h5
@@ -2068,7 +2068,7 @@ NX>
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML test file])
-AT_CHECK([$HAVE_XML && env NO_READLINE=1 nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep -v 'file_time = ' | grep -v 'XML_version = ' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
+AT_CHECK([$HAVE_XML && env NO_READLINE=1 nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep -v 'file_time = ' | grep -v 'XML_version = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
 [[NXBrowse 4.3.0 Copyright (C) 2009 NeXus Data Format
     NeXus_version = 4.3.0
     file_name = NXtest.xml
