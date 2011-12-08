@@ -816,7 +816,7 @@ static hid_t nxToHDF5Type(int datatype)
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
   memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
   for(i = 0; i< rank; i++) {
-  if (dimensions[i] == NX_UNLIMITED){
+  if (dimensions[i] == NX_UNLIMITED || dimensions[i] <= 0){
          chunk_size[i]= 1;
   }    
   }
