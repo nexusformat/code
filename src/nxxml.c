@@ -356,7 +356,6 @@ NXstatus  NXXopengroup (NXhandle fid, CONSTCHAR *name,
 /*----------------------------------------------------------------------*/
 NXstatus  NXXclosegroup (NXhandle fid){
   pXMLNexus xmlHandle = NULL;
-  mxml_node_t *newGroup = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -749,7 +748,6 @@ NXstatus  NXXputdatatable (NXhandle fid, void *data){
   const char* name;
   pNXDS dataset;
   int i, offset, length;
-  char *pPtr = NULL;
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
   /* current points at the Idims node as done in NXXopendatatable */
@@ -817,12 +815,20 @@ NXstatus  NXXputdata (NXhandle fid, void *data){
       {
 	length *= dim[i];
       }
-      pPtr = (char *)malloc((length+1)*sizeof(char));
-      if(pPtr != NULL){
-        memcpy(pPtr,data,length);
-        pPtr[length] = '\0';
-	mxmlSetOpaque(userData,(const char *)pPtr);
-        free(pPtr);
+      /* we seem to have trouble reading an empty node back (no userData), so make sure we have at least a single space present even for empty strings */
+      if (length == 0)
+      {
+	mxmlSetOpaque(userData," ");
+      }
+      else
+      {
+        pPtr = (char *)malloc((length+1)*sizeof(char));
+        if(pPtr != NULL){
+          memcpy(pPtr,data,length);
+          pPtr[length] = '\0';
+	  mxmlSetOpaque(userData,(const char *)pPtr);
+          free(pPtr);
+        }
       }
     }
     else
@@ -984,7 +990,7 @@ NXstatus  NXXgetinfo64 (NXhandle fid, int *rank,
   clone the dataset and set the data pointer. This in order to use
   the addressing and type conversion implemented in nxdataset
 ---------------------------------------------------------------------*/ 
-static pNXDS makeSlabData(pNXDS dataset, void *data, int64_t size[]){
+static pNXDS makeSlabData(pNXDS dataset, void *data, const int64_t size[]){
   pNXDS slabData = NULL;
   int rank, i;
   
@@ -1124,7 +1130,7 @@ NXstatus  NXXputslab64 (NXhandle fid, void *data,
   This goes by recursion
 ----------------------------------------------------------------------*/
 static void getSlabData(pNXDS dataset, pNXDS slabData, int dim,
-			int64_t start[], 
+			const int64_t start[], 
 			int64_t sourcePos[],int64_t targetPos[]){
   int64_t i, rank, length;
 
@@ -1776,7 +1782,7 @@ static char *findLinkPath(mxml_node_t *node){
   mxml_node_t **path = NULL;
   int stackPtr;
   mxml_node_t *current = NULL;
-  char *pathString = NULL, *result = NULL;
+  char *result = NULL;
 
   path = (mxml_node_t **)malloc(NXMAXSTACK*sizeof(mxml_node_t *));
   if(path == NULL){
