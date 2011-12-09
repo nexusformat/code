@@ -738,7 +738,7 @@ static mxml_node_t *findData(mxml_node_t *node){
 }
 
 /* we only havv to deal with non-character data here */
-NXstatus  NXXputdatatable (NXhandle fid, void *data){
+NXstatus  NXXputdatatable (NXhandle fid, const void *data){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
@@ -779,7 +779,7 @@ NXstatus  NXXputdatatable (NXhandle fid, void *data){
 }
 
 /*------------------------------------------------------------------------*/
-NXstatus  NXXputdata (NXhandle fid, void *data){
+NXstatus  NXXputdata (NXhandle fid, const void *data){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
   mxml_node_t *current = NULL;
@@ -990,7 +990,7 @@ NXstatus  NXXgetinfo64 (NXhandle fid, int *rank,
   clone the dataset and set the data pointer. This in order to use
   the addressing and type conversion implemented in nxdataset
 ---------------------------------------------------------------------*/ 
-static pNXDS makeSlabData(pNXDS dataset, void *data, const int64_t size[]){
+static pNXDS makeSlabData(pNXDS dataset, const void *data, const int64_t size[]){
   pNXDS slabData = NULL;
   int rank, i;
   
@@ -1006,7 +1006,7 @@ static pNXDS makeSlabData(pNXDS dataset, void *data, const int64_t size[]){
     slabData->dim[i] = size[i];
   }
   slabData->type = getNXDatasetType(dataset);
-  slabData->u.ptr = data;
+  slabData->u.ptr = (void*)data;
   slabData->magic = dataset->magic;
   return slabData;
 } 
@@ -1014,8 +1014,8 @@ static pNXDS makeSlabData(pNXDS dataset, void *data, const int64_t size[]){
   This goes by recursion
 ----------------------------------------------------------------------*/
 static void putSlabData(pNXDS dataset, pNXDS slabData, int dim,
-			int64_t start[], 
-			int64_t sourcePos[],int64_t targetPos[]){
+			const int64_t start[], 
+			int64_t sourcePos[], int64_t targetPos[]){
   int64_t i, rank, length;
 
   rank = getNXDatasetRank(slabData);
@@ -1040,7 +1040,7 @@ static void putSlabData(pNXDS dataset, pNXDS slabData, int dim,
  This is in order to support unlimited dimensions along the first axis
  -----------------------------------------------------------------------*/
 static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset, 
-				 int64_t start[], int64_t size[]){
+				 const int64_t start[], const int64_t size[]){
   int64_t dim0, byteLength;
   void *oldData = NULL;
   char *typestring = NULL;
@@ -1069,13 +1069,13 @@ static int checkAndExtendDataset(mxml_node_t *node, pNXDS dataset,
   return 1;
 }
 
-NXstatus  NXXputslabtable (NXhandle fid, void *data, 
-				   int64_t iStart[], int64_t iSize[]){
+NXstatus  NXXputslabtable (NXhandle fid, const void *data, 
+				   const int64_t iStart[], const int64_t iSize[]){
     return NX_OK;
 }
 /*----------------------------------------------------------------------*/
-NXstatus  NXXputslab64 (NXhandle fid, void *data, 
-				   int64_t iStart[], int64_t iSize[]){
+NXstatus  NXXputslab64 (NXhandle fid, const void *data, 
+				   const int64_t iStart[], const int64_t iSize[]){
   
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *userData = NULL;
@@ -1219,7 +1219,7 @@ static NXstatus  NXXsetnumberformat(NXhandle fid,
   return NX_OK;
 }
 /*============================ Attributes ============================*/
-static char *formatAttributeData(void *data, int datalen, int iType){
+static char *formatAttributeData(const void *data, int datalen, int iType){
   int intData = 0;
   long iValue = -99999;
   double dValue = -1e38;
@@ -1295,7 +1295,7 @@ static char *formatAttributeData(void *data, int datalen, int iType){
   return number;
 }
 /*---------------------------------------------------------------------*/
-NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
+NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, const void *data, 
 				   int datalen, int iType){
   char buffer[256];
   pXMLNexus xmlHandle = NULL;

@@ -898,7 +898,7 @@ static hid_t nxToHDF5Type(int datatype)
   
 
 
-  NXstatus  NX5putdata (NXhandle fid, void *data)
+  NXstatus  NX5putdata (NXhandle fid, const void *data)
   {
     pNexusFile5 pFile;
     herr_t iRet;
@@ -973,7 +973,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 }
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, void *data, 
+  NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, const void *data, 
 
 			int datalen, int iType)
   {
@@ -1026,7 +1026,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
   
   /* ------------------------------------------------------------------- */
  
-  NXstatus  NX5putslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+  NXstatus  NX5putslab64 (NXhandle fid, const void *data, const int64_t iStart[], const int64_t iSize[])
   {
     pNexusFile5 pFile;
     int iRet, rank, i;

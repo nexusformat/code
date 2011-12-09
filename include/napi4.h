@@ -29,9 +29,9 @@ extern  NXstatus  NX4getdata(NXhandle handle, void* data);
 extern  NXstatus  NX4getslab64(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
 extern  NXstatus  NX4getattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
   
-extern  NXstatus  NX4putdata(NXhandle handle, void* data);
-extern  NXstatus  NX4putslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);
-extern  NXstatus  NX4putattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
+extern  NXstatus  NX4putdata(NXhandle handle, const void* data);
+extern  NXstatus  NX4putslab64(NXhandle handle, const void* data, const int64_t start[], const int64_t size[]);
+extern  NXstatus  NX4putattr(NXhandle handle, CONSTCHAR* name, const void* data, int iDataLen, int iType);
   
 extern  NXstatus  NX4getinfo64(NXhandle handle, int* rank, int64_t dimension[], int* datatype);
 extern  NXstatus  NX4getgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);

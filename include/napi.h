@@ -463,7 +463,7 @@ extern  NXstatus  NXclosedata(NXhandle handle);
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXputdata(NXhandle handle, void* data);
+extern  NXstatus  NXputdata(NXhandle handle, const void* data);
 
   /**
    * Write an attribute. The kind of attribute written depends on the  
@@ -478,7 +478,7 @@ extern  NXstatus  NXputdata(NXhandle handle, void* data);
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
+extern  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, const void* data, int iDataLen, int iType);
 
   /**
    * Write  a subset of a multi dimensional dataset.
@@ -489,12 +489,12 @@ extern  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, void* data, int iD
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXputslab(NXhandle handle, void* data, int start[], int size[]);    
+extern  NXstatus  NXputslab(NXhandle handle, const void* data, const int start[], const int size[]);    
 
   /**
    * @copydoc NXputdata()
    */
-extern  NXstatus  NXputslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);    
+extern  NXstatus  NXputslab64(NXhandle handle, const void* data, const int64_t start[], const int64_t size[]);    
 
   /**
    * Retrieve link data for a dataset. This link data can later on be used to link this 
@@ -896,9 +896,9 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxcompress) (NXhandle handle, int compr_type);
         NXstatus ( *nxopendata) (NXhandle handle, CONSTCHAR* label);
         NXstatus ( *nxclosedata)(NXhandle handle);
-        NXstatus ( *nxputdata)(NXhandle handle, void* data);
-        NXstatus ( *nxputattr)(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
-        NXstatus ( *nxputslab64)(NXhandle handle, void* data, int64_t start[], int64_t size[]);    
+        NXstatus ( *nxputdata)(NXhandle handle, const void* data);
+        NXstatus ( *nxputattr)(NXhandle handle, CONSTCHAR* name, const void* data, int iDataLen, int iType);
+        NXstatus ( *nxputslab64)(NXhandle handle, const void* data, const int64_t start[], const int64_t size[]);    
         NXstatus ( *nxgetdataID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakelink)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakenamedlink)(NXhandle handle, CONSTCHAR *newname, NXlink* pLink);
@@ -930,7 +930,7 @@ extern  NXstatus  NXsetcache(long newVal);
   extern NXstatus  NXfopen(char * filename, NXaccess* am, 
 					NXhandle pHandle);
   extern NXstatus  NXfclose (NXhandle pHandle);
-  extern NXstatus  NXfputattr(NXhandle fid, char *name, void *data, 
+  extern NXstatus  NXfputattr(NXhandle fid, const char *name, const void *data, 
                                    int *pDatalen, int *pIType);
   extern NXstatus  NXfcompress(NXhandle fid, int *compr_type);
   extern NXstatus  NXfcompmakedata(NXhandle fid, char *name, 
