@@ -151,7 +151,7 @@ static int				/* O  - 0 on success, -1 on error */
 myxml_add_char(int  ch,			/* I  - Character to add */
               char **bufptr,		/* IO - Current position in buffer */
 	      char **buffer,		/* IO - Current buffer */
-	      int  *bufsize)		/* IO - Current buffer size */
+	      size_t  *bufsize)		/* IO - Current buffer size */
 {
   char	*newbuffer;			/* New buffer value */
 
@@ -481,7 +481,7 @@ int nexusLoadCallback(mxml_node_t *node, const char *buffer){
   return 0;
 }
 /*---------------------------------------------------------------------*/
-static void stringIntoBuffer(char **buffer, char **bufPtr, int *bufSize, 
+static void stringIntoBuffer(char **buffer, char **bufPtr, size_t *bufSize, 
 		      char *string){
   size_t i;
 
@@ -536,7 +536,8 @@ char *nexusWriteCallback(mxml_node_t *node){
   char pNumber[80], indent[80], format[30];
   char *buffer, *bufPtr;
   pNXDS dataset;
-  int bufsize, i, length, currentLen, table_style = 0; 
+  int currentLen, table_style = 0; 
+  size_t i, bufsize, length;
   int is_definition = 0;
   /* this is set by nxconvert when making a definiton */
   is_definition = (getenv("NX_IS_DEFINITION") != NULL);
