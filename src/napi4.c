@@ -386,7 +386,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     char HDF_VERSION[64];
     uint32 lmajor, lminor, lrelease;
     int32 am1=0;
-    int32 file_id=0, an_id=0, ann_id=0;
   
     *pHandle = NULL;
 
