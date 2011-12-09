@@ -1178,7 +1178,6 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
 {
   hid_t  dataID, aid2, aid1, attID;
   herr_t status;
-  int type = NX_CHAR;
   char name[] = "target";
 
     /*
@@ -1229,8 +1228,6 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 {
     pNexusFile5 pFile;
     char        linkTarget[1024];
-    int         type = NX_CHAR;
-    hid_t 	targetid;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1266,9 +1263,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   {
     pNexusFile5 pFile;
     char        linkTarget[1024];
-    int         type = NX_CHAR;
     char        *itemName = NULL;
-    hid_t 	targetid;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1427,7 +1422,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 /*---------------------------------------------------------------------------*/
 static int countObjectsInGroup(hid_t loc_id)
 {
-  int count = 0, type;
+  int count = 0;
   H5G_info_t numobj;
   
   herr_t status;

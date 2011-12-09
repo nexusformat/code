@@ -768,7 +768,6 @@ void DumpData(FILE *fd, int rank, int dimensions[], int dataType, void *data)
 {
    char *dataPtr;
    int i, dimSize, dataSize, lineSize;
-   int type_size = 0;
 
    if (rank > 1) { /* Recursively call DumpData until rank = 1 */
       for (i = 1, dimSize = 1; i < rank; i++) {

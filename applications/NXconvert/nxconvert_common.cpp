@@ -106,7 +106,7 @@ static const char* definition_name = NULL;
 
 int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_)
 {
-   int i, nx_is_definition = 0;
+   int nx_is_definition = 0;
    if (definition_name_ != NULL && definition_name_[0] == '\0') {
      definition_name = NULL;
    } else {
@@ -152,7 +152,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    if (nx_format != NXACC_CREATE && nx_format != NXACC_CREATE4)
    {
 /* now create any required links */
-       for(i=0; i<links_to_make.size(); i++)
+       for(size_t i=0; i<links_to_make.size(); i++)
        {
 	    if (NXopenpath(outId, links_to_make[i].to) != NX_OK) return NX_ERROR;
 	    if (NXgetdataID(outId, &link) == NX_OK  || NXgetgroupID(outId, &link) == NX_OK)
