@@ -357,11 +357,13 @@ fi
 
 # enable compiler warnings if gcc
 if test "$CC" = "gcc"; then
-    CFLAGS="$CFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+#    CFLAGS="$CFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+    CFLAGS="$CFLAGS -Wall"
 fi
 
 if test "$CXX" = "g++"; then
-    CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+#    CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+    CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 dnl extra FCFLAGS for Absoft f90
@@ -606,7 +608,7 @@ HDF5_API_DEFS="-DH5Acreate_vers=2 -DH5Aiterate_vers=2 -DH5Dcreate_vers=2 -DH5Dop
 if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
-	1.[[689]]*)
+	1.[[89]]*)
     		HDF5_LDFLAGS=""
 		for j in lib lib64; do
 		    if test -d $H5ROOT/$j; then 
@@ -618,8 +620,10 @@ if test "$H5ROOT"; then
     		HDF5_LDFLAGS="$HDF5_LDFLAGS -lhdf5 -lz"
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5 -DH5_NO_DEPRECATED_SYMBOLS ${HDF5_API_DEFS}"
 		;;
-	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
-		H5ROOT="";;
+	*)	
+		AC_MSG_WARN([The HDF 5 installation at $H5ROOT is not the right version ($H5VERSION). You need at least 1.8])
+		H5ROOT=""
+		;;
     esac
 fi
 AC_SUBST(HDF5_LDFLAGS)
