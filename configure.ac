@@ -287,6 +287,7 @@ if test x$with_python != xno; then
     fi
     AM_PATH_PYTHON(,, :)
     AC_CHECK_PYTHON_MODULE(numpy)
+    AC_CHECK_PYTHON_MODULE(ctypes)
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
@@ -759,7 +760,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
-AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy_found"  = "yes"])
+AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy_found"  = "yes" -a "$PYTHON_ctypes_found"  = "yes"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
@@ -954,7 +955,7 @@ build:
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
 		 MATLAB:	       ${MATLABBINDING} (--with-matlabroot=${MATLABROOT})
-	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
+	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found, ctypes found: $PYTHON_ctypes_found)
 
 	application tools:
 	     ant:	       ${ANT_PROG}
