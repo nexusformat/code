@@ -47,6 +47,16 @@ endif (HDF5_SEARCH)
 
 set(HDF4_SEARCH "" CACHE PATH "Where to search for HDF4")
 
+function(install_pdb target)
+#	set (OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+	set (OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/Release)
+	get_target_property (OUT_NAME ${target} OUTPUT_NAME)
+	get_filename_component (OUT_BASE_NAME ${OUT_NAME} NAME_WE)
+#	set(PDB_FILE ${OUT_DIR}/${OUT_BASE_NAME}${CMAKE_DEBUG_POSTFIX}.pdb)
+	set(PDB_FILE ${OUT_DIR}/${OUT_BASE_NAME}.pdb)
+	install (FILES ${PDB_FILE} DESTINATION bin COMPONENT Runtime)  
+endfunction()
+
 #find_package(HDF5 REQUIRED)
 find_package(HDF5)
 find_package(JPEG)
@@ -57,6 +67,25 @@ find_package(Doxygen)
 find_package(SWIG)
 find_package(TCL)
 find_package(LATEX)
+
+if(UNIX)
+    set(HDF5_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf5" "/sw")
+	set(HD_NAMES df)
+	set(HM_NAMES mfhdf)
+endif(UNIX)
+if(WIN32)
+    set(HDF5_SEARCH_DEFAULT "C:/InstallKits/HDF5-1.8.6-win64")
+    set(HDF4_SEARCH_DEFAULT "C:/InstallKits/HDF4.2.6_win_x64")
+	set(HD_NAMES hd426m hd425m)
+	set(HM_NAMES hm426m hm425m)
+	set(CMAKE_DEBUG_POSTFIX "D")
+endif(WIN32)
+
+find_library(MY_HDF5_DLL NAMES hdf5dll HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES dll lib DOC "location of hdf5 dll")
+find_library(MY_HDF5 NAMES hdf5 HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hdf5 lib")
+
+find_library(MY_HD_DLL NAMES ${HD_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll lib DOC "location of hd dll")
+find_library(MY_HM_DLL NAMES ${HM_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll lib DOC "location of hm dll")
 
 if (WIN32)
     if (HDF5_SEARCH)
@@ -69,7 +98,7 @@ if (WIN32)
 	    set(HDF4_CPP "-I\"${HDF4_SEARCH}/include\" -DHDF4")
 	    set(HDF4_FOUND YES)
     endif (HDF4_SEARCH)
-	set(MXML_CPP "-DNXXML")
+#	set(MXML_CPP "-DNXXML")
 else(WIN32)
     set(HDF5_STATIC_LIBRARIES ${HDF5_SEARCH}/lib/libhdf5.a )
     set(HDF5_SHARED_LIBRARIES ${HDF5_SEARCH}/lib/libhdf5.so )
@@ -104,8 +133,6 @@ find_library(TERMCAP termcap)
 find_library(READLINE readline)
 find_library(HISTORY history)
 
-#Why do we need this?
-SET(CPACK_SET_DESTDIR "ON")
 
 if(M)
    set(M_LINK "-lm")
@@ -245,7 +272,8 @@ file(WRITE ${CMAKE_SOURCE_DIR}/include/nxconfig.h "/*A dummy config*/")
 # warning 4820 is byte padding in structures
 # warning 4996 is about using _strdup ratherthan strdup etc
 # /W4 rather than /Wall
-set(NX_CFLAGS "/W4 /wd4820 /wd4996")
+# /Zi to get pdb file in all configurations
+set(NX_CFLAGS "/W4 /wd4820 /wd4996 /Zi")
 set(NX_CPP -D_CRT_SECURE_NO_WARNINGS)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
@@ -277,14 +305,8 @@ add_subdirectory (third_party)
 #add_subdirectory (Windows_extra)
 
 # CPack must always be last
-set(CPACK_BINARY_NSIS ON)
-set(CPACK_BINARY_ZIP OFF)
-
-set(CPACK_SOURCE_IGNORE_FILES 
-	  "nexus_spec.in;~$;/.svn/;/.cvsignore/;/CMakeFiles/;/nbproject/;autogen.sh;cmake_install.cmake;Makefile;${CPACK_SOURCE_IGNORE_FILES}") 
-
-include(CPack)
 configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" 
 				"${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake"
 				@ONLY)
 set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake")
+include(CPack)

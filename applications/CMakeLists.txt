@@ -42,7 +42,9 @@ if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (NXdump)
 endif()
 
+if (HAVE_XML)
 add_subdirectory (nxingest)
+endif(HAVE_XML)
 
 add_subdirectory (NXtraverse)
 

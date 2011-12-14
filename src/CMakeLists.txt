@@ -47,6 +47,9 @@ if (WIN32)
 	endif()
 endif (WIN32)
 
+if(HAVE_XML)
+    set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
+endif(HAVE_XML)
 
 set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
 
@@ -104,6 +107,7 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 target_link_libraries(NeXus_Shared_Library ${HDF5_SHARED_LIBRARIES} ${HDF4_SHARED_LIBRARIES} ${NX_LIBS})
 
+if(HAVE_XML)
 if(MXMLLIB_FOUND)
     target_link_libraries(NeXus_Static_Library ${MXML})
     target_link_libraries(NeXus_Shared_Library ${MXML})
@@ -111,8 +115,11 @@ else()
     target_link_libraries(NeXus_Static_Library MXML_Static_Library)
     target_link_libraries(NeXus_Shared_Library MXML_Shared_Library)
 endif(MXMLLIB_FOUND)
+endif(HAVE_XML)
 
 install (TARGETS NeXus_Static_Library NeXus_Shared_Library
          RUNTIME DESTINATION bin COMPONENT Runtime
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
+
+install_pdb (NeXus_Shared_Library)
