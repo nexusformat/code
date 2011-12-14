@@ -26,7 +26,7 @@ dnl AT_TESTED(NXtest.f90)
 
 AT_BANNER([[Testing the NeXus C library.]])
 
-AT_SETUP([Check the HDF4 binding])
+AT_SETUP([Check the C binding using HDF4])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.hdf
 Number of global attributes: 4
@@ -83,7 +83,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the HDF5 binding])
+AT_SETUP([Check the C binding using HDF5])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.h5
 Number of global attributes: 4
@@ -142,7 +142,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the HDF4 binding (static library)])
+AT_SETUP([Check the C binding using HDF4 (static library)])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.hdf
 Number of global attributes: 4
@@ -199,7 +199,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the HDF5 binding (static library)])
+AT_SETUP([Check the C binding using HDF5 (static library)])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test-hdf5-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.h5
 Number of global attributes: 4
@@ -258,7 +258,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the XML binding])
+AT_SETUP([Check the C binding using XML])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
 Number of global attributes: 7
@@ -320,7 +320,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the XML binding (static library)])
+AT_SETUP([Check the C binding using XML (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
 Number of global attributes: 7
@@ -382,7 +382,7 @@ External File Linking tested OK
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the XML table binding (static library)])
+AT_SETUP([Check the C binding using XML table (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-table-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest-table.xml
 Number of global attributes: 7
@@ -568,7 +568,7 @@ Link Check OK
 AT_CLEANUP
 
 AT_BANNER([Check the C++ binding.])
-AT_SETUP([Check the C++ binding with HDF4.])
+AT_SETUP([Check the C++ binding using HDF4.])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test_cpp-hdf4 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.hdf
 Number of global attributes: 4
@@ -605,7 +605,7 @@ entry1 external URL = nxfile://data/dmc01.hdf#entry1
 TypeMap is correct size
 ]])
 AT_CLEANUP
-AT_SETUP([Check the C++ binding with HDF5.])
+AT_SETUP([Check the C++ binding using HDF5.])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test_cpp-hdf5 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.h5
 Number of global attributes: 4
@@ -644,7 +644,7 @@ entry1 external URL = nxfile://data/dmc01.h5#entry1
 TypeMap is correct size
 ]])
 AT_CLEANUP
-AT_SETUP([Check the C++ binding with xml.])
+AT_SETUP([Check the C++ binding using xml.])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test_cpp-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.xml
 Number of global attributes: 7
@@ -688,21 +688,21 @@ TypeMap is correct size
 AT_CLEANUP
 
 AT_BANNER([[Testing the Python bindings.]])
-AT_SETUP([Checking HDF4 test file])
+AT_SETUP([Checking python binding using HDF4])
 AT_CHECK([skip_test && $HAVE_HDF4 && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q hdf4 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 test file])
+AT_SETUP([Checking python binding using HDF5])
 AT_CHECK([$HAVE_HDF5 && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q hdf5 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
-AT_SETUP([Checking XML test file])
+AT_SETUP([Checking python binding using XML])
 AT_CHECK([$HAVE_XML && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q xml | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
 
 AT_BANNER([[Testing the IDL bindings.]])
-AT_SETUP([Checking HDF4 test file])
+AT_SETUP([Checking IDL binding using HDF4])
 AT_CHECK([skip_test && $HAVE_HDF4 && $HAVE_IDL && $SETUP_TEST && $SHELL $abs_srcdir/../bindings/idl/testidlnapi "'hdf4'" | sed -e 's/\r$//' ],[], 
 [['hdf4'
 NeXus IDL Api Write test
@@ -1119,7 +1119,7 @@ nxclose status:        1
 finished napi test
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 test file])
+AT_SETUP([Checking IDL binding using HDF5])
 AT_CHECK([$HAVE_HDF5 && $HAVE_IDL && $SETUP_TEST && $SHELL $abs_srcdir/../bindings/idl/testidlnapi "'hdf5'" | sed -e 's/\r$//' ],[], 
 [['hdf5'
 NeXus IDL Api Write test
@@ -1536,7 +1536,7 @@ nxclose status:        1
 finished napi test
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML test file])
+AT_SETUP([Checking IDL binding using XML])
 AT_CHECK([$HAVE_XML && $HAVE_IDL && $SETUP_TEST && $SHELL $abs_srcdir/../bindings/idl/testidlnapi "'xml'" | sed -e 's/\r$//' ],[], 
 [['xml'
 NeXus IDL Api Write test
@@ -1970,55 +1970,55 @@ finished napi test
 AT_CLEANUP
 
 AT_BANNER([[Testing the NeXus File Converter.]])
-AT_SETUP([Checking HDF4 -> HDF4 ])
+AT_SETUP([Checking nxconvert HDF4 -> HDF4 ])
 AT_CHECK([$HAVE_HDF4 && nxconvert --hdf 4 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to HDF4 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF4 -> HDF5 ])
+AT_SETUP([Checking nxconvert HDF4 -> HDF5 ])
 AT_CHECK([$HAVE_HDF4 && $HAVE_HDF5 && nxconvert --hdf 5 NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to HDF5 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF4 -> XML ])
+AT_SETUP([Checking nxconvert HDF4 -> XML ])
 AT_CHECK([$HAVE_HDF4 && $HAVE_XML && nxconvert -x NXtest.hdf a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.hdf to XML NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
-#AT_SETUP([Checking HDF5 -> HDF4 ])
+#AT_SETUP([Checking nxconvert HDF5 -> HDF4 ])
 #AT_CHECK([$HAVE_HDF5 && $HAVE_HDF4 && nxconvert --hdf 4 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 #[[Converting NXtest.h5 to HDF4 NeXus file a.a
 #Convertion successful.
 #]])
 #AT_CLEANUP
-AT_SETUP([Checking HDF5 -> HDF5 ])
+AT_SETUP([Checking nxconvert HDF5 -> HDF5 ])
 AT_CHECK([$HAVE_HDF5 && nxconvert --hdf 5 NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to HDF5 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 -> XML ])
+AT_SETUP([Checking nxconvert HDF5 -> XML ])
 AT_CHECK([$HAVE_HDF5 && $HAVE_XML && nxconvert -x NXtest.h5 a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.h5 to XML NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
-#AT_SETUP([Checking XML -> HDF4 ])
+#AT_SETUP([Checking nxconvert XML -> HDF4 ])
 #AT_CHECK([$HAVE_XML && $HAVE_HDF4 && nxconvert --hdf 4 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 #[[Converting NXtest.xml to HDF4 NeXus file a.a
 #Convertion successful.
 #]])
 #AT_CLEANUP
-AT_SETUP([Checking XML -> HDF5 ])
+AT_SETUP([Checking nxconvert XML -> HDF5 ])
 AT_CHECK([$HAVE_XML && $HAVE_HDF5 && nxconvert --hdf 5 NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to HDF5 NeXus file a.a
 Convertion successful.
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML -> XML ])
+AT_SETUP([Checking nxconvert XML -> XML ])
 AT_CHECK([$HAVE_XML && nxconvert -x NXtest.xml a.a | sed -e 's/\r$//' ],[], 
 [[Converting NXtest.xml to XML NeXus file a.a
 Convertion successful.
@@ -2026,24 +2026,24 @@ Convertion successful.
 AT_CLEANUP
 
 AT_BANNER([[Testing NXsummary Tool.]])
-AT_SETUP([Checking HDF4 test file])
+AT_SETUP([Checking nxsummary HDF4 test file])
 AT_CHECK([$HAVE_HDF4 && $HAVE_NXSUMMARY && nxsummary --config NONE NXtest.hdf | sed -e 's/\r$//' ],[], 
 [[SAMPLE:
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 test file])
+AT_SETUP([Checking nxsummary HDF5 test file])
 AT_CHECK([$HAVE_HDF5 && $HAVE_NXSUMMARY && nxsummary --config NONE NXtest.h5 | sed -e 's/\r$//' ],[], 
 [[SAMPLE:
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML test file])
+AT_SETUP([Checking nxsummary XML test file])
 AT_CHECK([$HAVE_XML && $HAVE_NXSUMMARY && nxsummary --config NONE NXtest.xml | sed -e 's/\r$//' ],[], 
 [[SAMPLE:
 ]])
 AT_CLEANUP
 
 AT_BANNER([[Testing NXbrowse Tool.]])
-AT_SETUP([Checking HDF4 test file])
+AT_SETUP([Checking nxbrowse HDF4 test file])
 AT_CHECK([$HAVE_HDF4 && env NO_READLINE=1 nxbrowse NXtest.hdf  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF_version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
 [[NXBrowse 4.3.0 Copyright (C) 2009 NeXus Data Format
     NeXus_version = 4.3.0
@@ -2055,7 +2055,7 @@ NX>   NX Group : entry (NXentry)
 NX>
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 test file])
+AT_SETUP([Checking nxbrowse HDF5 test file])
 AT_CHECK([$HAVE_HDF5 && env NO_READLINE=1 nxbrowse NXtest.h5  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF5_Version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
 [[NXBrowse 4.3.0 Copyright (C) 2009 NeXus Data Format
     NeXus_version = 4.3.0
@@ -2067,7 +2067,7 @@ NX>   NX Group : entry (NXentry)
 NX>
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML test file])
+AT_SETUP([Checking nxbrowse XML test file])
 AT_CHECK([$HAVE_XML && env NO_READLINE=1 nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep -v 'file_time = ' | grep -v 'XML_version = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
 [[NXBrowse 4.3.0 Copyright (C) 2009 NeXus Data Format
     NeXus_version = 4.3.0
@@ -2084,19 +2084,19 @@ NX>
 AT_CLEANUP
 
 AT_BANNER([[Testing NXdir Tool.]])
-AT_SETUP([Checking HDF4 test file])
+AT_SETUP([Checking nxdir HDF4 test file])
 AT_CHECK([$HAVE_HDF4 && nxdir NXtest.hdf | sed -e 's/\r$//' ],[], 
 [[/entry/
 /link/
 ]])
 AT_CLEANUP
-AT_SETUP([Checking HDF5 test file])
+AT_SETUP([Checking nxdir HDF5 test file])
 AT_CHECK([$HAVE_HDF5 && nxdir NXtest.h5 | sed -e 's/\r$//' ],[], 
 [[/entry/
 /link/
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML test file])
+AT_SETUP([Checking nxdir XML test file])
 AT_CHECK([$HAVE_XML && nxdir NXtest.xml | sed -e 's/\r$//' ],[], 
 [[/entry/
 /link/
