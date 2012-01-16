@@ -131,6 +131,7 @@ if test ! -z "$with_f77" -a x"$with_f77" != x"no" ; then
 	mytop=`pwd`
 	dnl get right F77 include option
 	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
+	FFLAGS="$FFLAGS -g"
 	AC_F77_LIBRARY_LDFLAGS
 	WITH_F77=yes
 else
@@ -152,7 +153,7 @@ if test ! -z "$with_f90" -a x"$with_f90" != x"no" ; then
 	dnl ready compiled module to point the option at so for now we are just
 	dnl check that the option takes a directory and the compiler works
 	mytop=`pwd`
-	FCFLAGS="$FCFLAGS -I$mytop/bindings/f90"
+	FCFLAGS="$FCFLAGS -g -I$mytop/bindings/f90"
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-qextname])
@@ -833,6 +834,7 @@ AC_CONFIG_FILES([Makefile
 		applications/NXconvert/Makefile
 		applications/NXvalidate/Makefile
 		applications/NXvalidate/nxvalidate
+		applications/NXvalidate/src/org/nexusformat/nxvalidate/resources/nxvalidate.properties
 		applications/NXdump/Makefile
 		applications/nxingest/Makefile
 		applications/NXsummary/Makefile
