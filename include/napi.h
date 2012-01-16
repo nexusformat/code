@@ -592,7 +592,7 @@ extern  NXstatus  NXgetnextentry(NXhandle handle, NXname name, NXname nxclass, i
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetslab(NXhandle handle, void* data, int start[], int size[]);
+extern  NXstatus  NXgetslab(NXhandle handle, void* data, const int start[], const int size[]);
 
 
   /**
@@ -772,12 +772,12 @@ extern  NXstatus  NXlinkexternaldataset(NXhandle handle, CONSTCHAR *name, CONSTC
    * \return NX_OK when allocation succeeds, NX_ERROR in the case of an error.   
    * \ingroup c_memory
    */ 
-extern  NXstatus  NXmalloc(void** data, int rank, int dimensions[], int datatype);
+extern  NXstatus  NXmalloc(void** data, int rank, const int dimensions[], int datatype);
 
   /**
    * @copydoc NXmalloc()
    */ 
-extern  NXstatus  NXmalloc64(void** data, int rank, int64_t dimensions[], int datatype);
+extern  NXstatus  NXmalloc64(void** data, int rank, const int64_t dimensions[], int datatype);
 
 
   /**

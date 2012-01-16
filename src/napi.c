@@ -1091,7 +1091,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   
   
   NXstatus  NXmalloc (void** data, int rank, 
-				   int dimensions[], int datatype)
+				   const int dimensions[], int datatype)
   {
 	  int status;
 	  int64_t* dims64 = dupDimsArray(dimensions, rank);
@@ -1101,7 +1101,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   }
 
   NXstatus  NXmalloc64 (void** data, int rank, 
-				   int64_t dimensions[], int datatype)
+				   const int64_t dimensions[], int datatype)
   {
     int i;
     size_t size = 1;
@@ -1292,7 +1292,7 @@ char *nxitrim(char *str)
   /*-------------------------------------------------------------------------*/
 
   NXstatus  NXgetslab (NXhandle fid, void *data, 
-				    int iStart[], int iSize[])
+				    const int iStart[], const int iSize[])
   {
 	  int i, iType, rank;
 	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];

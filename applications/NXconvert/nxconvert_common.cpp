@@ -149,8 +149,6 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    {
 	return NX_ERROR;
    }
-   if (nx_format != NXACC_CREATE && nx_format != NXACC_CREATE4)
-   {
 /* now create any required links */
        for(size_t i=0; i<links_to_make.size(); i++)
        {
@@ -176,7 +174,6 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 	        return NX_ERROR;
 	    }
 	}
-   }
 /* Close the input and output files */
    if (NXclose (&outId) != NX_OK)
    {
@@ -189,7 +186,9 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 static int WriteGroup (int is_definition)
 { 
   
-   int status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+   int i, status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+   static const int slab_start[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+   static const int MAX_DEF_ARRAY_ELEMENTS_PER_DIM = 3; /* doesn't work yet - only 1 element is written */
    NXname name, nxclass;
    void *dataBuffer;
    NXlink link;
@@ -210,14 +209,30 @@ static int WriteGroup (int is_definition)
 	    if (!strcmp(current_path, link.targetPath))
 	    {
                 if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
-                if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
-                if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
                 if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
                 if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
+		if ( is_definition && (dataType != NX_CHAR) )
+		{
+		    for(i=0; i<dataRank; ++i)
+		    {
+			if (dataDimensions[i] > MAX_DEF_ARRAY_ELEMENTS_PER_DIM)
+			{
+			    dataDimensions[i] = MAX_DEF_ARRAY_ELEMENTS_PER_DIM;
+			}
+		    }
+                    if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
+                    if (NXgetslab (inId, dataBuffer, slab_start, dataDimensions)  != NX_OK) return NX_ERROR;
+                    if (NXputslab (outId, dataBuffer, slab_start, dataDimensions) != NX_OK) return NX_ERROR;
+		}
+		else
+		{
+                    if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
+                    if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
+                    if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
+		}
                 if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
-                if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
-                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
                 if (NXclosedata (outId) != NX_OK) return NX_ERROR;
+                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
 	        remove_path(name);
 	    }
 	    else
