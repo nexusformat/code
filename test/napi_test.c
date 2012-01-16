@@ -448,6 +448,14 @@ int main (int argc, char *argv[])
     printf("Failure on NXopenpath\n");
     return 0;
   }
+  if(NXopengrouppath(fileid,"/entry/data/comp_data") != NX_OK){
+    printf("Failure on NXopengrouppath\n");
+    return 0;
+  }
+  if(NXopenpath(fileid,"/entry/data/r8_data") != NX_OK){
+    printf("Failure on NXopenpath\n");
+    return 0;
+  }
   printf("NXopenpath checks OK\n");
 
   if (NXclose (&fileid) != NX_OK) return 1;
