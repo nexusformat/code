@@ -91,6 +91,31 @@ Additional metadata can be inserted before saving the data to a file.
     >>> root.entry.sample.temperature.units = 'K'
     >>> root.save('example.nxs')
 
+NXfield objects have much of the functionality of Numpy arrays. They may be used
+in simple arithmetic expressions with other NXfields, Numpy arrays or scalar
+values and will be cast as ndarray objects if used as arguments in Numpy
+modules.
+
+    >>> x=nx.NXfield(np.linspace(0,10.0,11))
+    >>> x
+    NXfield([  0.   1.   2. ...,   8.   9.  10.])
+    >>> x + 10
+    NXfield([ 10.  11.  12. ...,  18.  19.  20.])
+    >>> sin(x)
+    array([ 0.        ,  0.84147098,  0.90929743, ...,  0.98935825,
+        0.41211849, -0.54402111])
+
+If the arithmetic operation is assigned to a NeXus group attribute, it will be
+automatically cast as a valid NXfield object with the type and shape determined
+by the Numpy array type and shape.
+
+    >>> entry.data.result = sin(x)
+    >>> entry.data.result
+    NXfield([ 0.          0.84147098  0.90929743 ...,  0.98935825  0.41211849
+     -0.54402111])
+    >>> entry.data.result.dtype, entry.data.result.shape
+    (dtype('float64'), (11,))
+
 NeXus Objects
 -------------
 Properties of the entry in the tree are referenced by attributes that depend
@@ -256,10 +281,6 @@ class NeXusTree(napi.NeXus):
     the file closed again.  open/close are available for when we want to
     read/write slabs without the overhead of moving the file cursor each time.
     The NXdata objects in the returned tree hold the object values.
-
-    Subclasses can provide methods for individual NeXus classes such
-    as NXbeam or NXdata.  Brave users can also specialize NXgroup, 
-    NXattr, NXfield and NXlink methods.
     """
 
     def readfile(self):
@@ -418,8 +439,6 @@ class NeXusTree(napi.NeXus):
         if hasattr(data,'_target'):
             return [(path, data._target)]
 
-        # Finally some data, but don't read it if it is big
-        # Instead record the location, type and size
         #If the array size is too large, their product needs a long integer
         if np.prod(shape) > 10000 or np.prod(shape) < 0:
             # Compress the fastest moving dimension of large datasets
@@ -2841,8 +2860,8 @@ def load(filename, mode='r'):
     return tree
 
 #Definition for when there are name clashes with Numpy
-read = load
-__all__.append('read')
+nxload = load
+__all__.append('nxload')
 
 def save(filename, group, format='w5'):
     """
