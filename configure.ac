@@ -834,7 +834,6 @@ AC_CONFIG_FILES([Makefile
 		applications/NXconvert/Makefile
 		applications/NXvalidate/Makefile
 		applications/NXvalidate/nxvalidate
-		applications/NXvalidate/src/org/nexusformat/nxvalidate/resources/nxvalidate.properties
 		applications/NXdump/Makefile
 		applications/nxingest/Makefile
 		applications/NXsummary/Makefile
