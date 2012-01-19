@@ -8,7 +8,7 @@ The `nexus.tree` modules are designed to accomplish two goals:
 
     1. To provide convenient access to existing data contained in NeXus files.
     2. To enable new NeXus data to be created and manipulated interactively.
-    
+
 These goals are achieved by mapping hierarchical NeXus data structures directly
 into python objects, which either represent NeXus groups or NeXus fields.
 Entries in a group are referenced much like fields in a class are referenced in
@@ -74,8 +74,8 @@ file. The data are first created as Numpy arrays
     >>> x=y=np.linspace(0,2*np.pi,101)
     >>> X,Y=np.meshgrid(y,x)
     >>> z=np.sin(X)*np.sin(Y)
-    
-Then a NeXus data groups are created and the data inserted to produce a 
+
+Then a NeXus data groups are created and the data inserted to produce a
 NeXus-compliant structure that can be saved to a file.
 
     >>> root=nx.NXroot(NXentry())
@@ -146,13 +146,13 @@ NeXus attributes (class NXattr) have a type and a value only::
     * dtype    attribute type
     * nxdata   attribute data
 
-There is a subclass of NXgroup for each group class defined by the NeXus standard, 
+There is a subclass of NXgroup for each group class defined by the NeXus standard,
 so it is possible to create an NXgroup of NeXus class NXsample directly using:
 
     >>> sample = NXsample()
 
-The default group name will be the class name following the 'NX', so the above 
-group will have an nxname of 'sample'. However, this is overridden by the 
+The default group name will be the class name following the 'NX', so the above
+group will have an nxname of 'sample'. However, this is overridden by the
 attribute name when it is assigned as a group attribute, e.g.,
 
     >>> entry.sample1 = NXsample()
@@ -163,9 +163,9 @@ You can traverse the tree by component class instead of component name. Since
 there may be multiple components of the same class in one group you will need to
 specify which one to use.  For example,
 
-    tree.NXentry[0].NXinstrument[0].NXdetector[0].distance 
+    tree.NXentry[0].NXinstrument[0].NXdetector[0].distance
 
-references the first detector of the first instrument of the first entry. 
+references the first detector of the first instrument of the first entry.
 Unfortunately, there is no guarantee regarding the order of the entries, and it
 may vary from call to call, so this is mainly useful in iterative searches.
 
@@ -224,8 +224,8 @@ signal sample points, entry is file/path within the file to the data group and
 title is the title of the group or the parent NXentry, if available.
 """
 
-__all__ = ['NeXusTree', 'NXobject', 'NXfield', 'NXgroup', 'NXattr', 
-           'NX_MEMORY', 'setmemory', 'load', 'save', 'tree', 'centers', 
+__all__ = ['NeXusTree', 'NXobject', 'NXfield', 'NXgroup', 'NXattr',
+           'NX_MEMORY', 'setmemory', 'load', 'save', 'tree', 'centers',
            'NXlink', 'NXlinkfield', 'NXlinkgroup', 'SDS', 'NXlinkdata']
 
 from copy import copy, deepcopy
@@ -287,13 +287,13 @@ class NeXusTree(napi.NeXus):
         """
         Read the NeXus file structure from the file and return a tree of NXobjects.
 
-        Large datasets are not read until they are needed.  
+        Large datasets are not read until they are needed.
         """
         self.open()
         self.openpath("/")
         root = self._readgroup()
         self.close()
-        root._group = None        
+        root._group = None
         # Resolve links (not necessary now that link is set as a property)
         #self._readlinks(root, root)
         root._file = self
@@ -303,7 +303,7 @@ class NeXusTree(napi.NeXus):
         """
         Write the NeXus file structure to a file.
 
-        The file is assumed to start empty. Updating individual objects can be 
+        The file is assumed to start empty. Updating individual objects can be
         done using the napi interface, with nx.handle as the nexus file handle.
         """
         self.open()
@@ -378,7 +378,7 @@ class NeXusTree(napi.NeXus):
         """
         n,name,nxclass = self.getgroupinfo()
         attrs = {}
-        attrs = self.getattrs()        
+        attrs = self.getattrs()
         if 'target' in attrs and attrs['target'] != self.path:
             # This is a linked group; don't try to load it.
             group = self.NXlinkgroup(target=attrs['target'], name=name)
@@ -396,7 +396,7 @@ class NeXusTree(napi.NeXus):
             for obj in children.values():
                 obj._group = group
         return group
-    
+
     def _readlinks(self, root, group):
         """
         Convert linked objects into direct references.
@@ -412,11 +412,11 @@ class NeXusTree(napi.NeXus):
                     pass
             elif isinstance(entry, NXgroup):
                 self._readlinks(root, entry)
-                
+
     def _writeattrs(self, attrs):
         """
         Return the attributes for the currently open group/data.
-        
+
         If no group or data object is open, the file attributes are returned.
         """
         for name,pair in attrs.iteritems():
@@ -445,7 +445,7 @@ class NeXusTree(napi.NeXus):
             slab_dims = np.ones(len(shape),'i')
             if shape[-1] < 100000:
                 slab_dims[-1] = shape[-1]
-            else: 
+            else:
                 slab_dims[-1] = 100000
             self.compmakedata(data.nxname, data.dtype, shape, 'lzw', slab_dims)
         else:
@@ -492,7 +492,7 @@ class NeXusTree(napi.NeXus):
     def _writelinks(self, links):
         """
         Create links within the NeXus file.
-        
+
         THese are defined by the set of pairs returned by _writegroup.
         """
         gid = {}
@@ -526,7 +526,7 @@ class NeXusTree(napi.NeXus):
 def _readaxes(axes):
     """
     Return a list of axis names stored in the 'axes' attribute.
-    
+
     The delimiter separating each axis can be white space, a comma, or a colon.
     """
     import re
@@ -539,7 +539,7 @@ class AttrDict(dict):
     """
     A dictionary class to assign all attributes to the NXattr class.
     """
-    
+
     def __setitem__(self, key, value):
         if isinstance(value, NXattr):
             dict.__setitem__(self, key, value)
@@ -551,11 +551,11 @@ class NXattr(object):
 
     """
     Class for NeXus attributes of a NXfield or NXgroup object.
-    
-    This class is only used for NeXus attributes that are stored in a 
-    NeXus file and helps to distinguish them from Python attributes. 
+
+    This class is only used for NeXus attributes that are stored in a
+    NeXus file and helps to distinguish them from Python attributes.
     There are two Python attributes for each NeXus attribute.
-    
+
     Python Attributes
     -----------------
     nxdata : string, Numpy scalar, or Numpy ndarray
@@ -564,13 +564,13 @@ class NXattr(object):
         The data type of the NeXus attribute. This is set to 'char' for
         a string attribute or the string of the corresponding Numpy data type
         for a numeric attribute.
-    
+
     NeXus Attributes
     ----------------
     NeXus attributes are stored in the 'attrs' dictionary of the parent object,
     NXfield or NXgroup, but can often be referenced or assigned using the
-    attribute name as if it were an object attribute. 
-    
+    attribute name as if it were an object attribute.
+
     For example, after assigning the NXfield, the following three attribute
     assignments are all equivalent::
 
@@ -578,14 +578,14 @@ class NXattr(object):
         >>> entry.sample.temperature.attrs['units'] = 'K'
         >>> entry.sample.temperature.units = NXattr('K')
         >>> entry.sample.temperature.units = 'K'
-    
-    The third version above is only allowed for NXfield attributes and is 
+
+    The third version above is only allowed for NXfield attributes and is
     not allowed if the attribute has the same name as one of the following
     internally defined attributes, i.e.,
-    
-    ['entries', 'attrs', 'dtype','shape'] 
-    
-    or if the attribute name begins with 'nx' or '_'. It is only possible to 
+
+    ['entries', 'attrs', 'dtype','shape']
+
+    or if the attribute name begins with 'nx' or '_'. It is only possible to
     reference attributes with one of the proscribed names using the 'attrs'
     dictionary.
 
@@ -605,7 +605,7 @@ class NXattr(object):
             if isinstance(value, str):
                 self._data,self._dtype = str(value), 'char'
             elif value is not None:
-                if isinstance(value, NXobject): 
+                if isinstance(value, NXobject):
                     raise NeXusError, "A data attribute cannot be a NXfield or NXgroup"
                 else:
                     self._data = np.array(value)
@@ -638,10 +638,10 @@ class NXattr(object):
         Return the attribute value.
         """
         return self._data
-    
+
     def _getdtype(self):
         return self._dtype
-    
+
     nxdata = property(_getdata,doc="The attribute values")
     dtype = property(_getdtype, "Data type of NeXus attribute")
 
@@ -651,37 +651,37 @@ class NXobject(object):
 
     """
     Abstract base class for elements in NeXus files.
-    
+
     The object has a subclass of NXfield, NXgroup, or one of the NXgroup
     subclasses. Child nodes should be accessible directly as object attributes.
     Constructors for NXobject objects are defined by either the NXfield or
     NXgroup classes.
-    
+
     Python Attributes
     -----------------
     nxclass : string
         The class of the NXobject. NXobjects can have class NXfield, NXgroup, or
         be one of the NXgroup subclasses.
     nxname : string
-        The name of the NXobject. Since it is possible to reference the same 
+        The name of the NXobject. Since it is possible to reference the same
         Python object multiple times, this is not necessarily the same as the
         object name. However, if the object is part of a NeXus tree, this will
-        be the attribute name within the tree. 
+        be the attribute name within the tree.
     nxgroup : NXgroup
-        The parent group containing this object within a NeXus tree. If the 
+        The parent group containing this object within a NeXus tree. If the
         object is not part of any NeXus tree, it will be set to None.
     nxpath : string
         The path to this object with respect to the root of the NeXus tree. For
         NeXus data read from a file, this will be a group of class NXroot, but
-        if the NeXus tree was defined interactively, it can be any valid 
+        if the NeXus tree was defined interactively, it can be any valid
         NXgroup.
     nxroot : NXgroup
         The root object of the NeXus tree containing this object. For
         NeXus data read from a file, this will be a group of class NXroot, but
-        if the NeXus tree was defined interactively, it can be any valid 
+        if the NeXus tree was defined interactively, it can be any valid
         NXgroup.
     nxfile : NeXusTree
-        The file handle of the root object of the NeXus tree containing this 
+        The file handle of the root object of the NeXus tree containing this
         object.
     filename : string
         The file name of NeXus object's tree file handle.
@@ -692,7 +692,7 @@ class NXobject(object):
     -------
     dir(self, attrs=False, recursive=False):
         Print the group directory.
-        
+
         The directory is a list of NeXus objects within this group, either NeXus
         groups or NXfield data. If 'attrs' is True, NXfield attributes are
         displayed. If 'recursive' is True, the contents of child groups are also
@@ -700,16 +700,16 @@ class NXobject(object):
 
     tree:
         Print the object's tree.
-        
-        It invokes the 'dir' method with both 'attrs' and 'recursive' 
+
+        It invokes the 'dir' method with both 'attrs' and 'recursive'
         set to True. Note that this method is defined as a property attribute and
         does not require parentheses.
 
     save(self, filename, format='w5')
         Save the NeXus group into a file
 
-        The object is wrapped in an NXroot group (with name 'root') and an 
-        NXentry group (with name 'entry'), if necessary, in order to produce 
+        The object is wrapped in an NXroot group (with name 'root') and an
+        NXentry group (with name 'entry'), if necessary, in order to produce
         a valid NeXus file.
 
     """
@@ -724,11 +724,11 @@ class NXobject(object):
 
     def __repr__(self):
         return "NXobject('%s','%s')"%(self.nxclass,self.nxname)
-        
+
     def _setattrs(self, attrs):
         for k,v in attrs.items():
             self._attrs[k] = v
-    
+
     def _str_name(self,indent=0):
         if self.nxclass == 'NXfield':
             return " "*indent+self.nxname
@@ -751,7 +751,7 @@ class NXobject(object):
         Print current object and possibly children.
         """
         result = [self._str_name(indent=indent)]
-        if attrs and self.attrs: 
+        if attrs and self.attrs:
             result.append(self._str_attrs(indent=indent+2))
         # Print children
         entries = self.entries
@@ -768,13 +768,18 @@ class NXobject(object):
         result
         return "\n".join(result)
 
+    def walk(self):
+        print "yielding",self.nxname,self.nxclass
+        if False: yield
+
+
     def dir(self,attrs=False,recursive=False):
         """
         Print the object directory.
-        
-        The directory is a list of NeXus objects within this object, either 
-        NeXus groups or NXfields. If 'attrs' is True, NXfield attributes are 
-        displayed. If 'recursive' is True, the contents of child groups are 
+
+        The directory is a list of NeXus objects within this object, either
+        NeXus groups or NXfields. If 'attrs' is True, NXfield attributes are
+        displayed. If 'recursive' is True, the contents of child groups are
         also displayed.
         """
         print self._str_tree(attrs=attrs,recursive=recursive)
@@ -783,30 +788,31 @@ class NXobject(object):
     def tree(self):
         """
         Print the directory tree.
-        
-        The tree contains all child objects of this object and their children. 
-        It invokes the 'dir' method with both 'attrs' and 'recursive' set 
+
+        The tree contains all child objects of this object and their children.
+        It invokes the 'dir' method with both 'attrs' and 'recursive' set
         to True.
         """
-        print self._str_tree(attrs=True,recursive=True)
-        
-    def treestr(self, attrs=True):
+        return self._str_tree(attrs=False,recursive=True)
+
+    @property
+    def tree_with_attrs(self, attrs=True):
         """Return directory tree string"""
-        return self._str_tree(attrs=attrs,recursive=True)
-    
+        return self._str_tree(attrs=True,recursive=True)
+
     def save(self, filename=None, format='w5'):
         """
         Save the NeXus object to a data file.
-        
-        An error is raised if the object is an NXroot group from an external file 
-        that has been opened as readonly and no file name is specified.  
-        
-        The object is wrapped in an NXroot group (with name 'root') and an 
-        NXentry group (with name 'entry'), if necessary, in order to produce 
+
+        An error is raised if the object is an NXroot group from an external file
+        that has been opened as readonly and no file name is specified.
+
+        The object is wrapped in an NXroot group (with name 'root') and an
+        NXentry group (with name 'entry'), if necessary, in order to produce
         a valid NeXus file.
         """
         if self.nxclass == "NXroot":
-            tree = self
+            root = self
             if filename is None:
                 if self._file:
                     if self._file.mode == napi.ACC_READ:
@@ -816,32 +822,33 @@ class NXobject(object):
                         filename = self._file.filename
         elif filename:
             if self.nxclass == "NXentry":
-                tree = NXroot(self)
+                root = NXroot(self)
             else:
-                tree = NXroot(NXentry(self))
+                root = NXroot(NXentry(self))
 
         if filename is None:
             raise NeXusError, "No output file specified"
 
+        # Preload the source tree
+        for node in root.walk():
+            #print "node",node.nxname, node
+            if isinstance(node, NXfield): node.nxdata
+        if root._file: root._file.close()
         file = NeXusTree(filename, format)
-        file.writefile(tree)
+        file.writefile(root)
         file.close()
-        tree._file = file
-        tree._file.open()
-        tree._file.openpath('/')
-        tree._setattrs(tree._file.getattrs())
-        tree._file.close()
-        return tree
+
+        return load(filename, 'rw')
 
     def _getclass(self):
         return self._class
-    
+
     def _getname(self):
         return self._name
-    
+
     def _getgroup(self):
         return self._group
-    
+
     def _getpath(self):
         if self.nxgroup is None:
             return ""
@@ -849,7 +856,7 @@ class NXobject(object):
             return "/" + self.nxname
         else:
             return self.nxgroup._getpath()+"/"+self.nxname
-    
+
     def _getroot(self):
         if self.nxgroup is None:
             return self
@@ -857,13 +864,13 @@ class NXobject(object):
             return self.nxgroup
         else:
             return self.nxgroup._getroot()
-    
+
     def _getfile(self):
         return self.nxroot._file
-    
+
     def _getfilename(self):
         return self.nxroot._file.filename
-    
+
     def _getattrs(self):
         return self._attrs
 
@@ -881,11 +888,11 @@ class NXfield(NXobject):
 
     """
     A NeXus data field.
-    
+
     This is a subclass of NXobject that contains scalar, array, or string data
-    and associated NeXus attributes. 
-    
-    NXfield(value=None, name='unknown', dtype='', shape=[], attrs={}, file=None, 
+    and associated NeXus attributes.
+
+    NXfield(value=None, name='unknown', dtype='', shape=[], attrs={}, file=None,
             path=None, group=None, **attr)
 
     Input Parameters
@@ -910,7 +917,7 @@ class NXfield(NXobject):
         by the data type of the 'value' parameter.
     shape : list of ints
         The dimensions of the NXfield data, which is accessible as the NXfield
-        attribute 'shape'. This corresponds to the shape of the Numpy array. 
+        attribute 'shape'. This corresponds to the shape of the Numpy array.
         Scalars (numeric or string) are stored as Numpy zero-rank arrays,
         for which shape=[].
     attrs : dict
@@ -919,7 +926,7 @@ class NXfield(NXobject):
     file : filename
         The file from which the NXfield has been read.
     path : string
-        The path to this object with respect to the root of the NeXus tree, 
+        The path to this object with respect to the root of the NeXus tree,
         using the convention for unix file paths.
     group : NXgroup or subclass of NXgroup
         The parent NeXus object. If the NXfield is initialized as the attribute
@@ -930,17 +937,17 @@ class NXfield(NXobject):
     nxclass : 'NXfield'
         The class of the NXobject.
     nxname : string
-        The name of the NXfield. Since it is possible to reference the same 
+        The name of the NXfield. Since it is possible to reference the same
         Python object multiple times, this is not necessarily the same as the
         object name. However, if the field is part of a NeXus tree, this will
-        be the attribute name within the tree. 
+        be the attribute name within the tree.
     nxgroup : NXgroup
-        The parent group containing this field within a NeXus tree. If the 
+        The parent group containing this field within a NeXus tree. If the
         field is not part of any NeXus tree, it will be set to None.
     dtype : string or Numpy dtype
         The data type of the NXfield value. If the NXfield has been initialized
         but the data values have not been read in or defined, this is a string.
-        Otherwise, it is set to the equivalent Numpy dtype. 
+        Otherwise, it is set to the equivalent Numpy dtype.
     shape : list or tuple of ints
         The dimensions of the NXfield data. If the NXfield has been initialized
         but the data values have not been read in or defined, this is a list of
@@ -948,28 +955,28 @@ class NXfield(NXobject):
         tuple. Scalars (numeric or string) are stored as Numpy zero-rank arrays,
         for which shape=().
     attrs : dict
-        A dictionary of all the NeXus attributes associated with the field. 
+        A dictionary of all the NeXus attributes associated with the field.
         These are objects with class NXattr.
     nxdata : scalar, Numpy array or string
-        The data value of the NXfield. This is normally initialized using the 
-        'value' parameter (see above). If the NeXus data is contained 
-        in a file and the size of the NXfield array is too large to be stored 
+        The data value of the NXfield. This is normally initialized using the
+        'value' parameter (see above). If the NeXus data is contained
+        in a file and the size of the NXfield array is too large to be stored
         in memory, the value is not read in until this attribute is directly
         accessed. Even then, if there is insufficient memory, a value of None
-        will be returned. In this case, the NXfield array should be read as a 
-        series of smaller slabs using 'get'. 
+        will be returned. In this case, the NXfield array should be read as a
+        series of smaller slabs using 'get'.
     nxdata_as('units') : scalar value or Numpy array
         If the NXfield 'units' attribute has been set, the data values, stored
         in 'nxdata', are returned after conversion to the specified units.
     nxpath : string
         The path to this object with respect to the root of the NeXus tree. For
         NeXus data read from a file, this will be a group of class NXroot, but
-        if the NeXus tree was defined interactively, it can be any valid 
+        if the NeXus tree was defined interactively, it can be any valid
         NXgroup.
     nxroot : NXgroup
         The root object of the NeXus tree containing this object. For
         NeXus data read from a file, this will be a group of class NXroot, but
-        if the NeXus tree was defined interactively, it can be any valid 
+        if the NeXus tree was defined interactively, it can be any valid
         NXgroup.
 
     NeXus Attributes
@@ -982,9 +989,9 @@ class NXfield(NXobject):
     within the NeXus standard. When writing modules, it is recommended that the
     attributes always be referenced using the 'attrs' dictionary if there is
     any doubt.
-    
+
     a) Assigning a NeXus attribute
-    
+
     In the example below, after assigning the NXfield, the following three
     NeXus attribute assignments are all equivalent:
 
@@ -992,15 +999,15 @@ class NXfield(NXobject):
         >>> entry.sample.temperature.attrs['units'] = 'K'
         >>> entry.sample.temperature.units = NXattr('K')
         >>> entry.sample.temperature.units = 'K'
-    
+
     b) Referencing a NeXus attribute
-    
+
     If the name of the NeXus attribute is not the same as any of the Python
-    attributes listed above, or one of the methods listed below, or any of the 
+    attributes listed above, or one of the methods listed below, or any of the
     attributes defined for Numpy arrays, they can be referenced as if they were
     a Python attribute of the NXfield. However, it is only possible to reference
     attributes with one of the proscribed names using the 'attrs' dictionary.
-    
+
         >>> entry.sample.temperature.tree = 10.0
         >>> entry.sample.temperature.tree
         temperature = 40.0
@@ -1018,7 +1025,7 @@ class NXfield(NXobject):
     ndarrays. NXfields are technically not a sub-class of the ndarray class, but
     most Numpy operations work on NXfields, returning either another NXfield or,
     in some cases, an ndarray that can easily be converted to an NXfield.
-    
+
         >>> x = NXfield((1.0,2.0,3.0,4.0))
         >>> print x+1
         [ 2.  3.  4.  5.]
@@ -1042,9 +1049,9 @@ class NXfield(NXobject):
         dtype('float64')
 
     All these operations return valid NXfield objects containing the same
-    attributes as the first NXobject in the expression. The 'reshape' and 
+    attributes as the first NXobject in the expression. The 'reshape' and
     'transpose' methods also return NXfield objects.
-    
+
     It is possible to use the standard slice syntax.
 
         >>> x=NXfield(np.linspace(0,10,11))
@@ -1052,20 +1059,20 @@ class NXfield(NXobject):
         NXfield([  0.   1.   2. ...,   8.   9.  10.])
         >>> x[2:5]
         NXfield([ 2.  3.  4.])
-    
+
     In addition, it is possible to use floating point numbers as the slice
     indices. If one of the indices is not integer, both indices are used to
     extract elements in the array with values between the two index values.
-    
+
         >>> x=NXfield(np.linspace(0,100.,11))
         >>> x
         NXfield([   0.   10.   20. ...,   80.   90.  100.])
         >>> x[20.:50.]
         NXfield([ 20.  30.  40.  50.])
-   
-    The standard Numpy ndarray attributes and methods will also work with 
+
+    The standard Numpy ndarray attributes and methods will also work with
     NXfields, but will return scalars or Numpy arrays.
-    
+
         >>> x.size
         4
         >>> x.sum()
@@ -1078,36 +1085,36 @@ class NXfield(NXobject):
         1.25
         >>> x.reshape((2,2)).sum(1)
         array([ 3.,  7.])
-    
+
     Finally, NXfields are cast as ndarrays for operations that require them.
-    The returned value will be the same as for the equivalent ndarray 
+    The returned value will be the same as for the equivalent ndarray
     operation, e.g.,
-    
+
     >>> np.sin(x)
     array([ 0.84147098,  0.90929743,  0.14112001, -0.7568025 ])
     >>> np.sqrt(x)
     array([ 1.        ,  1.41421356,  1.73205081,  2.        ])
-    
+
     Methods
     -------
     dir(self, attrs=False):
         Print the NXfield specification.
-        
-        This outputs the name, dimensions and data type of the NXfield. 
+
+        This outputs the name, dimensions and data type of the NXfield.
         If 'attrs' is True, NXfield attributes are displayed.
 
     tree:
         Print the NXfield's tree.
-        
-        It invokes the 'dir' method with both 'attrs' and 'recursive' 
+
+        It invokes the 'dir' method with both 'attrs' and 'recursive'
         set to True. Note that this method is defined as a property attribute and
         does not require parentheses.
-        
-        
+
+
     save(self, filename, format='w5')
         Save the NXfield into a file wrapped in a NXroot group and NXentry group
-        with default names. This is equivalent to 
-        
+        with default names. This is equivalent to
+
         >>> NXroot(NXentry(NXfield(...))).save(filename)
 
     Examples
@@ -1115,7 +1122,7 @@ class NXfield(NXobject):
     >>> x = NXfield(np.linspace(0,2*np.pi,101), units='degree')
     >>> phi = x.nxdata_as(units='radian')
     >>> y = NXfield(np.sin(phi))
-    
+
     # Read a Ni x Nj x Nk array one vector at a time
     >>> with root.NXentry[0].data.data as slab:
             Ni,Nj,Nk = slab.shape
@@ -1126,7 +1133,7 @@ class NXfield(NXobject):
 
     """
 
-    def __init__(self, value=None, name='unknown', dtype=None, shape=(), attrs={}, group=None, 
+    def __init__(self, value=None, name='unknown', dtype=None, shape=(), attrs={}, group=None,
                  **attr):
         if isinstance(value, list) or isinstance(value, tuple):
             value = np.array(value)
@@ -1165,7 +1172,7 @@ class NXfield(NXobject):
                 return "NXfield(%s)" % self._str_value()
         else:
             return "NXfield(dtype=%s,shape=%s)" % (self.dtype,self.shape)
-        
+
     def __getattr__(self, name):
         """
         Enable standard numpy ndarray attributes if not otherwise defined.
@@ -1192,10 +1199,10 @@ class NXfield(NXobject):
     def __getitem__(self, index):
         """
         Returns a slice from the NXfield.
-        
+
         In most cases, the slice values are applied to the NXfield nxdata array
         and returned within an NXfield object with the same metadata. However,
-        if the array is one-dimensional and the index start and stop values 
+        if the array is one-dimensional and the index start and stop values
         are real, the nxdata array is returned with values between those limits.
         This is to allow axis arrays to be limited by their actual value. This
         real-space slicing should only be used on monotonically increasing (or
@@ -1228,7 +1235,7 @@ class NXfield(NXobject):
             except ValueError:
                 result = self.nxdata.__getitem__(index)
         return NXfield(result, name=self.nxname, attrs=self.attrs)
-                
+
     def __setitem__(self, index, value):
         """
         Assign a slice to the NXfield.
@@ -1237,7 +1244,7 @@ class NXfield(NXobject):
             self.nxdata[index] = value
         else:
             raise NeXusError, "NXfield dataspace not yet allocated"
-                
+
     def __deepcopy__(self, memo):
         dpcpy = self.__class__()
         memo[id(self)] = dpcpy
@@ -1253,12 +1260,12 @@ class NXfield(NXobject):
         """
         Return the length of the NXfield data.
         """
-        return np.prod(self.shape)        
-        
+        return np.prod(self.shape)
+
     def index(self, value, max=False):
         """
         Return the index of the NXfield nxdata array that is greater than or equal to the value.
-        
+
         If max, then return the index that is less than or equal to the value.
         This should only be used on one-dimensional monotonically increasing arrays.
         """
@@ -1272,7 +1279,7 @@ class NXfield(NXobject):
         Cast the NXfield as an array when it is expected by numpy
         """
         return self.nxdata
-                
+
     def __eq__(self, other):
         """
         Return true if the values of the NXfield are the same.
@@ -1303,10 +1310,10 @@ class NXfield(NXobject):
         """
         try:
             if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata+other.nxdata, name=self.nxname, 
+                return NXfield(value=self.nxdata+other.nxdata, name=self.nxname,
                                attrs=self.attrs)
             else:
-                return NXfield(value=self.nxdata+other, name=self.nxname, 
+                return NXfield(value=self.nxdata+other, name=self.nxname,
                                attrs=self.attrs)
         except TypeError, message:
             raise NeXusError, message
@@ -1314,7 +1321,7 @@ class NXfield(NXobject):
     def __radd__(self, other):
         """
         Return the sum of the NXfield and another NXfield or number.
-        
+
         This variant makes __add__ commutative.
         """
         return self.__add__(other)
@@ -1325,10 +1332,10 @@ class NXfield(NXobject):
         """
         try:
             if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata-other.nxdata, name=self.nxname, 
+                return NXfield(value=self.nxdata-other.nxdata, name=self.nxname,
                                attrs=self.attrs)
             else:
-                return NXfield(value=self.nxdata-other, name=self.nxname, 
+                return NXfield(value=self.nxdata-other, name=self.nxname,
                                attrs=self.attrs)
         except TypeError, message:
             raise NeXusError, message
@@ -1339,10 +1346,10 @@ class NXfield(NXobject):
         """
         try:
             if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata*other.nxdata, name=self.nxname, 
+                return NXfield(value=self.nxdata*other.nxdata, name=self.nxname,
                                attrs=self.attrs)
             else:
-                return NXfield(value=self.nxdata*other, name=self.nxname, 
+                return NXfield(value=self.nxdata*other, name=self.nxname,
                                attrs=self.attrs)
         except TypeError, message:
             raise NeXusError, message
@@ -1350,7 +1357,7 @@ class NXfield(NXobject):
     def __rmul__(self, other):
         """
         Return the product of the NXfield and another NXfield or number.
-        
+
         This variant makes __mul__ commutative.
         """
         return self.__mul__(other)
@@ -1361,10 +1368,10 @@ class NXfield(NXobject):
         """
         try:
             if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata/other.nxdata, name=self.nxname, 
+                return NXfield(value=self.nxdata/other.nxdata, name=self.nxname,
                                attrs=self.attrs)
             else:
-                return NXfield(value=self.nxdata/other, name=self.nxname, 
+                return NXfield(value=self.nxdata/other, name=self.nxname,
                                attrs=self.attrs)
         except TypeError, message:
             raise NeXusError, message
@@ -1375,10 +1382,10 @@ class NXfield(NXobject):
         """
         try:
             if isinstance(other, NXfield):
-                return NXfield(value=other.nxdata/self.nxdata, name=self.nxname, 
+                return NXfield(value=other.nxdata/self.nxdata, name=self.nxname,
                                attrs=self.attrs)
             else:
-                return NXfield(value=other/self.nxdata, name=self.nxname, 
+                return NXfield(value=other/self.nxdata, name=self.nxname,
                                attrs=self.attrs)
         except TypeError, message:
             raise NeXusError, message
@@ -1388,7 +1395,7 @@ class NXfield(NXobject):
         Return the NXfield raised to the specified power.
         """
         try:
-            return NXfield(value=pow(self.nxdata,power), name=self.nxname, 
+            return NXfield(value=pow(self.nxdata,power), name=self.nxname,
                            attrs=self.attrs)
         except TypeError, message:
             raise NeXusError, message
@@ -1403,16 +1410,16 @@ class NXfield(NXobject):
 
     def transpose(self,shape=None):#added shape variable here 9/8/2010
         """
-        Returns an NXfield containing the transpose of the data array. Equivalent 
+        Returns an NXfield containing the transpose of the data array. Equivalent
         to the Numpy ndarray.transpose.
         """
         # error, no shape variable in this scope
-        return NXfield(value=self.nxdata.transpose(shape), name=self.nxname, 
+        return NXfield(value=self.nxdata.transpose(shape), name=self.nxname,
                        attrs=self.attrs)
 
     def centers(self):
         """
-        Returns an NXfield with the centers of a single axis 
+        Returns an NXfield with the centers of a single axis
         assuming it contains bin boundaries.
         """
         return NXfield((self.nxdata[:-1]+self.nxdata[1:])/2,
@@ -1423,7 +1430,7 @@ class NXfield(NXobject):
         Open the datapath for reading slab by slab.
 
         Note: the results are undefined if you try accessing
-        more than one slab at a time.  Don't nest your 
+        more than one slab at a time.  Don't nest your
         "with data" statements!
         """
         # TODO: provide a file lock to prevent movement of the
@@ -1449,7 +1456,7 @@ class NXfield(NXobject):
 
         Offsets are 0-origin. Shape can be inferred from the data.
         Offset and shape must each have one entry per dimension.
-        
+
         This operation should be performed in a "with group.data"
         context.
 
@@ -1485,17 +1492,17 @@ class NXfield(NXobject):
                 raise NeXusError, "NeXus file is readonly"
             self.__enter__()
             if isinstance(data, NXfield):
-                self.nxroot._file.putslab(data.nxdata.astype(self.dtype), offset, 
+                self.nxroot._file.putslab(data.nxdata.astype(self.dtype), offset,
                                         data.shape)
             else:
                 data = np.array(data)
-                self.nxroot._file.putslab(data.astype(self.dtype), offset, 
+                self.nxroot._file.putslab(data.astype(self.dtype), offset,
                                         data.shape)
             self.__exit__()
             if refresh: self.refresh()
         else:
             raise NeXusError, "No output file specified for NXputslab"
-        
+
     def add(self, data, offset):
         """
         Add a slab into the data array.
@@ -1505,19 +1512,19 @@ class NXfield(NXobject):
         compatible data types.
         """
         if isinstance(data, NXfield):
-            value = self.get(offset, data.shape)        
+            value = self.get(offset, data.shape)
             self.put(data.nxdata.astype(self.dtype)+value, offset)
         else:
             value = self.get(offset, data.shape)
             self.put(data.astype(self.dtype)+value, offset)
-        
+
     def refresh(self):
         """
         Rereads the data from the file.
 
         Calls net to read in data again. If put has been called, then
         nxdata is no longer synchronized with the file making a refresh
-        necessary. This will only be performed if nxdata already stores the 
+        necessary. This will only be performed if nxdata already stores the
         data.
         """
         if self._value is not None:
@@ -1525,7 +1532,7 @@ class NXfield(NXobject):
                 self._value = self.nxroot._file.readpath(self.nxpath)
             else:
                 raise NeXusError, "No file specified for reads"
-        
+
     def convert(self, units=""):
         """
         Return the data in particular units.
@@ -1538,7 +1545,7 @@ class NXfield(NXobject):
             return self._converter(self._value,units)
         else:
             return None
-    
+
     def __str__(self):
         """
         If value is loaded, return the value as a string.  If value is
@@ -1564,10 +1571,13 @@ class NXfield(NXobject):
         if attrs and self.attrs: v.append(self._str_attrs(indent=indent+2))
         return "\n".join(v)
 
+    def walk(self):
+        yield self
+
     def _getaxes(self):
         """
         Return a list of NXfields containing axes.
-        
+
         Only works if the NXfield has the 'axes' attribute
         """
         try:
@@ -1589,9 +1599,9 @@ class NXfield(NXobject):
                     raise MemoryError, 'Data size larger than NX_MEMORY=%s MB' % NX_MEMORY
             else:
                 return None
-                
+
         return self._value
-    
+
     def _setdata(self, value):
         if value is not None:
             if str(self._dtype) == 'char' or isinstance(value,str):
@@ -1608,10 +1618,10 @@ class NXfield(NXobject):
 
     def _getdtype(self):
         return self._dtype
-    
+
     def _getshape(self):
         return self._shape
-    
+
     def _getsize(self):
         return len(self)
 
@@ -1643,7 +1653,7 @@ class PylabPlotter(object):
     def plot(self, signal, axes, title, errors, **opts):
         """
         Plot the data entry.
-        
+
         Raises NeXusError if the data cannot be plotted.
         """
         try:
@@ -1656,7 +1666,7 @@ class PylabPlotter(object):
         else:
             over = False
         if not over: pylab.clf()
-        
+
         if "log" in opts.keys():
             logplot = True
             del opts["log"]
@@ -1664,7 +1674,7 @@ class PylabPlotter(object):
             logplot = False
 
         # Provide a new view of the data if there is a dimension of length 1
-        if 1 in signal.shape: 
+        if 1 in signal.shape:
             data, axes = _fixaxes(signal, axes)
         else:
             data = signal.nxdata
@@ -1680,7 +1690,7 @@ class PylabPlotter(object):
             if logplot:
                 data = np.log10(np.clip(data,0,1e8))
                 if errors: ebars = np.log10(errors)
-            elif errors: 
+            elif errors:
                 ebars = errors.nxdata
             if errors:
                 myopts=copy(opts)
@@ -1694,7 +1704,7 @@ class PylabPlotter(object):
                 pylab.xlabel(label(axes[0]))
                 pylab.ylabel(label(signal))
                 pylab.title(title)
- 
+
         #Two dimensional plot
         else:
             if len(data.shape) > 2:
@@ -1708,7 +1718,7 @@ class PylabPlotter(object):
             #gridplot = pylab.pcolormesh
             gridplot = imshow_irregular
             if logplot:
-                gridplot(axis_data[0], axis_data[1], 
+                gridplot(axis_data[0], axis_data[1],
                          np.log10(np.clip(data,0.,1e8)+1).T, **opts)
             else:
                 gridplot(axis_data[0], axis_data[1], np.clip(data,-1e8,1e8).T, **opts)
@@ -1719,56 +1729,56 @@ class PylabPlotter(object):
     @staticmethod
     def show():
         import pylab
-        pylab.show()    
+        pylab.show()
 
 
 class NXgroup(NXobject):
 
     """
     A NeXus group object.
-    
+
     This is a subclass of NXobject and is the base class for the specific
-    NeXus group classes, e.g., NXentry, NXsample, NXdata. 
-    
+    NeXus group classes, e.g., NXentry, NXsample, NXdata.
+
     NXgroup(*items, **opts)
 
     Parameters
     ----------
-    The NXgroup parameters consist of a list of positional and/or keyword 
+    The NXgroup parameters consist of a list of positional and/or keyword
     arguments.
-    
-    Positional Arguments : These must be valid NeXus objects, either an NXfield 
-    or a NeXus group. These are added without modification as children of this 
-    group. 
-    
-    Keyword Arguments : Apart from a list of special keywords shown below, 
+
+    Positional Arguments : These must be valid NeXus objects, either an NXfield
+    or a NeXus group. These are added without modification as children of this
+    group.
+
+    Keyword Arguments : Apart from a list of special keywords shown below,
     keyword arguments are used to add children to the group using the keywords
-    as attribute names. The values can either be valid NXfields or NXgroups, 
-    in which case the 'name' attribute is changed to the keyword, or they 
+    as attribute names. The values can either be valid NXfields or NXgroups,
+    in which case the 'name' attribute is changed to the keyword, or they
     can be numerical or string data, which are converted to NXfield objects.
-    
+
     Special Keyword Arguments:
 
     name : string
-        The name of the NXgroup, which is directly accessible as the NXgroup 
-        attribute 'name'. If the NXgroup is initialized as the attribute of 
-        a parent group, the name is automatically set to the name of this 
+        The name of the NXgroup, which is directly accessible as the NXgroup
+        attribute 'name'. If the NXgroup is initialized as the attribute of
+        a parent group, the name is automatically set to the name of this
         attribute. If 'nxclass' is specified and has the usual prefix 'NX',
         the default name is the class name without this prefix.
     nxclass : string
-        The class of the NXgroup. 
+        The class of the NXgroup.
     entries : dict
-        A dictionary containing a list of group entries. This is an 
-        alternative way of adding group entries to the use of keyword 
+        A dictionary containing a list of group entries. This is an
+        alternative way of adding group entries to the use of keyword
         arguments.
     file : filename
         The file from which the NXfield has been read.
     path : string
-        The path to this object with respect to the root of the NeXus tree, 
+        The path to this object with respect to the root of the NeXus tree,
         using the convention for unix file paths.
     group : NXobject (NXgroup or subclass of NXgroup)
-        The parent NeXus group, which is accessible as the group attribute 
-        'group'. If the group is initialized as the attribute of 
+        The parent NeXus group, which is accessible as the group attribute
+        'group'. If the group is initialized as the attribute of
         a parent group, this is set to the parent group.
 
     Python Attributes
@@ -1776,7 +1786,7 @@ class NXgroup(NXobject):
     nxclass : string
         The class of the NXobject.
     nxname : string
-        The name of the NXfield. 
+        The name of the NXfield.
     entries : dictionary
         A dictionary of all the NeXus objects contained within an NXgroup.
     attrs : dictionary
@@ -1789,12 +1799,12 @@ class NXgroup(NXobject):
     nxpath : string
         The path to this object with respect to the root of the NeXus tree. For
         NeXus data read from a file, this will be a group of class NXroot, but
-        if the NeXus tree was defined interactively, it can be any valid 
+        if the NeXus tree was defined interactively, it can be any valid
         NXgroup.
     nxroot : NXgroup
         The root object of the NeXus tree containing this object. For
         NeXus data read from a file, this will be a group of class NXroot, but
-        if the NeXus tree was defined interactively, it can be any valid 
+        if the NeXus tree was defined interactively, it can be any valid
         NXgroup.
 
     NeXus Group Entries
@@ -1806,10 +1816,10 @@ class NXgroup(NXobject):
     be assigned or referenced as if they are Python attributes, i.e., using the
     dictionary name directly as the group attribute name, as long as this name
     is not the same as one of the Python attributes defined above or as one of
-    the NXfield Python attributes.  
-    
+    the NXfield Python attributes.
+
     a) Assigning a NeXus object to a NeXus group
-    
+
     In the example below, after assigning the NXgroup, the following three
     NeXus object assignments to entry.sample are all equivalent:
 
@@ -1819,23 +1829,23 @@ class NXgroup(NXobject):
         >>> entry.sample.temperature = 40.0
         >>> entry.sample.temperature
         NXfield(40.0)
-        
-    If the assigned value is not a valid NXobject, then it is cast as an NXfield 
+
+    If the assigned value is not a valid NXobject, then it is cast as an NXfield
     with a type determined from the Python data type.
-    
+
         >>> entry.sample.temperature = 40.0
         >>> entry.sample.temperature
         NXfield(40.0)
         >>> entry.data.data.x=np.linspace(0,10,11).astype('float32')
         >>> entry.data.data.x
         NXfield([  0.   1.   2. ...,   8.   9.  10.])
-    
+
     b) Referencing a NeXus object in a NeXus group
-    
+
     If the name of the NeXus object is not the same as any of the Python
     attributes listed above, or the methods listed below, they can be referenced
-    as if they were a Python attribute of the NXgroup. However, it is only possible 
-    to reference attributes with one of the proscribed names using the group 
+    as if they were a Python attribute of the NXgroup. However, it is only possible
+    to reference attributes with one of the proscribed names using the group
     dictionary, i.e.,
 
         >>> entry.sample.tree = 100.0
@@ -1844,7 +1854,7 @@ class NXgroup(NXobject):
           tree = 100.0
         >>> entry.sample['tree']
         NXfield(100.0)
-    
+
     For this reason, it is recommended to use the group dictionary to reference
     all group objects within Python scripts.
 
@@ -1870,16 +1880,16 @@ class NXgroup(NXobject):
     -------
     insert(self, NXobject, name='unknown'):
         Insert a valid NXobject (NXfield or NXgroup) into the group.
-        
+
         If NXobject has a 'name' attribute and the 'name' keyword is not given,
         then the object is inserted with the NXobject name.
-        
+
     makelink(self, NXobject):
         Add the NXobject to the group entries as a link (NXlink).
 
     dir(self, attrs=False, recursive=False):
         Print the group directory.
-        
+
         The directory is a list of NeXus objects within this group, either NeXus
         groups or NXfield data. If 'attrs' is True, NXfield attributes are
         displayed. If 'recursive' is True, the contents of child groups are also
@@ -1887,16 +1897,16 @@ class NXgroup(NXobject):
 
     tree:
         Print the group tree.
-        
-        It invokes the 'dir' method with both 'attrs' and 'recursive' 
+
+        It invokes the 'dir' method with both 'attrs' and 'recursive'
         set to True. Note that this method is defined as a property attribute and
         does not require parentheses.
-        
+
     save(self, filename, format='w5')
         Save the NeXus group into a file
 
-        The object is wrapped in an NXroot group (with name 'root') and an 
-        NXentry group (with name 'entry'), if necessary, in order to produce 
+        The object is wrapped in an NXroot group (with name 'root') and an
+        NXentry group (with name 'entry'), if necessary, in order to produce
         a valid NeXus file.
 
     Examples
@@ -1911,17 +1921,17 @@ class NXgroup(NXobject):
         @units = K
 
     Note: All the currently defined NeXus classes are defined as subclasses
-          of the NXgroup class. It is recommended that these are used 
+          of the NXgroup class. It is recommended that these are used
           directly, so that the above examples become:
 
     >>> entry = NXentry(x)
     >>> entry.sample = NXsample(temperature=NXfield(40.0,units='K'))
-    
+
     or
-    
+
     >>> entry.sample.temperature = 40.0
     >>> entry.sample.temperature.units='K'
-     
+
     """
 
     # Plotter to use for plot calls
@@ -1950,7 +1960,7 @@ class NXgroup(NXobject):
             try: # If one exists, set the class to a valid NXgroup subclass
                 self.__class__ = globals()[self.nxclass]
             except KeyError:
-                pass             
+                pass
         for item in items:
             try:
                 setattr(self, item.nxname, item)
@@ -1966,9 +1976,15 @@ class NXgroup(NXobject):
 
     def __repr__(self):
         return "%s('%s')" % (self.__class__.__name__,self.nxname)
-        
+
     def _str_value(self,indent=0):
         return ""
+
+    def walk(self):
+        yield self
+        for node in self.entries.values():
+            for child in node.walk():
+                yield child
 
     def __getattr__(self, key):
         """
@@ -1985,18 +2001,18 @@ class NXgroup(NXobject):
     def __setattr__(self, name, value):
         """
         Set an attribute as an object or regular Python attribute.
-        
-        It is assumed that attributes starting with 'nx' or '_' are regular 
+
+        It is assumed that attributes starting with 'nx' or '_' are regular
         Python attributes. All other attributes are converted to valid NXobjects,
         with class NXfield, NXgroup, or a sub-class of NXgroup, depending on the
         assigned value.
-        
-        The internal value of the attribute name, i.e., 'name', is set to the 
-        attribute name used in the assignment.  The parent group of the 
+
+        The internal value of the attribute name, i.e., 'name', is set to the
+        attribute name used in the assignment.  The parent group of the
         attribute, i.e., 'group', is set to the parent group of the attribute.
-        
+
         If the assigned value is a numerical (scalar or array) or string object,
-        it is converted to an object of class NXfield, whose attribute, 'nxdata', 
+        it is converted to an object of class NXfield, whose attribute, 'nxdata',
         is set to the assigned value.
         """
         if name.startswith('_'):
@@ -2004,16 +2020,16 @@ class NXgroup(NXobject):
         elif isinstance(value, NXattr):
             self._attrs[name] = value
         else:
-            self[name] = value 
+            self[name] = value
 
     def __getitem__(self, index):
         """
         Returns a slice from the NXgroup nxsignal attribute (if it exists) as
-        a new NXdata group, if the index is a slice object. 
-        
+        a new NXdata group, if the index is a slice object.
+
         In most cases, the slice values are applied to the NXfield nxdata array
         and returned within an NXfield object with the same metadata. However,
-        if the array is one-dimensional and the index start and stop values 
+        if the array is one-dimensional and the index start and stop values
         are real, the nxdata array is returned with values between the limits
         set by those axis values.
         This is to allow axis arrays to be limited by their actual value. This
@@ -2023,7 +2039,7 @@ class NXgroup(NXobject):
         if isinstance(index, str): #i.e., requesting a dictionary value
             return self._entries[index]
 
-        if not self.nxsignal: 
+        if not self.nxsignal:
             raise NeXusError, "No plottable signal"
         if not hasattr(self,"nxclass"):
             raise NeXusError, "Indexing not allowed for groups of unknown class"
@@ -2036,7 +2052,7 @@ class NXgroup(NXobject):
             axes = self.nxaxes
             axes[0] = axes[0][index]
             if isinstance(index.start, float) or isinstance(index.stop, float):
-                index = slice(self.nxaxes[0].index(index.start), 
+                index = slice(self.nxaxes[0].index(index.start),
                               self.nxaxes[0].index(index.stop,max=True)+1)
                 result = NXdata(self.nxsignal[index], axes)
                 if self.nxerrors: result.errors = self.errors[index]
@@ -2073,7 +2089,7 @@ class NXgroup(NXobject):
         if isinstance(value, NXlink):
             self._entries[key] = value
         elif isinstance(value, NXobject):
-            if value.nxgroup is not None:   
+            if value.nxgroup is not None:
                 memo = {}
                 value = deepcopy(value, memo)
                 value._attrs = copy(value._attrs)
@@ -2081,7 +2097,7 @@ class NXgroup(NXobject):
             value._name = key
             self._entries[key] = value
         else:
-            self._entries[key] = NXfield(value=value, name=key, group=self) 
+            self._entries[key] = NXfield(value=value, name=key, group=self)
 
     def __deepcopy__(self, memo):
         dpcpy = self.__class__()
@@ -2090,7 +2106,7 @@ class NXgroup(NXobject):
             if isinstance(v, NXgroup):
                 dpcpy[k] = deepcopy(v, memo)
             else:
-                dpcpy[k] = copy(v)                
+                dpcpy[k] = copy(v)
         for k, v in self.attrs.items():
             dpcpy.attrs[k] = copy(v)
         return dpcpy
@@ -2106,13 +2122,13 @@ class NXgroup(NXobject):
         Returns the values of NeXus objects in the group.
         """
         return self._entries.values()
-    
+
     def items(self):
         """
         Returns a list of the NeXus objects in the group as (key,value) pairs.
         """
         return self._entries.items()
-    
+
     def has_key(self, name):
         """
         Returns true if the NeXus object with the specified name is in the group.
@@ -2122,9 +2138,9 @@ class NXgroup(NXobject):
     def insert(self, value, name='unknown'):
         """
         Adds an attribute to the group.
-        
-        If it is not a valid NeXus object (NXfield or NXgroup), the attribute 
-        is converted to an NXfield.        
+
+        If it is not a valid NeXus object (NXfield or NXgroup), the attribute
+        is converted to an NXfield.
         """
         if isinstance(value, NXobject):
             if name == 'unknown': name = value.nxname
@@ -2138,7 +2154,7 @@ class NXgroup(NXobject):
     def makelink(self, target):
         """
         Creates a linked NXobject within the group.
-        
+
         All attributes are inherited from the parent object including the name
         """
         if isinstance(target, NXobject):
@@ -2146,16 +2162,16 @@ class NXgroup(NXobject):
         else:
             raise NeXusError, "Link target must be an NXobject"
 
-        
+
     def sum(self, axis=None):
         """
         Return the sum of the NXdata group using the Numpy sum method
         on the NXdata signal.
 
         The result contains a copy of all the metadata contained in
-        the NXdata group. 
+        the NXdata group.
         """
-        if not self.nxsignal: 
+        if not self.nxsignal:
             raise NeXusError, "No signal to sum"
         if not hasattr(self,"nxclass"):
             raise NeXusError, "Summing not allowed for groups of unknown class"
@@ -2177,17 +2193,17 @@ class NXgroup(NXobject):
                 result.errors = NXfield(errors, name="errors")
             if self.nxtitle:
                 result.title = self.nxtitle
-            return result        
+            return result
 
     def moment(self, order=1):
         """
-        Return an NXfield containing the moments of the NXdata group 
+        Return an NXfield containing the moments of the NXdata group
         assuming the signal is one-dimensional.
-        
-        Currently, only the first moment has been defined. Eventually, the 
+
+        Currently, only the first moment has been defined. Eventually, the
         order of the moment will be defined by the 'order' parameter.
         """
-        if not self.nxsignal: 
+        if not self.nxsignal:
             raise NeXusError, "No signal to calculate"
         elif len(self.nxsignal.shape) > 1:
             raise NeXusError, "Operation only possible on one-dimensional signals"
@@ -2207,14 +2223,14 @@ class NXgroup(NXobject):
     def signals(self):
         """
         Return a dictionary of NXfield's containing signal data.
-        
+
         The key is the value of the signal attribute.
         """
         signals = {}
         for obj in self.entries.values():
             if 'signal' in obj.attrs:
                 signals[obj.nxsignal.nxdata] = obj
-        return signals                
+        return signals
 
     def _signal(self):
         """
@@ -2253,8 +2269,8 @@ class NXgroup(NXobject):
     def _title(self):
         """
         Return the title as a string.
-        
-        If there is no title attribute in the string, the parent 
+
+        If there is no title attribute in the string, the parent
         NXentry group in the group's path is searched.
         """
         title = self.nxpath
@@ -2268,7 +2284,7 @@ class NXgroup(NXobject):
                 except KeyError:
                     pass
                 obj = obj.nxgroup
-            return self.nxpath        
+            return self.nxpath
 
     def _getentries(self):
         return self._entries
@@ -2277,16 +2293,16 @@ class NXgroup(NXobject):
     nxaxes = property(_axes, "List of axes within group")
     nxerrors = property(_errors, "Errors NXfield within group")
     nxtitle = property(_title, "Title for group plot")
-    entries = property(_getentries,doc="NeXus objects within group")    
+    entries = property(_getentries,doc="NeXus objects within group")
 
-    
+
     def plot(self, **opts):
         """
         Plot data contained within the group.
-        
+
         Raises NeXusError if the data could not be plotted.
         """
-        
+
         group = self
         if self.nxclass == "NXroot":
             group = group.NXentry[0]
@@ -2295,7 +2311,7 @@ class NXgroup(NXobject):
                 group = group.NXdata[0]
             except IndexError:
                 raise NeXusError('No NXdata group found')
-        
+
         # Find a plottable signal
         signal = group.nxsignal
         if not signal:
@@ -2303,13 +2319,13 @@ class NXgroup(NXobject):
 
         # Find errors
         errors= group.nxerrors
-        
+
         # Find the associated axes
         axes = group.nxaxes
-        
+
         # Construct title
         title = group.nxtitle
- 
+
         # Plot with the available plotter
         group._plotter.plot(signal, axes, title, errors, **opts)
 
@@ -2318,7 +2334,7 @@ class NXlink(NXobject):
 
     """
     Class for NeXus linked objects.
-    
+
     The real object will be accessible by following the link attribute.
     """
 
@@ -2379,14 +2395,14 @@ class NXlink(NXobject):
 
     nxlink = property(_getlink, "Linked object")
     attrs = property(_getattrs,doc="NeXus attributes for object")
-    entries = property(_getentries,doc="NeXus objects within group")    
+    entries = property(_getentries,doc="NeXus objects within group")
 
 
 class NXlinkfield(NXlink, NXfield):
 
     """
     Class for a NeXus linked field.
-    
+
     The real field will be accessible by following the link attribute.
     """
 
@@ -2404,7 +2420,7 @@ class NXlinkfield(NXlink, NXfield):
 
         Offsets are 0-origin.  Shape can be inferred from the data.
         Offset and shape must each have one entry per dimension.
-        
+
         This operation should be performed in a "with group.data"
         conext.
 
@@ -2418,14 +2434,14 @@ class NXlinkfield(NXlink, NXfield):
             self.nxlink.__exit__()
         else:
             raise NeXusError, "No input file specified for NXgetslab"
-    
+
 NXlinkdata = NXlinkfield # For backward compatibility
 
 class NXlinkgroup(NXlink, NXgroup):
 
     """
     Class for a NeXus linked group.
-    
+
     The real group will be accessible by following the link attribute.
     """
 
@@ -2448,11 +2464,11 @@ class NXentry(NXgroup):
     NXentry group. This is a subclass of the NXgroup class.
 
     Each NXdata and NXmonitor object of the same name will be added
-    together, raising an NeXusError if any of the groups do not exist 
-    in both NXentry groups or if any of the NXdata additions fail. 
-    The resulting NXentry group contains a copy of all the other metadata 
-    contained in the first group. Note that other extensible data, such 
-    as the run duration, are not currently added together. 
+    together, raising an NeXusError if any of the groups do not exist
+    in both NXentry groups or if any of the NXdata additions fail.
+    The resulting NXentry group contains a copy of all the other metadata
+    contained in the first group. Note that other extensible data, such
+    as the run duration, are not currently added together.
 
     See the NXgroup documentation for more details.
     """
@@ -2463,7 +2479,7 @@ class NXentry(NXgroup):
 
     def __add__(self, other):
         """
-        Add two NXentry objects       
+        Add two NXentry objects
         """
         result = NXentry(entries=self.entries, attrs=self.attrs)
         try:
@@ -2523,18 +2539,18 @@ class NXdata(NXgroup):
 
     """
     NXdata group. This is a subclass of the NXgroup class.
-    
+
     The constructor assumes that the first argument contains the signal and
     the second contains either the axis, for one-dimensional data, or a list
-    of axes, for multidimensional data. These arguments can either be NXfield 
-    objects or Numpy arrays, which are converted to NXfield objects with default 
+    of axes, for multidimensional data. These arguments can either be NXfield
+    objects or Numpy arrays, which are converted to NXfield objects with default
     names.
-    
-    Various arithmetic operations (addition, subtraction, multiplication, 
+
+    Various arithmetic operations (addition, subtraction, multiplication,
     and division) have been defined for combining NXdata groups with other
-    NXdata groups, Numpy arrays, or constants, raising a NeXusError if the 
-    shapes don't match. Data errors are propagated in quadrature if 
-    they are defined, i.e., if the 'nexerrors' attribute is not None, 
+    NXdata groups, Numpy arrays, or constants, raising a NeXusError if the
+    shapes don't match. Data errors are propagated in quadrature if
+    they are defined, i.e., if the 'nexerrors' attribute is not None,
 
     Attributes
     ----------
@@ -2546,12 +2562,12 @@ class NXdata(NXgroup):
     -------
     plot(self, over=False, log=False, **opts)
         Plot the NXdata group using the defined signal and axes. Valid
-        Matplotlib parameters, specifying markers, colors, etc, can be 
-        specified using the 'opts' dictionary.    
-    
+        Matplotlib parameters, specifying markers, colors, etc, can be
+        specified using the 'opts' dictionary.
+
     moment(self, order=1)
-        Calculate moments of the NXdata group. This assumes that the 
-        signal is one-dimenional. Currently, only the first moment is 
+        Calculate moments of the NXdata group. This assumes that the
+        signal is one-dimenional. Currently, only the first moment is
         implemented.
 
     Examples
@@ -2574,7 +2590,7 @@ class NXdata(NXgroup):
         axis2 = float64(101)
         intensity = float64(101x101)
           @axes = axis1:axis2
-          @signal = 1    
+          @signal = 1
 
     See the NXgroup documentation for more details.
     """
@@ -2607,7 +2623,7 @@ class NXdata(NXgroup):
                         axisname = "axis%s" % i
                         self[axisname] = axis
                         axisnames[i] = axisname
-                self[signalname].axes = ":".join(axisnames.values())                
+                self[signalname].axes = ":".join(axisnames.values())
 
     def __add__(self, other):
         """
@@ -2615,10 +2631,10 @@ class NXdata(NXgroup):
         or to a number. Only the signal data is affected.
 
         The result contains a copy of all the metadata contained in
-        the first NXdata group. The module checks that the dimensions are 
+        the first NXdata group. The module checks that the dimensions are
         compatible, but does not check that the NXfield names or values are
         identical. This is so that spelling variations or rounding errors
-        do not make the operation fail. However, it is up to the user to 
+        do not make the operation fail. However, it is up to the user to
         ensure that the results make sense.
         """
         result = NXdata(entries=self.entries, attrs=self.attrs)
@@ -2637,17 +2653,17 @@ class NXdata(NXgroup):
             result.entries[self.nxsignal.nxname] = self.nxsignal + other
             result.entries[self.nxsignal.nxname].nxname = self.nxsignal.nxname
             return result
-        
+
     def __sub__(self, other):
         """
-        Define a method for subtracting a NXdata group or a number from 
+        Define a method for subtracting a NXdata group or a number from
         the NXdata group. Only the signal data is affected.
 
         The result contains a copy of all the metadata contained in
-        the first NXdata group. The module checks that the dimensions are 
+        the first NXdata group. The module checks that the dimensions are
         compatible, but does not check that the NXfield names or values are
         identical. This is so that spelling variations or rounding errors
-        do not make the operation fail. However, it is up to the user to 
+        do not make the operation fail. However, it is up to the user to
         ensure that the results make sense.
         """
         result = NXdata(entries=self.entries, attrs=self.attrs)
@@ -2666,17 +2682,17 @@ class NXdata(NXgroup):
             result.entries[self.nxsignal.nxname] = self.nxsignal - other
             result.entries[self.nxsignal.nxname].nxname = self.nxsignal.nxname
             return result
-        
+
     def __mul__(self, other):
         """
         Define a method for multiplying the NXdata group with a NXdata group
         or a number. Only the signal data is affected.
 
         The result contains a copy of all the metadata contained in
-        the first NXdata group. The module checks that the dimensions are 
+        the first NXdata group. The module checks that the dimensions are
         compatible, but does not check that the NXfield names or values are
         identical. This is so that spelling variations or rounding errors
-        do not make the operation fail. However, it is up to the user to 
+        do not make the operation fail. However, it is up to the user to
         ensure that the results make sense.
         """
         result = NXdata(entries=self.entries, attrs=self.attrs)
@@ -2709,17 +2725,17 @@ class NXdata(NXgroup):
         This variant makes __mul__ commutative.
         """
         return self.__mul__(other)
-        
+
     def __div__(self, other):
         """
         Define a method for dividing the NXdata group by a NXdata group
         or a number. Only the signal data is affected.
 
         The result contains a copy of all the metadata contained in
-        the first NXdata group. The module checks that the dimensions are 
+        the first NXdata group. The module checks that the dimensions are
         compatible, but does not check that the NXfield names or values are
         identical. This is so that spelling variations or rounding errors
-        do not make the operation fail. However, it is up to the user to 
+        do not make the operation fail. However, it is up to the user to
         ensure that the results make sense.
         """
         result = NXdata(entries=self.entries, attrs=self.attrs)
@@ -2731,9 +2747,9 @@ class NXdata(NXgroup):
                 resultvalues = result.entries[self.nxsignal.nxname].nxdata
                 if self.nxerrors:
                     if other.nxerrors:
-                        result.errors = (np.sqrt(self.errors.nxdata**2 + 
+                        result.errors = (np.sqrt(self.errors.nxdata**2 +
                                          (resultvalues*other.errors.nxdata)**2)
-                                         / other.nxsignal)                                              
+                                         / other.nxsignal)
                     else:
                         result.errors = self.errors
                 return result
@@ -2750,7 +2766,7 @@ class NXmonitor(NXdata):
 
     """
     NXmonitor group. This is a subclass of the NXdata class.
-    
+
     See the NXdata and NXgroup documentation for more details.
     """
 
@@ -2765,21 +2781,21 @@ class NXlog(NXgroup):
 
     """
     NXlog group. This is a subclass of the NXgroup class.
-    
+
     Methods
     -------
     plot(self, **opts)
         Plot the logged values against the elapsed time. Valid
-        Matplotlib parameters, specifying markers, colors, etc, can be 
+        Matplotlib parameters, specifying markers, colors, etc, can be
         specified using the 'opts' dictionary.
-    
+
     See the NXgroup documentation for more details.
     """
 
     def __init__(self, *items, **opts):
         self._class = "NXlog"
         NXgroup.__init__(self, *items, **opts)
-    
+
     def plot(self, **opts):
         axis = [self.time]
         title = "%s Log" % self.value.nxname.upper()
@@ -2793,7 +2809,7 @@ for _class in _nxclasses:
     if _class not in globals():
         docstring = """
                     %s group. This is a subclass of the NXgroup class.
-    
+
                     See the NXgroup documentation for more details.
                     """ % _class
         globals()[_class]=type(_class, (NXgroup,),
@@ -2806,7 +2822,7 @@ for _class in _nxclasses:
 def centers(signal, axes):
     """
     Return the centers of the axes.
-    
+
     This works regardless if the axes contain bin boundaries or centers.
     """
     def findc(axis, dimlen):
@@ -2851,7 +2867,7 @@ def imshow_irregular(x,y,z):
 def load(filename, mode='r'):
     """
     Read a NeXus file returning a tree of objects.
-    
+
     This is aliased to 'read' because of potential name clashes with Numpy
     """
     file = NeXusTree(filename,mode)
@@ -2886,8 +2902,8 @@ def tree(file):
 
 def demo(argv):
     """
-    Process a list of command line commands.  
-    
+    Process a list of command line commands.
+
     'argv' should contain program name, command, arguments, where command is one
     of the following:
         copy fromfile.nxs tofile.nxs
@@ -2908,7 +2924,7 @@ def demo(argv):
             tree = getattr(tree,entry)
         tree.plot()
         tree._plotter.show()
-            
+
     else:
         usage = """
 usage: %s cmd [args]
@@ -2917,7 +2933,7 @@ usage: %s cmd [args]
     plot file.nxs entry.data
         """%(argv[0],)
         print usage
-        
+
 
 if __name__ == "__main__":
     import sys
