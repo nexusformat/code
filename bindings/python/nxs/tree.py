@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# This program is public domain
+# This program is public domain 
+# Author: Paul Kienzle, Ray Osborn
 
 """
 NeXus data as Python trees
@@ -217,7 +218,7 @@ The plot() method uses matplotlib by default to plot the data.  You can replace
 this with your own plotter by setting nexus.NXgroup._plotter to your own plotter
 class.  The plotter class has one method::
 
-    plot(signal, axes, entry, title)
+    plot(signal, axes, entry, title, format, **opts)
 
 where signal is the field containing the data, axes are the fields listing the
 signal sample points, entry is file/path within the file to the data group and
@@ -771,7 +772,6 @@ class NXobject(object):
     def walk(self):
         print "yielding",self.nxname,self.nxclass
         if False: yield
-
 
     def dir(self,attrs=False,recursive=False):
         """
@@ -1650,28 +1650,39 @@ class PylabPlotter(object):
     Matplotlib plotter class for NeXus data.
     """
 
-    def plot(self, signal, axes, title, errors, **opts):
+    def plot(self, signal, axes, title, errors, fmt, 
+             xmin, xmax, ymin, ymax, zmin, zmax, **opts):
         """
         Plot the data entry.
 
         Raises NeXusError if the data cannot be plotted.
         """
         try:
-            import pylab
+            import matplotlib.pyplot as plt
         except ImportError:
             raise NeXusError, "Plotting package not available."
-        if "over" in opts.keys():
-            over = True
-            del opts["over"]
-        else:
-            over = False
-        if not over: pylab.clf()
 
+        over = False
+        if "over" in opts.keys():
+            if opts["over"]: over = True
+            del opts["over"]
+
+        log = logx = logy = False
         if "log" in opts.keys():
-            logplot = True
+            if opts["log"]: log = True
             del opts["log"]
+        if "logy" in opts.keys():
+            if opts["logy"]: logy = True
+            del opts["logy"]
+        if "logx" in opts.keys():
+            if opts["logx"]: logx = True
+            del opts["logx"]
+
+        if over:
+            plt.autoscale(enable=False)
         else:
-            logplot = False
+            plt.autoscale(enable=True)
+            plt.clf()
 
         # Provide a new view of the data if there is a dimension of length 1
         if 1 in signal.shape:
@@ -1684,52 +1695,93 @@ class PylabPlotter(object):
 
         #One-dimensional Plot
         if len(data.shape) == 1:
+            plt.ioff()
             if hasattr(signal, 'units'):
                 if not errors and signal.units == 'counts':
                     errors = NXfield(np.sqrt(data))
-            if logplot:
-                data = np.log10(np.clip(data,0,1e8))
-                if errors: ebars = np.log10(errors)
-            elif errors:
-                ebars = errors.nxdata
             if errors:
-                myopts=copy(opts)
-                myopts.setdefault('fmt','o')
-                myopts.setdefault('linestyle','None')
-                pylab.scatter(axis_data[0], data, **opts)
-                pylab.errorbar(axis_data[0], data, ebars, **myopts)
+                ebars = errors.nxdata
+                plt.errorbar(axis_data[0], data, ebars, fmt=fmt, **opts)
             else:
-                pylab.scatter(axis_data[0], data, **opts)
+                plt.plot(axis_data[0], data, fmt, **opts)
             if not over:
-                pylab.xlabel(label(axes[0]))
-                pylab.ylabel(label(signal))
-                pylab.title(title)
+                ax = plt.gca()
+                xlo, xhi = ax.set_xlim(auto=True)        
+                ylo, yhi = ax.set_ylim(auto=True)                
+                if xmin: xlo = xmin
+                if xmax: xhi = xmax
+                ax.set_xlim(xlo, xhi)
+                if ymin: ylo = ymin
+                if ymax: yhi = ymax
+                ax.set_ylim(ylo, yhi)
+                if logx: ax.set_xscale('symlog')
+                if log or logy: ax.set_yscale('symlog')
+                plt.xlabel(label(axes[0]))
+                plt.ylabel(label(signal))
+                plt.title(title)
+            plt.ion()
+            plt.show()
 
         #Two dimensional plot
         else:
+            from matplotlib.image import NonUniformImage
+            from matplotlib.colors import LogNorm
+
             if len(data.shape) > 2:
                 slab = [slice(None), slice(None)]
                 for _dim in data.shape[2:]:
                     slab.append(0)
                 data = data[slab].view().reshape(data.shape[:2])
                 print "Warning: Only the top 2D slice of the data is plotted"
-            #from api.nexus import meshgl
-            #gridplot = meshgl.pcolor_gl
-            #gridplot = pylab.pcolormesh
-            gridplot = imshow_irregular
-            if logplot:
-                gridplot(axis_data[0], axis_data[1],
-                         np.log10(np.clip(data,0.,1e8)+1).T, **opts)
+
+            x = axis_data[0]
+            y = axis_data[1]
+            if not zmin: zmin = np.min(data)
+            if not zmax: zmax = np.max(data)
+            z = np.clip(data,zmin,zmax).T
+            
+            ax = plt.gca()
+            extent = (x[0],x[-1],y[0],y[-1])
+            if log:
+                opts["norm"] = LogNorm()
+                if z.min() < 1e-8:
+                    z = np.clip(z,0.1,zmax)
+                
+            im = NonUniformImage(ax, extent=extent, origin=None, **opts)
+            im.set_data(x,y,z)
+            ax.images.append(im)
+            xlo, xhi = ax.set_xlim(x[0],x[-1])
+            ylo, yhi = ax.set_ylim(y[0],y[-1])
+            if xmin: 
+                xlo = xmin
             else:
-                gridplot(axis_data[0], axis_data[1], np.clip(data,-1e8,1e8).T, **opts)
-            pylab.xlabel(label(axes[0]))
-            pylab.ylabel(label(axes[1]))
-            pylab.title(title)
+                xlo = x[0]
+            if xmax: 
+                xhi = xmax
+            else:
+                xhi = x[-1]
+            if ymin: 
+                yhi = ymin
+            else:
+                yhi = y[0]
+            if ymax: 
+                yhi = ymax
+            else:
+                yhi = y[-1]
+            ax.set_xlim(xlo, xhi)
+            ax.set_ylim(ylo, yhi)
+            plt.xlabel(label(axes[0]))
+            plt.ylabel(label(axes[1]))
+            plt.title(title)
+            plt.colorbar(im)
+            plt.gcf().canvas.draw_idle()
+        
+        return plt.gcf()
 
     @staticmethod
     def show():
-        import pylab
-        pylab.show()
+        import matplotlib.pyplot as plt
+        plt.show()    
 
 
 class NXgroup(NXobject):
@@ -1849,7 +1901,7 @@ class NXgroup(NXobject):
     dictionary, i.e.,
 
         >>> entry.sample.tree = 100.0
-        >>> entry.sample.tree
+        >>> print entry.sample.tree
         sample:NXsample
           tree = 100.0
         >>> entry.sample['tree']
@@ -1869,7 +1921,7 @@ class NXgroup(NXobject):
 
         >>> entry.sample.temperature = 40.0
         >>> entry.sample.attrs['tree'] = 10.0
-        >>> entry.sample.tree
+        >>> print entry.sample.tree
         sample:NXsample
           @tree = 10.0
           temperature = 40.0
@@ -1896,11 +1948,10 @@ class NXgroup(NXobject):
         displayed.
 
     tree:
-        Print the group tree.
+        Return the group tree.
 
         It invokes the 'dir' method with both 'attrs' and 'recursive'
-        set to True. Note that this method is defined as a property attribute and
-        does not require parentheses.
+        set to True.
 
     save(self, filename, format='w5')
         Save the NeXus group into a file
@@ -1915,7 +1966,7 @@ class NXgroup(NXobject):
     >>> entry = NXgroup(x, name='entry', nxclass='NXentry')
     >>> entry.sample = NXgroup(temperature=NXfield(40.0,units='K'),
                                nxclass='NXsample')
-    >>> entry.sample.tree
+    >>> print entry.sample.tree
     sample:NXsample
       temperature = 40.0
         @units = K
@@ -2162,7 +2213,6 @@ class NXgroup(NXobject):
         else:
             raise NeXusError, "Link target must be an NXobject"
 
-
     def sum(self, axis=None):
         """
         Return the sum of the NXdata group using the Numpy sum method
@@ -2185,7 +2235,8 @@ class NXgroup(NXobject):
             if hasattr(summedaxis, "units"): units = summedaxis.units
             signal.long_name = "Integral from %s to %s %s" % \
                                (summedaxis[0], summedaxis[-1], units)
-            average = NXfield(0.5*(summedaxis.nxdata[0]+summedaxis.nxdata[-1]), name=summedaxis.nxname)
+            average = NXfield(0.5*(summedaxis.nxdata[0]+summedaxis.nxdata[-1]), 
+                                   name=summedaxis.nxname)
             if units: average.units = units
             result = NXdata(signal, axes, average)
             if self.nxerrors:
@@ -2295,10 +2346,24 @@ class NXgroup(NXobject):
     nxtitle = property(_title, "Title for group plot")
     entries = property(_getentries,doc="NeXus objects within group")
 
-
-    def plot(self, **opts):
+    def plot(self, fmt='bo', xmin=None, xmax=None, ymin=None, ymax=None,
+             zmin=None, zmax=None, **opts):
         """
         Plot data contained within the group.
+
+        The format argument is used to set the color and type of the
+        markers or lines for one-dimensional plots, using the standard 
+        matplotlib syntax. The default is set to blue circles. All 
+        keyword arguments accepted by matplotlib.pyplot.plot can be
+        used to customize the plot.
+        
+        In addition to the matplotlib keyword arguments, the following
+        are defined:
+        
+            log = True     - plot the intensity on a log scale
+            logy = True    - plot the y-axis on a log scale
+            logx = True    - plot the x-axis on a log scale
+            over = True    - plot on the current figure
 
         Raises NeXusError if the data could not be plotted.
         """
@@ -2327,8 +2392,23 @@ class NXgroup(NXobject):
         title = group.nxtitle
 
         # Plot with the available plotter
-        group._plotter.plot(signal, axes, title, errors, **opts)
+        group._plotter.plot(signal, axes, title, errors, fmt, 
+                            xmin, xmax, ymin, ymax, zmin, zmax, **opts)
+    
+    def oplot(self, fmt='bo', **opts):
+        """
+        Plot the data contained within the group over the current figure.
+        """
+        self.plot(fmt=fmt, over=True, **opts)
 
+    def logplot(self, fmt='bo', xmin=None, xmax=None, ymin=None, ymax=None,
+                zmin=None, zmax=None, **opts):
+        """
+        Plot the data intensity contained within the group on a log scale.
+        """
+        self.plot(fmt=fmt, log=True,
+                  xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax,
+                  zmin=zmin, zmax=zmax, **opts)
 
 class NXlink(NXobject):
 
@@ -2850,18 +2930,6 @@ def label(field):
         return "%s (%s)"%(field.nxname,field.units)
     else:
         return field.nxname
-
-def imshow_irregular(x,y,z):
-    import pylab
-#    from matplotlib.ticker import LogFormatter
-    ax = pylab.gca()
-    im = pylab.mpl.image.NonUniformImage(ax, extent=(x[0],x[-1],y[0],y[-1]), origin=None)
-    im.set_data(x,y,z)
-    ax.images.append(im)
-    ax.set_xlim(x[0],x[-1])
-    ax.set_ylim(y[0],y[-1])
-    pylab.colorbar(im)#, format=LogFormatter())
-    pylab.gcf().canvas.draw_idle()
 
 # File level operations
 def load(filename, mode='r'):
