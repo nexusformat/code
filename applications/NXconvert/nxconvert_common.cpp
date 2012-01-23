@@ -186,7 +186,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 static int WriteGroup (int is_definition)
 { 
   
-   int i, status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+   int i, n, status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
    static const int slab_start[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
    static const int MAX_DEF_ARRAY_ELEMENTS_PER_DIM = 3; /* doesn't work yet - only 1 element is written */
    NXname name, nxclass;
@@ -228,6 +228,22 @@ static int WriteGroup (int is_definition)
 		{
                     if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
                     if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
+		    /* fix potential non-UTF8 character issue */
+		    if (is_definition && dataType == NX_CHAR)
+		    {
+			n = 1;
+		    	for(i=0; i<dataRank; ++i)
+		    	{
+			    n *= dataDimensions[i];
+		 	}
+			for(i=0; i<n; ++i)
+			{
+			    if (!isprint(((const unsigned char*)dataBuffer)[i]))
+			    {
+				((char*)dataBuffer)[i] = '?';
+			    }
+			}
+		    }
                     if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
 		}
                 if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
