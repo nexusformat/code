@@ -132,7 +132,7 @@ Groups (class NXgroup) have attributes for accessing children::
     * entries  dictionary of entries within the group
     * component('nxclass')  return group entries of a particular class
     * dir()    print the list of entries in the group
-    * tree     print the list of entries and subentries in the group
+    * tree     return the list of entries and subentries in the group
     * plot()   plot signal and axes for the group, if available
 
 Fields (class NXfield) have attributes for accessing data:
@@ -514,7 +514,6 @@ class NeXusTree(napi.NeXus):
 
         # find gids for targets
         for target in gid.iterkeys():
-            #sprint "target",target
             self.openpath(target)
             # Can't tell from the name if we are linking to a group or
             # to a dataset, so cheat and rely on getdataID to signal
@@ -529,7 +528,6 @@ class NeXusTree(napi.NeXus):
             if path != target:
                 # ignore self-links
                 parent = "/".join(path.split("/")[:-1])
-                #print "link %s -> %s"%(parent,target)
                 self.openpath(parent)
                 self.makelink(gid[target])
 
@@ -710,10 +708,10 @@ class NXobject(object):
         displayed.
 
     tree:
-        Print the object's tree.
+        Return the object's tree as a string.
 
         It invokes the 'dir' method with both 'attrs' and 'recursive'
-        set to True. Note that this method is defined as a property attribute and
+        set to True. Note that this is defined as a property attribute and
         does not require parentheses.
 
     save(self, filename, format='w5')
@@ -783,7 +781,6 @@ class NXobject(object):
         return "\n".join(result)
 
     def walk(self):
-        print "yielding",self.nxname,self.nxclass
         if False: yield
 
     def dir(self,attrs=False,recursive=False):
@@ -800,17 +797,12 @@ class NXobject(object):
     @property
     def tree(self):
         """
-        Print the directory tree.
+        Return the directory tree as a string.
 
         The tree contains all child objects of this object and their children.
         It invokes the 'dir' method with both 'attrs' and 'recursive' set
         to True.
         """
-        return self._str_tree(attrs=True,recursive=True)
-
-    @property
-    def tree_with_attrs(self, attrs=True):
-        """Return directory tree string"""
         return self._str_tree(attrs=True,recursive=True)
 
     def __enter__(self):
@@ -912,11 +904,15 @@ class NXobject(object):
         """
         return self._changed
     
-    def set_unchanged(self):
+    def set_unchanged(self, recursive=False):
         """
         Set an object's change status to unchanged.
         """
-        self._changed = False
+        if recursive:
+            for node in self.walk():
+                node._changed = False
+        else:
+            self._changed = False
     
     def _getclass(self):
         return self._class
@@ -1184,10 +1180,10 @@ class NXfield(NXobject):
         If 'attrs' is True, NXfield attributes are displayed.
 
     tree:
-        Print the NXfield's tree.
+        Return the NXfield's tree.
 
         It invokes the 'dir' method with both 'attrs' and 'recursive'
-        set to True. Note that this method is defined as a property attribute and
+        set to True. Note that this is defined as a property attribute and
         does not require parentheses.
 
 
@@ -1213,8 +1209,8 @@ class NXfield(NXobject):
 
     """
 
-    def __init__(self, value=None, name='field', dtype=None, shape=(), attrs={}, group=None,
-                 **attr):
+    def __init__(self, value=None, name='field', dtype=None, shape=(), group=None,
+                 attrs={}, **attr):
         if isinstance(value, list) or isinstance(value, tuple):
             value = np.array(value)
         self._value = value
@@ -2116,6 +2112,9 @@ class NXgroup(NXobject):
         if "nxclass" in opts.keys():
             self._class = opts["nxclass"]
             del opts["nxclass"]
+        if "group" in opts.keys():
+            self._group = opts["group"]
+            del opts["group"]
         for k,v in opts.items():
             setattr(self, k, v)
         if self.nxclass.startswith("NX"):
@@ -2254,12 +2253,12 @@ class NXgroup(NXobject):
         Adds or modifies an item in the NeXus group.
         """
         if key in self.entries: 
-            infile = self[key]._infile
-            attrs = self[key].attrs
-            if isinstance(self[key], NXlink):
+            infile = self._entries[key]._infile
+            if isinstance(self._entries[key], NXlink):
                 if self._entries[key].nxlink:
                     setattr(self._entries[key].nxlink.nxgroup, key, value)
                 return
+            attrs = self._entries[key].attrs
         else:
             infile = None
             attrs = {}
@@ -2340,6 +2339,44 @@ class NXgroup(NXobject):
             self[target.nxname] = NXlink(target=target, group=self)
         else:
             raise NeXusError, "Link target must be an NXobject"
+
+    def read(self):
+        """
+        Read the NXgroup and all its children from the NeXus file.
+        """
+        if self.nxfile:
+            with self as path:
+                n, nxname, nxclass = path.getgroupinfo()
+                if nxclass != self.nxclass:
+                    raise NeXusError("The NeXus group class does not match the file")
+                self._setattrs(path.getattrs())
+                entries = path.entries()
+            for name,nxclass in entries:
+                path = self.nxpath + '/' + name
+                if nxclass == 'SDS':
+                    attrs = self.nxfile.getattrs()
+                    if 'target' in attrs and attrs['target'] != path:
+                        self._entries[name] = NXlinkfield(target=attrs['target'])            
+                    else:
+                        self._entries[name] = NXfield(name=name)
+                else:
+                    attrs = self.nxfile.getattrs()
+                    if 'target' in attrs and attrs['target'] != path:
+                        self._entries[name] = NXlinkgroup(name=name,
+                                                          target=attrs['target'])
+                    else:
+                        self._entries[name] = NXgroup(nxclass=nxclass)
+                self._entries[name]._group = self
+            #Make sure non-linked variables are processed first.
+            for entry in self._entries.values():
+                for node in entry.walk():
+                    if not isinstance(node, NXlink): node.read()
+            for entry in self._entries.values():
+                for node in entry.walk():
+                    if isinstance(node, NXlink): node.read()
+            self._infile = self._saved = self._changed = True
+        else:
+            raise IOError("Data is not attached to a file")
 
     def write(self):
         """
@@ -2441,6 +2478,14 @@ class NXgroup(NXobject):
 #                else:
                 return self[obj.nxname]
         return None
+    
+    def _set_signal(self, signal):
+        """
+        Setter for the signal attribute.
+        
+        The argument should be a valid NXfield within the group.
+        """
+        self[signal.nxname].signal = NXattr(1)
 
     def _axes(self):
         """
@@ -2454,6 +2499,16 @@ class NXgroup(NXobject):
                 if 'axis' in getattr(self,obj).attrs:
                     axes[getattr(self,obj).axis] = getattr(self,obj)
             return [axes[key] for key in sorted(axes.keys())]
+
+    def _set_axes(self, axes):
+        """
+        Setter for the signal attribute.
+        
+        The argument should be a list of valid NXfields within the group.
+        """
+        if not isinstance(axes, list):
+            axes = [axes]
+        self.nxsignal.axes = NXattr(":".join([axis.nxname for axis in axes]))
 
     def _errors(self):
         """
@@ -2487,8 +2542,8 @@ class NXgroup(NXobject):
     def _getentries(self):
         return self._entries
 
-    nxsignal = property(_signal, "Signal NXfield within group")
-    nxaxes = property(_axes, "List of axes within group")
+    nxsignal = property(_signal, _set_signal, "Signal NXfield within group")
+    nxaxes = property(_axes, _set_axes, "List of axes within group")
     nxerrors = property(_errors, "Errors NXfield within group")
     nxtitle = property(_title, "Title for group plot")
     entries = property(_getentries,doc="NeXus objects within group")
@@ -2569,6 +2624,7 @@ class NXlink(NXobject):
 
     def __init__(self, target=None, name='link', group=None):
         self._group = group
+        self._class = "NXlink"
         if isinstance(target, NXobject):
             self._name = target.nxname
             self._target = target.nxpath
@@ -2628,6 +2684,13 @@ class NXlink(NXobject):
     nxlink = property(_getlink, "Linked object")
     attrs = property(_getattrs,doc="NeXus attributes for object")
 
+    def read(self):
+        """
+        Read the linked NXobject.
+        """
+        self.nxlink.read()
+        self._infile = self._saved = self._changed = True
+
 
 class NXlinkfield(NXlink, NXfield):
 
@@ -2648,7 +2711,6 @@ class NXlinkfield(NXlink, NXfield):
             with self.nxgroup as path:
                 path.makelink(target)
             self._infile = self._saved = True
-
 
     def get(self, offset, size):
         """
@@ -2784,8 +2846,9 @@ class NXdata(NXgroup):
     the second contains either the axis, for one-dimensional data, or a list
     of axes, for multidimensional data. These arguments can either be NXfield
     objects or Numpy arrays, which are converted to NXfield objects with default
-    names.
-
+    names. Alternatively, the signal and axes NXfields can be defined using the
+    'nxsignal' and 'nxaxes' properties. See the examples below.
+    
     Various arithmetic operations (addition, subtraction, multiplication,
     and division) have been defined for combining NXdata groups with other
     NXdata groups, Numpy arrays, or constants, raising a NeXusError if the
@@ -2800,10 +2863,20 @@ class NXdata(NXgroup):
 
     Methods
     -------
-    plot(self, over=False, log=False, **opts)
+    plot(self, fmt, over=False, log=False, logy=False, logx=False, **opts)
         Plot the NXdata group using the defined signal and axes. Valid
         Matplotlib parameters, specifying markers, colors, etc, can be
-        specified using the 'opts' dictionary.
+        specified using format argument or through keyword arguments.
+
+    logplot(self, fmt, over=False, logy=False, logx=False, **opts)
+        Plot the NXdata group using the defined signal and axes with
+        the intensity plotted on a logarithmic scale. In one-dimensional
+        plots, this is the y-axis. In two-dimensional plots, it is the 
+        color scale.
+
+    oplot(self, fmt, **opts)
+        Plot the NXdata group using the defined signal and axes over
+        the current plot.
 
     moment(self, order=1)
         Calculate moments of the NXdata group. This assumes that the
@@ -2812,27 +2885,57 @@ class NXdata(NXgroup):
 
     Examples
     --------
+    There are three methods of creating valid NXdata groups with the
+    signal and axes NXfields defined according to the NeXus standard.
+    
+    1) Create the NXdata group with Numpy arrays that will be assigned
+       default names.
+       
     >>> x = np.linspace(0, 2*np.pi, 101)
     >>> line = NXdata(sin(x), x)
     data:NXdata
       signal = float64(101)
         @axes = x
         @signal = 1
-      x = float64(101)
-    >>> X, Y = np.meshgrid(x, x)
-    >>> z = NXfield(sin(X) * sin(Y), name='intensity')
+      axis1 = float64(101)
+      
+    2) Create the NXdata group with NXfields that have their internal
+       names already assigned.
+
+    >>> x = NXfield(linspace(0,2*pi,101), name='x')
+    >>> y = NXfield(linspace(0,2*pi,101), name='y')    
+    >>> X, Y = np.meshgrid(x, y)
+    >>> z = NXfield(sin(X) * sin(Y), name='z')
     >>> entry = NXentry()
-    >>> entry.grid = NXdata(z, (x, x))
+    >>> entry.grid = NXdata(z, (x, y))
     >>> grid.tree()
     entry:NXentry
       grid:NXdata
-        axis1 = float64(101)
-        axis2 = float64(101)
-        intensity = float64(101x101)
-          @axes = axis1:axis2
+        x = float64(101)
+        y = float64(101)
+        z = float64(101x101)
+          @axes = x:y
           @signal = 1
 
-    See the NXgroup documentation for more details.
+    3) Create the NXdata group with keyword arguments defining the names 
+       and set the signal and axes using the nxsignal and nxaxes properties.
+
+    >>> x = linspace(0,2*pi,101)
+    >>> y = linspace(0,2*pi,101)  
+    >>> X, Y = np.meshgrid(x, y)
+    >>> z = sin(X) * sin(Y)
+    >>> entry = NXentry()
+    >>> entry.grid = NXdata(z=sin(X)*sin(Y), x=x, y=y)
+    >>> entry.grid.nxsignal = entry.grid.z
+    >>> entry.grid.nxaxes = [entry.grid.x.entry.grid.y]
+    >>> grid.tree()
+    entry:NXentry
+      grid:NXdata
+        x = float64(101)
+        y = float64(101)
+        z = float64(101x101)
+          @axes = x:y
+          @signal = 1
     """
 
     def __init__(self, signal=None, axes=None, *items, **opts):
