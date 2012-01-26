@@ -42,6 +42,22 @@
 static int WriteGroup (int is_definition);
 static int WriteAttributes (int is_definition, int is_group);
 
+static void clean_string(void* dataBuffer, int dataRank, int dataDimensions[])
+{
+	int i, n = 1;
+    	for(i=0; i<dataRank; ++i)
+    	{
+	    n *= dataDimensions[i];
+ 	}
+	for(i=0; i<n; ++i)
+	{
+	    if (!isprint(((const unsigned char*)dataBuffer)[i]))
+	    {
+		((char*)dataBuffer)[i] = '?';
+	    }
+	}
+}
+
 struct link_to_make
 {
     char from[1024];   /* path of directory with link */
@@ -186,7 +202,7 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 static int WriteGroup (int is_definition)
 { 
   
-   int i, n, status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+   int i,  status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
    static const int slab_start[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
    static const int MAX_DEF_ARRAY_ELEMENTS_PER_DIM = 3; /* doesn't work yet - only 1 element is written */
    NXname name, nxclass;
@@ -231,18 +247,7 @@ static int WriteGroup (int is_definition)
 		    /* fix potential non-UTF8 character issue */
 		    if (is_definition && dataType == NX_CHAR)
 		    {
-			n = 1;
-		    	for(i=0; i<dataRank; ++i)
-		    	{
-			    n *= dataDimensions[i];
-		 	}
-			for(i=0; i<n; ++i)
-			{
-			    if (!isprint(((const unsigned char*)dataBuffer)[i]))
-			    {
-				((char*)dataBuffer)[i] = '?';
-			    }
-			}
+			clean_string(dataBuffer, dataRank, dataDimensions);
 		    }
                     if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
 		}
@@ -333,6 +338,10 @@ static int WriteAttributes (int is_definition, int is_group)
             attrLen++; /* Add space for string termination */
             if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return NX_ERROR;
             if (NXgetattr (inId, attrName, attrBuffer, &attrLen , &attrType) != NX_OK) return NX_ERROR;
+	    if (is_definition && attrType == NX_CHAR)
+	    {
+		clean_string(attrBuffer, 1, &attrLen);
+	    }
             if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
             if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
          }
