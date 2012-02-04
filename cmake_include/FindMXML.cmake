@@ -26,23 +26,32 @@
 #
 #====================================================================
 
-find_library(MXML NAMES mxml mxml1 PATHS $ENV{MXML_ROOT})
 
-find_path(MXML_INCLUDE NAMES mxml.h mxml1.h PATHS $ENV{MXML_ROOT})
+# looks in MXML_ROOT environment variable for hint
+# set MXML_FOUND MXML_DEFINITIONS MXML_INCLUDE_DIRS  MXML_LIBRARIES  MXML_ROOT_DIR
 
-if(MXML AND MXML_INCLUDE)
-    set(MXML_LINK "-lmxml")
-    set(MXML_CPP "-DNXXML")
-    include_directories($ENV{MXML_INCLUDE})
-else(MXML AND MXML_INCLUDE)
-    include_directories(${CMAKE_SOURCE_DIR}/third_party/mxml-2.6)
-#    add_dependencies(NeXus_Static_Library MXML_Static_Library)
-#    add_dependencies(NeXus_Shared_Library MXML_Static_Library)
-#    set(MXML_LINK "-lmxml")
-#    set(MXML_CPP "-DNXXML")
-endif(MXML AND MXML_INCLUDE)
+if (WIN32)
+    set(MXML_SEARCH_DEFAULT "C:/InstallKits/HDF5-1.8.6-win64")
+	find_library(MXML_SHARED_LIBRARIES NAMES mxml mxml1 HINTS ${MXML_SEARCH} ENV MXML_ROOT PATHS ${MXML_SEARCH_DEFAULT} PATH_SUFFIXES dll lib DOC "location of mxml dll")
+	find_library(MXML_STATIC_LIBRARIES NAMES mxml mxml1 HINTS ${MXML_SEARCH} ENV MXML_ROOT PATHS ${MXML_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of mxml lib")
+else(WIN32)
+    set(MXML_SEARCH_DEFAULT "/usr" "/usr/local" "/sw")
+	find_library(MXML_SHARED_LIBRARIES NAMES mxml HINTS ${MXML_SEARCH} ENV MXML_ROOT PATHS ${MXML_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of mxml dll")
+	find_library(MXML_STATIC_LIBRARIES NAMES mxml HINTS ${MXML_SEARCH} ENV MXML_ROOT PATHS ${MXML_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of mxml lib")
+endif(WIN32)
+
+mark_as_advanced(MXML_SHARED_LIBRARIES MXML_STATIC_LIBRARIES)
+
+if (MXML_SHARED_LIBRARIES)
+    set(MXML_LIBRARIES ${MXML_SHARED_LIBRARIES})
+	get_filename_component(_MXML_LIBDIR ${MXML_SHARED_LIBRARIES} PATH)
+elseif (MXML_STATIC_LIBRARIES)
+    set(MXML_LIBRARIES ${MXML_STATIC_LIBRARIES})
+	get_filename_component(_MXML_LIBDIR ${MXML_STATIC_LIBRARIES} PATH)
+endif()
+set(MXML_DEFINITIONS "")
+set(MXML_ROOT_DIR "${_MXML_LIBDIR}/..")
+set(MXML_INCLUDE_DIRS "${MXML_ROOT_DIR}/include")
 
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(MXMLLIB DEFAULT_MSG MXML MXML_INCLUDE)
-
-MARK_AS_ADVANCED(MXML)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(MXML DEFAULT_MSG MXML_LIBRARIES MXML_INCLUDE_DIRS)

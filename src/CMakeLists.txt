@@ -26,17 +26,27 @@
 #
 #====================================================================
 
-add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP} ${NX_CPP})
+add_definitions(-DIN_NEXUS_LIBRARY ${NX_CPP})
 
 set (NAPISRC napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c nxdataset.h nx_stptok.h)
 
-if (HDF4_FOUND)
+if (HAVE_HDF4)
   set (NAPISRC ${NAPISRC} napi4.c)
-endif (HDF4_FOUND)
+  add_definitions(-DHDF4 ${HDF4_DEFINITIONS} ${HDF4_CPP})
+  include_directories(${HDF4_INCLUDE_DIRS})
+endif (HAVE_HDF4)
 
-if (HDF5_FOUND)
+if (HAVE_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
-endif (HDF5_FOUND)
+  add_definitions(-DHDF5 ${HDF5_DEFINITIONS} ${HDF5_CPP})
+  include_directories(${HDF5_INCLUDE_DIRS})
+endif (HAVE_HDF5)
+
+if(HAVE_MXML)
+    set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
+    add_definitions(-DNXXML ${MXML_DEFINITIONS} ${MXML_CPP})
+	include_directories(${MXML_INCLUDE_DIRS})
+endif(HAVE_MXML)
 
 # need napi_exports2.c  on win32 but not win64
 if (WIN32)
@@ -47,18 +57,12 @@ if (WIN32)
 	endif()
 endif (WIN32)
 
-if(HAVE_XML)
-    set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
-endif(HAVE_XML)
-
-set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
-
 set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 
 file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 
 set (NX_LIBS  ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB} )
+                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${SZIP_LIBRARIES} ${ZLIB_LIBRARIES}  )
 #if (MINGW_MSYS)
 #  set (MINGW_SRC napi_exports.c napi_exports2.c napi_exports.h)
 #  file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols_win.txt
@@ -81,7 +85,7 @@ add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES OUTPUT_NAME NeXusStatic)
 
-target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${NX_LIBS})
+target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${MXML_STATIC_LIBRARIES}  ${NX_LIBS})
 
 #Make NeXus Shared Library
 
@@ -105,17 +109,17 @@ else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
                       VERSION 1.0 SOVERSION 4)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-target_link_libraries(NeXus_Shared_Library ${HDF5_SHARED_LIBRARIES} ${HDF4_SHARED_LIBRARIES} ${NX_LIBS})
+target_link_libraries(NeXus_Shared_Library ${HDF5_SHARED_LIBRARIES} ${HDF4_SHARED_LIBRARIES} ${MXML_SHARED_LIBRARIES} ${NX_LIBS})
 
-if(HAVE_XML)
-if(MXMLLIB_FOUND)
-    target_link_libraries(NeXus_Static_Library ${MXML})
-    target_link_libraries(NeXus_Shared_Library ${MXML})
-else()
-    target_link_libraries(NeXus_Static_Library MXML_Static_Library)
-    target_link_libraries(NeXus_Shared_Library MXML_Shared_Library)
-endif(MXMLLIB_FOUND)
-endif(HAVE_XML)
+#if(HAVE_MXML)
+#if(MXMLLIB_FOUND)
+#    target_link_libraries(NeXus_Static_Library ${MXML})
+#    target_link_libraries(NeXus_Shared_Library ${MXML})
+#else()
+#    target_link_libraries(NeXus_Static_Library MXML_Static_Library)
+#    target_link_libraries(NeXus_Shared_Library MXML_Shared_Library)
+#endif(MXMLLIB_FOUND)
+#endif(HAVE_MXML)
 
 install (TARGETS NeXus_Static_Library NeXus_Shared_Library
          RUNTIME DESTINATION bin COMPONENT Runtime

@@ -27,16 +27,35 @@
 #====================================================================
 
 
-find_library(DF df)
-find_library(HDF4 mfhdf)
+# looks in HDF4_ROOT environment variable for hint
+# set HDF4_FOUND HDF4_DEFINITIONS HDF4_INCLUDE_DIRS  HDF4_LIBRARIES  HDF4_ROOT_DIR
 
-if(HDF4)
-    set(HDF4_LINK "-lmfhdf")
-    set(HDF4_CPP "-I/usr/include/hdf -DHDF4")
-    set(HDF4_FOUND 1)
-endif(HDF4)
+if (WIN32)
+    set(HDF4_SEARCH_DEFAULT "C:/InstallKits/HDF4.2.6_win_x64")
+	set(HD_NAMES hd426m hd425m)
+	set(HM_NAMES hm426m hm425m)
+	find_library(HDF4_HD_LIBRARY NAMES ${HD_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll lib DOC "location of hd dll")
+	find_library(HDF4_HM_LIBRARY NAMES ${HM_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll lib DOC "location of hm dll")
+else(WIN32)
+    set(HDF4_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf4" "/sw")
+	set(HD_NAMES df)
+	set(HM_NAMES mfhdf)
+	find_library(HDF4_HD_LIBRARY NAMES ${HD_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hd dll")
+	find_library(HDF4_HM_LIBRARY NAMES ${HM_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hm dll")
+endif(WIN32)
 
+mark_as_advanced(HDF4_HD_LIBRARY HDF4_HM_LIBRARY)
 
-if(DF)
-set(DF_LINK "-ldf")
-endif(DF)
+if (HDF4_HM_LIBRARY AND HDF4_HD_LIBRARY)
+    set(HDF4_SHARED_LIBRARIES ${HDF4_HM_LIBRARY} ${HDF4_HD_LIBRARY})
+    set(HDF4_STATIC_LIBRARIES ${HDF4_HM_LIBRARY} ${HDF4_HD_LIBRARY})
+    set(HDF4_LIBRARIES ${HDF4_SHARED_LIBRARIES})
+    get_filename_component(_HDF4_LIBDIR ${HDF4_HM_LIBRARY} PATH)
+    set(HDF4_ROOT_DIR "${_HDF4_LIBDIR}/..")
+    set(HDF4_INCLUDE_DIRS "${HDF4_ROOT_DIR}/include")
+endif()
+
+set(HDF4_DEFINITIONS "")
+
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(HDF4 DEFAULT_MSG HDF4_LIBRARIES HDF4_INCLUDE_DIRS)

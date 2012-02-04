@@ -1,0 +1,24 @@
+/* $Id:$ */
+
+#cmakedefine HAVE_HDF4
+
+#cmakedefine HAVE_HDF5
+
+#cmakedefine HAVE_MXML
+
+#cmakedefine HAVE_FTIME
+
+#cmakedefine HAVE_TZSET
+
+#cmakedefine01 HAVE_STDINT_H
+
+#define SIZEOF_VOIDP 			@CMAKE_SIZEOF_VOID_P@
+
+#define SIZEOF_INT 				@SIZEOF_INT@ 
+
+#define SIZEOF_LONG_INT 		@SIZEOF_LONG_INT@ 
+
+#define SIZEOF_LONG_LONG_INT 	@SIZEOF_LONG_LONG_INT@ 
+
+#define SIZEOF_SIZE_T 			@SIZEOF_SIZE_T@
+
