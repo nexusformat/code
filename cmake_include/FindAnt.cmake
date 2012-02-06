@@ -26,9 +26,9 @@
 #
 #====================================================================
 
-find_file(ANT NAMES ant ant.sh ant.bat PATHS $ENV{ANT_HOME}/bin)
+find_file(ANT_EXEC NAMES ant ant.sh ant.bat PATHS $ENV{ANT_HOME}/bin)
 
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(ANTEXEC DEFAULT_MSG ANT)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(ANT DEFAULT_MSG ANT_EXEC)
 
-MARK_AS_ADVANCED(ANT)
+MARK_AS_ADVANCED(ANT_EXEC)

@@ -29,7 +29,11 @@
 # The name of our project is "NeXus". CMakeLists files in this project can
 # refer to the root source directory of the project as ${NeXus_SOURCE_DIR} and
 # to the root binary directory of the project as ${NeXus_BINARY_DIR}.
+if(WIN32)
+cmake_minimum_required (VERSION 2.8.7)
+else()
 cmake_minimum_required (VERSION 2.8.4)
+endif()
 
 #The name of our project
 project (NeXus)
@@ -48,6 +52,8 @@ set(MXML_SEARCH "" CACHE PATH "Where to search for MXML")
 
 set(SZIP_SEARCH "" CACHE PATH "Where to search for SZIP")
 
+set(ZLIB_SEARCH "" CACHE PATH "Where to search for ZLIB")
+
 #CMake includes 
 
 include(CheckCCompilerFlag)
@@ -61,8 +67,8 @@ include(CheckLibraryExists)
 include(cmake_include/Utilities.cmake)
 include(cmake_include/FindPython.cmake)
 include(cmake_include/FindCBFLib.cmake)
-include(cmake_include/FindJava.cmake)
-include(cmake_include/FindJNI.cmake)
+#include(cmake_include/FindJava.cmake)
+#include(cmake_include/FindJNI.cmake)
 include(cmake_include/FindGuile.cmake)
 include(cmake_include/FindMZScheme.cmake)
 include(cmake_include/FindHDF4.cmake)
@@ -74,19 +80,34 @@ include(cmake_include/FindDocbookUtils.cmake)
 include(cmake_include/FindSZIP.cmake)
 include(cmake_include/FindAnt.cmake)
 
-CHECK_TYPE_SIZE(int SIZEOF_INT)
+CHECK_TYPE_SIZE("int" SIZEOF_INT)
+set(HAVE_INT ${HAVE_SIZEOF_INT})
 CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
+set(HAVE_LONG_INT ${HAVE_SIZEOF_LONG_INT})
 CHECK_TYPE_SIZE("long long int" SIZEOF_LONG_LONG_INT)
-CHECK_TYPE_SIZE(size_t SIZEOF_SIZE_T)
+set(HAVE_LONG_LONG_INT ${HAVE_SIZEOF_LONG_LONG_INT})
+CHECK_TYPE_SIZE("unsigned long long int" SIZEOF_UNSIGNED_LONG_LONG_INT)
+set(HAVE_UNSIGNED_LONG_LONG_INT ${HAVE_SIZEOF_UNSIGNED_LONG_LONG_INT})
+CHECK_TYPE_SIZE("size_t" SIZEOF_SIZE_T)
+set(HAVE_SIZE_T ${HAVE_SIZEOF_SIZE_T})
 
 CHECK_FUNCTION_EXISTS(ftime HAVE_FTIME)
 CHECK_FUNCTION_EXISTS(tzset HAVE_TZSET)
+CHECK_FUNCTION_EXISTS(strdup HAVE_STRDUP)
 
+CHECK_INCLUDE_FILE(inttypes.h HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILE(stdint.h HAVE_STDINT_H)
 CHECK_INCLUDE_FILE(dlfcn.h HAVE_DLFCN_H)
-#if (WIN32)
-ADD_DEFINITIONS(-DPRINTF_INT64="lld" -DPRINTF_UINT64="llu")
-#endif()
+
+if (SIZEOF_LONG_LONG_INT EQUAL 8)
+	set(PRINTF_INT64 "lld")
+	set(PRINTF_UINT64 "llu")
+elseif (WIN32)
+	set(PRINTF_INT64 "I64d")
+	set(PRINTF_UINT64 "I64u")
+else()
+	message(SEND_ERROR "Cannot printf int64 and uint64")
+endif()
 
 if(UNIX)
     CHECK_LIBRARY_EXISTS(dl dlopen "" HAVE_LIBDL)
@@ -103,6 +124,19 @@ find_package(Doxygen)
 find_package(SWIG)
 find_package(TCL)
 find_package(LATEX)
+
+#Find the java runtime and sdk
+find_package(Java 1.6)
+find_package(JNI)
+
+# set ZLIB_ROOT as hint to find_package
+if (ZLIB_SEARCH)
+    set(ZLIB_ROOT ${ZLIB_SEARCH})
+elseif($ENV{ZLIB_ROOT})
+    set(ZLIB_ROOT $ENV{ZLIB_ROOT})
+else()
+    set(ZLIB_ROOT $HDF5_ROOT_DIR $HDF4_ROOT_DIR $SZIP_ROOT_DIR)
+endif()
 find_package(ZLIB)
 
 #Find the libraries for the build.
@@ -164,14 +198,14 @@ option (BUILD_FORTRAN_BINDINGS
 
 #Use HDF4 in build
 option (BUILD_HDF4 
-        "Should I build HDF4 bindings?" OFF)
+        "Should I build HDF4 bindings if libraries available?" OFF)
 
 option (BUILD_HDF5 
-        "Should I build HDF4 bindings?" ON)
+        "Should I build HDF4 bindings if libraries available?" ON)
 
 #Use XML in build
 option (BUILD_XML 
-        "We have the XML libraries installed and would like to use them." ON)
+        "Should I build XML bindings if libraries available?" ON)
 set(BUILD_MXML ${BUILD_XML})
 
 #This is a MINGW build

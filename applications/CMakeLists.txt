@@ -29,9 +29,6 @@
 #The LibXML 2 Libraries
 find_package(LibXml2)
 
-#Find the java runtime and sdk
-find_package(Java 1.6)
-
 # Recurse into the subdirectories.
 
 add_subdirectory (NXbrowse)
@@ -42,15 +39,15 @@ if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (NXdump)
 endif()
 
-if (HAVE_XML)
+if (HAVE_MXML)
 add_subdirectory (nxingest)
-endif(HAVE_XML)
+endif(HAVE_MXML)
 
 add_subdirectory (NXtraverse)
 
-if(Java_FOUND AND ANTEXEC_FOUND)
+if(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
     add_subdirectory (NXvalidate)
-endif(Java_FOUND AND ANTEXEC_FOUND)
+endif(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
 
 if(LIBXML2_FOUND)
     add_subdirectory (NXsummary)

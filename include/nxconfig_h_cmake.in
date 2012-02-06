@@ -10,7 +10,19 @@
 
 #cmakedefine HAVE_TZSET
 
+#cmakedefine HAVE_STRDUP
+
+#cmakedefine01 HAVE_LONG_LONG_INT
+
+#cmakedefine01 HAVE_UNSIGNED_LONG_LONG_INT
+
 #cmakedefine01 HAVE_STDINT_H
+
+#cmakedefine01 HAVE_INTTYPES_H
+
+#define PRINTF_INT64			@PRINTF_INT64@
+
+#define PRINTF_UINT64			@PRINTF_UINT64@
 
 #define SIZEOF_VOIDP 			@CMAKE_SIZEOF_VOID_P@
 

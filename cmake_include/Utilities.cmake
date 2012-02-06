@@ -27,9 +27,8 @@
 #====================================================================
 
 # checks a list of possible compiler flags and adds allowed ones to the current list
-function(check_add_c_compiler_flags FLAGS)
-    foreach(FLAG ${FLAGS})
-	    message("c hello ${FLAG}")
+function(check_add_c_compiler_flags)
+    foreach(FLAG ${ARGV})
         check_c_compiler_flag(${FLAG} RES)
 	    if (RES)
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAG}" PARENT_SCOPE)
@@ -38,9 +37,8 @@ function(check_add_c_compiler_flags FLAGS)
 endfunction()
 
 # checks a list of possible compiler flags and adds allowed ones to the current list
-function(check_add_cxx_compiler_flags FLAGS)
-    foreach(FLAG ${FLAGS})
-	    message("cxx hello ${FLAG}")
+function(check_add_cxx_compiler_flags)
+    foreach(FLAG ${ARGV})
         check_cxx_compiler_flag(${FLAG} RES)
 	    if (RES)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAG}" PARENT_SCOPE)
@@ -50,8 +48,8 @@ endfunction()
 
 # define a HAVE_  if both  BUILD_  and  _FOUND  are defined
 # e.g. creates HAVE_HDF5 if both BUILD_HDF5 and HDF5_FOUND are ture
-function(create_have_vars NAMES)
-    foreach(NAME ${NAMES})
+function(create_have_vars)
+    foreach(NAME ${ARGV})
         if(${BUILD_${NAME}} AND ${${NAME}_FOUND})
 	        set(HAVE_${NAME} ON PARENT_SCOPE)
 	    else()

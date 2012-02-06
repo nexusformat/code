@@ -37,7 +37,7 @@ else(WIN32)
 	find_library(SZIP_LIBRARIES NAMES sz HINTS ${SZIP_SEARCH} ENV SZIP_ROOT PATHS ${SZIP_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of szip lib")
 endif(WIN32)
 
-find_path(SZIP_INCLUDE_DIRS NAMES sz.h szlib.h HINTS ${SZIP_SEARCH} ENV SZIP_ROOT PATHS ${SZIP_SEARCH_DEFAULT} PATH_SUFFIXES include DOC "location of szip include")
+find_path(SZIP_INCLUDE_DIRS NAMES sz.h szlib.h HINTS ${SZIP_SEARCH} ENV SZIP_ROOT PATHS ${SZIP_SEARCH_DEFAULT} PATH_SUFFIXES include DOC "location of szip includes")
 
 #if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 #    find_library(ZIP_LIB NAMES z zlib zdll zlib1 zlibd zlibd1 PATHS $ENV{HDF5_ROOT}/bin $ENV{HDF5_ROOT}/lib)
@@ -54,7 +54,9 @@ find_path(SZIP_INCLUDE_DIRS NAMES sz.h szlib.h HINTS ${SZIP_SEARCH} ENV SZIP_ROO
 
 set(SZIP_DEFINITIONS "")
 get_filename_component(_SZIP_LIBDIR ${SZIP_LIBRARIES} PATH)
-set(SZIP_ROOT_DIR "${_SZIP_LIBDIR}/..")
+get_filename_component(SZIP_ROOT_DIR "${_SZIP_LIBDIR}/.." ABSOLUTE)
+
+mark_as_advanced(SZIP_LIBRARIES SZIP_INCLUDE_DIRS)
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SZIP DEFAULT_MSG SZIP_LIBRARIES SZIP_INCLUDE_DIRS)
