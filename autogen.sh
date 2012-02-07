@@ -2,6 +2,44 @@
 
 rm -fr autom4te.cache
 
+PACKAGE_RELEASE=""
+NEXUS_VERSION=""
+NEXUS_RELEASE=""
+while getopts "p:r:v:" opt; do
+  case $opt in
+    p)
+	PACKAGE_RELEASE="$OPTARG"
+	;;
+    v)
+	NEXUS_VERSION="$OPTARG"
+	;;
+    r)
+	NEXUS_RELEASE="$OPTARG"
+	;;
+    \?)
+	echo "Invalid option: -$OPTARG" >&2
+	;;
+  esac
+done
+if test ! -z "$PACKAGE_RELEASE"; then
+    echo "Setting package release to $PACKAGE_RELEASE"
+    mv configure.ac configure.ac.$$
+    sed -e "s/^m4_define.*PACKAGE_RELEASE.*/m4_define\([PACKAGE_RELEASE],[$PACKAGE_RELEASE]\)/" < configure.ac.$$ > configure.ac
+    rm -f configure.ac.$$
+fi
+if test ! -z "$NEXUS_VERSION"; then
+    echo "Setting NeXus version to $NEXUS_VERSION"
+    mv configure.ac configure.ac.$$
+    sed -e "s/^m4_define.*NEXUS_VERSION.*/m4_define\([NEXUS_VERSION],[$NEXUS_VERSION]\)/" < configure.ac.$$ > configure.ac
+    rm -f configure.ac.$$
+fi
+if test ! -z "$NEXUS_RELEASE"; then
+    echo "Setting NeXus release to $NEXUS_RELEASE"
+    mv configure.ac configure.ac.$$
+    sed -e "s/^m4_define.*NEXUS_RELEASE.*/m4_define\([NEXUS_RELEASE],[$NEXUS_RELEASE]\)/" < configure.ac.$$ > configure.ac
+    rm -f configure.ac.$$
+fi
+
 for libtoolize in glibtoolize libtoolize ; do 
 	LIBTOOLIZE=`which $libtoolize 2>/dev/null`
 	if test "$LIBTOOLIZE" ; then

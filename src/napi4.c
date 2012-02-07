@@ -386,7 +386,6 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     char HDF_VERSION[64];
     uint32 lmajor, lminor, lrelease;
     int32 am1=0;
-    int32 file_id=0, an_id=0, ann_id=0;
   
     *pHandle = NULL;
 
@@ -1117,7 +1116,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NX4putdata (NXhandle fid, void *data)
+  NXstatus  NX4putdata (NXhandle fid, const void *data)
   {
     pNexusFile pFile;
     int32 iStart[H4_MAX_VAR_DIMS], iSize[H4_MAX_VAR_DIMS], iStride[H4_MAX_VAR_DIMS];
@@ -1142,7 +1141,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     }
   
     /* actually write */
-    iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iSize, data);
+    iRet = SDwritedata (pFile->iCurrentSDS, iStart, iStride, iSize, (void*)data);
     if (iRet < 0) {
       /* HEprint(stdout,0); */
       sprintf (pError, "ERROR: failure to write data to %s", pBuffer);
@@ -1155,7 +1154,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   /* ------------------------------------------------------------------- */
 
   NXstatus
-   NX4putattr (NXhandle fid, CONSTCHAR *name, void *data, int datalen, int iType)
+   NX4putattr (NXhandle fid, CONSTCHAR *name, const void *data, int datalen, int iType)
   {
     pNexusFile pFile;
     int iRet, type;
@@ -1228,7 +1227,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
    /* ------------------------------------------------------------------- */
 
    
-  NXstatus  NX4putslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+  NXstatus  NX4putslab64 (NXhandle fid, const void *data, const int64_t iStart[], const int64_t iSize[])
   {
     pNexusFile pFile;
     int iRet;
@@ -1259,7 +1258,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
          }
          /* finally write */
          iRet = SDwritedata (pFile->iCurrentSDS, myStart, 
-                        iStride, mySize, data);
+                        iStride, mySize, (void*)data);
 
 
     /* deal with HDF errors */

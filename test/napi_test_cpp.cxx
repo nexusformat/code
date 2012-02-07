@@ -536,7 +536,7 @@ int testTypeMap(const std::string &fname)
 {
 	NeXus::File file(fname);
 	multimap<string, string> *map = file.getTypeMap();
-	int mapsize = 25;
+	size_t mapsize = 25;
 	// HDF4 does not have int64 capability, so resulting map is one shorter than HDF5 and XML files
 	if (fname == string("napi_test_cpp.hdf")) {
 		if (map->size() != (mapsize - 1))

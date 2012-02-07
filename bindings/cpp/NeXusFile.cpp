@@ -138,7 +138,7 @@ namespace {
 static void inner_malloc(void* & data, const std::vector<int64_t>& dims, NXnumtype type) {
   int rank = dims.size();
   int64_t c_dims[NX_MAXRANK];
-  for (size_t i = 0; i < rank; i++) {
+  for (int i = 0; i < rank; i++) {
     c_dims[i] = dims[i];
   }
   NXstatus status = NXmalloc64(&data, rank, c_dims, type);
@@ -1018,8 +1018,6 @@ void File::getSlab(void* data, const vector<int64_t>& start,
     throw Exception(msg.str());
   }
 
-  int rank = start.size();
-
   NXstatus status = NXgetslab64(this->m_file_id, data, &(start[0]), &(size[0]));
   if (status != NX_OK) {
     throw Exception("NXgetslab failed", status);
@@ -1070,7 +1068,7 @@ void File::getAttr(const AttrInfo& info, void* data, int length) {
     throw Exception(msg.str());
   }
   // char attributes are always NULL terminated and so may change length
-  if (length != info.length && type != NX_CHAR) {
+  if (static_cast<unsigned>(length) != info.length && type != NX_CHAR) {
     stringstream msg;
     msg << "NXgetattr(" << info.name << ") change length [" << info.length
         << "->" << length << "]";

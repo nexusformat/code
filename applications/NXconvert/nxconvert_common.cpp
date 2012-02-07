@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <iostream>
 #ifdef _MSC_VER
 #else
 #include <unistd.h>
@@ -40,6 +41,22 @@
 
 static int WriteGroup (int is_definition);
 static int WriteAttributes (int is_definition, int is_group);
+
+static void clean_string(void* dataBuffer, int dataRank, int dataDimensions[])
+{
+	int i, n = 1;
+    	for(i=0; i<dataRank; ++i)
+    	{
+	    n *= dataDimensions[i];
+ 	}
+	for(i=0; i<n; ++i)
+	{
+	    if (!isprint(((const unsigned char*)dataBuffer)[i]))
+	    {
+		((char*)dataBuffer)[i] = '?';
+	    }
+	}
+}
 
 struct link_to_make
 {
@@ -105,7 +122,7 @@ static const char* definition_name = NULL;
 
 int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_)
 {
-   int i, nx_is_definition = 0;
+   int nx_is_definition = 0;
    if (definition_name_ != NULL && definition_name_[0] == '\0') {
      definition_name = NULL;
    } else {
@@ -148,10 +165,8 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    {
 	return NX_ERROR;
    }
-   if (nx_format != NXACC_CREATE && nx_format != NXACC_CREATE4)
-   {
 /* now create any required links */
-       for(i=0; i<links_to_make.size(); i++)
+       for(size_t i=0; i<links_to_make.size(); i++)
        {
 	    if (NXopenpath(outId, links_to_make[i].to) != NX_OK) return NX_ERROR;
 	    if (NXgetdataID(outId, &link) == NX_OK  || NXgetgroupID(outId, &link) == NX_OK)
@@ -175,7 +190,6 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 	        return NX_ERROR;
 	    }
 	}
-   }
 /* Close the input and output files */
    if (NXclose (&outId) != NX_OK)
    {
@@ -188,7 +202,9 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
 static int WriteGroup (int is_definition)
 { 
   
-   int status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+   int i,  status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+   static const int slab_start[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+   static const int MAX_DEF_ARRAY_ELEMENTS_PER_DIM = 3; /* doesn't work yet - only 1 element is written */
    NXname name, nxclass;
    void *dataBuffer;
    NXlink link;
@@ -201,7 +217,57 @@ static int WriteGroup (int is_definition)
       status = NXgetnextentry (inId, name, nxclass, &dataType);
       if (status == NX_ERROR) return NX_ERROR;
       if (status == NX_OK) {
-         if (!strncmp(nxclass,"NX",2)) {
+//         std::cerr << "WriteGroup: " << name << "(" << nxclass << ")" << std::endl;
+         if (!strncmp(nxclass,"SDS",3)) {
+	    add_path(name);
+            if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
+	    if (NXgetdataID(inId, &link) != NX_OK) return NX_ERROR;
+	    if (!strcmp(current_path, link.targetPath))
+	    {
+                if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
+                if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
+                if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
+		if ( is_definition && (dataType != NX_CHAR) )
+		{
+		    for(i=0; i<dataRank; ++i)
+		    {
+			if (dataDimensions[i] > MAX_DEF_ARRAY_ELEMENTS_PER_DIM)
+			{
+			    dataDimensions[i] = MAX_DEF_ARRAY_ELEMENTS_PER_DIM;
+			}
+		    }
+                    if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
+                    if (NXgetslab (inId, dataBuffer, slab_start, dataDimensions)  != NX_OK) return NX_ERROR;
+                    if (NXputslab (outId, dataBuffer, slab_start, dataDimensions) != NX_OK) return NX_ERROR;
+		}
+		else
+		{
+                    if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
+                    if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
+		    /* fix potential non-UTF8 character issue */
+		    if (is_definition && dataType == NX_CHAR)
+		    {
+			clean_string(dataBuffer, dataRank, dataDimensions);
+		    }
+                    if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
+		}
+                if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
+                if (NXclosedata (outId) != NX_OK) return NX_ERROR;
+                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
+	        remove_path(name);
+	    }
+	    else
+	    {
+	        remove_path(name);
+		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
+	    }
+            if (NXclosedata (inId) != NX_OK) return NX_ERROR;
+         }
+         /* napi4.c returns UNKNOWN for DFTAG_VH in groups */
+         else if (!strcmp(nxclass, "UNKNOWN") || !strncmp(nxclass, "CDF", 3)) {
+             ;
+         }
+         else {
             if (NXopengroup (inId, name, nxclass) != NX_OK) return NX_ERROR;
 	    add_path(name);
 	    if (NXgetgroupID(inId, &link) != NX_OK) return NX_ERROR;
@@ -240,30 +306,6 @@ static int WriteGroup (int is_definition)
          	if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
 	    }
          }
-         else if (!strncmp(nxclass,"SDS",3)) {
-	    add_path(name);
-            if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
-	    if (NXgetdataID(inId, &link) != NX_OK) return NX_ERROR;
-	    if (!strcmp(current_path, link.targetPath))
-	    {
-                if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
-                if (NXmalloc (&dataBuffer, dataRank, dataDimensions, dataType) != NX_OK) return NX_ERROR;
-                if (NXgetdata (inId, dataBuffer)  != NX_OK) return NX_ERROR;
-                if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
-                if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
-                if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
-                if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
-                if (NXfree((void**)&dataBuffer) != NX_OK) return NX_ERROR;
-                if (NXclosedata (outId) != NX_OK) return NX_ERROR;
-	        remove_path(name);
-	    }
-	    else
-	    {
-	        remove_path(name);
-		links_to_make.push_back(link_to_make(current_path, name, link.targetPath));
-	    }
-            if (NXclosedata (inId) != NX_OK) return NX_ERROR;
-         }
       }
       else if (status == NX_EOD) {
          if (NXclosegroup (inId) != NX_OK) return NX_ERROR;
@@ -296,6 +338,10 @@ static int WriteAttributes (int is_definition, int is_group)
             attrLen++; /* Add space for string termination */
             if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return NX_ERROR;
             if (NXgetattr (inId, attrName, attrBuffer, &attrLen , &attrType) != NX_OK) return NX_ERROR;
+	    if (is_definition && attrType == NX_CHAR)
+	    {
+		clean_string(attrBuffer, 1, &attrLen);
+	    }
             if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
             if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
          }

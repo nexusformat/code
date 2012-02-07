@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
     printf("Testing HDF4\n");
     time(&tim);
     test_unlimited(NXACC_CREATE4, "test_unlimited.nx4");
-    printf("Took %u seconds\n", time(NULL) - tim);
+    printf("Took %u seconds\n", (unsigned)(time(NULL) - tim));
     printf("Testing XML\n");
     time(&tim);
     test_unlimited(NXACC_CREATEXML, "test_unlimited.xml");
-    printf("Took %u seconds\n", time(NULL) - tim);
+    printf("Took %u seconds\n", (unsigned)(time(NULL) - tim));
     printf("Testing HDF5\n");
     time(&tim);
     test_unlimited(NXACC_CREATE5, "test_unlimited.nx5");
-    printf("Took %u seconds\n", time(NULL) - tim);
+    printf("Took %u seconds\n", (unsigned)(time(NULL) - tim));
     return 0;
 }

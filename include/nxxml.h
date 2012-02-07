@@ -44,15 +44,15 @@ NXstatus  NXXmakedata64 (NXhandle fid,
 				    int rank, int64_t dimensions[]);
 NXstatus  NXXopendata (NXhandle fid, CONSTCHAR *name);
 NXstatus  NXXclosedata (NXhandle fid);
-NXstatus  NXXputdata (NXhandle fid, void *data);
+NXstatus  NXXputdata (NXhandle fid, const void *data);
 NXstatus  NXXgetdata (NXhandle fid, void *data);
 NXstatus  NXXgetinfo64 (NXhandle fid, int *rank, 
 				   int64_t dimension[], int *iType);
-NXstatus  NXXputslab64 (NXhandle fid, void *data, 
-				   int64_t iStart[], int64_t iSize[]);
+NXstatus  NXXputslab64 (NXhandle fid, const void *data, 
+				   const int64_t iStart[], const int64_t iSize[]);
 NXstatus  NXXgetslab64 (NXhandle fid, void *data, 
 				   const int64_t iStart[], const int64_t iSize[]);
-NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
+NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, const void *data, 
 				   int datalen, int iType);
 NXstatus  NXXgetattr (NXhandle fid, char *name, 
 				   void *data, int* datalen, int* iType);

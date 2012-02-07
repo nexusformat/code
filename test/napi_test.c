@@ -204,7 +204,7 @@ int main (int argc, char *argv[])
            if (NXputdata (fileid, "NeXus sample") != NX_OK) return 1;
         if (NXclosedata (fileid) != NX_OK) return 1;
         if (NXgetgroupID (fileid, &glink) != NX_OK) return 1;
-        if (nx_creation_code & NXACC_CREATEXML == 0) {
+        if (( nx_creation_code & NXACC_CREATEXML) == 0 ) {
             if (NXmakedata (fileid, "cdata_unlimited", NX_CHAR, 2, unlimited_cdims) != NX_OK) return 1;
 	    if (NXopendata (fileid, "cdata_unlimited") != NX_OK) return 1;
 	    slab_size[0] = 1;
@@ -445,6 +445,14 @@ int main (int argc, char *argv[])
     return 0;
   }
   if(NXopenpath(fileid,"../r8_data") != NX_OK){
+    printf("Failure on NXopenpath\n");
+    return 0;
+  }
+  if(NXopengrouppath(fileid,"/entry/data/comp_data") != NX_OK){
+    printf("Failure on NXopengrouppath\n");
+    return 0;
+  }
+  if(NXopenpath(fileid,"/entry/data/r8_data") != NX_OK){
     printf("Failure on NXopenpath\n");
     return 0;
   }

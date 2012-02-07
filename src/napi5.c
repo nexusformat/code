@@ -816,7 +816,7 @@ static hid_t nxToHDF5Type(int datatype)
   memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
   memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
   for(i = 0; i< rank; i++) {
-  if (dimensions[i] == NX_UNLIMITED){
+  if (dimensions[i] == NX_UNLIMITED || dimensions[i] <= 0){
          chunk_size[i]= 1;
   }    
   }
@@ -898,7 +898,7 @@ static hid_t nxToHDF5Type(int datatype)
   
 
 
-  NXstatus  NX5putdata (NXhandle fid, void *data)
+  NXstatus  NX5putdata (NXhandle fid, const void *data)
   {
     pNexusFile5 pFile;
     herr_t iRet;
@@ -973,7 +973,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 }
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, void *data, 
+  NXstatus  NX5putattr (NXhandle fid, CONSTCHAR *name, const void *data, 
 
 			int datalen, int iType)
   {
@@ -1026,7 +1026,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
   
   /* ------------------------------------------------------------------- */
  
-  NXstatus  NX5putslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+  NXstatus  NX5putslab64 (NXhandle fid, const void *data, const int64_t iStart[], const int64_t iSize[])
   {
     pNexusFile5 pFile;
     int iRet, rank, i;
@@ -1178,7 +1178,6 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
 {
   hid_t  dataID, aid2, aid1, attID;
   herr_t status;
-  int type = NX_CHAR;
   char name[] = "target";
 
     /*
@@ -1229,8 +1228,6 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 {
     pNexusFile5 pFile;
     char        linkTarget[1024];
-    int         type = NX_CHAR;
-    hid_t 	targetid;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1266,9 +1263,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
   {
     pNexusFile5 pFile;
     char        linkTarget[1024];
-    int         type = NX_CHAR;
     char        *itemName = NULL;
-    hid_t 	targetid;
 
     pFile = NXI5assert (fid);
     if (pFile->iCurrentG == 0) { /* root level, can not link here */
@@ -1427,7 +1422,7 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
 /*---------------------------------------------------------------------------*/
 static int countObjectsInGroup(hid_t loc_id)
 {
-  int count = 0, type;
+  int count = 0;
   H5G_info_t numobj;
   
   herr_t status;
@@ -2147,7 +2142,6 @@ static int countObjectsInGroup(hid_t loc_id)
   {
      herr_t iRet;
      pNexusFile5 pFile;
-     char pBuffer[256]; 
      hid_t openwhere;
 
      pFile = NXI5assert(fileid);
@@ -2199,26 +2193,36 @@ static int countObjectsInGroup(hid_t loc_id)
      herr_t ret;
      H5L_info_t link_buff;
      char linkval_buff[1024];
-     const char *filepath, *objpath;
+     const char *filepath = NULL, *objpath = NULL;
+     size_t val_size;
 
      pFile = NXI5assert(fileid);
+     memset(url, 0, urllen);
 
      ret = H5Lget_info(pFile->iFID, name, &link_buff, H5P_DEFAULT);
      if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
        return NX_ERROR;
      }
 
-     ret = H5Lget_val(pFile->iFID, name, linkval_buff, sizeof(linkval_buff), H5P_DEFAULT);
+     val_size = link_buff.u.val_size;
+     if (val_size > sizeof(linkval_buff)) {
+       NXReportError("ERROR: linkval_buff too small");
+       return NX_ERROR;
+     }
+
+     ret = H5Lget_val(pFile->iFID, name, linkval_buff, val_size, H5P_DEFAULT);
      if (ret < 0) {
+       NXReportError("ERROR: H5Lget_val failed");
        return NX_ERROR;
      }
 
-     ret = H5Lunpack_elink_val(linkval_buff, sizeof(linkval_buff), 0, &filepath, &objpath);
-     if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
+     ret = H5Lunpack_elink_val(linkval_buff, val_size, NULL, &filepath, &objpath);
+     if (ret < 0) {
+       NXReportError("ERROR: H5Lunpack_elink_val failed");
        return NX_ERROR;
      }
 
-    snprintf(url, urllen, "nxfile://%s#%s", filepath, objpath);
+    snprintf(url, urllen-1, "nxfile://%s#%s", filepath, objpath);
     return NX_OK;
      
   }

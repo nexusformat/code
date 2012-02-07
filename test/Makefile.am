@@ -96,7 +96,7 @@ nxconvert:
 
 nxvalidate:
 	rm -f $@
-	ln -s ../applications/NXvalidate/$@$(EXEEXT) $@
+	ln -s ../applications/NXvalidate/$@ $@
 
 nxbrowse:
 	rm -f $@

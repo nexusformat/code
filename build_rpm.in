@@ -25,12 +25,22 @@ mkdir $nxtop/installroot
 make dist
 ln -sf $nxtop/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.gz $topdir/SOURCES
 cp $nxtop/nexus.spec $topdir/SPECS
-cd $topdir/SPECS
 #
 if test -z "$1"; then
     build_args='@CONFIGURE_ARGS@'
 else
     build_args="$1"
 fi
+if ! test -z "$2"; then
+    RESULTS=/tmp/nexus-mock-results
+    mkdir -p $RESULTS
+    mock_args="-r $2 --resultdir=$RESULTS"
+    mock ${mock_args} --init
+    env NEXUS_CONFIG_OPTIONS="$build_args" mock ${mock_args} --buildsrpm --spec nexus.spec --sources . --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5" 
+    srpm=`ls $RESULTS/*.src.rpm`
+    env NEXUS_CONFIG_OPTIONS="$build_args" mock ${mock_args} --rebuild $srpm  --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5"
+else
 # buildroot is actually where we install to
-env NEXUS_CONFIG_OPTIONS="$build_args" rpmbuild -ba --buildroot $nxtop/installroot --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5" nexus.spec
+    cd $topdir/SPECS
+    env NEXUS_CONFIG_OPTIONS="$build_args" rpmbuild -ba --buildroot $nxtop/installroot --define "_source_filedigest_algorithm md5" --define "_binary_filedigest_algorithm md5" nexus.spec
+fi

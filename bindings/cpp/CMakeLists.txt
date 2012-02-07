@@ -48,6 +48,8 @@ target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library
 add_library (NeXus_CPP_Shared_Library SHARED ${HEADERS} ${SOURCES})
 
 #Note - library version needs to be got from somewhere?
+# may want to use DEBUG_OUTPUT_NAME and RELEASE_OUTPUT_NAME
+# of define CMAKE_DEBUG_POSTFIX globally
 set_target_properties(NeXus_CPP_Shared_Library PROPERTIES OUTPUT_NAME NeXusCPP
                       VERSION 1.0 SOVERSION 4)
 
@@ -59,6 +61,8 @@ install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
          RUNTIME DESTINATION bin COMPONENT Runtime
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
+
+install_pdb (NeXus_CPP_Shared_Library)
 
 
 

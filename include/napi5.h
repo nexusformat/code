@@ -22,10 +22,10 @@ extern  NXstatus  NX5compmakedata64 (NXhandle handle, CONSTCHAR* label, int data
 extern  NXstatus  NX5compress (NXhandle handle, int compr_type);
 extern  NXstatus  NX5opendata (NXhandle handle, CONSTCHAR* label);
 extern  NXstatus  NX5closedata(NXhandle handle);
-extern  NXstatus  NX5putdata(NXhandle handle, void* data);
+extern  NXstatus  NX5putdata(NXhandle handle, const void* data);
 
-extern  NXstatus  NX5putattr(NXhandle handle, CONSTCHAR* name, void* data, int iDataLen, int iType);
-extern  NXstatus  NX5putslab64(NXhandle handle, void* data, int64_t start[], int64_t size[]);    
+extern  NXstatus  NX5putattr(NXhandle handle, CONSTCHAR* name, const void* data, int iDataLen, int iType);
+extern  NXstatus  NX5putslab64(NXhandle handle, const void* data, const int64_t start[], const int64_t size[]);    
 
 extern  NXstatus  NX5getdataID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX5makelink(NXhandle handle, NXlink* pLink);

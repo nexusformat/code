@@ -974,7 +974,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NXputdata (NXhandle fid, void *data)
+  NXstatus  NXputdata (NXhandle fid, const void *data)
   {
     pNexusFunction pFunc = handleToNexusFunc(fid);
     return LOCKED_CALL(pFunc->nxputdata(pFunc->pNexusData, data));
@@ -982,7 +982,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NXputattr (NXhandle fid, CONSTCHAR *name, void *data, 
+  NXstatus  NXputattr (NXhandle fid, CONSTCHAR *name, const void *data, 
                                   int datalen, int iType)
   {
     char buffer[256];
@@ -1003,7 +1003,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NXputslab (NXhandle fid, void *data, int iStart[], int iSize[])
+  NXstatus  NXputslab (NXhandle fid, const void *data, const int iStart[], const int iSize[])
   {
 	  int i, iType, rank;
 	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];
@@ -1019,7 +1019,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
 	  return NXputslab64(fid, data, iStart64, iSize64);
   }
 
-  NXstatus  NXputslab64 (NXhandle fid, void *data, int64_t iStart[], int64_t iSize[])
+  NXstatus  NXputslab64 (NXhandle fid, const void *data, const int64_t iStart[], const int64_t iSize[])
   {
     pNexusFunction pFunc = handleToNexusFunc(fid);
     return LOCKED_CALL(pFunc->nxputslab64(pFunc->pNexusData, data, iStart, iSize));
@@ -1091,7 +1091,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   
   
   NXstatus  NXmalloc (void** data, int rank, 
-				   int dimensions[], int datatype)
+				   const int dimensions[], int datatype)
   {
 	  int status;
 	  int64_t* dims64 = dupDimsArray(dimensions, rank);
@@ -1101,7 +1101,7 @@ static int analyzeNapimount(char *napiMount, char *extFile, int extFileLen,
   }
 
   NXstatus  NXmalloc64 (void** data, int rank, 
-				   int64_t dimensions[], int datatype)
+				   const int64_t dimensions[], int datatype)
   {
     int i;
     size_t size = 1;
@@ -1292,7 +1292,7 @@ char *nxitrim(char *str)
   /*-------------------------------------------------------------------------*/
 
   NXstatus  NXgetslab (NXhandle fid, void *data, 
-				    int iStart[], int iSize[])
+				    const int iStart[], const int iSize[])
   {
 	  int i, iType, rank;
 	  int64_t iStart64[NX_MAXRANK], iSize64[NX_MAXRANK];
@@ -1462,7 +1462,7 @@ NXstatus  NXisexternalgroup(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass,
   LOCKED_CALL(pFunc->nxclosegroup(pFunc->pNexusData));
   if(attStatus == NX_OK){
     length = strlen(nxurl);
-    if(length > urlLen){
+    if(length >= urlLen){
       length = urlLen - 1;
     }
     memset(url,0,urlLen);
@@ -1498,7 +1498,7 @@ NXstatus  NXisexternaldataset(NXhandle fid, CONSTCHAR *name,
   LOCKED_CALL(pFunc->nxclosedata(pFunc->pNexusData));
   if(attStatus == NX_OK){
     length = strlen(nxurl);
-    if(length > urlLen){
+    if(length >= urlLen){
       length = urlLen - 1;
     }
     memset(url,0,urlLen);
@@ -1542,7 +1542,7 @@ NXstatus  NXlinkexternal(NXhandle fid, CONSTCHAR *name, CONSTCHAR *nxclass, CONS
     return status;
   }
   length = strlen(url);
-  status = NXputattr(fid, "napimount",(void *)url,length, type);
+  status = NXputattr(fid, "napimount",url,length, type);
   if(status != NX_OK){
     return status;
   }
@@ -1589,7 +1589,7 @@ NXstatus  NXlinkexternaldataset(NXhandle fid, CONSTCHAR *name,
     return status;
   }
   length = strlen(url);
-  status = NXputattr(fid, "napimount",(void *)url,length, type);
+  status = NXputattr(fid, "napimount",url,length, type);
   if(status != NX_OK){
     return status;
   }
@@ -2100,7 +2100,7 @@ char *NXIformatNeXusTime(){
       return NXcompress(fid,*compr_type);
   }
 /*-----------------------------------------------------------------------*/
-  NXstatus  NXfputattr(NXhandle fid, char *name, void *data, 
+  NXstatus  NXfputattr(NXhandle fid, const char *name, const void *data, 
                                    int *pDatalen, int *pIType)
   {
     return NXputattr(fid, name, data, *pDatalen, *pIType);

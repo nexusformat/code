@@ -33,7 +33,7 @@ if(DEFINED JAVA_COMPILE)
 
         SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-        MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/bindings/java/)
+#        MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/bindings/java/)
 
         SET(JAVA_TEST ${CMAKE_SOURCE_DIR}/bindings/java/test/TestJapi.java)
 

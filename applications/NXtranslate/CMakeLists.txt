@@ -38,10 +38,10 @@ add_subdirectory (spec)
 add_subdirectory (esrf_edf)
 #add_subdirectory ($(GENIESUBDIR)
 
-add_definitions(-DIPNS_RETRIEVER -DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER -DEDF_RETRIEVER -DSPEC_RETRIEVER)
+add_definitions(-DFRM2_RETRIEVER -DTEXT_COLLIST_RETRIEVER -DTEXT_PLAIN_RETRIEVER -DTEXT_XML_RETRIEVER -DDYNAMIC_RETRIEVER -DSNS_HISTOGRAM_RETRIEVER -DLOOPY_RETRIEVER -DBINARY_RETRIEVER -DEDF_RETRIEVER -DSPEC_RETRIEVER)
 
 
-include_directories(. ${LIBXML2_INCLUDE_DIR} IPNS_CPP text_collist text_plain text_xml sns_histogram FRM2 loopy)
+include_directories(. ${LIBXML2_INCLUDE_DIR} text_collist text_plain text_xml sns_histogram FRM2 loopy)
 
 add_executable (nxtranslate attr.cpp main.cpp nexus_retriever.cpp  nexus_util.cpp node.cpp
 	                  node_util.cpp retriever.cpp string_util.cpp xml_parser.cpp
@@ -53,7 +53,7 @@ target_link_libraries(nxtranslate NeXus_Static_Library ${HDF5_LIBRARIES}
                       ${MXML_LINK} ${READLINE_LINK} ${M_LINK} ${DF_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${TERMCAP_LINK} ${HDF4_LINK}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES} 
-                      ${LIBXML2_LIBRARIES} BinaryRetriever Edf FRM2 IPNSRunfile
+                      ${LIBXML2_LIBRARIES} BinaryRetriever Edf FRM2 
                       Loopy SNShistogram Spec TextCollist TextPlain TextXML
                       )
 

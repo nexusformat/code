@@ -28,7 +28,7 @@
 #====================================================================
 LIBNEXUS=$(top_builddir)/src/libNeXus.la
 LIBNEXUSCPP=$(top_builddir)/bindings/cpp/libNeXusCPP.la
-AM_CPPFLAGS=-I. -I$(top_srcdir)/include -I$(top_srcdir)/bindings/cpp -I$(top_srcdir)/third_party
+AM_CPPFLAGS=-I. -DNXCONVERT_EXPORTS -I$(top_srcdir)/include -I$(top_srcdir)/bindings/cpp -I$(top_srcdir)/third_party
 
 EXTRA_DIST=SConscript $(man_MANS)
 

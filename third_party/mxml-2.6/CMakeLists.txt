@@ -25,7 +25,7 @@
 #
 #
 #====================================================================
-include(FindAllIncludes.cmake)
+#include(FindAllIncludes.cmake)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     include_directories(vcnet)
@@ -64,4 +64,10 @@ target_link_libraries(testmxml MXML_Static_Library ${PTHREAD_LINK})
 
 target_link_libraries(mxmldoc MXML_Static_Library ${PTHREAD_LINK})
 
+install (TARGETS MXML_Shared_Library MXML_Static_Library
+         RUNTIME DESTINATION bin COMPONENT Runtime
+         LIBRARY DESTINATION lib COMPONENT Runtime
+         ARCHIVE DESTINATION lib/nexus COMPONENT Development)
+
+install_pdb (MXML_Shared_Library)
 

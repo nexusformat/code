@@ -41,10 +41,10 @@ m4_define([NEXUS_VERSION],[4.3.0])dnl
 
 ## things like  rc1   or  20100903svn1734
 #m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl
-m4_define([NEXUS_RELEASE],[rc1])dnl
+m4_define([NEXUS_RELEASE],[rc2])dnl
 
 # 0.* for pre release; 1, 2, ... post releas
-m4_define([PACKAGE_RELEASE],[0.1])dnl
+m4_define([PACKAGE_RELEASE],[0.2])dnl
 
 AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,[-],NEXUS_RELEASE), [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
@@ -131,6 +131,7 @@ if test ! -z "$with_f77" -a x"$with_f77" != x"no" ; then
 	mytop=`pwd`
 	dnl get right F77 include option
 	AC_CHECK_F77_OPTION([-I$mytop/bindings/f77],[      INCLUDE 'napif.inc'])
+	FFLAGS="$FFLAGS -g"
 	AC_F77_LIBRARY_LDFLAGS
 	WITH_F77=yes
 else
@@ -152,7 +153,7 @@ if test ! -z "$with_f90" -a x"$with_f90" != x"no" ; then
 	dnl ready compiled module to point the option at so for now we are just
 	dnl check that the option takes a directory and the compiler works
 	mytop=`pwd`
-	FCFLAGS="$FCFLAGS -I$mytop/bindings/f90"
+	FCFLAGS="$FCFLAGS -g -I$mytop/bindings/f90"
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-p $mytop/bindings/f90],[      INCLUDE 'NXmodule.f90'])
 	dnl AC_CHECK_F90_OPTION([-qextname])
@@ -287,6 +288,7 @@ if test x$with_python != xno; then
     fi
     AM_PATH_PYTHON(,, :)
     AC_CHECK_PYTHON_MODULE(numpy)
+    AC_CHECK_PYTHON_MODULE(ctypes)
 fi
 
 AC_ARG_WITH([swig], AC_HELP_STRING([--with-swig=swig compiler], [Specify path of swig compiler]), [with_swig=$withval], [with_swig=])
@@ -357,11 +359,13 @@ fi
 
 # enable compiler warnings if gcc
 if test "$CC" = "gcc"; then
-    CFLAGS="$CFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+#    CFLAGS="$CFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+    CFLAGS="$CFLAGS -Wall"
 fi
 
 if test "$CXX" = "g++"; then
-    CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+#    CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment"
+    CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 dnl extra FCFLAGS for Absoft f90
@@ -606,7 +610,7 @@ HDF5_API_DEFS="-DH5Acreate_vers=2 -DH5Aiterate_vers=2 -DH5Dcreate_vers=2 -DH5Dop
 if test "$H5ROOT"; then
     H5VERSION=`grep H5_VERS_INFO ${H5ROOT}/include/H5public.h | cut -d '"' -f 2 | cut -d ' ' -f 4`
     case $H5VERSION in
-	1.[[689]]*)
+	1.[[89]]*)
     		HDF5_LDFLAGS=""
 		for j in lib lib64; do
 		    if test -d $H5ROOT/$j; then 
@@ -618,8 +622,10 @@ if test "$H5ROOT"; then
     		HDF5_LDFLAGS="$HDF5_LDFLAGS -lhdf5 -lz"
     		HDF5_CPPFLAGS="-I$H5ROOT/include -DHDF5 -DH5_NO_DEPRECATED_SYMBOLS ${HDF5_API_DEFS}"
 		;;
-	*)	AC_MSG_WARN([The HDF 5 installation has not the right version ($H5VERSION). You need at least 1.6]) 
-		H5ROOT="";;
+	*)	
+		AC_MSG_WARN([The HDF 5 installation at $H5ROOT is not the right version ($H5VERSION). You need at least 1.8])
+		H5ROOT=""
+		;;
     esac
 fi
 AC_SUBST(HDF5_LDFLAGS)
@@ -755,7 +761,7 @@ AC_CHECK_FUNCS([ftime memset strchr strdup strrchr strstr tzset mkstemp])
 AM_CONDITIONAL(HAVE_CPP, [test ! -z "$CXX"])
 AM_CONDITIONAL(HAVE_F77, [test "$with_f77" != "no"])
 AM_CONDITIONAL(HAVE_F90, [test "$with_f90" != "no"])
-AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy_found"  = "yes"])
+AM_CONDITIONAL(HAVE_PYTHON, [test ! -z "$PYTHONROOT" -a "$PYTHON_numpy_found"  = "yes" -a "$PYTHON_ctypes_found"  = "yes"])
 AM_CONDITIONAL(HAVE_TCL, [test ! -z "$TCLROOT"])
 AM_CONDITIONAL(HAVE_GUILE, [test ! -z "$GUILEROOT"])
 AM_CONDITIONAL(HAVE_SWIG, [test ! -z "$SWIG"])
@@ -950,7 +956,7 @@ build:
 		SWIG:	       ${SWIGBINDING}
 		 IDL:	       ${IDLBINDING} (--with-idlroot=${IDLROOT}, --with-idldlm=${IDLDLM})
 		 MATLAB:	       ${MATLABBINDING} (--with-matlabroot=${MATLABROOT})
-	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found)
+	      PYTHON:	       ${PYTHONBINDING} (PYTHONROOT=${PYTHONROOT}, numpy found: $PYTHON_numpy_found, ctypes found: $PYTHON_ctypes_found)
 
 	application tools:
 	     ant:	       ${ANT_PROG}

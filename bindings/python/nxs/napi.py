@@ -288,12 +288,12 @@ class NeXus(object):
         Open the NeXus file returning a handle.
 
         mode can be one of the following:
-            nxs.ACC_READ      'r'
-            nxs.ACC_RDWR      'rw'
-            nxs.ACC_CREATE    'w'
-            nxs.ACC_CREATE4   'w4'
-            nxs.ACC_CREATE5   'w5'
-            nxs.ACC_CREATEXML 'wx'
+            nxs.ACC_READ      'r'     open a file read-only
+            nxs.ACC_RDWR      'rw'    open a file read/write
+            nxs.ACC_CREATE    'w'     open a file write
+            nxs.ACC_CREATE4   'w4'    open a Nexus file with HDF4
+            nxs.ACC_CREATE5   'w5'    open a Nexus file with HDF5
+            nxs.ACC_CREATEXML 'wx'    open a Nexus file with XML
 
         Raises ValueError if the open mode is invalid.
 
@@ -560,7 +560,7 @@ class NeXus(object):
         Open the group nxclass:name. If the nxclass is not specified
         this will search for it.
 
-        Raises ValueError if the group could not be opened.
+        Raises NeXusError if the group could not be opened.
 
         Corresponds to NXopengroup(handle, name, nxclass)
         """
@@ -696,8 +696,7 @@ class NeXus(object):
                 return nxclass
             if nxname is None:
                 break
-        raise NeXusError("Failed to find entry with name \"%s\" " \
-                         + "at %s" % (target, self.path))
+        raise NeXusError("Failed to find entry with name \"%s\" at %s" % (target, self.path))
 
     def entries(self):
         """

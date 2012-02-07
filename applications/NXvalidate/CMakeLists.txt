@@ -26,11 +26,18 @@
 #
 #====================================================================
 
-configure_file(nxvalidate.in nxvalidate)
+configure_file(nxvalidate.in nxvalidate @ONLY)
 
-execute_process(COMMAND ${ANT})
+add_custom_target(NXvalidate ALL COMMAND ${ANT_EXEC} DEPENDS build.xml nbproject)
 
-install (TARGETS nxvalidate DESTINATION bin)
+add_custom_command(OUTPUT build.xml COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/build.xml build.xml COMMENT "Creating build.xml")
+
+add_custom_command(OUTPUT nbproject COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/nbproject nbproject COMMENT "Creating nbproject")
+
+set_property(DIRECTORY . APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES build.xml nbproject)
+
+install (FILES nxvalidate DESTINATION bin)
+
 install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
          FILE_PERMISSIONS
             OWNER_READ OWNER_EXECUTE OWNER_WRITE
@@ -41,7 +48,8 @@ install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
             GROUP_READ GROUP_EXECUTE 
             WORLD_READ WORLD_EXECUTE)
 
-install (LIBRARY dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION lib/lib COMPONENT Runtime)
-install (LIBRARY dist/NXvalidate.jar DESTINATION lib COMPONENT Development)
+install (FILES dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION lib/lib COMPONENT Runtime)
+
+install (FILES dist/NXvalidate.jar DESTINATION lib COMPONENT Development)
 
 
