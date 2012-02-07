@@ -28,7 +28,26 @@ Packager: NeXus Developers <nexus-developers@nexusformat.org>
 # this value will not usually be used, but something must
 # be specified here to allow   rpm --buildroot   to be used later
 # (it will get used for a   rpmbuild --recompile  of the the src.rpm)
+%if 0%{?rhel} == 5
+%define is_rhel5 1
+%endif
+%if 0%{?el5}
+%define is_rhel5 1
+%endif
+%if "0%{?dist}" == "0.el5"
+%define is_rhel5 1
+%endif
+
 BuildRoot: %{_tmppath}/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
+BuildRequires: python numpy
+BuildRequires: hdf5-devel hdf-devel 
+# mxml is not in rhel or epel as yet
+%if 0%{?fedora}
+BuildRequires: mxml-devel
+%endif
+%if 0%{?is_rhel5}
+BuildRequires: python-ctypes
+%endif
 
 %description
 NeXus is an international standard for exchanging data files
