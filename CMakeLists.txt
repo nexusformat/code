@@ -293,13 +293,13 @@ configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in"
 				"${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake"
 				@ONLY)
 set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake")
-set (CPACK_GENERATOR TGZ;ZIP)
+set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 if(UNIX)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
     #set (CPACK_RPM_PACKAGE_PROVIDES "")
 endif(UNIX)
 if(WIN32)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};NSIS)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
 endif(WIN32)
 if(APPLE)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
