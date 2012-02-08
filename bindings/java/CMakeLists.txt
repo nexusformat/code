@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-if(DEFINED JAVA_COMPILE)
+if(DEFINED Java_JAVAC_EXECUTABLE)
     if(DEFINED JNI_INCLUDE_DIRS)
 
         INCLUDE_DIRECTORIES(. ../ native ${JNI_INCLUDE_DIRS} ${CMAKE_BINARY_DIR}/bindings/java/native)
@@ -71,16 +71,11 @@ if(DEFINED JAVA_COMPILE)
 
         SET(JAVA_DOCS ${CMAKE_BINARY_DIR}/bindings/java/apidoc)
 
-        FIND_PROGRAM(JAVA_NATIVE
-           NAMES javah
-           PATHS ${JAVA_BIN_PATH}
-        )
-
         STRING(REPLACE ".java" ".class" javaclass "${JAVA_SOURCES}")
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JAVA_CLASSES}
-            COMMAND   ${JAVA_COMPILE}
+            COMMAND   ${Java_JAVAC_EXECUTABLE}
             ARGS      -d . ${JAVA_SOURCES}
             COMMENT   "Compile Java"
         )
@@ -94,7 +89,7 @@ if(DEFINED JAVA_COMPILE)
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JAR_ARCHIVE}
-            COMMAND   ${JAVA_ARCHIVE}
+            COMMAND   ${Java_JAR_EXECUTABLE}
             ARGS      cvf ${JAR_ARCHIVE} ${JAVA_CLASSES} ${EXTRA_CLASSES}
             DEPENDS   ${EXTRA_CLASSES}
             COMMENT   "Build JAR File"
@@ -102,7 +97,7 @@ if(DEFINED JAVA_COMPILE)
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JNI_HEADER}
-            COMMAND   ${Java_JNI_EXECUTABLE}
+            COMMAND   ${Java_JAVAH_EXECUTABLE}
             ARGS      -jni -d native -classpath . org.nexusformat.NexusFile
             DEPENDS   ${JAR_ARCHIVE}
             COMMENT   "Build JNI Header"
@@ -110,7 +105,7 @@ if(DEFINED JAVA_COMPILE)
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JAVA_DOCS}
-            COMMAND   ${Java_DOC_EXECUTABLE}
+            COMMAND   ${Java_JAVADOC_EXECUTABLE}
             ARGS      -d ${JAVA_DOCS} -windowtitle jnexus -doctitle jnexus -classpath . 
                       -sourcepath ${CMAKE_SOURCE_DIR}/bindings/java org.nexusformat ncsa.hdf.hdflib
             DEPENDS   ${JNI_HEADER}
@@ -152,6 +147,6 @@ if(DEFINED JAVA_COMPILE)
         INSTALL(FILES ${JAVA_TEST} DESTINATION ${NXEXAMPLEDIR}/ COMPONENT Examples)
 
      endif(DEFINED JNI_INCLUDE_DIRS)
-endif(DEFINED JAVA_COMPILE)
+endif(DEFINED Java_JAVAC_EXECUTABLE)
 
 
