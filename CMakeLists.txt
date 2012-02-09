@@ -65,6 +65,10 @@ include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
 
+if(WIN32)
+include(InstallRequiredSystemLibraries)
+endif()
+
 include(cmake_include/Utilities.cmake)
 include(cmake_include/FindPython.cmake)
 include(cmake_include/FindCBFLib.cmake)
@@ -303,5 +307,7 @@ endif(WIN32)
 if(APPLE)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
 endif(APPLE)
+if(CYGWIN)
+endif(CYGWIN)
 # include of CPack must be last
 include(CPack)
