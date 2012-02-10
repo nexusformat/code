@@ -38,15 +38,33 @@ Packager: NeXus Developers <nexus-developers@nexusformat.org>
 %define is_rhel5 1
 %endif
 
+%if 0%{?rhel} == 6
+%define is_rhel6 1
+%endif
+%if 0%{?el6}
+%define is_rhel6 1
+%endif
+%if "0%{?dist}" == "0.el6"
+%define is_rhel6 1
+%endif
+
 BuildRoot: %{_tmppath}/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 BuildRequires: python numpy
 BuildRequires: hdf5-devel hdf-devel 
+BuildRequires: libxml2-devel
+BuildRequires: java-1.6.0-openjdk-devel
+BuildRequires: readline-devel
 # mxml is not in rhel or epel as yet
+# ant on rhel5 is too old to build NXvalidate
 %if 0%{?fedora}
 BuildRequires: mxml-devel
+BuildRequires: ant
 %endif
 %if 0%{?is_rhel5}
 BuildRequires: python-ctypes
+%endif
+%if 0%{?is_rhel6}
+BuildRequires: ant ant-nodeps
 %endif
 
 %description
@@ -107,9 +125,9 @@ data is stored using the HDF format from NCSA. This package provides
 # RPM_INSTALL_PREFIX - where to install software
 # do --prefix last in case also present in passed config options
 if ! test -z "$RPM_INSTALL_PREFIX"; then
-    ./configure $NEXUS_CONFIG_OPTIONS --prefix="$RPM_INSTALL_PREFIX"
+    ./configure %{?nexus_config_options} --prefix="$RPM_INSTALL_PREFIX"
 else
-    ./configure $NEXUS_CONFIG_OPTIONS --prefix=%{_prefix} --libdir=%{_libdir}
+    ./configure %{?nexus_config_options} --prefix=%{_prefix} --libdir=%{_libdir}
 fi
 make
 
