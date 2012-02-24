@@ -93,7 +93,45 @@ NXstatus  NX5closegroup (NXhandle fid);
   {
     self->iStack5[self->iStackPtr].iCurrentIDX = 0;
   }
+
+static herr_t readStringAttribute(hid_t attr, char** data)
+{
+     int iSize;
+     herr_t iRet;
+     hid_t atype = -1, btype = -1;
+
+	atype = H5Aget_type(attr);
+	btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
+	*data = NULL;
+	if ( H5Tis_variable_str(atype) )
+	{
+	    iRet = H5Aread(attr, btype, data);
+	    H5Tclose(btype);
+	}
+	else
+	{
+	    iSize = H5Tget_size(atype);
+	    *data = malloc(iSize+1);
+	    iRet = H5Aread(attr, atype, *data);
+	    (*data)[iSize] = '\0';
+	}
+	H5Tclose(atype);
+    return iRet;
+}
   
+static herr_t readStringAttributeN(hid_t attr, char* data, int maxlen)
+{
+    herr_t iRet;
+    char* vdat = NULL;
+    iRet = readStringAttribute(attr, &vdat);
+    if (iRet >= 0)
+    {
+        strncpy(data, vdat, maxlen);
+        free(vdat);
+    }
+    data[maxlen-1] = '\0';
+    return iRet;
+}
   /*--------------------------------------------------------------------*/
 
   static void NXI5KillAttDir (pNexusFile5 self)
@@ -490,11 +528,13 @@ NXstatus  NX5open(CONSTCHAR *filename, NXaccess am,
         }
         atype=H5Tcopy(H5T_C_S1);
         H5Tset_size(atype,sizeof(data));  
-        iRet = H5Aread(attr1, atype, data);
+	iRet = readStringAttributeN(attr1, data, sizeof(data));
+        //iRet = H5Aread(attr1, atype, data);
         if (strcmp(data, nxclass) == 0) {
               /* test OK */
         } else {
-              NXReportError( "ERROR: group class is not identical");
+              snprintf(pBuffer, sizeof(pBuffer), "ERROR: group class is not identical: \"%s\" != \"%s\"", data, nxclass);
+              NXReportError(pBuffer);
               iRet = H5Tclose(atype);
               iRet = H5Aclose(attr1); 
               return NX_ERROR; 
@@ -1407,7 +1447,8 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
       } else {
         atype=H5Tcopy(H5T_C_S1);
         H5Tset_size(atype,sizeof(data));  
-        H5Aread(attr_id, atype, data);
+	readStringAttributeN(attr_id, data, sizeof(data));
+        //H5Aread(attr_id, atype, data);
         strcpy(pClass,data);
         pFile->iNX=0;
         grp = H5Gopen(pFile->iFID,pFile->name_ref,H5P_DEFAULT);
@@ -1460,7 +1501,8 @@ static int countObjectsInGroup(hid_t loc_id)
       } else {
         atype=H5Tcopy(H5T_C_S1);
         H5Tset_size(atype,sizeof(data));  
-        H5Aread(attr_id, atype, data);
+	readStringAttributeN(attr_id, data, sizeof(data));
+        //H5Aread(attr_id, atype, data);
         strcpy(pClass,data);
         pFile->iNX=0;
         *iN = countObjectsInGroup(pFile->iCurrentG);
@@ -1708,7 +1750,8 @@ static int countObjectsInGroup(hid_t loc_id)
                type=H5T_C_S1;
                atype=H5Tcopy(type);
                H5Tset_size(atype,sizeof(data));  
-               iRet = H5Aread(attr1, atype, data);
+	       iRet = readStringAttributeN(attr1, data, sizeof(data));
+               //iRet = H5Aread(attr1, atype, data);
                strcpy(nxclass,data);
                H5Tclose(atype);
 	       H5Aclose(attr1);
@@ -1950,7 +1993,7 @@ static int countObjectsInGroup(hid_t loc_id)
      hid_t atype, aspace;
      herr_t iRet;
      int iPType,rank;
-     char *iname = NULL; 
+     char *iname = NULL, *vlen_str = NULL; 
      hsize_t idx, intern_idx=-1;
      int vid;
      H5O_info_t oinfo;
@@ -2003,7 +2046,9 @@ static int countObjectsInGroup(hid_t loc_id)
      attr_id = H5Tget_class(atype);
      if (attr_id==H5T_STRING) {
        iPType=NX_CHAR;
-       rank = H5Tget_size(atype);
+       readStringAttribute(pFile->iCurrentA, &vlen_str);
+       rank = strlen(vlen_str);
+       free(vlen_str);
      }
      if (rank == 0) {
        rank++;
@@ -2049,10 +2094,7 @@ static int countObjectsInGroup(hid_t loc_id)
      if (type==H5T_C_S1)
      {
 	atype = H5Aget_type(pFile->iCurrentA);
-	H5Tclose(atype);
-	atype=H5Tcopy(type);
-	H5Tset_size(atype,*datalen);  
-	iRet = H5Aread(pFile->iCurrentA, atype, data);
+	iRet = readStringAttributeN(pFile->iCurrentA, data, *datalen);
 	*datalen = strlen((char*)data);
      } else {
        iRet = H5Aread(pFile->iCurrentA, type, data);
@@ -2060,7 +2102,7 @@ static int countObjectsInGroup(hid_t loc_id)
      }
 
      if (iRet < 0) {
-       sprintf (pBuffer, "ERROR: could not read attribute data");
+       sprintf (pBuffer, "ERROR: could not read attribute data for \"%s\"", name);
        NXReportError( pBuffer);
        killAttVID(pFile,vid);
        return NX_ERROR;
