@@ -101,10 +101,10 @@ static herr_t readStringAttribute(hid_t attr, char** data)
      hid_t atype = -1, btype = -1;
 
 	atype = H5Aget_type(attr);
-	btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
 	*data = NULL;
 	if ( H5Tis_variable_str(atype) )
 	{
+	    btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
 	    iRet = H5Aread(attr, btype, data);
 	    H5Tclose(btype);
 	}
@@ -1798,10 +1798,11 @@ static int countObjectsInGroup(hid_t loc_id)
    NXstatus  NX5getdata (NXhandle fid, void *data)
    {
      pNexusFile5 pFile;
-     int iStart[H5S_MAX_RANK], status;
+     int i, iStart[H5S_MAX_RANK], status;
      hid_t memtype_id; 
      H5T_class_t tclass;
-     int dims;    
+     hsize_t ndims,dims[H5S_MAX_RANK],len;    
+     char** vstrdata = NULL;
 
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
@@ -1810,26 +1811,51 @@ static int countObjectsInGroup(hid_t loc_id)
 	NXReportError( "ERROR: no dataset open");
 	return NX_ERROR;
      }
+     ndims = H5Sget_simple_extent_dims(pFile->iCurrentS, dims, NULL); 
+     if (ndims <= 0)
+     {
+	NXReportError( "ERROR: unable to read dims");
+	return NX_ERROR;
+     }
      memset (iStart, 0, H5S_MAX_RANK * sizeof(int));
      /* map datatypes of other plateforms */
      tclass = H5Tget_class(pFile->iCurrentT);
-     if (tclass==H5T_STRING)
+     if ( H5Tis_variable_str(pFile->iCurrentT) )
      {
-	dims = H5Tget_size(pFile->iCurrentT);
+        vstrdata = (char **) malloc (dims[0] * sizeof (char *));
 	memtype_id = H5Tcopy(H5T_C_S1);
-	H5Tset_size(memtype_id, dims);
+	H5Tset_size(memtype_id, H5T_VARIABLE);
+        status = H5Dread (pFile->iCurrentD, memtype_id, 
+		       H5S_ALL, H5S_ALL,H5P_DEFAULT, vstrdata);
+        ((char*)data)[0] = '\0';
+        if (status >= 0)
+	{
+	    for(i=0; i<dims[0]; ++i)
+	    {
+	        if (vstrdata[i] != NULL)
+	 	{
+		    strcat((char*)data, vstrdata[i]);
+		}
+	    }
+	}
+        H5Dvlen_reclaim(memtype_id, pFile->iCurrentS, H5P_DEFAULT, vstrdata);
+	free(vstrdata);
+        H5Tclose(memtype_id);
+     }
+     else if (tclass==H5T_STRING)
+     {
+	len = H5Tget_size(pFile->iCurrentT);
+	memtype_id = H5Tcopy(H5T_C_S1);
+	H5Tset_size(memtype_id, len);
+        status = H5Dread (pFile->iCurrentD, memtype_id, 
+		       H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
+        H5Tclose(memtype_id);
      }
      else 
      {
        memtype_id = h5MemType(pFile->iCurrentT);
-     }
-
-     /* actually read */    
-     status = H5Dread (pFile->iCurrentD, memtype_id, 
+       status = H5Dread (pFile->iCurrentD, memtype_id, 
 		       H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
-     if(tclass == H5T_STRING)
-     {
-       H5Tclose(memtype_id);
      }
      if(status < 0)
      {
@@ -1846,7 +1872,7 @@ static int countObjectsInGroup(hid_t loc_id)
    {
      pNexusFile5 pFile;
      int i, iRank, mType;
-     hsize_t myDim[H5S_MAX_RANK]; 
+     hsize_t myDim[H5S_MAX_RANK], vlen_bytes = 0, total_dims_size = 1; 
      H5T_class_t tclass;
 
      pFile = NXI5assert (fid);
@@ -1861,10 +1887,23 @@ static int countObjectsInGroup(hid_t loc_id)
      mType = hdf5ToNXType(tclass,pFile->iCurrentT);
      iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS);
      H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
+     for(i=0; i<iRank; ++i)
+     {
+	total_dims_size *= myDim[i];
+     }
      /* conversion to proper ints for the platform */ 
      *iType = (int)mType;
      if (tclass==H5T_STRING && myDim[iRank-1] == 1) {
-        myDim[iRank-1] = H5Tget_size(pFile->iCurrentT);
+	if ( H5Tis_variable_str(pFile->iCurrentT) )
+	{
+	    /* this would not work for ragged arrays */
+	    H5Dvlen_get_buf_size(pFile->iCurrentD, pFile->iCurrentT, pFile->iCurrentS, &vlen_bytes);
+	    myDim[iRank-1] = vlen_bytes / total_dims_size;
+	}
+	else
+	{
+            myDim[iRank-1] = H5Tget_size(pFile->iCurrentT);
+	}
      } 
      *rank = (int)iRank;
      for (i = 0; i < iRank; i++)
