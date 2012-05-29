@@ -1,7 +1,0 @@
-NeXus for Debian
-----------------
-
-Not all potentially available bindings are built (no fortran or swig to name two).
-If requests arise I may include them.
-
- -- Tobias Stefan Richter <tsr-debian@achos.com>  Mon, 21 Jun 2010 10:43:50 +0100
