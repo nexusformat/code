@@ -15,7 +15,7 @@ New Features
 
 * New API functions have been added to handle very large arrays. Most original NeXus functions had array dimensions of type "int" which restricted the maximum size of an array. New functions with a "64" suffix have been added which use int64_t rather than int - existing functions continue to work as normal, so there is no need to update code unless you want to make use of the larger dimensions. 
 
-* A new python tree API has been added (note: need to add link for more finformation) 
+* A new python tree API has been added
 
 * A GUI java based NXvalidate program has now been added 
 
