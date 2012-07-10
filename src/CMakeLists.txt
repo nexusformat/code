@@ -126,4 +126,6 @@ install (TARGETS NeXus_Static_Library NeXus_Shared_Library
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
 
+if(WIN32)
 install_pdb (NeXus_Shared_Library)
+endif()

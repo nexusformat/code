@@ -62,7 +62,9 @@ install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
 
+if(WIN32)
 install_pdb (NeXus_CPP_Shared_Library)
+endif()
 
 
 

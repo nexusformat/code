@@ -1,3 +1,0 @@
-debian/tmp/usr/lib/libj*.so* /usr/lib/jni
-debian/tmp/usr/share/java/*.jar
-debian/tmp/usr/share/nexus/doc/java/README.JNEXUS

@@ -32,7 +32,8 @@
 if(WIN32)
 cmake_minimum_required (VERSION 2.8.7)
 else()
-cmake_minimum_required (VERSION 2.8.4)
+cmake_minimum_required (VERSION 2.8.3)
+set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove this line when CMake >= 2.8.4 is required
 endif()
 
 #The name of our project
@@ -63,6 +64,10 @@ include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
+
+if(WIN32)
+include(InstallRequiredSystemLibraries)
+endif()
 
 include(cmake_include/Utilities.cmake)
 include(cmake_include/FindPython.cmake)
@@ -289,20 +294,20 @@ add_subdirectory (test)
 #
 # set CPack packaging options
 #
-configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" 
-				"${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake"
-				@ONLY)
-set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIRECTORY}CPackOptions.cmake")
-set (CPACK_GENERATOR TGZ;ZIP)
+configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CPackOptions.cmake"  @ONLY)
+set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackOptions.cmake")
+set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 if(UNIX)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
     #set (CPACK_RPM_PACKAGE_PROVIDES "")
 endif(UNIX)
 if(WIN32)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};NSIS)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
 endif(WIN32)
 if(APPLE)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
 endif(APPLE)
+if(CYGWIN)
+endif(CYGWIN)
 # include of CPack must be last
 include(CPack)

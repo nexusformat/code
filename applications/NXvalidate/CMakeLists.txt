@@ -1,4 +1,4 @@
-## Process this file with cmake
+## Process this file with cmake
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #
@@ -28,17 +28,19 @@
 
 configure_file(nxvalidate.in nxvalidate @ONLY)
 
-add_custom_target(NXvalidate ALL COMMAND ${ANT_EXEC} DEPENDS build.xml nbproject)
+if ( NOT (${CMAKE_CURRENT_BINARY_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}) )
+    add_custom_command(OUTPUT build.xml COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/build.xml . COMMENT "Creating build.xml")
+    add_custom_command(OUTPUT nbproject COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/nbproject nbproject COMMENT "Creating nbproject")
+    set_property(DIRECTORY . APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES build.xml nbproject)
+endif()
 
-add_custom_command(OUTPUT build.xml COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/build.xml build.xml COMMENT "Creating build.xml")
+add_custom_target(NXvalidate ALL COMMAND ${ANT_EXEC} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/build.xml ${CMAKE_CURRENT_BINARY_DIR}/nbproject)
 
-add_custom_command(OUTPUT nbproject COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/nbproject nbproject COMMENT "Creating nbproject")
 
-set_property(DIRECTORY . APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES build.xml nbproject)
+install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nxvalidate DESTINATION bin)
 
-install (FILES nxvalidate DESTINATION bin)
-
-install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
+if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dist/javadoc)
+install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
          FILE_PERMISSIONS
             OWNER_READ OWNER_EXECUTE OWNER_WRITE
             GROUP_READ GROUP_EXECUTE 
@@ -47,9 +49,10 @@ install (DIRECTORY dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate
             OWNER_READ OWNER_EXECUTE OWNER_WRITE
             GROUP_READ GROUP_EXECUTE 
             WORLD_READ WORLD_EXECUTE)
+endif()
 
-install (FILES dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION lib/lib COMPONENT Runtime)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dist/NXvalidate.jar lib/jhall.jar lib/saxon9he.jar DESTINATION share/java/lib COMPONENT Runtime)
 
-install (FILES dist/NXvalidate.jar DESTINATION lib COMPONENT Development)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dist/NXvalidate.jar DESTINATION share/java COMPONENT Development)
 
 

@@ -25,7 +25,7 @@ contents as a tree, and then accesses individual data items.
 
     >>> from nexpy.api import nexus as nx
     >>> a=nx.load('sns/data/ARCS_7326.nxs')
-    >>> a.tree
+    >>> print a.tree
     root:NXroot
       @HDF5_Version = 1.8.2
       @NeXus_version = 4.2.1
@@ -80,7 +80,7 @@ Then a NeXus data groups are created and the data inserted to produce a
 NeXus-compliant structure that can be saved to a file.
 
     >>> root=nx.NXroot(NXentry())
-    >>> root.tree
+    >>> print root.tree
     root:NXroot
       entry:NXentry
     >>> root.entry.data=nx.NXdata(z,[x,y])
@@ -451,7 +451,7 @@ class NeXusTree(napi.NeXus):
         if shape == (): shape = (1,)
 
         #If the array size is too large, their product needs a long integer
-        if np.prod(shape) > 10000 or np.prod(shape) < 0:
+        if np.prod(shape) > 10000:
             # Compress the fastest moving dimension of large datasets
             slab_dims = np.ones(len(shape),'i')
             if shape[-1] < 100000:
@@ -609,13 +609,13 @@ class NXattr(object):
             elif dtype == 'char':
                 self._data,self._dtype = str(value),dtype
             else:
-                raise NeXusError, "Invalid data type"
+                raise NeXusError("Invalid data type")
         else:
             if isinstance(value, str):
                 self._data,self._dtype = str(value), 'char'
             elif value is not None:
                 if isinstance(value, NXobject):
-                    raise NeXusError, "A data attribute cannot be a NXfield or NXgroup"
+                    raise NeXusError("A data attribute cannot be a NXfield or NXgroup")
                 else:
                     self._data = np.array(value)
                 self._dtype = self._data.dtype.name
@@ -878,7 +878,7 @@ class NXobject(object):
                 entry.write()
 
         else:
-            raise NeXusError, "No output file specified"
+            raise NeXusError("No output file specified")
 
     @property
     def infile(self):
@@ -928,7 +928,7 @@ class NXobject(object):
 
     def _getpath(self):
         if self.nxgroup is None:
-            return "/"
+            return ""
         elif isinstance(self.nxgroup, NXroot):
             return "/" + self.nxname
         else:
@@ -1215,7 +1215,7 @@ class NXfield(NXobject):
             value = np.array(value)
         self._value = value
         self._class = 'NXfield'
-        self._name = name
+        self._name = name.replace(' ','_')
         self._group = group
         self._dtype = dtype
         if dtype == 'char':
@@ -1223,7 +1223,7 @@ class NXfield(NXobject):
         elif dtype in np.typeDict:
             self._dtype = np.dtype(dtype)
         elif dtype:
-            raise NeXusError, "Invalid data type: %s" % dtype
+            raise NeXusError("Invalid data type: %s" % dtype)
         self._shape = tuple(shape)
         # Append extra keywords to the attribute list
         self._attrs = AttrDict()
@@ -1327,7 +1327,7 @@ class NXfield(NXobject):
             self._saved = False
             self._changed = True
         else:
-            raise NeXusError, "NXfield dataspace not yet allocated"
+            raise NeXusError("NXfield dataspace not yet allocated")
 
     def __deepcopy__(self, memo):
         dpcpy = self.__class__()
@@ -1392,15 +1392,12 @@ class NXfield(NXobject):
         """
         Return the sum of the NXfield and another NXfield or number.
         """
-        try:
-            if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata+other.nxdata, name=self.nxname,
-                               attrs=self.attrs)
-            else:
-                return NXfield(value=self.nxdata+other, name=self.nxname,
-                               attrs=self.attrs)
-        except TypeError, message:
-            raise NeXusError, message
+        if isinstance(other, NXfield):
+            return NXfield(value=self.nxdata+other.nxdata, name=self.nxname,
+                           attrs=self.attrs)
+        else:
+            return NXfield(value=self.nxdata+other, name=self.nxname,
+                           attrs=self.attrs)
 
     def __radd__(self, other):
         """
@@ -1414,29 +1411,23 @@ class NXfield(NXobject):
         """
         Return the NXfield with the subtraction of another NXfield or number.
         """
-        try:
-            if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata-other.nxdata, name=self.nxname,
-                               attrs=self.attrs)
-            else:
-                return NXfield(value=self.nxdata-other, name=self.nxname,
-                               attrs=self.attrs)
-        except TypeError, message:
-            raise NeXusError, message
+        if isinstance(other, NXfield):
+            return NXfield(value=self.nxdata-other.nxdata, name=self.nxname,
+                           attrs=self.attrs)
+        else:
+            return NXfield(value=self.nxdata-other, name=self.nxname,
+                           attrs=self.attrs)
 
     def __mul__(self, other):
         """
         Return the product of the NXfield and another NXfield or number.
         """
-        try:
-            if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata*other.nxdata, name=self.nxname,
-                               attrs=self.attrs)
-            else:
-                return NXfield(value=self.nxdata*other, name=self.nxname,
-                               attrs=self.attrs)
-        except TypeError, message:
-            raise NeXusError, message
+        if isinstance(other, NXfield):
+            return NXfield(value=self.nxdata*other.nxdata, name=self.nxname,
+                           attrs=self.attrs)
+        else:
+            return NXfield(value=self.nxdata*other, name=self.nxname,
+                          attrs=self.attrs)
 
     def __rmul__(self, other):
         """
@@ -1450,39 +1441,30 @@ class NXfield(NXobject):
         """
         Return the NXfield divided by another NXfield or number.
         """
-        try:
-            if isinstance(other, NXfield):
-                return NXfield(value=self.nxdata/other.nxdata, name=self.nxname,
-                               attrs=self.attrs)
-            else:
-                return NXfield(value=self.nxdata/other, name=self.nxname,
-                               attrs=self.attrs)
-        except TypeError, message:
-            raise NeXusError, message
+        if isinstance(other, NXfield):
+            return NXfield(value=self.nxdata/other.nxdata, name=self.nxname,
+                           attrs=self.attrs)
+        else:
+            return NXfield(value=self.nxdata/other, name=self.nxname,
+                           attrs=self.attrs)
 
     def __rdiv__(self, other):
         """
         Return the inverse of the NXfield divided by another NXfield or number.
         """
-        try:
-            if isinstance(other, NXfield):
-                return NXfield(value=other.nxdata/self.nxdata, name=self.nxname,
-                               attrs=self.attrs)
-            else:
-                return NXfield(value=other/self.nxdata, name=self.nxname,
-                               attrs=self.attrs)
-        except TypeError, message:
-            raise NeXusError, message
+        if isinstance(other, NXfield):
+            return NXfield(value=other.nxdata/self.nxdata, name=self.nxname,
+                           attrs=self.attrs)
+        else:
+            return NXfield(value=other/self.nxdata, name=self.nxname,
+                           attrs=self.attrs)
 
     def __pow__(self, power):
         """
         Return the NXfield raised to the specified power.
         """
-        try:
-            return NXfield(value=pow(self.nxdata,power), name=self.nxname,
-                           attrs=self.attrs)
-        except TypeError, message:
-            raise NeXusError, message
+        return NXfield(value=pow(self.nxdata,power), name=self.nxname,
+                       attrs=self.attrs)
 
     def reshape(self, shape):
         """
@@ -1526,7 +1508,7 @@ class NXfield(NXobject):
                 elif np.prod(shape) * np.dtype(dtype).itemsize <= NX_MEMORY*1024*1024:
                     self._value = path.getdata()
                 else:
-                    raise MemoryError, 'Data size larger than NX_MEMORY=%s MB' % NX_MEMORY
+                    raise MemoryError('Data size larger than NX_MEMORY=%s MB' % NX_MEMORY)
                 self._shape = tuple(shape)
                 self._dtype = dtype
                 if dtype == 'char':
@@ -1543,12 +1525,12 @@ class NXfield(NXobject):
         """
         if self.nxfile:
             if self.nxfile.mode == napi.ACC_READ:
-                raise NeXusError, "NeXus file is readonly"
+                raise NeXusError("NeXus file is readonly")
             if not self.infile:
                 shape = self.shape
                 if shape == (): shape = (1,)
                 with self.nxgroup as path:
-                    if np.prod(shape) > 10000 or np.prod(shape) < 0:
+                    if np.prod(shape) > 10000:
                     # Compress the fastest moving dimension of large datasets
                         slab_dims = np.ones(len(shape),'i')
                         if shape[-1] < 100000:
@@ -1598,14 +1580,14 @@ class NXfield(NXobject):
         """
         if self.nxfile:
             if self.nxfile.mode == napi.ACC_READ:
-                raise NeXusError, "NeXus file is readonly"
+                raise NeXusError("NeXus file is readonly")
             with self as path:
                 if isinstance(data, NXfield):
                     path.putslab(data.nxdata.astype(self.dtype), offset, data.shape)
                 else:
                     data = np.array(data)
                     path.putslab(data.astype(self.dtype), offset, data.shape)
-            if refresh: self.refresh()
+            if refresh: self.read()
         else:
             raise IOError("Data is not attached to a file")
 
@@ -1647,7 +1629,7 @@ class NXfield(NXobject):
         try:
             import units
         except ImportError:
-            raise NeXusError, "No conversion utility available"
+            raise NeXusError("No conversion utility available")
         if self._value is not None:
             return self._converter(self._value,units)
         else:
@@ -1703,7 +1685,7 @@ class NXfield(NXobject):
                 elif np.prod(self.shape) * np.dtype(self.dtype).itemsize <= NX_MEMORY*1024*1024:
                     self._value = self.nxfile.readpath(self.nxpath)
                 else:
-                    raise MemoryError, 'Data size larger than NX_MEMORY=%s MB' % NX_MEMORY
+                    raise MemoryError('Data size larger than NX_MEMORY=%s MB' % NX_MEMORY)
                 self._saved = True
             else:
                 return None
@@ -1770,7 +1752,7 @@ class PylabPlotter(object):
         try:
             import matplotlib.pyplot as plt
         except ImportError:
-            raise NeXusError, "Plotting package not available."
+            raise NeXusError("Default plotting package (matplotlib) not available.")
 
         over = False
         if "over" in opts.keys():
@@ -1851,9 +1833,9 @@ class PylabPlotter(object):
             
             if log:
                 opts["norm"] = LogNorm()
-                if z.min() < 1e-8:
+                if z.min() <= 0 and np.issubdtype(z[0,0],int):
                     z = np.clip(z,0.1,zmax)
-                
+
             ax = plt.gca()
             extent = (x[0],x[-1],y[0],y[-1])
             im = NonUniformImage(ax, extent=extent, origin=None, **opts)
@@ -2098,7 +2080,7 @@ class NXgroup(NXobject):
 
     def __init__(self, *items, **opts):
         if "name" in opts.keys():
-            self._name = opts["name"]
+            self._name = opts["name"].replace(' ','_')
             del opts["name"]
         self._entries = {}
         if "entries" in opts.keys():
@@ -2127,7 +2109,7 @@ class NXgroup(NXobject):
             try:
                 setattr(self, item.nxname, item)
             except AttributeError:
-                raise NeXusError, "Non-keyword arguments must be valid NXobjects"
+                raise NeXusError("Non-keyword arguments must be valid NXobjects")
         self._saved = False
         self._changed = True
 
@@ -2206,9 +2188,9 @@ class NXgroup(NXobject):
             return self._entries[index]
 
         if not self.nxsignal:
-            raise NeXusError, "No plottable signal"
+            raise NeXusError("No plottable signal")
         if not hasattr(self,"nxclass"):
-            raise NeXusError, "Indexing not allowed for groups of unknown class"
+            raise NeXusError("Indexing not allowed for groups of unknown class")
         if isinstance(index, int):
             axes = self.nxaxes
             axes[0] = axes[0][index]
@@ -2323,7 +2305,7 @@ class NXgroup(NXobject):
         if isinstance(value, NXobject):
             if name == 'unknown': name = value.nxname
             if name in self._entries:
-                raise NeXusError, "'%s' already exists in group" % name
+                raise NeXusError("'%s' already exists in group" % name)
             value._group = self
             self._entries[name] = value
         else:
@@ -2338,7 +2320,7 @@ class NXgroup(NXobject):
         if isinstance(target, NXobject):
             self[target.nxname] = NXlink(target=target, group=self)
         else:
-            raise NeXusError, "Link target must be an NXobject"
+            raise NeXusError("Link target must be an NXobject")
 
     def read(self):
         """
@@ -2384,7 +2366,7 @@ class NXgroup(NXobject):
         """
         if self.nxfile:
             if self.nxfile.mode == napi.ACC_READ:
-                raise NeXusError, "NeXus file is readonly"
+                raise NeXusError("NeXus file is readonly")
             if not self.infile:
                 with self.nxgroup as path:
                     path.makegroup(self.nxname, self.nxclass)
@@ -2406,9 +2388,9 @@ class NXgroup(NXobject):
         the NXdata group.
         """
         if not self.nxsignal:
-            raise NeXusError, "No signal to sum"
+            raise NeXusError("No signal to sum")
         if not hasattr(self,"nxclass"):
-            raise NeXusError, "Summing not allowed for groups of unknown class"
+            raise NeXusError("Summing not allowed for groups of unknown class")
         if axis is None:
             return self.nxsignal.sum()
         else:
@@ -2439,13 +2421,13 @@ class NXgroup(NXobject):
         order of the moment will be defined by the 'order' parameter.
         """
         if not self.nxsignal:
-            raise NeXusError, "No signal to calculate"
+            raise NeXusError("No signal to calculate")
         elif len(self.nxsignal.shape) > 1:
-            raise NeXusError, "Operation only possible on one-dimensional signals"
+            raise NeXusError("Operation only possible on one-dimensional signals")
         elif order > 1:
-            raise NeXusError, "Higher moments not yet implemented"
+            raise NeXusError("Higher moments not yet implemented")
         if not hasattr(self,"nxclass"):
-            raise NeXusError, "Operation not allowed for groups of unknown class"
+            raise NeXusError("Operation not allowed for groups of unknown class")
         return (centers(self.nxsignal,self.nxaxes)*self.nxsignal).sum() \
                 /self.nxsignal.sum()
 
@@ -2529,15 +2511,10 @@ class NXgroup(NXobject):
         title = self.nxpath
         if 'title' in self.entries:
             return str(self.title)
-        else:
-            obj = self
-            while obj.nxgroup is not None:
-                try:
-                    if obj.nxclass == 'NXentry': return str(obj.title)
-                except KeyError:
-                    pass
-                obj = obj.nxgroup
-            return self.nxpath
+        elif self.nxgroup:
+            if 'title' in self.nxgroup.entries:
+                return str(self.nxgroup.title)
+        return self.nxpath
 
     def _getentries(self):
         return self._entries
@@ -2630,7 +2607,7 @@ class NXlink(NXobject):
             self._target = target.nxpath
             self.nxlink.attrs["target"] = target.nxpath
             if target.nxclass == "NXlink":
-                raise NeXusError, "Cannot link to another NXlink object"
+                raise NeXusError("Cannot link to another NXlink object")
             elif target.nxclass == "NXfield":
                 self.__class__ = NXlinkfield
             else:
@@ -2646,7 +2623,7 @@ class NXlink(NXobject):
             except KeyError:
                 return self.nxlink.__getattr__(key)
         except KeyError:
-            raise KeyError, (key+" not in %s" % self._target)
+            raise KeyError((key+" not in %s" % self._target))
 
     def __setattr__(self, name, value):
         if name.startswith('_')  or name.startswith('nx'):
@@ -2799,7 +2776,7 @@ class NXentry(NXgroup):
                     raise KeyError
             return result
         except KeyError:
-            raise NeXusError, "Inconsistency between two NXentry groups"
+            raise NeXusError("Inconsistency between two NXentry groups")
 
     def __sub__(self, other):
         """
@@ -2821,7 +2798,7 @@ class NXentry(NXgroup):
                     raise KeyError
             return result
         except KeyError:
-            raise NeXusError, "Inconsistency between two NXentry groups"
+            raise NeXusError("Inconsistency between two NXentry groups")
 
 
 class NXsubentry(NXentry):
@@ -2991,7 +2968,7 @@ class NXdata(NXgroup):
                         result.errors = self.errors
                 return result
         elif isinstance(other, NXgroup):
-            raise NeXusError, "Cannot add two arbitrary groups"
+            raise NeXusError("Cannot add two arbitrary groups")
         else:
             result.entries[self.nxsignal.nxname] = self.nxsignal + other
             result.entries[self.nxsignal.nxname].nxname = self.nxsignal.nxname
@@ -3020,7 +2997,7 @@ class NXdata(NXgroup):
                         result.errors = self.errors
                 return result
         elif isinstance(other, NXgroup):
-            raise NeXusError, "Cannot subtract two arbitrary groups"
+            raise NeXusError("Cannot subtract two arbitrary groups")
         else:
             result.entries[self.nxsignal.nxname] = self.nxsignal - other
             result.entries[self.nxsignal.nxname].nxname = self.nxsignal.nxname
@@ -3053,7 +3030,7 @@ class NXdata(NXgroup):
                         result.errors = self.errors
                 return result
         elif isinstance(other, NXgroup):
-            raise NeXusError, "Cannot multiply two arbitrary groups"
+            raise NeXusError("Cannot multiply two arbitrary groups")
         else:
             result.entries[self.nxsignal.nxname] = self.nxsignal * other
             result.entries[self.nxsignal.nxname].nxname = self.nxsignal.nxname
@@ -3097,7 +3074,7 @@ class NXdata(NXgroup):
                         result.errors = self.errors
                 return result
         elif isinstance(other, NXgroup):
-            raise NeXusError, "Cannot divide two arbitrary groups"
+            raise NeXusError("Cannot divide two arbitrary groups")
         else:
             result.entries[self.nxsignal.nxname] = self.nxsignal / other
             result.entries[self.nxsignal.nxname].nxname = self.nxsignal.nxname
