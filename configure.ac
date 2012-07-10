@@ -41,12 +41,12 @@ m4_define([NEXUS_VERSION],[4.3.0])dnl
 
 ## things like  rc1   or  20100903svn1734
 #m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl
-m4_define([NEXUS_RELEASE],[rc2])dnl
+m4_define([NEXUS_RELEASE],[])dnl
 
 # 0.* for pre release; 1, 2, ... post releas
-m4_define([PACKAGE_RELEASE],[0.2])dnl
+m4_define([PACKAGE_RELEASE],[1])dnl
 
-AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,[-],NEXUS_RELEASE), [nexus-developers@nexusformat.org], [nexus])
+AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,NEXUS_RELEASE), [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
 This software is covered by the GNU LESSER GENERAL PUBLIC LICENSE
 see file COPYING for further information])
