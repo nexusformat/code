@@ -89,7 +89,7 @@ FCFLAGS="$F90FLAGS $FCFLAGS" # for compatibility with nexus-3.0
 
 # default is tar-v7 but this only supports paths up to 99 characters
 # and the doxygen doc has longer than this.
-AM_INIT_AUTOMAKE([1.6 tar-ustar])
+AM_INIT_AUTOMAKE([1.6 tar-pax])
 
 AC_SUBST(NXLTVERSINFO)
 
