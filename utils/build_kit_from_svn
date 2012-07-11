@@ -7,7 +7,7 @@
 # $1 is tags, branches or trunk
 # $2 is version e.g. 4.0rc1
 # 
-# -o options for configure
+# -c options for configure
 # -r build rpms with this release number
 # -t svn parent directory (tags, branches or trunk)
 # -v svn sub directory (e.g. 4.0) - not needed for trunk
