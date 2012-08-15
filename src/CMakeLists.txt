@@ -103,7 +103,9 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME libNeXus-0
                       VERSION 1.0 SOVERSION 4 )
-	set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${DEF_FILE})
+	if (MSVC)
+	    set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${DEF_FILE})
+	endif(MSVC)
 else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
                       VERSION 1.0 SOVERSION 4)
