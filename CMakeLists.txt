@@ -36,6 +36,7 @@ else()
     endif()
 endif()
 
+# if we do this, need to do it before project()
 if(WIN32)
     set(CMAKE_INSTALL_PREFIX "c:/nxinstall" CACHE PATH "")
 endif()
@@ -251,6 +252,8 @@ create_have_vars(HDF4 HDF5 MXML)
 
 #Include source files.
 include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${HDF5_INCLUDE_DIR})
+
+include_directories(C:/development/nexus-third-party/win64/include)
 
 if (UNIX)
     check_add_c_compiler_flags("-Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment")
