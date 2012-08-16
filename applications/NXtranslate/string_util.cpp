@@ -112,8 +112,11 @@ extern long long string_util::str_to_int64(const string &str){
 
   if(it!=str.end())
     throw invalid_argument("str_to_int(string) argument is not an integer");
-
+#ifdef _WIN32
+  return _atoi64(str.c_str());
+#else
   return atoll(str.c_str());
+#endif
 }
 
 extern unsigned long string_util::str_to_uint(const string &str){

@@ -173,13 +173,13 @@ void EdfRetriever::getData(const string &location, tree<Node> &tr){
 	//    
 	    if(Edf.string_by_key(key_string, string_value)){
 		
-	        int size=string_value.size();//check size of string
-	        char valueS[size];
+	        const int size=string_value.size();//check size of string
+	        std::vector<char> valueS(size);
 		for(int i=0; i<size; i++){
 		    valueS[i]=string_value[i];//translate C++ string into C-style string, NXtranslate convetion
 		}
 		dims[0]=size;
-		Node node(key, (void*)valueS, 1, dims, NX_CHAR);
+		Node node(key, (void*)&(valueS[0]), 1, dims, NX_CHAR);
                 tr.insert(tr.begin(),node);	        
 	    }
 	    //
@@ -273,7 +273,7 @@ void EdfRetriever::getData(const string &location, tree<Node> &tr){
 	    key=Edf.get_key_string(i, string_value);
 	    int size=string_value.size();
 	    dims1[0]=size;
-	    char valueS[size];
+	    std::vector<char> valueS(size);
 	    //  
 	    //convert C++ string into C-style string, NXtranslate convention
 	    //
@@ -283,7 +283,7 @@ void EdfRetriever::getData(const string &location, tree<Node> &tr){
 	    //
 	    //store pairs key-string value in NXlog group
 	    //
-	    Node node_child(key, (void*)valueS, 1, dims1, NX_CHAR);
+	    Node node_child(key, (void*)&(valueS[0]), 1, dims1, NX_CHAR);
             tr.append_child(log,node_child);	    
 	}
 	//
