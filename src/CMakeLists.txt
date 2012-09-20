@@ -34,12 +34,16 @@ if (HAVE_HDF4)
   set (NAPISRC ${NAPISRC} napi4.c)
   add_definitions(-DHDF4 ${HDF4_DEFINITIONS} ${HDF4_CPP})
   include_directories(${HDF4_INCLUDE_DIRS})
+  file(GLOB HDF4DLLS "${HDF4_ROOT_DIR}/bin/*.dll") 
+  install (FILES ${HDF4DLLS} DESTINATION bin COMPONENT Runtime)
 endif (HAVE_HDF4)
 
 if (HAVE_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
   add_definitions(-DHDF5 ${HDF5_DEFINITIONS} ${HDF5_CPP})
   include_directories(${HDF5_INCLUDE_DIRS})
+  file(GLOB HDF5DLLS "${HDF5_ROOT_DIR}/bin/*.dll") 
+  install (FILES ${HDF5DLLS} DESTINATION bin COMPONENT Runtime)
 endif (HAVE_HDF5)
 
 if(HAVE_MXML)
@@ -127,7 +131,6 @@ install (TARGETS NeXus_Static_Library NeXus_Shared_Library
          RUNTIME DESTINATION bin COMPONENT Runtime
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
-
 if(WIN32)
 install_pdb (NeXus_Shared_Library)
 endif()

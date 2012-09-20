@@ -148,6 +148,7 @@ Function ${UN}EnvVarUpdate
   ${EndIf}
   
   ;; From http://nsis.sourceforge.net/Environmental_Variables:_append,_prepend,_and_remove_entries
+  ;; faa - remove check for empty original
   ;; khc - here check if length is going to be greater then max string length
   ;;       and abort if so - also abort if original path empty - may mean
   ;;       it was too long as well- write message to say set it by hand 
@@ -157,8 +158,9 @@ Function ${UN}EnvVarUpdate
    StrLen $7 $4  
    StrLen $6 $5
    IntOp $8 $6 + $7
-   ${If} $5 == ""
-   ${OrIf} $8 >= ${NSIS_MAX_STRLEN}
+;;   ${If} $5 == ""  ;; faa
+;;   ${OrIf} $8 >= ${NSIS_MAX_STRLEN}  ;; faa
+   ${If} $8 >= ${NSIS_MAX_STRLEN}
      SetErrors
      DetailPrint "Current $1 length ($6) too long to modify in NSIS; set manually if needed"
      Pop $8
