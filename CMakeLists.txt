@@ -36,11 +36,6 @@ else()
     endif()
 endif()
 
-# if we do this, need to do it before project()
-if(WIN32)
-    set(CMAKE_INSTALL_PREFIX "c:/nxinstall" CACHE PATH "")
-endif()
-
 #
 # convert a native windows path to its equivalent cygwin path
 #
@@ -49,6 +44,14 @@ function(to_cygwin_path PATH RESULT)
     string(REGEX REPLACE "^([a-zA-Z]):/" "/\\1/" CP2 ${CP})   	# c:/ -> /c/
 	set(${RESULT} "/cygdrive${CP2}" PARENT_SCOPE) 				# /c/ -> /cygdrive/c/
 endfunction()
+
+# set a default install prefix for windows - we will adjust for 64bit later if this is unchanged
+set(DEFAULT_WIN_INSTALL_PREFIX "c:/nxinstall")
+if(WIN32)
+    set(CMAKE_INSTALL_PREFIX ${DEFAULT_WIN_INSTALL_PREFIX} CACHE PATH "")
+endif()
+
+set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
 #The name of our project
 project (NeXus)
@@ -81,8 +84,8 @@ set(ZLIB_SEARCH "" CACHE PATH "Where to search for ZLIB")
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
-include(CheckTypeSize)
 include(CheckFunctionExists)
+include(CheckTypeSize)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
@@ -292,8 +295,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 
 if (CMAKE_SIZEOF_VOID_P MATCHES "8")
     set(ARCH64 1)
+	set(ARCHSUFFIX "64")
 else()
     set(ARCH64 0)
+	set(ARCHSUFFIX "")
+endif()
+
+# if we haven't changed the default windows install prefix, adjust for 64 bit
+if(${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_WIN_INSTALL_PREFIX})
+    set(CMAKE_INSTALL_PREFIX "${DEFAULT_WIN_INSTALL_PREFIX}${ARCHSUFFIX}" CACHE PATH "" FORCE)
 endif()
 
 # Recurse into the subdirectories.
@@ -323,7 +333,7 @@ set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackOptions.cmake")
 set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 set (CPACK_SOURCE_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 if(WIN32)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};NSIS)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
     set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};ZIP) 
 elseif(APPLE)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)

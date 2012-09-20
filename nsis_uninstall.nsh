@@ -1,0 +1,8 @@
+;;;;;;;; !include "EnvVarUpdate.nsh"
+${un.EnvVarUpdate} $0 "NEXUSDIR" "R" "HKCU" "$INSTDIR"
+${un.EnvVarUpdate} $0 "NEXUSDIR${NEXUSENVSUFFIX}" "R" "HKCU" "$INSTDIR"
+${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\bin"
+${un.EnvVarUpdate} $0 "LIB" "R" "HKCU" "$INSTDIR\lib"
+${un.EnvVarUpdate} $0 "INCLUDE" "R" "HKCU" "$INSTDIR\include"
+${un.EnvVarUpdate} $0 "PYTHONPATH" "R" "HKCU" "$INSTDIR\python;$INSTDIR\bin"
+${un.EnvVarUpdate} $0 "CLASSPATH" "R" "HKCU" "$INSTDIR\java\jnexus.jar"

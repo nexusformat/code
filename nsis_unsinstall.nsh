@@ -1,7 +1,0 @@
-!include "EnvVarUpdate.nsh"
-; ${un.EnvVarUpdate} $0 "NEXUSDIR" "R" "HKLM" "C:\Program Files\Windows Resource Kits\Tools"
-; ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "%NEXUSDIR%\bin"
-; ${un.EnvVarUpdate} $0 "LIB" "R" "HKLM" "%NEXUSDIR%\lib"
-; ${un.EnvVarUpdate} $0 "INCLUDE" "R" "HKLM" "%NEXUSDIR%\include"
-; ${un.EnvVarUpdate} $0 "PYTHONPATH" "R" "HKLM" "%NEXUSDIR%\python;%NEXUSDIR%\bin"
-; ${un.EnvVarUpdate} $0 "CLASSPATH" "R" "HKLM" "%NEXUSDIR%\java\jnexus.jar"
