@@ -95,9 +95,17 @@ class Diff:
 
     def __cmpData(self, left, right):
         left = left.getData(self.path)
-        right = right.getData(self.path)
+        right = right.getData(self.path)     
+        # display data after changed /entry/raw_frames from int32 to uint64
         if left.type != right.type:
-            self.details.append("TYPE MISMATCH: %s != %s" \
+            if (left.type == "int32" and right.type == "uint64") or \
+                   (left.type == "uint64" and right.type == "int32"):
+                self.details.append("IGNORED TYPE MISMATCH: %s != %s" \
+                                   % (left.type, right.type))
+                self.details.append("LEFT DATA: " + str(left.data))
+                self.details.append("RIGHT DATA: " + str(right.data))
+            else:
+                self.details.append("TYPE MISMATCH: %s != %s" \
                                 % (left.type, right.type))
         if left.attrs != right.attrs:
             self.details.append("ATTRIBUTES MISMATCH: %s != %s" % \
