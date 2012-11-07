@@ -190,8 +190,16 @@ class Diff2:
         # display the long path
         self.details.append("IGNORED: %s != %s" \
                             % (leftpath, rightpath))
+        # display data after changed float32 to float64
         if left.type != right.type:
-            self.details.append("TYPE MISMATCH: %s != %s" \
+            if (left.type == "float64" and right.type == "float32") or \
+                   (left.type == "float32" and right.type == "float64"):
+                self.details.append("IGNORED TYPE MISMATCH: %s != %s" \
+                                   % (left.type, right.type))
+                self.details.append("LEFT DATA: " + str(left.data))
+                self.details.append("RIGHT DATA: " + str(right.data))
+            else:
+                self.details.append("TYPE MISMATCH: %s != %s" \
                                 % (left.type, right.type))
         if left.attrs != right.attrs:
             self.details.append("ATTRIBUTES MISMATCH: %s != %s" % \
