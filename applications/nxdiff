@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-VERSION = "1.4.2"
+VERSION = "1.4.3"
 
 import nxs
 import numpy
@@ -149,6 +149,99 @@ class Diff:
         else:
             self.__format = "standard"
 
+# Diff2 is based on Diff yet compares two similar paths (after changed NXgroup
+#     to NXcollection and changed NXpositioner to NXlog).
+class Diff2:
+    DIFF     = "|"
+    def __init__(self, **kwargs):
+        try:
+            left = kwargs["left"]
+        except KeyError:
+            left = None
+        try:
+            right = kwargs["right"]
+        except KeyError:
+            right = None
+        try:
+            leftpath = kwargs["leftpath"]
+        except KeyError:
+            leftpath = None
+        try:
+            rightpath = kwargs["rightpath"]
+        except KeyError:
+            rightpath = None
+        try:
+            self.setFormat(kwargs["format"])
+        except KeyError:
+            self.setFormat("standard")
+        self.summary = Diff2.DIFF # same format unified or standard
+
+        self.details = []
+        self.__cmpData(left, right, leftpath, rightpath)
+
+    def __str__(self):
+        if self.summary == Diff2.DIFF: # always true
+            result = Diff2.DIFF
+            result += " " + " ".join(self.details)
+        return result
+    def __cmpData(self, left, right, leftpath, rightpath):
+        left = left.getData(leftpath)
+        right = right.getData(rightpath)
+        # display the long path
+        self.details.append("IGNORED: %s != %s" \
+                            % (leftpath, rightpath))
+        if left.type != right.type:
+            self.details.append("TYPE MISMATCH: %s != %s" \
+                                % (left.type, right.type))
+        if left.attrs != right.attrs:
+            self.details.append("ATTRIBUTES MISMATCH: %s != %s" % \
+                                (left.attrs, right.attrs))
+        if left.type == "CHAR" or left.type == "char" \
+               or right.type =="CHAR" or right.type == "char":
+            if left.data != right.data:
+                self.details.append("DATA MISMATCH: %s != %s" % \
+                                    (left.data, right.data))
+            return
+        if not numpy.alltrue(left.dims == right.dims):
+            self.details.append("DIMENSION MISMATCH: %s != %s" \
+                                % (left.dims, right.dims))
+            return
+        else:
+            try:
+                if left.data.dtype != right.data.dtype:
+                    self.details.append("DATA MISMATCH: %s != %s" \
+                                        % (left.data.dtype.name, \
+                                           right.data.dtype.name))
+                    return
+            except TypeError:
+                pass
+            except AttributeError:
+                pass
+
+        # special case when the array is only nans
+        if numpy.alltrue(numpy.isnan(left.data)) and \
+           numpy.alltrue(numpy.isnan(right.data)):
+            return
+
+        if numpy.alltrue(left.data == right.data):
+            return
+        else:
+            if left.data.size == 1 and right.data.size == 1:
+                self.details.append("DATA MISMATCH %s != %s" \
+                                    % (str(left.data), str(right.data)))
+                return
+            diffs = getPercentDiff(left.data, right.data)
+            if numpy.nanmax(diffs) <= 0.:
+                return
+            stats = getStats(diffs)
+            self.details.append("MISMATCH [min%s,max%s,med%s,avg%s,dev%s]" \
+                                % (stats[0], stats[1], stats[2], stats[3],
+                                   stats[4]))
+    def setFormat(self, format):
+        if format == "unified":
+            self.__format = "unified"
+        else:
+            self.__format = "standard"
 class NXSfile:
     def __init__(self, name, **kwargs):
         try:
@@ -163,6 +256,10 @@ class NXSfile:
             self.__ignorets = kwargs["ignorets"]
         except KeyError:
             self.__ignorets = False
+        try:
+            self.__ignoreNXgroupNXpositioner = kwargs["ignoreNXgroupNXpositioner"]
+        except KeyError:
+            self.__ignoreNXgroupNXpositioner = False
         self.name = os.path.abspath(name)
         self.__initPaths()
 
@@ -239,6 +336,58 @@ class NXSfile:
             diffPaths.sort()
             for path in diffPaths:
                 self.__removeDuplicate(path, diffPaths)
+            result = []
+            # if ignoreNXgroupNXpositioner is ture
+            if self.__ignoreNXgroupNXpositioner:
+                for path in missingSelf[:]:
+                    if path.find("NXgroup") != -1:
+                    # Found NXgroup, file from TS/HistoTool (motor logs are NXpositioner)
+                        if path.find("NXpositioner") != -1:
+                        # Found NXpositioner, motor log
+                            otherpath = path.replace("NXpositioner", "NXlog").replace("NXgroup", "NXcollection")
+                            if otherpath in missingOther:
+                            # Found corresponding path, otherwise do nothing
+                                result.append(Diff2(left=self, right=other, leftpath=otherpath, rightpath=path))
+                                missingSelf.remove(path)
+                                missingOther.remove(otherpath)
+                                diffPaths.remove(path)
+                                diffPaths.remove(otherpath)
+                        else:
+                        # not motor log
+                            otherpath = path.replace("NXgroup", "NXcollection")
+                            if otherpath in missingOther:
+                            # Found corresponding path, otherwise do nothing
+                                result.append(Diff2(left=self, right=other, leftpath=otherpath, rightpath=path))
+                                missingSelf.remove(path)
+                                missingOther.remove(otherpath)
+                                diffPaths.remove(path)
+                                diffPaths.remove(otherpath)
+
+
+                for path in missingOther[:]:
+                    if path.find("NXgroup") != -1:
+                    # Found NXgroup, file from TS/HistoTool (motor logs are NXpositioner)
+                        if path.find("NXpositioner") != -1:
+                        # Found NXpositioner, motor log
+                            otherpath = path.replace("NXpositioner", "NXlog").replace("NXgroup", "NXcollection")
+                            if otherpath in missingSelf:
+                            # Found corresponding path, otherwise do nothing
+                                result.append(Diff2(left=self, right=other, leftpath=path, rightpath=otherpath))
+                                missingOther.remove(path)
+                                missingSelf.remove(otherpath)
+                                diffPaths.remove(path)
+                                diffPaths.remove(otherpath)
+                        else:
+                        # not motor log
+                            otherpath = path.replace("NXgroup", "NXcollection")
+                            if otherpath in missingSelf:
+                            # Found corresponding path, otherwise do nothing
+                                result.append(Diff2(left=self, right=other, leftpath=path, rightpath=otherpath))
+                                missingOther.remove(path)
+                                missingSelf.remove(otherpath)
+                                diffPaths.remove(path)
+                                diffPaths.remove(otherpath)
+
             for path in missingSelf:
                 index = diffPaths.index(path)
                 diffPaths[index] = "> %s" % diffPaths[index]
@@ -246,7 +395,6 @@ class NXSfile:
                 index = diffPaths.index(path)
                 diffPaths[index] = "< %s" % diffPaths[index]
 
-        result = []
         for path in diffPaths:
             if path.startswith("<") or path.startswith(">"):
                 result.append(Diff(path, diff=path[0]))
@@ -488,7 +636,10 @@ if __name__ == "__main__":
                       help="Ignore the author and date fields in notes")
     parser.add_option("", "--ignore-ts", dest="ignorets", action="store_true",
                       help="Ignore differences in the version of ts used")
-                      
+    parser.add_option("", "--ignore-NXgroup-NXpositioner", dest="ignoreNXgroupNXpositioner",
+                      action="store_true", help="Ignore differences between NXgroup and"
+                      + "NXcollection, as well as between NXpositioner and NXlog")
+
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignorelinks=False)
     parser.set_defaults(numvalues=None)
@@ -496,6 +647,7 @@ if __name__ == "__main__":
     parser.set_defaults(shownandiffs=False)
     parser.set_defaults(ignorenotes=False)
     parser.set_defaults(ignorets=False)
+    parser.set_defaults(ignoreNXgroupNXpositioner=False)
 
     # parse and fix values
     (options, args) = parser.parse_args()
@@ -518,10 +670,12 @@ if __name__ == "__main__":
     else:
         left = NXSfile(args[0], ignorelinks=options.ignorelinks,
                        ignorenotes=options.ignorenotes,
-                       ignorets=options.ignorets)
+                       ignorets=options.ignorets,
+                       ignoreNXgroupNXpositioner=options.ignoreNXgroupNXpositioner)
         right = NXSfile(args[1], ignorelinks=options.ignorelinks,
                         ignorenotes=options.ignorenotes,
-                        ignorets=options.ignorets)
+                        ignorets=options.ignorets,
+                        ignoreNXgroupNXpositioner=options.ignoreNXgroupNXpositioner)
 
     # direct comparison of the two files
     if left == right:
