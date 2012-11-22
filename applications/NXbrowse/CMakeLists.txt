@@ -29,7 +29,7 @@
 add_executable (nxbrowse NXbrowse.c)
 
 target_link_libraries(nxbrowse NeXus_Shared_Library 
-                      ${READLINE_LINK} ${M_LINK}
+                      ${READLINE_LINK}  ${M_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
                       ${HISTORY_LINK})
 

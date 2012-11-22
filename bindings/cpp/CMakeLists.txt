@@ -69,9 +69,9 @@ install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
 
 INSTALL (FILES ${HEADERS} DESTINATION ${NX_INCLUDE}/ COMPONENT Development)
 
-if(WIN32)
-install_pdb (NeXus_CPP_Shared_Library)
-endif()
+#if(WIN32)
+#install_pdb (NeXus_CPP_Shared_Library)
+#endif()
 
 
 

@@ -53,6 +53,7 @@ endif()
 
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
+
 #The name of our project
 project (NeXus)
 
@@ -146,7 +147,7 @@ endif(UNIX)
 
 #find_package(HDF5 REQUIRED)
 #find_package(HDF5)
-find_package(JPEG)
+#find_package(JPEG)
 find_package(XMLRPC)
 #find_package(ZLIB)
 find_package(LibXml2)
@@ -166,7 +167,7 @@ if (ZLIB_SEARCH)
 elseif($ENV{ZLIB_ROOT})
     set(ZLIB_ROOT $ENV{ZLIB_ROOT})
 else()
-    set(ZLIB_ROOT $HDF5_ROOT_DIR $HDF4_ROOT_DIR $SZIP_ROOT_DIR)
+    set(ZLIB_ROOT ${HDF5_ROOT_DIR} ${HDF4_ROOT_DIR} ${SZIP_ROOT_DIR})
 endif()
 find_package(ZLIB)
 
@@ -179,6 +180,10 @@ find_library(PTHREAD pthread)
 find_library(TERMCAP termcap)
 find_library(READLINE readline)
 find_library(HISTORY history)
+
+if(NOT WIN32)
+CHECK_LIBRARY_EXISTS(${READLINE} readline "" HAVE_LIBREADLINE)
+endif()
 
 if(M)
    set(M_LINK "-lm")
@@ -193,7 +198,7 @@ if(PTHREAD)
 endif(PTHREAD)
 
 if(SZIPLIB_FOUND)
-   set(SZIP_LINK "-lsz")
+   set(SZIP_LINK "-lsz") 
 else(SZIPLIB_FOUND)
    set(SZIP_LIB "")
 endif(SZIPLIB_FOUND)
@@ -203,7 +208,7 @@ if(TERMCAP)
 endif(TERMCAP)
 
 if(READLINE)
-   set(READLINE_LINK "")
+   set(READLINE_LINK "${READLINE}")
 endif(READLINE)
 
 if(HISTORY)
@@ -229,7 +234,7 @@ option (BUILD_FORTRAN_BINDINGS
 
 #Use HDF4 in build
 option (BUILD_HDF4 
-        "Should I build HDF4 bindings if libraries available?" OFF)
+        "Should I build HDF4 bindings if libraries available?" ON)
 
 option (BUILD_HDF5 
         "Should I build HDF4 bindings if libraries available?" ON)
@@ -256,7 +261,6 @@ create_have_vars(HDF4 HDF5 MXML)
 #Include source files.
 include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${HDF5_INCLUDE_DIR})
 
-include_directories(C:/development/nexus-third-party/win64/include)
 
 if (UNIX)
     check_add_c_compiler_flags("-Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment")
@@ -288,6 +292,7 @@ if(MSVC)
     set(NX_CFLAGS "/W4 /wd4820 /wd4996 /Zi")
     set(NX_CPP -D_CRT_SECURE_NO_WARNINGS)
 	set(CMAKE_DEBUG_POSTFIX "D")
+#	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL" CACHE STRING "" FORCE)   # workaround for problems
 endif(MSVC)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
@@ -304,6 +309,17 @@ endif()
 # if we haven't changed the default windows install prefix, adjust for 64 bit
 if(${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_WIN_INSTALL_PREFIX})
     set(CMAKE_INSTALL_PREFIX "${DEFAULT_WIN_INSTALL_PREFIX}${ARCHSUFFIX}" CACHE PATH "" FORCE)
+endif()
+
+if(WIN32)
+	if(ARCH64)
+		include_directories("${NEXUS_THIRD_PARTY}/win64/include")
+		file(GLOB EXTRA_DLLS "${NEXUS_THIRD_PARTY}/win64/bin/*.dll")
+	else()
+		include_directories("${NEXUS_THIRD_PARTY}/win32/include")
+		file(GLOB EXTRA_DLLS "${NEXUS_THIRD_PARTY}/win32/bin/*.dll")
+	endif()
+	install(FILES ${EXTRA_DLLS} DESTINATION bin COMPONENT Runtime)
 endif()
 
 # Recurse into the subdirectories.
