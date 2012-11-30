@@ -63,6 +63,8 @@ static char* my_readline(const char* prompt)
 
 #ifdef _WIN32
 #define STRNCASECMP strnicmp
+#else
+#define STRNCASECMP strncasecmp
 #endif /* _WIN32 */
 
 int NXBdir (NXhandle fileId);
