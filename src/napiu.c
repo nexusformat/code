@@ -24,7 +24,6 @@
   $Id$
 
  ----------------------------------------------------------------------------*/
-static const char* rscid = "$Id$";	/* Revision interted by CVS */
 
 #include <stdlib.h>
 #include <assert.h>
@@ -35,7 +34,7 @@ static const char* rscid = "$Id$";	/* Revision interted by CVS */
 #define DO_GLOBAL(__name) \
 	if (__name != NULL) \
 	{ \
-		if (NXputattr(file_id, #__name, (char*)__name, strlen(__name), NX_CHAR) != NX_OK) \
+		if (NXputattr(file_id, #__name, (char*)__name, (int)strlen(__name), NX_CHAR) != NX_OK) \
 		{ \
 			return NX_ERROR; \
 		} \
