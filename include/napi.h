@@ -942,7 +942,7 @@ extern  NXstatus  NXsetcache(long newVal);
   extern NXstatus  NXfflush(NXhandle pHandle);
   extern NXstatus  NXfgetpath(NXhandle fid, char *path, int *pathlen);
 #ifdef __cplusplus
-}
+};
 #endif /* __cplusplus */
 
 /**

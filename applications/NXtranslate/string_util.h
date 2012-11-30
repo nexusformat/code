@@ -106,5 +106,5 @@ namespace string_util{
 	extern std::vector<std::string> strip_punct(std::vector<std::string> &strvec);
 	extern bool contains(std::string &str, std::string substr);
 	extern std::string lower_str(std::string str);
-}
+};
 #endif
