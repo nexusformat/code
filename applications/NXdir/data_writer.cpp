@@ -111,7 +111,6 @@ static bool contains(const PathVector &vec, const Path &path){
 static PathVector find_int_attr(NXhandle handle, const Tree &tree,
                                    const string attr_name, const int attr_val){
   PathVector attr_tree;
-  bool found_attr=false;
 
   // find the named attribute
   for(Tree::const_iterator path=tree.begin() ; path!=tree.end() ; path++ ){
@@ -127,7 +126,6 @@ static PathVector find_int_attr(NXhandle handle, const Tree &tree,
     }
   }
 
-  int size=attr_tree.size();
   if(attr_tree.size()<=0)
     throw "did not find attribute";
   else 
