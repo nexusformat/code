@@ -165,107 +165,6 @@ class Diff:
         else:
             self.__format = "standard"
 
-# Diff2 is based on Diff yet compares two similar paths (after changed NXgroup
-#     to NXcollection and changed NXpositioner to NXlog).
-class Diff2:
-    DIFF     = "|"
-    def __init__(self, **kwargs):
-        try:
-            left = kwargs["left"]
-        except KeyError:
-            left = None
-        try:
-            right = kwargs["right"]
-        except KeyError:
-            right = None
-        try:
-            leftpath = kwargs["leftpath"]
-        except KeyError:
-            leftpath = None
-        try:
-            rightpath = kwargs["rightpath"]
-        except KeyError:
-            rightpath = None
-        try:
-            self.setFormat(kwargs["format"])
-        except KeyError:
-            self.setFormat("standard")
-        self.summary = Diff2.DIFF # same format unified or standard
-
-        self.details = []
-        self.__cmpData(left, right, leftpath, rightpath)
-
-    def __str__(self):
-        if self.summary == Diff2.DIFF: # always true
-            result = Diff2.DIFF
-            result += " " + " ".join(self.details)
-        return result
-    def __cmpData(self, left, right, leftpath, rightpath):
-        left = left.getData(leftpath)
-        right = right.getData(rightpath)
-        # display the long path
-        self.details.append("IGNORED: %s != %s" \
-                            % (leftpath, rightpath))
-        # display data after changed float32 to float64
-        if left.type != right.type:
-            if (left.type == "float64" and right.type == "float32") or \
-                   (left.type == "float32" and right.type == "float64"):
-                self.details.append("IGNORED TYPE MISMATCH: %s != %s" \
-                                   % (left.type, right.type))
-                self.details.append("LEFT DATA: " + str(left.data))
-                self.details.append("RIGHT DATA: " + str(right.data))
-            else:
-                self.details.append("TYPE MISMATCH: %s != %s" \
-                                % (left.type, right.type))
-        if left.attrs != right.attrs:
-            self.details.append("ATTRIBUTES MISMATCH: %s != %s" % \
-                                (left.attrs, right.attrs))
-        if left.type == "CHAR" or left.type == "char" \
-               or right.type =="CHAR" or right.type == "char":
-            if left.data != right.data:
-                self.details.append("DATA MISMATCH: %s != %s" % \
-                                    (left.data, right.data))
-            return
-        if not numpy.alltrue(left.dims == right.dims):
-            self.details.append("DIMENSION MISMATCH: %s != %s" \
-                                % (left.dims, right.dims))
-            return
-        else:
-            try:
-                if left.data.dtype != right.data.dtype:
-                    self.details.append("DATA MISMATCH: %s != %s" \
-                                        % (left.data.dtype.name, \
-                                           right.data.dtype.name))
-                    return
-            except TypeError:
-                pass
-            except AttributeError:
-                pass
-
-        # special case when the array is only nans
-        if numpy.alltrue(numpy.isnan(left.data)) and \
-           numpy.alltrue(numpy.isnan(right.data)):
-            return
-
-        if numpy.alltrue(left.data == right.data):
-            return
-        else:
-            if left.data.size == 1 and right.data.size == 1:
-                self.details.append("DATA MISMATCH %s != %s" \
-                                    % (str(left.data), str(right.data)))
-                return
-            diffs = getPercentDiff(left.data, right.data)
-            if numpy.nanmax(diffs) <= 0.:
-                return
-            stats = getStats(diffs)
-            self.details.append("MISMATCH [min%s,max%s,med%s,avg%s,dev%s]" \
-                                % (stats[0], stats[1], stats[2], stats[3],
-                                   stats[4]))
-    def setFormat(self, format):
-        if format == "unified":
-            self.__format = "unified"
-        else:
-            self.__format = "standard"
 class NXSfile:
     def __init__(self, name, **kwargs):
         try:
@@ -367,21 +266,21 @@ class NXSfile:
             #print number
             # handle retype
             if number > 0:
-                oldnames = []
-                newnames = []
+                lnames = []
+                rnames = []
                 for item in self.__retype:
                     if item.find("=") != -1:
                         # TODO: add check for "NX*" if limit to type only
-                        (old, new) = item.split("=")
-                        oldnames.append(old)
-                        newnames.append(new)
-                #print oldnames
-                #print newnames
+                        (lname, rname) = item.split("=")
+                        lnames.append(lname)
+                        rnames.append(rname)
+                #print lnames
+                #print rnames
                 for path in missingSelf[:]:
                     otherpath = path
                     for i in range(number):
-                        if path.find(newnames[i]) != -1:
-                            otherpath = otherpath.replace(newnames[i], oldnames[i])
+                        if path.find(rnames[i]) != -1:
+                            otherpath = otherpath.replace(rnames[i], lnames[i])
                     #print otherpath
                     if otherpath in missingOther:
                     # Found corresponding path, otherwise do nothing
@@ -394,8 +293,8 @@ class NXSfile:
                 for path in missingOther[:]:
                     otherpath = path
                     for i in range(number):
-                        if path.find(oldnames[i]) != -1:
-                            otherpath = otherpath.replace(oldnames[i], newnames[i])
+                        if path.find(lnames[i]) != -1:
+                            otherpath = otherpath.replace(lnames[i], rnames[i])
                     #print otherpath
                     if otherpath in missingSelf:
                     # Found corresponding path, otherwise do nothing
