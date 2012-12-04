@@ -55,6 +55,10 @@ class Diff:
             right = kwargs["right"]
         except KeyError:
             right = None
+        try:
+            rightpath = kwargs["rightpath"]
+        except KeyError:
+            rightpath = None
         temp = self.path.split(" ")
         if len(temp) == 2:
             (self.summary, self.path) = temp
@@ -75,7 +79,8 @@ class Diff:
         self.details = []
         if self.summary != Diff.UNKNOWN:
             return
-        self.__cmpData(left, right)
+
+        self.__cmpData(left, right, rightpath)
         if len(self.details) > 0:
             self.summary = Diff.DIFF
         else:
@@ -93,9 +98,12 @@ class Diff:
             result += " " + " ".join(self.details)
         return result
 
-    def __cmpData(self, left, right):
+    def __cmpData(self, left, right, rightpath):
         left = left.getData(self.path)
-        right = right.getData(self.path)     
+        if rightpath != None:
+            right = right.getData(rightpath)
+        else:
+            right = right.getData(self.path)
         # display data after changed /entry/raw_frames from int32 to uint64
         if left.type != right.type:
             if (left.type == "int32" and right.type == "uint64") or \
@@ -273,9 +281,9 @@ class NXSfile:
         except KeyError:
             self.__ignorets = False
         try:
-            self.__ignoreNXgroupNXpositioner = kwargs["ignoreNXgroupNXpositioner"]
+            self.__retype = kwargs["retype"]
         except KeyError:
-            self.__ignoreNXgroupNXpositioner = False
+            self.__retype = []
         self.name = os.path.abspath(name)
         self.__initPaths()
 
@@ -353,56 +361,50 @@ class NXSfile:
             for path in diffPaths:
                 self.__removeDuplicate(path, diffPaths)
             result = []
-            # if ignoreNXgroupNXpositioner is ture
-            if self.__ignoreNXgroupNXpositioner:
+
+
+            number = len(self.__retype)
+            #print number
+            # handle retype
+            if number > 0:
+                oldnames = []
+                newnames = []
+                for item in self.__retype:
+                    if item.find("=") != -1:
+                        # TODO: add check for "NX*" if limit to type only
+                        (old, new) = item.split("=")
+                        oldnames.append(old)
+                        newnames.append(new)
+                #print oldnames
+                #print newnames
                 for path in missingSelf[:]:
-                    if path.find("NXgroup") != -1:
-                    # Found NXgroup, file from TS/HistoTool (motor logs are NXpositioner)
-                        if path.find("NXpositioner") != -1:
-                        # Found NXpositioner, motor log
-                            otherpath = path.replace("NXpositioner", "NXlog").replace("NXgroup", "NXcollection")
-                            if otherpath in missingOther:
-                            # Found corresponding path, otherwise do nothing
-                                result.append(Diff2(left=self, right=other, leftpath=otherpath, rightpath=path))
-                                missingSelf.remove(path)
-                                missingOther.remove(otherpath)
-                                diffPaths.remove(path)
-                                diffPaths.remove(otherpath)
-                        else:
-                        # not motor log
-                            otherpath = path.replace("NXgroup", "NXcollection")
-                            if otherpath in missingOther:
-                            # Found corresponding path, otherwise do nothing
-                                result.append(Diff2(left=self, right=other, leftpath=otherpath, rightpath=path))
-                                missingSelf.remove(path)
-                                missingOther.remove(otherpath)
-                                diffPaths.remove(path)
-                                diffPaths.remove(otherpath)
-
-
+                    otherpath = path
+                    for i in range(number):
+                        if path.find(newnames[i]) != -1:
+                            otherpath = otherpath.replace(newnames[i], oldnames[i])
+                    #print otherpath
+                    if otherpath in missingOther:
+                    # Found corresponding path, otherwise do nothing
+                        #print "Found " + otherpath + " in missingOther"
+                        result.append(Diff(otherpath, left=self, right=other, rightpath=path))
+                        missingSelf.remove(path)
+                        missingOther.remove(otherpath)
+                        diffPaths.remove(path)
+                        diffPaths.remove(otherpath)
                 for path in missingOther[:]:
-                    if path.find("NXgroup") != -1:
-                    # Found NXgroup, file from TS/HistoTool (motor logs are NXpositioner)
-                        if path.find("NXpositioner") != -1:
-                        # Found NXpositioner, motor log
-                            otherpath = path.replace("NXpositioner", "NXlog").replace("NXgroup", "NXcollection")
-                            if otherpath in missingSelf:
-                            # Found corresponding path, otherwise do nothing
-                                result.append(Diff2(left=self, right=other, leftpath=path, rightpath=otherpath))
-                                missingOther.remove(path)
-                                missingSelf.remove(otherpath)
-                                diffPaths.remove(path)
-                                diffPaths.remove(otherpath)
-                        else:
-                        # not motor log
-                            otherpath = path.replace("NXgroup", "NXcollection")
-                            if otherpath in missingSelf:
-                            # Found corresponding path, otherwise do nothing
-                                result.append(Diff2(left=self, right=other, leftpath=path, rightpath=otherpath))
-                                missingOther.remove(path)
-                                missingSelf.remove(otherpath)
-                                diffPaths.remove(path)
-                                diffPaths.remove(otherpath)
+                    otherpath = path
+                    for i in range(number):
+                        if path.find(oldnames[i]) != -1:
+                            otherpath = otherpath.replace(oldnames[i], newnames[i])
+                    #print otherpath
+                    if otherpath in missingSelf:
+                    # Found corresponding path, otherwise do nothing
+                        #print "Found " + otherpath + " in missingSelf"
+                        result.append(Diff(path, left=self, right=other, rightpath=otherpath))
+                        missingSelf.remove(otherpath)
+                        missingOther.remove(path)
+                        diffPaths.remove(path)
+                        diffPaths.remove(otherpath)
 
             for path in missingSelf:
                 index = diffPaths.index(path)
@@ -652,9 +654,9 @@ if __name__ == "__main__":
                       help="Ignore the author and date fields in notes")
     parser.add_option("", "--ignore-ts", dest="ignorets", action="store_true",
                       help="Ignore differences in the version of ts used")
-    parser.add_option("", "--ignore-NXgroup-NXpositioner", dest="ignoreNXgroupNXpositioner",
-                      action="store_true", help="Ignore differences between NXgroup and"
-                      + "NXcollection, as well as between NXpositioner and NXlog")
+    parser.add_option("", "--retype", dest="retype", action="append", help="Ignore "
+                      + "differences after renaming. Please be consistent." +
+                      "Usage: --retype leftname1=rightname1  --retype leftname2=rightname2 ...")
 
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignorelinks=False)
@@ -663,7 +665,7 @@ if __name__ == "__main__":
     parser.set_defaults(shownandiffs=False)
     parser.set_defaults(ignorenotes=False)
     parser.set_defaults(ignorets=False)
-    parser.set_defaults(ignoreNXgroupNXpositioner=False)
+    parser.set_defaults(retype=[])
 
     # parse and fix values
     (options, args) = parser.parse_args()
@@ -687,11 +689,11 @@ if __name__ == "__main__":
         left = NXSfile(args[0], ignorelinks=options.ignorelinks,
                        ignorenotes=options.ignorenotes,
                        ignorets=options.ignorets,
-                       ignoreNXgroupNXpositioner=options.ignoreNXgroupNXpositioner)
+                       retype=options.retype)
         right = NXSfile(args[1], ignorelinks=options.ignorelinks,
                         ignorenotes=options.ignorenotes,
                         ignorets=options.ignorets,
-                        ignoreNXgroupNXpositioner=options.ignoreNXgroupNXpositioner)
+                        retype=options.retype)
 
     # direct comparison of the two files
     if left == right:
