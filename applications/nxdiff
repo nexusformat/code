@@ -59,6 +59,10 @@ class Diff:
             rightpath = kwargs["rightpath"]
         except KeyError:
             rightpath = None
+        try:
+            epsilon = kwargs["epsilon"]
+        except KeyError:
+            epsilon = 0.0000001
         temp = self.path.split(" ")
         if len(temp) == 2:
             (self.summary, self.path) = temp
@@ -80,7 +84,7 @@ class Diff:
         if self.summary != Diff.UNKNOWN:
             return
 
-        self.__cmpData(left, right, rightpath)
+        self.__cmpData(left, right, rightpath, epsilon)
         if len(self.details) > 0:
             self.summary = Diff.DIFF
         else:
@@ -98,20 +102,23 @@ class Diff:
             result += " " + " ".join(self.details)
         return result
 
-    def __cmpData(self, left, right, rightpath):
+    def __cmpData(self, left, right, rightpath, epsilon):
         left = left.getData(self.path)
         if rightpath != None:
             right = right.getData(rightpath)
         else:
             right = right.getData(self.path)
-        # display data after changed /entry/raw_frames from int32 to uint64
+
         if left.type != right.type:
-            if (left.type == "int32" and right.type == "uint64") or \
-                   (left.type == "uint64" and right.type == "int32"):
-                self.details.append("IGNORED TYPE MISMATCH: %s != %s" \
-                                   % (left.type, right.type))
-                self.details.append("LEFT DATA: " + str(left.data))
-                self.details.append("RIGHT DATA: " + str(right.data))
+            # /entry/raw_frames changed from int32 to uint64. Also see below.
+            if (self.path.find("raw_frames") != -1 and left.type == "int32" \
+                and right.type == "uint64") or (self.path.find("raw_frames") != -1 \
+                and left.type == "uint64" and right.type == "int32"):
+                pass
+            # See below
+            elif (left.type == "float32" and right.type == "float64") or \
+            (left.type == "float64" and right.type == "float32"):
+                pass
             else:
                 self.details.append("TYPE MISMATCH: %s != %s" \
                                 % (left.type, right.type))
@@ -131,7 +138,55 @@ class Diff:
         else:
             try:
                 if left.data.dtype != right.data.dtype:
-                    self.details.append("DATA MISMATCH: %s != %s" \
+                    # Display /entry/raw_frames after changed from int32 to uint64.
+                    if (self.path.find("raw_frames") != -1 and left.type == "int32" \
+                        and right.type == "uint64") or (self.path.find("raw_frames") != -1 \
+                        and left.type == "uint64" and right.type == "int32"):
+                        self.details.append("IGNORED TYPE MISMATCH: %s != %s" \
+                                   % (left.type, right.type))
+                        self.details.append("LEFT DATA: " + str(left.data))
+                        self.details.append("RIGHT DATA: " + str(right.data))
+                    elif (left.type == "float32" and right.type == "float64") or \
+                        (left.type == "float64" and right.type == "float32"):
+                        # cast float32 to float64
+                        if left.type == "float32":
+                            if (left.dims == 1):
+                                if (abs(abs(numpy.float64(left.data)) - abs(right.data)) <= \
+                                    max(abs(numpy.float64(left.data)), abs(right.data)) * epsilon):
+                                    # equal within precision epsilon
+                                    pass
+                                else:
+                                    self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                        % (left.data, left.type, right.data, right.type))
+                            else:
+                                for i in range (left.dims):
+                                    if (abs(abs(numpy.float64(left.data[i])) - abs(right.data[i])) <= \
+                                        max(abs(numpy.float64(left.data[i])), abs(right.data[i])) * epsilon):
+                                        # equal within precision epsilon
+                                        pass
+                                    else:
+                                        self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                            % (left.data[i], left.type, right.data[i], right.type))
+                        if right.type == "float32":
+                            if (left.dims == 1):
+                                if (abs(abs(left.data) - abs(numpy.float64(right.data))) <= \
+                                    max(abs(left.data), abs(numpy.float64(right.data))) * epsilon):
+                                    # equal within precision epsilon
+                                    pass
+                                else:
+                                    self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                        % (left.data, left.type, right.data, right.type))
+                            else:
+                                for i in range (left.dims):
+                                    if (abs(abs(left.data[i]) - abs(numpy.float64(right.data[i]))) <= \
+                                        max(abs(left.data[i]), abs(numpy.float64(right.data[i]))) * epsilon):
+                                        # equal within precision epsilon
+                                        pass
+                                    else:
+                                        self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                            % (left.data[i], left.type, right.data[i], right.type))
+                    else:
+                        self.details.append("DATA MISMATCH: %s != %s" \
                                         % (left.data.dtype.name, \
                                            right.data.dtype.name))
                     return
@@ -183,6 +238,10 @@ class NXSfile:
             self.__retype = kwargs["retype"]
         except KeyError:
             self.__retype = []
+        try:
+            self.__epsilon = kwargs["epsilon"]
+        except KeyError:
+            self.__epsilon = 0.0000001
         self.name = os.path.abspath(name)
         self.__initPaths()
 
@@ -285,7 +344,7 @@ class NXSfile:
                     if otherpath in missingOther:
                     # Found corresponding path, otherwise do nothing
                         #print "Found " + otherpath + " in missingOther"
-                        result.append(Diff(otherpath, left=self, right=other, rightpath=path))
+                        result.append(Diff(otherpath, left=self, right=other, rightpath=path, epsilon=self.__epsilon))
                         missingSelf.remove(path)
                         missingOther.remove(otherpath)
                         diffPaths.remove(path)
@@ -299,7 +358,7 @@ class NXSfile:
                     if otherpath in missingSelf:
                     # Found corresponding path, otherwise do nothing
                         #print "Found " + otherpath + " in missingSelf"
-                        result.append(Diff(path, left=self, right=other, rightpath=otherpath))
+                        result.append(Diff(path, left=self, right=other, rightpath=otherpath, epsilon=self.__epsilon))
                         missingSelf.remove(otherpath)
                         missingOther.remove(path)
                         diffPaths.remove(path)
@@ -316,7 +375,7 @@ class NXSfile:
             if path.startswith("<") or path.startswith(">"):
                 result.append(Diff(path, diff=path[0]))
             else:
-                result.append(Diff(path, left=self, right=other))
+                result.append(Diff(path, left=self, right=other, epsilon=self.__epsilon))
 
         return result
 
@@ -556,7 +615,9 @@ if __name__ == "__main__":
     parser.add_option("", "--retype", dest="retype", action="append", help="Ignore "
                       + "differences after renaming. Please be consistent." +
                       "Usage: --retype leftname1=rightname1  --retype leftname2=rightname2 ...")
-
+    parser.add_option("", "--compareFloat32Float64", dest="epsilon", action="store",
+                      type="float", default=0.0000001, help = "Set the precision (float) for "
+                      + "relative epsilon comparison. The default is 0.0000001.")
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignorelinks=False)
     parser.set_defaults(numvalues=None)
@@ -588,11 +649,11 @@ if __name__ == "__main__":
         left = NXSfile(args[0], ignorelinks=options.ignorelinks,
                        ignorenotes=options.ignorenotes,
                        ignorets=options.ignorets,
-                       retype=options.retype)
+                       retype=options.retype, epsilon=options.epsilon)
         right = NXSfile(args[1], ignorelinks=options.ignorelinks,
                         ignorenotes=options.ignorenotes,
                         ignorets=options.ignorets,
-                        retype=options.retype)
+                        retype=options.retype, epsilon=options.epsilon)
 
     # direct comparison of the two files
     if left == right:
