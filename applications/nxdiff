@@ -242,6 +242,10 @@ class NXSfile:
             self.__epsilon = kwargs["epsilon"]
         except KeyError:
             self.__epsilon = 0.0000001
+        try:
+            self.__ignorerunnumber = kwargs["ignorerunnumber"]
+        except KeyError:
+            self.__ignorerunnumber = False
         self.name = os.path.abspath(name)
         self.__initPaths()
 
@@ -265,6 +269,9 @@ class NXSfile:
                     if name == "author" or name == "date":
                         continue
                 elif self.__ignorets and name == "SNStranslation_service":
+                    continue
+                elif self.__ignorerunnumber and (name == "entry_identifier" \
+                    or name == "run_number"):
                     continue
                 self.__nxs.opendata(name)
                 attrs = self.__nxs.getattrs()
@@ -618,6 +625,9 @@ if __name__ == "__main__":
     parser.add_option("", "--compareFloat32Float64", dest="epsilon", action="store",
                       type="float", default=0.0000001, help = "Set the precision (float) for "
                       + "relative epsilon comparison. The default is 0.0000001.")
+    parser.add_option("", "--ignore-run-number", dest="ignorerunnumber", action="store_true",
+                                        help="Ignore differences of /entry/entry_identifier and "
+                                        + "/entry/run_number.")
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignorelinks=False)
     parser.set_defaults(numvalues=None)
@@ -626,7 +636,7 @@ if __name__ == "__main__":
     parser.set_defaults(ignorenotes=False)
     parser.set_defaults(ignorets=False)
     parser.set_defaults(retype=[])
-
+    parser.set_defaults(ignorerunnumber=False)
     # parse and fix values
     (options, args) = parser.parse_args()
     if options.quiet:
@@ -649,11 +659,13 @@ if __name__ == "__main__":
         left = NXSfile(args[0], ignorelinks=options.ignorelinks,
                        ignorenotes=options.ignorenotes,
                        ignorets=options.ignorets,
-                       retype=options.retype, epsilon=options.epsilon)
+                       retype=options.retype, epsilon=options.epsilon,
+                       ignorerunnumber=options.ignorerunnumber)
         right = NXSfile(args[1], ignorelinks=options.ignorelinks,
                         ignorenotes=options.ignorenotes,
                         ignorets=options.ignorets,
-                        retype=options.retype, epsilon=options.epsilon)
+                        retype=options.retype, epsilon=options.epsilon,
+                        ignorerunnumber=options.ignorerunnumber)
 
     # direct comparison of the two files
     if left == right:
