@@ -312,6 +312,7 @@ class NXSfile:
             pass
         
     def cmpPaths(self, other, **kwargs):
+        result = []
         if self.__paths == other.__paths:
             diffPaths = self.__paths[:]
         else:
@@ -325,8 +326,6 @@ class NXSfile:
             diffPaths.sort()
             for path in diffPaths:
                 self.__removeDuplicate(path, diffPaths)
-            result = []
-
 
             number = len(self.__retype)
             #print number
