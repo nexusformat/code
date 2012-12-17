@@ -185,7 +185,6 @@ extern bool has_attr(NXhandle handle,const string name,int *length, int *type){
     throw "NXgetattrinfo failed";
 
   // determine if the attribute exists
-  int status=NX_OK;
   bool found=false;
   try{
     for( int i=0 ; i<num_attr ; i++ ){

@@ -51,6 +51,6 @@ install-data-hook :
 	fi
 
 # python setup.py install --root=$(DESTDIR)
-CLEANFILES=nxs.napi.html
+CLEANFILES=nxs.napi.html nxs/napi.pyc
 
 include $(top_srcdir)/build_rules.am

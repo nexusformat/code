@@ -17,5 +17,5 @@ namespace xml_parser{
   extern bool parse_xml_file(const std::map<std::string,std::string>&map,
                              const std::string &filename, NXhandle *handle,
                              const bool timing);
-}
+};
 #endif

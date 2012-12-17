@@ -15,7 +15,7 @@ using std::find;
 using std::string;
 using string_util::starts_with;
 
-static const string VERSION="0.3.0";
+static const string TRANSLATE_VERSION="0.3.0";
 
 // structure to hold options
 typedef struct{
@@ -68,7 +68,7 @@ static void trim_arg(string &arg, const string &flag){
 }
 
 static void print_version(){
-  cout << "nxtranslate (NXtranslate) version " << VERSION << endl;
+  cout << "nxtranslate (NXtranslate) version " << TRANSLATE_VERSION << endl;
   cout << endl;
   cout << "Copyright (c) 2004-2006, P.F.Peterson <petersonpf@ornl.gov>" << endl;
   cout << "NXtranslate can be copied under the terms of the \"MIT License\", which may be " << endl;
