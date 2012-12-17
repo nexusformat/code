@@ -38,10 +38,10 @@ man_MANS = nxconvert.1
 
 libnxconvert_la_SOURCES = nxconvert_common.cpp nxconvert_common.h
 libnxconvert_la_LIBADD = $(LIBNEXUSCPP) $(LIBNEXUS)
-libnxconvert_la_LDFLAGS = @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ -version-info $(NXLTVERSINFO) -L$(top_builddir)/bindings/cpp/.libs -L$(top_builddir)/src/.libs
+libnxconvert_la_LDFLAGS = -L$(top_builddir)/bindings/cpp/.libs -L$(top_builddir)/src/.libs @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ -version-info $(NXLTVERSINFO)
 
 nxconvert_SOURCES = nxconvert.cpp nxconvert_common.h
 nxconvert_LDADD = libnxconvert.la $(LIBNEXUS)
-nxconvert_LDFLAGS = -static @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@ $(LDFLAGS)
+nxconvert_LDFLAGS = -static $(LDFLAGS) @HDF4_LDFLAGS@ @HDF5_LDFLAGS@ @XML_LDFLAGS@
 
 include $(top_srcdir)/build_rules.am
