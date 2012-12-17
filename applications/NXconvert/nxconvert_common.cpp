@@ -42,6 +42,20 @@
 static int WriteGroup (int is_definition);
 static int WriteAttributes (int is_definition, int is_group);
 
+static bool is_valid_sds_name(const char* name)
+{
+    static const char* invalid_sds_names[] = { "Dim0.0", "UDim0.0", "CDF0.0", "Var0.0", "RIG0.0", "RI0.0" };
+    for(unsigned i=0; i<sizeof(invalid_sds_names)/sizeof(const char*); ++i)
+    {
+	if (!strcmp(name, invalid_sds_names[i]))
+	{
+	    return false;
+	}
+    }
+    return true;
+}
+
+
 static void clean_string(void* dataBuffer, int dataRank, int dataDimensions[])
 {
 	int i, n = 1;
@@ -264,7 +278,7 @@ static int WriteGroup (int is_definition)
             if (NXclosedata (inId) != NX_OK) return NX_ERROR;
          }
          /* napi4.c returns UNKNOWN for DFTAG_VH in groups */
-         else if (!strcmp(nxclass, "UNKNOWN") || !strncmp(nxclass, "CDF", 3)) {
+         else if (!strcmp(nxclass, "UNKNOWN") || !is_valid_sds_name(nxclass)) {
              ;
          }
          else {
