@@ -56,9 +56,9 @@ class Diff:
         except KeyError:
             right = None
         try:
-            rightpath = kwargs["rightpath"]
+            self.rightpath = kwargs["rightpath"]
         except KeyError:
-            rightpath = None
+            self.rightpath = None
         try:
             epsilon = kwargs["epsilon"]
         except KeyError:
@@ -84,7 +84,7 @@ class Diff:
         if self.summary != Diff.UNKNOWN:
             return
 
-        self.__cmpData(left, right, rightpath, epsilon)
+        self.__cmpData(left, right, self.rightpath, epsilon)
         if len(self.details) > 0:
             self.summary = Diff.DIFF
         else:
@@ -104,7 +104,7 @@ class Diff:
 
     def __cmpData(self, left, right, rightpath, epsilon):
         left = left.getData(self.path)
-        if rightpath != None:
+        if rightpath is not None:
             right = right.getData(rightpath)
         else:
             right = right.getData(self.path)
@@ -478,7 +478,11 @@ def printDataDiff(left, right, diff, **kwargs):
 
     # get the data
     left = left.getData(diff.path)
-    right = right.getData(diff.path)
+    # use diff.rightpath for --retype
+    if diff.rightpath is not None:
+        right = right.getData(diff.rightpath)
+    else:
+        right = right.getData(diff.path)
 
     # the dimensions of the data
     leftLength = 1
