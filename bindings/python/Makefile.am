@@ -40,6 +40,8 @@ nxs.napi.html : $(srcdir)/nxs/napi.py
 	env NEXUSLIB=../../src/.libs/libNeXus.$(SHARED_EXT) pydoc -w $(srcdir)/nxs/napi.py
 	if test -r napi.html; then \
 	    mv napi.html $@; \
+	else \
+	    touch $@; \
 	fi
 
 install-data-hook :

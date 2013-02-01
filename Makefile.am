@@ -34,9 +34,9 @@ CONTRIB=contrib
 endif
 SUBDIRS=third_party include src bindings applications test scripts examples doc macosx_install_kit $(CONTRIB)
 
-EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autoversion.sh \
-		build_rpm.in README.cygwin README.WIN32 README.macosx \
-		README.MinGW make_mingw_links SConstruct nexus_scons_utils.py \
+EXTRA_DIST=build_rules.am nexus_spec.in nexus.spec autogen.sh autoversion.sh \
+		build_rpm.in README.cygwin README.macosx \
+		README.MinGW make_mingw_links \
 		configure_mingw_kit Windows_extra InstallerBits \
 		README.VS2008.pdf
 
