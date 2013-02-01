@@ -400,14 +400,14 @@ void calculate_array (vector<int> & GrpPriority,
   //Allocate memory for the final array created
   void * NewArray;
   int rank=3;
-  int dims[GlobalArray.size()];
+  std::vector<int> dims(GlobalArray.size());
   for (int j=0 ; j< GlobalArray.size() ; ++j)
     {
       dims[j]=GlobalArray[j];
     }
   
   //  int dims[]={3,10,5};
-  NXmalloc(&NewArray,rank,dims,NX_INT32);
+  NXmalloc(&NewArray,rank,&(dims[0]),NX_INT32);
   
   //make an array for each group
   for (int i=0 ; i<GrpPriority.size() ; ++i)
@@ -486,7 +486,7 @@ void calculate_array (vector<int> & GrpPriority,
   delete[] MyGrpArray;  
   
   //write into nexus file
-  Node node("New Array from string location",NewArray,rank,dims,NX_INT32);
+  Node node("New Array from string location",NewArray,rank,&(dims[0]),NX_INT32);
   
   tr.insert(tr.begin(),node);   
   

@@ -126,7 +126,13 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
                      native/NexusFile.c 
                      native/hdfexceptionImp.h)
 
-        SET_TARGET_PROPERTIES(jnexus PROPERTIES VERSION 1.0 SOVERSION 4)
+		if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+			set_target_properties(jnexus PROPERTIES OUTPUT_NAME libjnexus-0
+                      VERSION 1.0 SOVERSION 4 )
+		else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+			set_target_properties(jnexus PROPERTIES OUTPUT_NAME jnexus
+                      VERSION 1.0 SOVERSION 4)
+		endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
         TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library 
                       ${READLINE_LINK} ${M_LINK} ${DF_LINK}
@@ -140,9 +146,11 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
 			ARCHIVE DESTINATION lib COMPONENT Runtime
         )
 
-        INSTALL(FILES ${JAR_ARCHIVE} DESTINATION lib COMPONENT Runtime)
+        INSTALL(FILES ${JAR_ARCHIVE} DESTINATION share/java COMPONENT Runtime)
 
         INSTALL(DIRECTORY ${JAVA_DOCS} DESTINATION ${NXDOCDIR}/java COMPONENT Documentation)
+		
+		install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/COPYING.NCSA ${CMAKE_CURRENT_SOURCE_DIR}/README.JNEXUS DESTINATION ${NXDOCDIR}/java COMPONENT Documentation)
 
         INSTALL(FILES ${JAVA_TEST} DESTINATION ${NXEXAMPLEDIR}/ COMPONENT Examples)
 

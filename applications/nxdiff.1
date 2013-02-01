@@ -1,4 +1,4 @@
-.TH NXDIFF 1 "October 2011"
+.TH NXDIFF 1 "November 2012"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -72,6 +72,12 @@ Ignore the author and date fields in notes
 .TP
 .B --ignore-ts
 Ignore differences in the version of ts used
+.B --retype
+Ignore differences after renaming. Please be consistent. Usage: --retype leftname1=rightname1  --retype leftname2=rightname2 ...
+.B --compareFloat32Float64=PRECISION
+Set the precision (float) for relative epsilon comparison. The default is 0.0000001.
+.B --ignore-run-number
+Ignore differences of /entry/entry_identifier and /entry/run_number.
 .SH SEE ALSO
 .BR nxconvert(1),
 .BR nxdir (1),
@@ -83,4 +89,8 @@ was originally written by Peter Peterson
 .nh
 <petersonpf@ornl.gov>
 .hy
-and may be used by others.
+and may be used by others. Modified by Marie Yao
+.nh
+<yaox@ornl.gov>
+.hy
+in December 2012.

@@ -198,7 +198,6 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
                 char lab[BUFFER_SIZE];//name of the label
                 char number[5];//temporary array for storing scan number
                 int MaxLabel; 
-	        int size_of_data;
                 //
 		//case for every scans(L:*:*) 	    	     
                 //
@@ -219,14 +218,15 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 		    //go to the scan and count number of measurements
 	            //
 		    scan_rewinder(infile, scan_number);
-	            if(!(size_of_data = count_data_sets(infile))){
+	        const int size_of_data = count_data_sets(infile);
+	            if(!(size_of_data)){
 	                cout<<" No data was collected in the scan "<<scan_number<<"\n";
 	                exit(1);
 	            }
 	            //
 		    //create array for storing data
 	            //
-		    double data[size_of_data];
+		    std::vector<double> data(size_of_data);
                     const int dims[1]={size_of_data};
 	            //
 		    //count labels
@@ -258,7 +258,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 		        //
 			//get values corresponding to label j-th
 	                //
-			get_values(infile, j, data, scan_number);
+			get_values(infile, j, &(data[0]), scan_number);
 	            
 			//
 			//create NXdata group for storing label data item
@@ -271,7 +271,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 		        //
 			//insert data item into NXdata group
 		        //
-			Node node_child(lab, (void*)data, 1, dims, NX_FLOAT64);
+			Node node_child(lab, (void*)&(data[0]), 1, dims, NX_FLOAT64);
                         tr.append_child(second_gen,node_child);	      
 	            }              
                 }     
@@ -306,16 +306,16 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 	                exit(1);
 	            }
 	            
-	            double data[size_of_data];
+	            std::vector<double> data(size_of_data);
                     const int dims[1]={size_of_data}; 
                     //
 		    //store values read from scan
                     //
-		    get_values(infile, label_position, data, scan_number);
+		    get_values(infile, label_position, &(data[0]), scan_number);
                     //
 		    //insert data item with label values
 	            //
-		    Node node(location, (void*)data, 1, dims, NX_FLOAT64);
+		    Node node(location, (void*)&(data[0]), 1, dims, NX_FLOAT64);
                     tr.insert(tr.begin(),node);
 	        }
 		//
@@ -368,12 +368,12 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 	                    exit(1);
 			}
 	                
-	                double data[size_of_data];
+	                std::vector<double> data(size_of_data);
                         const int dims[1]={size_of_data}; 
                         //
 			//fetch data corresponding to label in i-th scan
 	                //
-			get_values(infile, label_position, data, i);
+			get_values(infile, label_position, &(data[0]), i);
                         //
 			//insert data group with the name of the scan, 
 	                //
@@ -382,7 +382,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 		        //
 			//store plottable data item in the group NXdata, for given scan
                         //
-			Node node_child(item_name, (void*)data, 1, dims, NX_FLOAT64);
+			Node node_child(item_name, (void*)&(data[0]), 1, dims, NX_FLOAT64);
                         tr.append_child(second_gen,node_child);	
 	
 	            }              
@@ -865,7 +865,7 @@ void SpecRetriever::auto_translation(tree<Node> &t){
 	//                
 	//create array for data sets
 	//
-	double data[size_of_data];
+	std::vector<double> data(size_of_data);
         const int dims[1]={size_of_data};
 	//               
 	//go back to scan and count every labels
@@ -896,7 +896,7 @@ void SpecRetriever::auto_translation(tree<Node> &t){
 	//	            
 	//get the results coresponding to j-th label in i-th scan 
 	//
-	get_values(infile, j, data, i);
+	get_values(infile, j, &(data[0]), i);
 	//            
 	//create folder to keep data items
 	//
@@ -908,7 +908,7 @@ void SpecRetriever::auto_translation(tree<Node> &t){
 	//	            
 	//store data items in NXdata folder 
 	//
-	Node node_child(lab, (void*)data, 1, dims, NX_FLOAT64);
+	Node node_child(lab, (void*)&(data[0]), 1, dims, NX_FLOAT64);
         t.append_child(second_gen,node_child);	      
         }
 	//		

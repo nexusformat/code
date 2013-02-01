@@ -209,8 +209,8 @@ static Node convertFromNumeric(const Node &node, vector<int> &dims, const string
     return node;
 
   // create the dimension and rank information
-  int rank=dims.size();
-  int int_dims[rank];
+  const int rank=dims.size();
+  std::vector<int> int_dims(rank);
   int tot_num=1;
   for( int i=0 ; i<rank ; i++ ){
     int_dims[i]=dims[i];
@@ -219,7 +219,7 @@ static Node convertFromNumeric(const Node &node, vector<int> &dims, const string
 
   // allocate space for the data array
   void *value(NULL);
-  NXmalloc(&value,rank,int_dims,copy_type);
+  NXmalloc(&value,rank,&(int_dims[0]),copy_type);
 
   // temporary variable stating whether or not the cast worked
   bool worked=false;
@@ -248,7 +248,7 @@ static Node convertFromNumeric(const Node &node, vector<int> &dims, const string
 
   // package up the result
   Node result(name,"EMPTY");
-  result.set_data(value,rank,int_dims,copy_type);
+  result.set_data(value,rank,&(int_dims[0]),copy_type);
 
   // free up the temporary memory
   NXfree(&value);

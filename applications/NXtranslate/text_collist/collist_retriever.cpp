@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <cctype>
 #include "collist_retriever.h"
 #include "../node.h"
 #include "../nexus_util.h"

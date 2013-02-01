@@ -4,7 +4,7 @@
 #  
 #  CMakeLists for building the NeXus library and applications.
 #
-#  Copyright (C) 2010 Stephen Rankin
+# Copyright (C) 2008-2012 NeXus International Advisory Committee (NIAC)
 #  
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -26,15 +26,33 @@
 #
 #====================================================================
 
-# The name of our project is "NeXus". CMakeLists files in this project can
-# refer to the root source directory of the project as ${NeXus_SOURCE_DIR} and
-# to the root binary directory of the project as ${NeXus_BINARY_DIR}.
+# we need 2.8.8 for correct component install with CPACK for archives
 if(WIN32)
-cmake_minimum_required (VERSION 2.8.7)
+    cmake_minimum_required (VERSION 2.8.8)
 else()
-cmake_minimum_required (VERSION 2.8.3)
-set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove this line when CMake >= 2.8.4 is required
+    cmake_minimum_required (VERSION 2.8.8)
+    if (${CMAKE_VERSION} VERSION_LESS 2.8.4)
+        set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove this line when CMake >= 2.8.4 is required
+    endif()
 endif()
+
+#
+# convert a native windows path to its equivalent cygwin path
+#
+function(to_cygwin_path PATH RESULT)
+    file(TO_CMAKE_PATH ${PATH} CP)								# changes \ to / on windows
+    string(REGEX REPLACE "^([a-zA-Z]):/" "/\\1/" CP2 ${CP})   	# c:/ -> /c/
+	set(${RESULT} "/cygdrive${CP2}" PARENT_SCOPE) 				# /c/ -> /cygdrive/c/
+endfunction()
+
+# set a default install prefix for windows - we will adjust for 64bit later if this is unchanged
+set(DEFAULT_WIN_INSTALL_PREFIX "c:/nxinstall")
+if(WIN32)
+    set(CMAKE_INSTALL_PREFIX ${DEFAULT_WIN_INSTALL_PREFIX} CACHE PATH "")
+endif()
+
+set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
+
 
 #The name of our project
 project (NeXus)
@@ -42,6 +60,14 @@ project (NeXus)
 set (NeXus_VERSION_MAJOR 1)
 set (NeXus_VERSION_MINOR 0)
 set (NXLTVERSINFO '4:3:4')
+
+# needed for windows NSIS installer
+file(TO_NATIVE_PATH ${CMAKE_SOURCE_DIR} CMAKE_SOURCE_DIR_NATIVE) 
+file(TO_NATIVE_PATH ${CMAKE_BINARY_DIR} CMAKE_BINARY_DIR_NATIVE) 
+string(REPLACE "\\" "\\\\" CMAKE_SOURCE_DIR_NATIVE_D ${CMAKE_SOURCE_DIR_NATIVE})
+string(REPLACE "\\" "\\\\" CMAKE_BINARY_DIR_NATIVE_D ${CMAKE_BINARY_DIR_NATIVE})
+
+find_program(SVNVERSION svnversion)
 
 #Packages to find that are required for the build
 
@@ -59,8 +85,8 @@ set(ZLIB_SEARCH "" CACHE PATH "Where to search for ZLIB")
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
-include(CheckTypeSize)
 include(CheckFunctionExists)
+include(CheckTypeSize)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
@@ -70,7 +96,7 @@ include(InstallRequiredSystemLibraries)
 endif()
 
 include(cmake_include/Utilities.cmake)
-include(cmake_include/FindPython.cmake)
+#include(cmake_include/FindPython.cmake)
 include(cmake_include/FindCBFLib.cmake)
 #include(cmake_include/FindJava.cmake)
 #include(cmake_include/FindJNI.cmake)
@@ -121,7 +147,7 @@ endif(UNIX)
 
 #find_package(HDF5 REQUIRED)
 #find_package(HDF5)
-find_package(JPEG)
+#find_package(JPEG)
 find_package(XMLRPC)
 #find_package(ZLIB)
 find_package(LibXml2)
@@ -129,6 +155,7 @@ find_package(Doxygen)
 find_package(SWIG)
 find_package(TCL)
 find_package(LATEX)
+find_package(PythonInterp)
 
 #Find the java runtime and sdk
 find_package(Java 1.6)
@@ -140,7 +167,7 @@ if (ZLIB_SEARCH)
 elseif($ENV{ZLIB_ROOT})
     set(ZLIB_ROOT $ENV{ZLIB_ROOT})
 else()
-    set(ZLIB_ROOT $HDF5_ROOT_DIR $HDF4_ROOT_DIR $SZIP_ROOT_DIR)
+    set(ZLIB_ROOT ${HDF5_ROOT_DIR} ${HDF4_ROOT_DIR} ${SZIP_ROOT_DIR})
 endif()
 find_package(ZLIB)
 
@@ -153,6 +180,10 @@ find_library(PTHREAD pthread)
 find_library(TERMCAP termcap)
 find_library(READLINE readline)
 find_library(HISTORY history)
+
+if(NOT WIN32)
+CHECK_LIBRARY_EXISTS(${READLINE} readline "" HAVE_LIBREADLINE)
+endif()
 
 if(M)
    set(M_LINK "-lm")
@@ -167,7 +198,7 @@ if(PTHREAD)
 endif(PTHREAD)
 
 if(SZIPLIB_FOUND)
-   set(SZIP_LINK "-lsz")
+   set(SZIP_LINK "-lsz") 
 else(SZIPLIB_FOUND)
    set(SZIP_LIB "")
 endif(SZIPLIB_FOUND)
@@ -177,7 +208,7 @@ if(TERMCAP)
 endif(TERMCAP)
 
 if(READLINE)
-   set(READLINE_LINK "")
+   set(READLINE_LINK "${READLINE}")
 endif(READLINE)
 
 if(HISTORY)
@@ -203,7 +234,7 @@ option (BUILD_FORTRAN_BINDINGS
 
 #Use HDF4 in build
 option (BUILD_HDF4 
-        "Should I build HDF4 bindings if libraries available?" OFF)
+        "Should I build HDF4 bindings if libraries available?" ON)
 
 option (BUILD_HDF5 
         "Should I build HDF4 bindings if libraries available?" ON)
@@ -230,6 +261,7 @@ create_have_vars(HDF4 HDF5 MXML)
 #Include source files.
 include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${HDF5_INCLUDE_DIR})
 
+
 if (UNIX)
     check_add_c_compiler_flags("-Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment")
     check_add_cxx_compiler_flags("-Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment")
@@ -252,7 +284,7 @@ set(NX_INCLUDE "include/nexus")
 configure_file("${CMAKE_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${CMAKE_BINARY_DIR}/include/nxconfig.h" @ONLY)
 include_directories("${CMAKE_BINARY_DIR}/include")
 
-if(WIN32)
+if(MSVC)
 # warning 4820 is byte padding in structures
 # warning 4996 is about using _strdup ratherthan strdup etc
 # /W4 rather than /Wall
@@ -260,16 +292,34 @@ if(WIN32)
     set(NX_CFLAGS "/W4 /wd4820 /wd4996 /Zi")
     set(NX_CPP -D_CRT_SECURE_NO_WARNINGS)
 	set(CMAKE_DEBUG_POSTFIX "D")
-
-endif(WIN32)
+#	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL" CACHE STRING "" FORCE)   # workaround for problems
+endif(MSVC)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 
 if (CMAKE_SIZEOF_VOID_P MATCHES "8")
     set(ARCH64 1)
+	set(ARCHSUFFIX "64")
 else()
     set(ARCH64 0)
+	set(ARCHSUFFIX "")
+endif()
+
+# if we haven't changed the default windows install prefix, adjust for 64 bit
+if(${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_WIN_INSTALL_PREFIX})
+    set(CMAKE_INSTALL_PREFIX "${DEFAULT_WIN_INSTALL_PREFIX}${ARCHSUFFIX}" CACHE PATH "" FORCE)
+endif()
+
+if(WIN32)
+	if(ARCH64)
+		include_directories("${NEXUS_THIRD_PARTY}/win64/include")
+		file(GLOB EXTRA_DLLS "${NEXUS_THIRD_PARTY}/win64/bin/*.dll")
+	else()
+		include_directories("${NEXUS_THIRD_PARTY}/win32/include")
+		file(GLOB EXTRA_DLLS "${NEXUS_THIRD_PARTY}/win32/bin/*.dll")
+	endif()
+	install(FILES ${EXTRA_DLLS} DESTINATION bin COMPONENT Runtime)
 endif()
 
 # Recurse into the subdirectories.
@@ -297,17 +347,17 @@ add_subdirectory (test)
 configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CPackOptions.cmake"  @ONLY)
 set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackOptions.cmake")
 set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
-if(UNIX)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
-    #set (CPACK_RPM_PACKAGE_PROVIDES "")
-endif(UNIX)
+set (CPACK_SOURCE_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 if(WIN32)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
-endif(WIN32)
-if(APPLE)
+    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};ZIP) 
+elseif(APPLE)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
-endif(APPLE)
-if(CYGWIN)
-endif(CYGWIN)
-# include of CPack must be last
+elseif(CYGWIN)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};CygwinBinary)
+    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};CygwinSource) 
+elseif(UNIX)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
+endif()
+# Include of CPack must always be last
 include(CPack)

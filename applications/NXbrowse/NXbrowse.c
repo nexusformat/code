@@ -61,6 +61,12 @@ static char* my_readline(const char* prompt)
 
 #define StrEq(s1, s2) (strcmp((s1), (s2)) == 0)
 
+#ifdef _WIN32
+#define STRNCASECMP strnicmp
+#else
+#define STRNCASECMP strncasecmp
+#endif /* _WIN32 */
+
 int NXBdir (NXhandle fileId);
 int NXBopen (NXhandle fileId, NXname groupName);
 int NXBread (NXhandle fileId, NXname dataName, char *dimensions);
@@ -125,7 +131,7 @@ static char* command_generator(const char* text, int state)
     while( (name = commands[list_index].name) != NULL )
     {
 	++list_index;
-	if (strncasecmp(name, text, len) == 0)
+	if (STRNCASECMP(name, text, len) == 0)
 	{
 	    return strdup(name);
 	}

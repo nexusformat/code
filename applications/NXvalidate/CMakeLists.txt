@@ -26,7 +26,13 @@
 #
 #====================================================================
 
-configure_file(nxvalidate.in nxvalidate @ONLY)
+if (WIN32)
+    configure_file(nxvalidate.bat.in nxvalidate.bat @ONLY)
+	install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nxvalidate.bat DESTINATION bin)
+else(WIN32)
+	configure_file(nxvalidate.in nxvalidate @ONLY)
+	install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nxvalidate DESTINATION bin)
+endif(WIN32)
 
 if ( NOT (${CMAKE_CURRENT_BINARY_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}) )
     add_custom_command(OUTPUT build.xml COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/build.xml . COMMENT "Creating build.xml")
@@ -35,9 +41,6 @@ if ( NOT (${CMAKE_CURRENT_BINARY_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}) )
 endif()
 
 add_custom_target(NXvalidate ALL COMMAND ${ANT_EXEC} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/build.xml ${CMAKE_CURRENT_BINARY_DIR}/nbproject)
-
-
-install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nxvalidate DESTINATION bin)
 
 if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dist/javadoc)
 install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/javadoc DESTINATION ${NXDOCDIR}/java/nxvalidate

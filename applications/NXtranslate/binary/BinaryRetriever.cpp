@@ -239,7 +239,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
     }
 
   // create integer copy of size
-  int dims[size.size()];
+  std::vector<int> dims(size.size());
   for( size_t i=0 ; i<size.size() ; ++i )
     {
       dims[i]=size[i];
@@ -247,7 +247,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
 
   // allocate the space for the result
   void *data;
-  if(NXmalloc(&data,rank,dims,type)!=NX_OK)
+  if(NXmalloc(&data,rank,&(dims[0]),type)!=NX_OK)
     {
       throw runtime_error("NXmalloc failed");
     }
@@ -288,15 +288,15 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   // buffer to read data into
   size_t num_items=*(size.rbegin());
   size_t buffer_size=num_items*data_size;
-  char   data_buffer[buffer_size];
+  std::vector<char>   data_buffer(buffer_size);
 
   // push through the file grabbing the proper bits
   scalar_position=data_size*calculate_position(file_size,pos);
   data_file.seekg(scalar_position,std::ios::beg);
-  data_file.read(data_buffer,buffer_size);
+  data_file.read(&(data_buffer[0]),buffer_size);
 
   // copy into final array
-  memcpy((static_cast<char *>(data))+data_index*data_size,data_buffer,buffer_size);
+  memcpy((static_cast<char *>(data))+data_index*data_size,&(data_buffer[0]),buffer_size);
   data_index+=num_items;
 
   while(increment_position(start,size,pos))
@@ -304,9 +304,9 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
       // calculate where to go and read in a block of data
       scalar_position=data_size*calculate_position(file_size,pos);
       data_file.seekg(scalar_position,std::ios::beg);
-      data_file.read(data_buffer,buffer_size);
+      data_file.read(&(data_buffer[0]),buffer_size);
       // copy into final array
-      memcpy((static_cast<char *>(data))+data_index*data_size,data_buffer,buffer_size);
+      memcpy((static_cast<char *>(data))+data_index*data_size,&(data_buffer[0]),buffer_size);
       data_index+=num_items;
     }
 
@@ -314,7 +314,7 @@ void BinaryRetriever::getData(const string &location, tree<Node> &tr)
   data_file.close();
 
   // create the node - this copies the data
-  Node node=Node(NAME,data,rank,dims,type);
+  Node node=Node(NAME,data,rank,&(dims[0]),type);
 
   // insert the data into the tree
   tr.insert(tr.begin(),node);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-VERSION = "1.4.2"
+VERSION = "1.4.3"
 
 import nxs
 import numpy
@@ -55,6 +55,14 @@ class Diff:
             right = kwargs["right"]
         except KeyError:
             right = None
+        try:
+            self.rightpath = kwargs["rightpath"]
+        except KeyError:
+            self.rightpath = None
+        try:
+            epsilon = kwargs["epsilon"]
+        except KeyError:
+            epsilon = 0.0000001
         temp = self.path.split(" ")
         if len(temp) == 2:
             (self.summary, self.path) = temp
@@ -75,7 +83,8 @@ class Diff:
         self.details = []
         if self.summary != Diff.UNKNOWN:
             return
-        self.__cmpData(left, right)
+
+        self.__cmpData(left, right, self.rightpath, epsilon)
         if len(self.details) > 0:
             self.summary = Diff.DIFF
         else:
@@ -93,11 +102,25 @@ class Diff:
             result += " " + " ".join(self.details)
         return result
 
-    def __cmpData(self, left, right):
+    def __cmpData(self, left, right, rightpath, epsilon):
         left = left.getData(self.path)
-        right = right.getData(self.path)
+        if rightpath is not None:
+            right = right.getData(rightpath)
+        else:
+            right = right.getData(self.path)
+
         if left.type != right.type:
-            self.details.append("TYPE MISMATCH: %s != %s" \
+            # /entry/raw_frames changed from int32 to uint64. Also see below.
+            if (self.path.find("raw_frames") != -1 and left.type == "int32" \
+                and right.type == "uint64") or (self.path.find("raw_frames") != -1 \
+                and left.type == "uint64" and right.type == "int32"):
+                pass
+            # See below
+            elif (left.type == "float32" and right.type == "float64") or \
+            (left.type == "float64" and right.type == "float32"):
+                pass
+            else:
+                self.details.append("TYPE MISMATCH: %s != %s" \
                                 % (left.type, right.type))
         if left.attrs != right.attrs:
             self.details.append("ATTRIBUTES MISMATCH: %s != %s" % \
@@ -115,7 +138,55 @@ class Diff:
         else:
             try:
                 if left.data.dtype != right.data.dtype:
-                    self.details.append("DATA MISMATCH: %s != %s" \
+                    # Display /entry/raw_frames after changed from int32 to uint64.
+                    if (self.path.find("raw_frames") != -1 and left.type == "int32" \
+                        and right.type == "uint64") or (self.path.find("raw_frames") != -1 \
+                        and left.type == "uint64" and right.type == "int32"):
+                        self.details.append("IGNORED TYPE MISMATCH: %s != %s" \
+                                   % (left.type, right.type))
+                        self.details.append("LEFT DATA: " + str(left.data))
+                        self.details.append("RIGHT DATA: " + str(right.data))
+                    elif (left.type == "float32" and right.type == "float64") or \
+                        (left.type == "float64" and right.type == "float32"):
+                        # cast float32 to float64
+                        if left.type == "float32":
+                            if (left.dims == 1):
+                                if (abs(abs(numpy.float64(left.data)) - abs(right.data)) <= \
+                                    max(abs(numpy.float64(left.data)), abs(right.data)) * epsilon):
+                                    # equal within precision epsilon
+                                    pass
+                                else:
+                                    self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                        % (left.data, left.type, right.data, right.type))
+                            else:
+                                for i in range (left.dims):
+                                    if (abs(abs(numpy.float64(left.data[i])) - abs(right.data[i])) <= \
+                                        max(abs(numpy.float64(left.data[i])), abs(right.data[i])) * epsilon):
+                                        # equal within precision epsilon
+                                        pass
+                                    else:
+                                        self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                            % (left.data[i], left.type, right.data[i], right.type))
+                        if right.type == "float32":
+                            if (left.dims == 1):
+                                if (abs(abs(left.data) - abs(numpy.float64(right.data))) <= \
+                                    max(abs(left.data), abs(numpy.float64(right.data))) * epsilon):
+                                    # equal within precision epsilon
+                                    pass
+                                else:
+                                    self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                        % (left.data, left.type, right.data, right.type))
+                            else:
+                                for i in range (left.dims):
+                                    if (abs(abs(left.data[i]) - abs(numpy.float64(right.data[i]))) <= \
+                                        max(abs(left.data[i]), abs(numpy.float64(right.data[i]))) * epsilon):
+                                        # equal within precision epsilon
+                                        pass
+                                    else:
+                                        self.details.append("DATA MISMATCH: %s %s != %s %s" \
+                                            % (left.data[i], left.type, right.data[i], right.type))
+                    else:
+                        self.details.append("DATA MISMATCH: %s != %s" \
                                         % (left.data.dtype.name, \
                                            right.data.dtype.name))
                     return
@@ -163,6 +234,18 @@ class NXSfile:
             self.__ignorets = kwargs["ignorets"]
         except KeyError:
             self.__ignorets = False
+        try:
+            self.__retype = kwargs["retype"]
+        except KeyError:
+            self.__retype = []
+        try:
+            self.__epsilon = kwargs["epsilon"]
+        except KeyError:
+            self.__epsilon = 0.0000001
+        try:
+            self.__ignorerunnumber = kwargs["ignorerunnumber"]
+        except KeyError:
+            self.__ignorerunnumber = False
         self.name = os.path.abspath(name)
         self.__initPaths()
 
@@ -186,6 +269,9 @@ class NXSfile:
                     if name == "author" or name == "date":
                         continue
                 elif self.__ignorets and name == "SNStranslation_service":
+                    continue
+                elif self.__ignorerunnumber and (name == "entry_identifier" \
+                    or name == "run_number"):
                     continue
                 self.__nxs.opendata(name)
                 attrs = self.__nxs.getattrs()
@@ -226,6 +312,7 @@ class NXSfile:
             pass
         
     def cmpPaths(self, other, **kwargs):
+        result = []
         if self.__paths == other.__paths:
             diffPaths = self.__paths[:]
         else:
@@ -239,6 +326,50 @@ class NXSfile:
             diffPaths.sort()
             for path in diffPaths:
                 self.__removeDuplicate(path, diffPaths)
+
+            number = len(self.__retype)
+            #print number
+            # handle retype
+            if number > 0:
+                lnames = []
+                rnames = []
+                for item in self.__retype:
+                    if item.find("=") != -1:
+                        # TODO: add check for "NX*" if limit to type only
+                        (lname, rname) = item.split("=")
+                        lnames.append(lname)
+                        rnames.append(rname)
+                #print lnames
+                #print rnames
+                for path in missingSelf[:]:
+                    otherpath = path
+                    for i in range(number):
+                        if path.find(rnames[i]) != -1:
+                            otherpath = otherpath.replace(rnames[i], lnames[i])
+                    #print otherpath
+                    if otherpath in missingOther:
+                    # Found corresponding path, otherwise do nothing
+                        #print "Found " + otherpath + " in missingOther"
+                        result.append(Diff(otherpath, left=self, right=other, rightpath=path, epsilon=self.__epsilon))
+                        missingSelf.remove(path)
+                        missingOther.remove(otherpath)
+                        diffPaths.remove(path)
+                        diffPaths.remove(otherpath)
+                for path in missingOther[:]:
+                    otherpath = path
+                    for i in range(number):
+                        if path.find(lnames[i]) != -1:
+                            otherpath = otherpath.replace(lnames[i], rnames[i])
+                    #print otherpath
+                    if otherpath in missingSelf:
+                    # Found corresponding path, otherwise do nothing
+                        #print "Found " + otherpath + " in missingSelf"
+                        result.append(Diff(path, left=self, right=other, rightpath=otherpath, epsilon=self.__epsilon))
+                        missingSelf.remove(otherpath)
+                        missingOther.remove(path)
+                        diffPaths.remove(path)
+                        diffPaths.remove(otherpath)
+
             for path in missingSelf:
                 index = diffPaths.index(path)
                 diffPaths[index] = "> %s" % diffPaths[index]
@@ -246,12 +377,11 @@ class NXSfile:
                 index = diffPaths.index(path)
                 diffPaths[index] = "< %s" % diffPaths[index]
 
-        result = []
         for path in diffPaths:
             if path.startswith("<") or path.startswith(">"):
                 result.append(Diff(path, diff=path[0]))
             else:
-                result.append(Diff(path, left=self, right=other))
+                result.append(Diff(path, left=self, right=other, epsilon=self.__epsilon))
 
         return result
 
@@ -348,7 +478,11 @@ def printDataDiff(left, right, diff, **kwargs):
 
     # get the data
     left = left.getData(diff.path)
-    right = right.getData(diff.path)
+    # use diff.rightpath for --retype
+    if diff.rightpath is not None:
+        right = right.getData(diff.rightpath)
+    else:
+        right = right.getData(diff.path)
 
     # the dimensions of the data
     leftLength = 1
@@ -488,7 +622,15 @@ if __name__ == "__main__":
                       help="Ignore the author and date fields in notes")
     parser.add_option("", "--ignore-ts", dest="ignorets", action="store_true",
                       help="Ignore differences in the version of ts used")
-                      
+    parser.add_option("", "--retype", dest="retype", action="append", help="Ignore "
+                      + "differences after renaming. Please be consistent." +
+                      "Usage: --retype leftname1=rightname1  --retype leftname2=rightname2 ...")
+    parser.add_option("", "--compareFloat32Float64", dest="epsilon", action="store",
+                      type="float", default=0.0000001, help = "Set the precision (float) for "
+                      + "relative epsilon comparison. The default is 0.0000001.")
+    parser.add_option("", "--ignore-run-number", dest="ignorerunnumber", action="store_true",
+                                        help="Ignore differences of /entry/entry_identifier and "
+                                        + "/entry/run_number.")
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignorelinks=False)
     parser.set_defaults(numvalues=None)
@@ -496,7 +638,8 @@ if __name__ == "__main__":
     parser.set_defaults(shownandiffs=False)
     parser.set_defaults(ignorenotes=False)
     parser.set_defaults(ignorets=False)
-
+    parser.set_defaults(retype=[])
+    parser.set_defaults(ignorerunnumber=False)
     # parse and fix values
     (options, args) = parser.parse_args()
     if options.quiet:
@@ -518,10 +661,14 @@ if __name__ == "__main__":
     else:
         left = NXSfile(args[0], ignorelinks=options.ignorelinks,
                        ignorenotes=options.ignorenotes,
-                       ignorets=options.ignorets)
+                       ignorets=options.ignorets,
+                       retype=options.retype, epsilon=options.epsilon,
+                       ignorerunnumber=options.ignorerunnumber)
         right = NXSfile(args[1], ignorelinks=options.ignorelinks,
                         ignorenotes=options.ignorenotes,
-                        ignorets=options.ignorets)
+                        ignorets=options.ignorets,
+                        retype=options.retype, epsilon=options.epsilon,
+                        ignorerunnumber=options.ignorerunnumber)
 
     # direct comparison of the two files
     if left == right:

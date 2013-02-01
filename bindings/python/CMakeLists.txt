@@ -30,12 +30,13 @@ if(DEFINED PYTHONINTERP_FOUND)
 
     SET (PYDOC_OUTPUT napi.html)
     SET (NXSPYTHON_DOC nxs.napi.html)
-    SET (NXSPYTHON_SOURCE ${CMAKE_SOURCE_DIR}/bindings/python/nxs/napi.py)
+    FILE(GLOB NXSPYTHON_SOURCE "${CMAKE_SOURCE_DIR}/bindings/python/nxs/*.py")
+	list(APPEND NXSPYTHON_SOURCE setup.py)
 
     GET_TARGET_PROPERTY(LIB_NAME NeXus_Shared_Library LOCATION)
     SET (ENV{NEXUSLIB} ${LIB_NAME})
 
-    FILE(READ ${NXSPYTHON_SOURCE} TEMP_SOURCE_IN)
+    FILE(READ "${CMAKE_SOURCE_DIR}/bindings/python/nxs/napi.py" TEMP_SOURCE_IN)
 
     STRING(REGEX REPLACE "nxprefix = .*" "nxprefix = ${CMAKE_INSTALL_PREFIX}" TEMP_SOURCE_OUT ${TEMP_SOURCE_IN})
 
@@ -68,11 +69,14 @@ if(DEFINED PYTHONINTERP_FOUND)
         COMMENT   "Rename NXS Python Docs"
     )
 
-    ADD_CUSTOM_TARGET(NXSPythonBuild ALL echo
-        DEPENDS   ${NXSPYTHON_DOC}
-    )
+	if (PYTHON_DOC)
+		ADD_CUSTOM_TARGET(NXSPythonDoc ALL echo
+			DEPENDS   ${NXSPYTHON_DOC}
+		)
+        install (FILES ${CMAKE_BINARY_DIR}/bindings/python/${NXSPYTHON_DOC} DESTINATION ${NXDOCDIR}/python COMPONENT Documentation)
+	endif()
 
-    install (FILES ${CMAKE_BINARY_DIR}/bindings/python/${NXSPYTHON_DOC} DESTINATION ${NXDOCDIR}/python COMPONENT Documentation)
+    install (FILES ${NXSPYTHON_SOURCE} DESTINATION lib/python/nxs COMPONENT Development)
     
 endif(DEFINED PYTHONINTERP_FOUND)
 

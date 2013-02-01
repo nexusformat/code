@@ -14,6 +14,7 @@
 #include <math.h>
 #include <cstring>
 #include <cstdlib>
+#include <cctype>
 
 using std::ifstream;
 using std::invalid_argument;
@@ -1541,6 +1542,19 @@ std::string Frm2Retriever::extract_header(std::ifstream &file, std::string arg, 
 	return result;
 }
 
+#ifdef _WIN32
+static double round(double x)
+{
+	if (x >= 0.0)
+	{
+		return (double)(long long)(x + 0.5);
+	}
+	else
+	{
+		return (double)(long long)(x - 0.5);
+	}
+}
+#endif
 
 std::vector<double> Frm2Retriever::extract_heidi_so(std::ifstream &file, int entry_num, unsigned int nxtype, unsigned int word, unsigned int wcount) {
 	const double dlim=1e-8;

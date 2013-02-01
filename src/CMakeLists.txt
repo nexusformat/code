@@ -34,12 +34,16 @@ if (HAVE_HDF4)
   set (NAPISRC ${NAPISRC} napi4.c)
   add_definitions(-DHDF4 ${HDF4_DEFINITIONS} ${HDF4_CPP})
   include_directories(${HDF4_INCLUDE_DIRS})
+  file(GLOB HDF4DLLS "${HDF4_ROOT_DIR}/bin/*.dll") 
+  install (FILES ${HDF4DLLS} DESTINATION bin COMPONENT Runtime)
 endif (HAVE_HDF4)
 
 if (HAVE_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
   add_definitions(-DHDF5 ${HDF5_DEFINITIONS} ${HDF5_CPP})
   include_directories(${HDF5_INCLUDE_DIRS})
+  file(GLOB HDF5DLLS "${HDF5_ROOT_DIR}/bin/*.dll") 
+  install (FILES ${HDF5DLLS} DESTINATION bin COMPONENT Runtime)
 endif (HAVE_HDF5)
 
 if(HAVE_MXML)
@@ -91,7 +95,9 @@ target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATI
 
 add_library (NeXus_Shared_Library SHARED ${NAPISRC})
 
-set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS _HDF5USEDLL_)
+#set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS _HDF5USEDLL_ _HDFDLL_)
+set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS H4_BUILT_AS_STATIC_LIB)
+set_property(TARGET NeXus_Static_Library APPEND PROPERTY COMPILE_DEFINITIONS H4_BUILT_AS_STATIC_LIB)
 
 if (CMAKE_CL_64)
    set(DEF_FILE ${PROJECT_SOURCE_DIR}/Windows_extra/libNeXus-0-x64.def)
@@ -103,13 +109,15 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME libNeXus-0
                       VERSION 1.0 SOVERSION 4 )
-	set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${DEF_FILE})
+	if (MSVC)
+	    set_property(TARGET NeXus_Shared_Library APPEND PROPERTY LINK_FLAGS /def:${DEF_FILE})
+	endif(MSVC)
 else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(NeXus_Shared_Library PROPERTIES OUTPUT_NAME NeXus
                       VERSION 1.0 SOVERSION 4)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-target_link_libraries(NeXus_Shared_Library ${HDF5_SHARED_LIBRARIES} ${HDF4_SHARED_LIBRARIES} ${MXML_SHARED_LIBRARIES} ${NX_LIBS})
+target_link_libraries(NeXus_Shared_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${MXML_STATIC_LIBRARIES} ${NX_LIBS})
 
 #if(HAVE_MXML)
 #if(MXMLLIB_FOUND)
@@ -126,6 +134,6 @@ install (TARGETS NeXus_Static_Library NeXus_Shared_Library
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
 
-if(WIN32)
-install_pdb (NeXus_Shared_Library)
-endif()
+#if(WIN32)
+#install_pdb (NeXus_Shared_Library)
+#endif()

@@ -62,57 +62,68 @@ namespace NeXus {
 
   template<>
   NXDLL_EXPORT NXnumtype getType(char number) {
+    (void)number;  // Avoid compiler warning
     return CHAR;
   }
 
   // template specialisations for types we know 
   template<>
   NXDLL_EXPORT NXnumtype getType(float number) {
+    (void)number;  // Avoid compiler warning
     return FLOAT32;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(double number) {
+    (void)number;  // Avoid compiler warning
     return FLOAT64;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(int8_t number) {
+    (void)number;  // Avoid compiler warning
     return INT8;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(uint8_t number) {
+    (void)number;  // Avoid compiler warning
     return UINT8;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(int16_t number) {
+    (void)number;  // Avoid compiler warning
     return INT16;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(uint16_t number) {
+    (void)number;  // Avoid compiler warning
     return UINT16;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(int32_t number) {
+    (void)number;  // Avoid compiler warning
     return INT32;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(uint32_t number) {
+    (void)number;  // Avoid compiler warning
     return UINT32;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(int64_t number) {
+    (void)number;  // Avoid compiler warning
     return INT64;
   }
 
   template<>
   NXDLL_EXPORT NXnumtype getType(uint64_t number) {
+    (void)number;  // Avoid compiler warning
     return UINT64;
   }
 
@@ -127,11 +138,13 @@ namespace NeXus {
 #define ARRAY_OFFSET	0	/* can dimension an array with zero elements */
 #endif /* _MSC_VER */
 
+/*
 static int check_float_too_big[4 - sizeof(float) + ARRAY_OFFSET]; // error if float > 4 bytes
 static int check_float_too_small[sizeof(float) - 4 + ARRAY_OFFSET]; // error if float < 4 bytes
 static int check_double_too_big[8 - sizeof(double) + ARRAY_OFFSET]; // error if double > 8 bytes
 static int check_double_too_small[sizeof(double) - 8 + ARRAY_OFFSET]; // error if double < 8 bytes
 static int check_char_too_big[1 - sizeof(char) + ARRAY_OFFSET]; // error if char > 1 byte
+*/
 
 namespace {
 
