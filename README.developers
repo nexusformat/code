@@ -49,6 +49,8 @@ you must add these to the DISTCHECK_CONFIGURE_FLAGS variable in Makefile.am
 
 To generate an RPM install kit see README.rpm
 
+Also see README.versions for setting nexus release versions
+
 If you have problems
 --------------------
 
@@ -66,14 +68,12 @@ now requires autoconf 2.61 or above
 NeXus Developer Mailing Lists
 -----------------------------
 
-CVS commit/log messages are automatically sent to the nexus-cvs@anl.gov 
-mailing list - if you wish to receive these, subscribe to the list via the link
+SVN commit/log messages are automatically sent to the nexus-code-svn@nexusformat.org mailing list - if you wish to receive these, subscribe to the list via the link
 
-  http://www.neutron.anl.gov/mailman/listinfo/nexus-cvs
+  http://lists.nexusformat.org/mailman/listinfo/nexus-code-svn
 
-Any general developer questions should be directed to nexus-developers@anl.gov 
-list - you can subscribe to this via the link
+Any general questions should be directed to nexus@nexusformat.org list - you can subscribe to this via the link
 
-  http://www.neutron.anl.gov/mailman/listinfo/nexus-developers
+  http://lists.nexusformat.org/mailman/listinfo/nexus
 
 $Id$
