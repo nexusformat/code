@@ -56,7 +56,7 @@
 #endif /* HAVE_CONFIG_H */
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "4.3.0"                /* major.minor.patch */
+#define NEXUS_VERSION   "4.3.1"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
