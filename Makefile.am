@@ -57,8 +57,10 @@ MAINTAINERCLEANFILES = \
 ChangeLog :
 	touch $@
 if HAVE_SVN2CL
-	@echo "Generating ChangeLog from svn via svn2cl"
-	$(SVN2CL) --non-interactive --authors=svn2cl_nexus_authors.xml .
+	if test -d .svn; then \
+	    echo "Generating ChangeLog from svn via svn2cl"; \
+	    $(SVN2CL) --non-interactive --authors=svn2cl_nexus_authors.xml .; \
+	fi
 endif
 
 #dist-hook : ChangeLog
