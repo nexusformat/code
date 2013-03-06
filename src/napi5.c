@@ -2279,11 +2279,18 @@ static int countObjectsInGroup(hid_t loc_id)
      char linkval_buff[1024];
      const char *filepath = NULL, *objpath = NULL;
      size_t val_size;
+     hid_t openthing;
 
      pFile = NXI5assert(fileid);
      memset(url, 0, urllen);
 
-     ret = H5Lget_info(pFile->iFID, name, &link_buff, H5P_DEFAULT);
+     if (pFile->iCurrentG > 0) {
+         openthing = pFile->iCurrentG;
+     } else {
+         openthing = pFile->iFID;
+     }
+
+     ret = H5Lget_info(openthing, name, &link_buff, H5P_DEFAULT);
      if (ret < 0 || link_buff.type != H5L_TYPE_EXTERNAL) {
        return NX_ERROR;
      }
@@ -2294,7 +2301,7 @@ static int countObjectsInGroup(hid_t loc_id)
        return NX_ERROR;
      }
 
-     ret = H5Lget_val(pFile->iFID, name, linkval_buff, val_size, H5P_DEFAULT);
+     ret = H5Lget_val(openthing, name, linkval_buff, val_size, H5P_DEFAULT);
      if (ret < 0) {
        NXReportError("ERROR: H5Lget_val failed");
        return NX_ERROR;
