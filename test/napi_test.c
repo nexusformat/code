@@ -460,12 +460,15 @@ int main (int argc, char *argv[])
 
   if (NXclose (&fileid) != NX_OK) return 1;
 
+  printf("before load path tests\n");
   if(testLoadPath() != 0) return 1;
 
+  printf("before external link tests\n");
   if(testExternal(argv[0]) != 0) {
     return 1;
   }
 
+  printf("all ok - done\n");
   return 0;
 }
 /*---------------------------------------------------------------------*/
@@ -535,11 +538,23 @@ static int testExternal(char *progName){
   if(NXopengroup(hfil,"entry3","NXentry") != NX_OK){
     return 1;
   }
+  /* force create old style external link */
   if (NXmakedata (hfil, "extlinkdata", NX_FLOAT32, 1, &dummylen) != NX_OK) return 1;
   if (NXopendata (hfil, "extlinkdata") != NX_OK) return 1;
   if (NXputdata (hfil, &dummyfloat) != NX_OK) return 1;
   sprintf(nxfile,"nxfile://data/dmc01.%s#/entry1/sample/temperature_mean",ext);
   if(NXputattr(hfil,"napimount",nxfile,strlen(nxfile), NX_CHAR) != NX_OK) return 1;
+  /* this would segfault because we are tricking the napi stack
+  if(NXclosedata(&hfil) != NX_OK){
+    return 1;
+  }
+  */
+  if(NXopenpath(hfil,"/entry3") != NX_OK){
+    return 1;
+  }
+  /* create new style external link on hdf5 , equivalent to the above on other backends */
+  if (NXlinkexternaldataset(hfil, "extlinknative", nxfile) != NX_OK) return 1;
+
   if(NXclose(&hfil) != NX_OK){
     return 1;
   }
@@ -596,7 +611,29 @@ static int testExternal(char *progName){
   if(NXopenpath(hfil,"/entry3") != NX_OK){
     return 1;
   }
+  if(NXisexternaldataset(hfil,"extlinkdata",filename,255) != NX_OK){
+    printf("extlinkdata should be external link\n");
+    return 1;
+  } else {
+    printf("extlinkdata external URL = %s\n", filename);
+  }
   if (NXopendata (hfil, "extlinkdata") != NX_OK) return 1;
+  memset(&temperature,0,4);
+  if(NXgetdata(hfil,&temperature) != NX_OK){
+    return 1;
+  }
+  printf("value retrieved: %4.2f\n", temperature);
+
+  if(NXopenpath(hfil,"/entry3") != NX_OK){
+    return 1;
+  }
+  if(NXisexternaldataset(hfil,"extlinknative",filename,255) != NX_OK){
+    printf("extlinknative should be external link\n");
+    return 1;
+  } else {
+    printf("extlinknative external URL = %s\n", filename);
+  }
+  if (NXopendata (hfil, "extlinknative") != NX_OK) return 1;
   memset(&temperature,0,4);
   if(NXgetdata(hfil,&temperature) != NX_OK){
     return 1;
