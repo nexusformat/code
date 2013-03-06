@@ -71,6 +71,8 @@ Data path /entry/r8_data
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.hdf
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -78,8 +80,12 @@ NXinquirefile found: data/dmc02.hdf
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.hdf#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.hdf#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.hdf#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
@@ -130,6 +136,8 @@ Data path /entry/r8_data
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.h5
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -137,8 +145,12 @@ NXinquirefile found: data/dmc02.h5
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.h5#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.h5#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.h5#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
@@ -187,6 +199,8 @@ Data path /entry/r8_data
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.hdf
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -194,8 +208,12 @@ NXinquirefile found: data/dmc02.hdf
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.hdf#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.hdf#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.hdf#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
@@ -246,6 +264,8 @@ Data path /entry/r8_data
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.h5
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -253,8 +273,12 @@ NXinquirefile found: data/dmc02.h5
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.h5#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.h5#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.h5#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
@@ -308,6 +332,8 @@ Data path /entry/grosse_zahl
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.xml
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -315,8 +341,12 @@ NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.xml#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.xml#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
@@ -370,6 +400,8 @@ Data path /entry/grosse_zahl
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.xml
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -377,8 +409,12 @@ NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.xml#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.xml#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
@@ -432,6 +468,8 @@ Data path /entry/r8_data
 Group path /link/sample
 Link check OK
 NXopenpath checks OK
+before load path tests
+before external link tests
 First file time: 2005-05-27 05:44:13
 NXinquirefile found: data/dmc01.xml
 Second file sample: Ga0.94Mn0.04Sb_8mm
@@ -439,8 +477,12 @@ NXinquirefile found: data/dmc02.xml
 Second file time: 2005-05-27 05:48:56
 entry1 external URL = nxfile://data/dmc01.xml#/entry1
 testing link to external data set
+extlinkdata external URL = nxfile://data/dmc01.xml#/entry1/sample/temperature_mean
+value retrieved: 4.00
+extlinknative external URL = nxfile://data/dmc01.xml#/entry1/sample/temperature_mean
 value retrieved: 4.00
 External File Linking tested OK
+all ok - done
 ]])
 AT_CLEANUP
 
