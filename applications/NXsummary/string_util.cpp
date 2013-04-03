@@ -71,6 +71,8 @@ namespace nxsum {
   // explicit instantiations so they get compiled in
   template string toString<uint32_t>(const uint32_t thing);
   template string toString<int>(const int thing);
+  template string toString<double>(const double thing);
+  template string toString<float>(const float thing);
 
   template <typename NumT>
   string toString(const NumT *data, const int dims[], const int rank) {
