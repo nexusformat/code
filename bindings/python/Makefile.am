@@ -45,7 +45,7 @@ nxs.napi.html : $(srcdir)/nxs/napi.py
 	fi
 
 install-data-hook :
-	sed -e "s|nxprefix = .*|nxprefix = \'${prefix}\'|" < ${srcdir}/nxs/napi.py > $(DESTDIR)${nxspythondir}/napi.py
+	sed -e "s|nxlibdir = .*|nxlibdir = \'${libdir}\'|" < ${srcdir}/nxs/napi.py > $(DESTDIR)${nxspythondir}/napi.py
 	if test -z "$(DESTDIR)"; then \
 	    $(py_compile) --basedir "$(nxspythondir)" napi.py; \
 	else \
