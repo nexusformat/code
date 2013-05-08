@@ -1,6 +1,7 @@
 #ifndef __NEXUS_UTIL_H_GUARD
 #define __NEXUS_UTIL_H_GUARD
 
+#include <napiconfig.h>
 #include <napi.h>
 #include <string>
 #include "node.h"

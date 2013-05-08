@@ -1,5 +1,4 @@
 #include <iostream>
-#include <napi.h>
 #include <stdexcept>
 #include <string>
 #include <cstring>

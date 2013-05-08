@@ -2,11 +2,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstring>
+#include "napiconfig.h" // needed for HAVE_STDINT_H
 #include "data_util.hpp"
 #include "nxsummary.hpp"
 #include "string_util.hpp"
 
-#include "nxconfig.h" // needed for HAVE_STDINT_H
 
 
 // use STDINT if possible, otherwise define the types here

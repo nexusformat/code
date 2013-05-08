@@ -22,12 +22,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "napi.h"
 #include <iostream>
-#include "nxdir.h"
 #include <cstring>
 #include <string>
 #include <map>
+#include "nxdir.h"
 
 #define ellipse std::string("...,")
 #define MAX_DIMS 2

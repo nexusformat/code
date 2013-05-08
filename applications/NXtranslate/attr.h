@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <napiconfig.h>
 #include <napi.h>
 #include <iostream>
 

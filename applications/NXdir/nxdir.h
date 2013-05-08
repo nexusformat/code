@@ -35,8 +35,8 @@
 #define DEFAULT_OUT_LINE_MODE OUT_SINGLE // can be OUT_SINGLE
 
 /* -------------------- DO NOT EDIT BELOW THIS LINE -------------------- */
-#include "napi.h"
 #include "napiconfig.h"
+#include "napi.h"
 #include <string>
 #include <vector>
 #include <iostream>

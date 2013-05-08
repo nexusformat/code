@@ -1,3 +1,4 @@
+#include "napiconfig.h"
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
 

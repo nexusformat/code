@@ -22,14 +22,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "napi.h"
 #include <fstream>
 #include <iostream>
-#include "nxdir.h"
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <map>
+#include "nxdir.h"
 //#include <utility> // REMOVE
 
 #define NXDATA "NXdata"
