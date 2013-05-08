@@ -38,7 +38,7 @@ public class ValidatorUtils {
 
     private File reduced = null;
     private File nxsFile = null;
-    private boolean keepTemp = true;
+    private boolean keepTemp = false;
     private File schematronFile = null;
     private boolean convertNxs = false;
     private String nxconvertCommand = null;
