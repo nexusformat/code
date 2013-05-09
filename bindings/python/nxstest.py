@@ -68,6 +68,7 @@ def show_structure(filename):
     
 
 def populate(filename,mode):
+    c1 = numpy.array(['abcd','efgh','ijkl','mnop','qrst'])
     i1 = numpy.arange(4,dtype='uint8')
     i2 = numpy.arange(4,dtype='int16')*1000
     i4 = numpy.arange(4,dtype='int32')*1000000
@@ -89,6 +90,10 @@ def populate(filename,mode):
     file.makedata("ch_data",'char',[10])
     file.opendata("ch_data")
     file.putdata("NeXus data")
+    file.closedata()
+    file.makedata("c1_data",'char',[5,4])
+    file.opendata("c1_data")
+    file.putdata(c1)
     file.closedata()
     
     # Write numeric data
@@ -250,6 +255,20 @@ def check(filename, mode):
     #if not (get==expect).all(): fail("r4_array retrieved %s"%(get))
     file.closedata()
 
+    file.opendata('c1_data')
+    rawshape,rawdtype = file.getrawinfo()
+    shape,dtype = file.getinfo()
+    get = file.getdata()
+    file.closedata()
+    if not (shape[0]==5 and shape[1]==4 and dtype=='char'):
+        fail("returned string array info is incorrect")
+    if not (rawshape[0]==5 and rawshape[1]==4 and rawdtype=='char'):
+        fail("returned string array storage info is incorrect")
+        print rawshape,dtype
+    if not (get[0]=="abcd" and get[4]=="qrst"):
+        fail("returned string is incorrect")
+        print shape,dtype
+
 
     # Check reading from compressed datasets
     comp_array=numpy.ones((100,20),dtype='int32')
@@ -281,7 +300,6 @@ def check(filename, mode):
     if not (get == "NeXus sample"):
         fail("returned string is incorrect")
         print shape,dtype
-
 
     file.closegroup() #/entry
 

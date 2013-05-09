@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
+#include "napiconfig.h" // needed for HAVE_STDINT_H
 #include <iostream>
-#include <napi.h>
 #include <stdexcept>
 #include <sstream>
 #include <string>

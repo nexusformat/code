@@ -26,7 +26,7 @@
 #
 #====================================================================
 
-add_definitions(-DIN_NEXUS_LIBRARY ${NX_CPP})
+add_definitions(-DIN_NEXUS_LIBRARY=1 ${NX_CPP})
 
 set (NAPISRC napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c nxdataset.h nx_stptok.h)
 

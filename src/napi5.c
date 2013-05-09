@@ -1846,12 +1846,8 @@ static int countObjectsInGroup(hid_t loc_id)
      }
      else if (tclass==H5T_STRING)
      {
-	len = H5Tget_size(pFile->iCurrentT);
-	memtype_id = H5Tcopy(H5T_C_S1);
-	H5Tset_size(memtype_id, len);
-        status = H5Dread (pFile->iCurrentD, memtype_id, 
+        status = H5Dread (pFile->iCurrentD, pFile->iCurrentT, 
 		       H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
-        H5Tclose(memtype_id);
      }
      else 
      {
@@ -1983,9 +1979,7 @@ static int countObjectsInGroup(hid_t loc_id)
        /* map datatypes of other plateforms */
        if (tclass == H5T_STRING)
        {
-	 dims = H5Tget_size(pFile->iCurrentT);
-	 memtype_id = H5Tcopy(H5T_C_S1);
-	 H5Tset_size(memtype_id, dims);  
+         memtype_id = pFile->iCurrentT;
        }
        else 
        {
@@ -2004,9 +1998,6 @@ static int countObjectsInGroup(hid_t loc_id)
 		     pFile->iCurrentS, H5P_DEFAULT,data);
       }    
       /* cleanup */
-      if (tclass == H5T_STRING) { /* we used H5Tcopy */
-         H5Tclose(memtype_id);
-      }
       H5Sclose(memspace);
 
       if (iRet < 0) 

@@ -22,13 +22,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "napi.h"
 #include <iostream>
-#include "nxdir.h"
 #include <string>
 #include <vector>
 #include <string.h>
 #include <algorithm>
+#include "nxdir.h"
 
 typedef std::vector<Node> NodeVector;
 typedef Tree::const_iterator TreeIter;

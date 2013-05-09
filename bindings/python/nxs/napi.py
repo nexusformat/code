@@ -19,16 +19,14 @@ looks in the following places in order::
    os.environ['NEXUSDIR']\\bin              - Windows
    os.environ['LD_LIBRARY_PATH']           - Unix
    os.environ['DYLD_LIBRARY_PATH']         - Darwin
-   PREFIX/lib                              - Unix and Darwin
-   /usr/local/lib                          - Unix and Darwin
-   /usr/lib                                - Unix and Darwin
+   LIBDIR                                  - Unix and Darwin
 @endverbatim
 
 - On Windows it looks for one of libNeXus.dll or libNeXus-0.dll.
 - On OS X it looks for libNeXus.0.dylib
 - On Unix it looks for libNeXus.so.0
 - NEXUSDIR defaults to 'C:\\Program Files\\NeXus Data Format'.
-- PREFIX defaults to /usr/local, but is replaced by the value of --prefix during configure.
+- LIBDIR defaults to /usr/local/lib, but is replaced by the value of --libdir during configure.
 
 The import will raise an OSError exception if the library wasn't found
 or couldn't be loaded.  Note that on Windows in particular this may be
@@ -210,11 +208,11 @@ def _is_list_like(obj):
 
 def _libnexus():
     """
-    Load the NeXus library whereever it may be.
+    Load the NeXus library.
     """
     # this will get changed as part of the install process
-    # it should correspond to --prefix specified to ./configure
-    nxprefix = '/usr/local'
+    # it should correspond to --libdir specified to ./configure
+    nxlibdir = '/usr/local/lib'
     # NEXUSLIB takes precedence
     if 'NEXUSLIB' in os.environ:
         file = os.environ['NEXUSLIB']
@@ -246,7 +244,7 @@ def _libnexus():
             ldenv = 'LD_LIBRARY_PATH'
         # Search the load library path as well as the standard locations
         ldpath = [p for p in os.environ.get(ldenv,'').split(':') if p != '']
-        stdpath = [ nxprefix+'/lib', '/usr/local/lib', '/usr/lib']
+        stdpath = [ nxlibdir ]
         files += [os.path.join(p,lib) for p in [filedir]+ldpath+stdpath]
 
     # Given a list of files, try loading the first one that is available.

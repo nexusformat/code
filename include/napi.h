@@ -51,10 +51,6 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
-#if HAVE_CONFIG_H
-#include <napiconfig.h>
-#endif /* HAVE_CONFIG_H */
-
 /* NeXus HDF45 */
 #define NEXUS_VERSION   "4.3.1"                /* major.minor.patch */
 

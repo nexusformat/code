@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+#include "napiconfig.h" // needed for HAVE_STDINT_H
 #include "nxsummary.hpp"
 #include "string_util.hpp"
 #include <algorithm>
@@ -33,7 +34,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include "nxconfig.h" // needed for HAVE_STDINT_H
 #include "data_util.hpp"
 
 // use STDINT if possible, otherwise define the types here
@@ -71,6 +71,8 @@ namespace nxsum {
   // explicit instantiations so they get compiled in
   template string toString<uint32_t>(const uint32_t thing);
   template string toString<int>(const int thing);
+  template string toString<double>(const double thing);
+  template string toString<float>(const float thing);
 
   template <typename NumT>
   string toString(const NumT *data, const int dims[], const int rank) {

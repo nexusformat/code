@@ -1,4 +1,3 @@
-#include <napi.h>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>

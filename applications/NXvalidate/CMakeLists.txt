@@ -26,6 +26,8 @@
 #
 #====================================================================
 
+add_subdirectory(cmdline)
+
 if (WIN32)
     configure_file(nxvalidate.bat.in nxvalidate.bat @ONLY)
 	install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nxvalidate.bat DESTINATION bin)
