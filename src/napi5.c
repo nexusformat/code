@@ -1906,7 +1906,7 @@ static int countObjectsInGroup(hid_t loc_id)
      *rank = (int)iRank;
      for (i = 0; i < iRank; i++)
      {
-	  dimension[i] = (int)myDim[i];
+	  dimension[i] = (int64_t)myDim[i];
      }
      return NX_OK;
    }
