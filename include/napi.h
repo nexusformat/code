@@ -51,6 +51,13 @@
 #ifndef NEXUSAPI
 #define NEXUSAPI
 
+#ifdef __cplusplus
+//#include <cstdint>   // needs c++11 support
+#include <stdint.h>
+#else
+#include <stdint.h>
+#endif /* __cplusplus */
+
 /* NeXus HDF45 */
 #define NEXUS_VERSION   "4.3.0"                /* major.minor.patch */
 
