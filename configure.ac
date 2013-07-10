@@ -37,14 +37,14 @@ m4_define([SVNREV],m4_esyscmd([svn info | grep Revision | awk '{print $2}' | tr 
 m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
 
 ## main version we are based on
-m4_define([NEXUS_VERSION],[4.3.1])dnl
+m4_define([NEXUS_VERSION],[4.3.2])dnl
 
 ## things like  rc1   or  20100903svn1734
 #m4_define([NEXUS_RELEASE],SVN_RELEASE)dnl
 m4_define([NEXUS_RELEASE],[])dnl
 
 # 0.* for pre release; 1, 2, ... post releas
-m4_define([PACKAGE_RELEASE],[1])dnl
+m4_define([PACKAGE_REL],[1])dnl
 
 AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,NEXUS_RELEASE), [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
@@ -54,14 +54,14 @@ see file COPYING for further information])
 m4_join([],[NEXUS_VERSION=],"NEXUS_VERSION")
 m4_join([],[NEXUS_RELEASE=],"NEXUS_RELEASE")
 m4_join([],[SVN_REVISION=],"SVN_REVISION")
-m4_join([],[PACKAGE_RELEASE=],"PACKAGE_RELEASE")
+m4_join([],[PACKAGE_RELEASE=],"PACKAGE_REL")
 AC_SUBST([NEXUS_VERSION])
 AC_SUBST([NEXUS_RELEASE])
 AC_SUBST([SVN_REVISION])
 AC_SUBST([PACKAGE_RELEASE])
 # AC_DEFINE([NEXUS_VERSION], "NEXUS_VERSION", [NeXus Version])dnl
 # AC_DEFINE([NEXUS_RELEASE], "NEXUS_RELEASE", [NeXus Release])dnl
-# AC_DEFINE([PACKAGE_RELEASE], "PACKAGE_RELEASE", [Package Release])dnl
+AC_DEFINE([PACKAGE_RELEASE], "PACKAGE_REL", [Package Release])dnl
 AC_DEFINE([SVN_REVISION], "SVNREV", [SVN Revision])dnl
 
 
@@ -679,6 +679,8 @@ if test ! -z "$LD_LIBRARY_PATH"; then
 else
     export LD_LIBRARY_PATH=${EXTRA_LD_LIBRARY_PATH}
 fi
+
+CPPFLAGS="$CPPFLAGS -DHAVE_NAPICONFIG_H"
 
 AC_SUBST(LIBG2C)
 
