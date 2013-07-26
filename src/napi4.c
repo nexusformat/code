@@ -921,7 +921,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       iRet = SDsetcompress(iNew, COMP_CODE_DEFLATE, &compstruct);
       if (iRet < 0) 
       {
-        NXReportError( "LZW-Compression failure!");
+        NXReportError( "Deflate-Compression failure!");
         return NX_ERROR;
       } 
     }

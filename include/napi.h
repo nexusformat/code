@@ -163,7 +163,7 @@ typedef struct {
 #define NX_COMP_RLE 300
 #define NX_COMP_HUF 400  
 
-/* to test for these we use ((value / 100) == NX_COMP_LZW) */
+/* levels for deflate - to test for these we use ((value / 100) == NX_COMP_LZW) */
 #define NX_COMP_LZW_LVL0 (100*NX_COMP_LZW + 0)
 #define NX_COMP_LZW_LVL1 (100*NX_COMP_LZW + 1)
 #define NX_COMP_LZW_LVL2 (100*NX_COMP_LZW + 2)
@@ -408,7 +408,7 @@ extern  NXstatus  NXmakedata64 (NXhandle handle, CONSTCHAR* label, int datatype,
    * \param rank The number of dimensions this dataset is going to have
    * \param comp_typ The compression scheme to use. Possible values:
    * \li NX_COMP_NONE no compression 
-   * \li NX_COMP_LZW lossless Lempel Ziv Welch compression (recommended)
+   * \li NX_COMP_LZW (recommended) despite the name this enabled zlib compression (of various levels, see above)
    * \li NX_COMP_RLE run length encoding (only HDF-4)
    * \li NX_COMP_HUF Huffmann encoding (only HDF-4)
    * \param dim An array of size rank holding the size of the dataset in each dimension. The first dimension 
@@ -434,7 +434,7 @@ extern  NXstatus NXcompmakedata64 (NXhandle handle, CONSTCHAR* label, int dataty
    * \param handle A NeXus file handle as initialized by NXopen. 
    * \param compr_type The compression scheme to use. Possible values:
    * \li NX_COMP_NONE no compression 
-   * \li NX_COMP_LZW lossless Lempel Ziv Welch compression (recommended)
+   * \li NX_COMP_LZW (recommended) despite the name this enabled zlib compression (of various levels, see above)
    * \li NX_COMP_RLE run length encoding (only HDF-4)
    * \li NX_COMP_HUF Huffmann encoding (only HDF-4)
    * \ingroup c_readwrite

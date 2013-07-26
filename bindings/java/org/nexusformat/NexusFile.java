@@ -59,12 +59,24 @@ public class NexusFile implements NeXusFileInterface {
     public final static int NX_CHAR   = 4;
 
     /**
-      * constants for compression schemes @see #compress
+      * constants for compression schemes 
       */
     public final static int NX_COMP_NONE = 100;
+    /* this one does zlib (deflate), no idea who chose the name */
     public final static int NX_COMP_LZW =  200;
-    public final static int NX_COMP_RLE =  300;
-    public final static int NX_COMP_HUF =  400;
+    public final static int NX_COMP_RLE =  300; /* hdf4 only */
+    public final static int NX_COMP_HUF =  400; /* hdf4 only */
+
+    public final static int NX_COMP_LZW_LVL0 = (100*NX_COMP_LZW + 0);
+    public final static int NX_COMP_LZW_LVL1 = (100*NX_COMP_LZW + 1);
+    public final static int NX_COMP_LZW_LVL2 = (100*NX_COMP_LZW + 2);
+    public final static int NX_COMP_LZW_LVL3 = (100*NX_COMP_LZW + 3);
+    public final static int NX_COMP_LZW_LVL4 = (100*NX_COMP_LZW + 4);
+    public final static int NX_COMP_LZW_LVL5 = (100*NX_COMP_LZW + 5);
+    public final static int NX_COMP_LZW_LVL6 = (100*NX_COMP_LZW + 6);
+    public final static int NX_COMP_LZW_LVL7 = (100*NX_COMP_LZW + 7);
+    public final static int NX_COMP_LZW_LVL8 = (100*NX_COMP_LZW + 8);
+    public final static int NX_COMP_LZW_LVL9 = (100*NX_COMP_LZW + 9);
 
     /**
       * Maximum name length, must be VGNAMELENMAX in hlimits.h
@@ -229,14 +241,7 @@ public class NexusFile implements NeXusFileInterface {
         checkType(type);    
         checkForNull(name, rank, iChunk);
         checkForNegInArray(true, dim, iChunk);
-        switch(compression_type) {
-	case NexusFile.NX_COMP_NONE:
-	case NexusFile.NX_COMP_LZW:
-	    break;
-	default:
-	    throw new NexusException("Invalid compression code requested");
-
-	}
+        checkCompression(compression_type);
 	nxmakecompdata(handle, name, type, rank, dim, compression_type, iChunk);
     }
 
@@ -246,14 +251,7 @@ public class NexusFile implements NeXusFileInterface {
         checkType(type);    
         checkForNull(name, rank, iChunk);
         checkForNegInArray(true, dim, iChunk);
-        switch(compression_type) {
-	case NexusFile.NX_COMP_NONE:
-	case NexusFile.NX_COMP_LZW:
-	    break;
-	default:
-	    throw new NexusException("Invalid compression code requested");
-
-	}
+        checkCompression(compression_type);
 	nxmakecompdata64(handle, name, type, rank, dim, compression_type, iChunk);
     }
 
@@ -288,16 +286,7 @@ public class NexusFile implements NeXusFileInterface {
 
     public void compress(int compression_type) throws NexusException {
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-        switch(compression_type) {
-	case NexusFile.NX_COMP_NONE:
-	case NexusFile.NX_COMP_LZW:
-	case NexusFile.NX_COMP_RLE:
-	case NexusFile.NX_COMP_HUF:
-	    break;
-	default:
-	    throw new NexusException("Invalid compression code requested");
-
-	}
+        checkCompression(compression_type);
 	nxcompress(handle,compression_type);
     }
 
@@ -601,6 +590,34 @@ public class NexusFile implements NeXusFileInterface {
         default:
 	    throw new NexusException("Illegal number type requested");
         }
+    } 
+
+    /**
+      * checkCompression verifies a parameter is a valid NeXus compression code. 
+      * If not an exception is thrown.
+      * @param type The value to check.
+      * @exception NexusException if the the type is no known compression value
+      */
+    private void checkCompression(int compression_type) throws NexusException {
+        switch(compression_type) {
+	case NexusFile.NX_COMP_NONE:
+    	case NexusFile.NX_COMP_LZW:
+    	case NexusFile.NX_COMP_RLE:
+    	case NexusFile.NX_COMP_HUF:
+	case NexusFile.NX_COMP_LZW_LVL0:
+    	case NexusFile.NX_COMP_LZW_LVL1:
+    	case NexusFile.NX_COMP_LZW_LVL2:
+    	case NexusFile.NX_COMP_LZW_LVL3:
+    	case NexusFile.NX_COMP_LZW_LVL4:
+    	case NexusFile.NX_COMP_LZW_LVL5:
+    	case NexusFile.NX_COMP_LZW_LVL6:
+    	case NexusFile.NX_COMP_LZW_LVL7:
+    	case NexusFile.NX_COMP_LZW_LVL8:
+    	case NexusFile.NX_COMP_LZW_LVL9:
+	    break;
+	default:
+	    throw new NexusException("Invalid compression code requested");
+	}
     } 
 
     // external file interface
