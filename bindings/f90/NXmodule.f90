@@ -128,8 +128,7 @@ CONTAINS
       INTEGER :: status, nxifopen
       EXTERNAL nxifopen
 
-      status = nxifopen (NXCstring(file_name), access_method, new_id)
-      file_id = new_id
+      status = nxifopen (NXCstring(file_name), access_method, file_id)
 
    END FUNCTION NXopen
 !------------------------------------------------------------------------------
