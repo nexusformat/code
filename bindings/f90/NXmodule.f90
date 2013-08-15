@@ -124,7 +124,6 @@ CONTAINS
       CHARACTER(len=*), INTENT(in)  :: file_name
       INTEGER,          INTENT(in)  :: access_method
       TYPE(NXhandle),   INTENT(out) :: file_id
-      TYPE(NXhandle) :: new_id
       INTEGER :: status, nxifopen
       EXTERNAL nxifopen
 
