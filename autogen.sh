@@ -24,19 +24,19 @@ done
 if test ! -z "$PACKAGE_RELEASE"; then
     echo "Setting package release to $PACKAGE_RELEASE"
     mv configure.ac configure.ac.$$
-    sed -e "s/^m4_define.*PACKAGE_RELEASE.*/m4_define\([PACKAGE_RELEASE],[$PACKAGE_RELEASE]\)/" < configure.ac.$$ > configure.ac
+    sed -e "s/^m4_define.*PACKAGE_REL.*/m4_define\([PACKAGE_REL],[$PACKAGE_RELEASE]\)dnl/" < configure.ac.$$ > configure.ac
     rm -f configure.ac.$$
 fi
 if test ! -z "$NEXUS_VERSION"; then
     echo "Setting NeXus version to $NEXUS_VERSION"
     mv configure.ac configure.ac.$$
-    sed -e "s/^m4_define.*NEXUS_VERSION.*/m4_define\([NEXUS_VERSION],[$NEXUS_VERSION]\)/" < configure.ac.$$ > configure.ac
+    sed -e "s/^m4_define.*NEXUS_VERSION.*/m4_define\([NEXUS_VERSION],[$NEXUS_VERSION]\)dnl/" < configure.ac.$$ > configure.ac
     rm -f configure.ac.$$
 fi
 if test ! -z "$NEXUS_RELEASE"; then
     echo "Setting NeXus release to $NEXUS_RELEASE"
     mv configure.ac configure.ac.$$
-    sed -e "s/^m4_define.*NEXUS_RELEASE.*/m4_define\([NEXUS_RELEASE],[$NEXUS_RELEASE]\)/" < configure.ac.$$ > configure.ac
+    sed -e "s/^m4_define.*NEXUS_RELEASE.*/m4_define\([NEXUS_RELEASE],[$NEXUS_RELEASE]\)dnl/" < configure.ac.$$ > configure.ac
     rm -f configure.ac.$$
 fi
 
