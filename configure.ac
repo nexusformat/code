@@ -44,7 +44,7 @@ m4_define([NEXUS_REL],SVN_RELEASE)dnl
 #m4_define([NEXUS_RELEASE],[rc1])dnl
 
 # 0.* for pre release; 1, 2, ... post releas
-m4_define([PACKAGE_REL],[0.1])dnl
+m4_define([PACKAGE_REL],[0])dnl
 
 AC_INIT([NeXus Library], m4_join([],NEXUS_VERSION,[-],NEXUS_REL), [nexus-developers@nexusformat.org], [nexus])
 AC_COPYRIGHT([Copyright (C) 2004 NeXus International Advisory Committee
