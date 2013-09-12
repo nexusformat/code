@@ -36,7 +36,7 @@ fi
 if test ! -z "$NEXUS_RELEASE"; then
     echo "Setting NeXus release to $NEXUS_RELEASE"
     mv configure.ac configure.ac.$$
-    sed -e "s/^m4_define.*NEXUS_RELEASE.*/m4_define\([NEXUS_RELEASE],[$NEXUS_RELEASE]\)dnl/" < configure.ac.$$ > configure.ac
+    sed -e "s/^m4_define.*NEXUS_REL.*/m4_define\([NEXUS_REL],[$NEXUS_RELEASE]\)dnl/" < configure.ac.$$ > configure.ac
     rm -f configure.ac.$$
 fi
 
