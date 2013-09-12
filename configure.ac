@@ -33,7 +33,7 @@ AC_REVISION($Revision$)
 
 m4_define([ISODATE],m4_esyscmd([date +%Y%m%d | tr -d '\n' ]))dnl
 dnl m4_define([SVNREV],m4_esyscmd_s([`svnversion`]))
-m4_define([SVNREV],m4_esyscmd([svn info | grep Revision | awk '{print $2}' | tr -d '\n' ]))dnl
+m4_define([SVNREV],m4_esyscmd([if test -r svn_revision.txt; then cat svn_revision.txt; else svn info | grep Revision | awk '{print $2}' | tr -d '\n'; fi ]))dnl
 m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
 
 ## main version we are based on
