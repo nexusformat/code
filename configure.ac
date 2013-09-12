@@ -37,7 +37,7 @@ m4_define([SVNREV],m4_esyscmd([svn info | grep Revision | awk '{print $2}' | tr 
 m4_define([SVN_RELEASE],m4_join([],ISODATE,[svn],SVNREV)))dnl
 
 ## main version we are based on
-m4_define([NEXUS_VERSION],[4.3.3])dnl
+m4_define([NEXUS_VERSION],[4.4.0])dnl
 
 ## things like  rc1   or  20100903svn1734
 m4_define([NEXUS_REL],SVN_RELEASE)dnl
