@@ -30,7 +30,7 @@ AT_SETUP([Check the C binding using HDF4])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.hdf
 Number of global attributes: 4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.hdf
 Number of group attributes: 2
 NXentry path /entry
@@ -93,7 +93,7 @@ AT_SETUP([Check the C binding using HDF5])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.h5
 Number of global attributes: 4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.h5
 Number of group attributes: 2
 NXentry path /entry
@@ -158,7 +158,7 @@ AT_SETUP([Check the C binding using HDF4 (static library)])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test-hdf4-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.hdf
 Number of global attributes: 4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.hdf
 Number of group attributes: 2
 NXentry path /entry
@@ -221,7 +221,7 @@ AT_SETUP([Check the C binding using HDF5 (static library)])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test-hdf5-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.h5
 Number of global attributes: 4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.h5
 Number of group attributes: 2
 NXentry path /entry
@@ -286,7 +286,7 @@ AT_SETUP([Check the C binding using XML])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
 Number of global attributes: 7
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.xml
    xmlns = http://definition.nexusformat.org/schema/3.1
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
@@ -354,7 +354,7 @@ AT_SETUP([Check the C binding using XML (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest.xml
 Number of global attributes: 7
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.xml
    xmlns = http://definition.nexusformat.org/schema/3.1
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
@@ -422,7 +422,7 @@ AT_SETUP([Check the C binding using XML table (static library)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-table-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest-table.xml
 Number of global attributes: 7
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest-table.xml
    xmlns = http://definition.nexusformat.org/schema/3.1
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
@@ -491,7 +491,7 @@ AT_BANNER([Check the FORTRAN binding.])
 AT_SETUP([Check the F77 binding using HDF4.])
 AT_CHECK([ $HAVE_F77 && $HAVE_HDF4 && $SETUP_TEST && napif_test-hdf4 | sed -e 's/\r$//' ], [], 
 [[ Number of global attributes:  4
-    NeXus_version = 4.3.1
+    NeXus_version = 4.3.2
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
  Path = /entry/ch_data
@@ -533,7 +533,7 @@ AT_CLEANUP
 AT_SETUP([Check the F77 binding using HDF5.])
 AT_CHECK([ $HAVE_F77 && $HAVE_HDF5 && $SETUP_TEST && napif_test-hdf5 | sed -e 's/\r$//' ], [], 
 [[ Number of global attributes:  4
-    NeXus_version = 4.3.1
+    NeXus_version = 4.3.2
     file_name = NXtest.nxs
  Group: entry(NXentry) contains  8 items
  Path = /entry/ch_data
@@ -576,7 +576,7 @@ AT_SETUP([Check the F90 binding using HDF5.])
 AT_CHECK([ $HAVE_F90 && $HAVE_HDF5 && $SETUP_TEST && NXtest | sed -e 's/\r$//' ], [], 
 [[Writing character data
 Number of global attributes:        4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = NXtest.nxs
 Group: entry(NXentry) contains        8 items
    ch_data : NX_CHAR
@@ -614,7 +614,7 @@ AT_SETUP([Check the C++ binding using HDF4.])
 AT_CHECK([ $HAVE_HDF4 && $SETUP_TEST && napi_test_cpp-hdf4 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.hdf
 Number of global attributes: 4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = napi_test_cpp.hdf
 Number of group attributes: 2
    hugo = namenlos
@@ -651,7 +651,7 @@ AT_SETUP([Check the C++ binding using HDF5.])
 AT_CHECK([ $HAVE_HDF5 && $SETUP_TEST && napi_test_cpp-hdf5 | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.h5
 Number of global attributes: 4
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = napi_test_cpp.h5
 Number of group attributes: 2
    hugo = namenlos
@@ -690,7 +690,7 @@ AT_SETUP([Check the C++ binding using xml.])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test_cpp-xml | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: napi_test_cpp.xml
 Number of global attributes: 7
-   NeXus_version = 4.3.1
+   NeXus_version = 4.3.2
    file_name = napi_test_cpp.xml
    xmlns = http://definition.nexusformat.org/schema/3.1
    xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
@@ -874,7 +874,7 @@ Number of global attributes:        4
 NXgetnextattr status:        1
 
 attribute name: NeXus_version
-attribute value: 4.3.1
+attribute value: 4.3.2
 
 NXgetnextattr status:        1
 
@@ -1291,7 +1291,7 @@ Number of global attributes:        4
 NXgetnextattr status:        1
 
 attribute name: NeXus_version
-attribute value: 4.3.1
+attribute value: 4.3.2
 
 NXgetnextattr status:        1
 
@@ -1708,7 +1708,7 @@ Number of global attributes:        7
 NXgetnextattr status:        1
 
 attribute name: NeXus_version
-attribute value: 4.3.1
+attribute value: 4.3.2
 
 NXgetnextattr status:        1
 
@@ -2087,8 +2087,8 @@ AT_CLEANUP
 AT_BANNER([[Testing NXbrowse Tool.]])
 AT_SETUP([Checking nxbrowse HDF4 test file])
 AT_CHECK([$HAVE_HDF4 && env NO_READLINE=1 nxbrowse NXtest.hdf  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF_version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.3.1 Copyright (C) 2009 NeXus Data Format
-    NeXus_version = 4.3.1
+[[NXBrowse 4.3.2 Copyright (C) 2009 NeXus Data Format
+    NeXus_version = 4.3.2
     file_name = NXtest.hdf
 NX>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
@@ -2099,8 +2099,8 @@ NX>
 AT_CLEANUP
 AT_SETUP([Checking nxbrowse HDF5 test file])
 AT_CHECK([$HAVE_HDF5 && env NO_READLINE=1 nxbrowse NXtest.h5  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF5_Version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.3.1 Copyright (C) 2009 NeXus Data Format
-    NeXus_version = 4.3.1
+[[NXBrowse 4.3.2 Copyright (C) 2009 NeXus Data Format
+    NeXus_version = 4.3.2
     file_name = NXtest.h5
 NX>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
@@ -2111,8 +2111,8 @@ NX>
 AT_CLEANUP
 AT_SETUP([Checking nxbrowse XML test file])
 AT_CHECK([$HAVE_XML && env NO_READLINE=1 nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep -v 'file_time = ' | grep -v 'XML_version = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.3.1 Copyright (C) 2009 NeXus Data Format
-    NeXus_version = 4.3.1
+[[NXBrowse 4.3.2 Copyright (C) 2009 NeXus Data Format
+    NeXus_version = 4.3.2
     file_name = NXtest.xml
     xmlns = http://definition.nexusformat.org/schema/3.1
     xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance

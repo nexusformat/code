@@ -59,7 +59,7 @@
 #endif /* __cplusplus */
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "4.3.1"                /* major.minor.patch */
+#define NEXUS_VERSION   "4.3.2"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
