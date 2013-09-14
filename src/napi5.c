@@ -1505,10 +1505,10 @@ static int countObjectsInGroup(hid_t loc_id)
 	readStringAttributeN(attr_id, data, sizeof(data));
         //H5Aread(attr_id, atype, data);
         strcpy(pClass,data);
-        pFile->iNX=0;
-        *iN = countObjectsInGroup(pFile->iCurrentG);
         H5Aclose(attr_id);
       }
+      pFile->iNX=0;
+      *iN = countObjectsInGroup(pFile->iCurrentG);
     }
     return NX_OK;
   }
@@ -2059,7 +2059,7 @@ static int countObjectsInGroup(hid_t loc_id)
      } 
      pFile->iAtt5.iCurrentIDX++;
      if (iname != NULL) {
-       if(strcmp(iname, "NX_class") == 0 && pFile->iCurrentG != 0) {
+       if(strcmp(iname, "NX_class") == 0 && pFile->iCurrentG != 0 && pFile->iCurrentD == 0) {
 	 /*
 	   skip NXclass attribute which is internal 
 	 */

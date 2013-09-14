@@ -297,11 +297,13 @@ void analyzeDim(const char *typeString, int *rank,
   }
 }
 /*--------------------------------------------------------------------*/
-int translateTypeCode(const char *code){
+int translateTypeCode(const char *code, const char* term){
   int i, result = -1;
+  char test_str[80];
   
   for(i = 0; i < NTYPECODE; i++){
-    if(strstr(code,typecode[i].name) != NULL){
+    snprintf(test_str, sizeof(test_str)-1, "%s%s", typecode[i].name, term);
+    if(strncmp(code, test_str, strlen(test_str)) == 0){
       result = typecode[i].nx_type;
       break;
     }
@@ -354,7 +356,7 @@ static void analyzeDataType(mxml_node_t *parent, int *rank, int *type,
     return;
   }
 
-  nx_type = translateTypeCode((char *)typeString);
+  nx_type = translateTypeCode((char *)typeString, "");
 
   /*
     assign type
