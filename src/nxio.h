@@ -41,7 +41,7 @@ void setNumberFormat(int dataType, char *formatString);
 void initializeNumberFormats();
 void getNumberText(int nx_type, char *typestring, int typeLen);
 void destroyDataset(void *data);
-int translateTypeCode(const char *code);
+int translateTypeCode(const char *code, const char* term);
 int isDataNode(mxml_node_t *node);
 void analyzeDim(const char *typeString, int *rank, 
 		int64_t *iDim, int *type);
