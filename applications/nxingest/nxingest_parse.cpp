@@ -62,7 +62,7 @@ enum param_type { STR, NUM};
 // 
 // *****************************************************************************
 
-mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx)
+mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t *topNode, mxml_node_t **outNode, NxClass nx)
 {
 	
 	Log log;
@@ -73,9 +73,7 @@ mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx)
 
 	int type_descent = MXML_DESCEND;		
 	const char 		*type;
-	
-	mxml_node_t 	*topNode = inNode;
-	
+		
 	while( (inNode = mxmlWalkNext(inNode, topNode, type_descent)) != NULL )
 	{
 		inNextNode = inNode; // Get the last inNode to pass back to the calling function
@@ -96,7 +94,7 @@ mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx)
 						for(int i = 0; i< inNode->value.element.num_attrs; i++)
 							if(strcmp(inNode->value.element.attrs[i].name, "type") != 0)
 								mxmlElementSetAttr(outNextNode, inNode->value.element.attrs[i].name, inNode->value.element.attrs[i].value);
-					inNode = parseXml(inNode, &outNextNode, nx);
+					inNode = parseXml(inNode, inNode, &outNextNode, nx);
 				} 
 				else if(strcmp(type, "user_tbl") == 0 )	// User table. There may be several user. Need to loop over the different NXusers.
 				{
@@ -113,7 +111,7 @@ mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx)
 									mxmlElementSetAttr(outNextNode, userInNode->value.element.attrs[i].name, userInNode->value.element.attrs[i].value);
 
 						log.set("parseXml", type, "Element added",userInNode->value.element.name).printLevel(NXING_LOG_DEBUG);
-						parseXml(userInNode, &outNextNode, nx);
+						parseXml(userInNode, topNode, &outNextNode, nx);
 						log.set("parseXml", type, "Parsed", inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
 
 					}while(nx.nextUser() != -1); 

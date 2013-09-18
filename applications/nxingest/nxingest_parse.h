@@ -35,7 +35,7 @@
 #include "nxingest_nexus.h"
 #define NXING_UNEXPECTED_PARAM_VALUE	NXING_ERR_BASE_PARSE -1
 
-mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx);
+mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t *topNode, mxml_node_t **outNode, NxClass nx);
 
 mxml_node_t * readRecord(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx);
 

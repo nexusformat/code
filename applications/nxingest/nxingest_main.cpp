@@ -130,7 +130,7 @@ int main (int argc, char *argv[])
 		 */
 		 log.set("main", "Parsing the mapping file!").printLevel(NXING_LOG_DEBUG);
 		 inNode = mxmlWalkNext(inTree, inTree, MXML_DESCEND);
-		 parseXml(inNode, &outTree, nx);
+		 parseXml(inNode, inTree, &outTree, nx);
 
 	
 		/* 
