@@ -811,6 +811,10 @@ void WriteData (FILE *fd, char *data, int dataType, int numElements)
    for (i=0; i<numElements; i++) {
       switch(dataType) {
          case NX_CHAR:
+	    if (data[i] == '\0')
+	    {
+		return;
+	    }
             fprintf (fd, "%c", ((char *)data)[i]);
             break;
          case NX_INT8:
