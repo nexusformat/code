@@ -27,6 +27,3 @@
 #====================================================================
 
 add_subdirectory (tclap)
-if(HAVE_XML)
-add_subdirectory (mxml-2.6)
-endif(HAVE_XML)
