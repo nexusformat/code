@@ -43,7 +43,7 @@ Enjoy!
 
 Use libtool 1.5 but note it has problems as MinGW does not ship the unix "file" command so you get "file magic" errors
 
-to remedy, install  file.MinGW   as /usr/local/bin/file and chmod +x it
+to remedy, install  scripts/file.MinGW   as /usr/local/bin/file and chmod +x it
 
 also rename libmxml.a as libmxml.dll.a
 
