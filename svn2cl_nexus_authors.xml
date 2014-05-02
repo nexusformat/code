@@ -15,6 +15,9 @@
   <author uid="Peter Peterson">
     Peter Peterson &lt;petersonpf@ornl.gov&gt;
   </author>
+  <author uid="BenWatts">
+    Ben Watts &lt;Benjamin.Watts@psi.ch&gt;
+  </author>
   <author uid="mk">
     Mark Koennecke &lt;Mark.Koennecke@psi.ch&gt;
   </author>
@@ -57,13 +60,61 @@
   <author uid="jph">
     John Hammonds &lt;jphammonds@anl.gov&gt;
   </author>
+  <author uid="root">
+    NeXus Developers &lt;nexus-developers@nexusformat.org&gt;
+  </author>
+  <author uid="(no author)">
+    NeXus Developers &lt;nexus-developers@nexusformat.org&gt;
+  </author>
   <author uid="nexus">
     NeXus Developers &lt;nexus-developers@nexusformat.org&gt;
   </author>
   <author uid="Tobias Richter">
-    Tobias Richter &lt;tobias.richter@diamond.ac.uk&gt;
+    Tobias Richter &lt;Tobias.Richter@diamond.ac.uk&gt;
+  </author>
+  <author uid="sic78">
+    Stuart Campbell &lt;campbellsi@ornl.gov&gt;
   </author>
   <author uid="Stuart Campbell">
     Stuart Campbell &lt;campbellsi@ornl.gov&gt;
+  </author>
+  <author uid="Eugenwintersberger">
+    Eugen Wintersberger  &lt;Eugen.Wintersberger@desy.de&gt;
+  </author>
+  <author uid="Marie">
+    Marie Yao  &lt;yaox@ornl.gov&gt;
+  </author>
+  <author uid="Paul Kienzle">
+    Paul Kienzle  &lt;Paul.Kienzle@nist.gov&gt;
+  </author>
+  <author uid="Pedro.vicente">
+    Pedro Vicente  &lt;pedro.vicente@space-research.org&gt;
+  </author>
+  <author uid="pj">
+    Pete Jemian  &lt;jemian@anl.gov&gt;
+  </author>
+  <author uid="Pete Jemian">
+    Pete Jemian  &lt;jemian@anl.gov&gt;
+  </author>
+  <author uid="Peter Chang">
+    Peter Chang  &lt;Peter.Chang@diamond.ac.uk&gt;
+  </author>
+  <author uid="Reuterma">
+    Michael A Reuter  &lt;reuterma@ornl.gov&gt;
+  </author>
+  <author uid="Stephen Rankin">
+    Stephen Rankin  &lt;s.e.rankin@rl.ac.uk&gt;
+  </author>
+  <author uid="Erica Yang">
+    Erica Yang  &lt;Erica.Yang@stfc.ac.uk&gt;
+  </author>
+  <author uid="Herbert Bernstein">
+    Herbert Bernstein  &lt;yayahjb@gmail.com&gt;
+  </author>
+  <author uid="L.lerusse">
+    Laurent Lerusse  &lt;l.lerusse@stfc.ac.uk&gt;
+  </author>
+  <author uid="Janik Zikovsky">
+    Janik Zikovsky  &lt;zikovsky@ornl.gov&gt;
   </author>
 </authors>
