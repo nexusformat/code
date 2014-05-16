@@ -19,7 +19,7 @@
 nxconvert \- convert a NeXus file between different on disk file formats
 .SH SYNOPSIS
 .B nxconvert
-[-x|-h4|-h5|-d|-o keepws|-o table] [\fIinfile\fP [\fIoutfile\fP]]
+[-x|-h 4|-h 5|-d|-o keepws|-o table] [\fIinfile\fP [\fIoutfile\fP]]
 .SH DESCRIPTION
 NeXus supports different file formats for physical storage on disk or other media.
 .B nxconvert
@@ -35,13 +35,13 @@ interactively. Same if the input file is not given.
 The following options are supported:
 .TP
 .B -x 
-make outfile XML 
+create XML output
 .TP
-.B -h4 
-make outfile HDF4 (this is the default)
+.B -h 4 
+create HDF4 output
 .TP
-.B -h5 
-make outfile HDF5
+.B -h 5 
+create HDF5 output
 .TP
 .B -d
 make a XML based definition file used for validating NeXus files (i.e. remove the data).
