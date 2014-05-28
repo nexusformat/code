@@ -1,9 +1,6 @@
 
 	JNEXUS
 
-	This is the README file for the NeXus API for Java, Version 2.0.
-        This version supports both HDF-4 and HDF-5.
-
         The NeXus API for Java (JAPI) is implemented by a class NexusFile
         which calls the C-language NeXus-API through the Java Native
    	Methods Interface (JNI). For more documentation see the API
@@ -11,7 +8,6 @@
         in directory test which not only serves as a test driver for
      	the JAPI but also as a code example for the usage of the NexusFile
         methods. 
-
 
 
         ACKNOWLEGDEMENT
@@ -24,14 +20,9 @@
 	JHI version from which the code was extracted was JHI-2.5 as 
 	downloaded in October 2000. 
 
+
 	USAGE
 	
-	I hope you downloaded a binary distribution of the JAPI. Due to the
-        complexity of this code we strive to provide binary distributions
-        for most platforms. If yours is not supported (we cannot have 
-        samples of any computer system in the world) compilation instructions 
-        can be found below.
- 
 	As the JAPI uses native methods your Java runtime needs to locate the
    	shared library implementing the NAPI. Otherwise you will get an
         Unsatisfied Link Error. There are three possibilities how the Java 
@@ -54,26 +45,3 @@
         As an example, see the runtestxx scripts supplied in the test
         directory for running the test driver.
 
-
-
-	COMPILING
-
-	Is fairly easy on a Unix system. Use one of the supplied Makefiles
-	(Makefile dor DigitalUnix4.0D or, Make.tux  for Redhat Linux 6.2)
-	and adapt the settings of the variables in the configuration 
-	section to the state of your system. You need to know:
-	- Where you Java binaries, include files, libraries reside.
-	- Where the HDF4.1r3 libraries are installed. 
-	- Furthermore adapt some compiler options in order to reflect the
-	  way how your compiler builds shared libraries. 
-
-
-	AUTHOR and Target for Comments:
-
-	Mark Koennecke
-	Laboratory for Neutron Scattering
-	Paul Scherrer Institut
-	CH-5232 Villigen-PSI
-	Switzerland
-	Mark.Koennecke@psi.ch
- 
