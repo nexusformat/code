@@ -1250,26 +1250,21 @@ char *nxitrim(char *str)
   }
   /*-------------------------------------------------------------------------*/
  
-  NXstatus  NXgetinfo (NXhandle fid, int *rank, 
-				    int dimension[], int *iType)
-  {
+  NXstatus  NXgetinfo (NXhandle fid, int *rank, int dimension[], int *iType) {
 	  int i, status;
 	  int64_t dims64[NX_MAXRANK];
 	  status = NXgetinfo64(fid, rank, dims64, iType);
-	  for(i=0; i < *rank; ++i)
-	  {
+	  for(i=0; i < *rank; ++i) {
 		  dimension[i] = (int)dims64[i];
 	  }
 	  return status;
   }
 
-  NXstatus  NXgetinfo64 (NXhandle fid, int *rank, 
-				    int64_t dimension[], int *iType)
-  {
+  NXstatus  NXgetinfo64 (NXhandle fid, int *rank, int64_t dimension[], int *iType) {
     int status;
     char *pPtr = NULL;
     pNexusFunction pFunc = handleToNexusFunc(fid);
-	*rank = 0;
+    *rank = 0;
     status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, rank, dimension, iType));
     /*
       the length of a string may be trimmed....

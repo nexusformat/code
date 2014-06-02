@@ -1920,6 +1920,7 @@ return status;
      for (i = 0; i < iRank; i++) {
 	  dimension[i] = (int64_t)myDim[i];
      }
+/* printf("\nrank %d first dimension: %ld\n", *rank, dimension[0]); */
      return NX_OK;
    }
 
@@ -1941,25 +1942,38 @@ return status;
 
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
-     if (pFile->iCurrentD == 0) 
-       {
+     if (pFile->iCurrentD == 0) {
 	 NXReportError( "ERROR: no dataset open");
 	 return NX_ERROR;
-       }
+     }
+     tclass = H5Tget_class(pFile->iCurrentT);
+      /* map datatypes of other platforms */
+      if (tclass == H5T_STRING) {
+         memtype_id = pFile->iCurrentT;
+      } else {
+	 memtype_id = h5MemType(pFile->iCurrentT);
+      }
+
      iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS); 
-     for (i = 0; i < iRank; i++)
-	{
+
+     if (iRank == 0) {
+	/* this is an unslabbale SCALAR*/
+	            hid_t filespace = H5Dget_space(pFile->iCurrentD);
+hid_t memspace = H5Screate(H5S_SCALAR);
+H5Sselect_all(filespace);
+iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, filespace, H5P_DEFAULT, data);	
+     } else {
+
+     for (i = 0; i < iRank; i++) {
 	  myStart[i] = (hssize_t)iStart[i];
 	  mySize[i]  = (hsize_t)iSize[i];
 	  mStart[i] = (hsize_t)0;
-	}
-      tclass = H5Tget_class(pFile->iCurrentT);
+     }
+
+      /* 
+       * this does not work for multidimensional string arrays. 
+       */
       if (tclass == H5T_STRING) {
-/* 
- * FAA 24/1/2007: I don't think this will work for multidimensional
- * string arrays. 
- * MK 23/7/2007: You are right Freddie. 
-*/
 	 mtype = NX_CHAR;
 	 if (mySize[0] == 1) {
 	     mySize[0]  = H5Tget_size(pFile->iCurrentT);
@@ -1983,41 +1997,28 @@ return status;
       memspace=H5Screate_simple(iRank, mySize, NULL);
       iRet = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, mStart,
 				NULL, mySize, NULL);
-      if (iRet < 0) 
-	{
+      if (iRet < 0) {
 	  NXReportError( "ERROR: selecting memspace failed");
 	  return NX_ERROR;
-	}
-       /* map datatypes of other plateforms */
-       if (tclass == H5T_STRING)
-       {
-         memtype_id = pFile->iCurrentT;
-       }
-       else 
-       {
-	 memtype_id = h5MemType(pFile->iCurrentT);
-       }
-
+      }
       /* read slab */ 
       if (mtype == NX_CHAR) {
-	 iRet = H5Dread(pFile->iCurrentD, memtype_id, H5S_ALL, 
-		     H5S_ALL, H5P_DEFAULT,tmp_data);
+	 iRet = H5Dread(pFile->iCurrentD, memtype_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, tmp_data);
 	  data1 = tmp_data + myStart[0];
 	  strncpy((char*)data,data1,(size_t)iSize[0]);
 	  free(tmp_data);           
       } else {    
-	 iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, 
-		     pFile->iCurrentS, H5P_DEFAULT,data);
+	 iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, pFile->iCurrentS, H5P_DEFAULT, data);
       }    
+}
       /* cleanup */
       H5Sclose(memspace);
+      H5Tclose(tclass);
 
-      if (iRet < 0) 
-
-	{
+      if (iRet < 0) {
 	  NXReportError( "ERROR: reading slab failed");
 	  return NX_ERROR;
-	}
+      }
       return NX_OK;
    }
 

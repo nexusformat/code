@@ -715,7 +715,7 @@ void PrintDimensions (int rank, int dimensions[])
 {
    int i;
 
-   if (rank > 1 || dimensions[0] != 1) {
+   /* if (rank > 1 || dimensions[0] != 1) { */
       printf ("[");
       for (i=0; i<rank; i++) {
          if (i > 0) 
@@ -723,7 +723,7 @@ void PrintDimensions (int rank, int dimensions[])
          printf ("%d", dimensions[i]);
       }
       printf ("]");
-   }
+   /* } */
 }
 
 /* Converts the NeXus data type into a character string */
