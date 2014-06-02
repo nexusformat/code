@@ -1824,7 +1824,7 @@ status = H5Dread(pFile->iCurrentD, datatype, memspace, filespace, H5P_DEFAULT, d
   H5Sclose(memspace);
   H5Sclose(filespace);
   H5Tclose(datatype);
-return status;
+return NX_OK;
      }
      if (ndims <= 0)
      {
@@ -1920,7 +1920,7 @@ return status;
      for (i = 0; i < iRank; i++) {
 	  dimension[i] = (int64_t)myDim[i];
      }
-/* printf("\nrank %d first dimension: %ld\n", *rank, dimension[0]); */
+ /* printf("\nrank %d first dimension: %ld\n", *rank, dimension[0]);  */
      return NX_OK;
    }
 

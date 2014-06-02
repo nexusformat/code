@@ -1212,17 +1212,14 @@ char *nxitrim(char *str)
     pNexusFunction pFunc = handleToNexusFunc(fid);
     status = LOCKED_CALL(pFunc->nxgetinfo64(pFunc->pNexusData, &rank, iDim, &type)); /* unstripped size if string */
     /* only strip one dimensional strings */
-    if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) && (rank == 1) )
-    {
-		pPtr = (char*)malloc((size_t)iDim[0]+5);
+    if ( (type == NX_CHAR) && (pFunc->stripFlag == 1) && (rank == 1) ) {
+        pPtr = (char*)malloc((size_t)iDim[0]+5);
         memset(pPtr, 0, (size_t)iDim[0]+5);
         status = LOCKED_CALL(pFunc->nxgetdata(pFunc->pNexusData, pPtr)); 
-		pPtr2 = nxitrim(pPtr);
-		strncpy((char*)data, pPtr2, strlen(pPtr2)); /* not NULL terminated by default */
-		free(pPtr);
-    }
-    else
-    {
+        pPtr2 = nxitrim(pPtr);
+        strncpy((char*)data, pPtr2, strlen(pPtr2)); /* not NULL terminated by default */
+        free(pPtr);
+    } else {
         status = LOCKED_CALL(pFunc->nxgetdata(pFunc->pNexusData, data)); 
     }
     return status;
