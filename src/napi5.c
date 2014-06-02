@@ -1814,6 +1814,18 @@ static int countObjectsInGroup(hid_t loc_id)
 	return NX_ERROR;
      }
      ndims = H5Sget_simple_extent_dims(pFile->iCurrentS, dims, NULL); 
+
+     if (ndims == 0) { /* SCALAR dataset */ /* this is a proof of concept and should be nicer integrated with what's going on below */
+hid_t memspace = H5Screate(H5S_SCALAR);
+            hid_t datatype = H5Dget_type(pFile->iCurrentD);
+            hid_t filespace = H5Dget_space(pFile->iCurrentD);
+H5Sselect_all(filespace);
+status = H5Dread(pFile->iCurrentD, datatype, memspace, filespace, H5P_DEFAULT, data);
+  H5Sclose(memspace);
+  H5Sclose(filespace);
+  H5Tclose(datatype);
+return status;
+     }
      if (ndims <= 0)
      {
 	NXReportError( "ERROR: unable to read dims");
@@ -1884,28 +1896,28 @@ static int countObjectsInGroup(hid_t loc_id)
      tclass = H5Tget_class(pFile->iCurrentT);
      mType = hdf5ToNXType(tclass,pFile->iCurrentT);
      iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS);
-     H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
-     for(i=0; i<iRank; ++i)
-     {
-	total_dims_size *= myDim[i];
+     if (iRank == 0) {
+	iRank = 1; /* we pretend */
+	myDim[0] = 1;
+     } else {
+	H5Sget_simple_extent_dims(pFile->iCurrentS, myDim, NULL);   
+	for(i=0; i<iRank; ++i) {
+	    total_dims_size *= myDim[i];
+        }
      }
      /* conversion to proper ints for the platform */ 
      *iType = (int)mType;
      if (tclass==H5T_STRING && myDim[iRank-1] == 1) {
-	if ( H5Tis_variable_str(pFile->iCurrentT) )
-	{
+	if ( H5Tis_variable_str(pFile->iCurrentT) ) {
 	    /* this would not work for ragged arrays */
 	    H5Dvlen_get_buf_size(pFile->iCurrentD, pFile->iCurrentT, pFile->iCurrentS, &vlen_bytes);
 	    myDim[iRank-1] = vlen_bytes / total_dims_size;
-	}
-	else
-	{
+	} else {
             myDim[iRank-1] = H5Tget_size(pFile->iCurrentT);
 	}
      } 
      *rank = (int)iRank;
-     for (i = 0; i < iRank; i++)
-     {
+     for (i = 0; i < iRank; i++) {
 	  dimension[i] = (int64_t)myDim[i];
      }
      return NX_OK;
