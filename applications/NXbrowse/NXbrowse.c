@@ -298,30 +298,25 @@ int main(int argc, char *argv[])
    strcpy (path, "NX");
    do {
       sprintf (prompt, "%s> ", path);
-      if (getenv("NO_READLINE") != NULL)
-      {
+      if (getenv("NO_READLINE") != NULL) {
           inputText = my_readline(prompt);
-      }
-      else
-      {
+      } else {
           inputText = readline(prompt);
       }
-      if (inputText == NULL)
-      {
+      if (inputText == NULL) {
           inputText = strdup("EXIT");
       }
-      if (*inputText)
-      {
+      if (*inputText) {
           add_history(inputText);
       }
       command = strtok(inputText," ");
       /* Check if a command has been given */
       if (command == NULL) command = " ";
       /* Convert it to upper case characters */
-      ConvertUpperCase (command);
+      ConvertUpperCase(command);
       /* Command is to print a directory of the current group */
       if (StrEq(command, "DIR") || StrEq(command, "LS")) {
-         status = NXBdir (the_fileId);
+         status = NXBdir(the_fileId);
       }    
       /* Command is to open the specified group */
       if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
@@ -339,8 +334,7 @@ int main(int argc, char *argv[])
 					 groupLevel++;
 				 }
 			 }
-         }
-         else {
+         } else {
             fprintf (rl_outstream, "NX_ERROR: Specify a group\n");
          }
       }
@@ -353,12 +347,10 @@ int main(int argc, char *argv[])
             if (stringPtr != NULL) {
                strcpy (fileName, stringPtr);
                status = NXBdump (the_fileId, dataName, fileName);
-            }
-            else {
+            } else {
                fprintf (rl_outstream, "NX_ERROR: Specify a dump file name \n");
             }
-         }
-         else {
+         } else {
             fprintf (rl_outstream, "NX_ERROR: Specify a data item\n");
          }
       }
@@ -369,8 +361,7 @@ int main(int argc, char *argv[])
             strcpy (dataName, stringPtr);
             dimensions = strtok(NULL, "[]");
             status = NXBread (the_fileId, dataName, dimensions);
-         }
-         else {
+         } else {
             fprintf (rl_outstream, "NX_ERROR: Specify a data item\n");
          }
       }
@@ -384,8 +375,7 @@ int main(int argc, char *argv[])
                   *stringPtr = '\0';            /* terminate the string there */
                groupLevel--;
             }
-         }
-         else {
+         } else {
             fprintf (rl_outstream, "NX_WARNING: Already at root level of file\n");
          }
       }
@@ -419,7 +409,7 @@ int main(int argc, char *argv[])
       /* Command is to exit the program */
       if (StrEq(command, "EXIT") || StrEq(command, "QUIT")) {
          for (i = groupLevel; i > 0; i--) NXclosegroup (the_fileId);
-         NXclose (&the_fileId);
+         NXclose(&the_fileId);
          return NX_OK;
       }
       status = NX_OK;
@@ -542,9 +532,8 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
          printf ("NX_ERROR: Data rank = %d\n", dataRank);
          return NX_ERROR;
       }
-   }
+   } else {
    /* Otherwise, allocate enough space for the first 3 elements of each dimension */
-   else {
       for (i = 0; i < dataRank; i++) {
          if (dataDimensions[i] > 3 && dataType != NX_CHAR) {
             start[i] = 0;
@@ -557,16 +546,14 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
       }
    }
    total_size = 1;
-   for(i = 0; i < dataRank; i++)
-   {
+   for(i = 0; i < dataRank; i++) {
        total_size *= dataDimensions[i];
    }
    if (NXmalloc((void**)&dataBuffer, dataRank, size, dataType) != NX_OK) return NX_ERROR;
    /* Read in the data with NXgetslab */
    if (dataType == NX_CHAR) {
       if (NXgetdata(fileId, dataBuffer) != NX_OK) return NX_ERROR;
-   }
-   else {
+   } else {
       if (NXgetslab (fileId, dataBuffer, start, size) != NX_OK) return NX_ERROR;
    }
    /* Output data name, dimensions and type */
