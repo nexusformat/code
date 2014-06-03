@@ -40,12 +40,10 @@ static char* my_readline(const char* prompt)
     char inputText[256];
     char* stringPtr;
     fprintf(stdout, "%s", prompt);
-    if (fgets(inputText, sizeof(inputText), stdin) == NULL)
-    {
+    if (fgets(inputText, sizeof(inputText), stdin) == NULL) {
 	return NULL;
     }
-    if ((stringPtr = strchr(inputText, '\n')) != NULL) 
-    {
+    if ((stringPtr = strchr(inputText, '\n')) != NULL) {
         *stringPtr = '\0';
     }
     return strdup(inputText);
@@ -157,13 +155,10 @@ static char* field_generator(const char* text, int state)
     char* res;
     int status, dataType;
     NXname name, nxclass;
-    if (!state)
-    {
+    if (!state) {
 	item = names;
-	while(item != NULL)
-	{
-	    if (item->name != NULL)
-	    {
+	while(item != NULL) {
+	    if (item->name != NULL) {
 		free(item->name);
 	  	item->name = NULL;
 	    }
@@ -174,33 +169,25 @@ static char* field_generator(const char* text, int state)
 	}
 	last_item = names = NULL;
         len = strlen(text);
-        if (NXinitgroupdir (the_fileId) != NX_OK)
-        {
+        if (NXinitgroupdir(the_fileId) != NX_OK) {
 	    return NULL;
         }
-        do 
-        {
-           status = NXgetnextentry (the_fileId, name, nxclass, &dataType);
+        do {
+           status = NXgetnextentry(the_fileId, name, nxclass, &dataType);
            if (status == NX_ERROR) break;
-           if (status == NX_OK) 
-           {
-	      if (strncmp(nxclass,"CDF",3) == 0){ 
+           if (status == NX_OK) {
+	      if (strncmp(nxclass,"CDF",3) == 0) { 
 	          ;
-	      }
-	      else if (strncmp(name, text, len) == 0)
-              {
+	      } else if (strncmp(name, text, len) == 0) {
 		  item = (struct name_item*)malloc(sizeof(struct name_item));
                   item->name = strdup(name);
-	          if (strcmp(nxclass,"SDS") != 0){ 
+	          if (strcmp(nxclass,"SDS") != 0) { 
 		     strcat(item->name, "/");
 		  }
 		  item->next = NULL;
-		  if (last_item == NULL)
-		  {
+		  if (last_item == NULL) {
 		    names = item;
-                  }
-		  else
-		  {
+                  } else {
 		    last_item->next = item;
 		  }
 		  last_item = item;
@@ -209,13 +196,10 @@ static char* field_generator(const char* text, int state)
         } while (status == NX_OK);
         last_item = names;
     }
-    if (last_item != NULL)
-    {
+    if (last_item != NULL) {
        res = strdup(last_item->name);
        last_item = last_item->next;
-    }
-    else
-    {
+    } else {
 	res = NULL;
     }
     return res;
@@ -229,14 +213,16 @@ static char** nxbrowse_complete(const char* text, int start, int end)
     static char line[512];
     strncpy(line, text+start, end-start);
     line[end-start] = '\0';
-    if (start == 0) 
-    {
+
+    if (start == 0) {
 	matches = rl_completion_matches(text, command_generator);
-    }
-    else
-    {
+        rl_completion_append_character = ' ';
+    } else {
 	matches = rl_completion_matches(text, field_generator);
+        rl_completion_append_character = '\0';
     }
+
+
     return matches;
 }
 #endif
