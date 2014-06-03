@@ -306,7 +306,7 @@ int main(int argc, char *argv[])
       }    
       /* Command is to open the specified group */
       if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
-         stringPtr = strtok(NULL, " /"); 
+         stringPtr = strtok(NULL, " "); 
          if (stringPtr != NULL) {
             strcpy (groupName, stringPtr);
 			 if (StrEq(groupName, "..")) {
@@ -477,6 +477,11 @@ int NXBopen (NXhandle fileId, NXname groupName)
    if (groupName == NULL) {
       printf ("NX_ERROR: Specify a group name with the OPEN command\n");
       return NX_ERROR;
+   }
+   int l=strlen(groupName);
+   for(; groupName[l-1] == '/' && l>0;) {
+	groupName[l-1] = '\0';
+        l--;
    }
    if (FindGroup (fileId, groupName, groupClass) != NX_OK) return NX_ERROR;
    if (NXopengroup (fileId, groupName, groupClass) != NX_OK) return NX_ERROR;
