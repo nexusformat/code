@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
    char prompt[512];
    char *inputText;
    NXname groupName, dataName;
-   int status, groupLevel = 0, i;
+   int status, i;
 
 #if HAVE_LIBREADLINE
    rl_readline_name = "NXbrowse";
@@ -308,32 +308,41 @@ int main(int argc, char *argv[])
       if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
          stringPtr = strtok(NULL, " "); 
          if (stringPtr != NULL) {
+	   char newwd[256];
+	   memset(newwd, 0, 256);
+
+		/** this string handling with hindsight is a bit clueless **/
+		/** strtok on / would have been much better... **/
 	    if (StrEq(stringPtr, "-")) {
                strcpy (groupName, oldwd);
 	    } else {
                strcpy (groupName, stringPtr);
 	    }
-			 if (StrEq(groupName, "..")) {
-				 strcpy(command, "CLOSE");
-			 } else {
-				 printf(" groupname %s\n", groupName);
-				 char newwd[256];
-				 memset(newwd, 0, 256);
+					stringPtr = groupName;
+
 				 if (groupName[0] != '/') {
-					if (strlen(path)>1)
-						 strcat(newwd, path);
+					int lenp = strlen(path);				
+
+	       				while(strncmp(stringPtr, "..", 2)==0) {
+						for(;lenp>2&&path[lenp-1]!='/';lenp--) 
+							;
+						lenp--;
+						stringPtr += 2;
+						while (stringPtr[0] == '/') stringPtr++;
+					}
+
+					if (lenp>1)
+						 strncat(newwd, path, lenp);
 					 strcat(newwd, "/");
 				 }
-				 strcat(newwd, groupName);
+				 strcat(newwd, stringPtr);
+
 				 status = NXBopen(the_fileId, newwd);
-				 printf(" going to %s\n", newwd);
-				 /* Add the group to the prompt string */
+
 				 if (status == NX_OK) {
 					 strcpy(oldwd, path);
 					 strcpy(path, newwd);
-					 groupLevel++;
 				 }
-			 }
          } else {
             fprintf (rl_outstream, "NX_ERROR: Specify a group\n");
          }
@@ -367,14 +376,13 @@ int main(int argc, char *argv[])
       }
       /* Command is to close the current group */
       if (StrEq(command, "CLOSE")) {
-         if (groupLevel > 0) {
+         if (strlen(path) > 1) {
             if (NXclosegroup (the_fileId) == NX_OK) {
                /* Remove the group from the prompt string */
                strcpy(oldwd, path);
                stringPtr = strrchr(path, '/'); /* position of last group delimiter */
                if (stringPtr != NULL) 
                   *stringPtr = '\0';            /* terminate the string there */
-               groupLevel--;
             }
          } else {
             fprintf (rl_outstream, "NX_WARNING: Already at root level of file\n");
@@ -409,7 +417,7 @@ int main(int argc, char *argv[])
       }
       /* Command is to exit the program */
       if (StrEq(command, "EXIT") || StrEq(command, "QUIT")) {
-         for (i = groupLevel; i > 0; i--) NXclosegroup (the_fileId);
+         /* for (i = groupLevel; i > 0; i--) NXclosegroup (the_fileId); */
          NXclose(&the_fileId);
          return NX_OK;
       }
