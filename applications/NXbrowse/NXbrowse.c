@@ -3,7 +3,7 @@
   
  NeXus Browser
 
- Copyright (C) 2000, Ray Osborn
+ Copyright (C) 2000-2014, NIAC
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,6 @@
 
  For further information, see <http://www.nexusformat.org>
 
- $Id$
 !----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -35,8 +34,7 @@
 #include <stdlib.h>
 #include "napi.h"
 #include "napiconfig.h"
-static char* my_readline(const char* prompt)
-{
+static char* my_readline(const char* prompt) {
     char inputText[256];
     char* stringPtr;
     fprintf(stdout, "%s", prompt);
@@ -66,7 +64,7 @@ static char* my_readline(const char* prompt)
 #endif /* _WIN32 */
 
 int NXBdir (NXhandle fileId);
-int NXBopen (NXhandle fileId, NXname groupName);
+int NXBopen (NXhandle fileId, char* groupName);
 int NXBread (NXhandle fileId, NXname dataName, char *dimensions);
 int NXBdump (NXhandle fileId, NXname dataName, char *fileName);
 void ConvertUpperCase (char *string);
@@ -229,7 +227,7 @@ static char** nxbrowse_complete(const char* text, int start, int end)
 
 int main(int argc, char *argv[])
 {
-   char fileName[256], path[256], *command, *dimensions, *stringPtr;
+   char fileName[256], path[256], oldwd[256], *command, *dimensions, *stringPtr;
    char prompt[512];
    char *inputText;
    NXname groupName, dataName;
@@ -251,7 +249,7 @@ int main(int argc, char *argv[])
 #define add_history(a)
 #endif
 
-   printf ("NXBrowse %s Copyright (C) 2009 NeXus Data Format\n", NEXUS_VERSION);
+   printf ("NXBrowse %s Copyright (C) 2009-2014 NeXus Data Format\n", NEXUS_VERSION);
 #if HAVE_LIBREADLINE
    printf ("Built with readline support - use <TAB> to complete commands and paths\n");
 #endif /* HAVE_LIBREADLINE */
@@ -274,16 +272,17 @@ int main(int argc, char *argv[])
    strcpy (nxFile, fileName);
  
 /* Open input file and output global attributes */
-   if (NXopen (fileName, NXACC_READ, &the_fileId) != NX_OK) {
+   if (NXopen(fileName, NXACC_READ, &the_fileId) != NX_OK) {
       printf ("NX_ERROR: Can't open %s\n", fileName);
       return NX_ERROR;
    }
    PrintAttributes (the_fileId);
    iByteAsChar = 0; /* Display remaining NX_INT8 and NX_UINT8 variables as integers by default */
 /* Input commands until the EXIT command is given */
-   strcpy (path, "NX");
+   strcpy(oldwd, "/");
+   strcpy(path, "/");
    do {
-      sprintf (prompt, "%s> ", path);
+      sprintf (prompt, "NX%s> ", path);
       if (getenv("NO_READLINE") != NULL) {
           inputText = my_readline(prompt);
       } else {
@@ -303,20 +302,35 @@ int main(int argc, char *argv[])
       /* Command is to print a directory of the current group */
       if (StrEq(command, "DIR") || StrEq(command, "LS")) {
          status = NXBdir(the_fileId);
+		/** allow "ls <foo>" **/
       }    
       /* Command is to open the specified group */
       if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
          stringPtr = strtok(NULL, " "); 
          if (stringPtr != NULL) {
-            strcpy (groupName, stringPtr);
+	    if (StrEq(stringPtr, "-")) {
+               strcpy (groupName, oldwd);
+	    } else {
+               strcpy (groupName, stringPtr);
+	    }
 			 if (StrEq(groupName, "..")) {
 				 strcpy(command, "CLOSE");
 			 } else {
-				 status = NXBopen (the_fileId, groupName);
+				 printf(" groupname %s\n", groupName);
+				 char newwd[256];
+				 memset(newwd, 0, 256);
+				 if (groupName[0] != '/') {
+					if (strlen(path)>1)
+						 strcat(newwd, path);
+					 strcat(newwd, "/");
+				 }
+				 strcat(newwd, groupName);
+				 status = NXBopen(the_fileId, newwd);
+				 printf(" going to %s\n", newwd);
 				 /* Add the group to the prompt string */
 				 if (status == NX_OK) {
-					 strcat (path, "/");
-					 strcat (path, groupName);
+					 strcpy(oldwd, path);
+					 strcpy(path, newwd);
 					 groupLevel++;
 				 }
 			 }
@@ -356,7 +370,8 @@ int main(int argc, char *argv[])
          if (groupLevel > 0) {
             if (NXclosegroup (the_fileId) == NX_OK) {
                /* Remove the group from the prompt string */
-               stringPtr = strrchr (path, '/'); /* position of last group delimiter */
+               strcpy(oldwd, path);
+               stringPtr = strrchr(path, '/'); /* position of last group delimiter */
                if (stringPtr != NULL) 
                   *stringPtr = '\0';            /* terminate the string there */
                groupLevel--;
@@ -427,20 +442,18 @@ void PrintGroupAttributes (NXhandle fileId, char *groupname)
 }
 
 /* Outputs the contents of a NeXus group */
-int NXBdir (NXhandle fileId)
-{
+int NXBdir (NXhandle fileId) {
    int status, dataType, dataRank, dataDimensions[NX_MAXRANK], length;
    NXname name, nxclass, nxurl;
 
-   if (NXinitgroupdir (fileId) != NX_OK) return NX_ERROR;
+   if (NXinitgroupdir(fileId) != NX_OK) return NX_ERROR;
    do {
-      status = NXgetnextentry (fileId, name, nxclass, &dataType);
+      status = NXgetnextentry(fileId, name, nxclass, &dataType);
       if (status == NX_ERROR) break;
       if (status == NX_OK) {
-	if (strncmp(nxclass,"CDF",3) == 0){ 
+	if (strncmp(nxclass,"CDF",3) == 0) { 
 	    ;
-	}
-	else if (strcmp(nxclass,"SDS") == 0){ 
+	} else if (strcmp(nxclass,"SDS") == 0) { 
             printf ("  NX Data  : %s", name);
             if (NXopendata (fileId, name) != NX_OK) return NX_ERROR;
             if (NXgetinfo (fileId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
@@ -451,15 +464,15 @@ int NXBdir (NXhandle fileId)
             printf ("\n");
 	} else {
 	    length = sizeof(nxurl);
-	    if(NXisexternalgroup(fileId, name,nxclass,nxurl,length) == NX_OK){
-	      printf ("  NX external Group: %s (%s), linked to: %s \n",name,nxclass,nxurl); 
+	    if (NXisexternalgroup(fileId, name, nxclass, nxurl, length) == NX_OK) {
+	      printf("  NX external Group: %s (%s), linked to: %s \n", name, nxclass, nxurl); 
             } else {
-	      printf ("  NX Group : %s (%s)\n", name, nxclass);
-	      if((status = NXopengroup(fileId,name,nxclass)) != NX_OK){
+	      printf("  NX Group : %s (%s)\n", name, nxclass);
+	      if ((status = NXopengroup(fileId, name, nxclass)) != NX_OK) {
 		return status;
 	      } 
 	      PrintGroupAttributes(fileId, name);
-	      if((status = NXclosegroup(fileId)) != NX_OK){
+	      if ((status = NXclosegroup(fileId)) != NX_OK) {
 		return status;
 	      } 
             }
@@ -470,22 +483,19 @@ int NXBdir (NXhandle fileId)
 }
 
 /* Opens the requested group */
-int NXBopen (NXhandle fileId, NXname groupName)
+int NXBopen (NXhandle fileId, char* groupName)
 {
-   NXname groupClass;
-
    if (groupName == NULL) {
       printf ("NX_ERROR: Specify a group name with the OPEN command\n");
       return NX_ERROR;
    }
    int l=strlen(groupName);
-   for(; groupName[l-1] == '/' && l>0;) {
+   for(; groupName[l-1] == '/' && l>1;) {
 	groupName[l-1] = '\0';
         l--;
    }
-   if (FindGroup (fileId, groupName, groupClass) != NX_OK) return NX_ERROR;
-   if (NXopengroup (fileId, groupName, groupClass) != NX_OK) return NX_ERROR;
-   return NX_OK;
+
+   return NXopengrouppath(fileId, groupName);
 }
 
 /* Outputs requested data */
