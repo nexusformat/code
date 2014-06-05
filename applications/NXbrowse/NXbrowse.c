@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
       printf ("NX_ERROR: Can't open %s\n", fileName);
       return NX_ERROR;
    }
-   PrintAttributes (the_fileId);
+   PrintAttributes(the_fileId);
    iByteAsChar = 0; /* Display remaining NX_INT8 and NX_UINT8 variables as integers by default */
 /* Input commands until the EXIT command is given */
    strcpy(oldwd, "/");
@@ -634,7 +634,7 @@ int NXBread (NXhandle fileId, NXname dataName, char *dimensions)
 
    /* Check for attributes unless a single element is specified */
    if (dimensions == NULL) 
-      PrintAttributes (fileId);
+      PrintAttributes(fileId);
 
    /* Close data set */
    if (NXclosedata(fileId) != NX_OK) return NX_ERROR;
@@ -692,8 +692,7 @@ int NXBdump (NXhandle fileId, NXname dataName, char *fileName)
 }
 
 /* Converts command string to upper case */
-void ConvertUpperCase (char *string)
-{
+void ConvertUpperCase (char *string) {
    int i;
    
    for (i=0; string[i]!=0; i++) {
@@ -704,31 +703,29 @@ void ConvertUpperCase (char *string)
 }   
 
 /* Checks for attributes and outputs their values */
-void PrintAttributes (NXhandle fileId)
-{
+void PrintAttributes(NXhandle fileId) {
    int status, attrLen, attrType;
    NXname attrName;
    void *attrBuffer;
 
    do {
-      status = NXgetnextattr (fileId, attrName, &attrLen, &attrType);
+      status = NXgetnextattr(fileId, attrName, &attrLen, &attrType);
       if (status == NX_ERROR) return;
       if (status == NX_OK) {
          attrLen++; /* Add space for string termination */
-         if (NXmalloc((void**)&attrBuffer, 1, &attrLen, attrType) != NX_OK) return;
-         if (NXgetattr (fileId, attrName, attrBuffer,&attrLen , &attrType) != NX_OK) return;
-         printf ("    %s = ", attrName);
-         PrintData (attrBuffer, attrType, attrLen);
+         if (NXmalloc((void**) &attrBuffer, 1, &attrLen, attrType) != NX_OK) return;
+         if (NXgetattr(fileId, attrName, attrBuffer, &attrLen , &attrType) != NX_OK) return;
+         printf("    %s = ", attrName);
+         PrintData(attrBuffer, attrType, attrLen);
          printf ("\n");
-         if (NXfree((void**)&attrBuffer) != NX_OK) return;
+         if (NXfree((void**) &attrBuffer) != NX_OK) return;
       }
    } while (status != NX_EOD);
    return;
 }
 
 /* Outputs the specified dimensions as a formatted string */
-void PrintDimensions (int rank, int dimensions[])
-{
+void PrintDimensions (int rank, int dimensions[]) {
    int i;
 
    /* if (rank > 1 || dimensions[0] != 1) { */
@@ -743,8 +740,7 @@ void PrintDimensions (int rank, int dimensions[])
 }
 
 /* Converts the NeXus data type into a character string */
-void PrintType (int dataType)
-{
+void PrintType (int dataType) {
    switch (dataType) {
       case NX_CHAR:
         printf ("(NX_CHAR)");

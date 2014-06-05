@@ -2087,41 +2087,41 @@ AT_CLEANUP
 AT_BANNER([[Testing NXbrowse Tool.]])
 AT_SETUP([Checking nxbrowse HDF4 test file])
 AT_CHECK([$HAVE_HDF4 && env NO_READLINE=1 nxbrowse NXtest.hdf  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF_version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.4.0 Copyright (C) 2009 NeXus Data Format
+[[NXBrowse 4.4.0 Copyright (C) 2009-2014 NeXus Data Format
     NeXus_version = 4.4.0
     file_name = NXtest.hdf
-NX>   NX Group : entry (NXentry)
+NX/>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
              entry attribute: cucumber = passion
   NX Group : link (NXentry)
-NX>
+NX/>
 ]])
 AT_CLEANUP
 AT_SETUP([Checking nxbrowse HDF5 test file])
 AT_CHECK([$HAVE_HDF5 && env NO_READLINE=1 nxbrowse NXtest.h5  < ${abs_srcdir}/nxbrowse.txt | grep -v 'HDF5_Version = ' | grep -v 'file_time = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.4.0 Copyright (C) 2009 NeXus Data Format
+[[NXBrowse 4.4.0 Copyright (C) 2009-2014 NeXus Data Format
     NeXus_version = 4.4.0
     file_name = NXtest.h5
-NX>   NX Group : entry (NXentry)
+NX/>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
              entry attribute: cucumber = passion
   NX Group : link (NXentry)
-NX>
+NX/>
 ]])
 AT_CLEANUP
 AT_SETUP([Checking nxbrowse XML test file])
 AT_CHECK([$HAVE_XML && env NO_READLINE=1 nxbrowse NXtest.xml  < ${abs_srcdir}/nxbrowse.txt | grep -v 'file_time = ' | grep -v 'XML_version = ' | grep -v 'readline support' | sed -e 's/\r$//' | sed -e 's/[ ]*$//' ],[], 
-[[NXBrowse 4.4.0 Copyright (C) 2009 NeXus Data Format
+[[NXBrowse 4.4.0 Copyright (C) 2009-2014 NeXus Data Format
     NeXus_version = 4.4.0
     file_name = NXtest.xml
     xmlns = http://definition.nexusformat.org/schema/3.1
     xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
     xsi:schemaLocation = http://definition.nexusformat.org/schema/3.1 http://definition.nexusformat.org/schema/3.1/BASE.xsd
-NX>   NX Group : entry (NXentry)
+NX/>   NX Group : entry (NXentry)
              entry attribute: hugo = namenlos
              entry attribute: cucumber = passion
   NX Group : link (NXentry)
-NX>
+NX/>
 ]])
 AT_CLEANUP
 
