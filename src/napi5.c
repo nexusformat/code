@@ -678,14 +678,12 @@ static hid_t nxToHDF5Type(int datatype)
       Check dimensions for consistency. Dimension may be -1
       thus denoting an unlimited dimension.
       */
-      for (i = 0; i < rank; i++)
-      {
+      for (i = 0; i < rank; i++) {
           chunkdims[i] = chunk_size[i];
           mydim[i] = dimensions[i];
           maxdims[i] = dimensions[i];
           size[i] = dimensions[i];
-          if (dimensions[i] <= 0) 
-          {
+          if (dimensions[i] <= 0) {
 		mydim[i] = 1;
 		maxdims[i] = H5S_UNLIMITED;
                 size[i] = 1;
@@ -697,8 +695,7 @@ static hid_t nxToHDF5Type(int datatype)
           }
       }
 
-      if (datatype == NX_CHAR)
-      {
+      if (datatype == NX_CHAR) {
           /* 
           *  This assumes string lenght is in the last dimensions and
           *  the logic must be the same as used in NX5getslab and NX5getinfo
@@ -706,129 +703,101 @@ static hid_t nxToHDF5Type(int datatype)
           *  search for tests on H5T_STRING
           */
           byte_zahl=(size_t)mydim[rank-1]; 
-          for(i = 0; i < rank; i++)
-          {
+          for(i = 0; i < rank; i++) {
               mydim1[i] = mydim[i];
-		if (dimensions[i] <= 0) 
-		  {
+		if (dimensions[i] <= 0) {
 	              mydim1[0] = 1;
        		       maxdims[0] = H5S_UNLIMITED;
 		 }
-
           }
           mydim1[rank-1] = 1;
-          if (mydim[rank-1] > 1)
-          {
+          if (mydim[rank-1] > 1) {
               mydim[rank-1] = maxdims[rank-1] = size[rank-1] = 1;
           }
-          if (chunkdims[rank-1] > 1) 
-          { 
+          if (chunkdims[rank-1] > 1) { 
               chunkdims[rank-1] = 1; 
           }
           dataspace=H5Screate_simple(rank,mydim1,maxdims);
-      } 
-      else 
-      {
-	  if (unlimiteddim)
-	  {
+      } else {
+	  if (unlimiteddim) {
               dataspace=H5Screate_simple(rank, mydim, maxdims);
-          } 
-          else 
-          {
+          } else {
               /* dataset creation */
               dataspace=H5Screate_simple(rank, mydim, NULL);  
           }
       }  
       datatype1=H5Tcopy(type);
-      if (datatype == NX_CHAR)
-      {
+      if (datatype == NX_CHAR) {
           H5Tset_size(datatype1, byte_zahl);
           /*       H5Tset_strpad(H5T_STR_SPACEPAD); */
       }
       compress_level = 6;
-      if ( (compress_type / 100) ==  NX_COMP_LZW )
-      {
+      if ( (compress_type / 100) ==  NX_COMP_LZW ) {
           compress_level = compress_type % 100;
           compress_type = NX_COMP_LZW;
       }
-      if(compress_type == NX_COMP_LZW)
-      {
+      if(compress_type == NX_COMP_LZW) {
           cparms = H5Pcreate(H5P_DATASET_CREATE);
           iNew = H5Pset_chunk(cparms,rank,chunkdims);
-          if (iNew < 0) 
-          {
+          if (iNew < 0) {
               NXReportError( "ERROR: size of chunks could not be set");
               return NX_ERROR;
           }
           H5Pset_deflate(cparms,compress_level); 
-          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
-      } 
-      else if (compress_type == NX_COMP_NONE) 
-      {
-          if (unlimiteddim)
-          {
+          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, 
+                         dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
+      } else if (compress_type == NX_COMP_NONE) {
+          if (unlimiteddim) {
               cparms = H5Pcreate(H5P_DATASET_CREATE);
               iNew = H5Pset_chunk(cparms,rank,chunkdims);
-              if (iNew < 0) 
-              {
+              if (iNew < 0) {
                   NXReportError( "ERROR: size of chunks could not be set");
                   return NX_ERROR;
               }
-              iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
-          } 
-          else 
-          {
-              iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+              iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, 
+                         dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);   
+          } else {
+              iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, 
+                       dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
           }               
-      } 
-      else if (compress_type == NX_CHUNK) 
-      {
+      } else if (compress_type == NX_CHUNK) {
           cparms = H5Pcreate(H5P_DATASET_CREATE);
           iNew = H5Pset_chunk(cparms,rank,chunkdims);
-          if (iNew < 0) 
-          {
+          if (iNew < 0) {
               NXReportError("ERROR: size of chunks could not be set");
               return NX_ERROR;
           }
-          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
+          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, 
+                      dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 
-      } 
-      else 
-      {
+      } else {
           NXReportError( 
-              "HDF5 doesn't support selected compression method! Dataset was saved without compression");
-          iRet = H5Dcreate (pFile->iCurrentG, (char*)name, datatype1, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
+              "HDF5 doesn't support selected compression method! Dataset created without compression");
+          iRet = H5Dcreate(pFile->iCurrentG, (char*)name, datatype1, 
+                    dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
       }
-      if (iRet < 0) 
-      {
+      if (iRet < 0) {
           NXReportError( "ERROR: creating chunked dataset failed");
           return NX_ERROR;
-      } 
-      else 
-      {
+      } else {
           pFile->iCurrentD = iRet;
       }
-      if (unlimiteddim)
-      {      
+      if (unlimiteddim) {      
           iNew = H5Dset_extent  (pFile->iCurrentD, size);
-          if (iNew < 0) 
-          {
-              sprintf (pBuffer, "ERROR: cannot create dataset %s",
-                  name);
+          if (iNew < 0) {
+              sprintf (pBuffer, "ERROR: cannot create dataset %s", name);
               NXReportError( pBuffer);
               return NX_ERROR;
           }
       }
-      if (cparms != -1)
-      {
+      if (cparms != -1) {
           iRet = H5Pclose(cparms);
       }
       iRet = H5Sclose(dataspace);
       iRet = H5Tclose(datatype1);
       iRet = H5Dclose(pFile->iCurrentD);
       pFile->iCurrentD = 0;
-      if (iRet < 0)
-      {
+      if (iRet < 0) {
           NXReportError( "ERROR: HDF cannot close dataset");
           return NX_ERROR;
       }
@@ -838,22 +807,22 @@ static hid_t nxToHDF5Type(int datatype)
 
   /* --------------------------------------------------------------------- */
 
-  NXstatus  NX5makedata64 (NXhandle fid, CONSTCHAR *name, int datatype, 
+  NXstatus  NX5makedata64(NXhandle fid, CONSTCHAR *name, int datatype, 
                                   int rank, int64_t dimensions[])
   {
-  int64_t chunk_size[H5S_MAX_RANK];
-  int i;
-   
-  NXI5assert(fid);
-    
-  memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
-  memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
-  for(i = 0; i< rank; i++) {
-  if (dimensions[i] == NX_UNLIMITED || dimensions[i] <= 0){
-         chunk_size[i]= 1;
-  }    
-  }
-  return NX5compmakedata64 (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
+	  int64_t chunk_size[H5S_MAX_RANK];
+	  int i;
+	   
+	  NXI5assert(fid);
+	    
+	  memset(chunk_size,0,H5S_MAX_RANK*sizeof(int64_t));
+	  memcpy(chunk_size,dimensions,rank*sizeof(int64_t));
+	  for(i = 0; i< rank; i++) {
+		  if (dimensions[i] == NX_UNLIMITED || dimensions[i] <= 0){
+			 chunk_size[i]= 1;
+		  }    
+	  }
+	  return NX5compmakedata64 (fid, name, datatype, rank, dimensions, NX_COMP_NONE, chunk_size);
   }
 
   
@@ -1870,8 +1839,7 @@ return NX_OK;
 
    /*-------------------------------------------------------------------------*/
 
-   NXstatus  NX5getinfo64 (NXhandle fid, int *rank, int64_t dimension[], int *iType)
-   {
+   NXstatus  NX5getinfo64 (NXhandle fid, int *rank, int64_t dimension[], int *iType) {
      pNexusFile5 pFile;
      int i, iRank, mType;
      hsize_t myDim[H5S_MAX_RANK], vlen_bytes = 0, total_dims_size = 1; 
@@ -1912,7 +1880,7 @@ return NX_OK;
      for (i = 0; i < iRank; i++) {
 	  dimension[i] = (int64_t)myDim[i];
      }
- /* printf("\nrank %d first dimension: %ld\n", *rank, dimension[0]);  */
+/* printf("\nrank %d first dimension: %ld\n", *rank, dimension[0]);  */
      return NX_OK;
    }
 
