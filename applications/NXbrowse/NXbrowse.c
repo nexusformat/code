@@ -83,6 +83,7 @@ static int iByteAsChar = 1; /* Assume global attributes are all characters */
 static char nxFile[256];
 
 static NXhandle the_fileId;
+static char path[256];
 
 /* 
  * Freddie Akeroyd 18/10/2009 
@@ -115,38 +116,28 @@ COMMAND commands[] = {
 };
 
 #if HAVE_LIBREADLINE
-static char* command_generator(const char* text, int state)
-{
+static char* command_generator(const char* text, int state) {
     static int len, list_index;
     const char* name;
-    if (!state)
-    {
+    if (!state) {
         list_index = 0;
         len = strlen(text);
     } 
-    while( (name = commands[list_index].name) != NULL )
-    {
+    while( (name = commands[list_index].name) != NULL ) {
 	++list_index;
-	if (STRNCASECMP(name, text, len) == 0)
-	{
+	if (STRNCASECMP(name, text, len) == 0) {
 	    return strdup(name);
 	}
     }
     return NULL;
 }
-#endif
 
-struct name_item; /* forward declaration for a linked list */
-
-struct name_item
-{
+struct name_item {
     char* name;
     struct name_item* next;
 };
     
-#if HAVE_LIBREADLINE
-static char* field_generator(const char* text, int state)
-{
+static char* field_generator(const char* text, int state) {
     static int len;
     struct name_item *item, *t_item;
     static struct name_item *names = NULL, *last_item = NULL;
@@ -166,10 +157,30 @@ static char* field_generator(const char* text, int state)
 	    free(t_item);
 	}
 	last_item = names = NULL;
+
         len = strlen(text);
+		char tmppath[256]; 
+		memset(tmppath, 0, 256);
+	char* gobackto = NULL;
+	char* dirend = strrchr(text, '/'); /* position of last group delimiter */
+	if (dirend != NULL) {
+		gobackto = path;
+
+		if (strlen(path)>1) {
+			strcpy(tmppath, path);
+			strcat(tmppath, "/");
+		}
+		strncat(tmppath, text, dirend-text);
+		text = dirend+1;
+		len = strlen(text);
+		status = NXopengrouppath(the_fileId, tmppath);
+		
+                if (status == NX_ERROR) return NULL;
+	}
         if (NXinitgroupdir(the_fileId) != NX_OK) {
 	    return NULL;
         }
+
         do {
            status = NXgetnextentry(the_fileId, name, nxclass, &dataType);
            if (status == NX_ERROR) break;
@@ -177,8 +188,15 @@ static char* field_generator(const char* text, int state)
 	      if (strncmp(nxclass,"CDF",3) == 0) { 
 	          ;
 	      } else if (strncmp(name, text, len) == 0) {
-		  item = (struct name_item*)malloc(sizeof(struct name_item));
-                  item->name = strdup(name);
+		  item = (struct name_item*) malloc(sizeof(struct name_item));
+		  item->name = (char*) malloc(256);
+		  if (strlen(tmppath) > 0) {
+                    strcpy(item->name, tmppath);
+		    strcat(item->name, "/");
+		    strcat(item->name, name);
+		  } else {
+                    strcpy(item->name, name);
+		  }
 	          if (strcmp(nxclass,"SDS") != 0) { 
 		     strcat(item->name, "/");
 		  }
@@ -192,6 +210,9 @@ static char* field_generator(const char* text, int state)
               }
            } 
         } while (status == NX_OK);
+	if (gobackto != NULL) {
+		NXopengrouppath(the_fileId, gobackto);
+	}
         last_item = names;
     }
     if (last_item != NULL) {
@@ -227,7 +248,7 @@ static char** nxbrowse_complete(const char* text, int start, int end)
 
 int main(int argc, char *argv[])
 {
-   char fileName[256], path[256], oldwd[256], *command, *dimensions, *stringPtr;
+   char fileName[256], oldwd[256], *command, *dimensions, *stringPtr;
    char prompt[512];
    char *inputText;
    NXname groupName, dataName;
@@ -265,11 +286,10 @@ int main(int argc, char *argv[])
       }
       if ((stringPtr = strchr(fileName, '\n')) != NULL) 
          *stringPtr = '\0';
+   } else {
+     strcpy(fileName, argv[1]);
    }
-   else {
-     strcpy (fileName, argv[1]);
-   }
-   strcpy (nxFile, fileName);
+   strcpy(nxFile, fileName);
  
 /* Open input file and output global attributes */
    if (NXopen(fileName, NXACC_READ, &the_fileId) != NX_OK) {
@@ -314,9 +334,9 @@ int main(int argc, char *argv[])
 		/** this string handling with hindsight is a bit clueless **/
 		/** strtok on / would have been much better... **/
 	    if (StrEq(stringPtr, "-")) {
-               strcpy (groupName, oldwd);
+               strcpy(groupName, oldwd);
 	    } else {
-               strcpy (groupName, stringPtr);
+               strcpy(groupName, stringPtr);
 	    }
 					stringPtr = groupName;
 
@@ -354,7 +374,7 @@ int main(int argc, char *argv[])
             strcpy (dataName, stringPtr);
             stringPtr = strtok(NULL," ");
             if (stringPtr != NULL) {
-               strcpy (fileName, stringPtr);
+               strcpy(fileName, stringPtr);
                status = NXBdump (the_fileId, dataName, fileName);
             } else {
                fprintf (rl_outstream, "NX_ERROR: Specify a dump file name \n");
@@ -365,9 +385,9 @@ int main(int argc, char *argv[])
       }
       /* Command is to print the values of the data */
       if (StrEq(command, "READ") || StrEq(command, "CAT")) {
-         stringPtr = strtok (NULL, " [");
+         stringPtr = strtok(NULL, " [");
          if (stringPtr != NULL) {
-            strcpy (dataName, stringPtr);
+            strcpy(dataName, stringPtr);
             dimensions = strtok(NULL, "[]");
             status = NXBread (the_fileId, dataName, dimensions);
          } else {
