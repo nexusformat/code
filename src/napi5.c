@@ -70,46 +70,39 @@ extern  void *NXpData;
         char iAccess[2];
   } NexusFile5, *pNexusFile5;
 
-/* 
-   forward declaration of NX5closegroup in order to get rid of a nasty
-   warning
-*/
+/* forward declaration of NX5closegroup in order to get rid of a nasty warning */
+
 NXstatus  NX5closegroup (NXhandle fid);
+
 /*-------------------------------------------------------------------*/
 
-  static pNexusFile5 NXI5assert(NXhandle fid)
-  {
+static pNexusFile5 NXI5assert(NXhandle fid) {
     pNexusFile5 pRes;
   
     assert(fid != NULL);
     pRes = (pNexusFile5)fid;
     assert(pRes->iNXID == NX5SIGNATURE);
     return pRes;
-  }
+}
   
-  /*--------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
-   static void NXI5KillDir (pNexusFile5 self)
-  {
+static void NXI5KillDir (pNexusFile5 self) {
     self->iStack5[self->iStackPtr].iCurrentIDX = 0;
-  }
+}
 
-static herr_t readStringAttribute(hid_t attr, char** data)
-{
+static herr_t readStringAttribute(hid_t attr, char** data) {
      size_t iSize;
      herr_t iRet;
      hid_t atype = -1, btype = -1;
 
 	atype = H5Aget_type(attr);
-	*data = NULL;
-	if ( H5Tis_variable_str(atype) )
-	{
+	/* if (H5Tis_variable_str(atype)) {
+	    *data = malloc(512);
 	    btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
-	    iRet = H5Aread(attr, btype, data);
+	    iRet = H5Aread(attr, btype, *data);
 	    H5Tclose(btype);
-	}
-	else
-	{
+	} else */ {
 	    iSize = H5Tget_size(atype);
 	    *data = malloc(iSize+1);
 	    iRet = H5Aread(attr, atype, *data);
@@ -119,25 +112,24 @@ static herr_t readStringAttribute(hid_t attr, char** data)
     return iRet;
 }
   
-static herr_t readStringAttributeN(hid_t attr, char* data, int maxlen)
-{
+static herr_t readStringAttributeN(hid_t attr, char* data, int maxlen) {
     herr_t iRet;
     char* vdat = NULL;
     iRet = readStringAttribute(attr, &vdat);
-    if (iRet >= 0)
-    {
+    if (iRet >= 0) {
         strncpy(data, vdat, maxlen);
         free(vdat);
     }
     data[maxlen-1] = '\0';
     return iRet;
 }
-  /*--------------------------------------------------------------------*/
 
-  static void NXI5KillAttDir (pNexusFile5 self)
-  {
+/*--------------------------------------------------------------------*/
+
+static void NXI5KillAttDir (pNexusFile5 self) {
     self->iAtt5.iCurrentIDX = 0;
-  }
+}
+
 /*---------------------------------------------------------------------*/
 static void buildCurrentPath(pNexusFile5 self, char *pathBuffer, 
 			     int pathBufferLen){
@@ -2130,16 +2122,16 @@ iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, filespace, H5P_DEFAULT, d
      vid = getAttVID(pFile);
      iNew = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
      if (iNew < 0) {
-       sprintf (pBuffer, "ERROR: attribute \"%s\" not found", name);
+       sprintf(pBuffer, "ERROR: attribute \"%s\" not found", name);
        killAttVID(pFile,vid);
-       NXReportError( pBuffer);
+       NXReportError(pBuffer);
        return NX_ERROR;
      }
      pFile->iCurrentA = iNew;
      /* finally read the data */
-     if (type==H5T_C_S1)
-     {
+     if (type==H5T_C_S1) {
 	atype = H5Aget_type(pFile->iCurrentA);
+
 	iRet = readStringAttributeN(pFile->iCurrentA, data, *datalen);
 	*datalen = (int)strlen((char*)data);
      } else {
@@ -2157,8 +2149,7 @@ iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace, filespace, H5P_DEFAULT, d
      H5Aclose(pFile->iCurrentA);
 
      killAttVID(pFile,vid);
-     if (type==H5T_C_S1)
-     {
+     if (atype != -1) {
        H5Tclose(atype);
      }
      return NX_OK;
