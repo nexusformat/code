@@ -138,7 +138,6 @@ struct name_item {
 };
     
 static char* field_generator(const char* text, int state) {
-    static int len;
     struct name_item *item, *t_item;
     static struct name_item *names = NULL, *last_item = NULL;
     char* res;
@@ -158,9 +157,9 @@ static char* field_generator(const char* text, int state) {
 	}
 	last_item = names = NULL;
 
-        len = strlen(text);
-		char tmppath[256]; 
-		memset(tmppath, 0, 256);
+	char* matchtext = text;
+	char tmppath[256]; 
+	memset(tmppath, 0, 256);
 	char* gobackto = NULL;
 	char* dirend = strrchr(text, '/'); /* position of last group delimiter */
 	if (dirend != NULL) {
@@ -171,8 +170,7 @@ static char* field_generator(const char* text, int state) {
 			strcat(tmppath, "/");
 		}
 		strncat(tmppath, text, dirend-text);
-		text = dirend+1;
-		len = strlen(text);
+		matchtext = dirend+1;
 		status = NXopengrouppath(the_fileId, tmppath);
 		
                 if (status == NX_ERROR) return NULL;
@@ -187,12 +185,11 @@ static char* field_generator(const char* text, int state) {
            if (status == NX_OK) {
 	      if (strncmp(nxclass,"CDF",3) == 0) { 
 	          ;
-	      } else if (strncmp(name, text, len) == 0) {
+	      } else if (strncmp(name, matchtext, strlen(matchtext)) == 0) {
 		  item = (struct name_item*) malloc(sizeof(struct name_item));
-		  item->name = (char*) malloc(256);
-		  if (strlen(tmppath) > 0) {
-                    strcpy(item->name, tmppath);
-		    strcat(item->name, "/");
+		  item->name = (char*) calloc(256, 1);
+		  if (matchtext != text) {
+                    strncpy(item->name, text, matchtext - text);
 		    strcat(item->name, name);
 		  } else {
                     strcpy(item->name, name);
