@@ -1693,8 +1693,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	    open group and find class name attribute 
 	  */
            strcpy(ph_name,"");
-           for(i = 1; i < (pFile->iStackPtr + 1); i++)
-           {
+           for(i = 1; i < (pFile->iStackPtr + 1); i++) {
               strcat(ph_name,pFile->iStack5[i].irefn);
               strcat(ph_name,"/");
            }
@@ -1769,46 +1768,45 @@ static int countObjectsInGroup(hid_t loc_id)
 
      pFile = NXI5assert (fid);
      /* check if there is an Dataset open */
-     if (pFile->iCurrentD == 0) 
-     {
+     if (pFile->iCurrentD == 0) {
 	NXReportError( "ERROR: no dataset open");
 	return NX_ERROR;
      }
      ndims = H5Sget_simple_extent_dims(pFile->iCurrentS, dims, NULL); 
 
-     if (ndims == 0) { /* SCALAR dataset */ /* this is a proof of concept and should be nicer integrated with what's going on below */
-hid_t memspace = H5Screate(H5S_SCALAR);
-            hid_t datatype = H5Dget_type(pFile->iCurrentD);
-            hid_t filespace = H5Dget_space(pFile->iCurrentD);
-H5Sselect_all(filespace);
-status = H5Dread(pFile->iCurrentD, datatype, memspace, filespace, H5P_DEFAULT, data);
-  H5Sclose(memspace);
-  H5Sclose(filespace);
-  H5Tclose(datatype);
-return NX_OK;
+     if (ndims == 0) { /* SCALAR dataset */ 
+	/* this is a proof of concept and should be integrated with what's going on below */
+	hid_t memspace = H5Screate(H5S_SCALAR);
+	memspace = H5Tcopy(H5T_C_S1);
+        hid_t datatype = H5Dget_type(pFile->iCurrentD);
+        hid_t filespace = H5Dget_space(pFile->iCurrentD);
+	H5Sselect_all(filespace);
+	char *strdata = malloc(512);
+	status = H5Dread(pFile->iCurrentD, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &strdata);
+	strcpy(data, strdata);
+	free(strdata);
+	H5Sclose(memspace);
+	H5Sclose(filespace);
+	H5Tclose(datatype);
+	return NX_OK;
      }
-     if (ndims <= 0)
-     {
+     if (ndims <= 0) {
 	NXReportError( "ERROR: unable to read dims");
 	return NX_ERROR;
      }
      memset (iStart, 0, H5S_MAX_RANK * sizeof(int));
      /* map datatypes of other plateforms */
      tclass = H5Tget_class(pFile->iCurrentT);
-     if ( H5Tis_variable_str(pFile->iCurrentT) )
-     {
+     if ( H5Tis_variable_str(pFile->iCurrentT) ) {
         vstrdata = (char **) malloc ((size_t)dims[0] * sizeof (char *));
 	memtype_id = H5Tcopy(H5T_C_S1);
 	H5Tset_size(memtype_id, H5T_VARIABLE);
-        status = H5Dread (pFile->iCurrentD, memtype_id, 
-		       H5S_ALL, H5S_ALL,H5P_DEFAULT, vstrdata);
+        status = H5Dread(pFile->iCurrentD, memtype_id, 
+		       H5S_ALL, H5S_ALL, H5P_DEFAULT, vstrdata);
         ((char*)data)[0] = '\0';
-        if (status >= 0)
-	{
-	    for(i=0; i<dims[0]; ++i)
-	    {
-	        if (vstrdata[i] != NULL)
-	 	{
+        if (status >= 0) {
+	    for(i=0; i<dims[0]; ++i) {
+	        if (vstrdata[i] != NULL) {
 		    strcat((char*)data, vstrdata[i]);
 		}
 	    }
@@ -1816,23 +1814,17 @@ return NX_OK;
         H5Dvlen_reclaim(memtype_id, pFile->iCurrentS, H5P_DEFAULT, vstrdata);
 	free(vstrdata);
         H5Tclose(memtype_id);
-     }
-     else if (tclass==H5T_STRING)
-     {
+     } else if (tclass==H5T_STRING) {
         status = H5Dread (pFile->iCurrentD, pFile->iCurrentT, 
 		       H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
-     }
-     else 
-     {
+     } else {
        memtype_id = h5MemType(pFile->iCurrentT);
        status = H5Dread (pFile->iCurrentD, memtype_id, 
 		       H5S_ALL, H5S_ALL,H5P_DEFAULT, data);
      }
-     if(status < 0)
-     {
+     if(status < 0) {
 	NXReportError( "ERROR: failed to transfer dataset");
 	return NX_ERROR;
-
      }
      return NX_OK;
    }
