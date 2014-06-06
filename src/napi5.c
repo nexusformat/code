@@ -1779,27 +1779,23 @@ NXstatus NX5getdata(NXhandle fid, void *data)
 
 		tclass = H5Tget_class(datatype);
 
-		if (tclass == H5T_STRING) {
-			/* string */
-			memtype_id = H5Tcopy(H5T_C_S1);
+		if (H5Tis_variable_str(pFile->iCurrentT)) {
 			char *strdata = calloc(512, sizeof(char));
 			status =
-			    H5Dread(pFile->iCurrentD, datatype, memtype_id,
+			    H5Dread(pFile->iCurrentD, datatype, H5S_ALL,
 				    H5S_ALL, H5P_DEFAULT, &strdata);
-			printf(" I got %s as strdata \n", strdata);
 			if (status >= 0)
 				strncpy(data, strdata, strlen(strdata));
 			free(strdata);
 		} else {
-			/* non-string */
 			memtype_id = H5Screate(H5S_SCALAR);
 			H5Sselect_all(filespace);
 			status =
 			    H5Dread(pFile->iCurrentD, datatype, memtype_id,
 				    filespace, H5P_DEFAULT, data);
+			H5Sclose(memtype_id);
 		}
 
-		H5Sclose(memtype_id);
 		H5Sclose(filespace);
 		H5Tclose(datatype);
 		if (status < 0)
@@ -1891,7 +1887,6 @@ NXstatus NX5getinfo64(NXhandle fid, int *rank, int64_t dimension[], int *iType)
 	for (i = 0; i < iRank; i++) {
 		dimension[i] = (int64_t) myDim[i];
 	}
-/* printf("\nrank %d first dimension: %ld\n", *rank, dimension[0]);  */
 	return NX_OK;
 }
 
