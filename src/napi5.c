@@ -1055,8 +1055,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
       return NX_ERROR;
     }
 
-    for(i = 0; i < rank; i++)
-    {
+    for(i = 0; i < rank; i++) {
        myStart[i] = iStart[i];
        mySize[i]  = iSize[i];
        size[i]    =  iStart[i] + iSize[i];
@@ -1064,24 +1063,20 @@ static void killAttVID(pNexusFile5 pFile, int vid){
 	unlimiteddim = 1;
        }
     }
-    if (H5Tget_class(pFile->iCurrentT) == H5T_STRING)
-    {
+    if (H5Tget_class(pFile->iCurrentT) == H5T_STRING) {
         mySize[rank - 1] = 1;
         myStart[rank - 1] = 0;
         size[rank - 1] = 1;
     }
     dataspace = H5Screate_simple(rank, mySize, NULL);
-    if (unlimiteddim)
-    {
-       for(i = 0; i < rank; i++)
-       {
+    if (unlimiteddim) {
+       for(i = 0; i < rank; i++) {
 	if (size[i] < thedims[i]) {
 		size[i] = thedims[i];
 	}
        } 
        iRet = H5Dset_extent(pFile->iCurrentD, size);
-       if (iRet < 0) 
-       {
+       if (iRet < 0) {
            NXReportError( "ERROR: extend slab failed");
            return NX_ERROR;
        }
@@ -1092,16 +1087,14 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        iRet = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, myStart,
                                NULL, mySize, NULL);
        /* deal with HDF errors */
-       if (iRet < 0) 
-       {
-       NXReportError( "ERROR: selecting slab failed");
-       return NX_ERROR;
+       if (iRet < 0) {
+         NXReportError( "ERROR: selecting slab failed");
+         return NX_ERROR;
        }
        /* write slab */ 
        iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, dataspace, 
                     filespace, H5P_DEFAULT, data);
-       if (iRet < 0)
-       {
+       if (iRet < 0) {
            NXReportError( "ERROR: writing slab failed");
        }
        /* update with new size */
@@ -1112,23 +1105,20 @@ static void killAttVID(pNexusFile5 pFile, int vid){
        iRet = H5Sselect_hyperslab(pFile->iCurrentS, H5S_SELECT_SET, myStart,
                                NULL, mySize, NULL);
        /* deal with HDF errors */
-       if (iRet < 0) 
-       {
+       if (iRet < 0) {
        NXReportError( "ERROR: selecting slab failed");
        return NX_ERROR;
        }
        /* write slab */ 
        iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, dataspace, 
                     pFile->iCurrentS, H5P_DEFAULT, data);
-       if (iRet < 0)
-       {
+       if (iRet < 0) {
            NXReportError( "ERROR: writing slab failed");
        }
    }
    /* deal with HDF errors */
    iRet = H5Sclose(dataspace);
-   if (iRet < 0) 
-   {
+   if (iRet < 0) {
       NXReportError( "ERROR: closing slab failed");
       return NX_ERROR;
    }
@@ -1137,17 +1127,14 @@ static void killAttVID(pNexusFile5 pFile, int vid){
  
   /* ------------------------------------------------------------------- */
 
-  NXstatus  NX5getdataID (NXhandle fid, NXlink* sRes)
-  {
+  NXstatus  NX5getdataID (NXhandle fid, NXlink* sRes) {
     pNexusFile5 pFile;
     int datalen, type = NX_CHAR;
   
     pFile = NXI5assert (fid);
 
-    /*
-      we cannot return ID's when no datset is open
-    */
-    if(pFile->iCurrentD <= 0){
+    /* we cannot return ID's when no datset is open */
+    if (pFile->iCurrentD <= 0) {
       return NX_ERROR;
     }
 
@@ -1158,8 +1145,7 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     NXMDisableErrorReporting();
     datalen = 1024;
     memset(&sRes->targetPath,0,datalen*sizeof(char));
-    if(NX5getattr(fid,"target",&sRes->targetPath,&datalen,&type) != NX_OK)
-    {
+    if(NX5getattr(fid, "target", &sRes->targetPath, &datalen, &type) != NX_OK) {
       buildCurrentPath(pFile, sRes->targetPath, 1024);
     }
     NXMEnableErrorReporting();
@@ -1167,17 +1153,16 @@ static void killAttVID(pNexusFile5 pFile, int vid){
     return NX_OK;
   }
 
- /* ------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
  
-  NXstatus  NX5printlink (NXhandle fid, NXlink* sLink)
-  {
+NXstatus  NX5printlink (NXhandle fid, NXlink* sLink) {
     NXI5assert(fid);
     printf("HDF5 link: targetPath = \"%s\", linkType = \"%d\"\n", sLink->targetPath, sLink->linkType);
     return NX_OK;
-  }
+}
+
 /*--------------------------------------------------------------------*/
-static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
-{
+static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink) {
   hid_t  dataID, aid2, aid1, attID;
   herr_t status;
   char name[] = "target";
@@ -1225,9 +1210,10 @@ static NXstatus NX5settargetattribute(pNexusFile5 pFile, NXlink *sLink)
     }
     return NX_OK;
 }
+
 /*---------------------------------------------------------------------*/
-NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
-{
+
+NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink) {
     pNexusFile5 pFile;
     char        linkTarget[1024];
 
@@ -1240,29 +1226,24 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
       build pathname to link from our current group and the name 
       of the thing to link
     */
-    if(strlen(pFile->name_ref) + strlen(name) + 2 < 1024)
-    {
+    if(strlen(pFile->name_ref) + strlen(name) + 2 < 1024) {
       strcpy(linkTarget,"/");
       strcat(linkTarget,pFile->name_ref);
       strcat(linkTarget,"/");
       strcat(linkTarget,name);
-    }
-    else 
-    {
+    } else {
       NXReportError("ERROR: path string to long");
       return NX_ERROR;
     } 
 
-    //targetid = H5Oopen(pFile->iFID, sLink->targetPath, H5P_DEFAULT);
     H5Lcreate_hard(pFile->iFID, sLink->targetPath, H5L_SAME_LOC, linkTarget, H5P_DEFAULT, H5P_DEFAULT);
-    //H5Oclose(targetid);
 
     return NX5settargetattribute(pFile,sLink);
 }
- /* ------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------- */
   
-  NXstatus  NX5makelink (NXhandle fid, NXlink* sLink)
-  {
+NXstatus  NX5makelink (NXhandle fid, NXlink* sLink) {
     pNexusFile5 pFile;
     char        linkTarget[1024];
     char        *itemName = NULL;
@@ -1299,39 +1280,31 @@ NXstatus NX5makenamedlink(NXhandle fid, CONSTCHAR *name, NXlink *sLink)
       return NX_ERROR;
     } 
 
-    //targetid = H5Oopen(pFile->iFID, sLink->targetPath, H5P_DEFAULT);
     H5Lcreate_hard(pFile->iFID, sLink->targetPath, H5L_SAME_LOC, linkTarget, H5P_DEFAULT, H5P_DEFAULT);
-    //H5Oclose(targetid);
 
     return NX5settargetattribute(pFile,sLink);
    }
  
-  /*----------------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 
-  NXstatus  NX5flush(NXhandle *pHandle)
-  {
+NXstatus  NX5flush(NXhandle *pHandle) {
     pNexusFile5 pFile = NULL;
     herr_t      iRet;
    
     pFile = NXI5assert (*pHandle);    
-    if (pFile->iCurrentD != 0)
-    {    
-    iRet=H5Fflush(pFile->iCurrentD,H5F_SCOPE_LOCAL);
+    if (pFile->iCurrentD != 0) {    
+	    iRet=H5Fflush(pFile->iCurrentD,H5F_SCOPE_LOCAL);
+    } else if (pFile->iCurrentG != 0) {    
+	    iRet=H5Fflush(pFile->iCurrentG,H5F_SCOPE_LOCAL);
+    } else { 
+	    iRet=H5Fflush(pFile->iFID,H5F_SCOPE_LOCAL);
     }
-    else if (pFile->iCurrentG != 0)
-    {    
-    iRet=H5Fflush(pFile->iCurrentG,H5F_SCOPE_LOCAL);
-    }
-    else
-    { 
-    iRet=H5Fflush(pFile->iFID,H5F_SCOPE_LOCAL);
-    }
-    if (iRet < 0){
+    if (iRet < 0) {
       NXReportError( "ERROR: The object cannot be flushed");
       return NX_ERROR; 
     }
     return NX_OK;
-  }   
+}   
   
   /*-------------------------------------------------------------------------*/
   
@@ -1776,25 +1749,40 @@ static int countObjectsInGroup(hid_t loc_id)
 
      if (ndims == 0) { /* SCALAR dataset */ 
 	/* this is a proof of concept and should be integrated with what's going on below */
-	hid_t memspace = H5Screate(H5S_SCALAR);
-	memspace = H5Tcopy(H5T_C_S1);
+
         hid_t datatype = H5Dget_type(pFile->iCurrentD);
         hid_t filespace = H5Dget_space(pFile->iCurrentD);
-	H5Sselect_all(filespace);
-	char *strdata = malloc(512);
-	status = H5Dread(pFile->iCurrentD, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &strdata);
-	strcpy(data, strdata);
-	free(strdata);
-	H5Sclose(memspace);
+
+        tclass = H5Tget_class(datatype);
+
+        if (tclass==H5T_STRING) {
+		/* string */
+		memtype_id = H5Tcopy(H5T_C_S1);
+		char* strdata = calloc(512, sizeof(char)); 
+		status = H5Dread(pFile->iCurrentD, datatype, memtype_id, H5S_ALL, H5P_DEFAULT, &strdata);
+		printf(" I got %s as strdata \n", strdata);
+		if (status >= 0)
+			strncpy(data, strdata, strlen(strdata));
+		free(strdata);
+	} else {
+		/* non-string */
+		memtype_id = H5Screate(H5S_SCALAR);
+		H5Sselect_all(filespace);
+		status = H5Dread(pFile->iCurrentD, datatype, memtype_id, filespace, H5P_DEFAULT, data);
+	}
+
+	H5Sclose(memtype_id);
 	H5Sclose(filespace);
 	H5Tclose(datatype);
+	if (status < 0)
+		return NX_ERROR;
 	return NX_OK;
      }
      if (ndims <= 0) {
 	NXReportError( "ERROR: unable to read dims");
 	return NX_ERROR;
      }
-     memset (iStart, 0, H5S_MAX_RANK * sizeof(int));
+     memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
      /* map datatypes of other plateforms */
      tclass = H5Tget_class(pFile->iCurrentT);
      if ( H5Tis_variable_str(pFile->iCurrentT) ) {
