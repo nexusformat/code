@@ -95,37 +95,65 @@ static void NXI5KillDir(pNexusFile5 self)
 
 static herr_t readStringAttribute(hid_t attr, char **data)
 {
-	size_t iSize;
 	herr_t iRet;
-	hid_t atype = -1, btype = -1;
+	hid_t atype = -1;
 	hid_t space;
 	int ndims;
-	hsize_t thedims[H5S_MAX_RANK], maxdims[H5S_MAX_RANK];
+	hsize_t thedims[H5S_MAX_RANK], sdim;
 
 	atype = H5Aget_type(attr);
-	
-
-	/* if (H5Tis_variable_str(atype)) {
-	 *data = malloc(512);
-	 btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
-	 iRet = H5Aread(attr, btype, *data);
-	 H5Tclose(btype);
-	 } else */  
-
+	sdim = H5Tget_size(atype);	
 	space = H5Aget_space(attr);
 	ndims = H5Sget_simple_extent_dims(space, thedims, NULL);
 
 	if (ndims == 0) {
-		iSize = H5Tget_size(atype);
-		*data = malloc(iSize + 1);
+		*data = malloc(sdim+1);
 		iRet = H5Aread(attr, atype, *data);
-		(*data)[iSize] = '\0';
+		(*data)[sdim] = '\0';
+	} else if (ndims == 1) {
+		int i;
+		hid_t memtype;
+		char **strings;
+		
+		strings = (char **) malloc(thedims[0] * sizeof(char*));
+		memtype = H5Tcopy(H5T_C_S1);
+		if (H5Tis_variable_str(atype)) {
+			H5Tset_size(memtype, H5T_VARIABLE);
+		} else {
+			strings[0] = (char *) malloc(thedims[0] * (sdim + 1) * sizeof(char));
+			for(i=1; i<thedims[0]; i++) {
+				strings[i] = strings[0] + i * (sdim + 1);
+			}
+			H5Tset_size(memtype, sdim + 1);
+		}
+
+		iRet = H5Aread(attr, memtype, strings);
+		*data = malloc((sdim + 2) * thedims[0] * sizeof(char));
+		for(i=0; i<thedims[0]; i++) {
+			if (i==0) {
+				strncpy(*data, strings[i], sdim);	
+			} else {
+				strcat(*data, ", ");
+				strncat(*data, strings[i], sdim);
+			}
+		}
+		if (H5Tis_variable_str(atype)) {
+			H5Dvlen_reclaim(memtype, space, H5P_DEFAULT, strings);
+		} else {
+			free(strings[0]);
+		}
+
+		free(strings);
+		H5Tclose(memtype);
 	} else {
-		*data = strdup("string array");
+		*data = strdup(" higher dimensional string array");
 	} 
 
 	H5Tclose(atype);
-	return iRet;
+	H5Tclose(space);
+	if (iRet < 0)
+		return NX_ERROR;
+	return NX_OK;
 }
 
 static herr_t readStringAttributeN(hid_t attr, char *data, int maxlen)
@@ -550,7 +578,6 @@ NXstatus NX5opengroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 		atype = H5Tcopy(H5T_C_S1);
 		H5Tset_size(atype, sizeof(data));
 		iRet = readStringAttributeN(attr1, data, sizeof(data));
-		//iRet = H5Aread(attr1, atype, data);
 		if (strcmp(data, nxclass) == 0) {
 			/* test OK */
 		} else {
@@ -1435,7 +1462,6 @@ NXstatus NX5getgroupinfo_recurse(NXhandle fid, int *iN, NXname pName,
 			atype = H5Tcopy(H5T_C_S1);
 			H5Tset_size(atype, sizeof(data));
 			readStringAttributeN(attr_id, data, sizeof(data));
-			//H5Aread(attr_id, atype, data);
 			strcpy(pClass, data);
 			pFile->iNX = 0;
 			grp =
@@ -1495,7 +1521,6 @@ NXstatus NX5getgroupinfo(NXhandle fid, int *iN, NXname pName, NXname pClass)
 			atype = H5Tcopy(H5T_C_S1);
 			H5Tset_size(atype, sizeof(data));
 			readStringAttributeN(attr_id, data, sizeof(data));
-			//H5Aread(attr_id, atype, data);
 			strcpy(pClass, data);
 			H5Aclose(attr_id);
 		}
@@ -1721,7 +1746,6 @@ NXstatus NX5getnextentry(NXhandle fid, NXname name, NXname nxclass,
 				iRet =
 				    readStringAttributeN(attr1, data,
 							 sizeof(data));
-				//iRet = H5Aread(attr1, atype, data);
 				strcpy(nxclass, data);
 				H5Tclose(atype);
 				H5Aclose(attr1);
@@ -1772,7 +1796,6 @@ NXstatus NX5getdata(NXhandle fid, void *data)
 	hid_t memtype_id;
 	H5T_class_t tclass;
 	hsize_t ndims, dims[H5S_MAX_RANK];
-	size_t len;
 	char **vstrdata = NULL;
 
 	pFile = NXI5assert(fid);
