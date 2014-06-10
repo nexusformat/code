@@ -1806,9 +1806,11 @@ NXstatus NX5getdata(NXhandle fid, void *data)
 	}
 	ndims = H5Sget_simple_extent_dims(pFile->iCurrentS, dims, NULL);
 
+	if (ndims < 0) {
+		NXReportError("ERROR: unable to read dims");
+		return NX_ERROR;
+	}
 	if (ndims == 0) {	/* SCALAR dataset */
-		/* this is a proof of concept and should be integrated with what's going on below */
-
 		hid_t datatype = H5Dget_type(pFile->iCurrentD);
 		hid_t filespace = H5Dget_space(pFile->iCurrentD);
 
@@ -1837,10 +1839,7 @@ NXstatus NX5getdata(NXhandle fid, void *data)
 			return NX_ERROR;
 		return NX_OK;
 	}
-	if (ndims <= 0) {
-		NXReportError("ERROR: unable to read dims");
-		return NX_ERROR;
-	}
+
 	memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
 	/* map datatypes of other plateforms */
 	tclass = H5Tget_class(pFile->iCurrentT);
