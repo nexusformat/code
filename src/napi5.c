@@ -98,19 +98,32 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 	size_t iSize;
 	herr_t iRet;
 	hid_t atype = -1, btype = -1;
+	hid_t space;
+	int ndims;
+	hsize_t thedims[H5S_MAX_RANK], maxdims[H5S_MAX_RANK];
 
 	atype = H5Aget_type(attr);
+	
+
 	/* if (H5Tis_variable_str(atype)) {
 	 *data = malloc(512);
 	 btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
 	 iRet = H5Aread(attr, btype, *data);
 	 H5Tclose(btype);
-	 } else */  {
+	 } else */  
+
+	space = H5Aget_space(attr);
+	ndims = H5Sget_simple_extent_dims(space, thedims, NULL);
+
+	if (ndims == 0) {
 		iSize = H5Tget_size(atype);
 		*data = malloc(iSize + 1);
 		iRet = H5Aread(attr, atype, *data);
 		(*data)[iSize] = '\0';
-	}
+	} else {
+		*data = strdup("string array");
+	} 
+
 	H5Tclose(atype);
 	return iRet;
 }
@@ -1178,8 +1191,7 @@ NXstatus NX5getdataID(NXhandle fid, NXlink * sRes)
 	NXMDisableErrorReporting();
 	datalen = 1024;
 	memset(&sRes->targetPath, 0, datalen * sizeof(char));
-	if (NX5getattr(fid, "target", &sRes->targetPath, &datalen, &type) !=
-	    NX_OK) {
+	if (NX5getattr(fid, "target", &sRes->targetPath, &datalen, &type) != NX_OK) {
 		buildCurrentPath(pFile, sRes->targetPath, 1024);
 	}
 	NXMEnableErrorReporting();
