@@ -66,7 +66,6 @@ static char *my_readline(const char *prompt)
 #endif				/* _WIN32 */
 
 int NXBdir(NXhandle fileId);
-int NXBopen(NXhandle fileId, char *groupName);
 int NXBread(NXhandle fileId, NXname dataName, char *dimensions);
 int NXBdump(NXhandle fileId, NXname dataName, char *fileName);
 void ConvertUpperCase(char *string);
@@ -355,9 +354,9 @@ int main(int argc, char *argv[])
 				parsepath(stringPtr, a, b);
 				strcat(a, "/"); 
 				strcat(a, b); 
-				NXopenpath(the_fileId, a);
+				NXopengrouppath(the_fileId, a);
 				NXBdir(the_fileId);
-				NXopenpath(the_fileId, path);
+				NXopengrouppath(the_fileId, path);
 			} else {
 				NXBdir(the_fileId);
 			}
@@ -377,14 +376,14 @@ int main(int argc, char *argv[])
 				strcat(a, "/"); 
 				strcat(a, b); 
 
-				status = NXBopen(the_fileId, a);
+				status = NXopengrouppath(the_fileId, a);
 
 				if (status == NX_OK) {
 					strcpy(oldwd, path);
 					strcpy(path, a);
 				} else {
 					fprintf(rl_outstream, "NX_ERROR: cannot change into %s\n", stringPtr);
-					NXBopen(the_fileId, path); /* to be sure */
+					NXopengrouppath(the_fileId, path); /* to be sure */
 				}
 
 			} else {
@@ -550,22 +549,6 @@ int NXBdir(NXhandle fileId)
 		}
 	} while (status == NX_OK);
 	return status;
-}
-
-/* Opens the requested group */
-int NXBopen(NXhandle fileId, char *groupName)
-{
-	if (groupName == NULL) {
-		printf("NX_ERROR: Specify a group name with the OPEN command\n");
-		return NX_ERROR;
-	}
-	int l = strlen(groupName);
-	for (; groupName[l - 1] == '/' && l > 1;) {
-		groupName[l - 1] = '\0';
-		l--;
-	}
-
-	return NXopengrouppath(fileId, groupName);
 }
 
 /* Outputs requested data */
