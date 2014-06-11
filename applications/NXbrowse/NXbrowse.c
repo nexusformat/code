@@ -77,13 +77,13 @@ void PrintData(void *data, int dataType, int numElements);
 void DumpData(FILE * fd, int rank, int dimensions[], int dataType, void *data);
 void WriteData(FILE * fd, char *data, int dataType, int numElements);
 int FindData(NXhandle fileId, char *dataName);
+void parsepath(const char* pathspec, char* absolutedir, char* lastcomponent);
 static int nxTypeSize(int dataType);
 
 /* if iByteAsChar, NX_INT8 and NX_UINT8 are treated as characters */
 static int iByteAsChar = 1;	/* Assume global attributes are all characters */
-static char nxFile[256];
-
 static NXhandle the_fileId;
+static char nxFile[256];
 static char path[256];
 
 /* 
@@ -102,6 +102,7 @@ COMMAND commands[] = {
 	{"cd", "Move into to a group"},
 	{"close", "Move out of a group"},
 	{"dir", ""},
+	{"pwd", ""},
 	{"ls", ""},
 	{"read", ""},
 	{"open", ""},
@@ -243,6 +244,7 @@ static char **nxbrowse_complete(const char *text, int start, int end)
 		matches = rl_completion_matches(text, command_generator);
 		rl_completion_append_character = ' ';
 	} else {
+		rl_completion_entry_function = field_generator; 
 		matches = rl_completion_matches(text, field_generator);
 		rl_completion_append_character = '\0';
 	}
@@ -257,7 +259,7 @@ int main(int argc, char *argv[])
 	char prompt[512];
 	char *inputText;
 	NXname groupName, dataName;
-	int status, i;
+	int status;
 
 #if HAVE_LIBREADLINE
 	rl_readline_name = "NXbrowse";
@@ -327,10 +329,35 @@ int main(int argc, char *argv[])
 		/* Convert it to upper case characters */
 		ConvertUpperCase(command);
 
+		if (StrEq(command, "PWD")) {
+			fprintf(rl_outstream, "%s\n", path);
+		}
+
+		if (StrEq(command, "TEST")) {
+			char a[256], b[256];
+			stringPtr = strtok(NULL, " ");
+			if (stringPtr != NULL) {
+				parsepath(stringPtr, a, b);
+				fprintf(rl_outstream," you entered >%s< - i think the full path is >%s< and the final component looks like this >%s<.\n", stringPtr, a, b);
+			} else {
+				fprintf(rl_outstream," you entered nothing\n");
+			}
+		}
+
 		/* Command is to print a directory of the current group */
 		if (StrEq(command, "DIR") || StrEq(command, "LS")) {
-			/** should allow "ls <foo>" **/
-			status = NXBdir(the_fileId);
+			char a[256], b[256];
+			stringPtr = strtok(NULL, " ");
+			if (stringPtr != NULL) {
+				parsepath(stringPtr, a, b);
+				strcat(a, "/"); 
+				strcat(a, b); 
+				NXBopen(the_fileId, a);
+				NXBdir(the_fileId);
+				NXBopen(the_fileId, path);
+			} else {
+				NXBdir(the_fileId);
+			}
 		}
 
 		/* Command is to open the specified group */
@@ -982,4 +1009,57 @@ static int nxTypeSize(int dataType)
 	}
 	return type_size;
 #endif
+}
+
+/* 
+  convert pathspec IN (which can contain .. . be absolute or relative) 
+  to an absolute path OUT and a final component OUT
+  relative paths are relative to the current path static
+*/
+void parsepath(const char* pathspec, char* absolutedir, char* lastcomponent) 
+{
+	char tmppath[512];
+	char* component[80];
+	int i = 0, n = 0;
+
+	tmppath[0] = '\0';
+	if (pathspec[0] != '/') {
+		strcat(tmppath, path);
+		strcat(tmppath, "/");
+	}
+	strcat(tmppath, pathspec);
+	/* path is now absolute */
+	component[0] = strtok(tmppath, "/");
+
+	/* chop up and remove .. references */
+	while((component[++n] = strtok(NULL, "/")));
+	for(i = 0; i < n; i++) {
+		if (strcmp(component[i], ".") == 0) {
+			component[i][0] = '\0';
+		}
+		if (strcmp(component[i], "..") == 0) {
+			int j = i - 1;
+			component[i][0] = '\0';
+			while(j>=0) {
+				if (component[j][0] != '\0') {
+					component[j][0] = '\0';
+					break;
+				}
+				j--;
+			}
+		}
+	}
+	absolutedir[0] = '\0';
+	lastcomponent[0] = '\0';
+	strcat(lastcomponent, component[n-1]);
+	for(i = 0; i < n-1; i++) {
+		if (component[i][0] != '\0') {
+			strcat(absolutedir, "/");
+			strcat(absolutedir, component[i]);
+		}
+	}
+	if (strlen(absolutedir) == 0)
+		strcat(absolutedir, "/");
+		
+	return;
 }
