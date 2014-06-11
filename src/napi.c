@@ -1799,7 +1799,7 @@ static NXstatus stepOneGroupUp(NXhandle hfil, char *name)
       }
     }
   }
-  snprintf(pBueffel,255,"ERROR: NXopenpath cannot step into %s",name);
+  snprintf(pBueffel,255,"ERROR: NXopengrouppath cannot step into %s",name);
   NXReportError( pBueffel);
   return NX_ERROR;              
 }
@@ -1846,11 +1846,12 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
   int status, run = 1;
   NXname pathElement;
   char *pPtr;
+  char buffer[256];
 
   if(hfil == NULL || path == NULL)
   {
     NXReportError(
-     "ERROR: NXopendata needs both a file handle and a path string");
+     "ERROR: NXopengrouppath needs both a file handle and a path string");
     return NX_ERROR;
   }
 
@@ -1858,23 +1859,20 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
   if(status != NX_OK)
   {
     NXReportError( 
-		    "ERROR: NXopendata failed to move down in hierarchy");
+		    "ERROR: NXopengrouppath failed to move down in hierarchy");
     return status;
   }
 
-  while(run == 1)
+  do
   {
     pPtr = extractNextPath(pPtr, pathElement);
-    status = stepOneGroupUp(hfil,pathElement);
-    if(status == NX_ERROR)
-    {
-      return status;
+    status = stepOneGroupUp(hfil, pathElement);
+    if(status != NX_OK) {
+	sprintf(buffer, "ERROR: NXopengrouppath cannot reach path %s", path);
+	NXReportError(buffer);
+	return NX_ERROR;
     }
-    if(pPtr == NULL || status == NX_EOD)
-    {
-      run = 0;
-    }
-  }
+  } while (pPtr != NULL);
   return NX_OK;
 }
 /*---------------------------------------------------------------------*/
