@@ -159,53 +159,58 @@ static char *field_generator(const char *text, int state)
 		}
 		last_item = names = NULL;
 
-		char *matchtext = text;
-		char tmppath[256];
-		memset(tmppath, 0, 256);
-		char *gobackto = NULL;
-		char *dirend = strrchr(text, '/');	/* position of last group delimiter */
-		if (dirend != NULL) {
-			gobackto = path;
+		char matchtext[256], absdir[256], tmppath[256], prefix[256];
 
-			if (strlen(path) > 1) {
-				strcpy(tmppath, path);
-				strcat(tmppath, "/");
+		prefix[0] = '\0';
+		char *ptr = rindex(text+1, '/');
+		if (ptr != NULL) {
+			strncpy(prefix, text, ptr-text+1);
+			prefix[ptr-text+1] = '\0';
+		}
+
+		parsepath(text, absdir, matchtext);
+
+		strcpy(tmppath, absdir);
+		strcat(tmppath, "/");
+		strcat(tmppath, matchtext);
+		
+		/* check if we've got a dir already */
+		NXMDisableErrorReporting();
+		status = NXopengrouppath(the_fileId, tmppath);
+		if (status == NX_OK) {
+			strcpy(absdir, tmppath);
+			strcpy(matchtext, "");
+			if (text[strlen(text)-1] != '/') {
+				strcpy(prefix, text);
+				strcat(prefix, "/");
 			}
-			strncat(tmppath, text, dirend - text);
-			matchtext = dirend + 1;
-			status = NXopengrouppath(the_fileId, tmppath);
+		} else {
+			status = NXopengrouppath(the_fileId, absdir);
+		}
+		NXMEnableErrorReporting();
 
-			if (status == NX_ERROR)
-				return NULL;
-		}
-		if (NXinitgroupdir(the_fileId) != NX_OK) {
+		if (status == NX_ERROR)
 			return NULL;
-		}
+
+		if (NXinitgroupdir(the_fileId) != NX_OK) 
+			return NULL;
 
 		do {
 			status =
-			    NXgetnextentry(the_fileId, name, nxclass,
-					   &dataType);
+			    NXgetnextentry(the_fileId, name, nxclass, &dataType);
 			if (status == NX_ERROR)
 				break;
 			if (status == NX_OK) {
 				if (strncmp(nxclass, "CDF", 3) == 0) {
 					;
 				} else
-				    if (strncmp
-					(name, matchtext,
-					 strlen(matchtext)) == 0) {
-					item =
-					    (struct name_item *)
+				    if (strncmp(name, matchtext, strlen(matchtext)) == 0) {
+					item = (struct name_item *)
 					    malloc(sizeof(struct name_item));
 					item->name = (char *)calloc(256, 1);
-					if (matchtext != text) {
-						strncpy(item->name, text,
-							matchtext - text);
-						strcat(item->name, name);
-					} else {
-						strcpy(item->name, name);
-					}
+					strcpy(item->name, prefix);
+					strcat(item->name, name);
+					
 					if (strcmp(nxclass, "SDS") != 0) {
 						strcat(item->name, "/");
 					}
@@ -219,9 +224,7 @@ static char *field_generator(const char *text, int state)
 				}
 			}
 		} while (status == NX_OK);
-		if (gobackto != NULL) {
-			NXopengrouppath(the_fileId, gobackto);
-		}
+		NXopengrouppath(the_fileId, path);
 		last_item = names;
 	}
 	if (last_item != NULL) {
@@ -346,15 +349,15 @@ int main(int argc, char *argv[])
 
 		/* Command is to print a directory of the current group */
 		if (StrEq(command, "DIR") || StrEq(command, "LS")) {
-			char a[256], b[256];
 			stringPtr = strtok(NULL, " ");
 			if (stringPtr != NULL) {
+				char a[256], b[256];
 				parsepath(stringPtr, a, b);
 				strcat(a, "/"); 
 				strcat(a, b); 
-				NXBopen(the_fileId, a);
+				NXopenpath(the_fileId, a);
 				NXBdir(the_fileId);
-				NXBopen(the_fileId, path);
+				NXopenpath(the_fileId, path);
 			} else {
 				NXBdir(the_fileId);
 			}
@@ -364,44 +367,26 @@ int main(int argc, char *argv[])
 		if (StrEq(command, "OPEN") || StrEq(command, "CD")) {
 			stringPtr = strtok(NULL, " ");
 			if (stringPtr != NULL) {
-				char newwd[256];
-				memset(newwd, 0, 256);
+				char a[256], b[256];
 
-				/** this string handling with hindsight is a bit clueless **/
-				/** strtok on / would have been much better... **/
 				if (StrEq(stringPtr, "-")) {
-					strcpy(groupName, oldwd);
-				} else {
-					strcpy(groupName, stringPtr);
-				}
-				stringPtr = groupName;
+					stringPtr = oldwd;
+				} 
 
-				if (groupName[0] != '/') {
-					int lenp = strlen(path);
+				parsepath(stringPtr, a, b);
+				strcat(a, "/"); 
+				strcat(a, b); 
 
-					while (strncmp(stringPtr, "..", 2) == 0) {
-						for (;
-						     lenp > 2
-						     && path[lenp - 1] != '/';
-						     lenp--) ;
-						lenp--;
-						stringPtr += 2;
-						while (stringPtr[0] == '/')
-							stringPtr++;
-					}
-
-					if (lenp > 1)
-						strncat(newwd, path, lenp);
-					strcat(newwd, "/");
-				}
-				strcat(newwd, stringPtr);
-
-				status = NXBopen(the_fileId, newwd);
+				status = NXBopen(the_fileId, a);
 
 				if (status == NX_OK) {
 					strcpy(oldwd, path);
-					strcpy(path, newwd);
+					strcpy(path, a);
+				} else {
+					fprintf(rl_outstream, "NX_ERROR: cannot change into %s\n", stringPtr);
+					NXBopen(the_fileId, path); /* to be sure */
 				}
+
 			} else {
 				fprintf(rl_outstream, "NX_ERROR: Specify a group\n");
 			}
@@ -465,11 +450,13 @@ int main(int argc, char *argv[])
 			printf("                    HELP\n");
 			printf("                    EXIT\n");
 			printf("\n");
-			printf("If readline support is enabled, pressing <TAB> after a command \n");
-			printf("or partial nexus object name will list/complete possible names\n");
+#if HAVE_LIBREADLINE
+			printf("Pressing <TAB> after a command or partial nexus object name will complete\n");
+			printf("possible names. For example:\n");
 			printf("\n");
 			printf("    cd ent<TAB KEY PRESSED>     # all items starting with ent are listed\n");
 			printf("\n");
+#endif
 		}
 		/* Command is to print byte as char information */
 		if (StrEq(command, "BYTEASCHAR")) {
@@ -1034,26 +1021,31 @@ void parsepath(const char* pathspec, char* absolutedir, char* lastcomponent)
 	/* chop up and remove .. references */
 	while((component[++n] = strtok(NULL, "/")));
 	for(i = 0; i < n; i++) {
+		if (component[i] == NULL)
+			continue;
 		if (strcmp(component[i], ".") == 0) {
-			component[i][0] = '\0';
+			component[i] = NULL;
+			continue;
 		}
 		if (strcmp(component[i], "..") == 0) {
 			int j = i - 1;
 			component[i][0] = '\0';
 			while(j>=0) {
-				if (component[j][0] != '\0') {
-					component[j][0] = '\0';
+				if (component[j] != NULL) {
+					component[j] = NULL;
 					break;
 				}
 				j--;
 			}
+			continue;
 		}
 	}
 	absolutedir[0] = '\0';
 	lastcomponent[0] = '\0';
-	strcat(lastcomponent, component[n-1]);
+	if (component[n-1] != NULL)
+		strcat(lastcomponent, component[n-1]);
 	for(i = 0; i < n-1; i++) {
-		if (component[i][0] != '\0') {
+		if (component[i] != NULL) {
 			strcat(absolutedir, "/");
 			strcat(absolutedir, component[i]);
 		}
