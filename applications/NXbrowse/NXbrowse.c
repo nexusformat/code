@@ -76,7 +76,6 @@ void PrintType(int dataType);
 void PrintData(void *data, int dataType, int numElements);
 void DumpData(FILE * fd, int rank, int dimensions[], int dataType, void *data);
 void WriteData(FILE * fd, char *data, int dataType, int numElements);
-int FindGroup(NXhandle fileId, char *groupName, char *groupClass);
 int FindData(NXhandle fileId, char *dataName);
 static int nxTypeSize(int dataType);
 
@@ -933,32 +932,6 @@ void WriteData(FILE * fd, char *data, int dataType, int numElements)
 void PrintData(void *data, int dataType, int numElements)
 {
 	WriteData(stdout, (char *)data, dataType, numElements);
-}
-
-/* Searches group for requested group and return its class */
-int FindGroup(NXhandle fileId, char *groupName, char *groupClass)
-{
-	int status, dataType;
-	NXname name, nxclass;
-
-	NXinitgroupdir(fileId);
-	do {
-		status = NXgetnextentry(fileId, name, nxclass, &dataType);
-		if (status == NX_ERROR)
-			return NX_ERROR;
-		if (status == NX_OK) {
-			if (StrEq(groupName, name)) {
-				strcpy(groupClass, nxclass);
-				if (!strncmp(groupClass, "NX", 2)) {
-					return NX_OK;
-				} else {
-					return NX_OK;	/* allow non NX (i.e. user defined) groups */
-				}
-			}
-		}
-	} while (status != NX_EOD);
-	printf("NX_ERROR: %s does not exist\n", groupName);
-	return NX_EOD;
 }
 
 /* Searches group for the requested data item */
