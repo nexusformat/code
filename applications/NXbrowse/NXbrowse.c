@@ -169,21 +169,21 @@ static char *field_generator(const char *text, int state)
 
 		parsepath(text, absdir, matchtext);
 
+		/* check if we've got a dir already */
+		NXMDisableErrorReporting();
 		strcpy(tmppath, absdir);
 		strcat(tmppath, "/");
 		strcat(tmppath, matchtext);
-		
-		/* check if we've got a dir already */
-		NXMDisableErrorReporting();
 		status = NXopengrouppath(the_fileId, tmppath);
 		if (status == NX_OK) {
 			strcpy(absdir, tmppath);
 			strcpy(matchtext, "");
-			if (text[strlen(text)-1] != '/') {
+			if (strlen(text) > 0 && text[strlen(text)-1] != '/') {
 				strcpy(prefix, text);
 				strcat(prefix, "/");
 			}
 		} else {
+			/* if not go into the dir part */
 			status = NXopengrouppath(the_fileId, absdir);
 		}
 		NXMEnableErrorReporting();
