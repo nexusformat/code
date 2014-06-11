@@ -1028,7 +1028,7 @@ void parsepath(const char* pathspec, char* absolutedir, char* lastcomponent)
 	if (component[n-1] != NULL)
 		strcat(lastcomponent, component[n-1]);
 	for(i = 0; i < n-1; i++) {
-		if (component[i] != NULL) {
+		if (component[i] != NULL && component[i][0] != '\0') {
 			strcat(absolutedir, "/");
 			strcat(absolutedir, component[i]);
 		}
