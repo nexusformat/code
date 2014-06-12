@@ -95,7 +95,7 @@ static void NXI5KillDir(pNexusFile5 self)
 
 static herr_t readStringAttribute(hid_t attr, char **data)
 {
-	herr_t iRet;
+	herr_t iRet = 0;
 	hid_t atype = -1;
 	hid_t space;
 	int ndims;
@@ -1939,7 +1939,6 @@ NXstatus NX5getslab64(NXhandle fid, void *data, const int64_t iStart[],
 	char *tmp_data = NULL;
 	char *data1;
 	int i, iRank, mtype = 0;
-	size_t dims;
 
 	pFile = NXI5assert(fid);
 	/* check if there is an Dataset open */
@@ -1960,11 +1959,12 @@ NXstatus NX5getslab64(NXhandle fid, void *data, const int64_t iStart[],
 	if (iRank == 0) {
 		/* this is an unslabbale SCALAR */
 		hid_t filespace = H5Dget_space(pFile->iCurrentD);
-		hid_t memspace = H5Screate(H5S_SCALAR);
+		memspace = H5Screate(H5S_SCALAR);
 		H5Sselect_all(filespace);
 		iRet =
 		    H5Dread(pFile->iCurrentD, memtype_id, memspace, filespace,
 			    H5P_DEFAULT, data);
+		H5Sclose(filespace);
 	} else {
 
 		for (i = 0; i < iRank; i++) {
