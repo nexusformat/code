@@ -1867,12 +1867,12 @@ NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
   {
     pPtr = extractNextPath(pPtr, pathElement);
     status = stepOneGroupUp(hfil, pathElement);
-    if(status != NX_OK) {
+    if(status == NX_ERROR) {
 	sprintf(buffer, "ERROR: NXopengrouppath cannot reach path %s", path);
 	NXReportError(buffer);
 	return NX_ERROR;
     }
-  } while (pPtr != NULL);
+  } while (pPtr != NULL && status != NX_EOD);
   return NX_OK;
 }
 /*---------------------------------------------------------------------*/
