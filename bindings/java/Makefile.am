@@ -73,7 +73,7 @@ noinst_HEADERS		= native/handle.h
 
 CLEANFILES	= $(jnexus_jar_CLASS) $(jnexus_jar_ARCHIVE) $(BUILT_SOURCES) \
 	libjnexus.def libjnexus.dll.lib libjnexus.dll.exp jnexus.dll \
-               ncsa/hdf/hdflib/ArrayDescriptor.class
+               ncsa/hdf/hdflib/ArrayDescriptor.class jnexus-src.jar
 
 
 noinst_JAVA	= ncsa/hdf/hdflib/HDFArray.java \
@@ -98,10 +98,12 @@ native/org_nexusformat_NexusFile.h: jnexus.jar # org/nexusformat/NexusFile.class
 	test -d native || mkdir native
 	$(JAVAH) -jni -d native -classpath . org.nexusformat.NexusFile
 
-jnexus.jar: $(jnexus_jar_CLASS) apidoc
+jnexus.jar: $(jnexus_jar_CLASS) apidoc jnexus-src.jar
 	$(JAR) cvf jnexus.jar $(jnexus_jar_CLASS) \
                ncsa/hdf/hdflib/ArrayDescriptor.class
 
+jnexus-src.jar:
+	$(JAR) cvf jnexus-src.jar org/*/*.java ncsa/*/*/*.java
 
 SUFFIXES = .java .class
 
