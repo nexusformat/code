@@ -314,7 +314,6 @@ JNIEXPORT jstring JNICALL Java_org_nexusformat_NexusFile_nxgetpath
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
-    int iRet;
     char path[1024];
 
     /* set error handler */
@@ -337,7 +336,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosegroup
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
-    int iRet;
 
     /* set error handler */
     NXMSetTError(env,JapiError);
@@ -532,7 +530,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxclosedata
   (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
-    int iRet;
 
     /* set error handler */
     NXMSetTError(env,JapiError);
@@ -551,7 +548,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxcompress
   (JNIEnv *env, jobject obj, jint handle , jint comp_type)
 {
     NXhandle nxhandle;
-    int iRet;
 
     /* set error handler */
     NXMSetTError(env,JapiError);
@@ -1543,7 +1539,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initattrdir
 (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
-    int iRet;
 
     /* set error handler */
     NXMSetTError(env,JapiError);
@@ -1560,7 +1555,6 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
 (JNIEnv *env, jobject obj, jint handle)
 {
     NXhandle nxhandle;
-    int iRet;
 
     /* set error handler */
     NXMSetTError(env,JapiError);
