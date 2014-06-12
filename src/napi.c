@@ -1843,7 +1843,7 @@ NXstatus  NXopenpath(NXhandle hfil, CONSTCHAR *path)
 /*---------------------------------------------------------------------*/
 NXstatus  NXopengrouppath(NXhandle hfil, CONSTCHAR *path)
 {
-  int status, run = 1;
+  int status;
   NXname pathElement;
   char *pPtr;
   char buffer[256];
