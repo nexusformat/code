@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
 	char fileName[256], oldwd[256], *command, *dimensions, *stringPtr;
 	char prompt[512];
 	char *inputText;
-	NXname groupName, dataName;
+	NXname dataName;
 	int status;
 
 #if HAVE_LIBREADLINE
