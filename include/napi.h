@@ -3,7 +3,7 @@
   
   Application Program Interface Header File
   
-  Copyright (C) 2000-2011 Mark Koennecke, Uwe Filges
+  Copyright (C) 2000-2014 NeXus International Advisory Committee
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,6 @@
  
   For further information, see <http://www.nexusformat.org>
   
-  $Id$
-
  ----------------------------------------------------------------------------*/
 /** \file 
  * Documentation for the NeXus-API version 4.3
@@ -678,7 +676,7 @@ extern  NXstatus  NXgetattrinfo(NXhandle handle, int* no_items);
    * \return NX_OK on success, NX_ERROR in the case of an error, NX_EOD when there are no more items.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int *dim[], int *iType);
+extern  NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
   /**
    * Read an arbitraily shaped attribute.
@@ -699,7 +697,7 @@ extern  NXstatus  NXgetattra(NXhandle handle, char* name, void* data);
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_metadata
    */
-extern  NXstatus  NXgetattrainfo(NXhandle handle, NXname pName, int *rank, int *dim[], int *iType);
+extern  NXstatus  NXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
   /**
    * Retrieve link data for the currently open group. This link data can later on be used to link this 
@@ -974,10 +972,10 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
         NXstatus ( *nxgetslab64)(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
         NXstatus ( *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
-        NXstatus ( *nxgetnextattra)(NXhandle handle, NXname pName, int *rank, int *dim[], int *iType);
+        NXstatus ( *nxgetnextattra)(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
         NXstatus ( *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
         NXstatus ( *nxgetattra)(NXhandle handle, char* name, void* data);
-        NXstatus ( *nxgetattrainfo)(NXhandle handle, NXname pName, int *rank, int *dim[], int *iType);
+        NXstatus ( *nxgetattrainfo)(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
         NXstatus ( *nxgetattrinfo)(NXhandle handle, int* no_items);
         NXstatus ( *nxgetgroupID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxgetgroupinfo)(NXhandle handle, int* no_items, NXname name, NXname nxclass);

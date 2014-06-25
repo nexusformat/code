@@ -3,7 +3,7 @@
   
   Application Program Interface Routines
   
-  Copyright (C) 1997-2006 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2014 NeXus International Advisory Committee
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -1937,6 +1937,27 @@ NXstatus NXgetpath(NXhandle fid, char *path, int pathlen)
 		return NX_ERROR;
 	}
 	return NX_OK;
+}
+
+NXstatus  NXputattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType)
+{
+	pNexusFunction pFunc = handleToNexusFunc(handle);
+	return LOCKED_CALL(pFunc->nxputattra(pFunc->pNexusData, name, data, rank, dim, iType));
+}
+NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+	pNexusFunction pFunc = handleToNexusFunc(handle);
+	return LOCKED_CALL(pFunc->nxgetnextattra(pFunc->pNexusData, pName, rank, dim, iType));
+}
+NXstatus  NXgetattra(NXhandle handle, char* name, void* data)
+{
+	pNexusFunction pFunc = handleToNexusFunc(handle);
+	return LOCKED_CALL(pFunc->nxgetattra(pFunc->pNexusData, name, data));
+}
+NXstatus  NXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+	pNexusFunction pFunc = handleToNexusFunc(handle);
+	return LOCKED_CALL(pFunc->nxgetattrainfo(pFunc->pNexusData, pName, rank, dim, iType));
 }
 
 /*--------------------------------------------------------------------
