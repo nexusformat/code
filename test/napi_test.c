@@ -250,6 +250,7 @@ int main (int argc, char *argv[])
         switch (NXtype) {
            case NX_CHAR:
               NXlen = sizeof (char_buffer);
+              if (NXgetattrainfo (fileid, name, &NXrank, NXdims, &NXtype) != NX_OK) return 1; /* hehe */
               if (NXgetattr (fileid, name, char_buffer, &NXlen, &NXtype) 
 		  != NX_OK) return 1;
 		if ( strcmp(name, "file_time") &&

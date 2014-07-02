@@ -2384,9 +2384,29 @@ NXstatus NX5initgroupdir(NXhandle fid)
 }
 
 /*------------------------------------------------------------------------*/
+NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType)
+{
+return NX_OK;
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+return NX_OK;
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
+{
+return NX_OK;
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NX5getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+return NX_OK;
+}
+
+/*------------------------------------------------------------------------*/
 void NX5assignFunctions(pNexusFunction fHandle)
 {
-
 	fHandle->nxclose = NX5close;
 	fHandle->nxreopen = NX5reopen;
 	fHandle->nxflush = NX5flush;
@@ -2420,6 +2440,10 @@ void NX5assignFunctions(pNexusFunction fHandle)
 	fHandle->nxnativeexternallink = NX5nativeexternallink;
 	fHandle->nxnativeinquirefile = NX5nativeinquirefile;
 	fHandle->nxnativeisexternallink = NX5nativeisexternallink;
+	fHandle->nxputattra = NX5putattra;
+	fHandle->nxgetnextattra = NX5getnextattra;
+	fHandle->nxgetattra = NX5getattra;
+	fHandle->nxgetattrainfo = NX5getattrainfo;
 }
 
 #endif				/* HDF5 */

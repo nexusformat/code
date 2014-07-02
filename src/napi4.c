@@ -1945,6 +1945,35 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   }
  
 /*--------------------------------------------------------------------*/
+NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType)
+{
+  NXReportError("This is a HDF4 file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+/*--------------------------------------------------------------------*/
+NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+  NXReportError("This is a HDF4 file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+/*--------------------------------------------------------------------*/
+NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
+{
+  NXReportError("This is a HDF4 file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+/*--------------------------------------------------------------------*/
+NXstatus  NX5getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+  NXReportError("This is a HDF4 file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+
+/*--------------------------------------------------------------------*/
 void NX4assignFunctions(pNexusFunction fHandle)
 {
       fHandle->nxclose=NX4close;
@@ -1978,6 +2007,10 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX4initattrdir;
       fHandle->nxprintlink=NX4printlink;
       fHandle->nxnativeexternallink=NULL;
+        fHandle->nxputattra = NX4putattra;
+        fHandle->nxgetnextattra = NX4getnextattra;
+        fHandle->nxgetattra = NX4getattra;
+        fHandle->nxgetattrainfo = NX4getattrainfo;
 }
 
 #endif /*HDF4*/
