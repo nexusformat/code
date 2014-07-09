@@ -2407,8 +2407,7 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 		H5Aclose(iRet);
 		iRet = H5Adelete(vid, name);
 		if (iRet < 0) {
-			NXReportError
-			    ("ERROR: old attribute cannot be removed! ");
+			NXReportError("ERROR: old attribute cannot be removed! ");
 			killAttVID(pFile, vid);
 			return NX_ERROR;
 		}
@@ -2437,23 +2436,22 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 		NXReportError("ERROR: creating attribute failed");
 		return NX_ERROR;
 	} else {
-		pFile->iCurrentD = iRet;
+		pFile->iCurrentA = iRet;
 	}
 	if (cparms != -1) {
 		iRet = H5Pclose(cparms);
 	}
 
-	iRet = H5Dwrite(pFile->iCurrentD, pFile->iCurrentT, H5S_ALL,
-		     H5S_ALL, H5P_DEFAULT, data);
+	iRet = H5Awrite(pFile->iCurrentA, type, data);
 	if (iRet < 0) {
 		NXReportError("ERROR: failure to write attribute");
-		return NX_ERROR;
+		return NX_ERROR; 
 	}
 
 	iRet = H5Sclose(dataspace);
 	iRet = H5Tclose(datatype1);
-	iRet = H5Dclose(pFile->iCurrentD);
-	pFile->iCurrentD = 0;
+	iRet = H5Aclose(pFile->iCurrentA);
+	pFile->iCurrentA = 0;
 	if (iRet < 0) {
 		NXReportError("ERROR: HDF cannot close attribute");
 		return NX_ERROR;
