@@ -1593,7 +1593,9 @@ static int hdf5ToNXType(H5T_class_t tclass, hid_t atype)
 		}
 	}
 	if (iPtype == -1) {
-		NXReportError("ERROR: hdf5ToNXtype: invalid type");
+		char message[80];
+		snprintf(message, 79, "ERROR: hdf5ToNXtype: invalid type (%d)", tclass);
+		NXReportError(message);
 	}
 
 	return iPtype;
@@ -1761,7 +1763,11 @@ NXstatus NX5getnextentry(NXhandle fid, NXname name, NXname nxclass,
 			/*
 			   open dataset and find type
 			 */
-			grp = H5Dopen(pFile->iCurrentG, name, H5P_DEFAULT);
+			if (pFile->iCurrentG == 0) {
+				grp = H5Dopen(pFile->iFID, name, H5P_DEFAULT);
+			} else {
+				grp = H5Dopen(pFile->iCurrentG, name, H5P_DEFAULT);
+			}
 			type = H5Dget_type(grp);
 			atype = H5Tcopy(type);
 			tclass = H5Tget_class(atype);
