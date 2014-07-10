@@ -340,6 +340,7 @@ int main (int argc, char *argv[])
                     if (attr_status == NX_ERROR) return 1;
                     if (attr_status == NX_OK) {
 		       if (NXgetattrainfo (fileid, name, &NXrank, NXdims, &NXtype) != NX_OK) return 1; /* hehe */
+		       printf(" found attribute named %s of rank %d and first dimension %d - hooray!\n", name, NXrank, NXdims[0]);
                        switch (NXtype) {
                           case NX_INT32:
                              NXlen = 1;
