@@ -107,9 +107,15 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 	ndims = H5Sget_simple_extent_dims(space, thedims, NULL);
 
 	if (ndims == 0) {
-		*data = malloc(sdim+1);
-		iRet = H5Aread(attr, atype, *data);
-		(*data)[sdim] = '\0';
+	       if (H5Tis_variable_str(atype)) {
+	           hid_t btype = H5Tget_native_type(atype, H5T_DIR_ASCEND); 
+	           iRet = H5Aread(attr, btype, data);
+	           H5Tclose(btype);
+	       } else {
+			*data = malloc(sdim+1);
+			iRet = H5Aread(attr, atype, *data);
+			(*data)[sdim] = '\0';
+		}
 	} else if (ndims == 1) {
 		int i;
 		hid_t memtype;
@@ -1587,7 +1593,9 @@ static int hdf5ToNXType(H5T_class_t tclass, hid_t atype)
 		}
 	}
 	if (iPtype == -1) {
-		NXReportError("ERROR: hdf5ToNXtype: invalid type");
+		char message[80];
+		snprintf(message, 79, "ERROR: hdf5ToNXtype: invalid type (%d)", tclass);
+		NXReportError(message);
 	}
 
 	return iPtype;
@@ -1755,7 +1763,11 @@ NXstatus NX5getnextentry(NXhandle fid, NXname name, NXname nxclass,
 			/*
 			   open dataset and find type
 			 */
-			grp = H5Dopen(pFile->iCurrentG, name, H5P_DEFAULT);
+			if (pFile->iCurrentG == 0) {
+				grp = H5Dopen(pFile->iFID, name, H5P_DEFAULT);
+			} else {
+				grp = H5Dopen(pFile->iCurrentG, name, H5P_DEFAULT);
+			}
 			type = H5Dget_type(grp);
 			atype = H5Tcopy(type);
 			tclass = H5Tget_class(atype);
