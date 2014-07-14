@@ -486,6 +486,27 @@ all ok - done
 ]])
 AT_CLEANUP
 
+AT_BANNER([[Testing new API for array attributes.]])
+
+AT_SETUP([Checking HDF5 (full support)])
+AT_CHECK([$HAVE_HDF5 && napi_attra_test-hdf5-static | sed -e 's/\r$//' ],[], 
+[[
+expected output here, please
+]])
+AT_CLEANUP
+AT_SETUP([Checking HDF4 (limited functionality)])
+AT_CHECK([$HAVE_HDF4 && napi_attra_test-hdf4-static | sed -e 's/\r$//' ],[], 
+[[
+expected output here, please
+]])
+AT_CLEANUP
+AT_SETUP([Checking XML (limited functionality)])
+AT_CHECK([$HAVE_XML && napi_attra_test-xml-static | sed -e 's/\r$//' ],[], 
+[[
+expected output here, please
+]])
+AT_CLEANUP
+
 AT_BANNER([Check the FORTRAN binding.])
 
 AT_SETUP([Check the F90 binding using HDF5.])
