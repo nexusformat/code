@@ -144,8 +144,6 @@ int main (int argc, char *argv[])
      if (NXcompmakedata (fileid, "r4_data", NX_FLOAT32, 2, array_dims,NX_COMP_LZW,chunk_size) != NX_OK) return 1;
      if (NXopendata (fileid, "r4_data") != NX_OK) return 1;
         if (NXputdata (fileid, r4_array) != NX_OK) return 1;
-        if (NXputattra (fileid, "r4_attribute_1d", r4_array, 1, array_dims, NX_FLOAT32) != NX_OK) return 1;
-        if (NXputattra (fileid, "r4_attribute_2d", r4_array, 2, array_dims, NX_FLOAT32) != NX_OK) return 1;
      if (NXclosedata (fileid) != NX_OK) return 1;
      if (NXmakedata (fileid, "r8_data", NX_FLOAT64, 2, array_dims) != NX_OK) return 1;
      if (NXopendata (fileid, "r8_data") != NX_OK) return 1;
@@ -339,8 +337,6 @@ int main (int argc, char *argv[])
                     attr_status = NXgetnextattr (fileid, name, NXdims, &NXtype);
                     if (attr_status == NX_ERROR) return 1;
                     if (attr_status == NX_OK) {
-		       if (NXgetattrainfo (fileid, name, &NXrank, NXdims, &NXtype) != NX_OK) return 1; /* hehe */
-		       printf(" found attribute named %s of rank %d and first dimension %d - hooray!\n", name, NXrank, NXdims[0]);
                        switch (NXtype) {
                           case NX_INT32:
                              NXlen = 1;
