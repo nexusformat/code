@@ -2171,14 +2171,14 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 		iRet = readStringAttributeN(pFile->iCurrentA, data, *datalen);
 		*datalen = (int)strlen((char *)data);
 	} else {
+		/* ERROR */
+		/* this hopes the data fits into that with no evidence to support that */
 		iRet = H5Aread(pFile->iCurrentA, type, data);
 		*datalen = 1;
 	}
 
 	if (iRet < 0) {
-		sprintf(pBuffer,
-			"ERROR: could not read attribute data for \"%s\"",
-			name);
+		sprintf(pBuffer, "ERROR: could not read attribute data for \"%s\"", name);
 		NXReportError(pBuffer);
 		killAttVID(pFile, vid);
 		return NX_ERROR;
