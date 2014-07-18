@@ -36,96 +36,44 @@ static void print_data(const char *prefix, void *data, int type, int num);
 int createAttrs(const NXhandle file)
 {
 	int array_dims[2] = { 5, 4 };
-	int i, j, k, n, NXrank, NXdims[32], NXtype, NXlen, entry_status,
-	    attr_status;
+	int i = 5;
+
 	float r4_array[5][4] =
-	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13.,
-									14.,
-									15.,
-									16.},
-	{17., 18., 19., 20.}
+	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13., 14., 15., 16.},
+		{17., 18., 19., 20.}
 	};
+
 	double r8_array[5][4] =
-	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13.,
-									14.,
-									15.,
-									16.},
-	{17., 18., 19., 20.}
+	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13., 14., 15., 16.},
+		{17., 18., 19., 20.}
 	};
 
-	int unlimited_dims[1] = { NX_UNLIMITED };
 
-	if (NXputattra
-	    (file, "attribute_1d", r4_array, 1, array_dims,
-	     NX_FLOAT32) != NX_OK)
+	if (NXputattra(file, "attribute_1d", r4_array, 1, array_dims, NX_FLOAT32) != NX_OK)
 		return 1;
-	if (NXputattra
-	    (file, "attribute_2d", r4_array, 2, array_dims,
-	     NX_FLOAT32) != NX_OK)
+	if (NXputattra (file, "attribute_2d", r8_array, 2, array_dims, NX_FLOAT64) != NX_OK)
 		return 1;
-	if (NXputattr(file, "old_style_int_attribute", &i, 1, NX_INT32) !=
-	    NX_OK)
+
+	if (NXputattr(file, "old_style_int_attribute", &i, 1, NX_INT32) != NX_OK)
 		return 1;
-	if (NXputattr
-	    (file, "oldstylestrattr", "i:wq!<ESC><ESC>",
-	     strlen("i:wq!<ESC><ESC>"), NX_CHAR) != NX_OK)
+	if (NXputattr (file, "oldstylestrattr", "i:wq!<ESC><ESC>", strlen("i:wq!<ESC><ESC>"), NX_CHAR) != NX_OK)
 		return 1;
 	return 0;
 }
 
 int main(int argc, char *argv[])
 {
-	int i, j, k, n, NXrank, NXdims[32], NXtype, NXlen, entry_status,
-	    attr_status;
+	int i, NXrank, NXdims[32], NXtype, NXlen, entry_status, attr_status;
 	float r;
-	void *data_buffer;
-	unsigned char i1_array[4] = { 1, 2, 3, 4 };
-	short int i2_array[4] = { 1000, 2000, 3000, 4000 };
+
 	int i4_array[4] = { 1000000, 2000000, 3000000, 4000000 };
 
-	float r4_array[5][4] =
-	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13.,
-									14.,
-									15.,
-									16.},
-	{17., 18., 19., 20.}
-	};
-	double r8_array[5][4] =
-	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13.,
-									14.,
-									15.,
-									16.},
-	{17., 18., 19., 20.}
-	};
-
-	int unlimited_dims[1] = { NX_UNLIMITED };
 	char name[64], char_class[64], char_buffer[128];
 	char group_name[64], class_name[64];
-	char c1_array[5][4] = { {'a', 'b', 'c', 'd'}, {'e', 'f', 'g', 'h'},
-	{'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'}, {'q', 'r', 's', 't'}
-	};
-	int unlimited_cdims[2] = { NX_UNLIMITED, 4 };
-	NXhandle fileid, clone_fileid;
-	NXlink glink, dlink, blink;
-	int comp_array[100][20];
-	int dims[2];
-	int cdims[2];
+	NXhandle fileid;
 	int nx_creation_code;
 	char nxFile[80];
-	char filename[256];
-	int64_t grossezahl[4];
-	const char *ch_test_data = "NeXus ><}&{'\\&\" Data";
 	char path[512];
-
-	grossezahl[0] = 12;
-	grossezahl[2] = 23;
-#if HAVE_LONG_LONG_INT
-	grossezahl[1] = (int64_t) 555555555555LL;
-	grossezahl[3] = (int64_t) 777777777777LL;
-#else
-	grossezahl[1] = (int64_t) 555555555555;
-	grossezahl[3] = (int64_t) 777777777777;
-#endif				/* HAVE_LONG_LONG_INT */
 
 	if (strstr(argv[0], "hdf4") != NULL) {
 		nx_creation_code = NXACC_CREATE;
@@ -164,12 +112,12 @@ int main(int argc, char *argv[])
 		return 1;
 
 /* create dataset attributes */
-	NXlen = strlen(ch_test_data);
-	if (NXmakedata(fileid, "dataset", NX_CHAR, 1, &NXlen) != NX_OK)
+	NXlen = 4;
+	if (NXmakedata(fileid, "dataset", NX_INT32, 1, &NXlen) != NX_OK)
 		return 1;
 	if (NXopendata(fileid, "dataset") != NX_OK)
 		return 1;
-	if (NXputdata(fileid, ch_test_data) != NX_OK)
+	if (NXputdata(fileid, i4_array) != NX_OK)
 		return 1;
 
 	fprintf(stderr, "creating dataset attributes\n");
