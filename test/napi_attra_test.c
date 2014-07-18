@@ -36,7 +36,9 @@ static void print_data(const char *prefix, void *data, int type, int num);
 int createAttrs(const NXhandle file)
 {
 	int array_dims[2] = { 5, 4 };
-	int i = 5;
+	static int i = 2014;
+
+	i++;
 
 	float r4_array[5][4] =
 	    { {1., 2., 3., 4.}, {5., 6., 7., 8.}, {9., 10., 11., 12.}, {13., 14., 15., 16.},
@@ -50,21 +52,22 @@ int createAttrs(const NXhandle file)
 
 
 	if (NXputattra(file, "attribute_1d", r4_array, 1, array_dims, NX_FLOAT32) != NX_OK)
-		return 1;
+		return NX_ERROR;
 	if (NXputattra (file, "attribute_2d", r8_array, 2, array_dims, NX_FLOAT64) != NX_OK)
-		return 1;
+		return NX_ERROR;
 
 	if (NXputattr(file, "old_style_int_attribute", &i, 1, NX_INT32) != NX_OK)
-		return 1;
+		return NX_ERROR;
 	if (NXputattr (file, "oldstylestrattr", "i:wq!<ESC><ESC>", strlen("i:wq!<ESC><ESC>"), NX_CHAR) != NX_OK)
-		return 1;
-	return 0;
+		return NX_ERROR;
+	return NX_OK;
 }
 
 int main(int argc, char *argv[])
 {
-	int i, NXrank, NXdims[32], NXtype, NXlen, entry_status, attr_status;
+	int i, n, NXrank, NXrank2, NXdims[32], NXdims2[32], NXtype, NXtype2, NXlen, entry_status, attr_status;
 	float r;
+	void *data_buffer;
 
 	int i4_array[4] = { 1000000, 2000000, 3000000, 4000000 };
 
@@ -98,8 +101,10 @@ int main(int argc, char *argv[])
 /* create global attributes */
 	fprintf(stderr, "creating global attributes\n");
 
-	if (createAttrs(fileid) != NX_OK)
+	if (createAttrs(fileid) != NX_OK && nx_creation_code == NXACC_CREATE5) {
+		fprintf(stderr, "unexpected problem creating attributes\n");
 		return 1;
+	}
 
 /* create group attributes */
 	if (NXmakegroup(fileid, "entry", "NXentry") != NX_OK)
@@ -108,8 +113,10 @@ int main(int argc, char *argv[])
 		return 1;
 
 	fprintf(stderr, "creating group attributes\n");
-	if (createAttrs(fileid) != NX_OK)
+	if (createAttrs(fileid) != NX_OK && nx_creation_code == NXACC_CREATE5) {
+		fprintf(stderr, "unexpected problem creating attributes\n");
 		return 1;
+	}
 
 /* create dataset attributes */
 	NXlen = 4;
@@ -121,8 +128,10 @@ int main(int argc, char *argv[])
 		return 1;
 
 	fprintf(stderr, "creating dataset attributes\n");
-	if (createAttrs(fileid) != NX_OK)
+	if (createAttrs(fileid) != NX_OK && nx_creation_code == NXACC_CREATE5) {
+		fprintf(stderr, "unexpected problem creating attributes\n");
 		return 1;
+	}
 
 	if (NXclosedata(fileid) != NX_OK)
 		return 1;
@@ -133,55 +142,38 @@ int main(int argc, char *argv[])
 	if (NXgetattrinfo(fileid, &i) != NX_OK)
 		return 1;
 	if (i > 0) {
-		fprintf(stderr, "      Number of attributes : %d\n", i);
+		fprintf(stderr, "\tNumber of attributes : %d\n", i);
 	}
 	do {
-		attr_status = NXgetnextattr(fileid, name, NXdims, &NXtype);
+		attr_status = NXgetnextattra(fileid, name, &NXrank, NXdims, &NXtype);
 		if (attr_status == NX_ERROR)
 			return 1;
 		if (attr_status == NX_OK) {
-			if (NXgetattrainfo
-			    (fileid, name, &NXrank, NXdims, &NXtype) != NX_OK)
-				return 1;	/* hehe */
-			fprintf(stderr, " found attribute named %s of rank %d and first dimension %d - hooray!\n",
-			     name, NXrank, NXdims[0]);
-			switch (NXtype) {
-			case NX_INT32:
-				NXlen = 1;
-				if (NXgetattr
-				    (fileid,
-				     name, &i, &NXlen, &NXtype) != NX_OK)
-					return 1;
-				fprintf(stderr, "         %s : %d\n", name, i);
-				break;
-			case NX_FLOAT32:
-				NXlen = 1;
-				if (NXgetattr
-				    (fileid,
-				     name, &r, &NXlen, &NXtype) != NX_OK)
-					return 1;
-				fprintf(stderr, "         %s : %f\n", name, r);
-				break;
-			case NX_CHAR:
-				NXlen = sizeof(char_buffer);
-				if (NXgetattr
-				    (fileid,
-				     name,
-				     char_buffer, &NXlen, &NXtype) != NX_OK)
-					return 1;
-				fprintf(stderr, "         %s : %s\n", name, char_buffer);
-				break;
+			/* cross checking against info retrieved by name */
+                       	if (NXgetattrainfo(fileid, name, &NXrank2, NXdims2, &NXtype2) != NX_OK) return 1;  
+			if (NXrank != NXrank2) {
+				fprintf(stderr, "attributes ranks disagree!\n");
+				return 1;
 			}
+			if (NXtype != NXtype2) {
+				fprintf(stderr, "attributes ranks disagree!\n");
+				return 1;
+			}
+			for(i = 0, n = 1 ; i < NXrank ; i++) {
+				n *= NXdims[i];
+				if (NXdims[i] != NXdims2[i]) {
+					fprintf(stderr, "attributes dimensions disagree!\n");
+					return 1;
+				}
+			}
+
+			fprintf(stderr, "\tfound attribute named %s of rank %d and dimensions ", name, NXrank);
+			print_data("", NXdims, NX_INT32, NXrank);
+			if (NXmalloc ((void **) &data_buffer, NXrank, NXdims, NXtype) != NX_OK) 
+				return 1;
+			print_data("\t\t", &data_buffer, NXtype, n);
 		}
 	} while (attr_status == NX_OK);
-
-/*
-	if (NXfree((void **)&data_buffer) != NX_OK)
-		return 1;
-*/
-
-/* find attributes by name */
-	fprintf(stderr, "accessing attributes by name\n");
 
 /* make sure old api fails correctly */
 	fprintf(stderr, "checking for old api interoperability\n");
