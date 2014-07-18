@@ -418,7 +418,7 @@ all ok - done
 ]])
 AT_CLEANUP
 
-AT_SETUP([Check the C binding using XML table (static library)])
+AT_SETUP([Check the C binding using XML table (static)])
 AT_CHECK([ $HAVE_XML && $SETUP_TEST && napi_test-xml-table-static | sed -e 's/\r$//' ], [], 
 [[NXinquirefile found: NXtest-table.xml
 Number of global attributes: 7
@@ -489,21 +489,56 @@ AT_CLEANUP
 AT_BANNER([[Testing new API for array attributes.]])
 
 AT_SETUP([Checking HDF5 (full support)])
-AT_CHECK([$HAVE_HDF5 && napi_attra_test-hdf5-static | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF5 && napi_attra_test-hdf5-static 2>&1 | sed -e 's/\r$//' -e 's, *$,,' ],[], 
 [[
-expected output here, please
+expected stderr here, please
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF4 (limited functionality)])
-AT_CHECK([$HAVE_HDF4 && napi_attra_test-hdf4-static | sed -e 's/\r$//' ],[], 
+AT_CHECK([$HAVE_HDF4 && napi_attra_test-hdf4-static 2>&1 | sed -e 's/\r$//' -e 's, *$,,' ],[], 
 [[
-expected output here, please
+starting attra napi test
+creating file
+creating global attributes
+This is a HDF4 file, attribute array API is not supported here
+creating group attributes
+This is a HDF4 file, attribute array API is not supported here
+creating dataset attributes
+This is a HDF4 file, attribute array API is not supported here
+iterating over attributes
+accessing attributes by name
+checking for old api interoperability
+Number of global attributes: 4
+   NeXus_version = 4.4.0
+   file_name = attra.h4
+Number of group attributes: 0
+NXentry path /entry
+we reached the end - this looks good
 ]])
 AT_CLEANUP
-AT_SETUP([Checking XML (limited functionality)])
-AT_CHECK([$HAVE_XML && napi_attra_test-xml-static | sed -e 's/\r$//' ],[], 
+AT_SETUP([Checking XML  (limited functionality)])
+AT_CHECK([$HAVE_XML && napi_attra_test-xml-static 2>&1 | sed -e 's/\r$//' -e 's, *$,,' ],[], 
 [[
-expected output here, please
+starting attra napi test
+creating file
+creating global attributes
+This is an XML file, attribute array API is not supported here
+creating group attributes
+This is an XML file, attribute array API is not supported here
+creating dataset attributes
+This is an XML file, attribute array API is not supported here
+iterating over attributes
+accessing attributes by name
+checking for old api interoperability
+Number of global attributes: 7
+   NeXus_version = 4.4.0
+   file_name = attra.xml
+   xmlns = http://definition.nexusformat.org/schema/3.1
+   xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
+   xsi:schemaLocation = http://definition.nexusformat.org/schema/3.1 http://definition.nexusformat.org/schema/3.1/BASE.xsd
+Number of group attributes: 0
+NXentry path /entry
+we reached the end - this looks good
 ]])
 AT_CLEANUP
 
