@@ -177,6 +177,8 @@ int main(int argc, char *argv[])
 
 /* make sure old api fails correctly */
 	fprintf(stderr, "checking for old api interoperability\n");
+/* getnextattr on file attr with array should fail */
+/* getattr on file attr with array should fail */
 
 	if (NXclosegroup(fileid) != NX_OK)
 		return 1;

@@ -2476,11 +2476,8 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
 {
 	pNexusFile5 pFile;
-	hid_t attr_id;
-	hid_t atype, aspace;
 	herr_t iRet;
-	int iPType;
-	char *iname = NULL, *vlen_str = NULL;
+	char *iname = NULL;
 	hsize_t idx, intern_idx = -1;
 	int vid;
 	H5O_info_t oinfo;
@@ -2526,34 +2523,13 @@ NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 		free(iname);
 		iname = NULL;
 	} else {
-		strcpy(pName, "What is this?");
+		NXReportError("ERROR: encountered nameless  attribute");
+		killAttVID(pFile, vid);
+		return NX_ERROR;
 	}
-	pFile->iCurrentA =
-	    H5Aopen_by_name(vid, ".", pName, H5P_DEFAULT, H5P_DEFAULT);
-	atype = H5Aget_type(pFile->iCurrentA);
-	aspace = H5Aget_space(pFile->iCurrentA);
-	*rank = H5Sget_simple_extent_ndims(aspace);
-	attr_id = H5Tget_class(atype);
-	if (attr_id == H5T_STRING) {
-		iPType = NX_CHAR;
-		readStringAttribute(pFile->iCurrentA, &vlen_str);
-		*rank = (int)strlen(vlen_str);
-		free(vlen_str);
-	}
-	if (rank == 0) {
-		rank++;
-	}
-	iPType = hdf5ToNXType(attr_id, atype);
-	*iType = iPType;
-	H5Tclose(atype);
-	H5Sclose(aspace);
-	H5Aclose(pFile->iCurrentA);
-
-	H5Oget_info(vid, &oinfo);
-	intern_idx = oinfo.num_attrs;
 
 	killAttVID(pFile, vid);
-	return NX_OK;
+	return NX5getattrainfo(handle, pName, rank, dim, iType);
 }
 /*------------------------------------------------------------------------*/
 NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
@@ -2652,7 +2628,7 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 	pNexusFile5 pFile;
 	int i, iRet, mType, vid;
 	hid_t filespace, attrt;
-	hsize_t myDim[H5S_MAX_RANK], vlen_bytes = 0, total_dims_size = 1, myrank;
+	hsize_t myDim[H5S_MAX_RANK], myrank;
 	H5T_class_t tclass;
 
 	pFile = NXI5assert(handle);
