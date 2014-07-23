@@ -2148,7 +2148,7 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	pNexusFile5 pFile;
 	int iNew, vid;
 	herr_t iRet;
-	hid_t type, atype = -1;
+	hid_t type;
 	char pBuffer[256];
 
 	pFile = NXI5assert(fid);
@@ -2166,8 +2166,6 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	pFile->iCurrentA = iNew;
 	/* finally read the data */
 	if (type == H5T_C_S1) {
-		atype = H5Aget_type(pFile->iCurrentA);
-
 		iRet = readStringAttributeN(pFile->iCurrentA, data, *datalen);
 		*datalen = (int)strlen((char *)data);
 	} else {
@@ -2187,9 +2185,6 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	H5Aclose(pFile->iCurrentA);
 
 	killAttVID(pFile, vid);
-	if (atype != -1) {
-		H5Tclose(atype);
-	}
 	return NX_OK;
 }
 
@@ -2550,7 +2545,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		NXReportError("ERROR: unable to open attribute");
 		return NX_ERROR;
 	}
-	filespace = H5Dget_space(pFile->iCurrentA);
+	filespace = H5Aget_space(pFile->iCurrentA);
 	ndims = H5Sget_simple_extent_dims(filespace, dims, NULL);
 
 	if (ndims < 0) {
@@ -2558,16 +2553,15 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		return NX_ERROR;
 	}
 	if (ndims == 0) {	/* SCALAR dataset */
-		hid_t datatype = H5Dget_type(pFile->iCurrentD);
-		hid_t filespace = H5Dget_space(pFile->iCurrentD);
+		hid_t datatype = H5Aget_type(pFile->iCurrentA);
+		hid_t filespace = H5Aget_space(pFile->iCurrentA);
 
 		tclass = H5Tget_class(datatype);
 
-		if (H5Tis_variable_str(pFile->iCurrentT)) {
+		if (H5Tis_variable_str(datatype)) {
 			char *strdata = calloc(512, sizeof(char));
 			status =
-			    H5Dread(pFile->iCurrentD, datatype, H5S_ALL,
-				    H5S_ALL, H5P_DEFAULT, &strdata);
+			    H5Aread(pFile->iCurrentA, H5S_ALL, &strdata);
 			if (status >= 0)
 				strncpy(data, strdata, strlen(strdata));
 			free(strdata);
@@ -2575,8 +2569,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 			memtype_id = H5Screate(H5S_SCALAR);
 			H5Sselect_all(filespace);
 			status =
-			    H5Dread(pFile->iCurrentD, datatype, memtype_id,
-				    filespace, H5P_DEFAULT, data);
+			    H5Aread(pFile->iCurrentA, memtype_id, data);
 			H5Sclose(memtype_id);
 		}
 
@@ -2587,15 +2580,15 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		return NX_OK;
 	}
 
+	hid_t datatype = H5Aget_type(pFile->iCurrentA);
 	memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
 	/* map datatypes of other plateforms */
-	tclass = H5Tget_class(pFile->iCurrentT);
-	if (H5Tis_variable_str(pFile->iCurrentT)) {
+	tclass = H5Tget_class(datatype);
+	if (H5Tis_variable_str(datatype)) {
 		vstrdata = (char **)malloc((size_t) dims[0] * sizeof(char *));
 		memtype_id = H5Tcopy(H5T_C_S1);
 		H5Tset_size(memtype_id, H5T_VARIABLE);
-		status = H5Dread(pFile->iCurrentD, memtype_id,
-				 H5S_ALL, H5S_ALL, H5P_DEFAULT, vstrdata);
+		status = H5Aread(pFile->iCurrentA, memtype_id, vstrdata);
 		((char *)data)[0] = '\0';
 		if (status >= 0) {
 			for (i = 0; i < dims[0]; ++i) {
@@ -2608,16 +2601,14 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 				vstrdata);
 		free(vstrdata);
 		H5Tclose(memtype_id);
-	} else if (tclass == H5T_STRING) {
-		status = H5Dread(pFile->iCurrentD, pFile->iCurrentT,
-				 H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+	/* } else if (tclass == H5T_STRING) {
+		status = H5Aread(pFile->iCurrentA, H5S_ALL, data); */
 	} else {
-		memtype_id = h5MemType(pFile->iCurrentT);
-		status = H5Dread(pFile->iCurrentD, memtype_id,
-				 H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+		memtype_id = h5MemType(datatype);
+		status = H5Aread(pFile->iCurrentA, memtype_id, data);
 	}
 	if (status < 0) {
-		NXReportError("ERROR: failed to transfer dataset");
+		NXReportError("ERROR: failed to read attribute");
 		return NX_ERROR;
 	}
 return NX_OK;

@@ -169,8 +169,10 @@ int main(int argc, char *argv[])
 
 			fprintf(stderr, "\tfound attribute named %s of rank %d and dimensions ", name, NXrank);
 			print_data("", NXdims, NX_INT32, NXrank);
-			if (NXmalloc ((void **) &data_buffer, NXrank, NXdims, NXtype) != NX_OK) 
+			if (NXmalloc((void **) &data_buffer, NXrank, NXdims, NXtype) != NX_OK) 
 				return 1;
+			if (NXgetattra(fileid, name, &data_buffer) != NX_OK)
+                                return 1;
 			print_data("\t\t", &data_buffer, NXtype, n);
 		}
 	} while (attr_status == NX_OK);
