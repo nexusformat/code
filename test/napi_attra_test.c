@@ -167,13 +167,13 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			fprintf(stderr, "\tfound attribute named %s of rank %d and dimensions ", name, NXrank);
+			fprintf(stderr, "\tfound attribute named %s of type %d, rank %d and dimensions ", name, NXtype, NXrank);
 			print_data("", NXdims, NX_INT32, NXrank);
 			if (NXmalloc((void **) &data_buffer, NXrank, NXdims, NXtype) != NX_OK) 
 				return 1;
-			if (NXgetattra(fileid, name, &data_buffer) != NX_OK)
+			if (NXgetattra(fileid, name, data_buffer) != NX_OK)
                                 return 1;
-			print_data("\t\t", &data_buffer, NXtype, n);
+			print_data("\t\t", data_buffer, NXtype, n);
 		}
 	} while (attr_status == NX_OK);
 
@@ -305,7 +305,7 @@ static void print_data(const char *prefix, void *data, int type, int num)
 			break;
 
 		default:
-			fprintf(stderr, "print_data: invalid type");
+			fprintf(stderr, " (print_data: invalid type %d)", type);
 			break;
 		}
 	}
