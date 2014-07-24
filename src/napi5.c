@@ -2518,7 +2518,7 @@ NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 		free(iname);
 		iname = NULL;
 	} else {
-		NXReportError("ERROR: encountered nameless  attribute");
+		NXReportError("ERROR: encountered nameless attribute");
 		killAttVID(pFile, vid);
 		return NX_ERROR;
 	}
@@ -2531,7 +2531,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 {
 	pNexusFile5 pFile;
 	int i, iStart[H5S_MAX_RANK], status, vid;
-	hid_t memtype_id, filespace;
+	hid_t memtype_id, filespace, datatype;
 	H5T_class_t tclass;
 	hsize_t ndims, dims[H5S_MAX_RANK];
 	char **vstrdata = NULL;
@@ -2546,32 +2546,20 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		return NX_ERROR;
 	}
 	filespace = H5Aget_space(pFile->iCurrentA);
+	datatype = H5Aget_type(pFile->iCurrentA);
 	ndims = H5Sget_simple_extent_dims(filespace, dims, NULL);
 
 	if (ndims < 0) {
 		NXReportError("ERROR: unable to read dims");
 		return NX_ERROR;
 	}
-	if (ndims == 0) {	/* SCALAR dataset */
-		hid_t datatype = H5Aget_type(pFile->iCurrentA);
-		hid_t filespace = H5Aget_space(pFile->iCurrentA);
-
-		tclass = H5Tget_class(datatype);
-
-		if (H5Tis_variable_str(datatype)) {
+	if (ndims == 0 && H5Tis_variable_str(datatype)) {
 			char *strdata = calloc(512, sizeof(char));
 			status =
 			    H5Aread(pFile->iCurrentA, H5S_ALL, &strdata);
 			if (status >= 0)
 				strncpy(data, strdata, strlen(strdata));
 			free(strdata);
-		} else {
-			memtype_id = H5Screate(H5S_SCALAR);
-			H5Sselect_all(filespace);
-			status =
-			    H5Aread(pFile->iCurrentA, memtype_id, data);
-			H5Sclose(memtype_id);
-		}
 
 		H5Sclose(filespace);
 		H5Tclose(datatype);
@@ -2580,7 +2568,6 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		return NX_OK;
 	}
 
-	hid_t datatype = H5Aget_type(pFile->iCurrentA);
 	memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
 	/* map datatypes of other plateforms */
 	tclass = H5Tget_class(datatype);
