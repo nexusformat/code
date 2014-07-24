@@ -2554,12 +2554,11 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		return NX_ERROR;
 	}
 	if (ndims == 0 && H5Tis_variable_str(datatype)) {
-			char *strdata = calloc(512, sizeof(char));
-			status =
-			    H5Aread(pFile->iCurrentA, H5S_ALL, &strdata);
-			if (status >= 0)
-				strncpy(data, strdata, strlen(strdata));
-			free(strdata);
+		char *strdata = calloc(512, sizeof(char));
+		status = H5Aread(pFile->iCurrentA, H5S_ALL, &strdata);
+		if (status >= 0)
+			strncpy(data, strdata, strlen(strdata));
+		free(strdata);
 
 		H5Sclose(filespace);
 		H5Tclose(datatype);
@@ -2567,10 +2566,18 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 			return NX_ERROR;
 		return NX_OK;
 	}
+	tclass = H5Tget_class(datatype);
+	/* stop gap kludge for fixed length strings */
+	if (tclass == H5T_C_S1) {
+		int datalen;
+		status = readStringAttributeN(pFile->iCurrentA, data, datalen);
+		if (status < 0)
+			return NX_ERROR;
+		return NX_OK;
+	} 
 
 	memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
 	/* map datatypes of other plateforms */
-	tclass = H5Tget_class(datatype);
 	if (H5Tis_variable_str(datatype)) {
 		vstrdata = (char **)malloc((size_t) dims[0] * sizeof(char *));
 		memtype_id = H5Tcopy(H5T_C_S1);
@@ -2588,8 +2595,8 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 				vstrdata);
 		free(vstrdata);
 		H5Tclose(memtype_id);
-	/* } else if (tclass == H5T_STRING) {
-		status = H5Aread(pFile->iCurrentA, H5S_ALL, data); */
+	} else if (tclass == H5T_STRING) {
+		status = H5Aread(pFile->iCurrentA, datatype, data); 
 	} else {
 		memtype_id = h5MemType(datatype);
 		status = H5Aread(pFile->iCurrentA, memtype_id, data);
