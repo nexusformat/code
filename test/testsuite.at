@@ -491,7 +491,89 @@ AT_BANNER([[Testing new API for array attributes.]])
 AT_SETUP([Checking HDF5 (full support)])
 AT_CHECK([$HAVE_HDF5 && napi_attra_test-hdf5-static 2>&1 | sed -e 's/\r$//' -e 's, *$,,' ],[], 
 [[
-expected stderr here, please
+starting attra napi test
+creating file
+creating global attributes
+creating group attributes
+creating dataset attributes
+file closed - reopening for testing reads
+=== at root level
+iterating over attributes
+	Number of attributes : 9
+	skipping over NeXus_version as the value is not controlled by this test!
+	found attribute named file_name of type 4, rank 1 and dimensions  8
+		attra.h5
+	reading 1d string the old way should produce similar result
+	file_name = attra.h5
+	skipping over HDF5_Version as the value is not controlled by this test!
+	skipping over file_time as the value is not controlled by this test!
+	found attribute named attribute_0d of type 5, rank 0 and dimensions 
+		 1.000000
+	reading 0d numbers the old way should produce similar result
+		 1.000000
+	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
+		 1.000000 2.000000 3.000000 4.000000 5.000000
+	reading array attributes the old way should produce an error
+		- it does!
+	found attribute named attribute_2d of type 6, rank 2 and dimensions  5 4
+		 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 7.000000 8.000000 9.000000 10.000000 11.000000 12.000000 13.000000 14.000000 15.000000 16.000000 17.000000 18.000000 19.000000 20.000000
+	reading array attributes the old way should produce an error
+		- it does!
+	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
+		 2015
+	reading 0d numbers the old way should produce similar result
+		 2015
+	found attribute named oldstylestrattr of type 4, rank 1 and dimensions  15
+		i:wq!<ESC><ESC>
+	reading 1d string the old way should produce similar result
+	oldstylestrattr = i:wq!<ESC><ESC>
+=== at entry level
+iterating over attributes
+	Number of attributes : 5
+	found attribute named attribute_0d of type 5, rank 0 and dimensions 
+		 1.000000
+	reading 0d numbers the old way should produce similar result
+		 1.000000
+	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
+		 1.000000 2.000000 3.000000 4.000000 5.000000
+	reading array attributes the old way should produce an error
+		- it does!
+	found attribute named attribute_2d of type 6, rank 2 and dimensions  5 4
+		 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 7.000000 8.000000 9.000000 10.000000 11.000000 12.000000 13.000000 14.000000 15.000000 16.000000 17.000000 18.000000 19.000000 20.000000
+	reading array attributes the old way should produce an error
+		- it does!
+	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
+		 2016
+	reading 0d numbers the old way should produce similar result
+		 2016
+	found attribute named oldstylestrattr of type 4, rank 1 and dimensions  15
+		i:wq!<ESC><ESC>
+	reading 1d string the old way should produce similar result
+	oldstylestrattr = i:wq!<ESC><ESC>
+=== at dataset level
+iterating over attributes
+	Number of attributes : 5
+	found attribute named attribute_0d of type 5, rank 0 and dimensions 
+		 1.000000
+	reading 0d numbers the old way should produce similar result
+		 1.000000
+	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
+		 1.000000 2.000000 3.000000 4.000000 5.000000
+	reading array attributes the old way should produce an error
+		- it does!
+	found attribute named attribute_2d of type 6, rank 2 and dimensions  5 4
+		 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 7.000000 8.000000 9.000000 10.000000 11.000000 12.000000 13.000000 14.000000 15.000000 16.000000 17.000000 18.000000 19.000000 20.000000
+	reading array attributes the old way should produce an error
+		- it does!
+	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
+		 2017
+	reading 0d numbers the old way should produce similar result
+		 2017
+	found attribute named oldstylestrattr of type 4, rank 1 and dimensions  15
+		i:wq!<ESC><ESC>
+	reading 1d string the old way should produce similar result
+	oldstylestrattr = i:wq!<ESC><ESC>
+we reached the end - this looks good
 ]])
 AT_CLEANUP
 AT_SETUP([Checking HDF4 (limited functionality)])
@@ -500,20 +582,16 @@ AT_CHECK([$HAVE_HDF4 && napi_attra_test-hdf4-static 2>&1 | sed -e 's/\r$//' -e '
 starting attra napi test
 creating file
 creating global attributes
-This is a HDF4 file, attribute array API is not supported here
+This is a HDF4 file, attribute array API is not supported here 
 creating group attributes
-This is a HDF4 file, attribute array API is not supported here
+This is a HDF4 file, attribute array API is not supported here 
 creating dataset attributes
-This is a HDF4 file, attribute array API is not supported here
+This is a HDF4 file, attribute array API is not supported here 
+file closed - reopening for testing reads
+=== at root level
 iterating over attributes
-accessing attributes by name
-checking for old api interoperability
-Number of global attributes: 4
-   NeXus_version = 4.4.0
-   file_name = attra.h4
-Number of group attributes: 0
-NXentry path /entry
-we reached the end - this looks good
+	Number of attributes : 4
+This is a HDF4 file, attribute array API is not supported here 
 ]])
 AT_CLEANUP
 AT_SETUP([Checking XML  (limited functionality)])
@@ -522,23 +600,16 @@ AT_CHECK([$HAVE_XML && napi_attra_test-xml-static 2>&1 | sed -e 's/\r$//' -e 's,
 starting attra napi test
 creating file
 creating global attributes
-This is an XML file, attribute array API is not supported here
+This is an XML file, attribute array API is not supported here 
 creating group attributes
-This is an XML file, attribute array API is not supported here
+This is an XML file, attribute array API is not supported here 
 creating dataset attributes
-This is an XML file, attribute array API is not supported here
+This is an XML file, attribute array API is not supported here 
+file closed - reopening for testing reads
+=== at root level
 iterating over attributes
-accessing attributes by name
-checking for old api interoperability
-Number of global attributes: 7
-   NeXus_version = 4.4.0
-   file_name = attra.xml
-   xmlns = http://definition.nexusformat.org/schema/3.1
-   xmlns:xsi = http://www.w3.org/2001/XMLSchema-instance
-   xsi:schemaLocation = http://definition.nexusformat.org/schema/3.1 http://definition.nexusformat.org/schema/3.1/BASE.xsd
-Number of group attributes: 0
-NXentry path /entry
-we reached the end - this looks good
+	Number of attributes : 7
+This is an XML file, attribute array API is not supported here 
 ]])
 AT_CLEANUP
 

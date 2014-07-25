@@ -182,11 +182,23 @@ int main(int argc, char *argv[])
 		if (i > 0) {
 			fprintf(stderr, "\tNumber of attributes : %d\n", i);
 		}
+		NXinitgroupdir(fileid);
 		do {
 			attr_status = NXgetnextattra(fileid, name, &NXrank, NXdims, &NXtype);
 
 			if (attr_status == NX_ERROR)
 				return 1;
+
+			if ( strcmp(name, "file_time") &&
+			     strcmp(name, "NeXus_version") &&
+			     strcmp(name, "HDF_version") &&
+			     strcmp(name, "HDF5_Version") &&
+			     strcmp(name, "XML_version") ) {
+				1; 
+			} else {
+				fprintf(stderr, "\tskipping over %s as the value is not controlled by this test!\n", name);
+				continue;
+			}
 
 			if (attr_status == NX_OK) {
 				/* cross checking against info retrieved by name */
@@ -252,6 +264,16 @@ int main(int argc, char *argv[])
 
 			}
 		} while (attr_status == NX_OK);
+
+		NXinitgroupdir(fileid);
+		do { 
+			attr_status = NXgetnextattr(fileid, name, NXdims, &NXtype);
+			if (attr_status == NX_EOD) {
+				fprintf(stderr, "BANG! We've seen no error iterating through array attributes with old api\n");
+				break;
+			}
+		} while (attr_status != NX_ERROR);
+
 	}
 
 	if (NXclose(&fileid) != NX_OK)
