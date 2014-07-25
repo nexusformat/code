@@ -3,7 +3,7 @@
   
   Application Program Interface (HDF5) Routines
   
-  Copyright (C) 1997-2011 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2014 NIAC
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -2146,9 +2146,9 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 		    void *data, int *datalen, int *iType)
 {
 	pNexusFile5 pFile;
-	int iNew, vid;
+	int iNew, vid, myrank;
 	herr_t iRet;
-	hid_t type;
+	hid_t type, filespace;
 	char pBuffer[256];
 
 	pFile = NXI5assert(fid);
@@ -2164,13 +2164,18 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 		return NX_ERROR;
 	}
 	pFile->iCurrentA = iNew;
+	filespace = H5Aget_space(pFile->iCurrentA);
+	myrank = H5Sget_simple_extent_ndims(filespace);
+	if (myrank != 0) {
+		NXReportError("ERROR: attribute arrays not supported by this api");
+		return NX_ERROR;
+	}
+
 	/* finally read the data */
 	if (type == H5T_C_S1) {
 		iRet = readStringAttributeN(pFile->iCurrentA, data, *datalen);
 		*datalen = (int)strlen((char *)data);
 	} else {
-		/* ERROR */
-		/* this hopes the data fits into that with no evidence to support that */
 		iRet = H5Aread(pFile->iCurrentA, type, data);
 		*datalen = 1;
 	}
