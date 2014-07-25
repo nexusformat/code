@@ -2645,18 +2645,18 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 	
 	/* conversion to proper ints for the platform */
 	*iType = (int)mType;
-/*
-	if (tclass == H5T_STRING && myDim[*rank - 1] == 1) {
-		if (H5Tis_variable_str(pFile->iCurrentT)) {
-//			 this would not work for ragged arrays 
-			H5Dvlen_get_buf_size(pFile->iCurrentD, pFile->iCurrentT,
-					     pFile->iCurrentS, &vlen_bytes);
-			myDim[myrank - 1] = vlen_bytes / total_dims_size;
+
+	if (tclass == H5T_STRING) {
+		myrank++;
+		if (H5Tis_variable_str(attrt)) {
+			int vlen_bytes;
+			H5Dvlen_get_buf_size(pFile->iCurrentA, attrt, H5S_ALL, &vlen_bytes);
+			myDim[myrank - 1] = vlen_bytes;
 		} else {
-			myDim[myrank - 1] = H5Tget_size(pFile->iCurrentT);
+			myDim[myrank - 1] = H5Tget_size(attrt);
 		}
 	}
-*/
+
 	for (i = 0; i < myrank; i++) {
 		dim[i] = (int) myDim[i];
 	}
