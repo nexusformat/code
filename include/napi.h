@@ -3,7 +3,7 @@
   
   Application Program Interface Header File
   
-  Copyright (C) 2000-2011 Mark Koennecke, Uwe Filges
+  Copyright (C) 2000-2014 NeXus International Advisory Committee
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,6 @@
  
   For further information, see <http://www.nexusformat.org>
   
-  $Id$
-
  ----------------------------------------------------------------------------*/
 /** \file 
  * Documentation for the NeXus-API version 4.3
@@ -212,6 +210,7 @@ typedef struct {
 #    define NXputslab           MANGLE(nxiputslab)
 #    define NXputslab64         MANGLE(nxiputslab64)
 #    define NXputattr           MANGLE(nxiputattr)
+#    define NXputattra          MANGLE(nxiputattra)
 #    define NXgetdataID         MANGLE(nxigetdataid)
 #    define NXmakelink          MANGLE(nximakelink)
 #    define NXmakenamedlink     MANGLE(nximakenamedlink)
@@ -232,7 +231,10 @@ typedef struct {
 #    define NXgetslab64         MANGLE(nxigetslab64)
 #    define NXgetnextattr       MANGLE(nxigetnextattr)
 #    define NXgetattr           MANGLE(nxigetattr)
+#    define NXgetnextattra      MANGLE(nxigetnextattra)
+#    define NXgetattra          MANGLE(nxigetattra)
 #    define NXgetattrinfo       MANGLE(nxigetattrinfo)
+#    define NXgetattrainfo      MANGLE(nxigetattrainfo)
 #    define NXgetgroupID        MANGLE(nxigetgroupid)
 #    define NXgetgroupinfo      MANGLE(nxigetgroupinfo)
 #    define NXsameID            MANGLE(nxisameid)
@@ -472,9 +474,11 @@ extern  NXstatus  NXputdata(NXhandle handle, const void* data);
 
   /**
    * Write an attribute. The kind of attribute written depends on the  
-   * poistion in the file: at root level, a global attribute is written, if 
+   * position in the file: at root level, a global attribute is written, if 
    * agroup is open but no dataset, a group attribute is written, if a dataset is 
    * open, a dataset attribute is written.
+   * This type of attribute can only contain a signle numerical value or a 
+   * single string. For multiple values use NXputattra
    * \param handle A NeXus file handle as initialized by NXopen. 
    * \param name The name of the attribute.
    * \param data A pointer to the data to write for the attribute.
@@ -484,6 +488,22 @@ extern  NXstatus  NXputdata(NXhandle handle, const void* data);
    * \ingroup c_readwrite
    */
 extern  NXstatus  NXputattr(NXhandle handle, CONSTCHAR* name, const void* data, int iDataLen, int iType);
+
+  /**
+   * Write an attribute of any rank. The kind of attribute written depends on the  
+   * position in the file: at root level, a global attribute is written, if 
+   * agroup is open but no dataset, a group attribute is written, if a dataset is 
+   * open, a dataset attribute is written.
+   * \param handle A NeXus file handle as initialized by NXopen. 
+   * \param name The name of the attribute.
+   * \param data A pointer to the data to write for the attribute.
+   * \param rank Rank of the attribute data
+   * \param dim Dimension array for the attribute data
+   * \param iType The NeXus data type of the attribute. 
+   * \return NX_OK on success, NX_ERROR in the case of an error.   
+   * \ingroup c_readwrite
+   */
+extern  NXstatus  NXputattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
 
   /**
    * Write  a subset of a multi dimensional dataset.
@@ -610,6 +630,7 @@ extern  NXstatus  NXgetslab64(NXhandle handle, void* data, const int64_t start[]
    * dataset. In order to search attributes multiple calls to #NXgetnextattr are performed in a loop 
    * until #NXgetnextattr returns NX_EOD which indicates that there are no further attributes.
    * reset search using #NXinitattrdir
+   * This is deprecated as it only allows single value numerical attributes and single strings.
    * \param handle A NeXus file handle as initialized by NXopen.
    * \param pName The name of the attribute
    * \param iLength A pointer to an integer which be set to the length of the attribute data.
@@ -620,7 +641,8 @@ extern  NXstatus  NXgetslab64(NXhandle handle, void* data, const int64_t start[]
 extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
 
   /**
-   * Read an attribute. 
+   * Read an attribute containing a single string or numerical value.
+   * Use NXgetattra for attributes with dimensions. (Recommened as the general case.)
    * \param handle A NeXus file handle as initialized by NXopen.
    * \param name The name of the atrribute to read.
    * \param data A pointer to a memory area large enough to hold the attributes value.
@@ -639,6 +661,43 @@ extern  NXstatus  NXgetattr(NXhandle handle, char* name, void* data, int* iDataL
    * \ingroup c_metadata
    */
 extern  NXstatus  NXgetattrinfo(NXhandle handle, int* no_items);
+
+/**
+   * Iterate over global, group or dataset attributes depending on the currently open group or 
+   * dataset. In order to search attributes multiple calls to #NXgetnextattr are performed in a loop 
+   * until #NXgetnextattr returns NX_EOD which indicates that there are no further attributes.
+   * reset search using #NXinitattrdir
+   * This allows for attributes with any dimensionality.
+   * \param handle A NeXus file handle as initialized by NXopen.
+   * \param pName The name of the attribute
+   * \param rank Rank of the attribute data.
+   * \param dim Dimension array for the attribute content.
+   * \param iType A pointer to an integer which be set to the NeXus data type of the attribute.
+   * \return NX_OK on success, NX_ERROR in the case of an error, NX_EOD when there are no more items.   
+   * \ingroup c_readwrite
+   */
+extern  NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+
+  /**
+   * Read an arbitraily shaped attribute.
+   * \param handle A NeXus file handle as initialized by NXopen.
+   * \param name The name of the atrribute to read.
+   * \param data A pointer to a memory area large enough to hold the attributes value.
+   * \return NX_OK on success, NX_ERROR in the case of an error.   
+   * \ingroup c_readwrite
+   */
+extern  NXstatus  NXgetattra(NXhandle handle, char* name, void* data);
+
+  /**
+   * Get the information about the storage of the named attribute.
+   * \param handle A NeXus file handle as initialized by NXopen.
+   * \param rank Rank of the attribute data.
+   * \param dim Dimension array for the attribute content.
+   * \param iType A pointer to an integer which be set to the NeXus data type of the attribute.
+   * \return NX_OK on success, NX_ERROR in the case of an error.   
+   * \ingroup c_metadata
+   */
+extern  NXstatus  NXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
   /**
    * Retrieve link data for the currently open group. This link data can later on be used to link this 
@@ -903,6 +962,7 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxclosedata)(NXhandle handle);
         NXstatus ( *nxputdata)(NXhandle handle, const void* data);
         NXstatus ( *nxputattr)(NXhandle handle, CONSTCHAR* name, const void* data, int iDataLen, int iType);
+        NXstatus ( *nxputattra)(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
         NXstatus ( *nxputslab64)(NXhandle handle, const void* data, const int64_t start[], const int64_t size[]);    
         NXstatus ( *nxgetdataID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxmakelink)(NXhandle handle, NXlink* pLink);
@@ -912,7 +972,10 @@ extern  NXstatus  NXsetcache(long newVal);
         NXstatus ( *nxgetnextentry)(NXhandle handle, NXname name, NXname nxclass, int* datatype);
         NXstatus ( *nxgetslab64)(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
         NXstatus ( *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
+        NXstatus ( *nxgetnextattra)(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
         NXstatus ( *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+        NXstatus ( *nxgetattra)(NXhandle handle, char* name, void* data);
+        NXstatus ( *nxgetattrainfo)(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
         NXstatus ( *nxgetattrinfo)(NXhandle handle, int* no_items);
         NXstatus ( *nxgetgroupID)(NXhandle handle, NXlink* pLink);
         NXstatus ( *nxgetgroupinfo)(NXhandle handle, int* no_items, NXname name, NXname nxclass);

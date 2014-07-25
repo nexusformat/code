@@ -81,3 +81,7 @@ putNXDatasetValueAt
 nxigetrawinfo_
 nxigetrawinfo64_
 nxireopen_
+nxiputattra_
+nxigetnextattra_
+nxigetattra_
+nxigetattrainfo_

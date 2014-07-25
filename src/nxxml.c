@@ -1954,12 +1954,43 @@ NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID,
     return NX_ERROR;
   }
 }
+
 /*--------------------------------------------------------------------*/
+
 int  NXXcompress(NXhandle fid, int comp){
   /* that will throw an exception in the Java API, errors have to be fatal */
   /* NXReportError("NXcompress is deprecated, IGNORED"); */
   return NX_OK;
 }
+
+/*--------------------------------------------------------------------*/
+NXstatus  NXXputattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType) 
+{
+  NXReportError("This is an XML file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+/*--------------------------------------------------------------------*/
+NXstatus  NXXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+  NXReportError("This is an XML file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+/*--------------------------------------------------------------------*/
+NXstatus  NXXgetattra(NXhandle handle, char* name, void* data)
+{
+  NXReportError("This is an XML file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
+/*--------------------------------------------------------------------*/
+NXstatus  NXXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+  NXReportError("This is an XML file, attribute array API is not supported here");
+  return NX_ERROR;
+}
+
 /*----------------------------------------------------------------------*/
 void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxclose=NXXclose;
@@ -1994,8 +2025,10 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxsetnumberformat=NXXsetnumberformat;
       fHandle->nxprintlink=NXXprintlink;
       fHandle->nxnativeexternallink=NULL;
+        fHandle->nxputattra = NXXputattra;
+        fHandle->nxgetnextattra = NXXgetnextattra;
+        fHandle->nxgetattra = NXXgetattra;
+        fHandle->nxgetattrainfo = NXXgetattrainfo;
 }
-
-
 
 #endif /*NXXML*/

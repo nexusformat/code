@@ -57,22 +57,23 @@ NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, const void *data,
 NXstatus  NXXgetattr (NXhandle fid, char *name, 
 				   void *data, int* datalen, int* iType);
 
-NXstatus  NXXgetnextentry (NXhandle fid,NXname name, 
-					NXname nxclass, int *datatype);
-extern  NXstatus  NXXgetnextattr(NXhandle handle, 
-				NXname pName, int *iLength, int *iType);
+NXstatus  NXXgetnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype);
+extern  NXstatus  NXXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
 extern  NXstatus  NXXinitgroupdir(NXhandle handle);
 extern  NXstatus  NXXinitattrdir(NXhandle handle);
 extern  NXstatus  NXXgetattrinfo (NXhandle fid, int *iN);
-extern  NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN, 
-					NXname pName, NXname pClass);
+extern  NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN, NXname pName, NXname pClass);
 
 extern NXstatus  NXXgetdataID (NXhandle fid, NXlink* sRes);
 extern NXstatus  NXXgetgroupID (NXhandle fid, NXlink* sRes);
 extern NXstatus  NXXmakelink (NXhandle fid, NXlink* sLink);
 extern NXstatus  NXXprintlink (NXhandle fid, NXlink* sLink);
-extern NXstatus  NXXsameID (NXhandle fileid, 
-					      NXlink* pFirstID, NXlink* pSecondID);
+extern NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID);
+
+extern  NXstatus  NXXputattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
+extern  NXstatus  NXXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+extern  NXstatus  NXXgetattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NXXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
 void NXXassignFunctions(pNexusFunction fHandle);
 #endif

@@ -46,8 +46,12 @@ extern  NXstatus  NX4getdataID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX4makelink(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX4printlink(NXhandle handle, NXlink* pLink);
 
-void NX4assignFunctions(pNexusFunction fHandle);
+extern  NXstatus  NX4putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
+extern  NXstatus  NX4getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+extern  NXstatus  NX4getattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NX4getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
+void NX4assignFunctions(pNexusFunction fHandle);
   
 /*
  *  HDF changed from MAX_VAR_DIMS to H4_MAX_VAR_DIMS aronud 9/5/2007 

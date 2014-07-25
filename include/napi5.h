@@ -45,6 +45,11 @@ extern  NXstatus  NX5getgroupinfo(NXhandle handle, int* no_items, NXname name, N
 extern  NXstatus  NX5initgroupdir(NXhandle handle);
 extern  NXstatus  NX5initattrdir(NXhandle handle);
 
+extern  NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
+extern  NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+extern  NXstatus  NX5getattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NX5getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+
 void NX5assignFunctions(pNexusFunction fHandle);
 
 herr_t attr_info(hid_t loc_id, const char *name, const H5A_info_t *unused, void *opdata);

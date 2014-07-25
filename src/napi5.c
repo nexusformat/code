@@ -3,7 +3,7 @@
   
   Application Program Interface (HDF5) Routines
   
-  Copyright (C) 1997-2011 Mark Koennecke, Przemek Klosowski
+  Copyright (C) 1997-2014 NIAC
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -1065,11 +1065,6 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 
 	/* determine vid */
 	vid = getAttVID(pFile);
-	aid2 = H5Screate(H5S_SCALAR);
-	aid1 = H5Tcopy(type);
-	if (iType == NX_CHAR) {
-		H5Tset_size(aid1, datalen);
-	}
 	iRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
 	if (iRet > 0) {
 		H5Aclose(iRet);
@@ -1080,6 +1075,11 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 			killAttVID(pFile, vid);
 			return NX_ERROR;
 		}
+	}
+	aid2 = H5Screate(H5S_SCALAR);
+	aid1 = H5Tcopy(type);
+	if (iType == NX_CHAR) {
+		H5Tset_size(aid1, datalen);
 	}
 	attr1 = H5Acreate(vid, name, aid1, aid2, H5P_DEFAULT, H5P_DEFAULT);
 	if (attr1 < 0) {
@@ -2057,87 +2057,26 @@ herr_t attr_info(hid_t loc_id, const char *name, const H5A_info_t * unused,
 
 NXstatus NX5getnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 {
-	pNexusFile5 pFile;
-	hid_t attr_id;
-	hid_t atype, aspace;
-	herr_t iRet;
-	int iPType, rank;
-	char *iname = NULL, *vlen_str = NULL;
-	hsize_t idx, intern_idx = -1;
-	int vid;
-	H5O_info_t oinfo;
+	int rank, status;
+	int mydim[H5S_MAX_RANK];
 
-	pFile = NXI5assert(fileid);
+	status = NX5getnextattra(fileid, pName, &rank, mydim, iType);
 
-	vid = getAttVID(pFile);
+	if (status != NX_OK)
+		return status;
 
-	pName[0] = '\0';
-	idx = pFile->iAtt5.iCurrentIDX;
-	iRet = 0;
-
-	H5Oget_info(vid, &oinfo);
-	intern_idx = oinfo.num_attrs;
-	if (intern_idx == idx) {
-		killAttVID(pFile, vid);
-		return NX_EOD;
-	}
-
-	if (intern_idx > idx) {
-		iRet =
-		    H5Aiterate(vid, H5_INDEX_CRT_ORDER, H5_ITER_INC, &idx,
-			       attr_info, &iname);
-	} else {
-		iRet = 0;
-	}
-	intern_idx = -1;
-	if (iRet < 0) {
-		NXReportError("ERROR: iterating through attribute list");
-		killAttVID(pFile, vid);
-		return NX_ERROR;
-	}
-	pFile->iAtt5.iCurrentIDX++;
-	if (iname != NULL) {
-		if (strcmp(iname, "NX_class") == 0 && pFile->iCurrentG != 0
-		    && pFile->iCurrentD == 0) {
-			/*
-			   skip NXclass attribute which is internal 
-			 */
-			killAttVID(pFile, vid);
-			return NX5getnextattr(fileid, pName, iLength, iType);
-		}
-		strcpy(pName, iname);
-		free(iname);
-		iname = NULL;
-	} else {
-		strcpy(pName, "What is this?");
-	}
-	pFile->iCurrentA =
-	    H5Aopen_by_name(vid, ".", pName, H5P_DEFAULT, H5P_DEFAULT);
-	atype = H5Aget_type(pFile->iCurrentA);
-	aspace = H5Aget_space(pFile->iCurrentA);
-	rank = H5Sget_simple_extent_ndims(aspace);
-	attr_id = H5Tget_class(atype);
-	if (attr_id == H5T_STRING) {
-		iPType = NX_CHAR;
-		readStringAttribute(pFile->iCurrentA, &vlen_str);
-		rank = (int)strlen(vlen_str);
-		free(vlen_str);
-	}
 	if (rank == 0) {
-		rank++;
+		*iLength = 1;
+		return NX_OK;
 	}
-	iPType = hdf5ToNXType(attr_id, atype);
-	*iType = iPType;
-	*iLength = rank;
-	H5Tclose(atype);
-	H5Sclose(aspace);
-	H5Aclose(pFile->iCurrentA);
 
-	H5Oget_info(vid, &oinfo);
-	intern_idx = oinfo.num_attrs;
-
-	killAttVID(pFile, vid);
-	return NX_OK;
+	if (rank == 1 && *iType == NX_CHAR) {
+		*iLength = mydim[0];
+		return NX_OK;
+	}
+		
+	NXReportError("ERROR iterating through attributes found array attribute not understood by this api");
+	return NX_ERROR;
 }
 
  /*-------------------------------------------------------------------------*/
@@ -2146,9 +2085,9 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 		    void *data, int *datalen, int *iType)
 {
 	pNexusFile5 pFile;
-	int iNew, vid;
+	int iNew, vid, myrank;
 	herr_t iRet;
-	hid_t type, atype = -1;
+	hid_t type, filespace;
 	char pBuffer[256];
 
 	pFile = NXI5assert(fid);
@@ -2164,10 +2103,15 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 		return NX_ERROR;
 	}
 	pFile->iCurrentA = iNew;
+	filespace = H5Aget_space(pFile->iCurrentA);
+	myrank = H5Sget_simple_extent_ndims(filespace);
+	if (myrank != 0) {
+		NXReportError("ERROR: attribute arrays not supported by this api");
+		return NX_ERROR;
+	}
+
 	/* finally read the data */
 	if (type == H5T_C_S1) {
-		atype = H5Aget_type(pFile->iCurrentA);
-
 		iRet = readStringAttributeN(pFile->iCurrentA, data, *datalen);
 		*datalen = (int)strlen((char *)data);
 	} else {
@@ -2176,9 +2120,7 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	}
 
 	if (iRet < 0) {
-		sprintf(pBuffer,
-			"ERROR: could not read attribute data for \"%s\"",
-			name);
+		sprintf(pBuffer, "ERROR: could not read attribute data for \"%s\"", name);
 		NXReportError(pBuffer);
 		killAttVID(pFile, vid);
 		return NX_ERROR;
@@ -2187,9 +2129,6 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	H5Aclose(pFile->iCurrentA);
 
 	killAttVID(pFile, vid);
-	if (atype != -1) {
-		H5Tclose(atype);
-	}
 	return NX_OK;
 }
 
@@ -2361,7 +2300,7 @@ NXstatus NX5nativeisexternallink(NXhandle fileid, const char *name, char *url,
 
 }
 
-  /* ------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
 
 NXstatus NX5sameID(NXhandle fileid, NXlink * pFirstID, NXlink * pSecondID)
 {
@@ -2373,7 +2312,7 @@ NXstatus NX5sameID(NXhandle fileid, NXlink * pFirstID, NXlink * pSecondID)
 	}
 }
 
- /*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 NXstatus NX5initattrdir(NXhandle fid)
 {
@@ -2384,7 +2323,7 @@ NXstatus NX5initattrdir(NXhandle fid)
 	return NX_OK;
 }
 
-  /*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 NXstatus NX5initgroupdir(NXhandle fid)
 {
@@ -2396,9 +2335,283 @@ NXstatus NX5initgroupdir(NXhandle fid)
 }
 
 /*------------------------------------------------------------------------*/
+NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType)
+{
+	hid_t datatype1, dataspace;
+	hid_t type, cparms = -1;
+	pNexusFile5 pFile;
+	char pBuffer[256];
+	int i, vid;
+	herr_t iRet;
+	hsize_t mydim[H5S_MAX_RANK];
+
+	pFile = NXI5assert(handle);
+
+	for (i = 0; i < rank; i++) {
+		mydim[i] = dim[i];
+	}
+
+	/* determine vid */
+	vid = getAttVID(pFile);
+	iRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
+	if (iRet > 0) {
+		H5Aclose(iRet);
+		iRet = H5Adelete(vid, name);
+		if (iRet < 0) {
+			NXReportError("ERROR: old attribute cannot be removed! ");
+			killAttVID(pFile, vid);
+			return NX_ERROR;
+		}
+	}
+
+	if (rank < 0) {
+		sprintf(pBuffer, "ERROR: invalid rank specified %s", name);
+		NXReportError(pBuffer);
+		return NX_ERROR;
+	}
+
+	type = nxToHDF5Type(iType);
+
+	datatype1 = H5Tcopy(type);
+	if (iType == NX_CHAR) {
+		H5Tset_size(datatype1, dim[rank-1]);
+		dataspace = H5Screate_simple(rank-1, mydim, NULL);
+	} else {
+		dataspace = H5Screate_simple(rank, mydim, NULL);
+	}
+
+	iRet = H5Acreate(vid, (char *)name, datatype1,
+		      dataspace, H5P_DEFAULT, H5P_DEFAULT);
+
+	if (iRet < 0) {
+		NXReportError("ERROR: creating attribute failed");
+		return NX_ERROR;
+	} else {
+		pFile->iCurrentA = iRet;
+	}
+	if (cparms != -1) {
+		iRet = H5Pclose(cparms);
+	}
+
+	iRet = H5Awrite(pFile->iCurrentA, type, data);
+	if (iRet < 0) {
+		NXReportError("ERROR: failure to write attribute");
+		return NX_ERROR; 
+	}
+
+	iRet = H5Sclose(dataspace);
+	iRet = H5Tclose(datatype1);
+	iRet = H5Aclose(pFile->iCurrentA);
+	pFile->iCurrentA = 0;
+	if (iRet < 0) {
+		NXReportError("ERROR: HDF cannot close attribute");
+		return NX_ERROR;
+	}
+
+	return NX_OK;
+}
+
+/*------------------------------------------------------------------------*/
+NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
+{
+	pNexusFile5 pFile;
+	herr_t iRet;
+	char *iname = NULL;
+	hsize_t idx, intern_idx = -1;
+	int vid;
+	H5O_info_t oinfo;
+
+	pFile = NXI5assert(handle);
+
+	vid = getAttVID(pFile);
+
+	pName[0] = '\0';
+	idx = pFile->iAtt5.iCurrentIDX;
+	iRet = 0;
+
+	H5Oget_info(vid, &oinfo);
+	intern_idx = oinfo.num_attrs;
+	if (intern_idx == idx) {
+		killAttVID(pFile, vid);
+		return NX_EOD;
+	}
+
+	if (intern_idx > idx) {
+		iRet = H5Aiterate(vid, H5_INDEX_CRT_ORDER, H5_ITER_INC, &idx,
+			       attr_info, &iname);
+	} else {
+		iRet = 0;
+	}
+	intern_idx = -1;
+	if (iRet < 0) {
+		NXReportError("ERROR: iterating through attribute list");
+		killAttVID(pFile, vid);
+		return NX_ERROR;
+	}
+	pFile->iAtt5.iCurrentIDX++;
+	if (iname != NULL) {
+		if (strcmp(iname, "NX_class") == 0 && pFile->iCurrentG != 0
+		    && pFile->iCurrentD == 0) {
+			/*
+			   skip NXclass attribute which is internal 
+			 */
+			killAttVID(pFile, vid);
+			return NX5getnextattra(handle, pName, rank, dim, iType);
+		}
+		strcpy(pName, iname);
+		free(iname);
+		iname = NULL;
+	} else {
+		NXReportError("ERROR: encountered nameless attribute");
+		killAttVID(pFile, vid);
+		return NX_ERROR;
+	}
+
+	killAttVID(pFile, vid);
+	return NX5getattrainfo(handle, pName, rank, dim, iType);
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
+{
+	pNexusFile5 pFile;
+	int i, iStart[H5S_MAX_RANK], status, vid;
+	hid_t memtype_id, filespace, datatype;
+	H5T_class_t tclass;
+	hsize_t ndims, dims[H5S_MAX_RANK];
+	char **vstrdata = NULL;
+
+	pFile = NXI5assert(handle);
+	
+	vid = getAttVID(pFile);
+	pFile->iCurrentA = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
+	if (pFile->iCurrentA < 0) {
+		pFile->iCurrentA = 0;
+		NXReportError("ERROR: unable to open attribute");
+		return NX_ERROR;
+	}
+	filespace = H5Aget_space(pFile->iCurrentA);
+	datatype = H5Aget_type(pFile->iCurrentA);
+	ndims = H5Sget_simple_extent_dims(filespace, dims, NULL);
+
+	if (ndims < 0) {
+		NXReportError("ERROR: unable to read dims");
+		return NX_ERROR;
+	}
+	if (ndims == 0 && H5Tis_variable_str(datatype)) {
+		char *strdata = calloc(512, sizeof(char));
+		status = H5Aread(pFile->iCurrentA, H5S_ALL, &strdata);
+		if (status >= 0)
+			strncpy(data, strdata, strlen(strdata));
+		free(strdata);
+
+		H5Sclose(filespace);
+		H5Tclose(datatype);
+		if (status < 0)
+			return NX_ERROR;
+		return NX_OK;
+	}
+	tclass = H5Tget_class(datatype);
+	/* stop gap kludge for fixed length strings */
+	if (tclass == H5T_C_S1) {
+		int datalen; /* fishy - uninitialised */
+		status = readStringAttributeN(pFile->iCurrentA, data, datalen);
+		if (status < 0)
+			return NX_ERROR;
+		return NX_OK;
+	} 
+
+	memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
+	/* map datatypes of other plateforms */
+	if (H5Tis_variable_str(datatype)) {
+		vstrdata = (char **)malloc((size_t) dims[0] * sizeof(char *));
+		memtype_id = H5Tcopy(H5T_C_S1);
+		H5Tset_size(memtype_id, H5T_VARIABLE);
+		status = H5Aread(pFile->iCurrentA, memtype_id, vstrdata);
+		((char *)data)[0] = '\0';
+		if (status >= 0) {
+			for (i = 0; i < dims[0]; ++i) {
+				if (vstrdata[i] != NULL) {
+					strcat((char *)data, vstrdata[i]);
+				}
+			}
+		}
+		H5Dvlen_reclaim(memtype_id, pFile->iCurrentS, H5P_DEFAULT,
+				vstrdata);
+		free(vstrdata);
+		H5Tclose(memtype_id);
+	} else if (tclass == H5T_STRING) {
+		status = H5Aread(pFile->iCurrentA, datatype, data); 
+	} else {
+		memtype_id = h5MemType(datatype);
+		status = H5Aread(pFile->iCurrentA, memtype_id, data);
+	}
+	if (status < 0) {
+		NXReportError("ERROR: failed to read attribute");
+		return NX_ERROR;
+	}
+return NX_OK;
+}
+/*------------------------------------------------------------------------*/
+NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], int *iType)
+{
+	pNexusFile5 pFile;
+	int i, iRet, mType, vid;
+	hid_t filespace, attrt;
+	hsize_t myDim[H5S_MAX_RANK], myrank;
+	H5T_class_t tclass;
+
+	pFile = NXI5assert(handle);
+
+	vid = getAttVID(pFile);
+	pFile->iCurrentA = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
+	if (pFile->iCurrentA < 0) {
+		pFile->iCurrentA = 0;
+		NXReportError("ERROR: unable to open attribute");
+		return NX_ERROR;
+	}
+
+	filespace = H5Aget_space(pFile->iCurrentA);
+	myrank = H5Sget_simple_extent_ndims(filespace);
+	if (myrank < 0) {
+		NXReportError("ERROR: Cannot determine attribute rank");
+		return NX_ERROR;
+	}
+	iRet = H5Sget_simple_extent_dims(filespace, myDim, NULL);
+	if (iRet < 0) {
+		NXReportError("ERROR: Cannot determine attribute dimensions");
+		return NX_ERROR;
+	}
+
+	/* read information */
+	attrt = H5Aget_type(pFile->iCurrentA);
+	tclass = H5Tget_class(attrt);
+	mType = hdf5ToNXType(tclass, attrt);
+	
+	/* conversion to proper ints for the platform */
+	*iType = (int)mType;
+
+	if (tclass == H5T_STRING) {
+		myrank++;
+		if (H5Tis_variable_str(attrt)) {
+			hsize_t vlen_bytes;
+			H5Dvlen_get_buf_size(pFile->iCurrentA, attrt, H5S_ALL, &vlen_bytes);
+			myDim[myrank - 1] = vlen_bytes;
+		} else {
+			myDim[myrank - 1] = H5Tget_size(attrt);
+		}
+	}
+
+	for (i = 0; i < myrank; i++) {
+		dim[i] = (int) myDim[i];
+	}
+	*rank = (int) myrank;
+
+	return NX_OK;
+}
+
+/*------------------------------------------------------------------------*/
 void NX5assignFunctions(pNexusFunction fHandle)
 {
-
 	fHandle->nxclose = NX5close;
 	fHandle->nxreopen = NX5reopen;
 	fHandle->nxflush = NX5flush;
@@ -2432,6 +2645,10 @@ void NX5assignFunctions(pNexusFunction fHandle)
 	fHandle->nxnativeexternallink = NX5nativeexternallink;
 	fHandle->nxnativeinquirefile = NX5nativeinquirefile;
 	fHandle->nxnativeisexternallink = NX5nativeisexternallink;
+	fHandle->nxputattra = NX5putattra;
+	fHandle->nxgetnextattra = NX5getnextattra;
+	fHandle->nxgetattra = NX5getattra;
+	fHandle->nxgetattrainfo = NX5getattrainfo;
 }
 
 #endif				/* HDF5 */
