@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 		if (i > 0) {
 			fprintf(stderr, "\tNumber of attributes : %d\n", i);
 		}
-		NXinitgroupdir(fileid);
+		NXinitattrdir(fileid);
 		do {
 			attr_status = NXgetnextattra(fileid, name, &NXrank, NXdims, &NXtype);
 
@@ -265,7 +265,8 @@ int main(int argc, char *argv[])
 			}
 		} while (attr_status == NX_OK);
 
-		NXinitgroupdir(fileid);
+		fprintf(stderr, "Next we are expecting a failure iterating with the old api\n");
+		NXinitattrdir(fileid);
 		do { 
 			attr_status = NXgetnextattr(fileid, name, NXdims, &NXtype);
 			if (attr_status == NX_EOD) {

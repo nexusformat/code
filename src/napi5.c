@@ -2057,87 +2057,26 @@ herr_t attr_info(hid_t loc_id, const char *name, const H5A_info_t * unused,
 
 NXstatus NX5getnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 {
-	pNexusFile5 pFile;
-	hid_t attr_id;
-	hid_t atype, aspace;
-	herr_t iRet;
-	int iPType, rank;
-	char *iname = NULL, *vlen_str = NULL;
-	hsize_t idx, intern_idx = -1;
-	int vid;
-	H5O_info_t oinfo;
+	int rank, status;
+	int mydim[H5S_MAX_RANK];
 
-	pFile = NXI5assert(fileid);
+	status = NX5getnextattra(fileid, pName, &rank, mydim, iType);
 
-	vid = getAttVID(pFile);
+	if (status != NX_OK)
+		return status;
 
-	pName[0] = '\0';
-	idx = pFile->iAtt5.iCurrentIDX;
-	iRet = 0;
-
-	H5Oget_info(vid, &oinfo);
-	intern_idx = oinfo.num_attrs;
-	if (intern_idx == idx) {
-		killAttVID(pFile, vid);
-		return NX_EOD;
-	}
-
-	if (intern_idx > idx) {
-		iRet =
-		    H5Aiterate(vid, H5_INDEX_CRT_ORDER, H5_ITER_INC, &idx,
-			       attr_info, &iname);
-	} else {
-		iRet = 0;
-	}
-	intern_idx = -1;
-	if (iRet < 0) {
-		NXReportError("ERROR: iterating through attribute list");
-		killAttVID(pFile, vid);
-		return NX_ERROR;
-	}
-	pFile->iAtt5.iCurrentIDX++;
-	if (iname != NULL) {
-		if (strcmp(iname, "NX_class") == 0 && pFile->iCurrentG != 0
-		    && pFile->iCurrentD == 0) {
-			/*
-			   skip NXclass attribute which is internal 
-			 */
-			killAttVID(pFile, vid);
-			return NX5getnextattr(fileid, pName, iLength, iType);
-		}
-		strcpy(pName, iname);
-		free(iname);
-		iname = NULL;
-	} else {
-		strcpy(pName, "What is this?");
-	}
-	pFile->iCurrentA =
-	    H5Aopen_by_name(vid, ".", pName, H5P_DEFAULT, H5P_DEFAULT);
-	atype = H5Aget_type(pFile->iCurrentA);
-	aspace = H5Aget_space(pFile->iCurrentA);
-	rank = H5Sget_simple_extent_ndims(aspace);
-	attr_id = H5Tget_class(atype);
-	if (attr_id == H5T_STRING) {
-		iPType = NX_CHAR;
-		readStringAttribute(pFile->iCurrentA, &vlen_str);
-		rank = (int)strlen(vlen_str);
-		free(vlen_str);
-	}
 	if (rank == 0) {
-		rank++;
+		*iLength = 1;
+		return NX_OK;
 	}
-	iPType = hdf5ToNXType(attr_id, atype);
-	*iType = iPType;
-	*iLength = rank;
-	H5Tclose(atype);
-	H5Sclose(aspace);
-	H5Aclose(pFile->iCurrentA);
 
-	H5Oget_info(vid, &oinfo);
-	intern_idx = oinfo.num_attrs;
-
-	killAttVID(pFile, vid);
-	return NX_OK;
+	if (rank == 1 && *iType == NX_CHAR) {
+		*iLength = mydim[0];
+		return NX_OK;
+	}
+		
+	NXReportError("ERROR iterating through attributes found array attribute not understood by this api");
+	return NX_ERROR;
 }
 
  /*-------------------------------------------------------------------------*/
@@ -2574,7 +2513,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 	tclass = H5Tget_class(datatype);
 	/* stop gap kludge for fixed length strings */
 	if (tclass == H5T_C_S1) {
-		int datalen;
+		int datalen; /* fishy - uninitialised */
 		status = readStringAttributeN(pFile->iCurrentA, data, datalen);
 		if (status < 0)
 			return NX_ERROR;
@@ -2654,7 +2593,7 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 	if (tclass == H5T_STRING) {
 		myrank++;
 		if (H5Tis_variable_str(attrt)) {
-			int vlen_bytes;
+			hsize_t vlen_bytes;
 			H5Dvlen_get_buf_size(pFile->iCurrentA, attrt, H5S_ALL, &vlen_bytes);
 			myDim[myrank - 1] = vlen_bytes;
 		} else {

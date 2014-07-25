@@ -514,10 +514,12 @@ iterating over attributes
 	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
 		 1.000000 2.000000 3.000000 4.000000 5.000000
 	reading array attributes the old way should produce an error
+ERROR: attribute arrays not supported by this api 
 		- it does!
 	found attribute named attribute_2d of type 6, rank 2 and dimensions  5 4
 		 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 7.000000 8.000000 9.000000 10.000000 11.000000 12.000000 13.000000 14.000000 15.000000 16.000000 17.000000 18.000000 19.000000 20.000000
 	reading array attributes the old way should produce an error
+ERROR: attribute arrays not supported by this api 
 		- it does!
 	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
 		 2015
@@ -527,6 +529,8 @@ iterating over attributes
 		i:wq!<ESC><ESC>
 	reading 1d string the old way should produce similar result
 	oldstylestrattr = i:wq!<ESC><ESC>
+Next we are expecting a failure iterating with the old api
+ERROR iterating through attributes found array attribute not understood by this api 
 === at entry level
 iterating over attributes
 	Number of attributes : 5
@@ -537,10 +541,12 @@ iterating over attributes
 	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
 		 1.000000 2.000000 3.000000 4.000000 5.000000
 	reading array attributes the old way should produce an error
+ERROR: attribute arrays not supported by this api 
 		- it does!
 	found attribute named attribute_2d of type 6, rank 2 and dimensions  5 4
 		 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 7.000000 8.000000 9.000000 10.000000 11.000000 12.000000 13.000000 14.000000 15.000000 16.000000 17.000000 18.000000 19.000000 20.000000
 	reading array attributes the old way should produce an error
+ERROR: attribute arrays not supported by this api 
 		- it does!
 	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
 		 2016
@@ -550,6 +556,8 @@ iterating over attributes
 		i:wq!<ESC><ESC>
 	reading 1d string the old way should produce similar result
 	oldstylestrattr = i:wq!<ESC><ESC>
+Next we are expecting a failure iterating with the old api
+ERROR iterating through attributes found array attribute not understood by this api 
 === at dataset level
 iterating over attributes
 	Number of attributes : 5
@@ -560,10 +568,12 @@ iterating over attributes
 	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
 		 1.000000 2.000000 3.000000 4.000000 5.000000
 	reading array attributes the old way should produce an error
+ERROR: attribute arrays not supported by this api 
 		- it does!
 	found attribute named attribute_2d of type 6, rank 2 and dimensions  5 4
 		 1.000000 2.000000 3.000000 4.000000 5.000000 6.000000 7.000000 8.000000 9.000000 10.000000 11.000000 12.000000 13.000000 14.000000 15.000000 16.000000 17.000000 18.000000 19.000000 20.000000
 	reading array attributes the old way should produce an error
+ERROR: attribute arrays not supported by this api 
 		- it does!
 	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
 		 2017
@@ -573,6 +583,8 @@ iterating over attributes
 		i:wq!<ESC><ESC>
 	reading 1d string the old way should produce similar result
 	oldstylestrattr = i:wq!<ESC><ESC>
+Next we are expecting a failure iterating with the old api
+ERROR iterating through attributes found array attribute not understood by this api 
 we reached the end - this looks good
 ]])
 AT_CLEANUP
