@@ -73,18 +73,15 @@ int createAttrs(const NXhandle file)
 int main(int argc, char *argv[])
 {
 	int i, n, level, NXrank, NXrank2, NXdims[32], NXdims2[32], NXtype,
-	    NXtype2, NXlen, entry_status, attr_status;
-	float r;
+	    NXtype2, NXlen, attr_status;
 	void *data_buffer;
 
 	int i4_array[4] = { 1000000, 2000000, 3000000, 4000000 };
 
-	char name[64], char_class[64], char_buffer[128];
-	char group_name[64], class_name[64];
+	char name[64], char_buffer[128];
 	NXhandle fileid;
 	int nx_creation_code;
 	char nxFile[80];
-	char path[512];
 
 	if (strstr(argv[0], "hdf4") != NULL) {
 		nx_creation_code = NXACC_CREATE;
