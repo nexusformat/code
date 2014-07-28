@@ -77,6 +77,20 @@ else
 fi
 export HAVE_PYTHON
 #
+if test ! -z "@JAVAC@"; then
+    HAVE_JAVA=run_test
+else
+    HAVE_JAVA=skip_test
+fi
+export HAVE_JAVA
+#
+if test ! -z "@JAVA@"; then
+    JAVA="@JAVA@"
+else
+    JAVA=:
+fi
+export JAVA
+#
 if test ! -z "@IDLROOT@"; then
     HAVE_IDL=run_test
 else

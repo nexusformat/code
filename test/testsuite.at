@@ -876,14 +876,39 @@ AT_SETUP([Checking python binding using HDF5])
 AT_CHECK([$HAVE_HDF5 && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q hdf5 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
+
 AT_SETUP([Checking python binding using HDF4])
 AT_CHECK([skip_test && $HAVE_HDF4 && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q hdf4 | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
+
 AT_SETUP([Checking python binding using XML])
 AT_CHECK([$HAVE_XML && $HAVE_PYTHON && $PYTHON $abs_srcdir/../bindings/python/nxstest.py -q xml | sed -e 's/\r$//' ],[], 
 [[]])
 AT_CLEANUP
+
+AT_BANNER([[Testing the Java bindings.]])
+AT_SETUP([Checking Java binding using HDF5])
+AT_CHECK([$HAVE_HDF5 && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi hdf5 ) | sed -e 's/\r$//' ],[], 
+[[
+stdout here
+]])
+AT_CLEANUP
+
+AT_SETUP([Checking Java binding using XML])
+AT_CHECK([$HAVE_XML && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi xml ) | sed -e 's/\r$//' ],[], 
+[[
+stdout here
+]])
+AT_CLEANUP
+
+AT_SETUP([Checking Java binding using HDF4])
+AT_CHECK([$HAVE_HDF4 && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi hdf4 ) | sed -e 's/\r$//' ],[], 
+[[
+stdout here
+]])
+AT_CLEANUP
+
 
 AT_BANNER([[Testing the IDL bindings.]])
 
