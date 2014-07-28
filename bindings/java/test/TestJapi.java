@@ -146,7 +146,7 @@ public class TestJapi {
 				iDim[0] = atten.length;
 				iDim[1] = atten.type;
 				nf.getattr(attname, bData, iDim);
-				System.out.println(attname + "=" + new String(bData));
+				System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
 			}
 
 			// test reading vGroup directory
@@ -196,7 +196,7 @@ public class TestJapi {
 			iDim[0] = 60;
 			iDim[1] = NexusFile.NX_CHAR;
 			nf.getattr("Units", bString, iDim);
-			System.out.println("Read attribute Units to: " + new String(bString));
+			System.out.println("Read attribute Units to: " + new String(bString, 0, iDim[0]));
 			// check reading a slab
 			iStart[0] = 0;
 			iStart[1] = 0;
