@@ -898,11 +898,11 @@ Testing HDF5
 ------------
 Exception handling mechanism works
  *** Writing Tests passed with flying banners
-Found global attribute: HDF5_Version type: 4, length: 5
+Found global attribute: HDF5_Version type: 4
 HDF5_Version= XXXX (volatile information withheld to aid automatic testing)
-Found global attribute: file_time type: 4, length: 25
+Found global attribute: file_time type: 4
 file_time= XXXX (volatile information withheld to aid automatic testing)
-Found global attribute: NeXus_version type: 4, length: 5
+Found global attribute: NeXus_version type: 4
 NeXus_version= XXXX (volatile information withheld to aid automatic testing)
 Found global attribute: file_name type: 4, length: 13
 file_name=japitest.hdf5
@@ -938,11 +938,11 @@ Exception handling mechanism works
  *** Writing Tests passed with flying banners
 Found global attribute: xmlns:xsi type: 4, length: 41
 xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
-Found global attribute: file_time type: 4, length: 25
+Found global attribute: file_time type: 4
 file_time= XXXX (volatile information withheld to aid automatic testing)
 Found global attribute: XML_version type: 4, length: 4
 XML_version=mxml
-Found global attribute: NeXus_version type: 4, length: 5
+Found global attribute: NeXus_version type: 4
 NeXus_version= XXXX (volatile information withheld to aid automatic testing)
 Found global attribute: xsi:schemaLocation type: 4, length: 98
 xsi:schemaLocation=http://definition.nexusformat.org/schema/3.1 http://definition.nexusformat.org/schema/3.1/BASE.xsd

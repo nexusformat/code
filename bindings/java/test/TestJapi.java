@@ -20,6 +20,7 @@ public class TestJapi {
 		NXlink gid, did;
 		String group = "entry1";
 		String nxclass = "NXentry";
+		Set<String> excludeattr = new HashSet<String>(Arrays.asList("HDF5_Version", "file_time", "NeXus_version", "HDF_version"));
 		
 		// create a NexusFile
 		nf = new NexusFile(fileName, fileType);
@@ -143,9 +144,8 @@ public class TestJapi {
 			while (e.hasMoreElements()) {
 				attname = (String) e.nextElement();
 				atten = (AttributeEntry) h.get(attname);
-				System.out.println("Found global attribute: " + attname + " type: " + atten.type + ", length: " + atten.length);
-				Set<String> excludeattr = new HashSet<String>(Arrays.asList("HDF5_Version", "file_time", "NeXus_version", "HDF_version"));
 				if (!excludeattr.contains(attname)) {
+					System.out.println("Found global attribute: " + attname + " type: " + atten.type + ", length: " + atten.length);
 					// add one for C null termination
 					bData = new byte[atten.length+1];
 					iDim[0] = atten.length+1;
@@ -153,6 +153,7 @@ public class TestJapi {
 					nf.getattr(attname, bData, iDim);
 					System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
 				} else {
+					System.out.println("Found global attribute: " + attname + " type: " + atten.type);
 					System.out.println(attname + "= XXXX (volatile information withheld to aid automatic testing)");
 				}
 			}
