@@ -6,6 +6,9 @@
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import org.nexusformat.*;
@@ -140,14 +143,18 @@ public class TestJapi {
 			while (e.hasMoreElements()) {
 				attname = (String) e.nextElement();
 				atten = (AttributeEntry) h.get(attname);
-				System.out.println("Found global attribute: " + attname + " type: " + atten.type + ", length: "
-						+ atten.length);
-				// add one for C null termination
-				bData = new byte[atten.length+1];
-				iDim[0] = atten.length+1;
-				iDim[1] = atten.type;
-				nf.getattr(attname, bData, iDim);
-				System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
+				System.out.println("Found global attribute: " + attname + " type: " + atten.type + ", length: " + atten.length);
+				Set<String> excludeattr = new HashSet<String>(Arrays.asList("HDF5_Version", "file_time", "NeXus_version", "HDF_version"));
+				if (!excludeattr.contains(attname)) {
+					// add one for C null termination
+					bData = new byte[atten.length+1];
+					iDim[0] = atten.length+1;
+					iDim[1] = atten.type;
+					nf.getattr(attname, bData, iDim);
+					System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
+				} else {
+					System.out.println(attname + "= XXXX (volatile information withheld to aid automatic testing)");
+				}
 			}
 
 			// test reading vGroup directory

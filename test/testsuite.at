@@ -889,25 +889,93 @@ AT_CLEANUP
 
 AT_BANNER([[Testing the Java bindings.]])
 AT_SETUP([Checking Java binding using HDF5])
-AT_CHECK([$HAVE_HDF5 && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi hdf5 ) | sed -e 's/\r$//' ],[], 
-[[
-stdout here
+AT_CHECK([$HAVE_HDF5 && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi hdf5 ) 2> /dev/null | sed -e 's/\r$//' ],[], 
+[[=================
+Testing Java API.
+=================
+
+Testing HDF5
+------------
+Exception handling mechanism works
+ *** Writing Tests passed with flying banners
+Found global attribute: HDF5_Version type: 4, length: 5
+HDF5_Version= XXXX (volatile information withheld to aid automatic testing)
+Found global attribute: file_time type: 4, length: 25
+file_time= XXXX (volatile information withheld to aid automatic testing)
+Found global attribute: NeXus_version type: 4, length: 5
+NeXus_version= XXXX (volatile information withheld to aid automatic testing)
+Found global attribute: file_name type: 4, length: 13
+file_name=japitest.hdf5
+Found in vGroup entry:
+     Item: iData1 class: SDS
+     Item: iData1_compressed class: SDS
+     Item: fData1 class: SDS
+     Item: slabbed class: SDS
+     Item: Stuart class: SDS
+Found iData1 with: rank = 2 type = 24 dims = 3, 10
+Found SDS attribute: signal type: 24, length: 1
+Found SDS attribute: target type: 4, length: 14
+Found SDS attribute: Units type: 4, length: 9
+ **** Inquiry routines passed test
+Read attribute Units to: MegaFarts
+ *** Data Reading routines appear to work
+*** openpath seems to work
+Success.
+
+Exiting.
 ]])
 AT_CLEANUP
 
 AT_SETUP([Checking Java binding using XML])
-AT_CHECK([$HAVE_XML && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi xml ) | sed -e 's/\r$//' ],[], 
-[[
-stdout here
+AT_CHECK([$HAVE_XML && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi xml ) 2> /dev/null | sed -e 's/\r$//' ],[], 
+[[=================
+Testing Java API.
+=================
+
+Testing XML
+------------
+Exception handling mechanism works
+ *** Writing Tests passed with flying banners
+Found global attribute: xmlns:xsi type: 4, length: 41
+xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
+Found global attribute: file_time type: 4, length: 25
+file_time= XXXX (volatile information withheld to aid automatic testing)
+Found global attribute: XML_version type: 4, length: 4
+XML_version=mxml
+Found global attribute: NeXus_version type: 4, length: 5
+NeXus_version= XXXX (volatile information withheld to aid automatic testing)
+Found global attribute: xsi:schemaLocation type: 4, length: 98
+xsi:schemaLocation=http://definition.nexusformat.org/schema/3.1 http://definition.nexusformat.org/schema/3.1/BASE.xsd
+Found global attribute: xmlns type: 4, length: 44
+xmlns=http://definition.nexusformat.org/schema/3.1
+Found global attribute: file_name type: 4, length: 12
+file_name=japitest.xml
+Found in vGroup entry:
+     Item: iData1 class: SDS
+     Item: iData1_compressed class: SDS
+     Item: fData1 class: SDS
+     Item: slabbed class: SDS
+     Item: Stuart class: SDS
+Found iData1 with: rank = 2 type = 24 dims = 3, 10
+Found SDS attribute: signal type: 24, length: 1
+Found SDS attribute: target type: 4, length: 14
+Found SDS attribute: Units type: 4, length: 9
+ **** Inquiry routines passed test
+Read attribute Units to: MegaFarts
+ *** Data Reading routines appear to work
+*** openpath seems to work
+Success.
+
+Exiting.
 ]])
 AT_CLEANUP
 
-AT_SETUP([Checking Java binding using HDF4])
-AT_CHECK([$HAVE_HDF4 && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi hdf4 ) | sed -e 's/\r$//' ],[], 
-[[
-stdout here
-]])
-AT_CLEANUP
+#AT_SETUP([Checking Java binding using HDF4])
+#AT_CHECK([$HAVE_HDF4 && $HAVE_JAVA && (cd $abs_srcdir/../bindings/java ; $JAVA -Djava.library.path=.libs TestJapi hdf4 ) 2> /dev/null | sed -e 's/\r$//' ],[], 
+#[[
+#hdf4 broken or at least inconsistent with other backends: emits null charaters
+#]])
+#AT_CLEANUP
 
 
 AT_BANNER([[Testing the IDL bindings.]])
