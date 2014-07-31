@@ -90,21 +90,17 @@ public class NexusFile implements NeXusFileInterface {
        else it tries to locate the library in the system shared library 
        path.
     */
-     static
-     {
+     static {
         String filename = null;   
         filename = System.getProperty("org.nexusformat.JNEXUSLIB",null);
-        if ((filename != null) && (filename.length() > 0))
-        {
+        if ((filename != null) && (filename.length() > 0)) {
             File hdfdll = new File(filename);
-            if (hdfdll.exists() && hdfdll.canRead() && hdfdll.isFile()) 
-	    {
+            if (hdfdll.exists() && hdfdll.canRead() && hdfdll.isFile()) {
                 System.load(filename);
              } else {
                  throw (new UnsatisfiedLinkError("Invalid JNEXUS library"));
              }
-         }
-         else {
+         } else {
             System.loadLibrary("jnexus");
          }
       }
@@ -295,7 +291,6 @@ public class NexusFile implements NeXusFileInterface {
     protected native void nxgetdata(int handle, byte bdata[]);
     protected native void nxgetslab(int handle, int Start[], int size[], byte bdata[]);
     protected native void nxgetslab64(int handle, long Start[], long size[], byte bdata[]);
-    protected native void nxgetattr(int handle, String name, byte bdata[], int args[]);
 
     public void getdata(Object array) throws NexusException {
         byte bdata[];
@@ -341,27 +336,11 @@ public class NexusFile implements NeXusFileInterface {
 	 }
     }
 
-    public void getattr(String name, Object array, int args[]) throws NexusException {
-        byte bdata[];
-        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-        checkType(args[1]);
-    	checkForNull(name, array);
-        try{
-	    HDFArray ha = new HDFArray(array);
-            bdata = ha.emptyBytes();
-            nxgetattr(handle, name, bdata,args);
-            array = ha.arrayify(bdata);
-	 }catch(HDFException he) {
-           throw new NexusException(he.getMessage());
-	 }
-    }
-
     // data set writing
     // native methods for this section
     protected native void nxputdata(int handle, byte array[]); 
     protected native void nxputslab(int handle, byte array[], int start[], int size[]); 
     protected native void nxputslab64(int handle, byte array[], long start[], long size[]); 
-    protected native void nxputattr(int handle, String name, byte array[], int type); 
 
     public void putdata(Object array) throws NexusException {
        byte data[];
@@ -414,6 +393,36 @@ public class NexusFile implements NeXusFileInterface {
        data = null;
     }
 
+    // attribute methods
+    protected native void nxgetattr(int handle, String name, byte bdata[], int args[]);
+    protected native void nxputattr(int handle, String name, byte array[], int type); 
+    protected native void nxputattra(int handle, String name, byte bdata[], int rank, int dim[], int iType);
+    protected native void nxgetnextattra(int handle, String name, int dim[], int args[]);
+    protected native void nxgetattra(int handle, String name, byte bdata[]);
+    protected native void nxgetattrainfo(int handle, String name, int rank, int dim[], int args[]);
+    protected native int nextattr(int handle, String names[], int args[]);
+    protected native void initattrdir(int handle);
+    protected native void initgroupdir(int handle);
+
+    public Object[] getattr(String name) throws NexusException {
+        return null;
+    }
+
+    public void getattr(String name, Object array, int args[]) throws NexusException {
+        byte bdata[];
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+        checkType(args[1]);
+    	checkForNull(name, array);
+        try{
+	    HDFArray ha = new HDFArray(array);
+            bdata = ha.emptyBytes();
+            nxgetattr(handle, name, bdata,args);
+            array = ha.arrayify(bdata);
+	 }catch(HDFException he) {
+           throw new NexusException(he.getMessage());
+	 }
+    }
+
     public void putattr(String name, Object array, int iType) throws NexusException {
        byte data[];
 
@@ -431,6 +440,41 @@ public class NexusFile implements NeXusFileInterface {
        data = null;
     }
 
+    public void putattr(String name, Object array, int size[], int iType) throws NexusException {
+       byte data[];
+
+       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+       checkType(iType);
+       checkForNull(name, array, size);
+       try {
+           HDFArray ha =  new HDFArray(array);
+           data = ha.byteify();
+           ha = null;
+       } catch(HDFException he) {
+	   throw new NexusException(he.getMessage());
+       }
+       nxputattra(handle, name, data, size.length, size, iType);
+       data = null;
+    }
+
+    public Hashtable attrdir() throws NexusException {
+        int args[] = new int[2];
+        AttributeEntry at;
+        String names[] = new String[1];
+
+        Hashtable h = new Hashtable();
+        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	initattrdir(handle);
+        while(nextattr(handle,names,args) != -1)
+	{
+          at = new AttributeEntry();
+          at.length = args[0];
+          at.type   = args[1];
+          h.put(names[0], at);
+        } 
+        return h;
+    }
+
     // inquiry
     //native methods for this section
     protected native void nxgetinfo(int handle, int iDim[], int args[]);
@@ -438,9 +482,6 @@ public class NexusFile implements NeXusFileInterface {
     protected native void nxsetnumberformat(int handle, int type, 
 					    String format);
     protected native int nextentry(int handle, String names[]);
-    protected native int nextattr(int handle, String names[], int args[]);
-    protected native void initattrdir(int handle);
-    protected native void initgroupdir(int handle);
 
     public void setnumberformat(int type, String format) throws NexusException {
        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
@@ -471,24 +512,6 @@ public class NexusFile implements NeXusFileInterface {
         return h;
     }
 
-    public Hashtable attrdir()throws NexusException {
-        int args[] = new int[2];
-        AttributeEntry at;
-        String names[] = new String[1];
-
-        Hashtable h = new Hashtable();
-        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
-	initattrdir(handle);
-        while(nextattr(handle,names,args) != -1)
-	{
-          at = new AttributeEntry();
-          at.length = args[0];
-          at.type   = args[1];
-          h.put(names[0], at);
-        } 
-        return h;
-    }
-    
     // linking 
     // native methods for this section
     protected native void nxgetgroupid(int handle, NXlink link);

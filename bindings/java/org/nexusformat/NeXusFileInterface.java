@@ -24,7 +24,7 @@ public interface NeXusFileInterface {
     /**
       * flush writes all previously unsaved data to disk. All directory
       * searches are invalidated. Any open SDS is closed.
-      * @exception NexusException if an HDF error occurs.
+      * @exception NexusException if an error occurs.
       */
     public void flush() throws NexusException;
 
@@ -95,7 +95,7 @@ public interface NeXusFileInterface {
     /**
       * closegroup closes access to the current group and steps down one
       * step in group hierarchy.
-      * @exception NexusException when an HDF error occurs during this
+      * @exception NexusException when an error occurs during this
       * operation.
       */ 
     public void closegroup() throws NexusException;
@@ -183,7 +183,7 @@ public interface NeXusFileInterface {
     /**
       * closedata closes an opened dataset. Then no further access is 
       * possible without a call to opendata.
-      * @exception NexusException when an HDF error occurrs.
+      * @exception NexusException when an error occurrs.
       */
     public void closedata() throws NexusException;
 
@@ -193,7 +193,7 @@ public interface NeXusFileInterface {
       * dataset.
       * @param compression_type determines the type of compression 
       * to use.
-      * @exception NexusException when no dataset is open or an HDF error 
+      * @exception NexusException when no dataset is open or an error 
       * occurs.
       */ 
     public void compress(int compression_type) throws NexusException;
@@ -205,7 +205,7 @@ public interface NeXusFileInterface {
       * @param array An n-dimensional array of the appropriate number
       * type for the dataset. Make sure to have the right type and size
       * here.
-      * @exception NexusException when either an HDF error occurs or 
+      * @exception NexusException when either an error occurs or 
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
@@ -218,7 +218,7 @@ public interface NeXusFileInterface {
       * @param size An array of dimension rank which contains the size
       * in each dimension of the data subset to read.
       * @param array An array for holding the returned data values.
-      * @exception NexusException when either an HDF error occurs or 
+      * @exception NexusException when either an error occurs or 
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
@@ -232,7 +232,7 @@ public interface NeXusFileInterface {
       * @param size An array of dimension rank which contains the size
       * in each dimension of the data subset to read.
       * @param array An array for holding the returned data values.
-      * @exception NexusException when either an HDF error occurs or 
+      * @exception NexusException when either an error occurs or 
       * no dataset is open or array is not of the right type to hold
       * the data.
       */
@@ -248,18 +248,27 @@ public interface NeXusFileInterface {
       * @param args An integer array holding the number of data elements
       * in data as args[0], and the type as args[1]. Both values will be
       * updated while reading.
-      * @exception NexusException when either an HDF error occurs or 
+      * @exception NexusException when either an error occurs or 
       * the attribute could not be found.
       */
     public void getattr(String name, Object data, int args[]) throws
                           NexusException;
+
+    /**
+      * getattr retrieves the data associated with the attribute * name. 
+      * @param name The name of the attribute.
+      * @return The attribute data as an array.
+      * @exception NexusException when either an error occurs or 
+      * the attribute could not be found.
+      */
+    public Object[] getattr(String name) throws NexusException;
 
     // data set writing
     /**
       * putdata writes the data from array into a previously opened
       * dataset.
       * @param array The data to write.
-      * @exception NexusException when an HDF error occurs.
+      * @exception NexusException when an error occurs.
       */
     public void putdata(Object array) throws NexusException;
 
@@ -271,7 +280,7 @@ public interface NeXusFileInterface {
       * startcoordinates of the data subset in the larger dataset.
       * @param size An integer array of dimension rank whidh holds the
       * size in each dimension of the data subset to write.
-      * @exception NexusException when an HDF error occurs.
+      * @exception NexusException when an error occurs.
       */ 
     public void putslab(Object array, int start[], int size[]) throws
                           NexusException;
@@ -284,20 +293,31 @@ public interface NeXusFileInterface {
       * startcoordinates of the data subset in the larger dataset.
       * @param size An integer array of dimension rank whidh holds the
       * size in each dimension of the data subset to write.
-      * @exception NexusException when an HDF error occurs.
+      * @exception NexusException when an error occurs.
       */ 
     public void putslab(Object array, long start[], long size[]) throws
                           NexusException;
 
     /**
       * putattr adds a named attribute to a previously opened dataset or
-      * a global attribute if no dataset is open.
+      * group or a global attribute if nothing is open.
       * @param name The name of the attribute.
       * @param array The data of the attribute.
       * @param iType The number type of the attribute.
-      * @exception NexusException if an HDF error occurs.
+      * @exception NexusException if an error occurs.
       */  
     public void putattr(String name, Object array, int iType) throws
+                          NexusException;
+
+    /**
+      * putattr adds a named attribute to a previously opened dataset or
+      * group or a global attribute if nothing is open.
+      * @param name The name of the attribute.
+      * @param array The data of the attribute.
+      * @param iType The number type of the attribute.
+      * @exception NexusException if an error occurs.
+      */  
+    public void putattr(String name, Object array, int size[], int iType) throws
                           NexusException;
 
     // inquiry
@@ -308,7 +328,7 @@ public interface NeXusFileInterface {
       * @param args An integer array which will hold more information about
       * the dataset after return. The fields: args[0] is the rank, args[1] is
       * the number type.
-      * @exception NexusException when  an HDF error occurs.
+      * @exception NexusException when  an error occurs.
       */ 
     public void getinfo(int iDim[], int args[]) throws NexusException;
 
@@ -319,7 +339,7 @@ public interface NeXusFileInterface {
       * @param args An integer array which will hold more information about
       * the dataset after return. The fields: args[0] is the rank, args[1] is
       * the number type.
-      * @exception NexusException when  an HDF error occurs.
+      * @exception NexusException when  an error occurs.
       */ 
     public void getinfo(long iDim[], int args[]) throws NexusException;
 
@@ -340,7 +360,7 @@ public interface NeXusFileInterface {
       * @return A Hashtable  which will hold the names of the items in 
       * the group as keys and the NeXus classname for vGroups or the 
       * string 'SDS' for datasets as values. 
-      * @exception NexusException if an HDF error occurs
+      * @exception NexusException if an error occurs
       */
     public Hashtable groupdir() throws NexusException;
 
@@ -349,7 +369,7 @@ public interface NeXusFileInterface {
       * the file global attributes if no dataset is open.
       * @return A Hashtable which will hold the names of the attributes
       * as keys. For each key there is an AttributeEntry class as value.
-      * @exception NexusException when an HDF error occurs.
+      * @exception NexusException when an error occurs.
       */ 
     public Hashtable attrdir() throws NexusException;
     
@@ -358,7 +378,7 @@ public interface NeXusFileInterface {
       * getgroupID gets the data necessary for linking the current vGroup
       * somewhere else.
       * @return A NXlink object holding the link data.
-      * @exception NexusException if an HDF error occurs.
+      * @exception NexusException if an error occurs.
       */
     public NXlink getgroupID() throws NexusException;
 
@@ -366,9 +386,9 @@ public interface NeXusFileInterface {
       * getdataID gets the data necessary for linking the current dataset
       * somewhere else.
       * @return A NXlink object holding the link data.
-      * @exception NexusException if an HDF error occurs.
+      * @exception NexusException if an error occurs.
       */
-    public NXlink getdataID()throws NexusException;
+    public NXlink getdataID() throws NexusException;
 
     /**
       * makelink links the object described by target into the current
@@ -376,7 +396,7 @@ public interface NeXusFileInterface {
       * @param target The Object to link into the current group.
       * @exception NexusException if an error occurs.
       */
-    public void makelink(NXlink target)throws NexusException;     
+    public void makelink(NXlink target) throws NexusException;     
     /**
       * makenamedlink links the object described by target into the current
       * vGroup. The object will have a new name in the group into which it is 

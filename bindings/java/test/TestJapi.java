@@ -42,7 +42,7 @@ public class TestJapi {
 			int iStart[] = new int[2];
 			int signal[] = new int[1];
 			int iEnd[] = new int[2];
-			String attname, vname, vclass;
+			String attname, attvalue, vname, vclass;
 			AttributeEntry atten;
 			
 			// create some data
@@ -56,6 +56,14 @@ public class TestJapi {
 				islab[i] = 10000 + i;
 			}
 			
+			// add attributes, the first one is also an example how to write
+			attvalue = "@012345abcdef";
+			nf.putattr("standardstringattribute", attvalue.getBytes(), NexusFile.NX_CHAR);
+			signal[0] = -177;
+			nf.putattr("singlenumber", signal, NexusFile.NX_INT32);
+			nf.putattr("numberarray", new int[] { 1, 2, 3, 4}, new int[] {2, 2}, NexusFile.NX_INT32);
+
+			// closedata
 			// create and open a group
 			nf.makegroup(group, nxclass);
 			nf.opengroup(group, nxclass);
@@ -146,12 +154,20 @@ public class TestJapi {
 				atten = (AttributeEntry) h.get(attname);
 				if (!excludeattr.contains(attname)) {
 					System.out.println("Found global attribute: " + attname + " type: " + atten.type + ", length: " + atten.length);
-					// add one for C null termination
-					bData = new byte[atten.length+1];
-					iDim[0] = atten.length+1;
-					iDim[1] = atten.type;
-					nf.getattr(attname, bData, iDim);
-					System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
+					if (atten.type == NexusFile.NX_CHAR) {
+						// add one for C null termination
+						bData = new byte[atten.length+1];
+						iDim[0] = atten.length+1;
+						iDim[1] = atten.type;
+						nf.getattr(attname, bData, iDim);
+						System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
+					} else if (atten.type == NexusFile.NX_INT32) {
+						int[] iData = new int[1];
+						iDim[0] = 1;
+						iDim[1] = atten.type;
+						nf.getattr(attname, iData, iDim);
+						System.out.println(String.format("%s = %d", attname, iData[0]));
+					}
 				} else {
 					System.out.println("Found global attribute: " + attname + " type: " + atten.type);
 					System.out.println(attname + "= XXXX (volatile information withheld to aid automatic testing)");

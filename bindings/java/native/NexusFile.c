@@ -1566,6 +1566,48 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_initgroupdir
       JapiError(env, "NXinitgroupdir failed");
     }
 }
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattra
+(JNIEnv *env, jobject obj, jint handle, jstring name, jbyteArray data, jint rank, jintArray dim, jint type)
+{
+   char *Name;
+   NXhandle nxhandle;
+   jbyte *bdata;
+   jint *iDim;
+   int iRet;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    /* extract the name and class to char * */
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    /* access dim array */
+    iDim = (*env)->GetIntArrayElements(env,dim,0);
+
+    /* convert jbteArray to C byte array */
+    bdata = (*env)->GetByteArrayElements(env,data,0);
+
+    iRet = NXputattra(nxhandle, Name, bdata, rank, iDim, type);
+
+    /* clean up */ 
+    (*env)->ReleaseStringUTFChars(env,name, Name);
+    (*env)->ReleaseIntArrayElements(env,dim,iDim,0);  
+
+    (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
+    if(iRet != NX_OK) {
+      JapiError(env, "NXputattra failed");
+    }
+}
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getattra(NXhandle handle, char* name, void* data);
+/*---------------------------------------------------------------------*/
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 /*------------------------------------------------------------------------
                                debugstop
 --------------------------------------------------------------------------*/
