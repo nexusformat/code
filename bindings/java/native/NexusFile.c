@@ -1603,7 +1603,38 @@ JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxputattra
     }
 }
 /*---------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxgetnextattra
+(JNIEnv *env, jobject obj, jint handle, jobjectArray jnames, jintArray dim, jintArray args)
+{
+    NXhandle nxhandle;
+    NXname pName;
+    int iRet, iType, rank, iDim[NX_MAXRANK], i;
+    jstring rstring;
+    jint *jdata;
+
+   /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    iRet = NXgetnextattra(nxhandle, pName, &rank, iDim, &iType);
+    if(iRet != NX_ERROR) {
+        /* copy C types to Java */
+        rstring = (*env)->NewStringUTF(env,pName);
+        (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
+	jdata = (*env)->GetIntArrayElements(env,dim,0);
+        for(i = 0; i < rank; i++) {
+           jdata[i] = iDim[i];
+        }
+        (*env)->ReleaseIntArrayElements(env,dim,jdata,0);
+	jdata = (*env)->GetIntArrayElements(env,args,0);
+        jdata[0] = rank;
+        jdata[1] = iType;
+        (*env)->ReleaseIntArrayElements(env,args,jdata,0);
+    }
+    return iRet;
+}
 /*---------------------------------------------------------------------*/
 JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getattra(NXhandle handle, char* name, void* data);
 /*---------------------------------------------------------------------*/

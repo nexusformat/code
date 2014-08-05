@@ -397,7 +397,7 @@ public class NexusFile implements NeXusFileInterface {
     protected native void nxgetattr(int handle, String name, byte bdata[], int args[]);
     protected native void nxputattr(int handle, String name, byte array[], int type); 
     protected native void nxputattra(int handle, String name, byte bdata[], int rank, int dim[], int iType);
-    protected native void nxgetnextattra(int handle, String name, int dim[], int args[]);
+    protected native int nxgetnextattra(int handle, String[] name, int dim[], int args[]);
     protected native void nxgetattra(int handle, String name, byte bdata[]);
     protected native void nxgetattrainfo(int handle, String name, int rank, int dim[], int args[]);
     protected native int nextattr(int handle, String names[], int args[]);
@@ -410,15 +410,15 @@ public class NexusFile implements NeXusFileInterface {
 
     public void getattr(String name, Object array, int args[]) throws NexusException {
         byte bdata[];
-        if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+        if (handle < 0) throw new NexusException("NAPI-ERROR: File not open");
         checkType(args[1]);
     	checkForNull(name, array);
-        try{
+        try {
 	    HDFArray ha = new HDFArray(array);
             bdata = ha.emptyBytes();
             nxgetattr(handle, name, bdata,args);
             array = ha.arrayify(bdata);
-	 }catch(HDFException he) {
+	 } catch(HDFException he) {
            throw new NexusException(he.getMessage());
 	 }
     }
@@ -426,14 +426,14 @@ public class NexusFile implements NeXusFileInterface {
     public void putattr(String name, Object array, int iType) throws NexusException {
        byte data[];
 
-       if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+       if (handle < 0) throw new NexusException("NAPI-ERROR: File not open");
        checkType(iType);
        checkForNull(name, array);
-       try{
+       try {
            HDFArray ha =  new HDFArray(array);
            data = ha.byteify();
            ha = null;
-       }catch(HDFException he) {
+       } catch(HDFException he) {
 	   throw new NexusException(he.getMessage());
        }
        nxputattr(handle,name,data,iType);
@@ -459,18 +459,34 @@ public class NexusFile implements NeXusFileInterface {
 
     public Hashtable attrdir() throws NexusException {
         int args[] = new int[2];
+        int dim[] = new int[32];
         AttributeEntry at;
         String names[] = new String[1];
 
         Hashtable h = new Hashtable();
         if(handle < 0) throw new NexusException("NAPI-ERROR: File not open");
 	initattrdir(handle);
-        while(nextattr(handle,names,args) != -1)
-	{
+        
+        while(nxgetnextattra(handle, names, dim, args) != -1) {
+          int rank = args[0];
+          int type = args[1];
+	  String name = names[0];
+	  int[] thedims = new int[rank];
+          for(int i = 0 ; i < rank ; i++) {
+             thedims[i] = dim[i];
+	  }
+
           at = new AttributeEntry();
-          at.length = args[0];
-          at.type   = args[1];
-          h.put(names[0], at);
+	  at.dim = thedims; 
+	  if (rank == 0) {
+            at.length = 1;
+	  } if (rank == 1) {
+            at.length = dim[0];
+	  } else {
+            at.length = 0;
+  	  }
+          at.type = type;
+          h.put(name, at);
         } 
         return h;
     }

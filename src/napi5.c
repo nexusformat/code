@@ -2599,7 +2599,10 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 		} else {
 			myDim[myrank - 1] = H5Tget_size(attrt);
 		}
-	}
+	} else if (myrank == 0) {
+		myrank = 1;	/* we pretend */
+		myDim[0] = 1;
+	} 
 
 	for (i = 0; i < myrank; i++) {
 		dim[i] = (int) myDim[i];
