@@ -2065,7 +2065,7 @@ NXstatus NX5getnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 	if (status != NX_OK)
 		return status;
 
-	if (rank == 0) {
+	if (rank == 0 || (rank == 1 && mydim[0] == 1)) {
 		*iLength = 1;
 		return NX_OK;
 	}

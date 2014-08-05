@@ -242,8 +242,8 @@ int main(int argc, char *argv[])
 					if (NXgetattr(fileid, name, char_buffer, &NXlen, &NXtype) != NX_OK)
 						return 1;
 					fprintf(stderr, "\t%s = %s\n", name, char_buffer);
-				} else if (NXrank == 0) {
-					fprintf(stderr, "\treading 0d numbers the old way should produce similar result\n");
+				} else if (NXrank == 0 || (NXrank == 1 && NXdims[0] == 1)) {
+					fprintf(stderr, "\treading scalar attributes the old way should produce similar result\n");
 					if (NXgetattr(fileid, name, char_buffer, &NXlen, &NXtype) != NX_OK) {
 						fprintf(stderr, "\tbut fails\n");
 						return 1;

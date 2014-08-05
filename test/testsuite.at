@@ -507,9 +507,9 @@ iterating over attributes
 	file_name = attra.h5
 	skipping over HDF5_Version as the value is not controlled by this test!
 	skipping over file_time as the value is not controlled by this test!
-	found attribute named attribute_0d of type 5, rank 0 and dimensions 
+	found attribute named attribute_0d of type 5, rank 1 and dimensions  1
 		 1.000000
-	reading 0d numbers the old way should produce similar result
+	reading scalar attributes the old way should produce similar result
 		 1.000000
 	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
 		 1.000000 2.000000 3.000000 4.000000 5.000000
@@ -521,9 +521,9 @@ ERROR: attribute arrays not supported by this api
 	reading array attributes the old way should produce an error
 ERROR: attribute arrays not supported by this api 
 		- it does!
-	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
+	found attribute named old_style_int_attribute of type 24, rank 1 and dimensions  1
 		 2015
-	reading 0d numbers the old way should produce similar result
+	reading scalar attributes the old way should produce similar result
 		 2015
 	found attribute named oldstylestrattr of type 4, rank 1 and dimensions  15
 		i:wq!<ESC><ESC>
@@ -534,9 +534,9 @@ ERROR iterating through attributes found array attribute not understood by this 
 === at entry level
 iterating over attributes
 	Number of attributes : 5
-	found attribute named attribute_0d of type 5, rank 0 and dimensions 
+	found attribute named attribute_0d of type 5, rank 1 and dimensions  1
 		 1.000000
-	reading 0d numbers the old way should produce similar result
+	reading scalar attributes the old way should produce similar result
 		 1.000000
 	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
 		 1.000000 2.000000 3.000000 4.000000 5.000000
@@ -548,9 +548,9 @@ ERROR: attribute arrays not supported by this api
 	reading array attributes the old way should produce an error
 ERROR: attribute arrays not supported by this api 
 		- it does!
-	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
+	found attribute named old_style_int_attribute of type 24, rank 1 and dimensions  1
 		 2016
-	reading 0d numbers the old way should produce similar result
+	reading scalar attributes the old way should produce similar result
 		 2016
 	found attribute named oldstylestrattr of type 4, rank 1 and dimensions  15
 		i:wq!<ESC><ESC>
@@ -561,9 +561,9 @@ ERROR iterating through attributes found array attribute not understood by this 
 === at dataset level
 iterating over attributes
 	Number of attributes : 5
-	found attribute named attribute_0d of type 5, rank 0 and dimensions 
+	found attribute named attribute_0d of type 5, rank 1 and dimensions  1
 		 1.000000
-	reading 0d numbers the old way should produce similar result
+	reading scalar attributes the old way should produce similar result
 		 1.000000
 	found attribute named attribute_1d of type 5, rank 1 and dimensions  5
 		 1.000000 2.000000 3.000000 4.000000 5.000000
@@ -575,9 +575,9 @@ ERROR: attribute arrays not supported by this api
 	reading array attributes the old way should produce an error
 ERROR: attribute arrays not supported by this api 
 		- it does!
-	found attribute named old_style_int_attribute of type 24, rank 0 and dimensions 
+	found attribute named old_style_int_attribute of type 24, rank 1 and dimensions  1
 		 2017
-	reading 0d numbers the old way should produce similar result
+	reading scalar attributes the old way should produce similar result
 		 2017
 	found attribute named oldstylestrattr of type 4, rank 1 and dimensions  15
 		i:wq!<ESC><ESC>
