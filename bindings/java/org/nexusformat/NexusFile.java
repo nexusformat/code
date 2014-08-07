@@ -428,14 +428,6 @@ public class NexusFile implements NeXusFileInterface {
 
 	switch (type) {
     		case NX_CHAR:
-			// special case
-			return null;
-		case NX_FLOAT32:
-			array = new float[totalsize];
-			break;
-		case NX_FLOAT64:
-			array = new double[totalsize];
-			break;
 		case NX_INT8:
 			array = new byte[totalsize];
 			break;
@@ -447,6 +439,12 @@ public class NexusFile implements NeXusFileInterface {
 			break;
 		case NX_INT64:
 			array = new long[totalsize];
+			break;
+		case NX_FLOAT32:
+			array = new float[totalsize];
+			break;
+		case NX_FLOAT64:
+			array = new double[totalsize];
 			break;
 		case NX_BOOLEAN:
 			throw new NexusException("type not currently supported in Java");
@@ -463,9 +461,19 @@ public class NexusFile implements NeXusFileInterface {
             bdata = ha.emptyBytes();
             nxgetattra(handle, name, bdata);
             array = ha.arrayify(bdata);
-	 } catch(HDFException he) {
-           throw new NexusException(he.getMessage());
-	 }
+	} catch(HDFException he) {
+            throw new NexusException(he.getMessage());
+	}
+
+	if (type == NX_CHAR) {
+		int noofstrings = totalsize / dim[rank-1];
+		int n = 0;
+		String strarr[] = new String[noofstrings];
+		for(int i = 0 ; i < noofstrings ; i++) {
+			strarr[i] = new String((byte[]) array, i * dim[rank-1], dim[rank-1]);	
+		}
+		array = strarr;
+	}
 
         return array;
     }

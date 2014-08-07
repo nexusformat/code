@@ -156,26 +156,22 @@ public class TestJapi {
 				attname = (String) e.nextElement();
 				atten = (AttributeEntry) h.get(attname);
 				if (!excludeattr.contains(attname)) {
-					System.out.println("Found global attribute: " + attname + " type: " + atten.type + ", length: " + atten.length);
-					if (atten.type == NexusFile.NX_CHAR) {
-						// add one for C null termination
-						bData = new byte[atten.length+1];
-						iDim[0] = atten.length+1;
-						iDim[1] = atten.type;
-						nf.getattr(attname, bData, iDim);
-						System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
-					} else {
-						try {
-							Object attr = nf.getattr(attname);
-							StringBuilder sb = new StringBuilder(Array.get(attr, 0).toString());
-							for(i = 1 ; i < Array.getLength(attr) ; i++) {
-								sb.append(", ");
-								sb.append(Array.get(attr, i).toString());
-							}
-							System.out.println(String.format("%s = %s", attname, sb.toString()));
-						} catch (NexusException ne) {
-							System.out.println(String.format("ERROR reading attribute %s (%s)", attname, ne.getMessage()));
+					StringBuilder sb = new StringBuilder();
+					for(i = 0; i < atten.dim.length; i++) { 
+						sb.append(" "); sb.append(atten.dim[i]);
+					}
+					System.out.println("Found global attribute: " + attname + " type: " + atten.type 
+						+ ", dimensions:" + sb.toString() + ", length: " + atten.length);
+					try {
+						Object attr = nf.getattr(attname);
+						sb = new StringBuilder(Array.get(attr, 0).toString());
+						for(i = 1 ; i < Array.getLength(attr) ; i++) {
+							sb.append(", ");
+							sb.append(Array.get(attr, i).toString());
 						}
+						System.out.println(String.format("%s = %s", attname, sb.toString()));
+					} catch (NexusException ne) {
+						System.out.println(String.format("ERROR reading attribute %s (%s)", attname, ne.getMessage()));
 					}
 				} else {
 					System.out.println("Found global attribute: " + attname + " type: " + atten.type);
