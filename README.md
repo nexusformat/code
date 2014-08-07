@@ -35,7 +35,7 @@ A typical run of configure might be:
 
         ./configure --prefix=/usr/local/nexus --with-hdf5=/usr/local/hdf5
 
-###Unix (including Mac OS X) svn checkout###
+###Unix (including Mac OS X) git checkout###
 
 As the "configure" file mentioned is a generated file, it is not included in the 
 version control checkout. To create it run:

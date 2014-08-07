@@ -68,12 +68,7 @@ now requires autoconf 2.61 or above
 NeXus Developer Mailing Lists
 -----------------------------
 
-SVN commit/log messages are automatically sent to the nexus-code-svn@nexusformat.org mailing list - if you wish to receive these, subscribe to the list via the link
-
-  http://lists.nexusformat.org/mailman/listinfo/nexus-code-svn
-
-Any general questions should be directed to nexus@nexusformat.org list - you can subscribe to this via the link
+Any questions should be directed to nexus@nexusformat.org list - you can subscribe to this via the link
 
   http://lists.nexusformat.org/mailman/listinfo/nexus
 
-$Id$
