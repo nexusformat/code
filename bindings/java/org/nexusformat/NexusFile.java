@@ -399,24 +399,86 @@ public class NexusFile implements NeXusFileInterface {
     protected native void nxputattra(int handle, String name, byte bdata[], int rank, int dim[], int iType);
     protected native int nxgetnextattra(int handle, String[] name, int dim[], int args[]);
     protected native void nxgetattra(int handle, String name, byte bdata[]);
-    protected native void nxgetattrainfo(int handle, String name, int rank, int dim[], int args[]);
+    protected native void nxgetattrainfo(int handle, String name, int dim[], int args[]);
     protected native int nextattr(int handle, String names[], int args[]);
     protected native void initattrdir(int handle);
     protected native void initgroupdir(int handle);
 
-    public Object[] getattr(String name) throws NexusException {
-        return null;
+    public Object getattr(String name) throws NexusException {
+
+        byte bdata[];
+        int args[] = new int[2];
+        int dim[] = new int[32];
+	int totalsize = 1;
+
+	checkForNull(name);
+        if (handle < 0) throw new NexusException("NAPI-ERROR: File not open");
+	
+    	nxgetattrainfo(handle, name, dim, args);
+
+        int rank = args[0];
+        int type = args[1];
+        int[] thedims = new int[rank];
+        for(int i = 0 ; i < rank ; i++) {
+             thedims[i] = dim[i];
+	     totalsize *= dim[i];
+        }
+
+	Object array = null;
+
+	switch (type) {
+    		case NX_CHAR:
+			// special case
+			return null;
+		case NX_FLOAT32:
+			array = new float[totalsize];
+			break;
+		case NX_FLOAT64:
+			array = new double[totalsize];
+			break;
+		case NX_INT8:
+			array = new byte[totalsize];
+			break;
+		case NX_INT16:
+			array = new short[totalsize];
+			break;
+		case NX_INT32:
+			array = new int[totalsize];
+			break;
+		case NX_INT64:
+			array = new long[totalsize];
+			break;
+		case NX_BOOLEAN:
+			throw new NexusException("type not currently supported in Java");
+		case NX_UINT16:
+		case NX_UINT32:
+		case NX_UINT64:
+			throw new NexusException("unsigned types not currently supported in Java");
+		default:
+			throw new NexusException("unknown type");
+	}
+
+        try {
+	    HDFArray ha = new HDFArray(array);
+            bdata = ha.emptyBytes();
+            nxgetattra(handle, name, bdata);
+            array = ha.arrayify(bdata);
+	 } catch(HDFException he) {
+           throw new NexusException(he.getMessage());
+	 }
+
+        return array;
     }
 
     public void getattr(String name, Object array, int args[]) throws NexusException {
         byte bdata[];
         if (handle < 0) throw new NexusException("NAPI-ERROR: File not open");
         checkType(args[1]);
-    	checkForNull(name, array);
+    	checkForNull(name, array, args);
         try {
 	    HDFArray ha = new HDFArray(array);
             bdata = ha.emptyBytes();
-            nxgetattr(handle, name, bdata,args);
+            nxgetattr(handle, name, bdata, args);
             array = ha.arrayify(bdata);
 	 } catch(HDFException he) {
            throw new NexusException(he.getMessage());

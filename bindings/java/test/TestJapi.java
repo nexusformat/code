@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.lang.reflect.Array;
 
 import org.nexusformat.*;
 
@@ -61,7 +62,8 @@ public class TestJapi {
 			nf.putattr("standardstringattribute", attvalue.getBytes(), NexusFile.NX_CHAR);
 			signal[0] = -177;
 			nf.putattr("singlenumber", signal, NexusFile.NX_INT32);
-			nf.putattr("numberarray", new int[] { 1, 2, 3, 4}, new int[] {2, 2}, NexusFile.NX_INT32);
+			nf.putattr("intarray", new int[] { 1, 2, 3, 4}, new int[] {2, 2}, NexusFile.NX_INT32);
+			nf.putattr("floatarray", fData1, new int[] {3, 10}, NexusFile.NX_FLOAT32);
 
 			// closedata
 			// create and open a group
@@ -135,13 +137,14 @@ public class TestJapi {
 			// nf.debugstop();
 			nf.closegroup();
 
-			// close a file explicitly (recommended!)
+			// close file explicitly (important!)
 			nf.close();
+
 			System.out.println(" *** Writing Tests passed with flying banners");
 
 			// **************** reading tests *******************************
 			iData2[2][5] = 66666;
-			fData1[2][5] = (float) 66666.66;
+			fData1[2][5] = 66666.66f;
 
 			nf = new NexusFile(fileName, NexusFile.NXACC_READ);
 
@@ -161,12 +164,18 @@ public class TestJapi {
 						iDim[1] = atten.type;
 						nf.getattr(attname, bData, iDim);
 						System.out.println(attname + "=" + new String(bData, 0, iDim[0]));
-					} else if (atten.type == NexusFile.NX_INT32) {
-						int[] iData = new int[1];
-						iDim[0] = 1;
-						iDim[1] = atten.type;
-						nf.getattr(attname, iData, iDim);
-						System.out.println(String.format("%s = %d", attname, iData[0]));
+					} else {
+						try {
+							Object attr = nf.getattr(attname);
+							StringBuilder sb = new StringBuilder(Array.get(attr, 0).toString());
+							for(i = 1 ; i < Array.getLength(attr) ; i++) {
+								sb.append(", ");
+								sb.append(Array.get(attr, i).toString());
+							}
+							System.out.println(String.format("%s = %s", attname, sb.toString()));
+						} catch (NexusException ne) {
+							System.out.println(String.format("ERROR reading attribute %s (%s)", attname, ne.getMessage()));
+						}
 					}
 				} else {
 					System.out.println("Found global attribute: " + attname + " type: " + atten.type);

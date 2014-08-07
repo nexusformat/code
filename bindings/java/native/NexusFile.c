@@ -1389,7 +1389,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nextattr
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
     iRet = NXgetnextattr(nxhandle, pName, &iLen, &iType);
-    if(iRet != NX_ERROR)
+    if(iRet == NX_OK)
     {
         /* copy C types to Java */
         rstring = (*env)->NewStringUTF(env,pName);
@@ -1619,7 +1619,7 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxgetnextattra
     nxhandle =  (NXhandle)HHGetPointer(handle);
 
     iRet = NXgetnextattra(nxhandle, pName, &rank, iDim, &iType);
-    if(iRet != NX_ERROR) {
+    if(iRet == NX_OK) {
         /* copy C types to Java */
         rstring = (*env)->NewStringUTF(env,pName);
         (*env)->SetObjectArrayElement(env,jnames,0,(jobject)rstring);
@@ -1636,9 +1636,73 @@ JNIEXPORT jint JNICALL Java_org_nexusformat_NexusFile_nxgetnextattra
     return iRet;
 }
 /*---------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getattra(NXhandle handle, char* name, void* data);
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetattra
+  (JNIEnv *env, jobject obj, jint handle, jstring name, jbyteArray data)
+{
+    NXhandle nxhandle;
+    jbyte *bdata;
+    int iRet;
+    char* Name;
+
+    /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    /* convert jbteArray to C byte array */
+    bdata = (*env)->GetByteArrayElements(env,data,0);
+
+    iRet = NXgetattra(nxhandle, Name, bdata);
+
+    /* cleanup */
+    (*env)->ReleaseByteArrayElements(env,data,bdata,0);   
+    if(iRet != NX_OK)
+    {
+#ifdef DEBUG
+      HEprint(stderr,0);
+#else
+      JapiError(env, "NXgetdata failed");
+#endif
+    }
+}
 /*---------------------------------------------------------------------*/
-JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
+JNIEXPORT void JNICALL Java_org_nexusformat_NexusFile_nxgetattrainfo
+    (JNIEnv *env, jobject obj, jint handle, jstring name, jintArray dim, jintArray args)
+{
+    int rank, type, iRet, iDim[NX_MAXRANK], i;
+    NXhandle nxhandle;
+    jint *jdata;
+    char* Name;
+
+   /* set error handler */
+    NXMSetTError(env,JapiError);
+
+    /* exchange the Java handler to a NXhandle */
+    nxhandle =  (NXhandle)HHGetPointer(handle);
+
+    Name = (char *) (*env)->GetStringUTFChars(env,name,0);    
+
+    /* call */
+    iRet = NXgetattrainfo(nxhandle, Name, &rank, iDim, &type);
+
+    /* copy data to Java types */
+    if(iRet == NX_OK)
+    {
+	jdata = (*env)->GetIntArrayElements(env,dim,0);
+        for(i = 0; i < rank; i++)
+	{
+           jdata[i] = iDim[i];
+        }
+        (*env)->ReleaseIntArrayElements(env,dim,jdata,0);
+	jdata = (*env)->GetIntArrayElements(env,args,0);
+        jdata[0] = rank;
+        jdata[1] = type;
+        (*env)->ReleaseIntArrayElements(env,args,jdata,0);
+    }
+}
 /*------------------------------------------------------------------------
                                debugstop
 --------------------------------------------------------------------------*/

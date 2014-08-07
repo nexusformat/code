@@ -261,7 +261,7 @@ public interface NeXusFileInterface {
       * @exception NexusException when either an error occurs or 
       * the attribute could not be found.
       */
-    public Object[] getattr(String name) throws NexusException;
+    public Object getattr(String name) throws NexusException;
 
     // data set writing
     /**
