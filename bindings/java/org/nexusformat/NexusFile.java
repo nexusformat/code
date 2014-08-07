@@ -541,20 +541,15 @@ public class NexusFile implements NeXusFileInterface {
           int rank = args[0];
           int type = args[1];
 	  String name = names[0];
+	  int length = 1;
 	  int[] thedims = new int[rank];
           for(int i = 0 ; i < rank ; i++) {
-             thedims[i] = dim[i];
+             thedims[i] = dim[i]; 
+             length *= dim[i];
 	  }
-
           at = new AttributeEntry();
 	  at.dim = thedims; 
-	  if (rank == 0) {
-            at.length = 1;
-	  } if (rank == 1) {
-            at.length = dim[0];
-	  } else {
-            at.length = 0;
-  	  }
+          at.length = length;
           at.type = type;
           h.put(name, at);
         } 
