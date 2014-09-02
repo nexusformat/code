@@ -2105,8 +2105,9 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	}
 	pFile->iCurrentA = iNew;
 	filespace = H5Aget_space(pFile->iCurrentA);
+	totalsize = 1;
 	ndims = H5Sget_simple_extent_dims(filespace, dims, NULL);
-	for(i = 0; i <  ndims; i++) {
+	for(i = 0; i < ndims; i++) {
 		totalsize *= dims[i];
 	}
 	if (ndims != 0 && totalsize > 1) {
