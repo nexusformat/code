@@ -600,7 +600,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 		//
 		//prepare dimensions for storing refill mode       
 	        //
-		const int dims[1]={strlen(refill)};
+		const int dims[1]={static_cast<int>(strlen(refill))};
 	        //
 		//store refill mode item in the place in hierarchy from where it was invoked
     	        //
@@ -626,7 +626,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 		//
 		//prepare dimension parameter for storing time of refill information       
 	        //
-		const int dims[1]={strlen(refill)};
+		const int dims[1]={static_cast<int>(strlen(refill))};
 	        //
 		//store refill time in the place from invoked
     	        //
@@ -738,7 +738,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 	                scan_group.replace(13,5,number);
 	                
 	                
-                        const int dims[1]={strlen(result)};	 
+                        const int dims[1]={static_cast<int>(strlen(result))};	 
 		        //
                         //store just read data in the place from invoked 
                         //
@@ -753,7 +753,7 @@ void SpecRetriever::getData(const string &location, tree<Node> &tr){
 	        break; //it will never go here
         }  
         if(scan_number!=0){
-            const int dims[1]={strlen(result)};
+            const int dims[1]={static_cast<int>(strlen(result))};
             //
 	    //store just read data in the place from invoked 
             //
@@ -814,7 +814,7 @@ void SpecRetriever::auto_translation(tree<Node> &t){
     //
     //dimensions of file name
     //
-    const int dims_file[1]={strlen(result)};	 
+    const int dims_file[1]={static_cast<int>(strlen(result))};	 
     //	    
     //store file name in the user group 
     //
@@ -830,7 +830,7 @@ void SpecRetriever::auto_translation(tree<Node> &t){
     //
     //dimensions of userId
     //
-    const int dims_id[1]={strlen(result)};	 
+    const int dims_id[1]={static_cast<int>(strlen(result))};	 
     //	    
     //store user Id in the user group
     //
@@ -1010,7 +1010,7 @@ void SpecRetriever::auto_translation(tree<Node> &t){
 	    cout<<" Date of scan "<<i<<" not specified. Empty string written into the nexus file.\n";
 	    strcpy(result," ");
         }
-	const int dims_date[1]={strlen(result)};
+	const int dims_date[1]={static_cast<int>(strlen(result))};
         //
         //go to the scan
 	//
