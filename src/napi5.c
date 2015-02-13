@@ -2085,7 +2085,8 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 		    void *data, int *datalen, int *iType)
 {
 	pNexusFile5 pFile;
-	int iNew, vid, myrank;
+	int iNew, vid, i;
+	hsize_t ndims, dims[H5S_MAX_RANK], totalsize;
 	herr_t iRet;
 	hid_t type, filespace;
 	char pBuffer[256];
@@ -2104,8 +2105,12 @@ NXstatus NX5getattr(NXhandle fid, char *name,
 	}
 	pFile->iCurrentA = iNew;
 	filespace = H5Aget_space(pFile->iCurrentA);
-	myrank = H5Sget_simple_extent_ndims(filespace);
-	if (myrank != 0) {
+	totalsize = 1;
+	ndims = H5Sget_simple_extent_dims(filespace, dims, NULL);
+	for(i = 0; i < ndims; i++) {
+		totalsize *= dims[i];
+	}
+	if (ndims != 0 && totalsize > 1) {
 		NXReportError("ERROR: attribute arrays not supported by this api");
 		return NX_ERROR;
 	}

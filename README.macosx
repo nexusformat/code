@@ -4,5 +4,3 @@ If you compile libmxml from source you may need to run
 
 Before NeXus will link to it
 
---
-$Id$
