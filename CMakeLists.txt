@@ -158,8 +158,10 @@ find_package(LATEX)
 find_package(PythonInterp)
 
 #Find the java runtime and sdk
-find_package(Java 1.6)
-find_package(JNI)
+if(ENABLE_JAVA_BINDINGS)
+    find_package(Java 1.6)
+    find_package(JNI)
+endif()
 
 # set ZLIB_ROOT as hint to find_package
 if (ZLIB_SEARCH)
@@ -251,6 +253,8 @@ option (MINGW_MSYS
 #This if we have the MS Libraries
 option (HAVE_MS_LIB 
         "We are building under MINGW." OFF)
+
+option(ENABLE_JAVA_BINDINGS "Build Java bindings" ON)
 
 if (HAVE_MS_LIB)
     set (MS_LIB LIB)
