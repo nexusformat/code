@@ -66,7 +66,10 @@ set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 
 set (NX_LIBS  ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${SZIP_LIBRARIES} ${ZLIB_LIBRARIES}  )
+                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES}  )
+if(SZIP_LIBRARIES)
+    list(APPEND NX_LIBS ${SZIP_LIBRARIES})
+endif()
 #if (MINGW_MSYS)
 #  set (MINGW_SRC napi_exports.c napi_exports2.c napi_exports.h)
 #  file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols_win.txt

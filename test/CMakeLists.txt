@@ -33,5 +33,5 @@ INSTALL (FILES ${NXEXAMPLE_FILES} DESTINATION ${NXEXAMPLEDIR} COMPONENT Examples
 add_executable(napi_test_hdf5 napi_test.c)
 target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
 
-add_test(napi_test_hdf5 ${EXECUTABLE_OUTPUT_PATH}/napi_test_hdf5)
+add_test(NAME napi_test_hdf5 COMMAND $<TARGET_FILE:napi_test_hdf5> )
 #set_property(TEST napi_test_hdf5 PROPERTY PASS_REGULAR_EXPRESSION kkk)
