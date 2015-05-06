@@ -92,7 +92,10 @@ add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES OUTPUT_NAME NeXusStatic)
 
-target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${MXML_STATIC_LIBRARIES}  ${NX_LIBS})
+target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${NX_LIBS})
+if(MXML_STATIC_LIBRARIES)
+    target_link_libraries(NeXus_Static_Library ${MXML_STATIC_LIBRARIES})
+endif()
 
 #Make NeXus Shared Library
 
@@ -120,7 +123,10 @@ else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
                       VERSION 1.0 SOVERSION 4)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-target_link_libraries(NeXus_Shared_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${MXML_STATIC_LIBRARIES} ${NX_LIBS})
+target_link_libraries(NeXus_Shared_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${NX_LIBS})
+if(MXML_STATIC_LIBRARIES)
+    target_link_libraries(NeXus_Shared_Library ${MXML_STATIC_LIBRARIES})
+endif()
 
 #if(HAVE_MXML)
 #if(MXMLLIB_FOUND)
