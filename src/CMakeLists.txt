@@ -100,6 +100,7 @@ endif()
 #Make NeXus Shared Library
 
 add_library (NeXus_Shared_Library SHARED ${NAPISRC})
+target_include_directories(NeXus_Shared_Library PUBLIC "../include")
 
 #set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS _HDF5USEDLL_ _HDFDLL_)
 set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS H4_BUILT_AS_STATIC_LIB)
