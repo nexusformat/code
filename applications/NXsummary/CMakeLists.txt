@@ -25,7 +25,7 @@
 #
 #
 #====================================================================
-include_directories(${CMAKE_SOURCE_DIR}/third_party ${LIBXML2_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/third_party ${LIBXML2_INCLUDE_DIR})
 
 add_executable (nxsummary data_util.cpp main.cpp string_util.cpp
                          preferences.cpp output.cpp data_util.hpp

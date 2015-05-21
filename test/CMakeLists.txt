@@ -33,5 +33,23 @@ INSTALL (FILES ${NXEXAMPLE_FILES} DESTINATION ${NXEXAMPLEDIR} COMPONENT Examples
 add_executable(napi_test_hdf5 napi_test.c)
 target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
 
-add_test(napi_test_hdf5 ${EXECUTABLE_OUTPUT_PATH}/napi_test_hdf5)
+set (TEST_FILES
+    data/dmc01.h5
+    data/dmc02.h5
+)
+
+foreach (tfile ${TEST_FILES})
+    set (dest "${PROJECT_BINARY_DIR}/${tfile}")
+  add_custom_command (
+      TARGET     napi_test_hdf5 POST_BUILD
+      # copy might be faster? no comparision is necessary
+      COMMAND    ${CMAKE_COMMAND} -E copy_if_different
+        ${PROJECT_SOURCE_DIR}/test/${tfile} ${dest}
+      COMMENT "Copying ${tfile} to the Build tree"
+  )
+endforeach (tfile ${TEST_FILES})
+
+
+add_test(NAME napi_test_hdf5 WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
+    COMMAND $<TARGET_FILE:napi_test_hdf5> )
 #set_property(TEST napi_test_hdf5 PROPERTY PASS_REGULAR_EXPRESSION kkk)

@@ -34,7 +34,7 @@ if(DOCBOOKUTILS_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    NeXus_definitions.pdf
         COMMAND   ${DOCBOOK2PDF_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/tech_ref/NeXus_definitions.docbook
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/tech_ref/NeXus_definitions.docbook
         DEPENDS   ${DOC_SRC} ${IMAGES}
         COMMENT   "PDF NeXus Definitions"
     )
@@ -42,7 +42,7 @@ if(DOCBOOKUTILS_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    NeXus_definitions.txt
         COMMAND   ${DOCBOOK2TXT_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/tech_ref/NeXus_definitions.docbook
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/tech_ref/NeXus_definitions.docbook
         DEPENDS   NeXus_definitions.pdf
         COMMENT   "TEXT NeXus Definitions"
     )
@@ -51,8 +51,8 @@ if(DOCBOOKUTILS_FOUND)
         DEPENDS   NeXus_definitions.txt
     )
 
-	install (FILES ${CMAKE_BINARY_DIR}/doc/tech_ref/NeXus_definitions.pdf
-                       ${CMAKE_BINARY_DIR}/doc/tech_ref/NeXus_definitions.txt
+	install (FILES ${PROJECT_BINARY_DIR}/doc/tech_ref/NeXus_definitions.pdf
+                       ${PROJECT_BINARY_DIR}/doc/tech_ref/NeXus_definitions.txt
                        DESTINATION ${NXDOCDIR}/tech_ref COMPONENT Documentation)
 
 endif(DOCBOOKUTILS_FOUND)

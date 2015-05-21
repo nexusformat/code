@@ -28,12 +28,12 @@
 
 if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
-    SET (ENV{TOPSRC} ${CMAKE_SOURCE_DIR})
+    SET (ENV{TOPSRC} ${PROJECT_SOURCE_DIR})
 
     ADD_CUSTOM_COMMAND( 
         OUTPUT    html-c latex-c c-api.tag
         COMMAND   ${DOXYGEN_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_c
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/doxygen/Doxyfile_c
         DEPENDS   ${javaclass}
         COMMENT   "C DOXYGEN"
     )
@@ -41,7 +41,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    html-cpp latex-cpp
         COMMAND   ${DOXYGEN_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_cpp
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/doxygen/Doxyfile_cpp
         DEPENDS   html-c latex-c c-api.tag
         COMMENT   "CPP DOXYGEN"
     )
@@ -49,7 +49,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    html-java latex-java
         COMMAND   ${DOXYGEN_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_java
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/doxygen/Doxyfile_java
         DEPENDS   html-cpp latex-cpp
         COMMENT   "Java DOXYGEN"
     )
@@ -57,7 +57,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    html-python latex-python
         COMMAND   ${DOXYGEN_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_python
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/doxygen/Doxyfile_python
         DEPENDS   html-java latex-java
         COMMENT   "Python DOXYGEN"
     )
@@ -65,7 +65,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    html-f90 latex-f90
         COMMAND   ${DOXYGEN_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_f90
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/doxygen/Doxyfile_f90
         DEPENDS   html-python latex-python
         COMMENT   "F90 DOXYGEN"
     )
@@ -73,7 +73,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    html-f77 latex-f77
         COMMAND   ${DOXYGEN_EXECUTABLE}
-        ARGS      ${CMAKE_SOURCE_DIR}/doc/doxygen/Doxyfile_f77
+        ARGS      ${PROJECT_SOURCE_DIR}/doc/doxygen/Doxyfile_f77
         DEPENDS   html-f90 latex-f90
         COMMENT   "F77 DOXYGEN"
     )
@@ -82,12 +82,12 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
         DEPENDS   html-f77 latex-f77
     )
 
-    install (DIRECTORY ${CMAKE_BINARY_DIR}/doc/doxygen/html-c
-                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-cpp
-                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-java
-                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-python
-                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-f90
-                       ${CMAKE_BINARY_DIR}/doc/doxygen/html-f77
+    install (DIRECTORY ${PROJECT_BINARY_DIR}/doc/doxygen/html-c
+                       ${PROJECT_BINARY_DIR}/doc/doxygen/html-cpp
+                       ${PROJECT_BINARY_DIR}/doc/doxygen/html-java
+                       ${PROJECT_BINARY_DIR}/doc/doxygen/html-python
+                       ${PROJECT_BINARY_DIR}/doc/doxygen/html-f90
+                       ${PROJECT_BINARY_DIR}/doc/doxygen/html-f77
                        DESTINATION ${NXDOCDIR}/doxygen COMPONENT Documentation)
 
 endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
