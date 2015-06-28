@@ -1,5 +1,5 @@
 ## Process this file with cmake
-#====================================================================
+#=============================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
 #  CMakeLists for building the NeXus library and applications.
@@ -24,29 +24,70 @@
 #  For further information, see <http://www.nexusformat.org>
 #
 #
-#====================================================================
+#=============================================================================
 
 
 # looks in HDF4_ROOT environment variable for hint
 # set HDF4_FOUND HDF4_DEFINITIONS HDF4_INCLUDE_DIRS  HDF4_LIBRARIES  HDF4_ROOT_DIR
 
 if (WIN32)
+    #-------------------------------------------------------------------------
+    # find HDF4 library on Windows
+    #-------------------------------------------------------------------------
 #    set(HDF4_SEARCH_DEFAULT "C:/InstallKits/HDF4.2.6_win_x64")
 	set(HDF4_SEARCH_DEFAULT "C:/Program Files/HDF Group/HDF4/4.2.7")
 	set(HD_NAMES hdf hdfdll hd427m hd426m hd425m )
 	set(HM_NAMES mfhdf mfhdfdll hm427m hm426m hm425m )
 	set(JPEG_NAMES libjpeg jpeg )
 	set(XDR_NAMES xdr )
-	find_library(HDF4_HD_LIBRARY NAMES ${HD_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll bin lib DOC "location of hd dll" NO_SYSTEM_ENVIRONMENT_PATH)
-	find_library(HDF4_HM_LIBRARY NAMES ${HM_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll bin lib DOC "location of hm dll" NO_SYSTEM_ENVIRONMENT_PATH)
-	find_library(JPEG_LIBRARY NAMES ${JPEG_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll bin lib DOC "location of jpeg dll" NO_SYSTEM_ENVIRONMENT_PATH)
-	find_library(XDR_LIBRARY NAMES ${XDR_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES dll bin lib DOC "location of xdr dll" NO_SYSTEM_ENVIRONMENT_PATH)
+	find_library(HDF4_HD_LIBRARY NAMES ${HD_NAMES} 
+                 HINTS ${HDF4_SEARCH} 
+                 ENV HDF4_ROOT 
+                 PATHS ${HDF4_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES dll bin lib 
+                 DOC "location of hd dll" NO_SYSTEM_ENVIRONMENT_PATH)
+
+	find_library(HDF4_HM_LIBRARY NAMES ${HM_NAMES} 
+                 HINTS ${HDF4_SEARCH} 
+                 ENV HDF4_ROOT 
+                 PATHS ${HDF4_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES dll bin lib 
+                 DOC "location of hm dll" NO_SYSTEM_ENVIRONMENT_PATH)
+
+	find_library(JPEG_LIBRARY NAMES ${JPEG_NAMES} 
+                 HINTS ${HDF4_SEARCH} 
+                 ENV HDF4_ROOT 
+                 PATHS ${HDF4_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES dll bin lib 
+                 DOC "location of jpeg dll" NO_SYSTEM_ENVIRONMENT_PATH)
+
+	find_library(XDR_LIBRARY NAMES ${XDR_NAMES} 
+                 HINTS ${HDF4_SEARCH} 
+                 ENV HDF4_ROOT 
+                 PATHS ${HDF4_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES dll bin lib 
+                 DOC "location of xdr dll" NO_SYSTEM_ENVIRONMENT_PATH)
 else(WIN32)
+    #-------------------------------------------------------------------------
+    # find HDF4 library on Linux/Unix
+    #-------------------------------------------------------------------------
     set(HDF4_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf4" "/sw")
 	set(HD_NAMES df)
 	set(HM_NAMES mfhdf)
-	find_library(HDF4_HD_LIBRARY NAMES ${HD_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hd dll")
-	find_library(HDF4_HM_LIBRARY NAMES ${HM_NAMES} HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hm dll")
+	find_library(HDF4_HD_LIBRARY NAMES ${HD_NAMES} 
+                 HINTS ${HDF4_SEARCH} 
+                 ENV HDF4_ROOT 
+                 PATHS ${HDF4_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES lib 
+                 DOC "location of hd dll")
+
+	find_library(HDF4_HM_LIBRARY 
+                 NAMES ${HM_NAMES} 
+                 HINTS ${HDF4_SEARCH} 
+                 ENV HDF4_ROOT 
+                 PATHS ${HDF4_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES lib 
+                 DOC "location of hm dll")
 	find_package(JPEG)
 endif(WIN32)
 
@@ -62,7 +103,13 @@ if (HDF4_HM_LIBRARY AND HDF4_HD_LIBRARY)
     set(HDF4_LIBRARIES ${HDF4_SHARED_LIBRARIES} CACHE FILEPATH "Location of HDF4 libraries")
     get_filename_component(_HDF4_LIBDIR ${HDF4_HM_LIBRARY} PATH)
     get_filename_component(HDF4_ROOT_DIR "${_HDF4_LIBDIR}/.." ABSOLUTE)
-	find_path(HDF4_INCLUDE_DIRS NAMES mfhdf.h HINTS ${HDF4_SEARCH} ENV HDF4_ROOT PATHS ${HDF4_SEARCH_DEFAULT} PATH_SUFFIXES include DOC "location of hdf4 includes" NO_SYSTEM_ENVIRONMENT_PATH)
+    message(${HDF4_ROOT_DIR})
+	find_path(HDF4_INCLUDE_DIRS NAMES mfhdf.h 
+              HINTS ${HDF4_SEARCH} 
+              ENV HDF4_ROOT 
+              PATHS ${HDF4_SEARCH_DEFAULT} 
+              PATH_SUFFIXES include 
+              DOC "location of hdf4 includes" NO_SYSTEM_ENVIRONMENT_PATH)
 endif()
 
 mark_as_advanced(HDF4_LIBRARIES HDF4_INCLUDE_DIRS)

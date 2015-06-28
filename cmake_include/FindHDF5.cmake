@@ -1,5 +1,5 @@
 ## Process this file with cmake
-#====================================================================
+#=============================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
 #  CMakeLists for building the NeXus library and applications.
@@ -24,20 +24,51 @@
 #  For further information, see <http://www.nexusformat.org>
 #
 #
-#====================================================================
+#=============================================================================
 
 # looks in HDF5_ROOT environment variable for hint
 # set HDF5_FOUND HDF5_DEFINITIONS HDF5_INCLUDE_DIRS  HDF5_C_LIBRARIES HDF5_LIBRARIES  HDF5_LIBRARY_DIRS HDF5_ROOT_DIR
 
 if (WIN32)
-#    set(HDF5_SEARCH_DEFAULT "C:/InstallKits/HDF5-1.8.6-win64")
+    #-------------------------------------------------------------------------
+    # find HDF5 libraries on Windows
+    #-------------------------------------------------------------------------
 	set(HDF5_SEARCH_DEFAULT "C:/Program Files/HDF Group/HDF5/1.8.9")
-	find_library(HDF5_SHARED_LIBRARIES NAMES hdf5dll HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES dll bin lib DOC "location of hdf5 dll" NO_SYSTEM_ENVIRONMENT_PATH)
-	find_library(HDF5_STATIC_LIBRARIES NAMES hdf5 HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hdf5 lib" NO_SYSTEM_ENVIRONMENT_PATH)
+	find_library(HDF5_SHARED_LIBRARIES NAMES hdf5dll 
+                 HINTS ${HDF5_SEARCH} 
+                 ENV HDF5_ROOT 
+                 PATHS ${HDF5_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES dll bin lib 
+                 DOC "location of hdf5 dll" NO_SYSTEM_ENVIRONMENT_PATH)
+	find_library(HDF5_STATIC_LIBRARIES NAMES hdf5 
+                 HINTS ${HDF5_SEARCH} 
+                 ENV HDF5_ROOT 
+                 PATHS ${HDF5_SEARCH_DEFAULT} 
+                 PATH_SUFFIXES lib 
+                 DOC "location of hdf5 lib" NO_SYSTEM_ENVIRONMENT_PATH)
 else(WIN32)
-    set(HDF5_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf5" "/sw")
-	find_library(HDF5_SHARED_LIBRARIES NAMES hdf5 HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hdf5 dll")
-	find_library(HDF5_STATIC_LIBRARIES NAMES hdf5 HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES lib DOC "location of hdf5 lib")
+    #-------------------------------------------------------------------------
+    # find HDF5 libraries on Linux/Unix
+    #-------------------------------------------------------------------------
+    if(PKG_CONFIG_FOUND)
+        pkg_search_module(HDF5 REQUIRED hdf5)
+        set(HDF5_SHARED_LIBRARIES ${HDF5_LIBRARIES})
+    else()
+        set(HDF5_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf5" "/sw")
+        find_library(HDF5_SHARED_LIBRARIES NAMES hdf5
+                     HINTS ${HDF5_SEARCH} 
+                     ENV HDF5_ROOT 
+                     PATHS ${HDF5_SEARCH_DEFAULT} 
+                     PATH_SUFFIXES lib 
+                     DOC "location of hdf5 dll")
+
+        find_library(HDF5_STATIC_LIBRARIES NAMES hdf5
+                     HINTS ${HDF5_SEARCH} 
+                     ENV HDF5_ROOT 
+                     PATHS ${HDF5_SEARCH_DEFAULT} 
+                     PATH_SUFFIXES lib 
+                     DOC "location of hdf5 lib")
+    endif()
 endif(WIN32)
 
 mark_as_advanced(HDF5_SHARED_LIBRARIES HDF5_STATIC_LIBRARIES)

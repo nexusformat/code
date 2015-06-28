@@ -90,6 +90,7 @@ include(CheckTypeSize)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
+include(FindPkgConfig)
 
 if(WIN32)
 include(InstallRequiredSystemLibraries)
