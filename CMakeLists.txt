@@ -51,7 +51,7 @@ if(WIN32)
     set(CMAKE_INSTALL_PREFIX ${DEFAULT_WIN_INSTALL_PREFIX} CACHE PATH "")
 endif()
 
-set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
+set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 
 
 #The name of our project
@@ -62,10 +62,10 @@ set (NeXus_VERSION_MINOR 0)
 set (NXLTVERSINFO '4:3:4')
 
 # needed for windows NSIS installer
-file(TO_NATIVE_PATH ${CMAKE_SOURCE_DIR} CMAKE_SOURCE_DIR_NATIVE) 
-file(TO_NATIVE_PATH ${CMAKE_BINARY_DIR} CMAKE_BINARY_DIR_NATIVE) 
-string(REPLACE "\\" "\\\\" CMAKE_SOURCE_DIR_NATIVE_D ${CMAKE_SOURCE_DIR_NATIVE})
-string(REPLACE "\\" "\\\\" CMAKE_BINARY_DIR_NATIVE_D ${CMAKE_BINARY_DIR_NATIVE})
+file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE) 
+file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE) 
+string(REPLACE "\\" "\\\\" PROJECT_SOURCE_DIR_NATIVE_D ${PROJECT_SOURCE_DIR_NATIVE})
+string(REPLACE "\\" "\\\\" PROJECT_BINARY_DIR_NATIVE_D ${PROJECT_BINARY_DIR_NATIVE})
 
 find_program(SVNVERSION svnversion)
 
@@ -159,8 +159,10 @@ find_package(LATEX)
 find_package(PythonInterp)
 
 #Find the java runtime and sdk
-find_package(Java 1.6)
-find_package(JNI)
+if(ENABLE_JAVA_BINDINGS)
+    find_package(Java 1.6)
+    find_package(JNI)
+endif()
 
 # set ZLIB_ROOT as hint to find_package
 if (ZLIB_SEARCH)
@@ -253,6 +255,8 @@ option (MINGW_MSYS
 option (HAVE_MS_LIB 
         "We are building under MINGW." OFF)
 
+option(ENABLE_JAVA_BINDINGS "Build Java bindings" ON)
+
 if (HAVE_MS_LIB)
     set (MS_LIB LIB)
 endif (HAVE_MS_LIB)
@@ -282,8 +286,8 @@ set(NXEXAMPLEDIR  "share/nexus/examples")
 set(NXINCLUDE  "include")
 set(NX_INCLUDE "include/nexus")
 
-configure_file("${CMAKE_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${CMAKE_BINARY_DIR}/include/nxconfig.h" @ONLY)
-include_directories("${CMAKE_BINARY_DIR}/include")
+configure_file("${PROJECT_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${PROJECT_BINARY_DIR}/include/nxconfig.h" @ONLY)
+include_directories("${PROJECT_BINARY_DIR}/include")
 
 if(MSVC)
 # warning 4820 is byte padding in structures
@@ -325,13 +329,13 @@ endif()
 
 # Recurse into the subdirectories.
 add_subdirectory (src)
-add_subdirectory (bindings)
-add_subdirectory (applications)
+#add_subdirectory (bindings)
+#add_subdirectory (applications)
 #add_subdirectory (config)
 #add_subdirectory (contrib)
 #add_subdirectory (definitions)
-add_subdirectory (doc)
-add_subdirectory (examples)
+#add_subdirectory (doc)
+#add_subdirectory (examples)
 add_subdirectory (include)
 #add_subdirectory (InstallerBits)
 #add_subdirectory (macosx_install_kit)

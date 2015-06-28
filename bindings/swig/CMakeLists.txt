@@ -35,7 +35,7 @@ if (SWIG_FOUND AND TCL_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${SWIG_TCL_WRAP}
         COMMAND   ${SWIG_EXECUTABLE}
-        ARGS      -I$(CMAKE_SOURCE_DIR)/bindings/swig -o ${SWIG_TCL_WRAP} -tcl -ltclsh.i nxinter.i
+        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_TCL_WRAP} -tcl -ltclsh.i nxinter.i
         COMMENT   "Generating ${SWIG_TCL_WRAP}"
     )
 
@@ -64,7 +64,7 @@ if (SWIG_FOUND AND GUILE_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${SWIG_GUILE_WRAP}
         COMMAND   ${SWIG_EXECUTABLE}
-        ARGS      -I$(CMAKE_SOURCE_DIR)/bindings/swig -o ${SWIG_GUILE_WRAP} -guile -lguilemain.i nxinter.i
+        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_GUILE_WRAP} -guile -lguilemain.i nxinter.i
         COMMENT   "Generating ${SWIG_GUILE_WRAP}"
     )
 
@@ -93,7 +93,7 @@ if (SWIG_FOUND AND MZScheme_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${SWIG_MZScheme_WRAP}
         COMMAND   ${SWIG_EXECUTABLE}
-        ARGS      -I$(CMAKE_SOURCE_DIR)/bindings/swig -o ${SWIG_MZScheme_WRAP} -mzscheme nxinter.i
+        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_MZScheme_WRAP} -mzscheme nxinter.i
         COMMENT   "Generating ${SWIG_MZScheme_WRAP}"
     )
 

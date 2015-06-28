@@ -29,47 +29,47 @@
 if(DEFINED Java_JAVAC_EXECUTABLE)
     if(DEFINED JNI_INCLUDE_DIRS)
 
-        INCLUDE_DIRECTORIES(. ../ native ${JNI_INCLUDE_DIRS} ${CMAKE_BINARY_DIR}/bindings/java/native)
+        INCLUDE_DIRECTORIES(. ../ native ${JNI_INCLUDE_DIRS} ${PROJECT_BINARY_DIR}/bindings/java/native)
 
         SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#        MESSAGE(STATUS ${CMAKE_SOURCE_DIR}/bindings/java/)
+#        MESSAGE(STATUS ${PROJECT_SOURCE_DIR}/bindings/java/)
 
-        SET(JAVA_TEST ${CMAKE_SOURCE_DIR}/bindings/java/test/TestJapi.java)
+        SET(JAVA_TEST ${PROJECT_SOURCE_DIR}/bindings/java/test/TestJapi.java)
 
-        SET(JAVA_SOURCES ${CMAKE_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/org/nexusformat/NexusException.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/org/nexusformat/NXlink.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/org/nexusformat/AttributeEntry.java 
-             ${CMAKE_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java 
+        SET(JAVA_SOURCES ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusException.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NXlink.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/AttributeEntry.java 
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java 
              ${JAVA_TEST})
 
-        SET(JAVA_CLASSES ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/org/nexusformat/NexusException.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/org/nexusformat/NXlink.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/org/nexusformat/AttributeEntry.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/org/nexusformat/NexusFile.class 
-             ${CMAKE_BINARY_DIR}/bindings/java/TestJapi.class)
+         SET(JAVA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusException.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NXlink.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/AttributeEntry.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusFile.class 
+             ${PROJECT_BINARY_DIR}/bindings/java/TestJapi.class)
 
-        SET(EXTRA_CLASSES ${CMAKE_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/ArrayDescriptor.class)
+        SET(EXTRA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/ArrayDescriptor.class)
 
         SET(JNI_HEADER native/org_nexusformat_NexusFile.h)
 
-        SET(JAR_ARCHIVE ${CMAKE_BINARY_DIR}/bindings/java/jnexus.jar)
+        SET(JAR_ARCHIVE ${PROJECT_BINARY_DIR}/bindings/java/jnexus.jar)
 
-        SET(JAVA_DOCS ${CMAKE_BINARY_DIR}/bindings/java/apidoc)
+        SET(JAVA_DOCS ${PROJECT_BINARY_DIR}/bindings/java/apidoc)
 
         STRING(REPLACE ".java" ".class" javaclass "${JAVA_SOURCES}")
 
@@ -107,7 +107,7 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
             OUTPUT    ${JAVA_DOCS}
             COMMAND   ${Java_JAVADOC_EXECUTABLE}
             ARGS      -d ${JAVA_DOCS} -windowtitle jnexus -doctitle jnexus -classpath . 
-                      -sourcepath ${CMAKE_SOURCE_DIR}/bindings/java org.nexusformat ncsa.hdf.hdflib
+                      -sourcepath ${PROJECT_SOURCE_DIR}/bindings/java org.nexusformat ncsa.hdf.hdflib
             DEPENDS   ${JNI_HEADER}
             COMMENT   "Build Javadocs"
         )

@@ -95,7 +95,7 @@ int main (int argc, char *argv[])
   grossezahl[3] = (int64_t)777777777777;
 #endif /* HAVE_LONG_LONG_INT */
 
-  if(strstr(argv[0],"napi_test-hdf5") != NULL){
+  if(strstr(argv[0],"napi_test_hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
     strcpy(nxFile,"NXtest.h5");
   }else if(strstr(argv[0],"napi_test-xml-table") != NULL){

@@ -27,7 +27,8 @@
 #=============================================================================
 
 # looks in HDF5_ROOT environment variable for hint
-# set HDF5_FOUND HDF5_DEFINITIONS HDF5_INCLUDE_DIRS  HDF5_C_LIBRARIES HDF5_LIBRARIES  HDF5_LIBRARY_DIRS HDF5_ROOT_DIR
+# set HDF5_FOUND HDF5_DEFINITIONS HDF5_INCLUDE_DIRS  \ 
+# HDF5_C_LIBRARIES HDF5_LIBRARIES  HDF5_LIBRARY_DIRS HDF5_ROOT_DIR
 
 if (WIN32)
     #-------------------------------------------------------------------------
@@ -74,15 +75,19 @@ endif(WIN32)
 mark_as_advanced(HDF5_SHARED_LIBRARIES HDF5_STATIC_LIBRARIES)
 
 if (HDF5_SHARED_LIBRARIES)
-    set(HDF5_LIBRARIES ${HDF5_SHARED_LIBRARIES} CACHE FILEPATH "Location of HDF5 libraries")
+    set(HDF5_LIBRARIES ${HDF5_SHARED_LIBRARIES} 
+        CACHE FILEPATH "Location of HDF5 libraries")
 	get_filename_component(_HDF5_LIBDIR ${HDF5_SHARED_LIBRARIES} PATH)
 elseif (HDF5_STATIC_LIBRARIES)
-    set(HDF5_LIBRARIES ${HDF5_STATIC_LIBRARIES} CACHE FILEPATH "Location of HDF5 libraries")
+    set(HDF5_LIBRARIES ${HDF5_STATIC_LIBRARIES} 
+        CACHE FILEPATH "Location of HDF5 libraries")
 	get_filename_component(_HDF5_LIBDIR ${HDF5_STATIC_LIBRARIES} PATH)
 endif()
 set(HDF5_DEFINITIONS "")
 get_filename_component(HDF5_ROOT_DIR "${_HDF5_LIBDIR}/.." ABSOLUTE)
-find_path(HDF5_INCLUDE_DIRS NAMES hdf5.h HINTS ${HDF5_SEARCH} ENV HDF5_ROOT PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES include DOC "location of hdf5 includes" NO_SYSTEM_ENVIRONMENT_PATH)
+find_path(HDF5_INCLUDE_DIRS NAMES hdf5.h HINTS ${HDF5_SEARCH} ENV HDF5_ROOT 
+          PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES include 
+          DOC "location of hdf5 includes" NO_SYSTEM_ENVIRONMENT_PATH)
 
 mark_as_advanced(HDF5_LIBRARIES HDF5_INCLUDE_DIRS)
 
