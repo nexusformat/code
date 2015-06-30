@@ -92,6 +92,10 @@ include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(FindPkgConfig)
 
+if(PKG_CONFIG_FOUND)
+    message("Found pkg-config!")
+endif()
+
 if(WIN32)
 include(InstallRequiredSystemLibraries)
 endif()

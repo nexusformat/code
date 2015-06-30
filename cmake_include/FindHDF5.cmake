@@ -50,10 +50,14 @@ if (WIN32)
 else(WIN32)
     #-------------------------------------------------------------------------
     # find HDF5 libraries on Linux/Unix
+    #
+    # We first try to use pkg-config 
     #-------------------------------------------------------------------------
     if(PKG_CONFIG_FOUND)
         pkg_search_module(HDF5 REQUIRED hdf5)
         set(HDF5_SHARED_LIBRARIES ${HDF5_LIBRARIES})
+        message(${HDF5_SHARED_LIBRARIES})
+        message(${CMAKE_LIBRARY_ARCHITECTURE})
     else()
         set(HDF5_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf5" "/sw")
         find_library(HDF5_SHARED_LIBRARIES NAMES hdf5
