@@ -26,9 +26,16 @@
 #
 #=============================================================================
 
-# looks in HDF5_ROOT environment variable for hint
-# set HDF5_FOUND HDF5_DEFINITIONS HDF5_INCLUDE_DIRS  \ 
-# HDF5_C_LIBRARIES HDF5_LIBRARIES  HDF5_LIBRARY_DIRS HDF5_ROOT_DIR
+#-----------------------------------------------------------------------------
+# The HDF5 search will set the following variables 
+#
+# HDF5_FOUND        - set to 1 if the libary exists
+# HDF5_LIBRARIES    - the libraries one has to link
+# HDF5_LIBRARY_DIRS - the directory where the library binaries are installed
+# HDF5_INCLUDE_DIRS - the directory where the header files are installed
+#
+#-----------------------------------------------------------------------------
+
 
 if (WIN32)
     #-------------------------------------------------------------------------
@@ -51,14 +58,15 @@ else(WIN32)
     #-------------------------------------------------------------------------
     # find HDF5 libraries on Linux/Unix
     #
-    # We first try to use pkg-config 
+    # We first try to use pkg-config  (at least on Debian systems this should 
+    # work and help avoiding problems with mulit-arch installations.
     #-------------------------------------------------------------------------
     if(PKG_CONFIG_FOUND)
         pkg_search_module(HDF5 REQUIRED hdf5)
-        set(HDF5_SHARED_LIBRARIES ${HDF5_LIBRARIES})
         message(${HDF5_SHARED_LIBRARIES})
         message(${CMAKE_LIBRARY_ARCHITECTURE})
     else()
+        #do a manual search 
         set(HDF5_SEARCH_DEFAULT "/usr" "/usr/local" "/usr/local/hdf5" "/sw")
         find_library(HDF5_SHARED_LIBRARIES NAMES hdf5
                      HINTS ${HDF5_SEARCH} 
@@ -73,27 +81,18 @@ else(WIN32)
                      PATHS ${HDF5_SEARCH_DEFAULT} 
                      PATH_SUFFIXES lib 
                      DOC "location of hdf5 lib")
+
+        #construct the required variables from the seach results
+        if(HDF5_SHARED_LIBRARIES)
+            get_filename_component(HDF5_LIBRARY_DIRS ${HDF5_SHARED_LIBRARIES} PATH)
+            get_filename_component(HDF5_LIBRARIES ${HDF5_SHARED_LIBRARIES} NAME_WE)
+        elseif(HDF5_STATIC_LIBRARIES)
+            get_filename_component(HDF5_STATIC_LIBRARY_DIRS
+                                   ${HDF5_STATIC_LIBRARIES} PATH)
+            get_filename_component(HDF5_STATIC_LIBRARY_DIRS
+                                   ${HDF5_STATIC_LIBRARIES NAME_WE)
+        endif()
+
     endif()
 endif(WIN32)
 
-mark_as_advanced(HDF5_SHARED_LIBRARIES HDF5_STATIC_LIBRARIES)
-
-if (HDF5_SHARED_LIBRARIES)
-    set(HDF5_LIBRARIES ${HDF5_SHARED_LIBRARIES} 
-        CACHE FILEPATH "Location of HDF5 libraries")
-	get_filename_component(_HDF5_LIBDIR ${HDF5_SHARED_LIBRARIES} PATH)
-elseif (HDF5_STATIC_LIBRARIES)
-    set(HDF5_LIBRARIES ${HDF5_STATIC_LIBRARIES} 
-        CACHE FILEPATH "Location of HDF5 libraries")
-	get_filename_component(_HDF5_LIBDIR ${HDF5_STATIC_LIBRARIES} PATH)
-endif()
-set(HDF5_DEFINITIONS "")
-get_filename_component(HDF5_ROOT_DIR "${_HDF5_LIBDIR}/.." ABSOLUTE)
-find_path(HDF5_INCLUDE_DIRS NAMES hdf5.h HINTS ${HDF5_SEARCH} ENV HDF5_ROOT 
-          PATHS ${HDF5_SEARCH_DEFAULT} PATH_SUFFIXES include 
-          DOC "location of hdf5 includes" NO_SYSTEM_ENVIRONMENT_PATH)
-
-mark_as_advanced(HDF5_LIBRARIES HDF5_INCLUDE_DIRS)
-
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(HDF5 DEFAULT_MSG HDF5_LIBRARIES HDF5_INCLUDE_DIRS)
