@@ -1,149 +1,114 @@
 ## Process this file with cmake
-#====================================================================
+#=============================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
 #  CMakeLists for building the NeXus library and applications.
 #
 # Copyright (C) 2008-2012 NeXus International Advisory Committee (NIAC)
 #  
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
+#  This library is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by the
+#  Free Software Foundation; either version 2 of the License, or (at your
+#  option) any later version.
 # 
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+#  This library is distributed in the hope that it will be useful, but WITHOUT
+#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+#  for more details.
 # 
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free 
-#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
-#  MA  02111-1307  USA
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with this library; if not, write to the Free Software Foundation,
+#  Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #             
 #  For further information, see <http://www.nexusformat.org>
 #
 #
-#====================================================================
+#==============================================================================
 
-# we need 2.8.8 for correct component install with CPACK for archives
-if(WIN32)
-    cmake_minimum_required (VERSION 2.8.8)
-else()
-    cmake_minimum_required (VERSION 2.8.8)
-    if (${CMAKE_VERSION} VERSION_LESS 2.8.4)
-        set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove this line when CMake >= 2.8.4 is required
-    endif()
-endif()
-
-#
-# convert a native windows path to its equivalent cygwin path
-#
-function(to_cygwin_path PATH RESULT)
-    file(TO_CMAKE_PATH ${PATH} CP)								# changes \ to / on windows
-    string(REGEX REPLACE "^([a-zA-Z]):/" "/\\1/" CP2 ${CP})   	# c:/ -> /c/
-	set(${RESULT} "/cygdrive${CP2}" PARENT_SCOPE) 				# /c/ -> /cygdrive/c/
-endfunction()
-
-# set a default install prefix for windows - we will adjust for 64bit later if this is unchanged
-set(DEFAULT_WIN_INSTALL_PREFIX "c:/nxinstall")
-if(WIN32)
-    set(CMAKE_INSTALL_PREFIX ${DEFAULT_WIN_INSTALL_PREFIX} CACHE PATH "")
-endif()
-
-set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
-
+cmake_minimum_required(VERSION 2.8.8)
 
 #The name of our project
 project (NeXus)
 
+message(${PROJECT_SOURCE_DIR})
+#set the module path
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
+message(${CMAKE_MODULE_PATH})
+
+
+#-----------------------------------------------------------------------------
+# define package version
+#-----------------------------------------------------------------------------
 set (NeXus_VERSION_MAJOR 1)
 set (NeXus_VERSION_MINOR 0)
 set (NXLTVERSINFO '4:3:4')
 
-# needed for windows NSIS installer
-file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE) 
-file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE) 
-string(REPLACE "\\" "\\\\" PROJECT_SOURCE_DIR_NATIVE_D ${PROJECT_SOURCE_DIR_NATIVE})
-string(REPLACE "\\" "\\\\" PROJECT_BINARY_DIR_NATIVE_D ${PROJECT_BINARY_DIR_NATIVE})
+#-----------------------------------------------------------------------------
+# define command line options by which the user can configure the build 
+#-----------------------------------------------------------------------------
+option(WITH_HDF5 "Build with HDF5 support" OFF)
+option(WITH_HDF5 "Build with HDF4 support" OFF)
+option(WITH_MXML  "Build with XML support" OFF)
+option(ENABLE_CONTRIB "Should I build the user contributions?" OFF)
+option(ENABLE_FORTRAN "Should I build the fortran bindings?" OFF)
+option(ENABLE_JAVA "Build Java bindings" ON)
+option(MINGW_MSYS   "We are building under MINGW." OFF)
+option(HAVE_MS_LIB  "We are building under MINGW." OFF)
 
-find_program(SVNVERSION svnversion)
+#-----------------------------------------------------------------------------
+# some chached variables 
+#-----------------------------------------------------------------------------
+set(HDF5_INCLUDE_DIRS "" CACHE PATH "Where to search for HDF5 header files")
+set(HDF5_LIBRARY_DIRS "" CACHE PATH "Where to search for HDF5 library files")
 
-#Packages to find that are required for the build
+set(HDF4_INCLUDE_DIRS "" CACHE PATH "Where to search for HDF4 header files")
+set(HDF4_LIBRARY_DIRS "" CACHE PATH "Where to search for HDF4 library files")
 
-set(HDF5_SEARCH "" CACHE PATH "Where to search for HDF5")
+set(MXML_INCLUDE_DIRS "" CACHE PATH "Where to search for MXML header files")
+set(MXML_LIBRARY_DIRS "" CACHE PATH "Where to search for MXML library files")
 
-set(HDF4_SEARCH "" CACHE PATH "Where to search for HDF4")
+set(SZIP_INCLUDE_DIRS "" CACHE PATH "Where to search for SZIP header files")
+set(SZIP_LIBRARY_DIRS "" CACHE PATH "Where to search for SZIP library files")
 
-set(MXML_SEARCH "" CACHE PATH "Where to search for MXML")
+set(ZLIB_INCLUDE_DIRS "" CACHE PATH "Where to search for ZLIB header files")
+set(ZLIB_INCLUDE_DIRS "" CACHE PATH "Where to search for ZLIB library files")
 
-set(SZIP_SEARCH "" CACHE PATH "Where to search for SZIP")
+set(CBF_INCLUDE_DIRS "" CACHE PATH "Where to search for CBF header files")
+set(CBF_INCLUDE_DIRS "" CACHE PATH "Where to search for CBF library files")
 
-set(ZLIB_SEARCH "" CACHE PATH "Where to search for ZLIB")
+#-----------------------------------------------------------------------------
+# include some general purpose modules 
+#-----------------------------------------------------------------------------
+include(CompilerChecks)
 
-#CMake includes 
 
-include(CheckCCompilerFlag)
-include(CheckCXXCompilerFlag)
-include(CheckFunctionExists)
-include(CheckTypeSize)
-include(CheckIncludeFile)
-include(CheckIncludeFiles)
-include(CheckLibraryExists)
+#-----------------------------------------------------------------------------
+# check for package config
+#-----------------------------------------------------------------------------
 include(FindPkgConfig)
 
 if(PKG_CONFIG_FOUND)
     message("Found pkg-config!")
 endif()
 
-if(WIN32)
-include(InstallRequiredSystemLibraries)
-endif()
-
 include(cmake_include/Utilities.cmake)
 #include(cmake_include/FindPython.cmake)
-include(cmake_include/FindCBFLib.cmake)
+#include(cmake_include/FindCBFLib.cmake)
 #include(cmake_include/FindJava.cmake)
 #include(cmake_include/FindJNI.cmake)
-include(cmake_include/FindGuile.cmake)
-include(cmake_include/FindMZScheme.cmake)
-include(cmake_include/FindHDF4.cmake)
-include(cmake_include/FindHDF5.cmake)
-include(cmake_include/FindIDL.cmake)
-include(cmake_include/FindMXML.cmake)
-include(cmake_include/FindOpenGenie.cmake)
-include(cmake_include/FindDocbookUtils.cmake)
-include(cmake_include/FindSZIP.cmake)
-include(cmake_include/FindAnt.cmake)
+#include(cmake_include/FindGuile.cmake)
+#include(cmake_include/FindMZScheme.cmake)
+#include(cmake_include/FindHDF4.cmake)
+#include(cmake_include/FindHDF5.cmake)
+#include(cmake_include/FindIDL.cmake)
 
-CHECK_TYPE_SIZE("int" SIZEOF_INT)
-set(HAVE_INT ${HAVE_SIZEOF_INT})
-CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
-set(HAVE_LONG_INT ${HAVE_SIZEOF_LONG_INT})
-CHECK_TYPE_SIZE("long long int" SIZEOF_LONG_LONG_INT)
-set(HAVE_LONG_LONG_INT ${HAVE_SIZEOF_LONG_LONG_INT})
-CHECK_TYPE_SIZE("unsigned long long int" SIZEOF_UNSIGNED_LONG_LONG_INT)
-set(HAVE_UNSIGNED_LONG_LONG_INT ${HAVE_SIZEOF_UNSIGNED_LONG_LONG_INT})
-CHECK_TYPE_SIZE("size_t" SIZEOF_SIZE_T)
-set(HAVE_SIZE_T ${HAVE_SIZEOF_SIZE_T})
+# we only need to configure MXML if we are going to use it
+include(FindMXML)
+#include(cmake_include/FindOpenGenie.cmake)
+#include(cmake_include/FindDocbookUtils.cmake)
+#include(cmake_include/FindSZIP.cmake)
+#include(cmake_include/FindAnt.cmake)
 
-CHECK_FUNCTION_EXISTS(ftime HAVE_FTIME)
-CHECK_FUNCTION_EXISTS(tzset HAVE_TZSET)
-CHECK_FUNCTION_EXISTS(strdup HAVE_STRDUP)
-
-CHECK_INCLUDE_FILE(inttypes.h HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILE(stdint.h HAVE_STDINT_H)
-CHECK_INCLUDE_FILE(dlfcn.h HAVE_DLFCN_H)
-
-if (SIZEOF_LONG_LONG_INT EQUAL 8)
-	set(PRINTF_INT64 "lld")
-	set(PRINTF_UINT64 "llu")
-elseif (WIN32)
-	set(PRINTF_INT64 "I64d")
-	set(PRINTF_UINT64 "I64u")
-else()
-	message(SEND_ERROR "Cannot printf int64 and uint64")
-endif()
 
 if(UNIX)
     CHECK_LIBRARY_EXISTS(dl dlopen "" HAVE_LIBDL)
@@ -230,36 +195,6 @@ if (HDF5_FOUND)
 endif (HDF5_FOUND)
 
 #Options
-
-#Build user contributions
-option (BUILD_CONTRIB 
-        "Should I build the user contributions?" OFF)
-
-#Build user contributions
-option (BUILD_FORTRAN_BINDINGS 
-        "Should I build the fortran bindings?" OFF)
-
-#Use HDF4 in build
-option (BUILD_HDF4 
-        "Should I build HDF4 bindings if libraries available?" ON)
-
-option (BUILD_HDF5 
-        "Should I build HDF4 bindings if libraries available?" ON)
-
-#Use XML in build
-option (BUILD_XML 
-        "Should I build XML bindings if libraries available?" ON)
-set(BUILD_MXML ${BUILD_XML})
-
-#This is a MINGW build
-option (MINGW_MSYS 
-        "We are building under MINGW." OFF)
-
-#This if we have the MS Libraries
-option (HAVE_MS_LIB 
-        "We are building under MINGW." OFF)
-
-option(ENABLE_JAVA_BINDINGS "Build Java bindings" ON)
 
 if (HAVE_MS_LIB)
     set (MS_LIB LIB)
