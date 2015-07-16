@@ -24,6 +24,7 @@
 #
 #
 #=============================================================================
+include(CMakeParseArguments)
 
 #-----------------------------------------------------------------------------
 # This module provides some utility functions that are used throughout the
@@ -81,4 +82,78 @@ function(install_pdb target)
 #	set(PDB_FILE ${OUT_DIR}/${OUT_BASE_NAME}${CMAKE_DEBUG_POSTFIX}.pdb)
 	set(PDB_FILE ${OUT_DIR}/${OUT_BASE_NAME}.pdb)
 	install (FILES ${PDB_FILE} DESTINATION bin COMPONENT Runtime)  
+endfunction()
+
+#-----------------------------------------------------------------------------
+function(find_module VAR )
+    set(oneValueArgs LIB_NAMES HEADER_NAMES MOD_NAME)
+    cmake_parse_arguments(find_module "" "${oneValueArgs}" "" ${ARGN})
+    set(LIB_NAMES  ${find_module_LIB_NAMES})
+    set(HEADER_NAMES ${find_module_HEADER_NAMES})
+    set(MOD_NAME ${find_module_MOD_NAME})
+    
+    set(HAVE_${VAR} TRUE PARENT_SCOPE)
+
+    if(${VAR}_INCLUDE_DIRS OR ${VAR}_LIBRARY_DIRS)
+        #if the user has provided the search path we have to do nothing but check 
+        #wether or not the library files exist 
+        if(${VAR}_LIBRARY_DIRS)
+            #if the user has provided a path we use this one 
+            find_library(LIBFILES NAME ${LIB_NAMES} PATHS ${${VAR}_LIBRARY_DIRS} NO_DEFAULT_PATH)
+        else()
+            #if the user has not provided a path we look in the 
+            #system defaults
+            find_library(LIBFILES NAME ${LIB_NAMES} PATHS)
+            get_filename_component(${VAR}_LIBRARY_DIRS ${LIBFILES} PATH)
+        endif()
+
+        if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
+            set(HAVE_${VAR} FALSE)
+        endif()
+
+        #-------------------------------------------------------------------------
+        # search for the header file
+        #-------------------------------------------------------------------------
+        if(${VAR}_INCLUDE_DIRS)
+            #just check if the user provided path contains the header file
+            find_file(HDRFILES NAME ${HEADER_NAMES} PATHS ${${VAR}_INCLUDE_DIRS} NO_DEFAULT_PATH)
+        else()
+            find_file(HDRFILES NAME ${HEADER_NAMES} PATHS)
+            get_filename_component(${VAR}_INCLUDE_DIRS ${HDRFILES} PATH)
+        endif()
+        
+        if(${HDRFILES} MATCHES "HDRFILES-NOTFOUND")
+            set(HAVE_${VAR} FALSE)
+        endif()
+
+    else()
+        #if the user has not provided any configuration we have to do this manually
+        if(PKG_CONFIG_FOUND AND MOD_NAME)
+            #the easy way  - we use package config
+            message("pkg-config is searching for : ${MOD_NAME}")
+            pkg_search_module(${VAR} ${MOD_NAME})
+        endif()
+
+        #if pkg-config was not successful we have to do this the hard way
+        if(NOT ${VAR}-FOUND)
+            find_library(LIBFILES NAME ${LIB_NAMES} PATHS)
+            if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
+                set(HAVE_${VAR} FALSE)
+            else()
+                get_filename_component(${VAR}_LIBRARY_DIRS ${LIBFILES} PATH) 
+            endif()
+
+            find_file(HDRFILES NAME ${HEADER_NAMES} PATHS)
+            if(${HDRFILES} MATCHES "HDRFILES-NOTFOUND")
+                set(HAVE_${VAR} FALSE)
+            else()
+                get_filename_component(${VAR}_INCLUDE_DIRS ${HDRFILES} PATH)
+            endif()
+            
+        endif()
+
+    endif()
+    set(${VAR}_INCLUDE_DIRS ${${VAR}_INCLUDE_DIRS} PARENT_SCOPE)
+    set(${VAR}_LIBRARY_DIRS ${${VAR}_LIBRARY_DIRS} PARENT_SCOPE)
+
 endfunction()

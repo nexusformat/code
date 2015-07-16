@@ -28,67 +28,17 @@
 message(${CMAKE_LIBRARY_ARCHITECTURE})
 
 set(HAVE_MXML TRUE)
-
-if(MXML_INCLUDE_DIRS OR MXML_LIBRARY_DIRS)
-    #if the user has provided the search path we have to do nothing but check 
-    #wether or not the library files exist 
-    if(MXML_LIBRARY_DIRS)
-        #if the user has provided a path we use this one 
-        find_library(MXML_LIBFILE NAME mxml PATHS ${MXML_LIBRARY_DIRS} NO_DEFAULT_PATH)
-    else(MXML_LIBRARY_DIRS)
-        #if the user has not provided a path we look in the 
-        #system defaults
-        find_library(MXML_LIBFILE NAME mxml PATHS)
-        get_filename_component(MXML_LIBRARY_DIRS ${MXML_LIBFILE} PATH)
-    endif(MXML_LIBRARY_DIRS)
-
-    if(${MXML_LIBFILE} MATCHES "MXML_LIBFILE-NOTFOUND")
-        set(HAVE_MXML FALSE)
-    endif()
-
-    #-------------------------------------------------------------------------
-    # search for the header file
-    #-------------------------------------------------------------------------
-    if(MXML_INCLUDE_DIRS)
-        #just check if the user provided path contains the header file
-        find_file(MXML_HDRFILE NAME mxml.h PATHS ${MXML_INCLUDE_DIRS} NO_DEFAULT_PATH)
-    else()
-        find_file(MXML_HDRFILE NAME mxml.h PATHS)
-        get_filename_component(MXML_INCLUDE_DIRS ${MXML_HDRFILE} PATH)
-    endif()
-    
-    if(${MXML_HDRFILE} MATCHES "MXML_HDRFILE-NOTFOUND")
-        set(HAVE_MXML FALSE)
-    endif()
-
-else()
-    #if the user has not provided any configuration we have to do this manually
-    if(PKG_CONFIG_FOUND)
-        #the easy way  - we use package config
-        pkg_search_module(MXML mxml)
-    endif()
-
-    #if pkg-config was not successful we have to do this the hard way
-    if(NOT MXML-FOUND)
-        find_library(MXML_LIBFILE NAME mxml PATHS)
-        if(${MXML_LIBFILE} MATCHES "MXML_LIBFILE-NOTFOUND")
-            set(HAVE_MXML FALSE)
-        endif()
-
-        find_file(MXML_HDRFILE NAME mxml.h PATHS)
-        if(${MXML_HDRFILE} MATCHES "MXML_HDRFILE-NOTFOUND")
-            set(HAVE_MXML FALSE)
-        endif()
-        
-    endif()
-
-endif()
+find_module(MXML 
+            LIB_NAMES mxml
+            HEADER_NAMES mxml.h
+            MOD_NAME mxml)
 
 if(WITH_MXML AND NOT HAVE_MXML)
     message(FATAL_ERROR "User requested MXML not found!")
 else(NOT WITH_MXML AND HAVE_MXML) 
-    set(WITH_MXML TRUE)
-    message("-- Build with MXML support!")
+    set(WITH_MXML ON)
+    message(STATUS "Build with MXML support!")
+    message(STATUS "MXML header dir: ${MXML_INCLUDE_DIRS}")
+    message(STATUS "MXML library dir: ${MXML_LIBRARY_DIRS}")
 endif()
-
 
