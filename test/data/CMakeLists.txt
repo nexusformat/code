@@ -25,36 +25,8 @@
 #
 #==============================================================================
 
-set(NAPITESTSRC napi_test.c)
+set(DATAFILES  dmc01.h5 dmc01.hdf dmc01.xml dmc02.h5 dmc02.hdf dmc02.xml)
 
-#------------------------------------------------------------------------------
-# Need to copy the test data files 
-#------------------------------------------------------------------------------
-add_subdirectory(data)
-
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
-#------------------------------------------------------------------------------
-# In all cases we have to build the C-tests
-#------------------------------------------------------------------------------
-add_executable(napi_c_test napi_test.c)
-target_link_libraries(napi_c_test NeXus_Shared_Library)
-add_test(NAME "NAPI-C-test" COMMAND napi_t_test)
-         
-
-if(ENABLE_CXX)
-    list(APPEND NAPITESTSRC napi_test_cpp.cxx)
-
-    add_executable(napi_cpp_test napi_test_cpp.cxx)
-    target_link_libraries(napi_cpp_test NeXus_Shared_Library)
-endif()
-
-if(ENABLE_FORTRAN77)
-    #sources napif4_test.f  napif5_test.f  napif_test.f)
-endif()
-
-if(ENABLE_FORTRAN90)
-    #source NXtest.f90
-endif()
-
-
+foreach(F ${DATAFILES})
+    configure_file(${F} ${F} COPYONLY)
+endforeach()

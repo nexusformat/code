@@ -42,7 +42,7 @@ if (WITH_HDF4)
   set (NAPISRC ${NAPISRC} napi4.c)
   add_definitions(-DHDF4)
   include_directories(${HDF4_INCLUDE_DIRS})
-  #list(APPEND NAPILINK ${HDF4_LIBRARIES})
+  list(APPEND NAPILINK ${HDF4_LIBRARIES})
 endif(WITH_HDF4)
 
 #-----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ if (WITH_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
   add_definitions(-DHDF5)
   include_directories(${HDF5_INCLUDE_DIRS})
-  #list(APPEND NAPILINK ${HDF5_LIBRARIES})
+  list(APPEND NAPILINK ${HDF5_LIBRARIES})
 endif (WITH_HDF5)
 
 #-----------------------------------------------------------------------------
