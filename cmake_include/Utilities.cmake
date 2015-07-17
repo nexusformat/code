@@ -85,9 +85,37 @@ function(install_pdb target)
 endfunction()
 
 #-----------------------------------------------------------------------------
+function(search_module_library VAR)
+    set(multiValueArgs SEARCH_PATH)
+    set(oneValueArgs)
+    cmake_parse_arguments(find_module_library "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(${VAR}_LIBRARY_DIRS)
+        #if the user has provided a path we use this one 
+        find_library(LIBFILES NAME ${LIB_NAMES} PATHS ${${VAR}_LIBRARY_DIRS} NO_DEFAULT_PATH)
+    else()
+        #if the user has not provided a path we look in the 
+        #system defaults
+        find_library(LIBFILES NAME ${LIB_NAMES} PATHS)
+        get_filename_component(${VAR}_LIBRARY_DIRS ${LIBFILES} PATH)
+    endif()
+
+    if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
+        message(STATUS "Could not find ${VAR} runtime binaries")
+        set(HAVE_${VAR} FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+
+#-----------------------------------------------------------------------------
+function(search_module_header VAR)
+
+endfunction()
+
+#-----------------------------------------------------------------------------
 function(find_module VAR )
-    set(oneValueArgs LIB_NAMES HEADER_NAMES MOD_NAME)
-    cmake_parse_arguments(find_module "" "${oneValueArgs}" "" ${ARGN})
+    set(oneValueArgs MOD_NAME)
+    set(multiValueArgs LIB_NAMES HEADER_NAMES)
+    cmake_parse_arguments(find_module "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     set(LIB_NAMES  ${find_module_LIB_NAMES})
     set(HEADER_NAMES ${find_module_HEADER_NAMES})
     set(MOD_NAME ${find_module_MOD_NAME})
@@ -108,7 +136,8 @@ function(find_module VAR )
         endif()
 
         if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
-            set(HAVE_${VAR} FALSE)
+            message(STATUS "Could not find ${VAR} runtime binaries")
+            set(HAVE_${VAR} FALSE PARENT_SCOPE)
         endif()
 
         #-------------------------------------------------------------------------
@@ -123,7 +152,8 @@ function(find_module VAR )
         endif()
         
         if(${HDRFILES} MATCHES "HDRFILES-NOTFOUND")
-            set(HAVE_${VAR} FALSE)
+            message(STATUS "Could not find ${VAR} header files!")
+            set(HAVE_${VAR} FALSE PARENT_SCOPE)
         endif()
 
     else()
@@ -135,19 +165,23 @@ function(find_module VAR )
         endif()
 
         #if pkg-config was not successful we have to do this the hard way
-        if(NOT ${VAR}-FOUND)
+        if(NOT ${VAR}_FOUND)
             find_library(LIBFILES NAME ${LIB_NAMES} PATHS)
             if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
-                set(HAVE_${VAR} FALSE)
+                set(STATUS "Could not find ${VAR} runtime binaries!")
+                set(HAVE_${VAR} FALSE PARENT_SCOPE)
             else()
                 get_filename_component(${VAR}_LIBRARY_DIRS ${LIBFILES} PATH) 
+                message(STATUS "${VAR} libraries: ${LIBFILES}")
             endif()
 
             find_file(HDRFILES NAME ${HEADER_NAMES} PATHS)
             if(${HDRFILES} MATCHES "HDRFILES-NOTFOUND")
-                set(HAVE_${VAR} FALSE)
+                message(STATUS "Could not find ${VAR} header files!")
+                set(HAVE_${VAR} FALSE PARENT_SCOPE)
             else()
                 get_filename_component(${VAR}_INCLUDE_DIRS ${HDRFILES} PATH)
+                message(STATUS "${VAR} headers: ${HDRFILES}")
             endif()
             
         endif()

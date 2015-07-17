@@ -25,20 +25,26 @@
 #
 #==============================================================================
 
-message(${CMAKE_LIBRARY_ARCHITECTURE})
-
-set(HAVE_MXML TRUE)
 find_module(MXML 
             LIB_NAMES mxml
             HEADER_NAMES mxml.h
             MOD_NAME mxml)
 
 if(WITH_MXML AND NOT HAVE_MXML)
+    #the user has explicitely requested to build with MXML - as we could not
+    #find the library we have to exit the configuration
     message(FATAL_ERROR "User requested MXML not found!")
-else(NOT WITH_MXML AND HAVE_MXML) 
+elseif(NOT WITH_MXML AND HAVE_MXML AND NOT WITHOUT_MXML) 
+    #the user has not explicitely requested to use MXML but the library
+    #is available and the the user has not explicitely switched of 
+    #MXML support
     set(WITH_MXML ON)
     message(STATUS "Build with MXML support!")
     message(STATUS "MXML header dir: ${MXML_INCLUDE_DIRS}")
     message(STATUS "MXML library dir: ${MXML_LIBRARY_DIRS}")
+else()
+    #in all cases we build the libary without MXML
+    message(STATUS "Build without MXML support!")
+    set(WITH_MXML OFF)
 endif()
 
