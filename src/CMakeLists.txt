@@ -50,7 +50,7 @@ endif(WITH_HDF4)
 #-----------------------------------------------------------------------------
 if (WITH_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
-  add_definitions(-DHDF5)
+  add_definitions(-DHDF5 ${HDF5_API_DEFS})
   include_directories(${HDF5_INCLUDE_DIRS})
   list(APPEND NAPILINK ${HDF5_LIBRARIES})
 endif (WITH_HDF5)

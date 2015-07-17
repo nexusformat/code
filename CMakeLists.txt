@@ -84,6 +84,7 @@ set(CBF_INCLUDE_DIRS "" CACHE PATH "Where to search for CBF library files")
 #-----------------------------------------------------------------------------
 # include some general purpose modules 
 #-----------------------------------------------------------------------------
+include(Utilities)
 include(CompilerChecks)
 
 
@@ -92,11 +93,6 @@ include(CompilerChecks)
 #-----------------------------------------------------------------------------
 include(FindPkgConfig)
 
-if(PKG_CONFIG_FOUND)
-    message("Found pkg-config!")
-endif()
-
-include(cmake_include/Utilities.cmake)
 #include(cmake_include/FindPython.cmake)
 #include(cmake_include/FindCBFLib.cmake)
 #include(cmake_include/FindJava.cmake)
@@ -191,29 +187,11 @@ endif(UNIX)
 #   set(HISTORY_LINK "")
 #endif(HISTORY)
 
-if (HAVE_HDF5 AND WITH_HDF5)
-#   set (HDF5_CPP "-DHDF5 -DH5_USE_16_API")
-#   these are needed if HDF5 1.8 has been instaleld with H5_USE_16_API_DEFAULT 
-  set(HDF5_API_DEFS "-DH5Acreate_vers=2 -DH5Aiterate_vers=2 -DH5Dcreate_vers=2 -DH5Dopen_vers=2 -DH5Eclear_vers=2 -DH5Eprint_vers=2 -DH5Epush_vers=2 -DH5Eset_auto_vers=2 -DH5Eget_auto_vers=2 -DH5Ewalk_vers=2 -DH5Gcreate_vers=2 -DH5Gopen_vers=2 -DH5Pget_filter_vers=2 -DH5Pget_filter_by_id_vers=2 -DH5Pinsert_vers=2 -DH5Pregister_vers=2 -DH5Rget_obj_type_vers=2 -DH5Tarray_create_vers=2 -DH5Tcommit_vers=2 -DH5Tget_array_dims_vers=2 -DH5Topen_vers=2")
-  set (HDF5_CPP "-DHDF5 -DH5_NO_DEPRECATED_SYMBOLS ${HDF5_API_DEFS}")
-endif()
-
-#Options
-
-#if (HAVE_MS_LIB)
-#    set (MS_LIB LIB)
-#endif (HAVE_MS_LIB)
-#
-#create_have_vars(HDF4 HDF5 MXML)
 #
 ##Include source files.
 #include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${HDF5_INCLUDE_DIR})
 
 
-if (UNIX)
-    check_add_c_compiler_flags("-Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment")
-    check_add_cxx_compiler_flags("-Wall -Wno-unused-variable -Wno-sign-compare -Wno-comment")
-endif(UNIX)
 
 #if (BUILD_FORTRAN_BINDINGS)
 #    enable_language(Fortran)
@@ -232,17 +210,6 @@ set(NX_INCLUDE "include/nexus")
 configure_file("${PROJECT_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${PROJECT_BINARY_DIR}/include/nxconfig.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
-if(MSVC)
-# warning 4820 is byte padding in structures
-# warning 4996 is about using _strdup ratherthan strdup etc
-# /W4 rather than /Wall
-# /Zi to get pdb file in all configurations
-    set(NX_CFLAGS "/W4 /wd4820 /wd4996 /Zi")
-    set(NX_CPP -D_CRT_SECURE_NO_WARNINGS)
-	set(CMAKE_DEBUG_POSTFIX "D")
-#	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL" CACHE STRING "" FORCE)   # workaround for problems
-endif(MSVC)
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 
@@ -254,21 +221,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 #	set(ARCHSUFFIX "")
 #endif()
 
-# if we haven't changed the default windows install prefix, adjust for 64 bit
-#if(${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_WIN_INSTALL_PREFIX})
-#    set(CMAKE_INSTALL_PREFIX "${DEFAULT_WIN_INSTALL_PREFIX}${ARCHSUFFIX}" CACHE PATH "" FORCE)
-#endif()
-#
-#if(WIN32)
-#	if(ARCH64)
-#		include_directories("${NEXUS_THIRD_PARTY}/win64/include")
-#		file(GLOB EXTRA_DLLS "${NEXUS_THIRD_PARTY}/win64/bin/*.dll")
-#	else()
-#		include_directories("${NEXUS_THIRD_PARTY}/win32/include")
-#		file(GLOB EXTRA_DLLS "${NEXUS_THIRD_PARTY}/win32/bin/*.dll")
-#	endif()
-#	install(FILES ${EXTRA_DLLS} DESTINATION bin COMPONENT Runtime)
-#endif()
 
 # Recurse into the subdirectories.
 add_subdirectory (include)
@@ -288,24 +240,3 @@ add_subdirectory (test)
 #add_subdirectory (vms)
 #add_subdirectory (windows)
 #add_subdirectory (Windows_extra)
-
-#
-# set CPack packaging options
-#
-configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CPackOptions.cmake"  @ONLY)
-set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackOptions.cmake")
-set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
-set (CPACK_SOURCE_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
-if(WIN32)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
-    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};ZIP) 
-elseif(APPLE)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
-elseif(CYGWIN)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};CygwinBinary)
-    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};CygwinSource) 
-elseif(UNIX)
-    set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
-endif()
-# Include of CPack must always be last
-include(CPack)
