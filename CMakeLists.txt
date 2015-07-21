@@ -190,11 +190,6 @@ endif(UNIX)
 #   set(HISTORY_LINK "")
 #endif(HISTORY)
 
-#
-##Include source files.
-#include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${HDF5_INCLUDE_DIR})
-
-
 
 #if (BUILD_FORTRAN_BINDINGS)
 #    enable_language(Fortran)
@@ -206,9 +201,6 @@ set(NXDOCDIR "share/nexus/doc")
 #We need a NXEXAMPLEDIR as a place to install the examples.
 set(NXEXAMPLEDIR  "share/nexus/examples")
 
-#We need a NXINCLUDE and NX_INCLUDE as a place to install the include files.
-set(NXINCLUDE  "include")
-set(NX_INCLUDE "include/nexus")
 
 configure_file("${PROJECT_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${PROJECT_BINARY_DIR}/include/nxconfig.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
@@ -228,6 +220,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 # Recurse into the subdirectories.
 add_subdirectory (include)
 add_subdirectory (src)
+add_subdirectory (test)
 #add_subdirectory (bindings)
 #add_subdirectory (applications)
 #add_subdirectory (config)
@@ -238,7 +231,6 @@ add_subdirectory (src)
 #add_subdirectory (InstallerBits)
 #add_subdirectory (macosx_install_kit)
 #add_subdirectory (scripts)
-add_subdirectory (test)
 #add_subdirectory (third_party)
 #add_subdirectory (vms)
 #add_subdirectory (windows)

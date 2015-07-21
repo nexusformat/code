@@ -127,15 +127,16 @@ function(find_module VAR )
         #wether or not the library files exist 
         if(${VAR}_LIBRARY_DIRS)
             #if the user has provided a path we use this one 
-            find_library(LIBFILES NAME ${LIB_NAMES} PATHS ${${VAR}_LIBRARY_DIRS} NO_DEFAULT_PATH)
+            find_library(${VAR}_LIBFILES NAME ${LIB_NAMES} 
+                         PATHS ${${VAR}_LIBRARY_DIRS} NO_DEFAULT_PATH)
         else()
             #if the user has not provided a path we look in the 
             #system defaults
-            find_library(LIBFILES NAME ${LIB_NAMES} PATHS)
-            get_filename_component(${VAR}_LIBRARY_DIRS ${LIBFILES} PATH)
+            find_library(${VAR}_LIBFILES NAME ${LIB_NAMES} PATHS)
+            get_filename_component(${VAR}_LIBRARY_DIRS ${${VAR}_LIBFILES} PATH)
         endif()
 
-        if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
+        if(${${VAR}_LIBFILES} MATCHES "${VAR}_LIBFILES-NOTFOUND")
             message(STATUS "Could not find ${VAR} runtime binaries")
             set(HAVE_${VAR} FALSE PARENT_SCOPE)
         endif()
@@ -145,13 +146,14 @@ function(find_module VAR )
         #-------------------------------------------------------------------------
         if(${VAR}_INCLUDE_DIRS)
             #just check if the user provided path contains the header file
-            find_file(HDRFILES NAME ${HEADER_NAMES} PATHS ${${VAR}_INCLUDE_DIRS} NO_DEFAULT_PATH)
+            find_file(${VAR}_HDRFILES NAME ${HEADER_NAMES} 
+                      PATHS ${${VAR}_INCLUDE_DIRS} NO_DEFAULT_PATH)
         else()
-            find_file(HDRFILES NAME ${HEADER_NAMES} PATHS)
-            get_filename_component(${VAR}_INCLUDE_DIRS ${HDRFILES} PATH)
+            find_file(${VAR}_HDRFILES NAME ${HEADER_NAMES} PATHS)
+            get_filename_component(${VAR}_INCLUDE_DIRS ${${VAR}_HDRFILES} PATH)
         endif()
         
-        if(${HDRFILES} MATCHES "HDRFILES-NOTFOUND")
+        if(${${VAR}_HDRFILES} MATCHES "${VAR}_HDRFILES-NOTFOUND")
             message(STATUS "Could not find ${VAR} header files!")
             set(HAVE_${VAR} FALSE PARENT_SCOPE)
         endif()
@@ -166,22 +168,23 @@ function(find_module VAR )
 
         #if pkg-config was not successful we have to do this the hard way
         if(NOT ${VAR}_FOUND)
-            find_library(LIBFILES NAME ${LIB_NAMES} PATHS)
-            if(${LIBFILES} MATCHES "LIBFILES-NOTFOUND")
+            find_library(${VAR}_LIBFILES NAME ${LIB_NAMES} PATHS)
+            if(${${VAR}_LIBFILES} MATCHES "${VAR}_LIBFILES-NOTFOUND")
                 set(STATUS "Could not find ${VAR} runtime binaries!")
                 set(HAVE_${VAR} FALSE PARENT_SCOPE)
             else()
-                get_filename_component(${VAR}_LIBRARY_DIRS ${LIBFILES} PATH) 
-                message(STATUS "${VAR} libraries: ${LIBFILES}")
+                get_filename_component(${VAR}_LIBRARY_DIRS 
+                    ${${VAR}_LIBFILES} PATH) 
+                message(STATUS "${VAR} libraries: ${${VAR}_LIBFILES}")
             endif()
 
-            find_file(HDRFILES NAME ${HEADER_NAMES} PATHS)
-            if(${HDRFILES} MATCHES "HDRFILES-NOTFOUND")
+            find_file(${VAR}_HDRFILES NAME ${HEADER_NAMES} PATHS)
+            if(${${VAR}_HDRFILES} MATCHES "${VAR}_HDRFILES-NOTFOUND")
                 message(STATUS "Could not find ${VAR} header files!")
                 set(HAVE_${VAR} FALSE PARENT_SCOPE)
             else()
-                get_filename_component(${VAR}_INCLUDE_DIRS ${HDRFILES} PATH)
-                message(STATUS "${VAR} headers: ${HDRFILES}")
+                get_filename_component(${VAR}_INCLUDE_DIRS ${${VAR}_HDRFILES} PATH)
+                message(STATUS "${VAR} headers: ${${VAR}_HDRFILES}")
             endif()
             
         endif()

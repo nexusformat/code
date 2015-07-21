@@ -6,20 +6,19 @@
 #
 #  Copyright (C) 2011 Stephen Rankin
 #  
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
+#  This library is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by the
+#  Free Software Foundation; either version 2 of the License, or (at your
+#  option) any later version.
 # 
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+#  This library is distributed in the hope that it will be useful, but WITHOUT
+#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+#  for more details.
 # 
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free 
-#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
-#  MA  02111-1307  USA
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with this library; if not, write to the Free Software Foundation,
+#  Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #             
 #  For further information, see <http://www.nexusformat.org>
 #
@@ -34,8 +33,13 @@ find_module(HDF4
             )
 
 if(WITH_HDF4 AND NOT HAVE_HDF4)
+    #the user has explicitely requested HDF4 support but the required libraries
+    #could not be found
     message(FATAL_ERROR "User requested HDF4 not found!")
-elseif(NOT WITH_HDF4 AND HAVE_HDF4) 
+elseif(NOT WITH_HDF4 AND HAVE_HDF4 AND NOT WITHOUT_HDF4)  
+    #the user has not requested explicitely for HDF4 support - however, the 
+    #libraries have been found and we automatically switch on HDF4 support.
+    #Only used if HDF4 support has not been explicitely switched of by the user
     set(WITH_HDF4 ON)
     message(STATUS "Build with HDF4 support!")
     message(STATUS "HDF4 header dir: ${HDF4_INCLUDE_DIRS}")
@@ -44,3 +48,9 @@ else()
     message(STATUS "Build without HDF4 support!")
 endif()
 
+#------------------------------------------------------------------------------
+# search for additional packages required to link against HDF4
+#------------------------------------------------------------------------------
+if(WITH_HDF4)
+    find_package(JPEG REQUIRED)
+endif(WITH_HDF4)
