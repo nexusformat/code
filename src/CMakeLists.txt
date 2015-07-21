@@ -76,23 +76,17 @@ file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 #------------------------------------------------------------------------------
 # building the static library
 #------------------------------------------------------------------------------
-message(STATUS "Add include directory: ${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/include")
 add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES 
-                      OUTPUT_NAME NeXusStatic)
-
-set_property(TARGET NeXus_Static_Library APPEND PROPERTY 
-             COMPILE_DEFINITIONS H4_BUILT_AS_STATIC_LIB)
+                      OUTPUT_NAME NeXus)
 
 target_link_libraries(NeXus_Static_Library ${NAPILINK})
 #------------------------------------------------------------------------------
 # building the shared library
 #------------------------------------------------------------------------------
 add_library (NeXus_Shared_Library SHARED ${NAPISRC})
-set_property(TARGET NeXus_Shared_Library APPEND PROPERTY 
-             COMPILE_DEFINITIONS H4_BUILT_AS_STATIC_LIB)
 
 set_target_properties(NeXus_Shared_Library PROPERTIES 
                       OUTPUT_NAME NeXus
@@ -105,8 +99,11 @@ target_link_libraries(NeXus_Shared_Library ${NAPILINK})
 #------------------------------------------------------------------------------
 # install the targets
 #-----------------------------------------------------------------------------
-install (TARGETS NeXus_Static_Library NeXus_Shared_Library
-         RUNTIME DESTINATION bin COMPONENT Runtime
-         LIBRARY DESTINATION lib COMPONENT Runtime
-         ARCHIVE DESTINATION lib/nexus COMPONENT Development)
+install (TARGETS NeXus_Shared_Library
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         COMPONENT Runtime)
+
+install (TARGETS NeXus_Static_Library 
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         COMPONENT Development)
 

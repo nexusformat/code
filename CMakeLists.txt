@@ -35,6 +35,9 @@ message(${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
 message(${CMAKE_MODULE_PATH})
 
+#load module for GNU/Linux default installation directories
+include(GNUInstallDirs)
+
 
 #-----------------------------------------------------------------------------
 # define package version
