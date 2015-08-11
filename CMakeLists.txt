@@ -1,25 +1,25 @@
 ## Process this file with cmake
 #=============================================================================
 #  NeXus - Neutron & X-ray Common Data Format
-#  
+#
 #  CMakeLists for building the NeXus library and applications.
 #
 # Copyright (C) 2008-2012 NeXus International Advisory Committee (NIAC)
-#  
+#
 #  This library is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by the
 #  Free Software Foundation; either version 2 of the License, or (at your
 #  option) any later version.
-# 
+#
 #  This library is distributed in the hope that it will be useful, but WITHOUT
 #  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 #  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
 #  for more details.
-# 
+#
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with this library; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-#             
+#
 #  For further information, see <http://www.nexusformat.org>
 #
 #
@@ -30,10 +30,10 @@ cmake_minimum_required(VERSION 2.8.8)
 #The name of our project
 project (NeXus)
 
-message(${PROJECT_SOURCE_DIR})
+message(STATUS ${PROJECT_SOURCE_DIR})
 #set the module path
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
-message(${CMAKE_MODULE_PATH})
+message(STATUS ${CMAKE_MODULE_PATH})
 
 #load module for GNU/Linux default installation directories
 include(GNUInstallDirs)
@@ -47,14 +47,11 @@ set (NeXus_VERSION_MINOR 0)
 set (NXLTVERSINFO '4:3:4')
 
 #-----------------------------------------------------------------------------
-# define command line options by which the user can configure the build 
+# define command line options by which the user can configure the build
 #-----------------------------------------------------------------------------
-option(WITH_HDF5 "Build with HDF5 support" OFF)
-option(WITH_HDF4 "Build with HDF4 support" OFF)
-option(WITH_MXML "Build with XML support" OFF)
-option(WITHOUT_HDF5 "Build without HDF5 support" OFF)
-option(WITHOUT_HDF4 "Build without HDF4 support" OFF)
-option(WITHOUT_MXML "Build without MXML support" OFF)
+option(ENABLE_HDF5 "Build with HDF5 support" ON)
+option(ENABLE_HDF4 "Build with HDF4 support" OFF)
+option(ENABLE_MXML "Build with XML support" OFF)
 option(ENABLE_CONTRIB "Build the user contributions" OFF)
 option(ENABLE_FORTRAN90 "Build the Fortran 90 bindings" OFF)
 option(ENABLE_FORTRAN77 "Build the Fortran 77 bindings" OFF)
@@ -64,28 +61,7 @@ option(MINGW_MSYS   "We are building under MINGW." OFF)
 option(HAVE_MS_LIB  "We are building under MINGW." OFF)
 
 #-----------------------------------------------------------------------------
-# some chached variables 
-#-----------------------------------------------------------------------------
-set(HDF5_INCLUDE_DIRS "" CACHE PATH "Where to search for HDF5 header files")
-set(HDF5_LIBRARY_DIRS "" CACHE PATH "Where to search for HDF5 library files")
-
-set(HDF4_INCLUDE_DIRS "" CACHE PATH "Where to search for HDF4 header files")
-set(HDF4_LIBRARY_DIRS "" CACHE PATH "Where to search for HDF4 library files")
-
-set(MXML_INCLUDE_DIRS "" CACHE PATH "Where to search for MXML header files")
-set(MXML_LIBRARY_DIRS "" CACHE PATH "Where to search for MXML library files")
-
-set(SZIP_INCLUDE_DIRS "" CACHE PATH "Where to search for SZIP header files")
-set(SZIP_LIBRARY_DIRS "" CACHE PATH "Where to search for SZIP library files")
-
-set(ZLIB_INCLUDE_DIRS "" CACHE PATH "Where to search for ZLIB header files")
-set(ZLIB_INCLUDE_DIRS "" CACHE PATH "Where to search for ZLIB library files")
-
-set(CBF_INCLUDE_DIRS "" CACHE PATH "Where to search for CBF header files")
-set(CBF_INCLUDE_DIRS "" CACHE PATH "Where to search for CBF library files")
-
-#-----------------------------------------------------------------------------
-# include some general purpose modules 
+# include some general purpose modules
 #-----------------------------------------------------------------------------
 include(Utilities)
 include(CompilerChecks)
@@ -104,9 +80,33 @@ include(FindPkgConfig)
 #include(cmake_include/FindMZScheme.cmake)
 #include(cmake_include/FindIDL.cmake)
 
-include(FindMXML)
-include(FindHDF4)
-include(FindHDF5)
+if(ENABLE_MXML)
+    include(FindMXML)
+else()
+    #in all cases we build the libary without MXML
+    message(STATUS "Build without MXML support!")
+endif()
+if(ENABLE_HDF4)
+    include(FindHDF4)
+else()
+    message(STATUS "Build without HDF4 support!")
+endif()
+if(ENABLE_HDF5)
+    set( HDF5_COMPONENTS "")
+
+    if (ENABLE_CXX)
+        set( HDF5_COMPONENTS "${HDF5_COMPONENTS} CXX HL" )
+    endif()
+
+    message ("${HDF5_COMPONENTS}")
+    if (HDF5_COMPONENTS)
+        find_package ( HDF5 COMPONENTS $HDF5_COMPONENTS REQUIRED )
+    else()
+        find_package ( HDF5 REQUIRED )
+    endif()
+else()
+    message(STATUS "Build without HDF5 support!")
+endif()
 #include(cmake_include/FindOpenGenie.cmake)
 #include(cmake_include/FindDocbookUtils.cmake)
 #include(cmake_include/FindSZIP.cmake)
@@ -173,7 +173,7 @@ endif(UNIX)
 #endif(PTHREAD)
 #
 #if(SZIPLIB_FOUND)
-#   set(SZIP_LINK "-lsz") 
+#   set(SZIP_LINK "-lsz")
 #else(SZIPLIB_FOUND)
 #   set(SZIP_LIB "")
 #endif(SZIPLIB_FOUND)
