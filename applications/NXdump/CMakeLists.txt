@@ -28,7 +28,7 @@
 
 if (CMAKE_Fortran_COMPILER_WORKS)
 
-    include_directories(${CMAKE_BINARY_DIR}/bindings/f90)
+    include_directories(${PROJECT_BINARY_DIR}/bindings/f90)
 
     add_executable (NXdump NXdump.f90)
 

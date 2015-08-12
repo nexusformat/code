@@ -30,17 +30,17 @@ if(DEFINED PYTHONINTERP_FOUND)
 
     SET (PYDOC_OUTPUT napi.html)
     SET (NXSPYTHON_DOC nxs.napi.html)
-    FILE(GLOB NXSPYTHON_SOURCE "${CMAKE_SOURCE_DIR}/bindings/python/nxs/*.py")
+    FILE(GLOB NXSPYTHON_SOURCE "${PROJECT_SOURCE_DIR}/bindings/python/nxs/*.py")
 	list(APPEND NXSPYTHON_SOURCE setup.py)
 
     GET_TARGET_PROPERTY(LIB_NAME NeXus_Shared_Library LOCATION)
     SET (ENV{NEXUSLIB} ${LIB_NAME})
 
-    FILE(READ "${CMAKE_SOURCE_DIR}/bindings/python/nxs/napi.py" TEMP_SOURCE_IN)
+    FILE(READ "${PROJECT_SOURCE_DIR}/bindings/python/nxs/napi.py" TEMP_SOURCE_IN)
 
     STRING(REGEX REPLACE "nxprefix = .*" "nxprefix = ${CMAKE_INSTALL_PREFIX}" TEMP_SOURCE_OUT ${TEMP_SOURCE_IN})
 
-    FILE(WRITE nxs/napi.py.out ${TEMP_SOURCE_OUT}) 
+    FILE(WRITE "${PROJECT_BINARY_DIR}/nxs/napi.py.out" ${TEMP_SOURCE_OUT}) 
 
     #We need to run py_compile somehow now on napi.py.out
     #according to the Makefile.am. py_compile is not portable
@@ -50,7 +50,7 @@ if(DEFINED PYTHONINTERP_FOUND)
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${PYDOC_OUTPUT}
         COMMAND   ${CMAKE_COMMAND} 
-        ARGS      -D NEXUSLIB="${LIB_NAME}" -D NXSPYTHON_SOURCE="${NXSPYTHON_SOURCE}" -D PYTHON_DOC="${PYTHON_DOC}" -P "${CMAKE_SOURCE_DIR}/bindings/python/pythondoc.cmake"
+        ARGS      -D NEXUSLIB="${LIB_NAME}" -D NXSPYTHON_SOURCE="${NXSPYTHON_SOURCE}" -D PYTHON_DOC="${PYTHON_DOC}" -P "${PROJECT_SOURCE_DIR}/bindings/python/pythondoc.cmake"
         COMMENT   "Build NXS Python Docs"
     )
 
@@ -73,7 +73,7 @@ if(DEFINED PYTHONINTERP_FOUND)
 		ADD_CUSTOM_TARGET(NXSPythonDoc ALL echo
 			DEPENDS   ${NXSPYTHON_DOC}
 		)
-        install (FILES ${CMAKE_BINARY_DIR}/bindings/python/${NXSPYTHON_DOC} DESTINATION ${NXDOCDIR}/python COMPONENT Documentation)
+        install (FILES ${PROJECT_BINARY_DIR}/bindings/python/${NXSPYTHON_DOC} DESTINATION ${NXDOCDIR}/python COMPONENT Documentation)
 	endif()
 
     install (FILES ${NXSPYTHON_SOURCE} DESTINATION lib/python/nxs COMPONENT Development)

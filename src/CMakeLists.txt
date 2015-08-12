@@ -66,7 +66,10 @@ set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
 
 set (NX_LIBS  ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${SZIP_LIBRARIES} ${ZLIB_LIBRARIES}  )
+                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES}  )
+if(SZIP_LIBRARIES)
+    list(APPEND NX_LIBS ${SZIP_LIBRARIES})
+endif()
 #if (MINGW_MSYS)
 #  set (MINGW_SRC napi_exports.c napi_exports2.c napi_exports.h)
 #  file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols_win.txt
@@ -89,11 +92,15 @@ add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES OUTPUT_NAME NeXusStatic)
 
-target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${MXML_STATIC_LIBRARIES}  ${NX_LIBS})
+target_link_libraries(NeXus_Static_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${NX_LIBS})
+if(MXML_STATIC_LIBRARIES)
+    target_link_libraries(NeXus_Static_Library ${MXML_STATIC_LIBRARIES})
+endif()
 
 #Make NeXus Shared Library
 
 add_library (NeXus_Shared_Library SHARED ${NAPISRC})
+target_include_directories(NeXus_Shared_Library PUBLIC "../include")
 
 #set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS _HDF5USEDLL_ _HDFDLL_)
 set_property(TARGET NeXus_Shared_Library APPEND PROPERTY COMPILE_DEFINITIONS H4_BUILT_AS_STATIC_LIB)
@@ -117,7 +124,10 @@ else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
                       VERSION 1.0 SOVERSION 4)
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-target_link_libraries(NeXus_Shared_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${MXML_STATIC_LIBRARIES} ${NX_LIBS})
+target_link_libraries(NeXus_Shared_Library ${HDF5_STATIC_LIBRARIES} ${HDF4_STATIC_LIBRARIES} ${NX_LIBS})
+if(MXML_STATIC_LIBRARIES)
+    target_link_libraries(NeXus_Shared_Library ${MXML_STATIC_LIBRARIES})
+endif()
 
 #if(HAVE_MXML)
 #if(MXMLLIB_FOUND)

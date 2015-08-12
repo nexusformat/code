@@ -811,6 +811,7 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 			NXReportError("ERROR: size of chunks could not be set");
 			return NX_ERROR;
 		}
+		H5Pset_shuffle(cparms); // mrt: improves compression
 		H5Pset_deflate(cparms, compress_level);
 		iRet = H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
 				 dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
