@@ -52,6 +52,7 @@ if (WITH_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
   add_definitions(-DHDF5 ${HDF5_API_DEFS})
   include_directories(${HDF5_INCLUDE_DIRS})
+  link_directories(${HDF5_LIBRARY_DIR})
   list(APPEND NAPILINK ${HDF5_LIBRARIES})
 endif (WITH_HDF5)
 
