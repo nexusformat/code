@@ -32,7 +32,10 @@ set(NAPITESTSRC napi_test.c)
 #------------------------------------------------------------------------------
 add_subdirectory(data)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include )
+link_directories(${HDF5_LIBRARY_DIRS} 
+                 ${HDF4_LIBRARY_DIRS}
+                 ${MXML_LIBRARY_DIRS})
 
 #------------------------------------------------------------------------------
 # In all cases we have to build the C-tests
