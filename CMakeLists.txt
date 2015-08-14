@@ -27,25 +27,10 @@
 #====================================================================
 
 # we need 2.8.8 for correct component install with CPACK for archives
-if(WIN32)
-    cmake_minimum_required (VERSION 2.8.8)
-else()
-    cmake_minimum_required (VERSION 2.8.8)
-    if (${CMAKE_VERSION} VERSION_LESS 2.8.4)
-        set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove this line when CMake >= 2.8.4 is required
-    endif()
-endif()
+cmake_minimum_required (VERSION 2.8.8)
 
-#
-# convert a native windows path to its equivalent cygwin path
-#
-function(to_cygwin_path PATH RESULT)
-    file(TO_CMAKE_PATH ${PATH} CP)								# changes \ to / on windows
-    string(REGEX REPLACE "^([a-zA-Z]):/" "/\\1/" CP2 ${CP})   	# c:/ -> /c/
-	set(${RESULT} "/cygdrive${CP2}" PARENT_SCOPE) 				# /c/ -> /cygdrive/c/
-endfunction()
 
-# set a default install prefix for windows - we will adjust for 64bit later if this is unchanged
+# set the default install prefix
 set(DEFAULT_WIN_INSTALL_PREFIX "c:/nxinstall")
 if(WIN32)
     set(CMAKE_INSTALL_PREFIX ${DEFAULT_WIN_INSTALL_PREFIX} CACHE PATH "")
