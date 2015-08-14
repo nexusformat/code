@@ -25,9 +25,8 @@
 #
 #==============================================================================
 
+set(DATAFILES  dmc01.h5 dmc01.hdf dmc01.xml dmc02.h5 dmc02.hdf dmc02.xml)
 
-SET(INCLUDE_FILES napi.h napiu.h)
-
-
-INSTALL (FILES ${INCLUDE_FILES} 
-         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ COMPONENT Development)
+foreach(F ${DATAFILES})
+    configure_file(${F} ${F} COPYONLY)
+endforeach()

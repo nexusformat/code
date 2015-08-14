@@ -31,7 +31,7 @@
 #include <time.h>
 #include <stdarg.h>
 
-#include "napi.h"
+#include <napi.h>
 #include "nxstack.h"
 
 /*---------------------------------------------------------------------
