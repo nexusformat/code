@@ -41,7 +41,9 @@ message(STATUS ${CMAKE_MODULE_PATH})
 if(WIN32)
     #don't know yet what to put here
 else()
-    set(CMAKE_INSTALL_PREFIX "/usr/local")
+    if(NOT CMAKE_INSTALL_PREFIX)
+        set(CMAKE_INSTALL_PREFIX "/usr/local")
+    endif()
     #load module for GNU/Linux default installation directories
     include(GNUInstallDirs)
 endif()
