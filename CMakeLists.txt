@@ -124,9 +124,6 @@ endif()
 #include(cmake_include/FindSZIP.cmake)
 #include(cmake_include/FindAnt.cmake)
 
-#find_package(HDF5 REQUIRED)
-#find_package(HDF5)
-#find_package(JPEG)
 #find_package(XMLRPC)
 #find_package(ZLIB)
 #find_package(LibXml2)
@@ -154,29 +151,43 @@ endif()
 
 #Find the libraries for the build.
 
-#find_library(M m)
-#find_library(RPC rpc)
-#find_library(DL dl)
-#find_library(PTHREAD pthread)
-#find_library(TERMCAP termcap)
-#find_library(READLINE readline)
-#find_library(HISTORY history)
+find_library(M m)
+if(M)
+   set(M_LINK "-lm")
+endif(M)
 
+find_library(READLINE readline)
+if(READLINE)
+   set(READLINE_LINK "${READLINE}")
+endif(READLINE)
+
+find_library(DL dl)
+if(DL)
+   set(DL_LINK "-ldl")
+endif(DL)
+
+find_library(PTHREAD pthread)
+if(PTHREAD)
+   set(PTHREAD_LINK "-lpthread")
+endif(PTHREAD)
+
+find_library(TERMCAP termcap)
+if(TERMCAP)
+   set(TERMCAP_LINK "")
+endif(TERMCAP)
+
+find_library(HISTORY history)
+if(HISTORY)
+   set(HISTORY_LINK "")
+endif(HISTORY)
+
+#find_library(RPC rpc)
 #if(NOT WIN32)
 #CHECK_LIBRARY_EXISTS(${READLINE} readline "" HAVE_LIBREADLINE)
 #endif()
 #
-#if(M)
-#   set(M_LINK "-lm")
-#endif(M)
 #
-#if(DL)
-#   set(DL_LINK "-ldl")
-#endif(DL)
 #
-#if(PTHREAD)
-#   set(PTHREAD_LINK "-lpthread")
-#endif(PTHREAD)
 #
 #if(SZIPLIB_FOUND)
 #   set(SZIP_LINK "-lsz")
@@ -184,17 +195,8 @@ endif()
 #   set(SZIP_LIB "")
 #endif(SZIPLIB_FOUND)
 #
-#if(TERMCAP)
-#   set(TERMCAP_LINK "")
-#endif(TERMCAP)
 #
-#if(READLINE)
-#   set(READLINE_LINK "${READLINE}")
-#endif(READLINE)
 #
-#if(HISTORY)
-#   set(HISTORY_LINK "")
-#endif(HISTORY)
 
 
 #if (BUILD_FORTRAN_BINDINGS)
@@ -228,7 +230,7 @@ add_subdirectory (include)
 add_subdirectory (src)
 add_subdirectory (test)
 #add_subdirectory (bindings)
-#add_subdirectory (applications)
+add_subdirectory (applications)
 #add_subdirectory (config)
 #add_subdirectory (contrib)
 #add_subdirectory (definitions)

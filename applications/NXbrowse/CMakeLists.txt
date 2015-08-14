@@ -33,6 +33,8 @@ target_link_libraries(nxbrowse NeXus_Shared_Library
                       ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK} ${TERMCAP_LINK}
                       ${HISTORY_LINK})
 
-install (TARGETS nxbrowse DESTINATION bin COMPONENT Runtime)
-install (FILES nxbrowse.1 DESTINATION man/man1 COMPONENT Documentation)
+install (TARGETS nxbrowse 
+         DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
+install (FILES nxbrowse.1 
+         DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 COMPONENT Documentation)
 

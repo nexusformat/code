@@ -30,29 +30,30 @@
 find_package(LibXml2)
 
 # Recurse into the subdirectories.
+include_directories("../include")
 
 add_subdirectory (NXbrowse)
 add_subdirectory (NXdir)
-add_subdirectory (NXconvert)
+#add_subdirectory (NXconvert)
 
-if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
-    add_subdirectory (NXdump)
-endif()
-
-if (HAVE_MXML)
-add_subdirectory (nxingest)
-endif(HAVE_MXML)
-
-add_subdirectory (NXtraverse)
-
-if(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
-    add_subdirectory (NXvalidate)
-endif(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
-
-if(LIBXML2_FOUND)
-    add_subdirectory (NXsummary)
-    add_subdirectory (NXtranslate)
-endif(LIBXML2_FOUND)
-
-install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)
+#if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
+#    add_subdirectory (NXdump)
+#endif()
+#
+#if (HAVE_MXML)
+#add_subdirectory (nxingest)
+#endif(HAVE_MXML)
+#
+#add_subdirectory (NXtraverse)
+#
+#if(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
+#    add_subdirectory (NXvalidate)
+#endif(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
+#
+#if(LIBXML2_FOUND)
+#    add_subdirectory (NXsummary)
+#    add_subdirectory (NXtranslate)
+#endif(LIBXML2_FOUND)
+#
+#install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)
 
