@@ -35,8 +35,16 @@ message(STATUS ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
 message(STATUS ${CMAKE_MODULE_PATH})
 
-#load module for GNU/Linux default installation directories
-include(GNUInstallDirs)
+#------------------------------------------------------------------------------
+# set the default installation prefix
+#------------------------------------------------------------------------------
+if(WIN32)
+    #don't know yet what to put here
+else()
+    set(CMAKE_INSTALL_PREFIX "/usr/local")
+    #load module for GNU/Linux default installation directories
+    include(GNUInstallDirs)
+endif()
 
 
 #-----------------------------------------------------------------------------
@@ -86,11 +94,13 @@ else()
     #in all cases we build the libary without MXML
     message(STATUS "Build without MXML support!")
 endif()
+
 if(ENABLE_HDF4)
     include(FindHDF4)
 else()
     message(STATUS "Build without HDF4 support!")
 endif()
+
 if(ENABLE_HDF5)
     set( HDF5_COMPONENTS "")
 
@@ -111,12 +121,6 @@ endif()
 #include(cmake_include/FindDocbookUtils.cmake)
 #include(cmake_include/FindSZIP.cmake)
 #include(cmake_include/FindAnt.cmake)
-
-
-if(UNIX)
-    CHECK_LIBRARY_EXISTS(dl dlopen "" HAVE_LIBDL)
-    CHECK_LIBRARY_EXISTS(pthread pthread_open "" HAVE_LIBPTHREAD)
-endif(UNIX)
 
 #find_package(HDF5 REQUIRED)
 #find_package(HDF5)
