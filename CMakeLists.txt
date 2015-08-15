@@ -104,15 +104,10 @@ else()
 endif()
 
 if(ENABLE_HDF5)
-    set( HDF5_COMPONENTS "")
-
-    if (ENABLE_CXX)
-        set( HDF5_COMPONENTS "${HDF5_COMPONENTS} CXX HL" )
-    endif()
 
     message ("${HDF5_COMPONENTS}")
-    if (HDF5_COMPONENTS)
-        find_package ( HDF5 COMPONENTS $HDF5_COMPONENTS REQUIRED )
+    if (ENABLE_CXX)
+        find_package ( HDF5 COMPONENTS CXX HL REQUIRED )
     else()
         find_package ( HDF5 REQUIRED )
     endif()
@@ -209,8 +204,7 @@ set(NXDOCDIR "share/nexus/doc")
 #We need a NXEXAMPLEDIR as a place to install the examples.
 set(NXEXAMPLEDIR  "share/nexus/examples")
 
-
-configure_file("${PROJECT_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${PROJECT_BINARY_DIR}/include/nxconfig.h" @ONLY)
+include_directories("./include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
@@ -229,7 +223,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 add_subdirectory (include)
 add_subdirectory (src)
 add_subdirectory (test)
-#add_subdirectory (bindings)
+add_subdirectory (bindings)
 add_subdirectory (applications)
 #add_subdirectory (config)
 #add_subdirectory (contrib)
