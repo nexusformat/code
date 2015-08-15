@@ -42,3 +42,9 @@ endif()
 # search for additional packages required to link against HDF4
 #------------------------------------------------------------------------------
 find_package(JPEG REQUIRED)
+
+#------------------------------------------------------------------------------
+# add libraries to the link list for NAPI
+#------------------------------------------------------------------------------
+list(APPEND NAPI_LINK_LIBS  df mfhdf jpeg)
+

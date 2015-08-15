@@ -35,3 +35,5 @@ if(NOT HAVE_MXML)
     #find the library we have to exit the configuration
     message(FATAL_ERROR "User requested MXML not found!")
 endif()
+
+list(APPEND NAPI_LINK_LIBS mxml)

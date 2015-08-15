@@ -90,8 +90,18 @@ include(FindPkgConfig)
 #include(cmake_include/FindMZScheme.cmake)
 #include(cmake_include/FindIDL.cmake)
 
+#------------------------------------------------------------------------------
+# a list of libraries we have to link NAPI against 
+# we need this in the global scope as all other programs have to be 
+# linked against this libraries as well - in this early stage there is 
+# no pkg-config we could use!
+#------------------------------------------------------------------------------
+set(NAPI_LINK_LIBS)
+
 if(ENABLE_MXML)
     include(FindMXML)
+    # the required libraries are appended to 
+    # NAPI_LINK_LIBS by this module
 else()
     #in all cases we build the libary without MXML
     message(STATUS "Build without MXML support!")
@@ -99,6 +109,8 @@ endif()
 
 if(ENABLE_HDF4)
     include(FindHDF4)
+    # the required libraries are appended to 
+    # NAPI_LINK_LIBS by this module
 else()
     message(STATUS "Build without HDF4 support!")
 endif()
@@ -111,15 +123,19 @@ if(ENABLE_HDF5)
     else()
         find_package ( HDF5 REQUIRED )
     endif()
+    set(HAVE_HDF5 1)
+    list(APPEND NAPI_LINK_LIBS ${HDF5_LIBRARIES})
 
-    if(HDF5_FOUND)
-        set(HAVE_HDF5 1)
-    else()
-        message(ERROR "Could not find HDF5!")
-    endif()
+    message(STATUS "HDF5 library found in: ${HDF5_LIBRARY_DIRS}")
+    message(STATUS "HDF5 headers found in: ${HDF5_INCLUDE_DIRS}") 
 else()
     message(STATUS "Build without HDF5 support!")
 endif()
+
+if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
+    enable_language(Fortran)
+endif()
+
 #include(cmake_include/FindOpenGenie.cmake)
 #include(cmake_include/FindDocbookUtils.cmake)
 #include(cmake_include/FindSZIP.cmake)
@@ -198,12 +214,6 @@ endif(HISTORY)
 #endif(SZIPLIB_FOUND)
 #
 #
-#
-
-
-#if (BUILD_FORTRAN_BINDINGS)
-#    enable_language(Fortran)
-#endif (BUILD_FORTRAN_BINDINGS)
 #
 
 include_directories("./include")

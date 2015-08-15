@@ -30,9 +30,14 @@ if(ENABLE_CXX)
     add_subdirectory (cpp)
 endif()
 
+if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
+    enable_language(Fortran)
+endif()
+
 if(ENABLE_FORTRAN77)
     add_subdirectory (f77)
 endif()
+
 
 if(ENABLE_FORTRAN90)
     add_subdirectory (f90)

@@ -41,7 +41,7 @@ link_directories(${HDF5_LIBRARY_DIRS}
 # In all cases we have to build the C-tests
 #------------------------------------------------------------------------------
 add_executable(napi_c_test napi_test.c)
-target_link_libraries(napi_c_test NeXus_Shared_Library)
+target_link_libraries(napi_c_test NeXus_Shared_Library ${NAPI_LINK_LIBS})
 add_test(NAME "NAPI-C-test" COMMAND napi_t_test)
          
 
@@ -50,7 +50,8 @@ if(ENABLE_CXX)
 
     include_directories(../bindings/cpp)
     add_executable(napi_cpp_test napi_test_cpp.cxx)
-    target_link_libraries(napi_cpp_test NeXus_CPP_Shared_Library)
+    target_link_libraries(napi_cpp_test NeXus_CPP_Shared_Library
+                          ${NAPI_LINK_LIBS})
 endif()
 
 if(ENABLE_FORTRAN77)
@@ -58,7 +59,12 @@ if(ENABLE_FORTRAN77)
 endif()
 
 if(ENABLE_FORTRAN90)
-    #source NXtest.f90
+    #need to add the directory with the .mod files to the include path
+    include_directories(${PROJECT_BINARY_DIR}/bindings/f90)
+    add_executable(NXtestf90 NXtest.f90)
+    target_link_libraries(NXtestf90 NeXus_F90_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "Fortran-90-test" COMMAND NXtestf90)
 endif()
 
 

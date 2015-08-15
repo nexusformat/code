@@ -43,7 +43,6 @@ if (WITH_HDF4)
   add_definitions(-DHDF4)
   include_directories(${HDF4_INCLUDE_DIRS} ${JPEG_INCLUDE_DIR})
   link_directories(${HDF4_LIBRARY_DIRS})
-  list(APPEND NAPILINK ${HDF4_LIBRARIES} ${JPEG_LIBRARIES})
 endif(WITH_HDF4)
 
 #-----------------------------------------------------------------------------
@@ -54,7 +53,6 @@ if (WITH_HDF5)
   add_definitions(-DHDF5 ${HDF5_API_DEFS})
   include_directories(${HDF5_INCLUDE_DIRS})
   link_directories(${HDF5_LIBRARY_DIRS})
-  list(APPEND NAPILINK ${HDF5_LIBRARIES})
 endif (WITH_HDF5)
 
 #-----------------------------------------------------------------------------
@@ -65,7 +63,6 @@ if(WITH_MXML)
     add_definitions(-DNXXML)
 	include_directories(${MXML_INCLUDE_DIRS})
     link_directories(${MXML_LIBRARY_DIRS})
-    list(APPEND NAPILINK ${MXML_LIBRARIES})
 endif(WITH_MXML)
 
 set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
@@ -79,7 +76,7 @@ add_library (NeXus_Static_Library STATIC ${NAPISRC})
 set_target_properties(NeXus_Static_Library PROPERTIES 
                       OUTPUT_NAME NeXus)
 
-target_link_libraries(NeXus_Static_Library ${NAPILINK})
+target_link_libraries(NeXus_Static_Library ${NAPI_LINK_LIBS})
 #------------------------------------------------------------------------------
 # building the shared library
 #------------------------------------------------------------------------------
@@ -90,7 +87,7 @@ set_target_properties(NeXus_Shared_Library PROPERTIES
                       VERSION 1.0 
                       SOVERSION 4)
 
-target_link_libraries(NeXus_Shared_Library ${NAPILINK})
+target_link_libraries(NeXus_Shared_Library ${NAPI_LINK_LIBS})
 
 
 #------------------------------------------------------------------------------
