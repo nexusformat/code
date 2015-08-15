@@ -35,6 +35,7 @@ include_directories("../include")
 add_subdirectory (NXbrowse)
 add_subdirectory (NXdir)
 add_subdirectory (NXconvert)
+add_subdirectory (NXtraverse)
 
 #if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
 #    add_subdirectory (NXdump)
@@ -43,8 +44,7 @@ add_subdirectory (NXconvert)
 #if (HAVE_MXML)
 #add_subdirectory (nxingest)
 #endif(HAVE_MXML)
-#
-#add_subdirectory (NXtraverse)
+
 #
 #if(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
 #    add_subdirectory (NXvalidate)

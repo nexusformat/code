@@ -26,18 +26,13 @@
 #
 #====================================================================
 
-include_directories(../../third_party ../../bindings/cpp)
+include_directories(../../bindings/cpp)
 
 add_executable (nxtraverse nxtraverse.cpp main.cpp nxtraverse.h)
 
-target_link_libraries(nxtraverse
-                      NeXus_CPP_Shared_Library 
-                      ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK}
-                      ${DF_LINK} ${TERMCAP_LINK} ${HISTORY_LINK})
+target_link_libraries(nxtraverse NeXus_CPP_Shared_Library )
 
 install (TARGETS nxtraverse
-         RUNTIME DESTINATION bin COMPONENT Runtime
-         LIBRARY DESTINATION lib COMPONENT Runtime
-         ARCHIVE DESTINATION lib/nexus COMPONENT Development)
-
+         DESTINATION ${CMAKE_INSTALL_BINDIR} 
+         COMPONENT Runtime)
 

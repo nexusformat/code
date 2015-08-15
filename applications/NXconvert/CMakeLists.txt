@@ -26,7 +26,10 @@
 #
 #====================================================================
 
-include_directories(../../third_party ../../bindings/cpp)
+#the third party library is required for the command line parser
+#we maybe should replace this with boost::program_options
+include_directories(../../third_party 
+                    ../../bindings/cpp)
 
 add_executable (nxconvert nxconvert.cpp nxconvert_common.h )
 
@@ -57,5 +60,7 @@ install (TARGETS NXconvert_Static_Library NXconvert_Shared_Library nxconvert
          LIBRARY DESTINATION lib COMPONENT Runtime
          ARCHIVE DESTINATION lib/nexus COMPONENT Development)
 
-install (FILES nxconvert.1 DESTINATION man/man1 COMPONENT Documentation)
+install (FILES nxconvert.1 
+         DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 
+         COMPONENT Documentation)
 
