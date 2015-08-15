@@ -48,8 +48,9 @@ add_test(NAME "NAPI-C-test" COMMAND napi_t_test)
 if(ENABLE_CXX)
     list(APPEND NAPITESTSRC napi_test_cpp.cxx)
 
+    include_directories(../bindings/cpp)
     add_executable(napi_cpp_test napi_test_cpp.cxx)
-    target_link_libraries(napi_cpp_test NeXus_Shared_Library)
+    target_link_libraries(napi_cpp_test NeXus_CPP_Shared_Library)
 endif()
 
 if(ENABLE_FORTRAN77)

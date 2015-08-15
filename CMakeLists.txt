@@ -35,8 +35,18 @@ message(STATUS ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
 message(STATUS ${CMAKE_MODULE_PATH})
 
-#load module for GNU/Linux default installation directories
-include(GNUInstallDirs)
+#------------------------------------------------------------------------------
+# set the default installation prefix
+#------------------------------------------------------------------------------
+if(WIN32)
+    #don't know yet what to put here
+else()
+    if(NOT CMAKE_INSTALL_PREFIX)
+        set(CMAKE_INSTALL_PREFIX "/usr/local")
+    endif()
+    #load module for GNU/Linux default installation directories
+    include(GNUInstallDirs)
+endif()
 
 
 #-----------------------------------------------------------------------------
@@ -86,23 +96,26 @@ else()
     #in all cases we build the libary without MXML
     message(STATUS "Build without MXML support!")
 endif()
+
 if(ENABLE_HDF4)
     include(FindHDF4)
 else()
     message(STATUS "Build without HDF4 support!")
 endif()
-if(ENABLE_HDF5)
-    set( HDF5_COMPONENTS "")
 
-    if (ENABLE_CXX)
-        set( HDF5_COMPONENTS "${HDF5_COMPONENTS} CXX HL" )
-    endif()
+if(ENABLE_HDF5)
 
     message ("${HDF5_COMPONENTS}")
-    if (HDF5_COMPONENTS)
-        find_package ( HDF5 COMPONENTS $HDF5_COMPONENTS REQUIRED )
+    if (ENABLE_CXX)
+        find_package ( HDF5 COMPONENTS CXX HL REQUIRED )
     else()
         find_package ( HDF5 REQUIRED )
+    endif()
+
+    if(HDF5_FOUND)
+        set(HAVE_HDF5 1)
+    else()
+        message(ERROR "Could not find HDF5!")
     endif()
 else()
     message(STATUS "Build without HDF5 support!")
@@ -112,15 +125,6 @@ endif()
 #include(cmake_include/FindSZIP.cmake)
 #include(cmake_include/FindAnt.cmake)
 
-
-if(UNIX)
-    CHECK_LIBRARY_EXISTS(dl dlopen "" HAVE_LIBDL)
-    CHECK_LIBRARY_EXISTS(pthread pthread_open "" HAVE_LIBPTHREAD)
-endif(UNIX)
-
-#find_package(HDF5 REQUIRED)
-#find_package(HDF5)
-#find_package(JPEG)
 #find_package(XMLRPC)
 #find_package(ZLIB)
 #find_package(LibXml2)
@@ -148,29 +152,44 @@ endif(UNIX)
 
 #Find the libraries for the build.
 
-#find_library(M m)
-#find_library(RPC rpc)
-#find_library(DL dl)
-#find_library(PTHREAD pthread)
-#find_library(TERMCAP termcap)
-#find_library(READLINE readline)
-#find_library(HISTORY history)
+find_library(M m)
+if(M)
+   set(M_LINK "-lm")
+endif(M)
 
+find_library(READLINE readline)
+if(READLINE)
+   set(HAVE_LIBREADLINE 1)
+   set(READLINE_LINK "readline")
+endif(READLINE)
+
+find_library(DL dl)
+if(DL)
+   set(DL_LINK "-ldl")
+endif(DL)
+
+find_library(PTHREAD pthread)
+if(PTHREAD)
+   set(PTHREAD_LINK "-lpthread")
+endif(PTHREAD)
+
+find_library(TERMCAP termcap)
+if(TERMCAP)
+   set(TERMCAP_LINK "")
+endif(TERMCAP)
+
+find_library(HISTORY history)
+if(HISTORY)
+   set(HISTORY_LINK "")
+endif(HISTORY)
+
+#find_library(RPC rpc)
 #if(NOT WIN32)
 #CHECK_LIBRARY_EXISTS(${READLINE} readline "" HAVE_LIBREADLINE)
 #endif()
 #
-#if(M)
-#   set(M_LINK "-lm")
-#endif(M)
 #
-#if(DL)
-#   set(DL_LINK "-ldl")
-#endif(DL)
 #
-#if(PTHREAD)
-#   set(PTHREAD_LINK "-lpthread")
-#endif(PTHREAD)
 #
 #if(SZIPLIB_FOUND)
 #   set(SZIP_LINK "-lsz")
@@ -178,31 +197,16 @@ endif(UNIX)
 #   set(SZIP_LIB "")
 #endif(SZIPLIB_FOUND)
 #
-#if(TERMCAP)
-#   set(TERMCAP_LINK "")
-#endif(TERMCAP)
 #
-#if(READLINE)
-#   set(READLINE_LINK "${READLINE}")
-#endif(READLINE)
 #
-#if(HISTORY)
-#   set(HISTORY_LINK "")
-#endif(HISTORY)
 
 
 #if (BUILD_FORTRAN_BINDINGS)
 #    enable_language(Fortran)
 #endif (BUILD_FORTRAN_BINDINGS)
 #
-#We need a NXDOCDIR as a place to install the docs for various packages.
-set(NXDOCDIR "share/nexus/doc")
 
-#We need a NXEXAMPLEDIR as a place to install the examples.
-set(NXEXAMPLEDIR  "share/nexus/examples")
-
-
-configure_file("${PROJECT_SOURCE_DIR}/include/nxconfig_h_cmake.in" "${PROJECT_BINARY_DIR}/include/nxconfig.h" @ONLY)
+include_directories("./include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
@@ -221,8 +225,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 add_subdirectory (include)
 add_subdirectory (src)
 add_subdirectory (test)
-#add_subdirectory (bindings)
-#add_subdirectory (applications)
+add_subdirectory (bindings)
+add_subdirectory (applications)
 #add_subdirectory (config)
 #add_subdirectory (contrib)
 #add_subdirectory (definitions)

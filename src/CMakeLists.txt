@@ -70,12 +70,6 @@ endif(WITH_MXML)
 
 set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 
-file(STRINGS ${PROJECT_SOURCE_DIR}/src/nexus_symbols.txt NEXUS_SYMBOLS)
-
-#if(SZIP_LIBRARIES)
-#    list(APPEND NX_LIBS ${SZIP_LIBRARIES})
-#endif()
-
 #------------------------------------------------------------------------------
 # building the static library
 #------------------------------------------------------------------------------

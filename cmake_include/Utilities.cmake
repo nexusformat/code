@@ -112,6 +112,31 @@ function(search_module_header VAR)
 endfunction()
 
 #-----------------------------------------------------------------------------
+#
+# Looks for a particular module 
+#
+# The function has three strategies to look for header and library files
+# 1.) Check for user provided ${VAR}_INCLUDE_DIRS and ${VAR}_LIBRARY_DIRS
+#     If the use has provided a location we look there for the libraries. 
+#     The search is exclusive. Only the user provided directories are 
+#     searched. This is to avoid conflicts with other version of a 
+#     particular library which might be installed in the default locations.
+# 2.) If the user has not provided any location we firs try pkg-config 
+#     to look for the module. The name of the module is passed via the 
+#     MOD_NAME keywoard argument.
+# 3.) If no  pkg-config module is available, the function looks in the 
+#     default search paths. 
+#
+# Arguments:
+#   Positional arguments: 
+#   VAR ................. prefix used for all output variables
+# Results:
+#   HAVE_{VAR} .......... true if the module was found (false otherwise)
+#   ${VAR}_INCLUDE_DIRS . holding the header directory
+#   ${VAR}_LIBRARY_DIRS . directory with runtime libraries
+#   
+# 
+# 
 function(find_module VAR )
     set(oneValueArgs MOD_NAME)
     set(multiValueArgs LIB_NAMES HEADER_NAMES)
