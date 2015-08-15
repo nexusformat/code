@@ -111,6 +111,12 @@ if(ENABLE_HDF5)
     else()
         find_package ( HDF5 REQUIRED )
     endif()
+
+    if(HDF5_FOUND)
+        set(HAVE_HDF5 1)
+    else()
+        message(ERROR "Could not find HDF5!")
+    endif()
 else()
     message(STATUS "Build without HDF5 support!")
 endif()
@@ -153,7 +159,8 @@ endif(M)
 
 find_library(READLINE readline)
 if(READLINE)
-   set(READLINE_LINK "${READLINE}")
+   set(HAVE_LIBREADLINE 1)
+   set(READLINE_LINK "readline")
 endif(READLINE)
 
 find_library(DL dl)
@@ -198,11 +205,6 @@ endif(HISTORY)
 #    enable_language(Fortran)
 #endif (BUILD_FORTRAN_BINDINGS)
 #
-#We need a NXDOCDIR as a place to install the docs for various packages.
-set(NXDOCDIR "share/nexus/doc")
-
-#We need a NXEXAMPLEDIR as a place to install the examples.
-set(NXEXAMPLEDIR  "share/nexus/examples")
 
 include_directories("./include")
 include_directories("${PROJECT_BINARY_DIR}/include")
