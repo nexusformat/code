@@ -1,10 +1,13 @@
 /* $Id:$ */
 
 #cmakedefine HAVE_HDF4
+#cmakedefine WITH_HDF4
 
 #cmakedefine HAVE_HDF5
+#cmakedefine WITH_HDF5
 
 #cmakedefine HAVE_MXML
+#cmakedefine WITH_MXML
 
 #cmakedefine HAVE_FTIME
 

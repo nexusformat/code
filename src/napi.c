@@ -32,6 +32,7 @@
 #include <stdarg.h>
 
 #include <napi.h>
+#include <nxconfig.h>
 #include "nxstack.h"
 
 /*---------------------------------------------------------------------
@@ -254,7 +255,7 @@ NXstatus NXsetcache(long newVal)
 	return NX_ERROR;
 }
 
-#ifdef NXXML
+#ifdef WITH_MXML
 /*-----------------------------------------------------------------------*/
 static NXstatus NXisXML(CONSTCHAR * filename)
 {
@@ -386,13 +387,13 @@ extern void NXMEnableErrorReporting()
 }
 
 /*----------------------------------------------------------------------*/
-#ifdef HDF5
+#ifdef WITH_HDF5
 #include "napi5.h"
 #endif
-#ifdef HDF4
+#ifdef WITH_HDF4
 #include "napi4.h"
 #endif
-#ifdef NXXML
+#ifdef WITH_MXML
 #include "nxxml.h"
 #endif
   /* ---------------------------------------------------------------------- 
@@ -413,19 +414,19 @@ static int determineFileTypeImpl(CONSTCHAR * filename)
 		return -1;
 	}
 	fclose(fd);
-#ifdef HDF5
+#ifdef WITH_HDF5
 	iRet = H5Fis_hdf5((const char *)filename);
 	if (iRet > 0) {
 		return 2;
 	}
 #endif
-#ifdef HDF4
+#ifdef WITH_HDF4
 	iRet = Hishdf((const char *)filename);
 	if (iRet > 0) {
 		return 1;
 	}
 #endif
-#ifdef NXXML
+#ifdef WITH_MXML
 	iRet = NXisXML(filename);
 	if (iRet == NX_OK) {
 		return 3;
@@ -569,7 +570,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 
 	if (hdf_type == 1) {
 		/* HDF4 type */
-#ifdef HDF4
+#ifdef WITH_HDF4
 		NXhandle hdf4_handle = NULL;
 		retstat = NX4open((const char *)filename, am, &hdf4_handle);
 		if (retstat != NX_OK) {
@@ -589,7 +590,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 		return retstat;
 	} else if (hdf_type == 2) {
 		/* HDF5 type */
-#ifdef HDF5
+#ifdef WITH_HDF5
 		retstat = NX5open(filename, am, &hdf5_handle);
 		if (retstat != NX_OK) {
 			free(fHandle);
@@ -610,7 +611,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 		/*
 		   XML type
 		 */
-#ifdef NXXML
+#ifdef WITH_MXML
 		NXhandle xmlHandle = NULL;
 		retstat = NXXopen(filename, am, &xmlHandle);
 		if (retstat != NX_OK) {

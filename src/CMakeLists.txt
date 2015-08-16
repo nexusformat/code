@@ -40,7 +40,6 @@ set (NAPILINK)
 #-----------------------------------------------------------------------------
 if (WITH_HDF4)
   set (NAPISRC ${NAPISRC} napi4.c)
-  add_definitions(-DHDF4)
   include_directories(${HDF4_INCLUDE_DIRS} ${JPEG_INCLUDE_DIR})
   link_directories(${HDF4_LIBRARY_DIRS})
 endif(WITH_HDF4)
@@ -50,7 +49,6 @@ endif(WITH_HDF4)
 #-----------------------------------------------------------------------------
 if (WITH_HDF5)
   set (NAPISRC ${NAPISRC} napi5.c)
-  add_definitions(-DHDF5 ${HDF5_API_DEFS})
   include_directories(${HDF5_INCLUDE_DIRS})
   link_directories(${HDF5_LIBRARY_DIRS})
 endif (WITH_HDF5)
@@ -60,7 +58,6 @@ endif (WITH_HDF5)
 #-----------------------------------------------------------------------------
 if(WITH_MXML)
     set (NAPISRC ${NAPISRC} nxxml.c nxio.c nxio.h)
-    add_definitions(-DNXXML)
 	include_directories(${MXML_INCLUDE_DIRS})
     link_directories(${MXML_LIBRARY_DIRS})
 endif(WITH_MXML)
@@ -70,7 +67,6 @@ set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 #------------------------------------------------------------------------------
 # building the static library
 #------------------------------------------------------------------------------
-include_directories("${PROJECT_SOURCE_DIR}/include")
 add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES 

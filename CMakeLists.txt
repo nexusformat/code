@@ -102,6 +102,7 @@ if(ENABLE_MXML)
     include(FindMXML)
     # the required libraries are appended to 
     # NAPI_LINK_LIBS by this module
+    set(WITH_MXML TRUE)
 else()
     #in all cases we build the libary without MXML
     message(STATUS "Build without MXML support!")
@@ -111,6 +112,7 @@ if(ENABLE_HDF4)
     include(FindHDF4)
     # the required libraries are appended to 
     # NAPI_LINK_LIBS by this module
+    set(WITH_HDF4 TRUE)
 else()
     message(STATUS "Build without HDF4 support!")
 endif()
@@ -125,6 +127,7 @@ if(ENABLE_HDF5)
     endif()
     set(HAVE_HDF5 1)
     list(APPEND NAPI_LINK_LIBS ${HDF5_LIBRARIES})
+    set(WITH_HDF5 TRUE)
 
     message(STATUS "HDF5 library found in: ${HDF5_LIBRARY_DIRS}")
     message(STATUS "HDF5 headers found in: ${HDF5_INCLUDE_DIRS}") 
