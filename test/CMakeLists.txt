@@ -42,7 +42,7 @@ link_directories(${HDF5_LIBRARY_DIRS}
 #------------------------------------------------------------------------------
 add_executable(napi_c_test napi_test.c)
 target_link_libraries(napi_c_test NeXus_Shared_Library ${NAPI_LINK_LIBS})
-add_test(NAME "NAPI-C-test" COMMAND napi_t_test)
+add_test(NAME "NAPI-C-test" COMMAND napi_c_test)
          
 
 if(ENABLE_CXX)
@@ -52,6 +52,23 @@ if(ENABLE_CXX)
     add_executable(napi_cpp_test napi_test_cpp.cxx)
     target_link_libraries(napi_cpp_test NeXus_CPP_Shared_Library
                           ${NAPI_LINK_LIBS})
+
+    add_test(NAME "NAPI-C++-test" COMMAND napi_cpp_test)
+
+    #--------------------------------------------------------------------------
+    # build leak tests
+    #--------------------------------------------------------------------------
+    add_executable(leak_test2 leak_test2.cxx)
+    target_link_libraries(leak_test2 NeXus_CPP_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C++-leak-test-2" 
+             COMMAND leak_test2)
+
+    add_executable(leak_test3 leak_test3.cxx)
+    target_link_libraries(leak_test3 NeXus_CPP_Shared_Library
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C++-leak-test-3"
+             COMMAND leak_test3)
 endif()
 
 if(ENABLE_FORTRAN77)

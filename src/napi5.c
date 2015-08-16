@@ -23,7 +23,9 @@
 
 ----------------------------------------------------------------------------*/
 
-#ifdef HDF5
+#include <nxconfig.h>
+
+#ifdef WITH_HDF5
 
 #include <stdlib.h>
 #include <assert.h>

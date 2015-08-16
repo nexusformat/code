@@ -29,6 +29,7 @@ cmake_minimum_required(VERSION 2.8.8)
 
 #The name of our project
 project (NeXus)
+enable_testing()
 
 message(STATUS ${PROJECT_SOURCE_DIR})
 #set the module path
