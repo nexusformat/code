@@ -48,8 +48,17 @@ add_executable(leak_test1 leak_test1.c)
 target_link_libraries(leak_test1 NeXus_Shared_Library ${NAPI_LINK_LIBS})
 add_test(NAME "NAPI-C-leak-test-1"
          COMMAND leak_test1)
+
+add_executable(test_nxunlimited test_nxunlimited.c)
+target_link_libraries(test_nxunlimited  NeXus_Shared_Library
+                      ${NAPI_LINK_LIBS})
+add_test(NAME "NAPI-C-test-nxunlimited"
+         COMMAND test_nxunlimited)
          
 
+#------------------------------------------------------------------------------
+# Add tests relevant to C++ bindings
+#------------------------------------------------------------------------------
 if(ENABLE_CXX)
     list(APPEND NAPITESTSRC napi_test_cpp.cxx)
 

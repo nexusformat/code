@@ -24,7 +24,9 @@
  *  For further information, see <http://www.nexusformat.org>
  */
 
-#ifdef NXXML 
+#include <nxconfig.h>
+
+#ifdef WITH_MXML 
 
 #include <mxml.h> 
 #include <assert.h>
