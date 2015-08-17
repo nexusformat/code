@@ -1,26 +1,26 @@
 ## Process this file with cmake
 #====================================================================
 #  NeXus - Neutron & X-ray Common Data Format
-#  
+#
 #  CMakeLists for building the NeXus library and applications.
 #
 #  Copyright (C) 2010 Stephen Rankin
-#  
+#
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
 #  License as published by the Free Software Foundation; either
 #  version 2 of the License, or (at your option) any later version.
-# 
+#
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  Lesser General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free 
-#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+#  License along with this library; if not, write to the Free
+#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #  MA  02111-1307  USA
-#             
+#
 #  For further information, see <http://www.nexusformat.org>
 #
 #
@@ -33,9 +33,11 @@ find_package(LibXml2)
 include_directories("../include")
 
 add_subdirectory (NXbrowse)
-add_subdirectory (NXdir)
-add_subdirectory (NXconvert)
-add_subdirectory (NXtraverse)
+if (ENABLE_CXX)
+  add_subdirectory (NXdir)
+  add_subdirectory (NXconvert)
+  add_subdirectory (NXtraverse)
+endif()
 
 #if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
 #    add_subdirectory (NXdump)
@@ -56,4 +58,3 @@ add_subdirectory (NXtraverse)
 #endif(LIBXML2_FOUND)
 #
 #install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)
-
