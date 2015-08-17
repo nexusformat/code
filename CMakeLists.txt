@@ -92,16 +92,16 @@ include(FindPkgConfig)
 #include(cmake_include/FindIDL.cmake)
 
 #------------------------------------------------------------------------------
-# a list of libraries we have to link NAPI against 
-# we need this in the global scope as all other programs have to be 
-# linked against this libraries as well - in this early stage there is 
+# a list of libraries we have to link NAPI against
+# we need this in the global scope as all other programs have to be
+# linked against this libraries as well - in this early stage there is
 # no pkg-config we could use!
 #------------------------------------------------------------------------------
 set(NAPI_LINK_LIBS)
 
 if(ENABLE_MXML)
     include(FindMXML)
-    # the required libraries are appended to 
+    # the required libraries are appended to
     # NAPI_LINK_LIBS by this module
     set(WITH_MXML TRUE)
 else()
@@ -111,7 +111,11 @@ endif()
 
 if(ENABLE_HDF4)
     include(FindHDF4)
-    # the required libraries are appended to 
+
+    message(STATUS "HDF4 library found in: ${HDF4_LIBRARY_DIR}")
+    message(STATUS "HDF4 headers found in: ${HDF4_INCLUDE_DIR}")
+
+    # the required libraries are appended to
     # NAPI_LINK_LIBS by this module
     set(WITH_HDF4 TRUE)
 else()
@@ -131,7 +135,7 @@ if(ENABLE_HDF5)
     set(WITH_HDF5 TRUE)
 
     message(STATUS "HDF5 library found in: ${HDF5_LIBRARY_DIRS}")
-    message(STATUS "HDF5 headers found in: ${HDF5_INCLUDE_DIRS}") 
+    message(STATUS "HDF5 headers found in: ${HDF5_INCLUDE_DIRS}")
 else()
     message(STATUS "Build without HDF5 support!")
 endif()
