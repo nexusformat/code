@@ -137,7 +137,30 @@ if(ENABLE_CXX)
 endif()
 
 if(ENABLE_FORTRAN77)
-    #sources napif4_test.f  napif5_test.f  napif_test.f)
+    include_directories(${PROJECT_BINARY_DIR}/bindings/f77)
+    include_directories(${PROJECT_SOURCE_DIR}/bindings/f77)
+   
+    if(WITH_HDF4)
+        add_executable(napif4_test napif4_test.f)
+        target_link_libraries(napif4_test NeXus_F77_Shared_Library)
+        add_test(NAME "NAPI-F77-HDF4-test"
+                 COMMAND napif4_test)
+    endif()
+    
+    if(WITH_HDF5)
+        add_executable(napif5_test napif5_test.f)
+        target_link_libraries(napif5_test NeXus_F77_Shared_Library)
+        add_test(NAME "NAPI-F77-HDF5-test"
+                 COMMAND napif5_test)
+    endif()
+
+    if(WITH_MXML)
+        add_executable(napif_test  napif_test.f)
+        target_link_libraries(napif_test NeXus_F77_Shared_Library)
+        add_test(NAME "NAPI-F77-XML-test"
+                 COMMAND napif_test)
+    endif()
+
 endif()
 
 if(ENABLE_FORTRAN90)
