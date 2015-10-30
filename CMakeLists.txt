@@ -27,9 +27,16 @@
 
 cmake_minimum_required(VERSION 2.8.9)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 #The name of our project
 project (NeXus)
 enable_testing()
+
 
 message(STATUS ${PROJECT_SOURCE_DIR})
 #set the module path
@@ -151,7 +158,7 @@ endif()
 
 #find_package(XMLRPC)
 #find_package(ZLIB)
-#find_package(LibXml2)
+find_package(LibXml2)
 #find_package(Doxygen)
 #find_package(SWIG)
 #find_package(TCL)
