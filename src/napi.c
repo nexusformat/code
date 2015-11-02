@@ -96,7 +96,7 @@ static int nxiunlock(int ret)
 
 static pthread_mutex_t nx_mutex;
 
-#ifdef PTHREAD_MUTEX_RECURSIVE
+#if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__FreeBSD__)
 #define RECURSIVE_LOCK PTHREAD_MUTEX_RECURSIVE
 #else
 #define RECURSIVE_LOCK PTHREAD_MUTEX_RECURSIVE_NP
