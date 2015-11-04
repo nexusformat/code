@@ -94,30 +94,30 @@ if(ENABLE_CXX)
     include_directories(../bindings/cpp)
 
     if(WITH_HDF5)
-        add_executable(napi_cpp_test-hdf5 napi_test_cpp.cxx)
-        target_link_libraries(napi_cpp_test-hdf5 NeXus_CPP_Shared_Library
+        add_executable(napi_test_cpp-hdf5 napi_test_cpp.cxx)
+        target_link_libraries(napi_test_cpp-hdf5 NeXus_CPP_Shared_Library
                               ${NAPI_LINK_LIBS})
-        add_test(NAME "NAPI-C++-HDF5-test" COMMAND napi_cpp_test-hdf5)
+        add_test(NAME "NAPI-C++-HDF5-test" COMMAND napi_test_cpp-hdf5)
     endif()
 
     if(WITH_HDF4)
-        add_executable(napi_cpp_test-hdf4 napi_test_cpp.cxx)
-        target_link_libraries(napi_cpp_test-hdf4 NeXus_CPP_Shared_Library
+        add_executable(napi_test_cpp-hdf4 napi_test_cpp.cxx)
+        target_link_libraries(napi_test_cpp-hdf4 NeXus_CPP_Shared_Library
                               ${NAPI_LINK_LIBS})
-        add_test(NAME "NAPI-C++-HDF4-test" COMMAND napi_cpp_test-hdf4)
+        add_test(NAME "NAPI-C++-HDF4-test" COMMAND napi_test_cpp-hdf4)
     endif()
 
     if(WITH_MXML)
-        add_executable(napi_cpp_test-xml napi_test_cpp.cxx)
-        target_link_libraries(napi_cpp_test-xml NeXus_CPP_Shared_Library
+        add_executable(napi_test_cpp-xml napi_test_cpp.cxx)
+        target_link_libraries(napi_test_cpp-xml NeXus_CPP_Shared_Library
                               ${NAPI_LINK_LIBS})
-        add_test(NAME "NAPI-C++-MXML-test" COMMAND napi_cpp_test-xml)
+        add_test(NAME "NAPI-C++-MXML-test" COMMAND napi_test_cpp-xml)
         
-        add_executable(napi_cpp_test-xml-table napi_test_cpp.cxx)
-        target_link_libraries(napi_cpp_test-xml-table NeXus_CPP_Shared_Library
-                              ${NAPI_LINK_LIBS})
-        add_test(NAME "NAPI-C++-MXML-TABLE-test" 
-                 COMMAND napi_cpp_test-xml-table)
+#        add_executable(napi_test_cpp-xml-table napi_test_cpp.cxx)
+#        target_link_libraries(napi_test_cpp-xml-table NeXus_CPP_Shared_Library
+#                              ${NAPI_LINK_LIBS})
+#        add_test(NAME "NAPI-C++-MXML-TABLE-test" 
+#                 COMMAND napi_test_cpp-xml-table)
     endif()
 
     #--------------------------------------------------------------------------
