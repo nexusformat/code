@@ -33,7 +33,7 @@ find_package(LibXml2)
 include_directories("../include")
 
 add_subdirectory (NXbrowse)
-add_subdirectory(c-nxvalidate)
+#add_subdirectory(c-nxvalidate)
 
 if (ENABLE_CXX)
   add_subdirectory (NXdir)
