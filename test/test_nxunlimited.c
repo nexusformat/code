@@ -64,17 +64,25 @@ int test_unlimited(int file_type, const char* filename)
 int main(int argc, char* argv[])
 {
     time_t tim;
+#ifdef WITH_HDF4
     printf("Testing HDF4\n");
     time(&tim);
     test_unlimited(NXACC_CREATE4, "test_unlimited.nx4");
     printf("Took %u seconds\n", (unsigned)(time(NULL) - tim));
+#endif
+
+#ifdef WITH_MXML
     printf("Testing XML\n");
     time(&tim);
     test_unlimited(NXACC_CREATEXML, "test_unlimited.xml");
     printf("Took %u seconds\n", (unsigned)(time(NULL) - tim));
+#endif
+
+#ifdef WITH_HDF5
     printf("Testing HDF5\n");
     time(&tim);
     test_unlimited(NXACC_CREATE5, "test_unlimited.nx5");
     printf("Took %u seconds\n", (unsigned)(time(NULL) - tim));
+#endif
     return 0;
 }
