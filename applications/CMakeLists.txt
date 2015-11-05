@@ -41,24 +41,24 @@ if (ENABLE_CXX)
   add_subdirectory (NXtraverse)
 endif()
 
+if (ENABLE_FORTRAN AND CMAKE_Fortran_COMPILER_WORKS)
+    add_subdirectory (NXdump)
+endif()
 
 
-#if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
-#    add_subdirectory (NXdump)
-#endif()
+if(LIBXML2_FOUND)
+    add_subdirectory (NXsummary)
+    add_subdirectory (NXtranslate)
+endif(LIBXML2_FOUND)
+
+#-----------------------------------------------------------------------------
+# programs built in the original distribution 
+#
+# currently not supported
+#-----------------------------------------------------------------------------
+#install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)
+
 #
 #if (HAVE_MXML)
 #add_subdirectory (nxingest)
 #endif(HAVE_MXML)
-
-#
-#if(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
-#    add_subdirectory (NXvalidate)
-#endif(Java_JAVAC_EXECUTABLE AND ANT_FOUND)
-#
-#if(LIBXML2_FOUND)
-#    add_subdirectory (NXsummary)
-#    add_subdirectory (NXtranslate)
-#endif(LIBXML2_FOUND)
-#
-#install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)

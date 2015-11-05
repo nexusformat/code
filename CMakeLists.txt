@@ -70,6 +70,7 @@ option(ENABLE_FORTRAN90 "Build the Fortran 90 bindings" OFF)
 option(ENABLE_FORTRAN77 "Build the Fortran 77 bindings" OFF)
 option(ENABLE_JAVA      "Build Java bindings" OFF)
 option(ENABLE_CXX       "Build C++ bindings" OFF)
+option(ENABLE_APPS      "Build utility applications" OFF)
 
 #show this only on Windows systems
 if(CMAKE_HOST_WIN32)
@@ -219,21 +220,12 @@ if(HISTORY)
    set(HISTORY_LINK "")
 endif(HISTORY)
 
-#find_library(RPC rpc)
-#if(NOT WIN32)
-#CHECK_LIBRARY_EXISTS(${READLINE} readline "" HAVE_LIBREADLINE)
-#endif()
-#
-#
-#
 #
 #if(SZIPLIB_FOUND)
 #   set(SZIP_LINK "-lsz")
 #else(SZIPLIB_FOUND)
 #   set(SZIP_LIB "")
 #endif(SZIPLIB_FOUND)
-#
-#
 #
 
 include_directories("./include")
@@ -256,7 +248,12 @@ add_subdirectory (include)
 add_subdirectory (src)
 add_subdirectory (test)
 add_subdirectory (bindings)
-add_subdirectory (applications)
+
+#on user request utility applications will be built
+if(ENABLE_APPS)
+    add_subdirectory (applications)
+endif()
+
 #add_subdirectory (config)
 #add_subdirectory (contrib)
 #add_subdirectory (definitions)
