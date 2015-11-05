@@ -75,17 +75,19 @@ line programs to work with NeXus files. These programs are not built by
 default. In order to include them in the build the ``ENABLE_APPS`` variable
 must be set to ``ON``. 
 
-==============  =======================================================
-Program         Description
-==============  =======================================================
-``nxbrowse``    browse a NeXus file
-``nxdir``       list the contents of a NeXus file
-``nxconvert``   convert a NeXus file to whatever?
-``nxtraverse``  no idea what this is good for
+===============  =======================================================
+Program          Description
+===============  =======================================================
+``nxbrowse``     browse a NeXus file
+``nxdir``        list the contents of a NeXus file
+``nxconvert``    convert a NeXus file to whatever?
+``nxtraverse``   no idea what this is good for
 ``nxdump``      
 ``nxingest``
 ``nxsummary``
-==============  =======================================================
+``nxtranslate``
+``nxtraverse``
+===============  =======================================================
 
 Building the distribution with these utility applications pulls in some
 additional build requirements. These are
