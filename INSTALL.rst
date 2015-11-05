@@ -82,6 +82,9 @@ Program         Description
 ``nxdir``       list the contents of a NeXus file
 ``nxconvert``   convert a NeXus file to whatever?
 ``nxtraverse``  no idea what this is good for
+``nxdump``      
+``nxingest``
+``nxsummary``
 ==============  =======================================================
 
 Building the distribution with these utility applications pulls in some
