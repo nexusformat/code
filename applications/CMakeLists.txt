@@ -26,11 +26,35 @@
 #
 #====================================================================
 
+#--------------------------------------------------------------------
+# checking for additional build dependencies pulled in by the 
+# applications. 
+#--------------------------------------------------------------------
 #The LibXML 2 Libraries
 find_package(LibXml2)
 
+find_library(READLINE readline)
+if(READLINE)
+   set(HAVE_LIBREADLINE 1)
+   set(READLINE_LINK "readline")
+endif(READLINE)
+
+find_library(TERMCAP termcap)
+if(TERMCAP)
+   set(TERMCAP_LINK "")
+endif(TERMCAP)
+
+find_library(HISTORY history)
+if(HISTORY)
+   set(HISTORY_LINK "")
+endif(HISTORY)
+
 # Recurse into the subdirectories.
 include_directories("../include")
+
+#-----------------------------------------------------------------------------
+# proceed with building the programs
+#-----------------------------------------------------------------------------
 
 add_subdirectory (NXbrowse)
 #add_subdirectory(c-nxvalidate)
