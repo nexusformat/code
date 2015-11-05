@@ -90,7 +90,6 @@ include(CompilerChecks)
 #-----------------------------------------------------------------------------
 include(FindPkgConfig)
 
-#include(cmake_include/FindPython.cmake)
 #include(cmake_include/FindCBFLib.cmake)
 #include(cmake_include/FindJava.cmake)
 #include(cmake_include/FindJNI.cmake)
@@ -151,36 +150,14 @@ if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
     enable_language(Fortran)
 endif()
 
-#include(cmake_include/FindOpenGenie.cmake)
 #include(cmake_include/FindDocbookUtils.cmake)
-#include(cmake_include/FindSZIP.cmake)
-#include(cmake_include/FindAnt.cmake)
-
-#find_package(XMLRPC)
-#find_package(ZLIB)
 #find_package(Doxygen)
-#find_package(SWIG)
-#find_package(TCL)
-#find_package(LATEX)
-#find_package(PythonInterp)
 
 #Find the java runtime and sdk
 #if(ENABLE_JAVA_BINDINGS)
 #    find_package(Java 1.6)
 #    find_package(JNI)
 #endif()
-
-# set ZLIB_ROOT as hint to find_package
-#if (ZLIB_SEARCH)
-#    set(ZLIB_ROOT ${ZLIB_SEARCH})
-#elseif($ENV{ZLIB_ROOT})
-#    set(ZLIB_ROOT $ENV{ZLIB_ROOT})
-#else()
-#    set(ZLIB_ROOT ${HDF5_ROOT_DIR} ${HDF4_ROOT_DIR} ${SZIP_ROOT_DIR})
-#endif()
-#find_package(ZLIB)
-
-#Find the libraries for the build.
 
 
 find_library(PTHREAD pthread)
@@ -194,28 +171,11 @@ if(PTHREAD)
    endif()
 endif(PTHREAD)
 
-#
-#if(SZIPLIB_FOUND)
-#   set(SZIP_LINK "-lsz")
-#else(SZIPLIB_FOUND)
-#   set(SZIP_LIB "")
-#endif(SZIPLIB_FOUND)
-#
-
-include_directories("./include")
-include_directories("${PROJECT_BINARY_DIR}/include")
+include_directories("${PROJECT_BINARY_DIR}/include"
+                    "${PROJECT_SOURCE_DIR}/include")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
-
-#if (CMAKE_SIZEOF_VOID_P MATCHES "8")
-#    set(ARCH64 1)
-#	set(ARCHSUFFIX "64")
-#else()
-#    set(ARCH64 0)
-#	set(ARCHSUFFIX "")
-#endif()
-
 
 # Recurse into the subdirectories.
 add_subdirectory (include)
@@ -228,9 +188,7 @@ if(ENABLE_APPS)
     add_subdirectory (applications)
 endif()
 
-#add_subdirectory (config)
 #add_subdirectory (contrib)
-#add_subdirectory (definitions)
 #add_subdirectory (doc)
 #add_subdirectory (examples)
 #add_subdirectory (InstallerBits)
