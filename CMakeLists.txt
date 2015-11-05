@@ -182,15 +182,6 @@ endif()
 
 #Find the libraries for the build.
 
-find_library(M m)
-if(M)
-   set(M_LINK "-lm")
-endif(M)
-
-find_library(DL dl)
-if(DL)
-   set(DL_LINK "-ldl")
-endif(DL)
 
 find_library(PTHREAD pthread)
 if(PTHREAD)
