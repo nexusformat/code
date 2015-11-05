@@ -202,6 +202,12 @@ endif(DL)
 find_library(PTHREAD pthread)
 if(PTHREAD)
    set(PTHREAD_LINK "-lpthread")
+
+   #this fixes an issue on OpenSuse 13.2 where the MXML library is not 
+   #prelinked with threads
+   if(WITH_MXML)
+       list(APPEND NAPI_LINK_LIBS ${PTHREAD_LINK})
+   endif()
 endif(PTHREAD)
 
 find_library(TERMCAP termcap)
