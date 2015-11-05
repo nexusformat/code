@@ -26,7 +26,7 @@ configuration
 
 * ``-DENABLE_HDF5=1`` for HDF5
 * ``-DENABLE_HDF4=1`` for HDF4
-* and ``-DENABLE_XML=1`` for MXML
+* and ``-DENABLE_MXML=1`` for MXML
 
 CMake tries then to figure out the locations of the required library binaries
 and header files. This should work if the library provides a ``pkg-config`` file
@@ -34,7 +34,7 @@ and/or is installed in one of the systems default locations.
 
 If your library is not in a default location you have basically two options. 
 
-1. if the library is installed with a ``pkg-confi`` file you can add the path 
+1. if the library is installed with a ``pkg-config`` file you can add the path 
    to this file to your ``PKG_CONFIG_PATH`` environment variable. 
 2. define CMake variables during configuration that point to the 
    appropriate location. 

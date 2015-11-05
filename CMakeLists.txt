@@ -37,22 +37,17 @@ endif(NOT CMAKE_BUILD_TYPE)
 project (NeXus)
 enable_testing()
 
-
-message(STATUS ${PROJECT_SOURCE_DIR})
 #set the module path
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
-message(STATUS ${CMAKE_MODULE_PATH})
 
-#------------------------------------------------------------------------------
-# set the default installation prefix
-#------------------------------------------------------------------------------
-if(WIN32)
-    #don't know yet what to put here
-else()
-    if(NOT CMAKE_INSTALL_PREFIX)
-        set(CMAKE_INSTALL_PREFIX "/usr/local")
-    endif()
-    #load module for GNU/Linux default installation directories
+#-----------------------------------------------------------------------------
+# setup installation directories
+#
+# This is an OS specific task and we need to take care about the target 
+# architecture. 
+#-----------------------------------------------------------------------------
+if(CMAKE_HOST_UNIX)
+    #easy on Unix - just follow the GNU standard
     include(GNUInstallDirs)
 endif()
 
@@ -75,8 +70,12 @@ option(ENABLE_FORTRAN90 "Build the Fortran 90 bindings" OFF)
 option(ENABLE_FORTRAN77 "Build the Fortran 77 bindings" OFF)
 option(ENABLE_JAVA      "Build Java bindings" OFF)
 option(ENABLE_CXX       "Build C++ bindings" OFF)
-option(MINGW_MSYS   "We are building under MINGW." OFF)
-option(HAVE_MS_LIB  "We are building under MINGW." OFF)
+
+#show this only on Windows systems
+if(CMAKE_HOST_WIN32)
+    option(MINGW_MSYS   "We are building under MINGW." OFF)
+    option(HAVE_MS_LIB  "We are building under MINGW." OFF)
+endif()
 
 #-----------------------------------------------------------------------------
 # include some general purpose modules
