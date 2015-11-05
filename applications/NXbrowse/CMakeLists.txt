@@ -25,10 +25,15 @@
 #
 #==============================================================================
 
+#------------------------------------------------------------------------------
+# build and link the executable
+#------------------------------------------------------------------------------
 add_executable (nxbrowse NXbrowse.c)
-
 target_link_libraries(nxbrowse NeXus_Shared_Library ${READLINE_LINK})
 
+#------------------------------------------------------------------------------
+# install binary and man-page
+#------------------------------------------------------------------------------
 install (TARGETS nxbrowse 
          DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
 install (FILES nxbrowse.1 
