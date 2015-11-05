@@ -30,13 +30,15 @@
 # build and link the program binary
 #-----------------------------------------------------------------------------
 include_directories(${PROJECT_BINARY_DIR}/bindings/f90)
-add_executable (NXdump NXdump.f90)
-target_link_libraries(NXdump NeXus_Shared_Library NeXus_F90_Shared_Library)
+add_executable (nxdump NXdump.f90)
+target_link_libraries(nxdump NeXus_Shared_Library NeXus_F90_Shared_Library)
 
 #-----------------------------------------------------------------------------
 # install the program binary
 #-----------------------------------------------------------------------------
-install (PROGRAMS NXdump DESTINATION bin COMPONENT Runtime)
+install (TARGETS nxdump 
+         DESTINATION ${CMAKE_INSTALL_BINDIR} 
+         COMPONENT Runtime)
 
 
 
