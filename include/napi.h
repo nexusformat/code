@@ -431,7 +431,7 @@ extern  NXstatus NXcompmakedata64 (NXhandle handle, CONSTCHAR* label, int dataty
 
 
   /**
-   * Switch compression on. This routine is superseeded by NXcompmakedata and thus 
+   * Switch compression on. This routine is superceded by NXcompmakedata and thus 
    * is deprecated.
    * \param handle A NeXus file handle as initialized by NXopen. 
    * \param compr_type The compression scheme to use. Possible values:
@@ -679,7 +679,7 @@ extern  NXstatus  NXgetattrinfo(NXhandle handle, int* no_items);
 extern  NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
   /**
-   * Read an arbitraily shaped attribute.
+   * Read an arbitrarily shaped attribute.
    * \param handle A NeXus file handle as initialized by NXopen.
    * \param name The name of the atrribute to read.
    * \param data A pointer to a memory area large enough to hold the attributes value.
