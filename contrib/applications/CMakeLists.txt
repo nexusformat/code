@@ -26,5 +26,4 @@
 #
 #====================================================================
 
-add_subdirectory (CBFLib)
 add_subdirectory (NXextract)

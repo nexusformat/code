@@ -22,7 +22,6 @@
 #
 #  For further information, see <http://www.nexusformat.org>
 #
-#
 #==============================================================================
 
 cmake_minimum_required(VERSION 2.8.9)
@@ -151,7 +150,6 @@ if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
 endif()
 
 #include(cmake_include/FindOpenGenie.cmake)
-include(cmake_include/FindDocbookUtils.cmake)
 #include(cmake_include/FindSZIP.cmake)
 #include(cmake_include/FindAnt.cmake)
 
@@ -201,7 +199,11 @@ endif()
 
 add_subdirectory (doc)
 #add_subdirectory (config)
-#add_subdirectory (contrib)
+
+if(ENABLE_CONTRIB)
+    add_subdirectory (contrib)
+endif()
+
 #add_subdirectory (examples)
 #add_subdirectory (InstallerBits)
 #add_subdirectory (macosx_install_kit)
