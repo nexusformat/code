@@ -37,7 +37,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
         COMMAND   ${DOXYGEN_EXECUTABLE} Doxyfile_c
         COMMENT   "C DOXYGEN"
     )
-    install(DIRECTORY html-c
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-c
             DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
             COMPONENT Documentation)
 
@@ -50,7 +50,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
             COMMENT   "CPP DOXYGEN"
         )
         
-        install(DIRECTORY html-cpp
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-cpp
                 DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
                 COMPONENT Documentation)
         
@@ -80,7 +80,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
             COMMENT   "F90 DOXYGEN"
         )
 
-        install(DIRECTORY html-f90
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-f90
                 DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
                 COMPONENT Documentation)
         
@@ -94,7 +94,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
             COMMENT   "F77 DOXYGEN"
         )
     
-        install(DIRECTORY html-f77
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-f77
                 DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
                 COMPONENT Documentation)
         add_dependencies(html html_f77_api_doc)
