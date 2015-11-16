@@ -154,7 +154,7 @@ endif()
 #include(cmake_include/FindAnt.cmake)
 
 #find_package(XMLRPC)
-#find_package(ZLIB)
+find_package(ZLIB)
 find_package(LibXml2)
 find_package(Doxygen)
 #find_package(SWIG)
