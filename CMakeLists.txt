@@ -204,7 +204,6 @@ if(ENABLE_CONTRIB)
     add_subdirectory (contrib)
 endif()
 
-#add_subdirectory (examples)
 #add_subdirectory (InstallerBits)
 #add_subdirectory (macosx_install_kit)
 #add_subdirectory (scripts)
