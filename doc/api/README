@@ -5,3 +5,6 @@
   NeXusInter.* is current. The file to edit is NeXusFile.radi which 
   is in a wiki like syntax
 
+  This directory is not automatically built but can act as a useful 
+  resouce for NAPI maintainers. 
+
