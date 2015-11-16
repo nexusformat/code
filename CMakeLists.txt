@@ -199,15 +199,9 @@ if(ENABLE_APPS)
     add_subdirectory (applications)
 endif()
 
-<<<<<<< HEAD
 add_subdirectory (doc)
-
 #add_subdirectory (config)
 #add_subdirectory (contrib)
-=======
-#add_subdirectory (contrib)
-#add_subdirectory (doc)
->>>>>>> c40ab21f601cb902b4696522920913160a78f248
 #add_subdirectory (examples)
 #add_subdirectory (InstallerBits)
 #add_subdirectory (macosx_install_kit)

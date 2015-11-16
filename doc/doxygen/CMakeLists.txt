@@ -88,7 +88,8 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
                        ${PROJECT_BINARY_DIR}/doc/doxygen/html-python
                        ${PROJECT_BINARY_DIR}/doc/doxygen/html-f90
                        ${PROJECT_BINARY_DIR}/doc/doxygen/html-f77
-                       DESTINATION ${NXDOCDIR}/doxygen COMPONENT Documentation)
+                       DESTINATION ${CMAKE_INSTALL_DOCDIR}/api 
+                       COMPONENT Documentation)
 
 endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 

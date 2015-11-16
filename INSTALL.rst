@@ -13,6 +13,8 @@ the build system
 * HDF5 libraries and header files 
 * Optional: HDF4 libraries and header files
 * Optional: MXML libraries and header files
+* doxygen: for building the API documentation
+
 
 Building the code on Linux
 ==========================
