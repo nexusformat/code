@@ -28,7 +28,11 @@
 
 if(DOCBOOKUTILS_FOUND)
 
-    SET(DOC_SRC NeXus_definitions.docbook terminology.docbook methods.docbook base_classes.docbook tofnpd.docbook tofnref.docbook monoref.docbook tofdgs.docbook monotas.docbook)
+    SET(DOC_SRC NeXus_definitions.docbook terminology.docbook 
+                methods.docbook base_classes.docbook 
+                tofnpd.docbook tofnref.docbook 
+                monoref.docbook tofdgs.docbook monotas.docbook)
+
     SET(IMAGES tofnpd.jpg tofnpd.gif)
 
     ADD_CUSTOM_COMMAND( 
@@ -53,7 +57,7 @@ if(DOCBOOKUTILS_FOUND)
 
 	install (FILES ${PROJECT_BINARY_DIR}/doc/tech_ref/NeXus_definitions.pdf
                        ${PROJECT_BINARY_DIR}/doc/tech_ref/NeXus_definitions.txt
-                       DESTINATION ${NXDOCDIR}/tech_ref COMPONENT Documentation)
+                       DESTINATION ${CMAKE_INSTALL_DOCDIR}/tech_ref COMPONENT Documentation)
 
 endif(DOCBOOKUTILS_FOUND)
 

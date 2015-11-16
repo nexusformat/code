@@ -26,12 +26,14 @@
 #
 #====================================================================
 
-add_subdirectory (api)
-add_subdirectory (doxygen)
+#add_subdirectory (api)
+#add_subdirectory (doxygen)
 #add_subdirectory (howto)
-add_subdirectory (nxdict)
+#add_subdirectory (nxdict)
 add_subdirectory (tech_ref)
 #add_subdirectory (tutorial)
 
-install (FILES README.doc DESTINATION ${NXDOCDIR} COMPONENT Documentation)
+install (FILES README.doc 
+         DESTINATION ${CMAKE_INSTALL_DOCDIR} 
+         COMPONENT Documentation)
 
