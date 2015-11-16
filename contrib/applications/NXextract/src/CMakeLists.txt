@@ -4,7 +4,7 @@
 #  
 #  CMakeLists for building the NeXus library and applications.
 #
-#  Copyright (C) 2011 Stephen Rankin
+#  Copyright (C) 2015 Eugen Wintersberger
 #  
 #  This library is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by the
@@ -24,4 +24,30 @@
 #
 #=============================================================================
 
-add_subdirectory (NXextract)
+set(SOURCE extractorapp.cpp 
+           extractor.cpp 
+           templateparsor.cpp
+		   nexusevaluator.cpp 
+           jpegwrap.cpp 
+           nxfile.cpp 
+           base.cpp 
+		   date.cpp 
+           bmp.cpp 
+           file.cpp 
+           membuf.cpp 
+		   base.h 
+           bmp.h 
+           date.h 
+           extractor.h 
+           file.h 
+		   jpegwrap.h 
+           membuf.h 
+           nexusevaluator.h 
+           nxfile.h 
+		   templateparsor.h 
+           variant.h 
+           variant.cpp)
+
+add_executable(nxextract ${SOURCE})
+target_link_libraries(nxextract NeXus_Shared_Library)
+

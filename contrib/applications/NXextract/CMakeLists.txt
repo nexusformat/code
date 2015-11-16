@@ -4,7 +4,7 @@
 #  
 #  CMakeLists for building the NeXus library and applications.
 #
-#  Copyright (C) 2011 Stephen Rankin
+#  Copyright (C) 2015 Eugen Wintersberger
 #  
 #  This library is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by the
@@ -24,4 +24,4 @@
 #
 #=============================================================================
 
-add_subdirectory (NXextract)
+add_subdirectory (src)
