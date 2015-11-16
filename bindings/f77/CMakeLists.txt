@@ -51,6 +51,5 @@ set_target_properties(NeXus_F77_Shared_Library PROPERTIES
 target_link_libraries(NeXus_F77_Shared_Library NeXus_Shared_Library)
 
 install (TARGETS NeXus_F77_Static_Library NeXus_F77_Shared_Library
-         RUNTIME DESTINATION bin COMPONENT Runtime
-         LIBRARY DESTINATION lib COMPONENT Runtime
-         ARCHIVE DESTINATION lib/nexus COMPONENT Development)
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus COMPONENT Development)

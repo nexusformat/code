@@ -26,11 +26,45 @@
 #
 #====================================================================
 
+#--------------------------------------------------------------------
+# checking for additional build dependencies pulled in by the 
+# applications. 
+#--------------------------------------------------------------------
 #The LibXML 2 Libraries
 find_package(LibXml2)
 
+find_library(READLINE readline)
+if(READLINE)
+   set(HAVE_LIBREADLINE 1)
+   set(READLINE_LINK "readline")
+endif(READLINE)
+
+find_library(TERMCAP termcap)
+if(TERMCAP)
+   set(TERMCAP_LINK "")
+endif(TERMCAP)
+
+find_library(HISTORY history)
+if(HISTORY)
+   set(HISTORY_LINK "")
+endif(HISTORY)
+
+find_library(M m)
+if(M)
+   set(M_LINK "-lm")
+endif(M)
+
+find_library(DL dl)
+if(DL)
+   set(DL_LINK "-ldl")
+endif(DL)
+
 # Recurse into the subdirectories.
 include_directories("../include")
+
+#-----------------------------------------------------------------------------
+# proceed with building the programs
+#-----------------------------------------------------------------------------
 
 add_subdirectory (NXbrowse)
 #add_subdirectory(c-nxvalidate)
@@ -41,7 +75,7 @@ if (ENABLE_CXX)
   add_subdirectory (NXtraverse)
 endif()
 
-if (ENABLE_FORTRAN AND CMAKE_Fortran_COMPILER_WORKS)
+if (ENABLE_FORTRAN90 AND CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (NXdump)
 endif()
 
@@ -51,6 +85,10 @@ if(LIBXML2_FOUND)
     add_subdirectory (NXtranslate)
 endif(LIBXML2_FOUND)
 
+if (WITH_MXML)
+    add_subdirectory (nxingest)
+endif()
+
 #-----------------------------------------------------------------------------
 # programs built in the original distribution 
 #
@@ -58,7 +96,4 @@ endif(LIBXML2_FOUND)
 #-----------------------------------------------------------------------------
 #install (PROGRAMS nxdiff DESTINATION bin COMPONENT Runtime)
 
-#
-#if (HAVE_MXML)
-#add_subdirectory (nxingest)
-#endif(HAVE_MXML)
+

@@ -90,7 +90,6 @@ include(CompilerChecks)
 #-----------------------------------------------------------------------------
 include(FindPkgConfig)
 
-#include(cmake_include/FindPython.cmake)
 #include(cmake_include/FindCBFLib.cmake)
 #include(cmake_include/FindJava.cmake)
 #include(cmake_include/FindJNI.cmake)
@@ -171,33 +170,6 @@ find_package(Doxygen)
 #    find_package(JNI)
 #endif()
 
-# set ZLIB_ROOT as hint to find_package
-#if (ZLIB_SEARCH)
-#    set(ZLIB_ROOT ${ZLIB_SEARCH})
-#elseif($ENV{ZLIB_ROOT})
-#    set(ZLIB_ROOT $ENV{ZLIB_ROOT})
-#else()
-#    set(ZLIB_ROOT ${HDF5_ROOT_DIR} ${HDF4_ROOT_DIR} ${SZIP_ROOT_DIR})
-#endif()
-#find_package(ZLIB)
-
-#Find the libraries for the build.
-
-find_library(M m)
-if(M)
-   set(M_LINK "-lm")
-endif(M)
-
-find_library(READLINE readline)
-if(READLINE)
-   set(HAVE_LIBREADLINE 1)
-   set(READLINE_LINK "readline")
-endif(READLINE)
-
-find_library(DL dl)
-if(DL)
-   set(DL_LINK "-ldl")
-endif(DL)
 
 find_library(PTHREAD pthread)
 if(PTHREAD)
@@ -210,38 +182,11 @@ if(PTHREAD)
    endif()
 endif(PTHREAD)
 
-find_library(TERMCAP termcap)
-if(TERMCAP)
-   set(TERMCAP_LINK "")
-endif(TERMCAP)
-
-find_library(HISTORY history)
-if(HISTORY)
-   set(HISTORY_LINK "")
-endif(HISTORY)
-
-#
-#if(SZIPLIB_FOUND)
-#   set(SZIP_LINK "-lsz")
-#else(SZIPLIB_FOUND)
-#   set(SZIP_LIB "")
-#endif(SZIPLIB_FOUND)
-#
-
-include_directories("./include")
-include_directories("${PROJECT_BINARY_DIR}/include")
+include_directories("${PROJECT_BINARY_DIR}/include"
+                    "${PROJECT_SOURCE_DIR}/include")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
-
-#if (CMAKE_SIZEOF_VOID_P MATCHES "8")
-#    set(ARCH64 1)
-#	set(ARCHSUFFIX "64")
-#else()
-#    set(ARCH64 0)
-#	set(ARCHSUFFIX "")
-#endif()
-
 
 # Recurse into the subdirectories.
 add_subdirectory (include)
@@ -254,15 +199,19 @@ if(ENABLE_APPS)
     add_subdirectory (applications)
 endif()
 
+<<<<<<< HEAD
 add_subdirectory (doc)
 
 #add_subdirectory (config)
 #add_subdirectory (contrib)
+=======
+#add_subdirectory (contrib)
+#add_subdirectory (doc)
+>>>>>>> c40ab21f601cb902b4696522920913160a78f248
 #add_subdirectory (examples)
 #add_subdirectory (InstallerBits)
 #add_subdirectory (macosx_install_kit)
 #add_subdirectory (scripts)
 #add_subdirectory (third_party)
-#add_subdirectory (vms)
 #add_subdirectory (windows)
 #add_subdirectory (Windows_extra)

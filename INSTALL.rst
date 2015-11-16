@@ -56,5 +56,47 @@ MXML_LIBRARY_DIRS  location of the MXML runtime libraries
 Enable language bindings
 ------------------------
 
+The library provides bindings for C++, Fortran 77, and Fortran 90. To enable
+them set the following variables to one during code configuration
+
+================ ===============================
+CMAKE variable   language bindings
+================ ===============================
+ENABLE_CXX       build with C++ bindings
+ENABLE_FORTRAN77 build with Fortran 77 bindings
+ENABLE_FORTRAN90 build with Fortran 90 bindings
+================ ===============================
+
 Enable applications
 -------------------
+
+Aside with the C-library the NAPI source distribution ships a couple of command
+line programs to work with NeXus files. These programs are not built by
+default. In order to include them in the build the ``ENABLE_APPS`` variable
+must be set to ``ON``. 
+
+===============  =======================================================
+Program          Description
+===============  =======================================================
+``nxbrowse``     browse a NeXus file
+``nxdir``        list the contents of a NeXus file
+``nxconvert``    convert a NeXus file to whatever?
+``nxtraverse``   no idea what this is good for
+``nxdump``      
+``nxingest``
+``nxsummary``
+``nxtranslate``
+``nxtraverse``
+===============  =======================================================
+
+Building the distribution with these utility applications pulls in some
+additional build requirements. These are
+
+* ``libreadline``
+* ``libtermcap``
+* ``libhistory`` (most probably provided by the ``libreadline`` package)
+* ``libxml2``
+
+As one cannot select an individual program to be included in the build, all
+these build dependencies must be satisified when ``ENABLE_APPS`` is set to
+``ON`` in order for the build to succeed.
