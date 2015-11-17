@@ -72,7 +72,7 @@ static void clean_string(void* dataBuffer, int dataRank, int dataDimensions[])
 	}
 }
 
-struct link_to_make
+struct link_to_make 
 {
     char from[1024];   /* path of directory with link */
     char name[256];    /* name of link */
@@ -212,11 +212,39 @@ int convert_file(int nx_format, const char* inFile, int nx_read_access, const ch
    return NX_OK;
 }
 
+/* Test if this is really a NX_CHAR in disguise */
+static int testForText(char *name)
+{
+  int count = 0;
+
+  static const char *txtNames[] = {
+    "name",
+    "type",
+    "title",
+    "start_time",
+    "end_time",
+    "sample_name",
+    "CounterMode",
+    "count_mode",
+    NULL
+  };
+
+  while(txtNames[count] != NULL){
+    if(strcmp(txtNames[count],name) == 0) {
+      return 1;
+    }
+    count++;
+  }
+  
+  return 0;
+}
+
 /* Prints the contents of each group as XML tags and values */
 static int WriteGroup (int is_definition)
 { 
   
-   int i,  status, dataType, dataRank, dataDimensions[NX_MAXRANK];     
+  int i,  status, dataType, dataRank, dataDimensions[NX_MAXRANK], testString; 
+  long dataSize;
    static const int slab_start[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
    static const int MAX_DEF_ARRAY_ELEMENTS_PER_DIM = 3; /* doesn't work yet - only 1 element is written */
    NXname name, nxclass;
@@ -226,6 +254,7 @@ static int WriteGroup (int is_definition)
    using namespace NeXus;
    using namespace NeXus::Stream;
    File nfile_in(inId), nfile_out(outId);
+   char *ptr = NULL;
 
    do {
       status = NXgetnextentry (inId, name, nxclass, &dataType);
@@ -234,12 +263,31 @@ static int WriteGroup (int is_definition)
 //         std::cerr << "WriteGroup: " << name << "(" << nxclass << ")" << std::endl;
          if (!strncmp(nxclass,"SDS",3)) {
 	    add_path(name);
+	    testString = 0;
             if (NXopendata (inId, name) != NX_OK) return NX_ERROR;
 	    if (NXgetdataID(inId, &link) != NX_OK) return NX_ERROR;
 	    if (!strcmp(current_path, link.targetPath))
 	    {
                 if (NXgetinfo (inId, &dataRank, dataDimensions, &dataType) != NX_OK) return NX_ERROR;
-                if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
+		if((dataType == NX_INT8 || dataType == NX_UINT8) &&  testForText(name)){
+		  /*
+		    This is really meant to be a NX_CHAR
+		  */
+		  if(dataDimensions[0] < 8) {
+		    dataDimensions[0] = 8;
+		  }
+		  if (NXmakedata (outId, name, NX_CHAR, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
+		  testString = 1;
+		} else {
+		  for(i = 0, dataSize  = 1; i < dataRank; i++){
+		    dataSize *= dataDimensions[i];
+		  }
+		  if(dataSize > 100){
+		    if (NXcompmakedata (outId, name, dataType, dataRank, dataDimensions, NX_COMP_LZW,dataDimensions) != NX_OK) return NX_ERROR;
+		  } else {
+		    if (NXmakedata (outId, name, dataType, dataRank, dataDimensions) != NX_OK) return NX_ERROR;
+                  }
+		}
                 if (NXopendata (outId, name) != NX_OK) return NX_ERROR;
 		if ( is_definition && (dataType != NX_CHAR) )
 		{
@@ -263,6 +311,14 @@ static int WriteGroup (int is_definition)
 		    {
 			clean_string(dataBuffer, dataRank, dataDimensions);
 		    }
+		    /* fix quasi empty strings */
+		    if(testString){
+		      ptr = (char *)dataBuffer;
+		      if(strlen(ptr) < 3) {
+			NXfree((void**)&dataBuffer);
+			dataBuffer = strdup("Unknown");
+		      }
+                    }
                     if (NXputdata (outId, dataBuffer) != NX_OK) return NX_ERROR;
 		}
                 if (WriteAttributes (is_definition, 0) != NX_OK) return NX_ERROR;
@@ -356,6 +412,14 @@ static int WriteAttributes (int is_definition, int is_group)
 	    {
 		clean_string(attrBuffer, 1, &attrLen);
 	    }
+	    if(attrType == NX_INT8 || attrType == NX_UINT8)
+	    {
+	      /*
+		This is most likely a very old file where we used NX_INT8 or NX_UINT8 
+		for strings because there was no explicit NX_CHAR type yet.
+	      */
+	      attrType = NX_CHAR;
+            }
             if (NXputattr (outId, attrName, attrBuffer, attrLen , attrType) != NX_OK) return NX_ERROR;
             if (NXfree((void**)&attrBuffer) != NX_OK) return NX_ERROR;
          }
