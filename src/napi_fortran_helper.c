@@ -26,8 +26,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include <napi_fortran_helper.h>
+#include <napi_internal.h>
+#include "nxstack.h"
 
 /*----------------------------------------------------------------------
                  F77 - API - Support - Routines
