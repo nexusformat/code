@@ -88,7 +88,6 @@ Program          Description
 ``nxingest``
 ``nxsummary``
 ``nxtranslate``
-``nxtraverse``
 ===============  =======================================================
 
 Building the distribution with these utility applications pulls in some
