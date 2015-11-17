@@ -187,7 +187,7 @@ function(find_module VAR )
         #if the user has not provided any configuration we have to do this manually
         if(PKG_CONFIG_FOUND AND MOD_NAME)
             #the easy way  - we use package config
-            message("pkg-config is searching for : ${MOD_NAME}")
+            message(STATUS "pkg-config is searching for : ${MOD_NAME}")
             pkg_search_module(${VAR} ${MOD_NAME})
         endif()
 

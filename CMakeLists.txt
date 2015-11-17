@@ -129,7 +129,7 @@ endif()
 
 if(ENABLE_HDF5)
 
-    message ("${HDF5_COMPONENTS}")
+    message (STATUS "${HDF5_COMPONENTS}")
     if (ENABLE_CXX)
         find_package ( HDF5 COMPONENTS CXX HL REQUIRED )
     else()
