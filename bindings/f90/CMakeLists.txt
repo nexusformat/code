@@ -46,7 +46,8 @@ add_library (NeXus_F90_Shared_Library SHARED ${SOURCES})
 #Note - library version needs to be got from somewhere?
 set_target_properties(NeXus_F90_Shared_Library PROPERTIES 
                       OUTPUT_NAME NeXus90
-                      VERSION 1.0 SOVERSION 4)
+                      VERSION "${NAPI_VERSION}"
+                      SOVERSION ${NEXUS_SONAME})
 
 target_link_libraries(NeXus_F90_Shared_Library NeXus_Shared_Library )
 

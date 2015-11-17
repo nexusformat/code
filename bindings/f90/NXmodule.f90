@@ -30,7 +30,7 @@ MODULE NXmodule
 
    PUBLIC
 ! *** NeXus version parameter
-   CHARACTER(len=*), PARAMETER, PUBLIC :: NeXus_version = "2.0.1"
+   CHARACTER(len=*), PARAMETER, PUBLIC :: NeXus_version = "4.4.0"
 ! *** NeXus file access parameters
    INTEGER, PARAMETER, PUBLIC :: NXACC_READ = 1
    INTEGER, PARAMETER, PUBLIC :: NXACC_RDWR = 2
