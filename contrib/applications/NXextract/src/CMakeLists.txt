@@ -24,6 +24,8 @@
 #
 #=============================================================================
 
+find_package(JPEG REQUIRED)
+
 set(SOURCE extractorapp.cpp 
            extractor.cpp 
            templateparsor.cpp
@@ -49,5 +51,5 @@ set(SOURCE extractorapp.cpp
            variant.cpp)
 
 add_executable(nxextract ${SOURCE})
-target_link_libraries(nxextract NeXus_Shared_Library)
+target_link_libraries(nxextract NeXus_Shared_Library jpeg)
 
