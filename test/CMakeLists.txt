@@ -51,7 +51,7 @@ if(WITH_HDF4)
     add_executable(napi_test_hdf4 napi_test.c)
     target_link_libraries(napi_test_hdf4 NeXus_Shared_Library 
                           ${NAPI_LINK_LIBS})
-    add_test(NAME "NPI-C-HDF4-test"
+    add_test(NAME "NAPI-C-HDF4-test"
              COMMAND napi_test_hdf4)
 endif()
 
@@ -59,12 +59,12 @@ if(WITH_MXML)
     add_executable(napi_test-xml napi_test.c)
     target_link_libraries(napi_test-xml NeXus_Shared_Library 
                           ${NAPI_LINK_LIBS})
-    add_test(NAME "NPI-C-MXML-test"
+    add_test(NAME "NAPI-C-MXML-test"
              COMMAND napi_test-xml)
     add_executable(napi_test-xml-table napi_test.c)
     target_link_libraries(napi_test-xml-table NeXus_Shared_Library 
                           ${NAPI_LINK_LIBS})
-  add_test(NAME "NPI-C-MXML-TABLE-test"
+    add_test(NAME "NAPI-C-MXML-TABLE-test"
              COMMAND napi_test-xml-table)
 endif()
 
