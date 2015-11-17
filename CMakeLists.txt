@@ -135,6 +135,12 @@ if(ENABLE_HDF5)
     else()
         find_package ( HDF5 REQUIRED )
     endif()
+
+    # Hide annoying and confusing "HDF5_DIR-NOTFOUND" in CMake-GUI
+    if (HDF5_DIR STREQUAL "HDF5_DIR-NOTFOUND")
+      unset (HDF5_DIR CACHE)
+    endif()
+
     set(HAVE_HDF5 1)
     list(APPEND NAPI_LINK_LIBS ${HDF5_LIBRARIES})
     set(WITH_HDF5 TRUE)
