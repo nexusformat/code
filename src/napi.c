@@ -32,6 +32,7 @@
 #include <stdarg.h>
 
 #include <napi.h>
+#include <napi_internal.h>
 #include <nxconfig.h>
 #include "nxstack.h"
 

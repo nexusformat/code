@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <mxml.h>
 #include <napi.h>
+#include <napi_internal.h>
 #include <nxxml.h>
 #include "nxio.h"
 #include "nxdataset.h"
