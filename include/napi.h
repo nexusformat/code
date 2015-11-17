@@ -250,18 +250,6 @@ typedef struct {
 #    define NXgetversion        MANGLE(nxigetversion)
 
 /* 
- * FORTRAN helpers - for NeXus internal use only 
- */
-#    define NXfopen             MANGLE(nxifopen)
-#    define NXfclose            MANGLE(nxifclose)
-#    define NXfflush            MANGLE(nxifflush)
-#    define NXfmakedata         MANGLE(nxifmakedata)
-#    define NXfcompmakedata     MANGLE(nxifcompmakedata)
-#    define NXfcompress         MANGLE(nxifcompress)
-#    define NXfputattr          MANGLE(nxifputattr)
-#    define NXfgetpath          MANGLE(nxifgetpath)
-
-/* 
  * Standard interface 
  *
  * Functions added here are not automatically exported from 
@@ -993,22 +981,6 @@ extern  NXstatus  NXsetcache(long newVal);
   /*---------------------*/
   extern long nx_cacheSize;
 
-/* FORTRAN internals */
-
-  extern NXstatus  NXfopen(char * filename, NXaccess* am, 
-					NXhandle pHandle);
-  extern NXstatus  NXfclose (NXhandle pHandle);
-  extern NXstatus  NXfputattr(NXhandle fid, const char *name, const void *data, 
-                                   int *pDatalen, int *pIType);
-  extern NXstatus  NXfcompress(NXhandle fid, int *compr_type);
-  extern NXstatus  NXfcompmakedata(NXhandle fid, char *name, 
-                int *pDatatype,
-		int *pRank, int dimensions[],
-                int *compression_type, int chunk[]);
-  extern NXstatus  NXfmakedata(NXhandle fid, char *name, int *pDatatype,
-		int *pRank, int dimensions[]);
-  extern NXstatus  NXfflush(NXhandle pHandle);
-  extern NXstatus  NXfgetpath(NXhandle fid, char *path, int *pathlen);
 #ifdef __cplusplus
 };
 #endif /* __cplusplus */
