@@ -25,7 +25,9 @@
 
 ----------------------------------------------------------------------------*/
 
-#ifdef HDF4 
+#include <nxconfig.h>
+
+#ifdef WITH_HDF4 
 
 #include <stdlib.h>
 #include <assert.h>
@@ -34,6 +36,7 @@
 
 #include "napi.h"
 #include "napi4.h"
+
 
 extern	void *NXpData;
 

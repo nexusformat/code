@@ -1,55 +1,175 @@
 ## Process this file with cmake
-#====================================================================
+#==============================================================================
 #  NeXus - Neutron & X-ray Common Data Format
 #  
 #  CMakeLists for building the NeXus library and applications.
 #
 #  Copyright (C) 2011 Stephen Rankin
 #  
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2 of the License, or (at your option) any later version.
+#  This library is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by the
+#  Free Software Foundation; either version 2 of the License, or (at your
+#  option) any later version.
 # 
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+#  This library is distributed in the hope that it will be useful, but WITHOUT
+#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+#  for more details.
 # 
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free 
-#  Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
-#  MA  02111-1307  USA
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with this library; if not, write to the Free Software Foundation,
+#  Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #             
 #  For further information, see <http://www.nexusformat.org>
 #
 #
-#====================================================================
+#==============================================================================
 
-SET (NXEXAMPLE_FILES napif4_test.f  napif5_test.f  napif_test.f  napi_test.c  napi_test_cpp.cxx  NXtest.f90)
+set(NAPITESTSRC napi_test.c)
 
-INSTALL (FILES ${NXEXAMPLE_FILES} DESTINATION ${NXEXAMPLEDIR} COMPONENT Examples)
+#------------------------------------------------------------------------------
+# Need to copy the test data files 
+#------------------------------------------------------------------------------
+add_subdirectory(data)
 
-add_executable(napi_test_hdf5 napi_test.c)
-target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
+include_directories(${PROJECT_SOURCE_DIR}/include )
+link_directories(${HDF5_LIBRARY_DIRS} 
+                 ${HDF4_LIBRARY_DIRS}
+                 ${MXML_LIBRARY_DIRS})
 
-set (TEST_FILES
-    data/dmc01.h5
-    data/dmc02.h5
-)
+#------------------------------------------------------------------------------
+# In all cases we have to build the C-tests
+#------------------------------------------------------------------------------
+if(WITH_HDF5)
+    add_executable(napi_test_hdf5 napi_test.c)
+    target_link_libraries(napi_test_hdf5 NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C-HDF5-test" COMMAND napi_test_hdf5)
+endif()
 
-foreach (tfile ${TEST_FILES})
-    set (dest "${PROJECT_BINARY_DIR}/${tfile}")
-  add_custom_command (
-      TARGET     napi_test_hdf5 POST_BUILD
-      # copy might be faster? no comparision is necessary
-      COMMAND    ${CMAKE_COMMAND} -E copy_if_different
-        ${PROJECT_SOURCE_DIR}/test/${tfile} ${dest}
-      COMMENT "Copying ${tfile} to the Build tree"
-  )
-endforeach (tfile ${TEST_FILES})
+if(WITH_HDF4)
+    add_executable(napi_test_hdf4 napi_test.c)
+    target_link_libraries(napi_test_hdf4 NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NPI-C-HDF4-test"
+             COMMAND napi_test_hdf4)
+endif()
+
+if(WITH_MXML)
+    add_executable(napi_test-xml napi_test.c)
+    target_link_libraries(napi_test-xml NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NPI-C-MXML-test"
+             COMMAND napi_test-xml)
+    add_executable(napi_test-xml-table napi_test.c)
+    target_link_libraries(napi_test-xml-table NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+  add_test(NAME "NPI-C-MXML-TABLE-test"
+             COMMAND napi_test-xml-table)
+endif()
+
+#------------------------------------------------------------------------------
+# (most probably a) regression test 
+#------------------------------------------------------------------------------
+add_executable(leak_test1 leak_test1.c)
+target_link_libraries(leak_test1 NeXus_Shared_Library ${NAPI_LINK_LIBS})
+add_test(NAME "NAPI-C-leak-test-1"
+         COMMAND leak_test1)
+
+#------------------------------------------------------------------------------
+# Add test for unlimited dimensions 
+#------------------------------------------------------------------------------
+add_executable(test_nxunlimited test_nxunlimited.c)
+target_link_libraries(test_nxunlimited  NeXus_Shared_Library
+                      ${NAPI_LINK_LIBS})
+add_test(NAME "NAPI-C-test-nxunlimited"
+         COMMAND test_nxunlimited)
+         
+
+#------------------------------------------------------------------------------
+# Add tests relevant to C++ bindings
+#------------------------------------------------------------------------------
+if(ENABLE_CXX)
+    list(APPEND NAPITESTSRC napi_test_cpp.cxx)
+    include_directories(../bindings/cpp)
+
+    if(WITH_HDF5)
+        add_executable(napi_test_cpp-hdf5 napi_test_cpp.cxx)
+        target_link_libraries(napi_test_cpp-hdf5 NeXus_CPP_Shared_Library
+                              ${NAPI_LINK_LIBS})
+        add_test(NAME "NAPI-C++-HDF5-test" COMMAND napi_test_cpp-hdf5)
+    endif()
+
+    if(WITH_HDF4)
+        add_executable(napi_test_cpp-hdf4 napi_test_cpp.cxx)
+        target_link_libraries(napi_test_cpp-hdf4 NeXus_CPP_Shared_Library
+                              ${NAPI_LINK_LIBS})
+        add_test(NAME "NAPI-C++-HDF4-test" COMMAND napi_test_cpp-hdf4)
+    endif()
+
+    if(WITH_MXML)
+        add_executable(napi_test_cpp-xml napi_test_cpp.cxx)
+        target_link_libraries(napi_test_cpp-xml NeXus_CPP_Shared_Library
+                              ${NAPI_LINK_LIBS})
+        add_test(NAME "NAPI-C++-MXML-test" COMMAND napi_test_cpp-xml)
+        
+#        add_executable(napi_test_cpp-xml-table napi_test_cpp.cxx)
+#        target_link_libraries(napi_test_cpp-xml-table NeXus_CPP_Shared_Library
+#                              ${NAPI_LINK_LIBS})
+#        add_test(NAME "NAPI-C++-MXML-TABLE-test" 
+#                 COMMAND napi_test_cpp-xml-table)
+    endif()
+
+    #--------------------------------------------------------------------------
+    # build leak tests
+    #--------------------------------------------------------------------------
+    add_executable(leak_test2 leak_test2.cxx)
+    target_link_libraries(leak_test2 NeXus_CPP_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C++-leak-test-2" 
+             COMMAND leak_test2)
+
+    add_executable(leak_test3 leak_test3.cxx)
+    target_link_libraries(leak_test3 NeXus_CPP_Shared_Library
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C++-leak-test-3"
+             COMMAND leak_test3)
+endif()
+
+if(ENABLE_FORTRAN77)
+    include_directories(${PROJECT_BINARY_DIR}/bindings/f77)
+    include_directories(${PROJECT_SOURCE_DIR}/bindings/f77)
+   
+    if(WITH_HDF4)
+        add_executable(napif4_test napif4_test.f)
+        target_link_libraries(napif4_test NeXus_F77_Shared_Library)
+        add_test(NAME "NAPI-F77-HDF4-test"
+                 COMMAND napif4_test)
+    endif()
+    
+    if(WITH_HDF5)
+        add_executable(napif5_test napif5_test.f)
+        target_link_libraries(napif5_test NeXus_F77_Shared_Library)
+        add_test(NAME "NAPI-F77-HDF5-test"
+                 COMMAND napif5_test)
+    endif()
+
+    if(WITH_MXML)
+        add_executable(napif_test  napif_test.f)
+        target_link_libraries(napif_test NeXus_F77_Shared_Library)
+        add_test(NAME "NAPI-F77-XML-test"
+                 COMMAND napif_test)
+    endif()
+
+endif()
+
+if(ENABLE_FORTRAN90)
+    #need to add the directory with the .mod files to the include path
+    include_directories(${PROJECT_BINARY_DIR}/bindings/f90)
+    add_executable(NXtestf90 NXtest.f90)
+    target_link_libraries(NXtestf90 NeXus_F90_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "Fortran-90-test" COMMAND NXtestf90)
+endif()
 
 
-add_test(NAME napi_test_hdf5 WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
-    COMMAND $<TARGET_FILE:napi_test_hdf5> )
-#set_property(TEST napi_test_hdf5 PROPERTY PASS_REGULAR_EXPRESSION kkk)

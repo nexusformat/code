@@ -33,25 +33,23 @@ set (SOURCES napif.f)
 
 add_library (NeXus_F77_Static_Library STATIC ${HEADERS} ${SOURCES})
 
-set_target_properties(NeXus_F77_Static_Library PROPERTIES OUTPUT_NAME NeXus77)
+set_target_properties(NeXus_F77_Static_Library PROPERTIES 
+                      OUTPUT_NAME NeXus77)
 
-target_link_libraries(NeXus_F77_Static_Library NeXus_Static_Library ${HDF5_LIBRARIES} ${MXML_LINK}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(NeXus_F77_Static_Library NeXus_Static_Library)
 
 #Make NeXus F77 Bindings Shared Library
 
 add_library (NeXus_F77_Shared_Library SHARED ${HEADERS} ${SOURCES})
 
 #Note - library version needs to be got from somewhere?
-set_target_properties(NeXus_F77_Shared_Library PROPERTIES OUTPUT_NAME NeXusCPP
-                      VERSION 1.0 SOVERSION 4)
+set_target_properties(NeXus_F77_Shared_Library PROPERTIES 
+                      OUTPUT_NAME NeXus77
+                      VERSION 1.0 
+                      SOVERSION 4)
 
-target_link_libraries(NeXus_F77_Shared_Library NeXus_Shared_Library ${HDF5_LIBRARIES} ${MXML_LINK}
-                      ${HDF4_LINK} ${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(NeXus_F77_Shared_Library NeXus_Shared_Library)
 
 install (TARGETS NeXus_F77_Static_Library NeXus_F77_Shared_Library
-         RUNTIME DESTINATION bin COMPONENT Runtime
-         LIBRARY DESTINATION lib COMPONENT Runtime
-         ARCHIVE DESTINATION lib/nexus COMPONENT Development)
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus COMPONENT Development)

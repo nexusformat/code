@@ -26,17 +26,29 @@
 #
 #====================================================================
 # Recurse into the subdirectories.
-add_subdirectory (cpp)
-if (BUILD_FORTRAN_BINDINGS AND CMAKE_Fortran_COMPILER_WORKS)
+if(ENABLE_CXX)
+    add_subdirectory (cpp)
+endif()
+
+if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
+    enable_language(Fortran)
+endif()
+
+if(ENABLE_FORTRAN77)
     add_subdirectory (f77)
+endif()
+
+
+if(ENABLE_FORTRAN90)
     add_subdirectory (f90)
-endif ()
+endif()
+
 #add_subdirectory (idl)
-if (NOT(Java_JAVAC_EXECUTABLE MATCHES NOTFOUND))
-    add_subdirectory (java)
-endif ()
+#if (NOT(Java_JAVAC_EXECUTABLE MATCHES NOTFOUND))
+#    add_subdirectory (java)
+#endif ()
 #add_subdirectory (matlab)
-if (PYTHONINTERP_FOUND)
-    add_subdirectory (python)
-endif (PYTHONINTERP_FOUND)
+#if (PYTHONINTERP_FOUND)
+#    add_subdirectory (python)
+#endif (PYTHONINTERP_FOUND)
 #add_subdirectory (swig)

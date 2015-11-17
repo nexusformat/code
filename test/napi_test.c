@@ -98,6 +98,9 @@ int main (int argc, char *argv[])
   if(strstr(argv[0],"napi_test_hdf5") != NULL){
     nx_creation_code = NXACC_CREATE5;
     strcpy(nxFile,"NXtest.h5");
+  }else if(strstr(argv[0],"napi_c_test") != NULL){
+    nx_creation_code = NXACC_CREATE5;
+    strcpy(nxFile,"NXtest.h5");
   }else if(strstr(argv[0],"napi_test-xml-table") != NULL){
     nx_creation_code = NXACC_CREATEXML | NXACC_TABLE;
     strcpy(nxFile,"NXtest-table.xml");
