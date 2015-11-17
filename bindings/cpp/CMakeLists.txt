@@ -38,28 +38,18 @@ set_property(SOURCE ${SOURCES} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 #------------------------------------------------------------------------------
 add_library (NeXus_CPP_Static_Library STATIC ${HEADERS} ${SOURCES})
 set_target_properties(NeXus_CPP_Static_Library PROPERTIES 
-                      OUTPUT_NAME NeXusCPPStatic)
+                      OUTPUT_NAME NeXusCPP)
 
-target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library 
-					${READLINE_LINK} ${M_LINK} ${DL_LINK} ${PTHREAD_LINK} ${DF_LINK}
-                      ${TERMCAP_LINK} ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library)
 
 #Make NeXus CPP Bindings Shared Library
 #------------------------------------------------------------------------------
 add_library (NeXus_CPP_Shared_Library SHARED ${HEADERS} ${SOURCES})
-
-#Note - library version needs to be got from somewhere?
-# may want to use DEBUG_OUTPUT_NAME and RELEASE_OUTPUT_NAME
-# of define CMAKE_DEBUG_POSTFIX globally
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set_target_properties(NeXus_CPP_Shared_Library PROPERTIES OUTPUT_NAME libNeXusCPP-0
-                      VERSION 1.0 SOVERSION 4 )
-else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set_target_properties(NeXus_CPP_Shared_Library PROPERTIES OUTPUT_NAME NeXusCPP
-                      VERSION 1.0 SOVERSION 4)
-endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
 target_link_libraries(NeXus_CPP_Shared_Library NeXus_Shared_Library)
+set_target_properties(NeXus_CPP_Shared_Library PROPERTIES
+                      OUTPUT_NAME NeXusCPP
+                      VERSION "${NAPI_VERSION}"
+                      SOVERSION ${NEXUS_SONAME})
 
 install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
          DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -68,9 +58,6 @@ install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
 INSTALL (FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
          COMPONENT Development)
 
-#if(WIN32)
-#install_pdb (NeXus_CPP_Shared_Library)
-#endif()
 
 
 
