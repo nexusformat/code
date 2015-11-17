@@ -149,6 +149,14 @@ if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
     enable_language(Fortran)
 endif()
 
+#-----------------------------------------------------------------------------
+# if contributed programs are built we have to add JPEG as a requirement 
+# for nxextract
+#-----------------------------------------------------------------------------
+if(ENABLE_CONTRIB)
+    find_package(JPEG REQUIRED)
+endif()
+
 #include(cmake_include/FindOpenGenie.cmake)
 #include(cmake_include/FindSZIP.cmake)
 #include(cmake_include/FindAnt.cmake)
