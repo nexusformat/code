@@ -2521,10 +2521,12 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 	tclass = H5Tget_class(datatype);
 	/* stop gap kludge for fixed length strings */
 	if (tclass == H5T_C_S1) {
-		int datalen; /* fishy - uninitialised */
-		status = readStringAttributeN(pFile->iCurrentA, data, datalen);
+		char *datatmp = NULL;
+		status = readStringAttribute(pFile->iCurrentA, &datatmp);
 		if (status < 0)
 			return NX_ERROR;
+		strcpy(data, datatmp);
+		free(datatmp);
 		return NX_OK;
 	} 
 
