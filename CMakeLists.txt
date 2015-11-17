@@ -54,9 +54,12 @@ endif()
 #-----------------------------------------------------------------------------
 # define package version
 #-----------------------------------------------------------------------------
-set (NeXus_VERSION_MAJOR 1)
-set (NeXus_VERSION_MINOR 0)
-set (NXLTVERSINFO '4:3:4')
+set (NEXUS_VERSION_MAJOR 4)
+set (NEXUS_VERSION_MINOR 4)
+set (NEXUS_VERSION_PATCH 0)
+set (NEXUS_SONAME 4)
+set (NAPI_VERSION "${NEXUS_VERSION_MAJOR}.${NEXUS_VERSION_MINOR}.${NEXUS_VERSION_PATCH}")
+set (NXLTVERSINFO "${NEXUS_VERSION_MAJOR}:${NEXUS_VERSION_MINOR}:${NEXUS_VERSION_PATCH}")
 
 #-----------------------------------------------------------------------------
 # define command line options by which the user can configure the build
