@@ -28,7 +28,7 @@
 
 SET(INCLUDE_FILES napi.h napiu.h)
 
-configure_file(nxconfig_h_cmake.in nxconfig.h @ONLY)
+configure_file(nxconfig.h.in nxconfig.h @ONLY)
 
 INSTALL (FILES ${INCLUDE_FILES} 
          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ COMPONENT Development)

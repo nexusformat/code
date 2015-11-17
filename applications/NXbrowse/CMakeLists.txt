@@ -28,6 +28,10 @@
 #------------------------------------------------------------------------------
 # build and link the executable
 #------------------------------------------------------------------------------
+if(HAVE_LIBREADLINE)
+    add_definitions(-DHAVE_LIBREADLINE)
+endif()
+
 add_executable (nxbrowse NXbrowse.c)
 target_link_libraries(nxbrowse NeXus_Shared_Library ${READLINE_LINK})
 
