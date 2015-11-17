@@ -270,7 +270,7 @@ typedef struct {
  * 
  */
 
-#ifdef __GNUC__
+#if (defined(__GNUC__) || defined(__clang__))
 #define NEXUS_DEPRECATED_FUNCTION __attribute__((deprecated))
 #else
 #define NEXUS_DEPRECATED_FUNCTION
