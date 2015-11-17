@@ -55,3 +55,7 @@ target_link_libraries(NeXus_F77_Shared_Library NeXus_Shared_Library)
 install (TARGETS NeXus_F77_Static_Library NeXus_F77_Shared_Library
          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus COMPONENT Development)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/napif.inc 
+         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nexus 
+         COMPONENT Development)
