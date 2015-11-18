@@ -23,6 +23,8 @@
 
 ----------------------------------------------------------------------------*/
 
+#define H5Aiterate_vers 2
+
 #include <nxconfig.h>
 
 #ifdef WITH_HDF5
