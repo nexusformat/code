@@ -27,6 +27,8 @@
 if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
     SET(SOURCES Doxyfile_c Doxyfile_cpp Doxyfile_f90 Doxyfile_f77 preamble.h)
+    set_directory_properties(PROPERTIES 
+        ADDITIONAL_MAKE_CLEAN_FILES "html-c html-cpp html-f77 html-f90")
 
     foreach(F ${SOURCES})
         configure_file(${F} ${F} @ONLY)
@@ -39,7 +41,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     )
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-c
             DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
-            COMPONENT Documentation)
+            COMPONENT html OPTIONAL)
 
     add_dependencies(html html_c_api_doc)
 
@@ -52,7 +54,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
         
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-cpp
                 DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
-                COMPONENT Documentation)
+                COMPONENT html OPTIONAL)
         
         add_dependencies(html html_cpp_api_doc)
     endif()
@@ -82,7 +84,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-f90
                 DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
-                COMPONENT Documentation)
+                COMPONENT html OPTIONAL)
         
         add_dependencies(html html_f90_api_doc)
     endif()
@@ -96,9 +98,15 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html-f77
                 DESTINATION ${CMAKE_INSTALL_DOCDIR}/api
-                COMPONENT Documentation)
+                COMPONENT html OPTIONAL)
         add_dependencies(html html_f77_api_doc)
     endif()
+
+    add_custom_target(install-html
+        ${CMAKE_COMMAND}
+        -D "CMAKE_INSTALL_COMPONENT=html"
+        -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake")
+    add_dependencies(install-html html)
 
 endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
