@@ -57,6 +57,14 @@ endif()
 #-----------------------------------------------------------------------------
 # define package version
 #-----------------------------------------------------------------------------
+set (API_VERSION_MAJOR 4)
+set (API_VERSION_MINOR 4)
+set (API_VERSION_PATCH 0)
+set (API_VERSION "${API_VERSION_MAJOR}.${API_VERSION_MINOR}.${API_VERSION_PATCH}")
+set (ABI_CURRENT 0)
+set (ABI_REVISION 5)
+set (ABI_AGE 0)
+
 set (NEXUS_VERSION_MAJOR 4)
 set (NEXUS_VERSION_MINOR 4)
 set (NEXUS_VERSION_PATCH 0)
