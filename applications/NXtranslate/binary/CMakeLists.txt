@@ -26,6 +26,6 @@
 #
 #=============================================================================
 
-include_directories(. ../)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-add_library (BinaryRetriever OBJECT BinaryRetriever.cpp BinaryRetriever.hpp)
+add_library (BinaryRetriever BinaryRetriever.cpp)

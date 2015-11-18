@@ -26,8 +26,7 @@
 #
 #=============================================================================
 
-include_directories(. ../)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (Edf OBJECT edf_reader.cpp edf_reader.h edf_retriever.cpp 
-                        edf_retriever.h)
+add_library (Edf edf_reader.cpp edf_retriever.cpp)
 

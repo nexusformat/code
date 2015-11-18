@@ -26,9 +26,9 @@
 #
 #=============================================================================
 
-include_directories(. ../ ${LIBXML2_INCLUDE_DIR})
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" ${LIBXML2_INCLUDE_DIR})
 
-add_library (TextXML OBJECT xml_retriever.cpp retriever.h
-                            xml_retriever_dom.cpp xml_retriever_dom.h
-                            void_copy.cpp void_copy.h)
+add_library (TextXML xml_retriever.cpp
+                     xml_retriever_dom.cpp
+                     void_copy.cpp)
 
