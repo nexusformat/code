@@ -33,6 +33,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "napi.h"
+#include "napi_internal.h" /* for NXM{En,Dis}ableErrorReporting */
 #include "napiconfig.h"
 static char *my_readline(const char *prompt)
 {

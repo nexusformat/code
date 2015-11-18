@@ -37,6 +37,7 @@
 #include "preferences.hpp"
 #include "string_util.hpp"
 #include "tclap/CmdLine.h"
+#include "napi_internal.h" // needed for NXMDisableErrorReporting
 
 using std::cerr;
 using std::cout;

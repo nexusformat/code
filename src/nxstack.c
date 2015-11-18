@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <napi.h>
+#include <napi_internal.h>
 #include "nxstack.h"
 
 /*-----------------------------------------------------------------------

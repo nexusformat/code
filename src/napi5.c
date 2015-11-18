@@ -33,6 +33,7 @@
 #include <time.h>
 
 #include "napi.h"
+#include "napi_internal.h"
 #include "napi5.h"
 
 #ifdef H5_VERSION_GE

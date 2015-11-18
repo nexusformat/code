@@ -33,6 +33,10 @@ add_definitions(-DIN_NEXUS_LIBRARY=1 ${NX_CPP})
 set (NAPISRC napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c 
              nxdataset.h nx_stptok.h)
 
+if (ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
+  set (NAPISRC ${NAPISRC} napi_fortran_helper.c)
+endif(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
+
 set (NAPILINK)
 
 #-----------------------------------------------------------------------------

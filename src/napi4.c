@@ -35,6 +35,7 @@
 #include <time.h>
 
 #include "napi.h"
+#include "napi_internal.h"
 #include "napi4.h"
 
 

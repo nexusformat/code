@@ -30,6 +30,7 @@
 #include <string.h>
 #include <time.h>
 #include "napiu.h"
+#include "napi_internal.h"
 
 #define DO_GLOBAL(__name) \
 	if (__name != NULL) \
