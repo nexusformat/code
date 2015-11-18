@@ -26,10 +26,8 @@
 #
 #=============================================================================
 
-include_directories(. ../)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (SNShistogram OBJECT string_location_format.cpp 
-                                 string_location_format.h
-                                 SNS_retriever.cpp SNS_retriever.hpp 
-                                 retriever.hpp)
+add_library (SNShistogram string_location_format.cpp 
+                          SNS_retriever.cpp)
 

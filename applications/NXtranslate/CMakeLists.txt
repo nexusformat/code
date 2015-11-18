@@ -47,46 +47,41 @@ add_definitions(-DFRM2_RETRIEVER
                 -DSPEC_RETRIEVER)
 
 
-include_directories(. ${LIBXML2_INCLUDE_DIR} text_collist text_plain 
-                    text_xml sns_histogram FRM2 loopy)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/text_collist"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/text_plain" 
+                    "${CMAKE_CURRENT_SOURCE_DIR}/text_xml"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/sns_histogram"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/FRM2"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/loopy"
+                    ${LIBXML2_INCLUDE_DIR})
 
 set(SOURCES attr.cpp 
             main.cpp 
             nexus_retriever.cpp  
             nexus_util.cpp 
             node.cpp
-	        node_util.cpp 
+            node_util.cpp 
             retriever.cpp 
             string_util.cpp 
             xml_parser.cpp
-            xml_util.h 
-            xml_util.cpp 
-            attr.h 
-            nexus_retriever.h 
-            nexus_util.h node.h 
-            node_util.h 
-            nxtranslate_debug.h 
-            Ptr.h 
-            retriever.h 
-            string_util.h 
-            xml_parser.h 
-            tree.hh 
-            dynamic_retriever.cpp 
-            dynamic_retriever.h)
+            xml_util.cpp
+            dynamic_retriever.cpp)
 
-add_executable(nxtranslate ${SOURCES} 
-               $<TARGET_OBJECTS:BinaryRetriever>
-               $<TARGET_OBJECTS:TextCollist>
-               $<TARGET_OBJECTS:TextPlain>
-               $<TARGET_OBJECTS:TextXML>
-               $<TARGET_OBJECTS:SNShistogram>
-               $<TARGET_OBJECTS:FRM2>
-               $<TARGET_OBJECTS:Loopy>
-               $<TARGET_OBJECTS:Spec>
-               $<TARGET_OBJECTS:Edf>
-              )
+add_executable(nxtranslate ${SOURCES})
 
-target_link_libraries(nxtranslate NeXus_Static_Library ${LIBXML2_LIBRARIES})
+target_link_libraries(nxtranslate
+                      NeXus_Static_Library
+                      BinaryRetriever
+                      TextCollist
+                      TextPlain
+                      TextXML
+                      SNShistogram
+                      FRM2
+                      Loopy
+                      Spec
+                      Edf
+                      ${LIBXML2_LIBRARIES})
 
 
 install (TARGETS nxtranslate DESTINATION bin COMPONENT Runtime)

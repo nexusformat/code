@@ -26,7 +26,7 @@
 #
 #=============================================================================
 
-include_directories(. ../)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (TextPlain OBJECT retriever.cpp retriever.h)
+add_library (TextPlain retriever.cpp)
 

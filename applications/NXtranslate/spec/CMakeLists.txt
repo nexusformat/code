@@ -26,9 +26,8 @@
 #
 #=============================================================================
 
-include_directories(. ../)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (Spec OBJECT SPEClib.cpp SPEClib.h spec_retriever.cpp  
-                         spec_retriever.h)
+add_library (Spec SPEClib.cpp spec_retriever.cpp)
 
 
