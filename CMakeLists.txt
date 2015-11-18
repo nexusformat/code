@@ -39,6 +39,9 @@ enable_testing()
 #set the module path
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
 
+#set some custom targets
+add_custom_target(html)
+
 #-----------------------------------------------------------------------------
 # setup installation directories
 #

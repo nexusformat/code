@@ -26,7 +26,6 @@
 #
 #====================================================================
 
-add_custom_target(html)
 
 add_subdirectory (doxygen)
 
