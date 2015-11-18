@@ -84,8 +84,8 @@ add_library (NeXus_Shared_Library SHARED ${NAPISRC})
 
 set_target_properties(NeXus_Shared_Library PROPERTIES 
                       OUTPUT_NAME NeXus
-                      VERSION ${NAPI_VERSION}
-                      SOVERSION 4)
+                      VERSION ${ABI_VERSION}
+                      SOVERSION ${ABI_AGE})
 
 target_link_libraries(NeXus_Shared_Library ${NAPI_LINK_LIBS})
 

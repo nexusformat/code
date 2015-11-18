@@ -48,8 +48,8 @@ add_library (NeXus_CPP_Shared_Library SHARED ${HEADERS} ${SOURCES})
 target_link_libraries(NeXus_CPP_Shared_Library NeXus_Shared_Library)
 set_target_properties(NeXus_CPP_Shared_Library PROPERTIES
                       OUTPUT_NAME NeXusCPP
-                      VERSION "${NAPI_VERSION}"
-                      SOVERSION ${NEXUS_SONAME})
+                      VERSION "${ABI_VERSION}"
+                      SOVERSION ${ABI_CURRENT})
 
 install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
          DESTINATION ${CMAKE_INSTALL_LIBDIR}
