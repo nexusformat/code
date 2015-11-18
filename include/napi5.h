@@ -3,6 +3,10 @@
 
 #define NX5SIGNATURE 959695
 
+/* Hide deprecated API from HDF5 versions before 1.8
+ * Required to build on Ubuntu 12.04 */
+#define H5_NO_DEPRECATED_SYMBOLS
+
 #include <hdf5.h>
 
 /* HDF5 interface */
