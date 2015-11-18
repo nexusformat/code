@@ -23,7 +23,7 @@ Configuration
 -------------
 
 Enabling a physical file formats
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++++++
 
 By default the NAPI is only built with HDF5 support. You can explicit switch on
 a particular file format by defining the appropriate CMake variable during
