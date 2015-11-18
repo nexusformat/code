@@ -258,6 +258,12 @@ typedef struct {
  * 
  */
 
+#if (defined(__GNUC__) || defined(__clang__))
+#define NEXUS_DEPRECATED_FUNCTION __attribute__((deprecated))
+#else
+#define NEXUS_DEPRECATED_FUNCTION
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -429,7 +435,7 @@ extern  NXstatus NXcompmakedata64 (NXhandle handle, CONSTCHAR* label, int dataty
    * \li NX_COMP_HUF Huffmann encoding (only HDF-4)
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXcompress (NXhandle handle, int compr_type);
+extern  NXstatus  NXcompress (NXhandle handle, int compr_type) NEXUS_DEPRECATED_FUNCTION;
 
   /**
    * Open access to a dataset. After this call it is possible to write and read data or 
@@ -626,7 +632,7 @@ extern  NXstatus  NXgetslab64(NXhandle handle, void* data, const int64_t start[]
    * \return NX_OK on success, NX_ERROR in the case of an error, NX_EOD when there are no more items.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
+extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType) NEXUS_DEPRECATED_FUNCTION;
 
   /**
    * Read an attribute containing a single string or numerical value.

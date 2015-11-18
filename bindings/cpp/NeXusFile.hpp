@@ -129,7 +129,7 @@ namespace NeXus {
      * This is a deprecated function.
      * \param com The compression type.
      */
-    void compress(NXcompression comp);
+    void compress(NXcompression comp) NEXUS_DEPRECATED_FUNCTION;
 
     /**
      * Initialize the pending group search to start again.
