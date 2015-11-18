@@ -19,11 +19,8 @@ the build system
 Building the code on Linux
 ==========================
 
-Configuration
--------------
-
 Enabling a physical file formats
-++++++++++++++++++++++++++++++++
+--------------------------------
 
 By default the NAPI is only built with HDF5 support. You can explicit switch on
 a particular file format by defining the appropriate CMake variable during
@@ -104,3 +101,26 @@ additional build requirements. These are
 As one cannot select an individual program to be included in the build, all
 these build dependencies must be satisified when ``ENABLE_APPS`` is set to
 ``ON`` in order for the build to succeed.
+
+Running the build
+-----------------
+
+To build the library and program binaries simply use 
+
+.. code-block:: bash 
+
+    $ make 
+
+and for installation 
+
+.. code-block:: bash
+
+    $ make install
+
+This procedure installs the binaries, header files, and the man pages for the
+programs (if configured to build them). To build the API documentation use 
+
+.. code-block:: bash
+
+    $ make html
+    $ make install-html
