@@ -45,6 +45,10 @@ if(WITH_HDF5)
     target_link_libraries(napi_test_hdf5 NeXus_Shared_Library 
                           ${NAPI_LINK_LIBS})
     add_test(NAME "NAPI-C-HDF5-test" COMMAND napi_test_hdf5)
+    add_executable(napi_attra_test_hdf5 napi_attra_test.c)
+    target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND napi_attra_test_hdf5)
 endif()
 
 if(WITH_HDF4)
@@ -53,6 +57,10 @@ if(WITH_HDF4)
                           ${NAPI_LINK_LIBS})
     add_test(NAME "NAPI-C-HDF4-test"
              COMMAND napi_test_hdf4)
+    add_executable(napi_attra_test_hdf4 napi_attra_test.c)
+    target_link_libraries(napi_attra_test_hdf4 NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C-HDF4-attra-test" COMMAND napi_attra_test_hdf4)
 endif()
 
 if(WITH_MXML)
@@ -66,6 +74,10 @@ if(WITH_MXML)
                           ${NAPI_LINK_LIBS})
     add_test(NAME "NAPI-C-MXML-TABLE-test"
              COMMAND napi_test-xml-table)
+    add_executable(napi_attra_test_xml napi_attra_test.c)
+    target_link_libraries(napi_attra_test_xml NeXus_Shared_Library 
+                          ${NAPI_LINK_LIBS})
+    add_test(NAME "NAPI-C-MXML-attra-test" COMMAND napi_attra_test_xml)
 endif()
 
 #------------------------------------------------------------------------------
