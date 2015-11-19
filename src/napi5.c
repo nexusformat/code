@@ -2489,6 +2489,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 	hid_t memtype_id, filespace, datatype;
 	H5T_class_t tclass;
 	hsize_t ndims, dims[H5S_MAX_RANK];
+	htri_t is_vlen_str = 0; /* false */
 	char **vstrdata = NULL;
 
 	pFile = NXI5assert(handle);
@@ -2508,7 +2509,10 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 		NXReportError("ERROR: unable to read dims");
 		return NX_ERROR;
 	}
-	if (ndims == 0 && H5Tis_variable_str(datatype)) {
+
+	is_vlen_str = H5Tis_variable_str(datatype);
+	if (ndims == 0 && is_vlen_str) {
+		/* this assumes a fixed size - is this dangerous? */
 		char *strdata = calloc(512, sizeof(char));
 		status = H5Aread(pFile->iCurrentA, H5S_ALL, &strdata);
 		if (status >= 0)
@@ -2523,7 +2527,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 	}
 	tclass = H5Tget_class(datatype);
 	/* stop gap kludge for fixed length strings */
-	if (tclass == H5T_C_S1) {
+	if (tclass == H5T_STRING && !is_vlen_str) {
 		char *datatmp = NULL;
 		status = readStringAttribute(pFile->iCurrentA, &datatmp);
 		if (status < 0)
@@ -2535,7 +2539,7 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 
 	memset(iStart, 0, H5S_MAX_RANK * sizeof(int));
 	/* map datatypes of other plateforms */
-	if (H5Tis_variable_str(datatype)) {
+	if (is_vlen_str) {
 		vstrdata = (char **)malloc((size_t) dims[0] * sizeof(char *));
 		memtype_id = H5Tcopy(H5T_C_S1);
 		H5Tset_size(memtype_id, H5T_VARIABLE);
