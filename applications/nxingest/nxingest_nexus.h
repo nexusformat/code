@@ -61,9 +61,6 @@ class NxClass
 		bool isOK(){ if(status == NXING_OK) return true; else return false; }
 		bool isNotOK(){ if(status != NXING_OK) return true; else return false; }
 
-	private:
-		char* buff2str(void* buff, int rank, int dim[], int data_type, char* vector, char* value);
-
 };
 
 #endif
