@@ -34,28 +34,15 @@ include_directories(../../third_party
 #-----------------------------------------------------------------------------
 # build the program binary and the required libraries
 #-----------------------------------------------------------------------------
-
-add_executable (nxconvert nxconvert.cpp nxconvert_common.h )
-
-set(NXCONVERT_LIB_SRC nxconvert_common.cpp nxconvert_common.h )
-
-add_library (NXconvert_Static_Library STATIC ${NXCONVERT_LIB_SRC} )
-add_library (NXconvert_Shared_Library SHARED ${NXCONVERT_LIB_SRC} )
-
-
-target_link_libraries(NXconvert_Static_Library NeXus_CPP_Static_Library)
-target_link_libraries(NXconvert_Shared_Library NeXus_CPP_Shared_Library)
-target_link_libraries(nxconvert NXconvert_Shared_Library)
-
-set_property(TARGET NXconvert_Shared_Library PROPERTY ENABLE_EXPORTS YES) 
+set(SOURCES nxconvert.cpp nxconvert_common.h nxconvert_common.cpp)
+add_executable (nxconvert ${SOURCES})
+target_link_libraries(nxconvert NeXus_CPP_Shared_Library)
 
 #-----------------------------------------------------------------------------
 # install the libraries, the program binary, and the man-page
 #-----------------------------------------------------------------------------
-install (TARGETS NXconvert_Static_Library NXconvert_Shared_Library nxconvert
-         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
-         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
-         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus COMPONENT Development)
+install (TARGETS nxconvert
+         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
 
 install (FILES nxconvert.1 
          DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 
