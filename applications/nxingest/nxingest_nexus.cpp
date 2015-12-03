@@ -38,6 +38,15 @@
 ============================================================================= */
 #include "nxingest_nexus.h"
 
+#include <string>
+#include <stdint.h>
+#include <sstream>
+#include <vector>
+
+using std::string;
+
+string buff2str(const void* buff, int rank, const int dim[], int data_type, const char* vector);
+
 // Enumeration for the different calculation available for arrays. 
 // Positives number are used for specific value of the array. 
 enum Calculation { Direct = 0, Avg = -1, Min = -2, Max = -3, Std = -4, Sum = -5};
@@ -206,7 +215,8 @@ char* NxClass::readTag(char *input, char *value, int user)
 			status = NXgetdata (nxFp, buff); 
 			if(status != NXING_OK) throw log.set("readTag", "Can't get the data", nexus_path, "",NXING_ERR_BASE_NEXUS-status);
 		}
-		value = buff2str(buff,  rank, dim, data_type, vector, value);
+		const string strval = buff2str(buff,  rank, dim, data_type, vector);
+		strcpy(value, strval.c_str());
 		log.set("readTag", nx_name, "Return", value).printLevel(NXING_LOG_DEBUG);
 
 		return value;
@@ -233,7 +243,7 @@ char* NxClass::getLocation(char *value)
 
 
 // *****************************************************************************
-//	Function : NxClass::buff2str
+//	Function : buff2str
 //		
 //		The function will parse the data buffer according to the content of 
 //		vector and return a string.
@@ -244,7 +254,7 @@ char* NxClass::getLocation(char *value)
 //		[MIN]/[MAX] Minimum/Maximum value.
 //
 // *****************************************************************************
-char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* vector, char* value)
+string buff2str(const void* buff, int rank, const int dim[], int data_type, const char* vector)
 {
 	Log log;
 	try 
@@ -253,10 +263,10 @@ char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* ve
 		// **********************************
 		if(data_type == NX_CHAR)
 		{
-			strcpy( value, (char*) buff);
-			return value;
+			return string(static_cast<const char*>(buff));
 		}
 		int vec = 0;
+		std::stringstream stream;
 		// Parse the vector to check what has to be done with the buffer
 		// **************************************************************
 		if(vector == 0  || strlen(vector) == 0) vec = Direct;	
@@ -267,7 +277,6 @@ char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* ve
 		else if (  strcmp(vector, "[SUM]") == 0) vec = Sum;		// Sum of all values
 		else 
 		{
-			vector[strlen(vector)-1] = 0;
 			vec = atoi(&vector[1]); 
 		}	
 		// Single Value
@@ -277,30 +286,29 @@ char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* ve
 			switch(data_type)
 			{
 				case NX_INT8	:
-					sprintf( value, "%d", (int)((char*) buff)[vec]);
+					stream << static_cast<int>(static_cast<const char*>(buff)[vec]);
 					break;			
 				case NX_INT16	:
-					sprintf( value, "%d", ((short*) buff)[vec]);
+					stream << static_cast<const int16_t*>(buff)[vec];
 					break;
 				case NX_INT32	:
-					sprintf( value, "%d", ((long*) buff)[vec]);
+					stream << static_cast<const int32_t*>(buff)[vec];
 					break;
 				case NX_UINT16	:
-					sprintf( value, "%d", ((unsigned short*) buff)[vec]);
+					stream << static_cast<const uint16_t*>(buff)[vec];
 					break;
 				case NX_UINT32	:
-					sprintf( value, "%d", ((unsigned int*) buff)[vec]);
+					stream << static_cast<const uint32_t*>(buff)[vec];
 					break;
 				case NX_FLOAT32	:
-					sprintf( value, "%f", ((float*) buff)[vec]);
+					stream << static_cast<const float*>(buff)[vec];
 					break;
 				case NX_FLOAT64	:
-					sprintf( value, "%f", ((double*) buff)[vec]);
+					stream << static_cast<const double*>(buff)[vec];
 					break;
 				default	:
 					break;
 			}	
-			return(value);
 		} 
 		// Array from which a value need to be extracted
 		// *********************************************
@@ -314,7 +322,7 @@ char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* ve
 			if(num_val <= 0) { 
 				throw log.set("buff2str", "The number of value of the array is null or negative.", "", "" ,NXING_ERR_NEGATIVE_NUMVAL);
 			}		// Big mistake
-			double *dblBuff  = new double[num_val];
+			std::vector<double> dblBuff = std::vector<double>(num_val, 0.0);
 			// Transform the array of unknown type into an array of double
 			// ***********************************************************
 			int i = 0;
@@ -322,31 +330,31 @@ char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* ve
 			{
 				case NX_INT8	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((char*) buff)[i];
+						dblBuff[i] = static_cast<const char*>(buff)[i];
 					break;			
 				case NX_INT16	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((short*) buff)[i];
+						dblBuff[i] = static_cast<const int16_t*>(buff)[i];
 					break;			
 				case NX_INT32	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((long*) buff)[i];
+						dblBuff[i] = static_cast<const int32_t*>(buff)[i];
 					break;			
 				case NX_UINT16	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((unsigned short*) buff)[i];
+						dblBuff[i] = static_cast<const uint16_t*>(buff)[i];
 					break;			
 				case NX_UINT32	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((unsigned int*) buff)[i];
+						dblBuff[i] = static_cast<const uint32_t*>(buff)[i];
 					break;
 				case NX_FLOAT32	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((float*) buff)[i];
+						dblBuff[i] = static_cast<const float*>(buff)[i];
 					break;		
 				case NX_FLOAT64	:
 					for( i = 0; i< num_val; i++)
-						dblBuff[i] = (double) ((double*) buff)[i];
+						dblBuff[i] = static_cast<const double*>(buff)[i];
 					break;		
 				default	:
 					break;
@@ -391,18 +399,16 @@ char* NxClass::buff2str(void* buff, int rank, int dim[], int data_type, char* ve
 					break; 
 			}
 			if((vec == Min || vec == Max || vec == Sum ) && (data_type == NX_INT8 || data_type == NX_INT16 || data_type == NX_INT32 || data_type == NX_UINT16 || data_type == NX_UINT32))
-				sprintf( value, "%ld", (long) num_value);
+			        stream << static_cast<long long int>(num_value);
 			else 
-				sprintf( value, "%g", num_value);
-			return(value);
+			        stream << num_value;
 		}
-		return(value);
+		return(stream.str());
 	}	
 	catch(Log log)
 	{
 		log.printLevel(NXING_LOG_ERROR);
-		return 0;
+		throw;
 	}
 	
 }
-
