@@ -71,7 +71,7 @@ set(SOURCES attr.cpp
 add_executable(nxtranslate ${SOURCES})
 
 target_link_libraries(nxtranslate
-                      NeXus_Static_Library
+                      NeXus_Shared_Library
                       BinaryRetriever
                       TextCollist
                       TextPlain
