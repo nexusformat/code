@@ -34,6 +34,20 @@ add_executable (nxdump NXdump.f90)
 target_link_libraries(nxdump NeXus_Shared_Library NeXus_F90_Shared_Library)
 
 #-----------------------------------------------------------------------------
+# build the manpage
+#-----------------------------------------------------------------------------
+add_custom_command(OUTPUT nxdump.1
+                   COMMAND rst2man ${CMAKE_CURRENT_SOURCE_DIR}/nxdump.1.rst 
+                           > nxdump.1
+                   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/nxdump.1.rst
+                   COMMENT "generate man page for nxdump")
+                   
+add_custom_target(nxdump_manpage ALL DEPENDS nxdump.1)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/nxdump.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+        COMPONENT Documentation)
+
+#-----------------------------------------------------------------------------
 # install the program binary
 #-----------------------------------------------------------------------------
 install (TARGETS nxdump 
