@@ -27,6 +27,12 @@
 
 add_definitions(-DIN_NEXUS_LIBRARY=1 ${NX_CPP})
 
+# this means a static nexus library will use a DLL HDF5. OK for now,
+# but may want to change later. 
+if (WIN32)
+add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB=1)
+endif (WIN32)
+
 #-----------------------------------------------------------------------------
 # generate list of common source files
 #-----------------------------------------------------------------------------
