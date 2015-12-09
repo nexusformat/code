@@ -73,7 +73,7 @@ MODULE NXmodule
       INTEGER(kind=NXi4) :: dummy(1040) ! at least as large as in napi.h
    END TYPE
    TYPE, PUBLIC :: NXhandle
-      INTEGER(kind=NXi4) :: dummy(5120) ! at least as large as in nxstack.c
+      INTEGER(kind=NXi4) :: dummy(9058) ! at least as large as in nxstack.c
    END TYPE
 ! *** Buffers for each type of parameter
    INTEGER(KIND=NXi1), ALLOCATABLE, PRIVATE :: buffer_i1(:)
