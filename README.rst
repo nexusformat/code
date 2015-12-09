@@ -14,7 +14,7 @@ the build system
 * Optional: HDF4 libraries and header files
 * Optional: MXML libraries and header files
 * doxygen: for building the API documentation
-
+* rst2man: for building manpages 
 
 Building the code on Linux
 ==========================
