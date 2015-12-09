@@ -2,7 +2,9 @@
 #include <iostream>
 #include <stdlib.h>
 #include <sstream>
+#ifndef _WIN32
 #include <unistd.h>
+#endif /* _WIN32 */
 #include <napi.h>
 
 #define PSZ(s) (s).c_str()
