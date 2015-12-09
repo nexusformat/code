@@ -26,7 +26,7 @@
 #==============================================================================
 
 find_module(MXML
-            LIB_NAMES mxml
+            LIB_NAMES mxml mxml1
             HEADER_NAMES mxml.h
             MOD_NAME mxml)
 
@@ -36,4 +36,4 @@ if(NOT HAVE_MXML)
     message(FATAL_ERROR "User requested MXML not found!")
 endif()
 
-list(APPEND NAPI_LINK_LIBS mxml)
+list(APPEND NAPI_LINK_LIBS ${MXML_LIBFILES})
