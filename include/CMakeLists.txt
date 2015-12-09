@@ -31,4 +31,4 @@ SET(INCLUDE_FILES napi.h napiu.h)
 configure_file(nxconfig.h.in nxconfig.h @ONLY)
 
 INSTALL (FILES ${INCLUDE_FILES} 
-         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ COMPONENT Development)
+         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nexus  COMPONENT Development)
