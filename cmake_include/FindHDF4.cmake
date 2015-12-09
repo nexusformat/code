@@ -27,12 +27,12 @@
 
 set(HDF4_LIBRARIES df mfhdf)
 
-find_library(HDF4_LIBRARIES NAMES df mfhdf PATH_SUFFIXES hdf)
+find_library(HDF4_LIBRARIES NAMES df mfhdf HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
 
-find_library(_HDF4_DF_LIBRARY NAMES df PATH_SUFFIXES hdf)
+find_library(_HDF4_DF_LIBRARY NAMES df hdf HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
 get_filename_component(HDF4_LIBRARY_DIRS ${_HDF4_DF_LIBRARY} PATH)
 
-find_path ( HDF4_INCLUDE_DIR mfhdf.h PATH /usr/include /usr/include/hdf)
+find_path ( HDF4_INCLUDE_DIR mfhdf.h PATH /usr/include /usr/include/hdf HINTS ENV HDF4_ROOT)
 
 include ( FindPackageHandleStandardArgs )
 find_package_handle_standard_args( HDF4 DEFAULT_MSG HDF4_LIBRARIES HDF4_INCLUDE_DIR )
@@ -51,6 +51,6 @@ find_package(JPEG REQUIRED)
 #------------------------------------------------------------------------------
 # add libraries to the link list for NAPI
 #------------------------------------------------------------------------------
-list(APPEND NAPI_LINK_LIBS  df mfhdf jpeg)
+list(APPEND NAPI_LINK_LIBS  ${_HDF4_DF_LIBRARY} mfhdf jpeg)
 include_directories ( SYSTEM ${HDF4_INCLUDE_DIR} )
 link_directories(${HDF4_LIBRARY_DIRS})
