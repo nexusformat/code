@@ -38,7 +38,6 @@ enable_testing()
 
 #set the module path
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_include")
-#set(CMAKE_MODULE_PATH "${HDF5_DIR}" "${PROJECT_SOURCE_DIR}/cmake_include" ${CMAKE_MODULE_PATH})
 
 #set some custom targets
 add_custom_target(html)
@@ -55,7 +54,7 @@ if(CMAKE_HOST_UNIX)
 else()
     set(CMAKE_INSTALL_LIBDIR lib)
     set(CMAKE_INSTALL_DOCDIR doc)
-	set(CMAKE_INSTALL_INCLUDEDIR include)
+    set(CMAKE_INSTALL_INCLUDEDIR include)
 endif() 
 
 
