@@ -131,19 +131,27 @@ Building the code on Windows
 These instructions will build everything except the applications using LIBXML2 (e.g. nxtranslate)
 
 * Download and install HDF4 and/or HDF5 libraries from HDF web site
+
   - within these installations is a "cmake" directory, I needed to remove/rename this to get everything to configure properly
+
 * Download MXML source from http://www.msweet.org/projects.php?Z3
+
   - open the vcnet directory
   - you need to edit mxml1.def and a add a single line containing the text    mxml_error   to the end of this file
   - open the visual studio solution and build the project
   - copy the files mxml.h mxml1.lib mxml1.dll to some other location
+
 * Define HDF4_ROOT, HEF5_ROOT and MXML_ROOT environment variables to point to top of each installed area
+
   - you should use / rather than \ for the paths specified in these variables
+
 * Create an empty build directory somewhere - this can be within your nexus source tree
 * Run CMAKE-GUI to generate Visual studio solutions files
+
   - Provide source and build paths in the relevant boxes
   - Click on Configure, choose appropriate visual studio version when prompted
   - A list of options will appear, choose the appropriate ENABLE_ ones and press Configure again
   - If nothing is red, click on Generate
+
 * Browse to the build directory and open the generated NeXus.sln
 * Build the solution
