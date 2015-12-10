@@ -42,19 +42,16 @@ link_directories(${HDF5_LIBRARY_DIRS}
 #------------------------------------------------------------------------------
 if(WITH_HDF5)
     add_executable(napi_test_hdf5 napi_test.c)
-    target_link_libraries(napi_test_hdf5 NeXus_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-test" COMMAND napi_test_hdf5)
     add_executable(napi_attra_test_hdf5 napi_attra_test.c)
-    target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND napi_attra_test_hdf5)
 endif()
 
 if(WITH_HDF4)
     add_executable(napi_test_hdf4 napi_test.c)
-    target_link_libraries(napi_test_hdf4 NeXus_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(napi_test_hdf4 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF4-test"
              COMMAND napi_test_hdf4)
     add_executable(napi_attra_test_hdf4 napi_attra_test.c)
@@ -65,18 +62,17 @@ endif()
 
 if(WITH_MXML)
     add_executable(napi_test-xml napi_test.c)
-    target_link_libraries(napi_test-xml NeXus_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(napi_test-xml NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-test"
              COMMAND napi_test-xml)
+             
     add_executable(napi_test-xml-table napi_test.c)
-    target_link_libraries(napi_test-xml-table NeXus_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(napi_test-xml-table NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-TABLE-test"
              COMMAND napi_test-xml-table)
+             
     add_executable(napi_attra_test_xml napi_attra_test.c)
-    target_link_libraries(napi_attra_test_xml NeXus_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(napi_attra_test_xml NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-attra-test" COMMAND napi_attra_test_xml)
     set_tests_properties("NAPI-C-MXML-attra-test" PROPERTIES WILL_FAIL TRUE)
 endif()
@@ -85,7 +81,7 @@ endif()
 # (most probably a) regression test 
 #------------------------------------------------------------------------------
 add_executable(leak_test1 leak_test1.c)
-target_link_libraries(leak_test1 NeXus_Shared_Library ${NAPI_LINK_LIBS})
+target_link_libraries(leak_test1 NeXus_Shared_Library)
 add_test(NAME "NAPI-C-leak-test-1"
          COMMAND leak_test1)
 
@@ -93,8 +89,7 @@ add_test(NAME "NAPI-C-leak-test-1"
 # Add test for unlimited dimensions 
 #------------------------------------------------------------------------------
 add_executable(test_nxunlimited test_nxunlimited.c)
-target_link_libraries(test_nxunlimited  NeXus_Shared_Library
-                      ${NAPI_LINK_LIBS})
+target_link_libraries(test_nxunlimited  NeXus_Shared_Library)
 add_test(NAME "NAPI-C-test-nxunlimited"
          COMMAND test_nxunlimited)
          
@@ -108,22 +103,19 @@ if(ENABLE_CXX)
 
     if(WITH_HDF5)
         add_executable(napi_test_cpp-hdf5 napi_test_cpp.cxx)
-        target_link_libraries(napi_test_cpp-hdf5 NeXus_CPP_Shared_Library
-                              ${NAPI_LINK_LIBS})
+        target_link_libraries(napi_test_cpp-hdf5 NeXus_CPP_Shared_Library)
         add_test(NAME "NAPI-C++-HDF5-test" COMMAND napi_test_cpp-hdf5)
     endif()
 
     if(WITH_HDF4)
         add_executable(napi_test_cpp-hdf4 napi_test_cpp.cxx)
-        target_link_libraries(napi_test_cpp-hdf4 NeXus_CPP_Shared_Library
-                              ${NAPI_LINK_LIBS})
+        target_link_libraries(napi_test_cpp-hdf4 NeXus_CPP_Shared_Library)
         add_test(NAME "NAPI-C++-HDF4-test" COMMAND napi_test_cpp-hdf4)
     endif()
 
     if(WITH_MXML)
         add_executable(napi_test_cpp-xml napi_test_cpp.cxx)
-        target_link_libraries(napi_test_cpp-xml NeXus_CPP_Shared_Library
-                              ${NAPI_LINK_LIBS})
+        target_link_libraries(napi_test_cpp-xml NeXus_CPP_Shared_Library)
         add_test(NAME "NAPI-C++-MXML-test" COMMAND napi_test_cpp-xml)
         
 #        add_executable(napi_test_cpp-xml-table napi_test_cpp.cxx)
@@ -137,14 +129,12 @@ if(ENABLE_CXX)
     # build leak tests
     #--------------------------------------------------------------------------
     add_executable(leak_test2 leak_test2.cxx)
-    target_link_libraries(leak_test2 NeXus_CPP_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(leak_test2 NeXus_CPP_Shared_Library)
     add_test(NAME "NAPI-C++-leak-test-2" 
              COMMAND leak_test2)
 
     add_executable(leak_test3 leak_test3.cxx)
-    target_link_libraries(leak_test3 NeXus_CPP_Shared_Library
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(leak_test3 NeXus_CPP_Shared_Library)
     add_test(NAME "NAPI-C++-leak-test-3"
              COMMAND leak_test3)
 endif()

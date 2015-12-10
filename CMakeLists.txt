@@ -82,10 +82,10 @@ set (NXLTVERSINFO "${NEXUS_VERSION_MAJOR}:${NEXUS_VERSION_MINOR}:${NEXUS_VERSION
 #-----------------------------------------------------------------------------
 # define command line options by which the user can configure the build
 #-----------------------------------------------------------------------------
-option(ENABLE_HDF5 "Build with HDF5 support" ON)
-option(ENABLE_HDF4 "Build with HDF4 support" OFF)
-option(ENABLE_MXML "Build with XML support" OFF)
-option(ENABLE_CONTRIB "Build the user contributions" OFF)
+option(ENABLE_HDF5      "Build with HDF5 support" ON)
+option(ENABLE_HDF4      "Build with HDF4 support" OFF)
+option(ENABLE_MXML      "Build with XML support" OFF)
+option(ENABLE_CONTRIB   "Build the user contributions" OFF)
 option(ENABLE_FORTRAN90 "Build the Fortran 90 bindings" OFF)
 option(ENABLE_FORTRAN77 "Build the Fortran 77 bindings" OFF)
 option(ENABLE_JAVA      "Build Java bindings" OFF)
@@ -125,6 +125,9 @@ include(FindPkgConfig)
 #------------------------------------------------------------------------------
 set(NAPI_LINK_LIBS)
 
+#------------------------------------------------------------------------------
+# if requested by the user - check for MXMLlibraries
+#------------------------------------------------------------------------------
 if(ENABLE_MXML)
     include(FindMXML)
     # the required libraries are appended to
@@ -135,11 +138,14 @@ else()
     message(STATUS "Build without MXML support!")
 endif()
 
+#------------------------------------------------------------------------------
+# if requested by the user - check for HDF4 libraries
+#------------------------------------------------------------------------------
 if(ENABLE_HDF4)
     include(FindHDF4)
 
-    message(STATUS "HDF4 library found in: ${HDF4_LIBRARY_DIR}")
-    message(STATUS "HDF4 headers found in: ${HDF4_INCLUDE_DIR}")
+    message(STATUS "HDF4 library found in: ${HDF4_LIBRARY_DIRS}")
+    message(STATUS "HDF4 headers found in: ${HDF4_INCLUDE_DIRS}")
 
     # the required libraries are appended to
     # NAPI_LINK_LIBS by this module
@@ -148,6 +154,9 @@ else()
     message(STATUS "Build without HDF4 support!")
 endif()
 
+#------------------------------------------------------------------------------
+# if requested by the user - check for HDF5 libraries
+#------------------------------------------------------------------------------
 if(ENABLE_HDF5)
 
     message (STATUS "${HDF5_COMPONENTS}")
@@ -172,6 +181,11 @@ else()
     message(STATUS "Build without HDF5 support!")
 endif()
 
+message(STATUS "Link with: ${NAPI_LINK_LIBS}")
+
+#------------------------------------------------------------------------------
+# enable FORTRAN bindings if requested by the user
+#------------------------------------------------------------------------------
 if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
     enable_language(Fortran)
 endif()
@@ -222,11 +236,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NX_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NX_CFLAGS}")
 
 # Recurse into the subdirectories.
-add_subdirectory (include)
-add_subdirectory (src)
-add_subdirectory (test)
-add_subdirectory (bindings)
-add_subdirectory (scripts)
+add_subdirectory (include)     #install header files
+add_subdirectory (src)         #build the binaries
+add_subdirectory (test)        #build the tests
+add_subdirectory (bindings)    #build the language bindings
+add_subdirectory (scripts)     #install pkg-config files
 
 #on user request utility applications will be built
 if(ENABLE_APPS)

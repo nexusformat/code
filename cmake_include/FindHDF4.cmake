@@ -25,45 +25,45 @@
 #
 #=============================================================================
 
-<<<<<<< HEAD
-find_library(HDF4_LIBRARIES NAMES df mfhdf PATH_SUFFIXES hdf)
-find_library(HDF4_DF_LIBRARY NAMES df PATH_SUFFIXES hdf)
-find_library(HDF4_MFHDF_LIBRARY NAMES mfhdf PATH_SUFFIXES hdf)
-message(STATUS "DF library found: ${HDF4_DF_LIBRARY}")
-message(STATUS "MFHDF library found: ${HDF4_MFHDF_LIBRARY}")
-
-message(STATUS "HDF4 libraries: ${HDF4_LIBRARIES}")
-=======
-set(HDF4_LIBRARIES df mfhdf)
 
 #------------------------------------------------------------------------------
 # find the runtime binaries of the HDF4 library
 #------------------------------------------------------------------------------
-find_library(HDF4_LIBRARIES NAMES df mfhdf 
+find_library(HDF4_DF_LIBRARY NAMES df hdf
              HINTS ENV HDF4_ROOT 
              PATH_SUFFIXES hdf)
+             
 
-find_library(_HDF4_DF_LIBRARY NAMES df hdf 
-             HINTS ENV 
-             HDF4_ROOT PATH_SUFFIXES hdf)
->>>>>>> 336bba8dd4b92aa97c0684b1285f94d575b23f8a
+if(HDF4_DF_LIBRARY MATCHES HDF4_DF_LIBRARY-NOTFOUND)
+    message(FATAL_ERROR "Could not find HDF4 DF library!")
+else()
+    get_filename_component(HDF4_LIBRARY_DIRS ${HDF4_DF_LIBRARY} PATH)
+    message(STATUS "Found HDF4 DF library: ${HDF4_DF_LIBRARY}")
+    message(STATUS "HDF4 libary path: ${HDF4_LIBRARY_DIRS}")
+endif()
 
-#if the binaries have been found their parent directory has to be 
-#extracted from the total path
-get_filename_component(HDF4_LIBRARY_DIRS ${_HDF4_DF_LIBRARY} PATH)
+find_library(HDF4_MFHDF_LIBRARY NAMES mfhdf 
+             HINTS ENV HDF4_ROOT
+             PATH_SUFFIXES hdf)
+
+if(HDF4_MFHDF_LIBRARY MATCHES HDF4_MFHDF_LIBRARY-NOTFOUND)
+    message(FATAL_ERROR "Could not find HDF5 MFHDF library!")
+else()
+    message(STATUS "Found HDF4 MFHDF library: ${HDF4_MFHDF_LIBRARY}")
+endif()
+
 
 #------------------------------------------------------------------------------
 # find the HDF4 header file
 #------------------------------------------------------------------------------
-find_path (HDF4_INCLUDE_DIR mfhdf.h HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
-
-include ( FindPackageHandleStandardArgs )
-find_package_handle_standard_args( HDF4 DEFAULT_MSG HDF4_LIBRARIES HDF4_INCLUDE_DIR )
-
-if(NOT HDF4_FOUND)
-    #the user has explicitely requested HDF4 support but the required libraries
-    #could not be found
-    message(FATAL_ERROR "User requested HDF4 not found!")
+find_path(HDF4_INCLUDE_DIRS mfhdf.h 
+          HINTS ENV HDF4_ROOT 
+          PATH_SUFFIXES hdf)
+          
+if(HDF4_INCLUDE_DIRS MATCHES HDF4_INCLUDE_DIRS-NOTFOUND)
+    message(FATAL_ERROR "Could not find HDF4 header files")
+else()
+    message(STATUS "Found HDF4 header files in: ${HDF4_INCLUDE_DIRS}")
 endif()
 
 #------------------------------------------------------------------------------
@@ -74,6 +74,6 @@ find_package(JPEG REQUIRED)
 #------------------------------------------------------------------------------
 # add libraries to the link list for NAPI
 #------------------------------------------------------------------------------
-list(APPEND NAPI_LINK_LIBS  ${_HDF4_DF_LIBRARY} mfhdf jpeg)
-include_directories ( SYSTEM ${HDF4_INCLUDE_DIR} )
+list(APPEND NAPI_LINK_LIBS  ${HDF4_DF_LIBRARY} ${HDF4_MFHDF_LIBRARY} jpeg)
+include_directories ( SYSTEM ${HDF4_INCLUDE_DIRS} )
 link_directories(${HDF4_LIBRARY_DIRS})
