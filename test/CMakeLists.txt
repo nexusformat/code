@@ -170,8 +170,7 @@ if(ENABLE_FORTRAN90)
     #need to add the directory with the .mod files to the include path
     include_directories(${PROJECT_BINARY_DIR}/bindings/f90)
     add_executable(NXtestf90 NXtest.f90)
-    target_link_libraries(NXtestf90 NeXus_F90_Shared_Library 
-                          ${NAPI_LINK_LIBS})
+    target_link_libraries(NXtestf90 NeXus_F90_Shared_Library)
     add_test(NAME "Fortran-90-test" COMMAND NXtestf90)
 endif()
 
