@@ -27,12 +27,25 @@
 
 set(HDF4_LIBRARIES df mfhdf)
 
-find_library(HDF4_LIBRARIES NAMES df mfhdf HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
+#------------------------------------------------------------------------------
+# find the runtime binaries of the HDF4 library
+#------------------------------------------------------------------------------
+find_library(HDF4_LIBRARIES NAMES df mfhdf 
+             HINTS ENV HDF4_ROOT 
+             PATH_SUFFIXES hdf)
 
-find_library(_HDF4_DF_LIBRARY NAMES df hdf HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
+find_library(_HDF4_DF_LIBRARY NAMES df hdf 
+             HINTS ENV 
+             HDF4_ROOT PATH_SUFFIXES hdf)
+
+#if the binaries have been found their parent directory has to be 
+#extracted from the total path
 get_filename_component(HDF4_LIBRARY_DIRS ${_HDF4_DF_LIBRARY} PATH)
 
-find_path ( HDF4_INCLUDE_DIR mfhdf.h PATH /usr/include /usr/include/hdf HINTS ENV HDF4_ROOT)
+#------------------------------------------------------------------------------
+# find the HDF4 header file
+#------------------------------------------------------------------------------
+find_path (HDF4_INCLUDE_DIR mfhdf.h HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
 
 include ( FindPackageHandleStandardArgs )
 find_package_handle_standard_args( HDF4 DEFAULT_MSG HDF4_LIBRARIES HDF4_INCLUDE_DIR )
