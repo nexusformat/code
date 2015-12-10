@@ -141,9 +141,9 @@ These instructions will build everything except the applications using LIBXML2 (
   - open the visual studio solution and build the project
   - copy the files mxml.h mxml1.lib mxml1.dll to some other location
 
-* Define HDF4_ROOT, HEF5_ROOT and MXML_ROOT environment variables to point to top of each installed area
+* Define HDF4_ROOT, HDF5_ROOT and MXML_ROOT environment variables to point to the top of each installed area
 
-  - you should use / rather than \ for the paths specified in these variables
+  - you should use / rather than \\ for the paths specified in these variables
 
 * Create an empty build directory somewhere - this can be within your nexus source tree
 * Run CMAKE-GUI to generate Visual studio solutions files
