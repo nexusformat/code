@@ -63,7 +63,7 @@ C------------------------------------------------------------------------------
       DATA U_BUFFER /0,1,2,3,4,5,6/
       EQUIVALENCE (CHAR_BUFFER, CHAR_BUFFER_B)
 
-      IF (NXOPEN('NXtest.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('NXtest.nxs', NXACC_CREATEXML, FILEID) .NE. NX_OK) STOP
       IF (NXMAKEGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
       IF (NXOPENGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
          IF (NXMAKEDATA(FILEID, 'ch_data', NX_CHAR, 1, 10) .NE. NX_OK) 
