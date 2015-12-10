@@ -8,7 +8,11 @@
 #include <map>
 #include "napiconfig.h"
 #include "NeXusFile.hpp"
+#ifdef _WIN32
+#include <direct.h> /* for getcwd() */
+#else
 #include <unistd.h>
+#endif /* _WIN32 */
 
 using std::cout;
 using std::endl;

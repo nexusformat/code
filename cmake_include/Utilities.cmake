@@ -125,7 +125,8 @@ endfunction()
 #     to look for the module. The name of the module is passed via the 
 #     MOD_NAME keywoard argument.
 # 3.) If no  pkg-config module is available, the function looks in the 
-#     default search paths. 
+#     default search paths. It can use the environment variable 
+#     ${MOD_NAME}_ROOT as a path hint.
 #
 # Arguments:
 #   Positional arguments: 
@@ -193,7 +194,7 @@ function(find_module VAR )
 
         #if pkg-config was not successful we have to do this the hard way
         if(NOT ${VAR}_FOUND)
-            find_library(${VAR}_LIBFILES NAME ${LIB_NAMES} PATHS)
+            find_library(${VAR}_LIBFILES NAME ${LIB_NAMES} PATHS ENV ${MOD_NAME}_ROOT)
             if(${${VAR}_LIBFILES} MATCHES "${VAR}_LIBFILES-NOTFOUND")
                 set(STATUS "Could not find ${VAR} runtime binaries!")
                 set(HAVE_${VAR} FALSE PARENT_SCOPE)
@@ -203,7 +204,7 @@ function(find_module VAR )
                 message(STATUS "${VAR} libraries: ${${VAR}_LIBFILES}")
             endif()
 
-            find_file(${VAR}_HDRFILES NAME ${HEADER_NAMES} PATHS)
+            find_file(${VAR}_HDRFILES NAME ${HEADER_NAMES} PATHS ENV ${MOD_NAME}_ROOT)
             if(${${VAR}_HDRFILES} MATCHES "${VAR}_HDRFILES-NOTFOUND")
                 message(STATUS "Could not find ${VAR} header files!")
                 set(HAVE_${VAR} FALSE PARENT_SCOPE)

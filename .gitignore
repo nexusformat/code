@@ -12,7 +12,8 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
-
+# Ignore usual in-tree CMake build area
+/build/
 
 # Compiled Object files
 *.slo

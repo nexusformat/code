@@ -51,7 +51,13 @@ add_custom_target(html)
 if(CMAKE_HOST_UNIX)
     #easy on Unix - just follow the GNU standard
     include(GNUInstallDirs)
-endif()
+else()
+    set(CMAKE_INSTALL_LIBDIR lib)
+    set(CMAKE_INSTALL_DOCDIR doc)
+    set(CMAKE_INSTALL_INCLUDEDIR include)
+    set(CMAKE_INSTALL_MANDIR man)
+    set(CMAKE_INSTALL_BINDIR bin)
+endif() 
 
 
 #-----------------------------------------------------------------------------
