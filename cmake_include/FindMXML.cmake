@@ -25,10 +25,18 @@
 #
 #==============================================================================
 
-find_module(MXML
-            LIB_NAMES mxml
-            HEADER_NAMES mxml.h
-            MOD_NAME mxml)
+
+if(CMAKE_HOST_UNIX)
+    find_module(MXML
+                LIB_NAMES mxml
+                HEADER_NAMES mxml.h
+                MOD_NAME mxml)
+else()
+    find_module(MXML
+                LIB_NAMES mxml mxml1
+                HEADER_NAMES mxml.h
+                MOD_NAME mxml)
+endif()
 
 if(NOT HAVE_MXML)
     #the user has explicitely requested to build with MXML - as we could not
@@ -36,4 +44,8 @@ if(NOT HAVE_MXML)
     message(FATAL_ERROR "User requested MXML not found!")
 endif()
 
-list(APPEND NAPI_LINK_LIBS mxml)
+if(CMAKE_HOST_UNIX)
+    list(APPEND NAPI_LINK_LIBS mxml)
+else()
+    list(APPEND NAPI_LINK_LIBS mxml mxml1)
+endif()

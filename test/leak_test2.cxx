@@ -3,7 +3,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <napi.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif /* _WIN32 */
 
 #define PSZ(s) (s).c_str()
 

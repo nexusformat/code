@@ -25,6 +25,7 @@
 #
 #=============================================================================
 
+<<<<<<< HEAD
 find_library(HDF4_LIBRARIES NAMES df mfhdf PATH_SUFFIXES hdf)
 find_library(HDF4_DF_LIBRARY NAMES df PATH_SUFFIXES hdf)
 find_library(HDF4_MFHDF_LIBRARY NAMES mfhdf PATH_SUFFIXES hdf)
@@ -32,11 +33,29 @@ message(STATUS "DF library found: ${HDF4_DF_LIBRARY}")
 message(STATUS "MFHDF library found: ${HDF4_MFHDF_LIBRARY}")
 
 message(STATUS "HDF4 libraries: ${HDF4_LIBRARIES}")
+=======
+set(HDF4_LIBRARIES df mfhdf)
 
-find_library(_HDF4_DF_LIBRARY NAMES df PATH_SUFFIXES hdf)
+#------------------------------------------------------------------------------
+# find the runtime binaries of the HDF4 library
+#------------------------------------------------------------------------------
+find_library(HDF4_LIBRARIES NAMES df mfhdf 
+             HINTS ENV HDF4_ROOT 
+             PATH_SUFFIXES hdf)
+
+find_library(_HDF4_DF_LIBRARY NAMES df hdf 
+             HINTS ENV 
+             HDF4_ROOT PATH_SUFFIXES hdf)
+>>>>>>> 336bba8dd4b92aa97c0684b1285f94d575b23f8a
+
+#if the binaries have been found their parent directory has to be 
+#extracted from the total path
 get_filename_component(HDF4_LIBRARY_DIRS ${_HDF4_DF_LIBRARY} PATH)
 
-find_path ( HDF4_INCLUDE_DIR mfhdf.h PATH /usr/include /usr/include/hdf)
+#------------------------------------------------------------------------------
+# find the HDF4 header file
+#------------------------------------------------------------------------------
+find_path (HDF4_INCLUDE_DIR mfhdf.h HINTS ENV HDF4_ROOT PATH_SUFFIXES hdf)
 
 include ( FindPackageHandleStandardArgs )
 find_package_handle_standard_args( HDF4 DEFAULT_MSG HDF4_LIBRARIES HDF4_INCLUDE_DIR )
@@ -55,6 +74,6 @@ find_package(JPEG REQUIRED)
 #------------------------------------------------------------------------------
 # add libraries to the link list for NAPI
 #------------------------------------------------------------------------------
-list(APPEND NAPI_LINK_LIBS  df mfhdf jpeg)
+list(APPEND NAPI_LINK_LIBS  ${_HDF4_DF_LIBRARY} mfhdf jpeg)
 include_directories ( SYSTEM ${HDF4_INCLUDE_DIR} )
 link_directories(${HDF4_LIBRARY_DIRS})
