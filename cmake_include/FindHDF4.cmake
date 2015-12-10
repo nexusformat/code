@@ -25,9 +25,13 @@
 #
 #=============================================================================
 
-set(HDF4_LIBRARIES df mfhdf)
-
 find_library(HDF4_LIBRARIES NAMES df mfhdf PATH_SUFFIXES hdf)
+find_library(HDF4_DF_LIBRARY NAMES df PATH_SUFFIXES hdf)
+find_library(HDF4_MFHDF_LIBRARY NAMES mfhdf PATH_SUFFIXES hdf)
+message(STATUS "DF library found: ${HDF4_DF_LIBRARY}")
+message(STATUS "MFHDF library found: ${HDF4_MFHDF_LIBRARY}")
+
+message(STATUS "HDF4 libraries: ${HDF4_LIBRARIES}")
 
 find_library(_HDF4_DF_LIBRARY NAMES df PATH_SUFFIXES hdf)
 get_filename_component(HDF4_LIBRARY_DIRS ${_HDF4_DF_LIBRARY} PATH)
