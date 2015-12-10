@@ -130,7 +130,7 @@ Building the code on Windows
 
 These instructions will build everything except the applications using LIBXML2 (e.g. nxtranslate)
 
-* Download and install HDF4 and/or HDF5 libraries from HDF web site
+* Download and install Win32/x64 HDF4 and/or HDF5 libraries from HDF web site
 
   - within these installations is a "cmake" directory, I needed to remove/rename this to get everything to configure properly
 
@@ -138,8 +138,8 @@ These instructions will build everything except the applications using LIBXML2 (
 
   - open the vcnet directory
   - you need to edit mxml1.def and a add a single line containing the text    mxml_error   to the end of this file
-  - open the visual studio solution and build the project
-  - copy the files mxml.h mxml1.lib mxml1.dll to some other location
+  - open the visual studio solution, chose either Win32 or x64 build type as appropriate, and build the project
+  - copy the files   mxml.h mxml1.lib mxml1.dll   to some other location
 
 * Define HDF4_ROOT, HDF5_ROOT and MXML_ROOT environment variables to point to the top of each installed area
 
@@ -149,8 +149,8 @@ These instructions will build everything except the applications using LIBXML2 (
 * Run CMAKE-GUI to generate Visual studio solutions files
 
   - Provide source and build paths in the relevant boxes
-  - Click on Configure, choose appropriate visual studio version when prompted
-  - A list of options will appear, choose the appropriate ENABLE_ ones and press Configure again
+  - Click on Configure, choose appropriate visual studio version (with Win64 suffix if needed) when prompted
+  - A list of options will appear, select the  ENABLE_*  boxes for the components you need and press Configure again
   - If nothing is red, click on Generate
 
 * Browse to the build directory and open the generated NeXus.sln
