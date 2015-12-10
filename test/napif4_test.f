@@ -62,7 +62,7 @@ C------------------------------------------------------------------------------
       DATA U_BUFFER /0,1,2,3,4,5,6/
       EQUIVALENCE (CHAR_BUFFER, CHAR_BUFFER_B)
 
-      IF (NXOPEN('NXtest.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('napif4.nxs', NXACC_CREATE, FILEID) .NE. NX_OK) STOP
       IF (NXMAKEGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
       IF (NXOPENGROUP(FILEID, 'entry', 'NXentry') .NE. NX_OK) STOP
          IF (NXMAKEDATA(FILEID, 'ch_data', NX_CHAR, 1, 10) .NE. NX_OK) 
@@ -160,7 +160,7 @@ C------------------------------------------------------------------------------
       IF (NXCLOSEGROUP(FILEID) .NE. NX_OK) STOP
       IF (NXCLOSE(FILEID) .NE. NX_OK) STOP
 C *** read data
-      IF (NXOPEN('NXtest.nxs', NXACC_READ, FILEID) .NE. NX_OK) STOP
+      IF (NXOPEN('napif4.nxs', NXACC_READ, FILEID) .NE. NX_OK) STOP
       IF (NXGETATTRINFO(FILEID, J) .NE. NX_OK) STOP
       IF (J .GT. 0) WRITE(*,'(1X,A,I2)') 
      +  'Number of global attributes: ', J

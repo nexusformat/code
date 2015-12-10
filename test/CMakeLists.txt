@@ -44,6 +44,7 @@ if(WITH_HDF5)
     add_executable(napi_test_hdf5 napi_test.c)
     target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-test" COMMAND napi_test_hdf5)
+    
     add_executable(napi_attra_test_hdf5 napi_attra_test.c)
     target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND napi_attra_test_hdf5)
@@ -54,6 +55,7 @@ if(WITH_HDF4)
     target_link_libraries(napi_test_hdf4 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF4-test"
              COMMAND napi_test_hdf4)
+             
     add_executable(napi_attra_test_hdf4 napi_attra_test.c)
     target_link_libraries(napi_attra_test_hdf4 NeXus_Shared_Library) 
     add_test(NAME "NAPI-C-HDF4-attra-test" COMMAND napi_attra_test_hdf4)
