@@ -74,6 +74,24 @@ find_package(JPEG REQUIRED)
 #------------------------------------------------------------------------------
 # add libraries to the link list for NAPI
 #------------------------------------------------------------------------------
-list(APPEND NAPI_LINK_LIBS  ${HDF4_DF_LIBRARY} ${HDF4_MFHDF_LIBRARY} jpeg)
+get_filename_component(LIB_EXT ${HDF4_DF_LIBRARY} EXT)
+if(LIB_EXT MATCHES .a)
+    message(STATUS "HDF4 DF library is static")
+    list(APPEND NAPI_LINK_LIBS "-Wl,-whole-archive" ${HDF4_DF_LIBRARY} "-Wl,-no-whole-archive")
+else()
+    list(APPEND NAPI_LINK_LIBS ${HDF4_DF_LIBRARY})
+endif()
+
+
+get_filename_component(LIB_EXT ${HDF4_MFHDF_LIBRARY} EXT)
+if(LIB_EXT MATCHES .a)
+    message(STATUS "HDF4 MFHDF library is static")
+    list(APPEND NAPI_LINK_LIBS "-Wl,-whole-archive" ${HDF4_MFHDF_LIBRARY} "-Wl,-no-whole-archive")
+else()
+    list(APPEND NAPI_LINK_LIBS ${HDF4_MFHDF_LIBRARY})
+endif()
+
+list(APPEND NAPI_LINK_LIBS jpeg)
+
 include_directories ( SYSTEM ${HDF4_INCLUDE_DIRS} )
 link_directories(${HDF4_LIBRARY_DIRS})
