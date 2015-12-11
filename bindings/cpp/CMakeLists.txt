@@ -52,7 +52,7 @@ set_target_properties(NeXus_CPP_Shared_Library PROPERTIES
                       SOVERSION ${ABI_CURRENT})
 
 install (TARGETS NeXus_CPP_Shared_Library
-         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+         RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 
 install (TARGETS NeXus_CPP_Static_Library 
