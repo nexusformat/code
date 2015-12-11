@@ -102,7 +102,8 @@ target_link_libraries(NeXus_Shared_Library ${NAPI_LINK_LIBS})
 #-----------------------------------------------------------------------------
 install (TARGETS NeXus_Shared_Library
          RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
-         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 
 install (TARGETS NeXus_Static_Library 
          DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -54,7 +54,8 @@ target_link_libraries(NeXus_F77_Shared_Library NeXus_Shared_Library)
 
 install (TARGETS NeXus_F77_Shared_Library
          RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
-         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 
 install (TARGETS NeXus_F77_Static_Library 
          DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus
