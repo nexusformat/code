@@ -36,7 +36,7 @@ C *** NXHANDLESIZE should be the size of an INTEGER*4 array that is (at least)
 C *** large enough to hold an NXhandle structure
       INTEGER NXHANDLESIZE
 C      PARAMETER(NXHANDLESIZE=5120)
-      PARAMETER(NXHANDLESIZE=9058)
+      PARAMETER(NXHANDLESIZE=9124)
 C *** NXLINKSIZE is (at least) the size of an INTEGER*4 array that can hold
 C *** an NXlink structure: we'll assume 64bit alignment of structure members for safety
       INTEGER NXLINKSIZE
