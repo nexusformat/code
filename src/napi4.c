@@ -578,7 +578,9 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     /* create and configure the group */
     iNew = Vattach (pFile->iVID, -1, "w");
     if (iNew < 0) {
-      NXReportError( "ERROR: HDF could not create Vgroup");
+      sprintf (pBuffer, "ERROR: HDF could not create Vgroup %s, class %s", 
+                        name, nxclass);
+      NXReportError( pBuffer);
       return NX_ERROR;
     }
     Vsetname (iNew, name);
