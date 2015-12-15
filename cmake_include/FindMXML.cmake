@@ -26,22 +26,30 @@
 #==============================================================================
 
 
-if(CMAKE_HOST_UNIX)
-    find_module(MXML
-                LIB_NAMES mxml
-                HEADER_NAMES mxml.h
-                MOD_NAME mxml)
+#------------------------------------------------------------------------------
+# find the runtime binaries of the MXML library
+#------------------------------------------------------------------------------
+find_library(MXML_LIBRARY NAMES mxml mxml1)
+             
+
+if(MXML_LIBRARY MATCHES MXML_LIBRARY-NOTFOUND)
+    message(FATAL_ERROR "Could not find MXML library!")
 else()
-    find_module(MXML
-                LIB_NAMES mxml mxml1
-                HEADER_NAMES mxml.h
-                MOD_NAME mxml)
+    get_filename_component(MXML_LIBRARY_DIRS ${MXML_LIBRARY} PATH)
+    message(STATUS "Found MXML library: ${MXML_LIBRARY}")
+    message(STATUS "MXML libary path: ${MXML_LIBRARY_DIRS}")
 endif()
 
-if(NOT HAVE_MXML)
-    #the user has explicitely requested to build with MXML - as we could not
-    #find the library we have to exit the configuration
-    message(FATAL_ERROR "User requested MXML not found!")
+#------------------------------------------------------------------------------
+# find the MXML header file
+#------------------------------------------------------------------------------
+find_path(MXML_INCLUDE_DIRS mxml.h)
+         
+if(MXML_INCLUDE_DIRS MATCHES MXML_INCLUDE_DIRS-NOTFOUND)
+    message(FATAL_ERROR "Could not find MXML header files")
+else()
+    message(STATUS "Found MXML header files in: ${MXML_INCLUDE_DIRS}")
 endif()
 
-list(APPEND NAPI_LINK_LIBS ${MXML_LIBFILES})
+include_directories(${MXML_INCLUDE_DIRS})
+list(APPEND NAPI_LINK_LIBS ${MXML_LIBRARY})
