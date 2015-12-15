@@ -29,9 +29,9 @@
 #------------------------------------------------------------------------------
 # find the runtime binaries of the MXML library
 #------------------------------------------------------------------------------
-find_library(MXML_LIBRARY NAMES mxml mxml1)
+find_library(MXML_LIBRARY NAMES mxml mxml1
+             HINTS ENV MXML_ROOT)
              
-
 if(MXML_LIBRARY MATCHES MXML_LIBRARY-NOTFOUND)
     message(FATAL_ERROR "Could not find MXML library!")
 else()
