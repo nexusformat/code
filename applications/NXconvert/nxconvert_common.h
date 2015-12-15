@@ -34,13 +34,14 @@
 
 static const char* nx_formats[] = { "XML", "HDF4", "HDF5", "DEFINITION", NULL };
 
-#ifdef _WIN32
-#ifdef NXCONVERT_EXPORTS
-__declspec(dllexport)
-#else
-__declspec(dllimport)
-#endif /* NXCONVERT_EXPORTS */ 
-#endif /* _WIN32 */
+// not needed now we are not being used as a library
+//#ifdef _WIN32
+//#ifdef NXCONVERT_EXPORTS
+//__declspec(dllexport)
+//#else
+//__declspec(dllimport)
+//#endif /* NXCONVERT_EXPORTS */ 
+//#endif /* _WIN32 */
 extern int convert_file(int nx_format, const char* inFile, int nx_read_access, const char* outFile, int nx_write_access, const char* definition_name_);
 
 #endif /* NXCONVERT_COMMON */

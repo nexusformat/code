@@ -36,7 +36,7 @@ set (SOURCES napif.f)
 add_library (NeXus_F77_Static_Library STATIC ${HEADERS} ${SOURCES})
 
 set_target_properties(NeXus_F77_Static_Library PROPERTIES 
-                      OUTPUT_NAME NeXus77)
+                      OUTPUT_NAME NeXus77${STATIC_LIBRARY_SUFFIX})
 
 target_link_libraries(NeXus_F77_Static_Library NeXus_Static_Library)
 
@@ -52,9 +52,14 @@ set_target_properties(NeXus_F77_Shared_Library PROPERTIES
 
 target_link_libraries(NeXus_F77_Shared_Library NeXus_Shared_Library)
 
-install (TARGETS NeXus_F77_Static_Library NeXus_F77_Shared_Library
-         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
-         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus COMPONENT Development)
+install (TARGETS NeXus_F77_Shared_Library
+         RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+
+install (TARGETS NeXus_F77_Static_Library 
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus
+         COMPONENT Development)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/napif.inc 
          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nexus 

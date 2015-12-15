@@ -38,7 +38,7 @@ set_property(SOURCE ${SOURCES} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 #------------------------------------------------------------------------------
 add_library (NeXus_CPP_Static_Library STATIC ${HEADERS} ${SOURCES})
 set_target_properties(NeXus_CPP_Static_Library PROPERTIES 
-                      OUTPUT_NAME NeXusCPP)
+                      OUTPUT_NAME NeXusCPP${STATIC_LIBRARY_SUFFIX})
 
 target_link_libraries(NeXus_CPP_Static_Library NeXus_Static_Library)
 
@@ -51,9 +51,14 @@ set_target_properties(NeXus_CPP_Shared_Library PROPERTIES
                       VERSION "${ABI_VERSION}"
                       SOVERSION ${ABI_CURRENT})
 
-install (TARGETS NeXus_CPP_Static_Library NeXus_CPP_Shared_Library
+install (TARGETS NeXus_CPP_Shared_Library
+         RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+
+install (TARGETS NeXus_CPP_Static_Library 
          DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime )
+         COMPONENT Development)
 
 INSTALL (FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nexus  
          COMPONENT Development)

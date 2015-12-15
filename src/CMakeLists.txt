@@ -37,11 +37,8 @@ endif (WIN32)
 # generate list of common source files
 #-----------------------------------------------------------------------------
 set (NAPISRC napi.c napiu.c nxstack.c nxstack.h stptok.c  nxdataset.c 
+             napi_fortran_helper.c
              nxdataset.h nx_stptok.h)
-
-if (ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
-  set (NAPISRC ${NAPISRC} napi_fortran_helper.c)
-endif(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
 
 set (NAPILINK)
 
@@ -80,7 +77,7 @@ set_property(SOURCE ${NAPISRC} APPEND PROPERTY COMPILE_FLAGS ${NX_CFLAGS})
 add_library (NeXus_Static_Library STATIC ${NAPISRC})
 
 set_target_properties(NeXus_Static_Library PROPERTIES 
-                      OUTPUT_NAME NeXus)
+                      OUTPUT_NAME NeXus${STATIC_LIBRARY_SUFFIX})
 
 target_link_libraries(NeXus_Static_Library ${NAPI_LINK_LIBS})
 #------------------------------------------------------------------------------
@@ -92,6 +89,10 @@ set_target_properties(NeXus_Shared_Library PROPERTIES
                       OUTPUT_NAME NeXus
                       VERSION ${ABI_VERSION}
                       SOVERSION ${ABI_CURRENT})
+if(MSVC)
+set_target_properties(NeXus_Shared_Library PROPERTIES LINK_FLAGS 
+                           "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/NeXus.def\"")
+endif(MSVC)
 
 target_link_libraries(NeXus_Shared_Library ${NAPI_LINK_LIBS})
 
@@ -100,8 +101,9 @@ target_link_libraries(NeXus_Shared_Library ${NAPI_LINK_LIBS})
 # install the targets
 #-----------------------------------------------------------------------------
 install (TARGETS NeXus_Shared_Library
-         DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+         RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 
 install (TARGETS NeXus_Static_Library 
          DESTINATION ${CMAKE_INSTALL_LIBDIR}

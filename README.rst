@@ -150,8 +150,13 @@ These instructions will build everything except the applications using LIBXML2 (
 
   - Provide source and build paths in the relevant boxes
   - Click on Configure, choose appropriate visual studio version (with Win64 suffix if needed) when prompted
-  - A list of options will appear, select the  ENABLE_*  boxes for the components you need and press Configure again
-  - If nothing is red, click on Generate
+  - A list of options will appear, select the  ENABLE_*  boxes for the components you need
+  - Also check the CMAKE_INSTALL_PREFIX is appropriate, this is the root where file may be installed to later
+  - press Configure again
+  - If anything now appears in red, it means it is a newly displayed option. If you change ones of these (or any other value) you need to pres Configure again, otherwise move onto the next step 
+  - Click on Generate 
 
 * Browse to the build directory and open the generated NeXus.sln
 * Build the solution
+
+  - If you wish to copy files to the install directory above, right click and Build the INSTALL project 

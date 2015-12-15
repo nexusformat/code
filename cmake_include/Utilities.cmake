@@ -218,5 +218,6 @@ function(find_module VAR )
     endif()
     set(${VAR}_INCLUDE_DIRS ${${VAR}_INCLUDE_DIRS} PARENT_SCOPE)
     set(${VAR}_LIBRARY_DIRS ${${VAR}_LIBRARY_DIRS} PARENT_SCOPE)
+	set(${VAR}_LIBFILES ${${VAR}_LIBFILES} PARENT_SCOPE)
 
 endfunction()

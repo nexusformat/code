@@ -34,7 +34,7 @@ set (SOURCES NXmodule.f90 NXUmodule.f90)
 #------------------------------------------------------------------------------
 
 add_library (NeXus_F90_Static_Library STATIC ${SOURCES})
-set_target_properties(NeXus_F90_Static_Library PROPERTIES OUTPUT_NAME NeXus90)
+set_target_properties(NeXus_F90_Static_Library PROPERTIES OUTPUT_NAME NeXus90${STATIC_LIBRARY_SUFFIX})
 target_link_libraries(NeXus_F90_Static_Library NeXus_Static_Library)
 
 #------------------------------------------------------------------------------
@@ -51,6 +51,11 @@ set_target_properties(NeXus_F90_Shared_Library PROPERTIES
 
 target_link_libraries(NeXus_F90_Shared_Library NeXus_Shared_Library )
 
-install (TARGETS NeXus_F90_Static_Library NeXus_F90_Shared_Library
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus COMPONENT Development)
+install (TARGETS NeXus_F90_Shared_Library
+         RUNTIME DESTINATION ${NEXUS_INSTALL_SHLIB} COMPONENT Runtime
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+
+install (TARGETS NeXus_F90_Static_Library 
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}/nexus
+         COMPONENT Development)
