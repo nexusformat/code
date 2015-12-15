@@ -193,7 +193,7 @@ message(STATUS "Link with: ${NAPI_LINK_LIBS}")
 if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
     enable_language(Fortran)
     
-    set(CMAKE_Fortran_FLAGS ${CMAKE_Fortran_FLAGS} "-Wall -fbacktrace -pedantic -fcheck=all -Wextra")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -fbacktrace -pedantic -fcheck=all -Wextra")
     message(STATUS ${CMAKE_Fortran_FLAGS})
 endif()
 
