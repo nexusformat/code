@@ -37,46 +37,59 @@ link_directories(${HDF5_LIBRARY_DIRS}
                  ${HDF4_LIBRARY_DIRS}
                  ${MXML_LIBRARY_DIRS})
 
+## doesn't seem to be needed at the moment...
+#if (WIN32)
+#  set(TESTSPATH "$ENV{HDF4_ROOT}/bin;$ENV{HDF5_ROOT}/bin;$ENV{MXML_ROOT};${NEXUS_INSTALL_SHLIB};$ENV{PATH}")
+#  STRING(REPLACE "/" "\\" TESTSPATH "${TESTSPATH}")
+#  STRING(REPLACE ";" "\\;" TESTSPATH "${TESTSPATH}")
+#endif(WIN32)
+#if (WIN32)
+#  set_tests_properties(NAPI-C-HDF5-test NAPI-C-HDF5-attra-test PROPERTIES ENVIRONMENT "PATH=${TESTSPATH}")
+#endif(WIN32)
+
 #------------------------------------------------------------------------------
 # In all cases we have to build the C-tests
 #------------------------------------------------------------------------------
 if(WITH_HDF5)
     add_executable(napi_test_hdf5 napi_test.c)
     target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
-    add_test(NAME "NAPI-C-HDF5-test" COMMAND napi_test_hdf5)
+    add_test(NAME "NAPI-C-HDF5-test" COMMAND ${CMAKE_COMMAND} -E environment napi_test_hdf5)
     
     add_executable(napi_attra_test_hdf5 napi_attra_test.c)
     target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library)
-    add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND napi_attra_test_hdf5)
+    add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND ${CMAKE_COMMAND} -E environment napi_attra_test_hdf5)
+
 endif()
 
 if(WITH_HDF4)
     add_executable(napi_test_hdf4 napi_test.c)
     target_link_libraries(napi_test_hdf4 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF4-test"
-             COMMAND napi_test_hdf4)
+             COMMAND ${CMAKE_COMMAND} -E environment napi_test_hdf4)
              
     add_executable(napi_attra_test_hdf4 napi_attra_test.c)
     target_link_libraries(napi_attra_test_hdf4 NeXus_Shared_Library) 
-    add_test(NAME "NAPI-C-HDF4-attra-test" COMMAND napi_attra_test_hdf4)
+    add_test(NAME "NAPI-C-HDF4-attra-test" COMMAND ${CMAKE_COMMAND} -E environment napi_attra_test_hdf4)
     set_tests_properties("NAPI-C-HDF4-attra-test" PROPERTIES WILL_FAIL TRUE)
+
 endif()
 
 if(WITH_MXML)
     add_executable(napi_test-xml napi_test.c)
     target_link_libraries(napi_test-xml NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-test"
-             COMMAND napi_test-xml)
+             COMMAND ${CMAKE_COMMAND} -E environment napi_test-xml)
              
     add_executable(napi_test-xml-table napi_test.c)
     target_link_libraries(napi_test-xml-table NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-TABLE-test"
-             COMMAND napi_test-xml-table)
+             COMMAND ${CMAKE_COMMAND} -E environment napi_test-xml-table)
              
     add_executable(napi_attra_test_xml napi_attra_test.c)
     target_link_libraries(napi_attra_test_xml NeXus_Shared_Library)
-    add_test(NAME "NAPI-C-MXML-attra-test" COMMAND napi_attra_test_xml)
+    add_test(NAME "NAPI-C-MXML-attra-test" COMMAND ${CMAKE_COMMAND} -E environment napi_attra_test_xml)
     set_tests_properties("NAPI-C-MXML-attra-test" PROPERTIES WILL_FAIL TRUE)
+
 endif()
 
 #------------------------------------------------------------------------------
@@ -85,7 +98,7 @@ endif()
 add_executable(leak_test1 leak_test1.c)
 target_link_libraries(leak_test1 NeXus_Shared_Library)
 add_test(NAME "NAPI-C-leak-test-1"
-         COMMAND leak_test1)
+         COMMAND ${CMAKE_COMMAND} -E environment leak_test1)
 
 #------------------------------------------------------------------------------
 # Add test for unlimited dimensions 
@@ -93,7 +106,7 @@ add_test(NAME "NAPI-C-leak-test-1"
 add_executable(test_nxunlimited test_nxunlimited.c)
 target_link_libraries(test_nxunlimited  NeXus_Shared_Library)
 add_test(NAME "NAPI-C-test-nxunlimited"
-         COMMAND test_nxunlimited)
+         COMMAND ${CMAKE_COMMAND} -E environment test_nxunlimited)
          
 
 #------------------------------------------------------------------------------
@@ -106,25 +119,26 @@ if(ENABLE_CXX)
     if(WITH_HDF5)
         add_executable(napi_test_cpp-hdf5 napi_test_cpp.cxx)
         target_link_libraries(napi_test_cpp-hdf5 NeXus_CPP_Shared_Library)
-        add_test(NAME "NAPI-C++-HDF5-test" COMMAND napi_test_cpp-hdf5)
+        add_test(NAME "NAPI-C++-HDF5-test" COMMAND ${CMAKE_COMMAND} -E environment napi_test_cpp-hdf5)
     endif()
 
     if(WITH_HDF4)
         add_executable(napi_test_cpp-hdf4 napi_test_cpp.cxx)
         target_link_libraries(napi_test_cpp-hdf4 NeXus_CPP_Shared_Library)
-        add_test(NAME "NAPI-C++-HDF4-test" COMMAND napi_test_cpp-hdf4)
+        add_test(NAME "NAPI-C++-HDF4-test" COMMAND ${CMAKE_COMMAND} -E environment napi_test_cpp-hdf4)
     endif()
 
     if(WITH_MXML)
         add_executable(napi_test_cpp-xml napi_test_cpp.cxx)
         target_link_libraries(napi_test_cpp-xml NeXus_CPP_Shared_Library)
-        add_test(NAME "NAPI-C++-MXML-test" COMMAND napi_test_cpp-xml)
-        
+        add_test(NAME "NAPI-C++-MXML-test" COMMAND ${CMAKE_COMMAND} -E environment napi_test_cpp-xml)
+
 #        add_executable(napi_test_cpp-xml-table napi_test_cpp.cxx)
 #        target_link_libraries(napi_test_cpp-xml-table NeXus_CPP_Shared_Library
 #                              ${NAPI_LINK_LIBS})
-#        add_test(NAME "NAPI-C++-MXML-TABLE-test" 
+#        add_test(NAME "NAPI-C++-MXML-TABLE-test"
 #                 COMMAND napi_test_cpp-xml-table)
+        
     endif()
 
     #--------------------------------------------------------------------------
@@ -133,12 +147,12 @@ if(ENABLE_CXX)
     add_executable(leak_test2 leak_test2.cxx)
     target_link_libraries(leak_test2 NeXus_CPP_Shared_Library)
     add_test(NAME "NAPI-C++-leak-test-2" 
-             COMMAND leak_test2)
+             COMMAND ${CMAKE_COMMAND} -E environment leak_test2)
 
     add_executable(leak_test3 leak_test3.cxx)
     target_link_libraries(leak_test3 NeXus_CPP_Shared_Library)
     add_test(NAME "NAPI-C++-leak-test-3"
-             COMMAND leak_test3)
+             COMMAND ${CMAKE_COMMAND} -E environment leak_test3)
 endif()
 
 if(ENABLE_FORTRAN77)
@@ -149,21 +163,21 @@ if(ENABLE_FORTRAN77)
         add_executable(napif4_test napif4_test.f)
         target_link_libraries(napif4_test NeXus_F77_Shared_Library)
         add_test(NAME "NAPI-F77-HDF4-test"
-                 COMMAND napif4_test)
+                 COMMAND ${CMAKE_COMMAND} -E environment napif4_test)
     endif()
     
     if(WITH_HDF5)
         add_executable(napif5_test napif5_test.f)
         target_link_libraries(napif5_test NeXus_F77_Shared_Library)
         add_test(NAME "NAPI-F77-HDF5-test"
-                 COMMAND napif5_test)
+                 COMMAND ${CMAKE_COMMAND} -E environment napif5_test)
     endif()
 
     if(WITH_MXML)
         add_executable(napif_test  napif_test.f)
         target_link_libraries(napif_test NeXus_F77_Shared_Library)
         add_test(NAME "NAPI-F77-XML-test"
-                 COMMAND napif_test)
+                 COMMAND ${CMAKE_COMMAND} -E environment napif_test)
     endif()
 
 endif()
@@ -173,7 +187,7 @@ if(ENABLE_FORTRAN90)
     include_directories(${PROJECT_BINARY_DIR}/bindings/f90)
     add_executable(NXtestf90 NXtest.f90)
     target_link_libraries(NXtestf90 NeXus_F90_Shared_Library)
-    add_test(NAME "Fortran-90-test" COMMAND NXtestf90)
+    add_test(NAME "Fortran-90-test" COMMAND ${CMAKE_COMMAND} -E environment NXtestf90)
 endif()
 
 
