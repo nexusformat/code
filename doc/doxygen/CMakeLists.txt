@@ -23,8 +23,9 @@
 #  For further information, see <http://www.nexusformat.org>
 #
 #=============================================================================
+include(FindDoxygen)
 
-if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+if (DOXYGEN_FOUND)
 
     SET(SOURCES Doxyfile_c Doxyfile_cpp Doxyfile_f90 Doxyfile_f77 preamble.h)
     set_directory_properties(PROPERTIES 
@@ -108,5 +109,7 @@ if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
         -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake")
     add_dependencies(install-html html)
 
-endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+else()
+    message(STATUS "Cannot find doxygen - no API documentation will be built!")
+endif ()
 
