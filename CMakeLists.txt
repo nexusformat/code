@@ -107,7 +107,7 @@ endif()
 #-----------------------------------------------------------------------------
 include(Utilities)
 include(CompilerChecks)
-
+include(InstallRequiredSystemLibraries)
 
 #-----------------------------------------------------------------------------
 # check for package config
@@ -287,6 +287,7 @@ if(WIN32)
 	file(GLOB HDF5_DLLS "${HDF5_INCLUDE_DIRS}/../bin/*.dll")
 	file(GLOB_RECURSE MXML_DLLS "${MXML_LIBRARY_DIRS}/*.dll")
 	install(FILES ${HDF4_DLLS} ${HDF5_DLLS} ${MXML_DLLS} DESTINATION bin COMPONENT Runtime)
+	INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT Runtime) 
 endif()
 
 file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE) 
