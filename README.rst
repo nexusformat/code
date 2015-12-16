@@ -141,7 +141,7 @@ These instructions will build everything except the applications using LIBXML2 (
   - open the visual studio solution, chose either Win32 or x64 build type as appropriate, and build the project
   - copy the files   mxml.h mxml1.lib mxml1.dll   to some other location
 
-* Define HDF4_ROOT, HDF5_ROOT and MXML_ROOT environment variables to point to the top of each installed area
+* Define HDF4_ROOT, HDF5_ROOT and MXML_ROOT Windows environment variables to point to the top of each installed area
 
   - you should use / rather than \\ for the paths specified in these variables
 
@@ -159,4 +159,5 @@ These instructions will build everything except the applications using LIBXML2 (
 * Browse to the build directory and open the generated NeXus.sln
 * Build the solution
 
-  - If you wish to copy files to the install directory above, right click and Build the INSTALL project 
+  - If you wish to copy files to the install directory specified above, right click and Build the INSTALL project 
+  - If you wish to run the tests, right click and Build the RUN_TESTS project. Currently tests pick up the DLL installed above, this will be fixed later to point to the DLL in the build tree.
