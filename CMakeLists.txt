@@ -107,7 +107,7 @@ endif()
 #-----------------------------------------------------------------------------
 include(Utilities)
 include(CompilerChecks)
-
+include(InstallRequiredSystemLibraries)
 
 #-----------------------------------------------------------------------------
 # check for package config
@@ -266,3 +266,48 @@ endif()
 #add_subdirectory (third_party)
 #add_subdirectory (windows)
 #add_subdirectory (Windows_extra)
+
+#
+# set CPack packaging options
+#
+
+# needed for windows NSIS installer
+if (CMAKE_SIZEOF_VOID_P MATCHES "8")
+    set(ARCH64 1)
+	set(ARCHSUFFIX "64")
+else()
+    set(ARCH64 0)
+	set(ARCHSUFFIX "")
+endif()
+
+if(WIN32)
+	file(GLOB HDF4_DLLS "${HDF4_LIBRARY_DIRS}/../bin/*.dll")
+	# for some reason HDF5_LIBRARY_DIRS is blank
+	file(GLOB HDF5_DLLS "${HDF5_INCLUDE_DIRS}/../bin/*.dll")
+	file(GLOB_RECURSE MXML_DLLS "${MXML_LIBRARY_DIRS}/*.dll")
+	install(FILES ${HDF4_DLLS} ${HDF5_DLLS} ${MXML_DLLS} DESTINATION bin COMPONENT Runtime)
+	INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT Runtime) 
+endif()
+
+file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE) 
+file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE) 
+string(REPLACE "\\" "\\\\" PROJECT_SOURCE_DIR_NATIVE_D ${PROJECT_SOURCE_DIR_NATIVE})
+string(REPLACE "\\" "\\\\" PROJECT_BINARY_DIR_NATIVE_D ${PROJECT_BINARY_DIR_NATIVE})
+
+configure_file("${PROJECT_SOURCE_DIR}/CPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CPackOptions.cmake"  @ONLY)
+set (CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackOptions.cmake")
+set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
+set (CPACK_SOURCE_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
+if(WIN32)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
+    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};ZIP) 
+elseif(APPLE)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
+elseif(CYGWIN)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};CygwinBinary)
+    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};CygwinSource) 
+elseif(UNIX)
+    set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
+endif()
+# Include of CPack must always be last
+include(CPack)
