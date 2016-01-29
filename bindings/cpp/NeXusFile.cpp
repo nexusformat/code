@@ -566,6 +566,74 @@ void File::putAttr(const AttrInfo& info, const void* data) {
   }
 }
 
+void File::putAttr(const std::string& name, const std::vector<std::string>& array) {
+  if (name == NULL_STR) {
+    throw Exception("Supplied bad attribute name \"" + NULL_STR + "\"");
+  }
+  if (name.empty()) {
+    throw Exception("Supplied empty name to putAttr");
+  }
+
+  int maxLength = 0;
+  for ( std::vector<std::string>::const_iterator it = array.begin();
+        it != array.end(); ++it ) {
+    if ( maxLength < it->size() ) {
+      maxLength = it->size();
+    }
+  }
+
+  // fill data
+  std::string data(maxLength*array.size(), '\0');
+  std::size_t pos = 0;
+  for ( std::vector<std::string>::const_iterator it = array.begin();
+        it != array.end(); ++it, pos += maxLength ) {
+    if ( !(it->empty()) ) {
+      data.replace(pos, it->size(), *it);
+    }
+  }
+
+  // set rank and dim
+  int rank = 2;
+  int dim[rank] = {array.size(), maxLength};
+
+  // write data
+  NXstatus status = NXputattra(this->m_file_id, name.c_str(),
+                               data.c_str(), rank, dim, CHAR);
+
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXputattra(" << name << ", data, " << rank
+        << ", [" << dim[0] << ", " << dim[1] << "], CHAR) failed";
+    throw Exception(msg.str(), status);
+  }
+}
+
+template <typename NumT>
+void File::putAttr(const std::string& name, const std::vector<NumT>& array) {
+  if (name == NULL_STR) {
+    throw Exception("Supplied bad attribute name \"" + NULL_STR + "\"");
+  }
+  if (name.empty()) {
+    throw Exception("Supplied empty name to putAttr");
+  }
+
+  // set rank and dim
+  int rank = 1;
+  int dim[rank] = {array.size()};
+
+  // write data
+  NXnumtype type = getType<NumT>();
+  NXstatus status = NXputattra(this->m_file_id, name.c_str(),
+                               &(array[0]), rank, dim, type);
+
+  if (status != NX_OK) {
+    stringstream msg;
+    msg << "NXputattra(" << name << ", data, " << rank
+        << ", [" << dim[0] << "], " << type << ") failed";
+    throw Exception(msg.str(), status);
+  }
+}
+
 template <typename NumT>
 void File::putAttr(const std::string& name, const NumT value) {
   AttrInfo info;
@@ -1363,6 +1431,27 @@ template
 NXDLL_EXPORT void File::putAttr(const string& name, const uint64_t value);
 template
 NXDLL_EXPORT void File::putAttr(const string& name, const char value);
+
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<float>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<double>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<int8_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<uint8_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<int16_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<uint16_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<int32_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<uint32_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<int64_t>& array);
+template
+NXDLL_EXPORT void File::putAttr(const string& name, const std::vector<uint64_t>& array);
 
 template
 NXDLL_EXPORT float File::getAttr(const AttrInfo& info);

@@ -482,6 +482,23 @@ namespace NeXus {
      * Put the supplied data as an attribute into the currently open data.
      *
      * \param name Name of the attribute to add.
+     * \param array The attribute value.
+     */
+    void putAttr(const std::string& name, const std::vector<std::string>& array);
+
+    /**
+     * Put the supplied data as an attribute into the currently open data.
+     *
+     * \param name Name of the attribute to add.
+     * \param array The attribute value.
+     */
+    template <typename NumT>
+    void putAttr(const std::string& name, const std::vector<NumT>& array);
+
+    /**
+     * Put the supplied data as an attribute into the currently open data.
+     *
+     * \param name Name of the attribute to add.
      * \param value The attribute value.
      * \tparam NumT numeric data type of \a value
      */

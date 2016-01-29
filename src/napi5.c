@@ -2404,7 +2404,7 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 		iRet = H5Pclose(cparms);
 	}
 
-	iRet = H5Awrite(pFile->iCurrentA, type, data);
+	iRet = H5Awrite(pFile->iCurrentA, datatype1, data);
 	if (iRet < 0) {
 		NXReportError("ERROR: failure to write attribute");
 		return NX_ERROR; 
