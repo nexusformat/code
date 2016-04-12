@@ -100,6 +100,8 @@ namespace NeXus {
     unsigned length;
     /** The name of the attribute. */
     std::string name;
+    /** The dimensions of the attribute. */
+    std::vector<int> dims;
   };
 
   /**
@@ -778,6 +780,15 @@ namespace NeXus {
      * \return The value of the attribute.
      */
     std::string getStrAttr(const AttrInfo & info);
+
+    /**
+     * Get the value of a string array attribute.
+     *
+     * \param info Which attribute to read.
+     *
+     * \param array The values of the attribute.
+     */
+    void getAttr(const std::string& name, std::vector<std::string>& array);
 
     /**
      * \return The id of the group used for linking.

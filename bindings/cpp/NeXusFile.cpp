@@ -1109,14 +1109,38 @@ AttrInfo File::getNextAttr() {
   //string & name, int & length, NXnumtype type) {
   char name[NX_MAXNAMELEN];
   int type;
-  int length;
-  NXstatus status = NXgetnextattr(this->m_file_id, name, &length, &type);
+  int rank;
+  int dim[NX_MAXRANK];
+  NXstatus status = NXgetnextattra(this->m_file_id, name, &rank, dim, &type);
   if (status == NX_OK) {
     AttrInfo info;
     info.type = static_cast<NXnumtype>(type);
-    info.length = length;
     info.name = string(name);
-    return info;
+
+    // scalar value
+    if (rank == 0 || (rank == 1 && dim[0] == 1)) {
+      info.length = 1;
+      return info;
+    }
+
+    // char (=string) or number array (1 dim)
+    if (rank == 1) {
+      info.length = dim[0];
+      return info;
+    }
+
+    // string array (2 dim char array)
+    if (rank == 2 && type == NX_CHAR) {
+      info.length = 1;
+      for( unsigned int d=0; d<rank; ++d){
+        info.dims.push_back(dim[d]);
+        info.length *= dim[d];
+      }
+      return info;
+    }
+
+    std::cerr << "ERROR iterating through attributes found array attribute not understood by this api" << std::endl;
+    throw Exception("getNextAttr failed", NX_ERROR);
   }
   else if (status == NX_EOD) {
     AttrInfo info;
@@ -1212,6 +1236,48 @@ string File::getStrAttr(const AttrInfo & info) {
   delete [] value;
 
   return res;
+}
+
+void File::getAttr(const std::string& name, std::vector<std::string>& array) {
+  if (name == NULL_STR) {
+    throw Exception("Supplied bad attribute name \"" + NULL_STR + "\"");
+  }
+  if (name.empty()) {
+    throw Exception("Supplied empty name to getAttr");
+  }
+
+  // get attrInfo
+  char attr_name[name.size()+1];
+  strcpy(attr_name, name.c_str());
+
+  int type;
+  int rank;
+  int dim[NX_MAXRANK];
+  NXstatus status = NXgetattrainfo(this->m_file_id, attr_name, &rank, dim, &type);
+  if (status != NX_OK) {
+    throw Exception("Attribute \"" + name + "\" not found");
+  }
+
+  if (rank != 2 || type != NX_CHAR) {
+    throw Exception("Attribute is not an array of strings");
+  }
+
+  // read data
+  std::string sep(", ");
+  char* char_data = new char[dim[0] * (dim[1] + sep.size())];
+  status = NXgetattra(this->m_file_id, attr_name, char_data);
+
+  // split data to strings
+  std::string data(char_data);
+
+  std::size_t start = 0;
+  std::size_t end = data.find(sep, start);
+  while( end!=std::string::npos) {
+    array.push_back(data.substr(start, (end-start)));
+    start = end+sep.size();
+    end = data.find(sep, start);
+  }
+  array.push_back(data.substr(start));
 }
 
 vector<AttrInfo> File::getAttrInfos() {
