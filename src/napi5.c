@@ -123,22 +123,18 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 		}
 	} else if (ndims == 1) {
 		int i;
-		hid_t memtype;
 		char **strings;
 		
 		strings = (char **) malloc(thedims[0] * sizeof(char*));
-		memtype = H5Tcopy(H5T_C_S1);
-		if (H5Tis_variable_str(atype)) {
-			H5Tset_size(memtype, H5T_VARIABLE);
-		} else {
-			strings[0] = (char *) malloc(thedims[0] * (sdim + 1) * sizeof(char));
+
+		if (! H5Tis_variable_str(atype)) {
+			strings[0] = (char *) malloc(thedims[0] * sdim * sizeof(char));
 			for(i=1; i<thedims[0]; i++) {
-				strings[i] = strings[0] + i * (sdim + 1);
+				strings[i] = strings[0] + i * sdim;
 			}
-			H5Tset_size(memtype, sdim + 1);
 		}
 
-		iRet = H5Aread(attr, memtype, strings);
+                iRet = H5Aread(attr, atype, strings[0]);
 		*data = malloc((sdim + 2) * thedims[0] * sizeof(char));
 		for(i=0; i<thedims[0]; i++) {
 			if (i==0) {
@@ -149,13 +145,12 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 			}
 		}
 		if (H5Tis_variable_str(atype)) {
-			H5Dvlen_reclaim(memtype, space, H5P_DEFAULT, strings);
+			H5Dvlen_reclaim(atype, space, H5P_DEFAULT, strings);
 		} else {
 			free(strings[0]);
 		}
 
 		free(strings);
-		H5Tclose(memtype);
 	} else {
 		*data = strdup(" higher dimensional string array");
 	} 
