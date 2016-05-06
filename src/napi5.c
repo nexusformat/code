@@ -1897,7 +1897,9 @@ NXstatus NX5getinfo64(NXhandle fid, int *rank, int64_t dimension[], int *iType)
 	int i, iRank, mType;
 	hsize_t myDim[H5S_MAX_RANK], vlen_bytes = 0, total_dims_size = 1;
 	H5T_class_t tclass;
-
+	hid_t memType;
+	char *vlData = NULL;
+	
 	pFile = NXI5assert(fid);
 	/* check if there is an Dataset open */
 	if (pFile->iCurrentD == 0) {
@@ -1908,7 +1910,7 @@ NXstatus NX5getinfo64(NXhandle fid, int *rank, int64_t dimension[], int *iType)
 	/* read information */
 	tclass = H5Tget_class(pFile->iCurrentT);
 	mType = hdf5ToNXType(tclass, pFile->iCurrentT);
-	iRank = H5Sget_simple_extent_ndims(pFile->iCurrentS);
+	iRank = H5Sget_simple_extent_dims (pFile->iCurrentS, myDim, NULL);
 	if (iRank == 0) {
 		iRank = 1;	/* we pretend */
 		myDim[0] = 1;
@@ -1922,10 +1924,15 @@ NXstatus NX5getinfo64(NXhandle fid, int *rank, int64_t dimension[], int *iType)
 	*iType = (int)mType;
 	if (tclass == H5T_STRING && myDim[iRank - 1] == 1) {
 		if (H5Tis_variable_str(pFile->iCurrentT)) {
-			/* this would not work for ragged arrays */
-			H5Dvlen_get_buf_size(pFile->iCurrentD, pFile->iCurrentT,
-					     pFile->iCurrentS, &vlen_bytes);
-			myDim[iRank - 1] = vlen_bytes / total_dims_size;
+			/* this will not work for arrays of strings */
+		        memType = H5Tcopy(H5T_C_S1);
+			H5Tset_size (memType, H5T_VARIABLE);
+			H5Dread(pFile->iCurrentD, memType, H5S_ALL, H5S_ALL, H5P_DEFAULT, &vlData);
+			if(vlData != NULL){
+			  myDim[iRank-1] = strlen(vlData) + 1;
+			  H5Dvlen_reclaim (memType, pFile->iCurrentS, H5P_DEFAULT, &vlData);
+			}
+			H5Tclose(memType);
 		} else {
 			myDim[iRank - 1] = H5Tget_size(pFile->iCurrentT);
 		}

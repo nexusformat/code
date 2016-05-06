@@ -632,6 +632,10 @@ int NXBread(NXhandle fileId, NXname dataName, char *dimensions)
 	if (dimensions == NULL) {	/* Print the first few values (max 3) */
 		if (dataType == NX_CHAR) {	/* If the data is a string, output the whole buffer */
 			/* this prints the first line of an array; could print more */
+		  if(dataDimensions[dataRank-1] == 0) {
+		    PrintData("No data in string\n",NX_CHAR,
+			      sizeof("No data in string\n"));
+		  } else {
 			for (i = 0;
 			     i < total_size / dataDimensions[dataRank - 1];
 			     i++) {
@@ -641,6 +645,7 @@ int NXBread(NXhandle fileId, NXname dataName, char *dimensions)
 					  dataDimensions[dataRank - 1]);
 				PrintData("\n", NX_CHAR, 1);
 			}
+		  }
 		} else {
 			if (dataRank == 1 && dataDimensions[0] == 1) {	/* It's a scalar */
 				PrintData(dataBuffer, dataType, 1);
