@@ -527,8 +527,8 @@ namespace NeXus {
      * \copydoc NeXus::File::putSlab(void* data, std::vector<int64_t>& start,
      *                                std::vector<int64_t>& size)
      */
-    void putSlab(void* data, std::vector<int>& start,
-                 std::vector<int>& size);
+    void putSlab(const void* data, const std::vector<int>& start,
+                 const std::vector<int>& size);
 
     /**
      * Insert an array as part of a data in the final file.
@@ -537,16 +537,16 @@ namespace NeXus {
      * \param start The starting index to insert the data.
      * \param size The size of the array to put in the file.
      */
-    void putSlab(void* data, std::vector<int64_t>& start,
-                 std::vector<int64_t>& size);
+    void putSlab(const void* data, const std::vector<int64_t>& start,
+                 const std::vector<int64_t>& size);
 
     /**
      * \copydoc NeXus::File::putSlab(std::vector<NumT>& data, std::vector<int64_t>&,
      *                               std::vector<int64_t>&)
      */
     template <typename NumT>
-    void putSlab(std::vector<NumT>& data, std::vector<int>& start,
-                 std::vector<int>& size);
+    void putSlab(const std::vector<NumT>& data, const std::vector<int>& start,
+                 const std::vector<int>& size);
 
     /**
      * Insert an array as part of a data in the final file.
@@ -557,14 +557,14 @@ namespace NeXus {
      * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
-    void putSlab(std::vector<NumT>& data, std::vector<int64_t>& start,
-                 std::vector<int64_t>& size);
+    void putSlab(const std::vector<NumT>& data, const std::vector<int64_t>& start,
+                 const std::vector<int64_t>& size);
 
     /**
      * \copydoc NeXus::File::putSlab(std::vector<NumT>&, int64_t, int64_t)
      */
     template <typename NumT>
-    void putSlab(std::vector<NumT>& data, int start, int size);
+    void putSlab(const std::vector<NumT>& data, int start, int size);
 
     /**
      * Insert a number as part of a data in the final file.
@@ -575,7 +575,7 @@ namespace NeXus {
      * \tparam NumT numeric data type of \a data
      */
     template <typename NumT>
-    void putSlab(std::vector<NumT>& data, int64_t start, int64_t size);
+    void putSlab(const std::vector<NumT>& data, int64_t start, int64_t size);
 
     /**
      * \return The id of the data used for linking.
