@@ -751,7 +751,7 @@ void ConvertUpperCase(char *string)
 /* Checks for attributes and outputs their values */
 void PrintAttributes(NXhandle fileId)
 {
-	int status, attrLen, attrType;
+	int status, attrLen = 0, attrType;
 	NXname attrName;
 	void *attrBuffer;
 

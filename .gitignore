@@ -11,6 +11,7 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 install_manifest.txt
+*.cmake
 
 # Ignore usual in-tree CMake build area
 /build/

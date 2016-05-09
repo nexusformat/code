@@ -2575,9 +2575,10 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 {
 	pNexusFile5 pFile;
 	int i, iRet, mType, vid;
-	hid_t filespace, attrt;
+	hid_t filespace, attrt, memtype;
 	hsize_t myDim[H5S_MAX_RANK], myrank;
 	H5T_class_t tclass;
+	char *vlStr = NULL;
 
 	pFile = NXI5assert(handle);
 
@@ -2612,9 +2613,14 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 	if (tclass == H5T_STRING) {
 		myrank++;
 		if (H5Tis_variable_str(attrt)) {
-			hsize_t vlen_bytes;
-			H5Dvlen_get_buf_size(pFile->iCurrentA, attrt, H5S_ALL, &vlen_bytes);
-			myDim[myrank - 1] = vlen_bytes;
+		  memtype = H5Tcopy (H5T_C_S1);
+		  H5Tset_size (memtype, H5T_VARIABLE);
+		  H5Aread(pFile->iCurrentA, memtype,&vlStr);
+		  if(vlStr != NULL){
+		    myDim[myrank - 1] = strlen(vlStr) +1;
+		    H5Dvlen_reclaim (memtype, pFile->iCurrentA, H5P_DEFAULT, &vlStr);
+ 		  }
+		  H5Tclose(memtype);
 		} else {
 			myDim[myrank - 1] = H5Tget_size(attrt);
 		}

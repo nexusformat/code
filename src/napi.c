@@ -1158,7 +1158,9 @@ NXstatus NXmalloc64(void **data, int rank,
 		return NX_ERROR;
 	}
 	*data = (void *)malloc(size);
-	memset(*data, 0, size);
+	if(*data != NULL){
+	  memset(*data, 0, size);
+	}
 	return NX_OK;
 }
 
