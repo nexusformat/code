@@ -1819,10 +1819,6 @@ NXstatus NX5getdata(NXhandle fid, void *data)
 	}
 	ndims = H5Sget_simple_extent_dims(pFile->iCurrentS, dims, NULL);
 
-	if (ndims < 0) {
-		NXReportError("ERROR: unable to read dims");
-		return NX_ERROR;
-	}
 	if (ndims == 0) {	/* SCALAR dataset */
 		hid_t datatype = H5Dget_type(pFile->iCurrentD);
 		hid_t filespace = H5Dget_space(pFile->iCurrentD);
@@ -2507,11 +2503,6 @@ NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
 	datatype = H5Aget_type(pFile->iCurrentA);
 	ndims = H5Sget_simple_extent_dims(filespace, dims, NULL);
 
-	if (ndims < 0) {
-		NXReportError("ERROR: unable to read dims");
-		return NX_ERROR;
-	}
-
 	is_vlen_str = H5Tis_variable_str(datatype);
 	if (ndims == 0 && is_vlen_str) {
 		/* this assumes a fixed size - is this dangerous? */
@@ -2592,10 +2583,6 @@ NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], in
 
 	filespace = H5Aget_space(pFile->iCurrentA);
 	myrank = H5Sget_simple_extent_ndims(filespace);
-	if (myrank < 0) {
-		NXReportError("ERROR: Cannot determine attribute rank");
-		return NX_ERROR;
-	}
 	iRet = H5Sget_simple_extent_dims(filespace, myDim, NULL);
 	if (iRet < 0) {
 		NXReportError("ERROR: Cannot determine attribute dimensions");

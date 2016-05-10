@@ -2017,7 +2017,7 @@ char *NXIformatNeXusTime()
 			time_info->tm_hour,
 			time_info->tm_min,
 			time_info->tm_sec,
-			abs(gmt_offset / 3600), abs((gmt_offset % 3600) / 60)
+			labs(gmt_offset / 3600), labs((gmt_offset % 3600) / 60)
 		    );
 	} else {
 		strcpy(time_buffer, "1970-01-01T00:00:00+00:00");

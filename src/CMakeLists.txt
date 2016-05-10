@@ -33,6 +33,9 @@ if (WIN32)
 add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB=1)
 endif (WIN32)
 
+configure_file(nexus_symbols.txt nexus_symbols.sym COPYONLY)
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--version-script=nexus_symbols.sym")
+
 #-----------------------------------------------------------------------------
 # generate list of common source files
 #-----------------------------------------------------------------------------

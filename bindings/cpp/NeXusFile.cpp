@@ -39,13 +39,7 @@ static string toString(const vector<NumT>& data) {
 
 static vector<int64_t> toInt64(const vector<int> & small_v) {
   // copy the dims over to call the int64_t version
-  vector<int64_t> big_v;
-  big_v.reserve(small_v.size());
-  for (vector<int>::const_iterator it = small_v.begin(); it != small_v.end(); ++it)
-  {
-    big_v.push_back(static_cast<int64_t>(*it));
-  }
-  return big_v;
+  return vector<int64_t>(small_v.begin(),small_v.end());
 }
 
 } // end of anonymous namespace
@@ -593,7 +587,7 @@ void File::putAttr(const std::string& name, const std::vector<std::string>& arra
   }
 
   // set rank and dim
-  int rank = 2;
+  const int rank = 2;
   int dim[rank] = {array.size(), maxLength};
 
   // write data
@@ -618,7 +612,7 @@ void File::putAttr(const std::string& name, const std::vector<NumT>& array) {
   }
 
   // set rank and dim
-  int rank = 1;
+  const int rank = 1;
   int dim[rank] = {array.size()};
 
   // write data
@@ -666,13 +660,13 @@ void File::putAttr(const std::string& name, const std::string value) {
   this->putAttr(info, &(my_value[0]));
 }
 
-void File::putSlab(void* data, vector<int>& start, vector<int>& size) {
+void File::putSlab(const void* data, const vector<int>& start, const vector<int>& size) {
   vector<int64_t> start_big = toInt64(start);
   vector<int64_t> size_big = toInt64(size);
   this->putSlab(data, start_big, size_big);
 }
 
-void File::putSlab(void* data, vector<int64_t>& start, vector<int64_t>& size) {
+void File::putSlab(const void* data, const vector<int64_t>& start, const vector<int64_t>& size) {
   if (data == NULL) {
     throw Exception("Data specified as null in putSlab");
   }
@@ -699,16 +693,16 @@ void File::putSlab(void* data, vector<int64_t>& start, vector<int64_t>& size) {
 }
 
 template <typename NumT>
-void File::putSlab(vector<NumT>& data, vector<int>& start,
-                   vector<int>& size) {
+void File::putSlab(const vector<NumT>& data, const vector<int>& start,
+                   const vector<int>& size) {
   vector<int64_t> start_big = toInt64(start);
   vector<int64_t> size_big = toInt64(size);
   this->putSlab(data, start_big, size_big);
 }
 
 template <typename NumT>
-void File::putSlab(vector<NumT>& data, vector<int64_t>& start,
-                   vector<int64_t>& size) {
+void File::putSlab(const vector<NumT>& data, const vector<int64_t>& start,
+                   const vector<int64_t>& size) {
   if (data.empty()) {
     throw Exception("Supplied empty data to putSlab");
   }
@@ -716,16 +710,14 @@ void File::putSlab(vector<NumT>& data, vector<int64_t>& start,
 }
 
 template <typename NumT>
-void File::putSlab(vector<NumT>& data, int start, int size) {
+void File::putSlab(const vector<NumT>& data, int start, int size) {
   this->putSlab(data, static_cast<int64_t>(start), static_cast<int64_t>(size));
 }
 
 template <typename NumT>
-void File::putSlab(vector<NumT>& data, int64_t start, int64_t size) {
-  vector<int64_t> start_v;
-  start_v.push_back(start);
-  vector<int64_t> size_v;
-  size_v.push_back(size);
+void File::putSlab(const vector<NumT>& data, int64_t start, int64_t size) {
+  vector<int64_t> start_v(1, start);
+  vector<int64_t> size_v(1, size);
   this->putSlab(data, start_v, size_v);
 }
 
@@ -1903,46 +1895,46 @@ template
 NXDLL_EXPORT void File::readData(const std::string & dataName, uint64_t& data);
 
 template
-NXDLL_EXPORT void File::putSlab(std::vector<float>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<float>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<double>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<double>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int8_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int8_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint8_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint8_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int16_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int16_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint16_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint16_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int32_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int32_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint32_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint32_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int64_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int64_t>& data, int start, int size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint64_t>& data, int start, int size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint64_t>& data, int start, int size);
 
 template
-NXDLL_EXPORT void File::putSlab(std::vector<float>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<float>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<double>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<double>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int8_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int8_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint8_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint8_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int16_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int16_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint16_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint16_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int32_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int32_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint32_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint32_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<int64_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<int64_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 template
-NXDLL_EXPORT void File::putSlab(std::vector<uint64_t>& data, std::vector<int64_t> & start, std::vector<int64_t> & size);
+NXDLL_EXPORT void File::putSlab(const std::vector<uint64_t>& data, const std::vector<int64_t> & start, const std::vector<int64_t> & size);
 
 template 
 NXDLL_EXPORT void File::getAttr(const std::string& name, double& value);
