@@ -95,6 +95,7 @@ option(ENABLE_FORTRAN77 "Build the Fortran 77 bindings" OFF)
 option(ENABLE_JAVA      "Build Java bindings" OFF)
 option(ENABLE_CXX       "Build C++ bindings" OFF)
 option(ENABLE_APPS      "Build utility applications" OFF)
+option(ENABLE_NXINTER   "Build Tcl-Swig Binding" OFF)
 
 #show this only on Windows systems
 if(CMAKE_HOST_WIN32)
@@ -169,6 +170,8 @@ if(ENABLE_HDF5)
     else()
         find_package ( HDF5 REQUIRED )
     endif()
+    
+    find_package(ZLIB)
 
     # Hide annoying and confusing "HDF5_DIR-NOTFOUND" in CMake-GUI
     if (HDF5_DIR STREQUAL "HDF5_DIR-NOTFOUND")
@@ -176,7 +179,7 @@ if(ENABLE_HDF5)
     endif()
 
     set(HAVE_HDF5 1)
-    list(APPEND NAPI_LINK_LIBS ${HDF5_LIBRARIES})
+    list(APPEND NAPI_LINK_LIBS ${HDF5_LIBRARIES} ${ZLIB_LIBRARIES})
     set(WITH_HDF5 TRUE)
 
     message(STATUS "HDF5 library found in: ${HDF5_LIBRARY_DIRS}")
@@ -209,11 +212,14 @@ endif()
 #include(cmake_include/FindSZIP.cmake)
 #include(cmake_include/FindAnt.cmake)
 
+if(ENABLE_NXINTER)
+	find_package(SWIG)
+	find_package(TCL)
+endif()
+
 #find_package(XMLRPC)
 find_package(ZLIB)
 find_package(LibXml2)
-#find_package(SWIG)
-#find_package(TCL)
 #find_package(LATEX)
 #find_package(PythonInterp)
 

@@ -29,6 +29,9 @@
 if (SWIG_FOUND AND TCL_FOUND)
 
     set (SWIG_TCL_WRAP nxinter_wrap.c)
+    set (SWIG_EXTRA  nxdataset.c nxinterhelper.c)
+
+    set (SOURCE ${SWIG_TCL_WRAP} ${SWIG_EXTRA} nxdataset.h nxdataset.i nxinter.i)
 
     add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP})
 
@@ -43,13 +46,20 @@ if (SWIG_FOUND AND TCL_FOUND)
         DEPENDS   ${SWIG_TCL_WRAP}
     )
 
-    add_library (SWIG_TCL_Static_Library STATIC ${SWIG_TCL_WRAP})
+    add_library (SWIG_TCL_Static_Library STATIC ${SWIG_TCL_WRAP} ${SWIG_EXTRA})
 
     set_target_properties(SWIG_TCL_Static_Library PROPERTIES OUTPUT_NAME libnxtcl)
 
     target_link_libraries(SWIG_TCL_Static_Library NeXus_Static_Library ${TCL_LIBRARY})
 
-    add_executable (nxinter ${SWIG_TCL_WRAP} ${TCL_INCLUDE_PATH})
+    add_library (SWIG_TCL_Shared_Library SHARED  ${SWIG_TCL_WRAP} ${SWIG_EXTRA} )
+
+    set_target_properties(SWIG_TCL_Shared_Library PROPERTIES 
+    						  OUTPUT_NAME nxinter VERSION ${ABI_VERSION})
+
+    target_link_libraries(SWIG_TCL_Shared_Library NeXus_Shared_Library ${TCL_LIBRARY})
+
+    add_executable (nxinter ${SWIG_TCL_WRAP} ${SWIG_EXTRA} ${TCL_INCLUDE_PATH})
 
     target_link_libraries(nxinter NeXus_Static_Library ${TCL_LIBRARY})
 
