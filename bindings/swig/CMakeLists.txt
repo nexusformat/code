@@ -29,9 +29,9 @@
 if (SWIG_FOUND AND TCL_FOUND)
 
     set (SWIG_TCL_WRAP nxinter_wrap.c)
-    set (SWIG_EXTRA  nxdataset.c nxinterhelper.c)
+    set (SWIG_EXTRA   nxinterhelper.c)
 
-    set (SOURCE ${SWIG_TCL_WRAP} ${SWIG_EXTRA} nxdataset.h nxdataset.i nxinter.i)
+    set (SOURCE ${SWIG_TCL_WRAP} ${SWIG_EXTRA}  nxdataset.i nxinter.i)
 
     add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP})
 
@@ -45,6 +45,8 @@ if (SWIG_FOUND AND TCL_FOUND)
     ADD_CUSTOM_TARGET(NexusSwingTCLBuild ALL echo
         DEPENDS   ${SWIG_TCL_WRAP}
     )
+
+    include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/bindings/swig")
 
     add_library (SWIG_TCL_Static_Library STATIC ${SWIG_TCL_WRAP} ${SWIG_EXTRA})
 
