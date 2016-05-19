@@ -14,7 +14,7 @@
 
 void *create_nxds(int rank, int type, int dim0, int dim1, int dim2, 
 	int dim3, int dim4, int dim5,int dim6){
-	int64_t dim[MAXDIM],i;
+	int dim[MAXDIM],i;
 
 	dim[0] = dim0;
 	dim[1] = dim1;
@@ -29,7 +29,7 @@ void *create_nxds(int rank, int type, int dim0, int dim1, int dim2,
 void *create_text_nxds(char *name){
 	return (void *)createTextNXDataset(name);
 }
- 
+
 void drop_nxds(void *ptr){
 	dropNXDataset( (pNXDS) ptr);
 }
