@@ -67,98 +67,98 @@ if (SWIG_FOUND AND TCL_FOUND)
 
 endif (SWIG_FOUND AND TCL_FOUND)
 
-if (SWIG_FOUND AND GUILE_FOUND)
-
-    set (SWIG_GUILE_WRAP nxguile_wrap.c)
-
-    add_definitions(-DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();")
-
-    ADD_CUSTOM_COMMAND( 
-        OUTPUT    ${SWIG_GUILE_WRAP}
-        COMMAND   ${SWIG_EXECUTABLE}
-        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_GUILE_WRAP} -guile -lguilemain.i nxinter.i
-        COMMENT   "Generating ${SWIG_GUILE_WRAP}"
-    )
-
-    ADD_CUSTOM_TARGET(NexusSwingGuileBuild ALL echo
-        DEPENDS   ${SWIG_GUILE_WRAP}
-    )
-
-    add_library (SWIG_GUILE_Static_Library STATIC ${SWIG_GUILE_WRAP})
-
-    set_target_properties(SWIG_GUILE_Static_Library PROPERTIES OUTPUT_NAME libnxguile)
-
-    target_link_libraries(SWIG_GUILE_Static_Library NeXus_Static_Library ${GUILE_LIB})
-
-    add_executable (nxguile ${SWIG_GUILE_WRAP} ${GUILE_INCLUDE})
-
-    target_link_libraries(nxguile NeXus_Static_Library ${GUILE_LIB})
-
-endif (SWIG_FOUND AND GUILE_FOUND)
-
-if (SWIG_FOUND AND MZScheme_FOUND)
-
-    set (SWIG_MZScheme_WRAP nxscheme_wrap.c)
-
-    add_definitions(-DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();")
-
-    ADD_CUSTOM_COMMAND( 
-        OUTPUT    ${SWIG_MZScheme_WRAP}
-        COMMAND   ${SWIG_EXECUTABLE}
-        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_MZScheme_WRAP} -mzscheme nxinter.i
-        COMMENT   "Generating ${SWIG_MZScheme_WRAP}"
-    )
-
-    ADD_CUSTOM_TARGET(NexusSwingMZSchemeBuild ALL echo
-        DEPENDS   ${SWIG_MZScheme_WRAP}
-    )
-
-    add_library (SWIG_MZScheme_Static_Library STATIC ${SWIG_MZScheme_WRAP})
-
-    set_target_properties(SWIG_MZScheme_Static_Library PROPERTIES OUTPUT_NAME libnxscheme)
-
-    target_link_libraries(testmxml MXML_Static_Library ${PTHREAD_LINK})
-
-endif (SWIG_FOUND AND MZScheme_FOUND)
-
-set (DOC_SRC nxinter.tex)
-
-if (LATEX_FOUND)
-
-    ADD_CUSTOM_COMMAND( 
-        OUTPUT    nxinter.aux
-        COMMAND   ${LATEX_COMPILER}
-        ARGS      ${DOC_SRC}
-        DEPENDS   nxinter.tex
-        COMMENT   "Generating SWIG INTER DVI"
-    )
-
-    ADD_CUSTOM_COMMAND( 
-        OUTPUT    nxinter.dvi
-        COMMAND   ${LATEX_COMPILER}
-        ARGS      ${DOC_SRC}
-        DEPENDS   nxinter.aux
-        COMMENT   "Generating SWIG INTER DVI"
-    )
-
-    ADD_CUSTOM_COMMAND( 
-        OUTPUT    nxinter.ps
-        COMMAND   ${DVIPS_CONVERTER}
-        ARGS      -o nxinter.ps nxinter.dvi
-        DEPENDS   nxinter.dvi
-        COMMENT   "Generating SWIG INTER PS"
-    )
-
-    ADD_CUSTOM_COMMAND( 
-        OUTPUT    nxinter.pdf
-        COMMAND   ${PS2PDF_CONVERTER}
-        ARGS      nxinter.ps nxinter.pdf
-        DEPENDS   nxinter.ps
-        COMMENT   "Generating SWIG INTER PDF"
-    )
-
-    ADD_CUSTOM_TARGET(NexusSwingDOCBuild ALL echo
-        DEPENDS   nxinter.pdf
-    )
-
-endif (LATEX_FOUND)
+#if (SWIG_FOUND AND GUILE_FOUND)
+#
+#    set (SWIG_GUILE_WRAP nxguile_wrap.c)
+#
+#    add_definitions(-DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();")
+#
+#    ADD_CUSTOM_COMMAND( 
+#        OUTPUT    ${SWIG_GUILE_WRAP}
+#        COMMAND   ${SWIG_EXECUTABLE}
+#        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_GUILE_WRAP} -guile -lguilemain.i nxinter.i
+#        COMMENT   "Generating ${SWIG_GUILE_WRAP}"
+#    )
+#
+#    ADD_CUSTOM_TARGET(NexusSwingGuileBuild ALL echo
+#        DEPENDS   ${SWIG_GUILE_WRAP}
+#    )
+#
+#    add_library (SWIG_GUILE_Static_Library STATIC ${SWIG_GUILE_WRAP})
+#
+#    set_target_properties(SWIG_GUILE_Static_Library PROPERTIES OUTPUT_NAME libnxguile)
+#
+#    target_link_libraries(SWIG_GUILE_Static_Library NeXus_Static_Library ${GUILE_LIB})
+#
+#    add_executable (nxguile ${SWIG_GUILE_WRAP} ${GUILE_INCLUDE})
+#
+#    target_link_libraries(nxguile NeXus_Static_Library ${GUILE_LIB})
+#
+#endif (SWIG_FOUND AND GUILE_FOUND)
+#
+#if (SWIG_FOUND AND MZScheme_FOUND)
+#
+#    set (SWIG_MZScheme_WRAP nxscheme_wrap.c)
+#
+#    add_definitions(-DSWIGINIT="SCM scm_init_nxinter_module(void); scm_init_nxinter_module();")
+#
+#    ADD_CUSTOM_COMMAND( 
+#        OUTPUT    ${SWIG_MZScheme_WRAP}
+#        COMMAND   ${SWIG_EXECUTABLE}
+#        ARGS      -I$(PROJECT_SOURCE_DIR)/bindings/swig -o ${SWIG_MZScheme_WRAP} -mzscheme nxinter.i
+#        COMMENT   "Generating ${SWIG_MZScheme_WRAP}"
+#    )
+#
+#    ADD_CUSTOM_TARGET(NexusSwingMZSchemeBuild ALL echo
+#        DEPENDS   ${SWIG_MZScheme_WRAP}
+#    )
+#
+#    add_library (SWIG_MZScheme_Static_Library STATIC ${SWIG_MZScheme_WRAP})
+#
+#    set_target_properties(SWIG_MZScheme_Static_Library PROPERTIES OUTPUT_NAME libnxscheme)
+#
+#    target_link_libraries(testmxml MXML_Static_Library ${PTHREAD_LINK})
+#
+#endif (SWIG_FOUND AND MZScheme_FOUND)
+#
+#set (DOC_SRC nxinter.tex)
+#
+#if (LATEX_FOUND)
+#
+#    ADD_CUSTOM_COMMAND( 
+#        OUTPUT    nxinter.aux
+#        COMMAND   ${LATEX_COMPILER}
+#        ARGS      ${DOC_SRC}
+#        DEPENDS   nxinter.tex
+#        COMMENT   "Generating SWIG INTER DVI"
+#    )
+#
+#    ADD_CUSTOM_COMMAND( 
+#        OUTPUT    nxinter.dvi
+#        COMMAND   ${LATEX_COMPILER}
+#        ARGS      ${DOC_SRC}
+#        DEPENDS   nxinter.aux
+#        COMMENT   "Generating SWIG INTER DVI"
+#    )
+#
+#    ADD_CUSTOM_COMMAND( 
+#        OUTPUT    nxinter.ps
+#        COMMAND   ${DVIPS_CONVERTER}
+#        ARGS      -o nxinter.ps nxinter.dvi
+#        DEPENDS   nxinter.dvi
+#        COMMENT   "Generating SWIG INTER PS"
+#    )
+#
+#    ADD_CUSTOM_COMMAND( 
+#        OUTPUT    nxinter.pdf
+#        COMMAND   ${PS2PDF_CONVERTER}
+#        ARGS      nxinter.ps nxinter.pdf
+#        DEPENDS   nxinter.ps
+#        COMMENT   "Generating SWIG INTER PDF"
+#    )
+#
+#    ADD_CUSTOM_TARGET(NexusSwingDOCBuild ALL echo
+#        DEPENDS   nxinter.pdf
+#    )
+#
+#endif (LATEX_FOUND)
