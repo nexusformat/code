@@ -48,7 +48,7 @@ int get_nxds_dim(void *ptr, int which){
 
 double get_nxds_value(void *ptr,int dim0, int dim1, int dim2, 
 	int dim3, int dim4, int dim5,int dim6){
-	int dim[MAXDIM];
+	int64_t dim[MAXDIM];
 
 	dim[0] = dim0;
 	dim[1] = dim1;
@@ -67,7 +67,7 @@ char *get_nxds_text(void *ptr){
 
 int  put_nxds_value(void *ptr, double value, int dim0, int dim1, int dim2, 
 	int dim3, int dim4, int dim5,int dim6){
-	int dim[MAXDIM];
+	int64_t dim[MAXDIM];
 
 	dim[0] = dim0;
 	dim[1] = dim1;
