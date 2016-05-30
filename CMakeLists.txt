@@ -213,8 +213,8 @@ endif()
 #include(cmake_include/FindAnt.cmake)
 
 if(ENABLE_NXINTER)
-	find_package(SWIG)
-	find_package(TCL)
+    find_package(SWIG REQUIRED)
+    find_package(TCL REQUIRED)
 endif()
 
 #find_package(XMLRPC)

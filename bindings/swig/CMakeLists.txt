@@ -33,7 +33,12 @@ if (SWIG_FOUND AND TCL_FOUND)
 
     set (SOURCE ${SWIG_TCL_WRAP} ${SWIG_EXTRA}  nxdataset.i nxinter.i)
 
+    
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${TCL_INCLUDE_PATH})
     add_definitions(-DIN_NEXUS_LIBRARY ${HDF5_DEFINITIONS} ${HDF5_CPP} ${HDF4_CPP} ${MXML_CPP})
+
+    configure_file(nxinter.i nxinter.i COPYONLY)
+    configure_file(nxdataset.i nxdataset.i COPYONLY)
 
     ADD_CUSTOM_COMMAND( 
         OUTPUT    ${SWIG_TCL_WRAP}
@@ -64,6 +69,13 @@ if (SWIG_FOUND AND TCL_FOUND)
     add_executable (nxinter ${SWIG_TCL_WRAP} ${SWIG_EXTRA} ${TCL_INCLUDE_PATH})
 
     target_link_libraries(nxinter NeXus_Static_Library ${TCL_LIBRARY})
+
+    install(TARGETS SWIG_TCL_Shared_Library 
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT RUNTIME)
+    install(TARGETS nxinter 
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT RUNTIME)
 
 endif (SWIG_FOUND AND TCL_FOUND)
 
