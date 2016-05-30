@@ -56,6 +56,10 @@ if(WITH_HDF5)
     target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND  napi_attra_test_hdf5)
 
+    add_executable(issue_364 issue_364.c)
+    target_link_libraries(issue_364 NeXus_Shared_Library)
+    add_test(NAME "Issue-364-regression-test" COMMAND issue_364)
+
     if (WIN32)
       set_property(TEST "NAPI-C-HDF5-test" "NAPI-C-HDF5-attra-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
     endif(WIN32)
