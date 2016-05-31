@@ -59,12 +59,12 @@ typedef struct __NexusFile5 {
 		hsize_t iCurrentIDX;
 	} iStack5[NXMAXSTACK];
 	struct iStack5 iAtt5;
-	int iFID;
-	int iCurrentG;
-	int iCurrentD;
-	int iCurrentS;
-	int iCurrentT;
-	int iCurrentA;
+	hid_t iFID;
+	hid_t iCurrentG;
+	hid_t iCurrentD;
+	hid_t iCurrentS;
+	hid_t iCurrentT;
+	hid_t iCurrentA;
 	int iNX;
 	int iNXID;
 	int iStackPtr;
@@ -275,31 +275,57 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
 		return NX_ERROR;
 	}
 	memset(pNew, 0, sizeof(NexusFile5));
+	
+    /* create file access property list - required in all cases*/
+    if((fapl = H5Pcreate(H5P_FILE_ACCESS))<0){
+        sprintf(pBuffer,"Error: failed to create file access property "
+                        "list for file %s",filename);
+        NXReportError(pBuffer);
+        free(pNew);
+        return NX_ERROR;
+    }
+	
+    /* set file close policy - need this in all cases*/
+    if(H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG)<0){
+        sprintf(pBuffer,"Error: cannot set close policy for file "
+                        "%s",filename);
+        NXReportError(pBuffer);
+        free(pNew);
+        return NX_ERROR;
+    }
 
 	/* start HDF5 interface */
 	if (am == NXACC_CREATE5) {
-		fapl = H5Pcreate(H5P_FILE_ACCESS);
-		H5Pget_cache(fapl, &mdc_nelmts, &rdcc_nelmts, &rdcc_nbytes,
-			     &rdcc_w0);
+		if(H5Pget_cache(fapl, &mdc_nelmts, &rdcc_nelmts, &rdcc_nbytes,
+                        &rdcc_w0) < 0){
+            sprintf(pBuffer,"Error: cannot obtain HDF5 cache size"
+                            " for file %s",filename);
+            NXReportError(pBuffer);
+            free(pNew);
+            return NX_ERROR;
+        }
+            
 		rdcc_nbytes = (size_t) nx_cacheSize;
-		H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes,
-			     rdcc_w0);
-		H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG);
+		if(H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes,
+			            rdcc_w0) < 0){
+            sprintf(pBuffer,"Error: cannot set cache size "
+                            "for file %s",filename);
+            NXReportError(pBuffer);
+            free(pNew);
+            return NX_ERROR;
+        }
+
 		am1 = H5F_ACC_TRUNC;
 		pNew->iFID = H5Fcreate(filename, am1, H5P_DEFAULT, fapl);
 	} else {
-		if (am == NXACC_READ) {
-			am1 = H5F_ACC_RDONLY;
-		} else {
-			am1 = H5F_ACC_RDWR;
-		}
-		fapl = H5Pcreate(H5P_FILE_ACCESS);
-		H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG);
+		if (am == NXACC_READ) am1 = H5F_ACC_RDONLY;
+		else                  am1 = H5F_ACC_RDWR;
+		
 		pNew->iFID = H5Fopen(filename, am1, fapl);
 	}
-	if (fapl != -1) {
-		H5Pclose(fapl);
-	}
+
+	if (fapl != -1) H5Pclose(fapl); /*close file access property list*/ 
+
 	if (pNew->iFID <= 0) {
 		sprintf(pBuffer, "ERROR: cannot open file: %s", filename);
 		NXReportError(pBuffer);
@@ -477,7 +503,7 @@ NXstatus NX5close(NXhandle * fid)
 NXstatus NX5makegroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 {
 	pNexusFile5 pFile;
-	herr_t iRet;
+	hid_t iRet;
 	hid_t iVID;
 	hid_t attr1, aid1, aid2;
 	char pBuffer[1024] = "";
@@ -535,7 +561,7 @@ NXstatus NX5opengroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 
 	pNexusFile5 pFile;
 	hid_t attr1, atype;
-	herr_t iRet;
+	hid_t iRet;
 	char pBuffer[1024];
 	char data[128];
 
@@ -712,7 +738,7 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 			   int compress_type, int64_t chunk_size[])
 {
 	hid_t datatype1, dataspace, iNew;
-	herr_t iRet;
+	hid_t iRet;
 	hid_t type, cparms = -1;
 	pNexusFile5 pFile;
 	char pBuffer[256];
@@ -1057,6 +1083,7 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 	pNexusFile5 pFile;
 	hid_t attr1, aid1, aid2;
 	hid_t type;
+    hid_t attr_id;
 	herr_t iRet;
 	int vid;
 
@@ -1066,9 +1093,9 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 
 	/* determine vid */
 	vid = getAttVID(pFile);
-	iRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
-	if (iRet > 0) {
-		H5Aclose(iRet);
+	attr_id = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
+	if (attr_id > 0) {
+		H5Aclose(attr_id);
 		iRet = H5Adelete(vid, name);
 		if (iRet < 0) {
 			NXReportError
