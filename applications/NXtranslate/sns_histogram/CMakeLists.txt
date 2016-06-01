@@ -31,11 +31,5 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 add_library (SNShistogram string_location_format.cpp
                           SNS_retriever.cpp)
 
-if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
-    install (TARGETS SNShistogram 
-             DESTINATION ${CMAKE_INSTALL_LIBDIR} 
-             COMPONENT Development)
-    install (FILES retriever.hpp SNS_retriever.hpp
-             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/sns_histogram
-             COMPONENT Development)
-endif()
+install (TARGETS SNShistogram DESTINATION ${CMAKE_INSTALL_LIBDIR} 
+        COMPONENT Runtime)

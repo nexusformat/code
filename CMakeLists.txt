@@ -95,7 +95,6 @@ option(ENABLE_FORTRAN77 "Build the Fortran 77 bindings" OFF)
 option(ENABLE_JAVA      "Build Java bindings" OFF)
 option(ENABLE_CXX       "Build C++ bindings" OFF)
 option(ENABLE_APPS      "Build utility applications" OFF)
-option(ENABLE_INSTALL_NXTRANSLATE_LIBS "Install libraries for nxtranslate" OFF)
 
 #show this only on Windows systems
 if(CMAKE_HOST_WIN32)

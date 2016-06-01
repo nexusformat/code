@@ -30,11 +30,5 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_library (Edf edf_reader.cpp edf_retriever.cpp)
 
-if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
-    install (TARGETS Edf 
-             DESTINATION ${CMAKE_INSTALL_LIBDIR}
-             COMPONENT Development)
-    install(FILES edf_reader.h edf_retriever.h
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/esrf_edf
-            COMPONENT Development)
-endif()
+install (TARGETS Edf DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         COMPONENT Runtime)

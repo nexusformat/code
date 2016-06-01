@@ -29,12 +29,3 @@
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 add_library (BinaryRetriever BinaryRetriever.cpp)
-
-if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
-    install(TARGETS BinaryRetriever
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT Development)
-    install(FILES BinaryRetriever.hpp 
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/binary
-            COMPONENT Development)
-endif()

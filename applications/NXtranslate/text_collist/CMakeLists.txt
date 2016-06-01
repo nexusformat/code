@@ -30,11 +30,5 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_library(TextCollist collist_retriever.cpp)
 
-if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
-    install (TARGETS TextCollist 
-             DESTINATION ${CMAKE_INSTALL_LIBDIR}
-             COMPONENT Development)
-    install (FILES collist_retriever.h
-             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/text_collist
-             COMPONENT Development)
-endif()
+install (TARGETS TextCollist DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         COMPONENT Runtime)
