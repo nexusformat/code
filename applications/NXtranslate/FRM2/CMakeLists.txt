@@ -30,5 +30,11 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_library (FRM2 frm2_retriever.cpp)
 
-install (TARGETS FRM2 DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
+    install (TARGETS FRM2 
+             DESTINATION ${CMAKE_INSTALL_LIBDIR} 
+             COMPONENT Development)
+    install (FILES frm2_retriever.h
+             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/FRM2
+             COMPONENT Development)
+endif()

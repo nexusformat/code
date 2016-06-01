@@ -30,5 +30,12 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_library (TextPlain retriever.cpp)
 
-install (TARGETS TextPlain DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
+    install (TARGETS TextPlain 
+             DESTINATION ${CMAKE_INSTALL_LIBDIR}
+             COMPONENT Development)
+    install (FILES retriever.h
+             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/text_plain
+             COMPONENT Development)
+endif()
+

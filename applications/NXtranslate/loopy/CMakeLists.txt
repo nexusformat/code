@@ -30,5 +30,11 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_library (Loopy retriever.cpp)
 
-install (TARGETS Loopy DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+if(ENABLE_INSTALL_NXTRANSLATE_LIBS)
+    install (TARGETS Loopy  
+             DESTINATION ${CMAKE_INSTALL_LIBDIR} 
+             COMPONENT Development)
+    install (FILES retriever.h
+             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nxtranslate/loopy
+             COMPONENT Development)
+endif()
