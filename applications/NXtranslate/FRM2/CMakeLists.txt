@@ -28,7 +28,4 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (FRM2 frm2_retriever.cpp)
-
-install (TARGETS FRM2 DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+add_library (FRM2 OBJECT frm2_retriever.cpp)

@@ -28,7 +28,4 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library(TextCollist collist_retriever.cpp)
-
-install (TARGETS TextCollist DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+add_library(TextCollist OBJECT collist_retriever.cpp)

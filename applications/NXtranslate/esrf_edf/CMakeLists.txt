@@ -28,7 +28,5 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (Edf edf_reader.cpp edf_retriever.cpp)
+add_library (Edf OBJECT edf_reader.cpp edf_retriever.cpp)
 
-install (TARGETS Edf DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)

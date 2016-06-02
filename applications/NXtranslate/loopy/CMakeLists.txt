@@ -28,7 +28,4 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (Loopy retriever.cpp)
-
-install (TARGETS Loopy DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
+add_library (Loopy OBJECT retriever.cpp)

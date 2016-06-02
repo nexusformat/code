@@ -68,19 +68,18 @@ set(SOURCES attr.cpp
             xml_util.cpp
             dynamic_retriever.cpp)
 
-add_executable(nxtranslate ${SOURCES})
+add_executable(nxtranslate ${SOURCES} $<TARGET_OBJECTS:BinaryRetriever>
+                                      $<TARGET_OBJECTS:TextCollist>
+                                      $<TARGET_OBJECTS:TextPlain>
+                                      $<TARGET_OBJECTS:TextXML>
+                                      $<TARGET_OBJECTS:SNShistogram>
+                                      $<TARGET_OBJECTS:FRM2>
+                                      $<TARGET_OBJECTS:Loopy>
+                                      $<TARGET_OBJECTS:Spec>
+                                      $<TARGET_OBJECTS:Edf>)
 
 target_link_libraries(nxtranslate
                       NeXus_Shared_Library
-                      BinaryRetriever
-                      TextCollist
-                      TextPlain
-                      TextXML
-                      SNShistogram
-                      FRM2
-                      Loopy
-                      Spec
-                      Edf
                       ${LIBXML2_LIBRARIES})
 
 

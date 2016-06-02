@@ -28,9 +28,6 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" ${LIBXML2_INCLUDE_DIR})
 
-add_library (TextXML xml_retriever.cpp
+add_library (TextXML OBJECT xml_retriever.cpp
                      xml_retriever_dom.cpp
                      void_copy.cpp)
-
-install (TARGETS TextXML DESTINATION ${CMAKE_INSTALL_LIBDIR}
-         COMPONENT Runtime)
