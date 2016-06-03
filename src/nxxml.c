@@ -1340,7 +1340,7 @@ NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, const void *data,
   return NX_OK;
 }
 /*--------------------------------------------------------------------------*/
-NXstatus  NXXgetattr (NXhandle fid, char *name, 
+NXstatus  NXXgetattr (NXhandle fid, const char *name, 
 				   void *data, int* datalen, int* iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
@@ -1980,7 +1980,7 @@ NXstatus  NXXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 }
 
 /*--------------------------------------------------------------------*/
-NXstatus  NXXgetattra(NXhandle handle, char* name, void* data)
+NXstatus  NXXgetattra(NXhandle handle, const char* name, void* data)
 {
   NXReportError("This is an XML file, attribute array API is not supported here");
   return NX_ERROR;

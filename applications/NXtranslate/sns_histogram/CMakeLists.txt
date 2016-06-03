@@ -28,6 +28,8 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (SNShistogram string_location_format.cpp 
+add_library (SNShistogram string_location_format.cpp
                           SNS_retriever.cpp)
 
+install (TARGETS SNShistogram DESTINATION ${CMAKE_INSTALL_LIBDIR} 
+        COMPONENT Runtime)

@@ -1355,7 +1355,7 @@ NXstatus NXgetnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 
   /*-------------------------------------------------------------------------*/
 
-NXstatus NXgetattr(NXhandle fid, char *name, void *data, int *datalen,
+NXstatus NXgetattr(NXhandle fid, const char *name, void *data, int *datalen,
 		   int *iType)
 {
 	pNexusFunction pFunc = handleToNexusFunc(fid);
@@ -1953,7 +1953,7 @@ NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], in
 	pNexusFunction pFunc = handleToNexusFunc(handle);
 	return LOCKED_CALL(pFunc->nxgetnextattra(pFunc->pNexusData, pName, rank, dim, iType));
 }
-NXstatus  NXgetattra(NXhandle handle, char* name, void* data)
+NXstatus  NXgetattra(NXhandle handle, const char* name, void* data)
 {
 	pNexusFunction pFunc = handleToNexusFunc(handle);
 	return LOCKED_CALL(pFunc->nxgetattra(pFunc->pNexusData, name, data));

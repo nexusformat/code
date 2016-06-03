@@ -63,8 +63,8 @@ extern "C" {
         NXstatus ( *nxgetslab64)(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
         NXstatus ( *nxgetnextattr)(NXhandle handle, NXname pName, int *iLength, int *iType);
         NXstatus ( *nxgetnextattra)(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
-        NXstatus ( *nxgetattr)(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
-        NXstatus ( *nxgetattra)(NXhandle handle, char* name, void* data);
+        NXstatus ( *nxgetattr)(NXhandle handle, const char* name, void* data, int* iDataLen, int* iType);
+        NXstatus ( *nxgetattra)(NXhandle handle, const char* name, void* data);
         NXstatus ( *nxgetattrainfo)(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
         NXstatus ( *nxgetattrinfo)(NXhandle handle, int* no_items);
         NXstatus ( *nxgetgroupID)(NXhandle handle, NXlink* pLink);

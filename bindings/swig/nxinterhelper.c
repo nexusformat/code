@@ -20,6 +20,18 @@
   --------------------------------------------------------------------*/
 static char errorText[256]= "";
 
+/*--------------------------------------------------------------------*/
+pNXDS createNXDataset32(int rank, int typecode, int dim[])
+{
+  int64_t newDim[NX_MAXRANK];
+  int i;
+
+  for(i = 0; i < rank; i++){
+    newDim[i] = dim[i];
+  }
+  return createNXDataset(rank,typecode, newDim);
+}
+/*--------------------------------------------------------------------*/
 static void nxinterError(void *pData, char *error){
   strncpy(errorText,error,255);
 }
@@ -307,7 +319,7 @@ void *nx_getslab(void *handle, void *startdim, void *sizedim){
     return NULL;
   }
   
-  resultdata = createNXDataset(rank,type,size->u.iPtr);
+  resultdata = createNXDataset32(rank,type,size->u.iPtr);
   if(resultdata == NULL){
     return NULL;
   }
@@ -338,7 +350,7 @@ void *nx_getds(void *handle, char *name){
     return NULL;
   }
 
-  result = createNXDataset(rank,type,dim);
+  result = createNXDataset32(rank,type,dim);
   if(result == NULL){
     NXclosedata(hfil);
     return NULL;
@@ -364,7 +376,7 @@ int   nx_putds(void *handle, char *name, void *dataset){
 
   status = NXopendata(hfil,name);
   if(status != NX_OK){
-    status = NXmakedata(hfil,name,data->type,data->rank,data->dim);
+    status = NXmakedata64(hfil,name,data->type,data->rank,data->dim);
     if(status != NX_OK){
       return 0;
     }
@@ -392,7 +404,7 @@ void *nx_getdata(void *handle){
     return NULL;
   }
 
-  result = createNXDataset(rank,type,dim);
+  result = createNXDataset32(rank,type,dim);
   if(result == NULL){
     NXclosedata(hfil);
     return NULL;
@@ -439,7 +451,7 @@ void *nx_getinfo(void *handle){
     return NULL;
   }
   rdim[0] = 2 + rank;
-  data = createNXDataset(1,NX_INT32,rdim);
+  data = createNXDataset32(1,NX_INT32,rdim);
   data->u.iPtr[0] = type;
   data->u.iPtr[1] = rank;
   for(i = 0; i < rank; i++){
@@ -522,7 +534,7 @@ void *nx_getattr(void *handle, char *name, int type, int length){
     prepare dataset
   */
   dim[0] = length+1;
-  data = createNXDataset(1,type,dim);
+  data = createNXDataset32(1,type,dim);
   if(data == NULL){
     return NULL;
   }

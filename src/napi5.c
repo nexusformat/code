@@ -2085,7 +2085,7 @@ NXstatus NX5getnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 
  /*-------------------------------------------------------------------------*/
 
-NXstatus NX5getattr(NXhandle fid, char *name,
+NXstatus NX5getattr(NXhandle fid, const char *name,
 		    void *data, int *datalen, int *iType)
 {
 	pNexusFile5 pFile;
@@ -2480,7 +2480,7 @@ NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 	return NX5getattrainfo(handle, pName, rank, dim, iType);
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
+NXstatus  NX5getattra(NXhandle handle, const char* name, void* data)
 {
 	pNexusFile5 pFile;
 	int i, iStart[H5S_MAX_RANK], status, vid;

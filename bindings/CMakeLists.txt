@@ -51,4 +51,7 @@ endif()
 #if (PYTHONINTERP_FOUND)
 #    add_subdirectory (python)
 #endif (PYTHONINTERP_FOUND)
-#add_subdirectory (swig)
+
+if(ENABLE_NXINTER)
+	add_subdirectory (swig)
+endif()

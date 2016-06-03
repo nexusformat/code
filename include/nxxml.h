@@ -54,7 +54,7 @@ NXstatus  NXXgetslab64 (NXhandle fid, void *data,
 				   const int64_t iStart[], const int64_t iSize[]);
 NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, const void *data, 
 				   int datalen, int iType);
-NXstatus  NXXgetattr (NXhandle fid, char *name, 
+NXstatus  NXXgetattr (NXhandle fid, const char *name, 
 				   void *data, int* datalen, int* iType);
 
 NXstatus  NXXgetnextentry (NXhandle fid,NXname name, NXname nxclass, int *datatype);
@@ -72,7 +72,7 @@ extern NXstatus  NXXsameID (NXhandle fileid, NXlink* pFirstID, NXlink* pSecondID
 
 extern  NXstatus  NXXputattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
 extern  NXstatus  NXXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
-extern  NXstatus  NXXgetattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NXXgetattra(NXhandle handle, const char* name, void* data);
 extern  NXstatus  NXXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
 void NXXassignFunctions(pNexusFunction fHandle);

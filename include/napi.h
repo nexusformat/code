@@ -645,7 +645,7 @@ extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+extern  NXstatus  NXgetattr(NXhandle handle, const char* name, void* data, int* iDataLen, int* iType);
 
   /**
    * Get the count of attributes in the currently open dataset, group or global attributes when at root level.
@@ -680,7 +680,7 @@ extern  NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int d
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NXgetattra(NXhandle handle, const char* name, void* data);
 
   /**
    * Get the information about the storage of the named attribute.

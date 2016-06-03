@@ -27,7 +27,7 @@ extern  NXstatus  NX4closedata(NXhandle handle);
   
 extern  NXstatus  NX4getdata(NXhandle handle, void* data);
 extern  NXstatus  NX4getslab64(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
-extern  NXstatus  NX4getattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+extern  NXstatus  NX4getattr(NXhandle handle, const char* name, void* data, int* iDataLen, int* iType);
   
 extern  NXstatus  NX4putdata(NXhandle handle, const void* data);
 extern  NXstatus  NX4putslab64(NXhandle handle, const void* data, const int64_t start[], const int64_t size[]);
@@ -48,7 +48,7 @@ extern  NXstatus  NX4printlink(NXhandle handle, NXlink* pLink);
 
 extern  NXstatus  NX4putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
 extern  NXstatus  NX4getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
-extern  NXstatus  NX4getattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NX4getattra(NXhandle handle, const char* name, void* data);
 extern  NXstatus  NX4getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
 void NX4assignFunctions(pNexusFunction fHandle);

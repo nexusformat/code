@@ -1702,7 +1702,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   /*-------------------------------------------------------------------------*/
 
 
-  NXstatus  NX4getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+  NXstatus  NX4getattr (NXhandle fid, const char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
     int32 iNew, iType32, count;
@@ -1965,7 +1965,7 @@ NXstatus  NX4getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 }
 
 /*--------------------------------------------------------------------*/
-NXstatus  NX4getattra(NXhandle handle, char* name, void* data)
+NXstatus  NX4getattra(NXhandle handle, const char* name, void* data)
 {
   NXReportError("This is a HDF4 file, attribute array API is not supported here");
   return NX_ERROR;
