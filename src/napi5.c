@@ -156,7 +156,7 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 	} 
 
 	H5Tclose(atype);
-	H5Tclose(space);
+	H5Sclose(space);
 	if (iRet < 0)
 		return NX_ERROR;
 	return NX_OK;
