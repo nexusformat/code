@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdexcept>
+#include "NeXusExport.hpp"
 
 /**
  * \file NeXusException.hpp
