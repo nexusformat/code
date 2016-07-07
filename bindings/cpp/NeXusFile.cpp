@@ -1131,6 +1131,7 @@ AttrInfo File::getNextAttr() {
       return info;
     }
 
+    // TODO - AttrInfo cannot handle more complex ranks/dimensions, we need to throw an error
     std::cerr << "ERROR iterating through attributes found array attribute not understood by this api" << std::endl;
     throw Exception("getNextAttr failed", NX_ERROR);
   }
@@ -1141,7 +1142,7 @@ AttrInfo File::getNextAttr() {
     return info;
   }
   else {
-    throw Exception("NXgetnextattr failed", status);
+    throw Exception("NXgetnextattra failed", status);
   }
 }
 
