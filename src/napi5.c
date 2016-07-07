@@ -135,7 +135,7 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 		}
 
                 iRet = H5Aread(attr, atype, strings[0]);
-		*data = malloc((sdim + 2) * thedims[0] * sizeof(char));
+		*data = calloc((sdim + 2) * thedims[0], sizeof(char));
 		for(i=0; i<thedims[0]; i++) {
 			if (i==0) {
 				strncpy(*data, strings[i], sdim);	
