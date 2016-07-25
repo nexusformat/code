@@ -588,7 +588,7 @@ void File::putAttr(const std::string& name, const std::vector<std::string>& arra
 
   // set rank and dim
   const int rank = 2;
-  int dim[rank] = {array.size(), maxLength};
+  int dim[rank] = {static_cast<int>(array.size()), maxLength};
 
   // write data
   NXstatus status = NXputattra(this->m_file_id, name.c_str(),
@@ -613,7 +613,7 @@ void File::putAttr(const std::string& name, const std::vector<NumT>& array) {
 
   // set rank and dim
   const int rank = 1;
-  int dim[rank] = {array.size()};
+  int dim[rank] = {static_cast<int>(array.size())};
 
   // write data
   NXnumtype type = getType<NumT>();
