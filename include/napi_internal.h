@@ -79,7 +79,7 @@ extern "C" {
         NXstatus ( *nxnativeisexternallink)(NXhandle handle, CONSTCHAR* name, char* url, int urllen);
         int stripFlag;
         int checkNameSyntax;
-        int access_mode;
+        NXaccess access_mode;
   } NexusFunction, *pNexusFunction;
   /*---------------------*/
   extern long nx_cacheSize;

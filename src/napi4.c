@@ -1983,7 +1983,7 @@ NXstatus  NX4getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], i
 void NX4assignFunctions(pNexusFunction fHandle)
 {
       fHandle->nxclose=NX4close;
-	  fHandle->nxreopen=NULL;
+      fHandle->nxreopen=NULL;
       fHandle->nxflush=NX4flush;
       fHandle->nxmakegroup=NX4makegroup;
       fHandle->nxopengroup=NX4opengroup;
@@ -2013,10 +2013,10 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX4initattrdir;
       fHandle->nxprintlink=NX4printlink;
       fHandle->nxnativeexternallink=NULL;
-        fHandle->nxputattra = NX4putattra;
-        fHandle->nxgetnextattra = NX4getnextattra;
-        fHandle->nxgetattra = NX4getattra;
-        fHandle->nxgetattrainfo = NX4getattrainfo;
+      fHandle->nxputattra = NX4putattra;
+      fHandle->nxgetnextattra = NX4getnextattra;
+      fHandle->nxgetattra = NX4getattra;
+      fHandle->nxgetattrainfo = NX4getattrainfo;
 }
 
 #endif /*HDF4*/

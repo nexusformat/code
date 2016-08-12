@@ -579,6 +579,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			return retstat;
 		}
 		fHandle->pNexusData = hdf4_handle;
+		fHandle->access_mode = backend_type || (NXACC_READ && am);
 		NX4assignFunctions(fHandle);
 		pushFileStack(fileStack, fHandle, filename);
 #else
@@ -599,6 +600,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			return retstat;
 		}
 		fHandle->pNexusData = hdf5_handle;
+		fHandle->access_mode = backend_type || (NXACC_READ && am);
 		NX5assignFunctions(fHandle);
 		pushFileStack(fileStack, fHandle, filename);
 #else
@@ -621,6 +623,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			return retstat;
 		}
 		fHandle->pNexusData = xmlHandle;
+		fHandle->access_mode = backend_type || (NXACC_READ && am);
 		NXXassignFunctions(fHandle);
 		pushFileStack(fileStack, fHandle, filename);
 #else
