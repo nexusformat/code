@@ -1102,16 +1102,6 @@ AttrInfo File::getNextAttr() {
   char name[NX_MAXNAMELEN];
   int type;
 
-#if defined(WITH_HDF4) || defined(WITH_MXML)
-  int length;
-  NXstatus status = NXgetnextattr(this->m_file_id, name, &length, &type);
-  if (status == NX_OK) {
-    AttrInfo info;
-    info.type = static_cast<NXnumtype>(type);
-    info.length = length;
-    info.name = string(name);
-    return info;
-#else
   int rank;
   int dim[NX_MAXRANK];
   NXstatus status = NXgetnextattra(this->m_file_id, name, &rank, dim, &type);
@@ -1145,15 +1135,13 @@ AttrInfo File::getNextAttr() {
     // TODO - AttrInfo cannot handle more complex ranks/dimensions, we need to throw an error
     std::cerr << "ERROR iterating through attributes found array attribute not understood by this api" << std::endl;
     throw Exception("getNextAttr failed", NX_ERROR);
-#endif
-  }
-  else if (status == NX_EOD) {
+
+  } else if (status == NX_EOD) {
     AttrInfo info;
     info.name = NULL_STR;
     info.length = 0;
     return info;
-  }
-  else {
+  } else {
     throw Exception("NXgetnextattra failed", status);
   }
 }
