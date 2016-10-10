@@ -28,6 +28,4 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library (Spec SPEClib.cpp spec_retriever.cpp)
-
-
+add_library (Spec OBJECT SPEClib.cpp spec_retriever.cpp)

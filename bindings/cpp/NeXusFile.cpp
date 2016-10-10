@@ -588,7 +588,7 @@ void File::putAttr(const std::string& name, const std::vector<std::string>& arra
 
   // set rank and dim
   const int rank = 2;
-  int dim[rank] = {array.size(), maxLength};
+  int dim[rank] = {static_cast<int>(array.size()), maxLength};
 
   // write data
   NXstatus status = NXputattra(this->m_file_id, name.c_str(),
@@ -613,7 +613,7 @@ void File::putAttr(const std::string& name, const std::vector<NumT>& array) {
 
   // set rank and dim
   const int rank = 1;
-  int dim[rank] = {array.size()};
+  int dim[rank] = {static_cast<int>(array.size())};
 
   // write data
   NXnumtype type = getType<NumT>();
@@ -1101,6 +1101,7 @@ AttrInfo File::getNextAttr() {
   //string & name, int & length, NXnumtype type) {
   char name[NX_MAXNAMELEN];
   int type;
+
   int rank;
   int dim[NX_MAXRANK];
   NXstatus status = NXgetnextattra(this->m_file_id, name, &rank, dim, &type);
@@ -1131,17 +1132,17 @@ AttrInfo File::getNextAttr() {
       return info;
     }
 
+    // TODO - AttrInfo cannot handle more complex ranks/dimensions, we need to throw an error
     std::cerr << "ERROR iterating through attributes found array attribute not understood by this api" << std::endl;
     throw Exception("getNextAttr failed", NX_ERROR);
-  }
-  else if (status == NX_EOD) {
+
+  } else if (status == NX_EOD) {
     AttrInfo info;
     info.name = NULL_STR;
     info.length = 0;
     return info;
-  }
-  else {
-    throw Exception("NXgetnextattr failed", status);
+  } else {
+    throw Exception("NXgetnextattra failed", status);
   }
 }
 

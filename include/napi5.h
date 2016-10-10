@@ -5,7 +5,6 @@
 
 /* Hide deprecated API from HDF5 versions before 1.8
  * Required to build on Ubuntu 12.04 */
-#define H5_NO_DEPRECATED_SYMBOLS
 
 #include <hdf5.h>
 
@@ -41,7 +40,7 @@ extern  NXstatus  NX5getnextentry(NXhandle handle, NXname name, NXname nxclass, 
 
 extern  NXstatus  NX5getslab64(NXhandle handle, void* data, const int64_t start[], const int64_t size[]);
 extern  NXstatus  NX5getnextattr(NXhandle handle, NXname pName, int *iLength, int *iType);
-extern  NXstatus  NX5getattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+extern  NXstatus  NX5getattr(NXhandle handle, const char* name, void* data, int* iDataLen, int* iType);
 extern  NXstatus  NX5getattrinfo(NXhandle handle, int* no_items);
 extern  NXstatus  NX5getgroupID(NXhandle handle, NXlink* pLink);
 extern  NXstatus  NX5getgroupinfo(NXhandle handle, int* no_items, NXname name, NXname nxclass);
@@ -51,7 +50,7 @@ extern  NXstatus  NX5initattrdir(NXhandle handle);
 
 extern  NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType);
 extern  NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
-extern  NXstatus  NX5getattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NX5getattra(NXhandle handle, const char* name, void* data);
 extern  NXstatus  NX5getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], int *iType);
 
 void NX5assignFunctions(pNexusFunction fHandle);

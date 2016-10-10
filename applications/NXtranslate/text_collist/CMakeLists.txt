@@ -28,6 +28,4 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library(TextCollist collist_retriever.cpp)
-
-
+add_library(TextCollist OBJECT collist_retriever.cpp)

@@ -1702,7 +1702,7 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   /*-------------------------------------------------------------------------*/
 
 
-  NXstatus  NX4getattr (NXhandle fid, char *name, void *data, int* datalen, int* iType)
+  NXstatus  NX4getattr (NXhandle fid, const char *name, void *data, int* datalen, int* iType)
   {
     pNexusFile pFile;
     int32 iNew, iType32, count;
@@ -1953,19 +1953,26 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
 /*--------------------------------------------------------------------*/
 NXstatus  NX4putattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType)
 {
-  NXReportError("This is a HDF4 file, attribute array API is not supported here");
-  return NX_ERROR;
+  if (rank > 1) {
+	  NXReportError("This is a HDF4 file, there is only rudimentary support for attribute arrays wirh rank <=1");
+	  return NX_ERROR;
+  } 
+
+  return NX4putattr(handle, name, data, dim[0], iType);
 }
 
 /*--------------------------------------------------------------------*/
 NXstatus  NX4getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
 {
-  NXReportError("This is a HDF4 file, attribute array API is not supported here");
-  return NX_ERROR;
+  NXstatus ret = NX4getnextattr(handle, pName, dim, iType);
+  if (ret != NX_OK) return ret;
+  (*rank) = 1;
+  if (dim[0] <= 1 ) (*rank) = 0;
+  return NX_OK;
 }
 
 /*--------------------------------------------------------------------*/
-NXstatus  NX4getattra(NXhandle handle, char* name, void* data)
+NXstatus  NX4getattra(NXhandle handle, const char* name, void* data)
 {
   NXReportError("This is a HDF4 file, attribute array API is not supported here");
   return NX_ERROR;
@@ -1983,7 +1990,7 @@ NXstatus  NX4getattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], i
 void NX4assignFunctions(pNexusFunction fHandle)
 {
       fHandle->nxclose=NX4close;
-	  fHandle->nxreopen=NULL;
+      fHandle->nxreopen=NULL;
       fHandle->nxflush=NX4flush;
       fHandle->nxmakegroup=NX4makegroup;
       fHandle->nxopengroup=NX4opengroup;
@@ -2013,10 +2020,10 @@ void NX4assignFunctions(pNexusFunction fHandle)
       fHandle->nxinitattrdir=NX4initattrdir;
       fHandle->nxprintlink=NX4printlink;
       fHandle->nxnativeexternallink=NULL;
-        fHandle->nxputattra = NX4putattra;
-        fHandle->nxgetnextattra = NX4getnextattra;
-        fHandle->nxgetattra = NX4getattra;
-        fHandle->nxgetattrainfo = NX4getattrainfo;
+      fHandle->nxputattra = NX4putattra;
+      fHandle->nxgetnextattra = NX4getnextattra;
+      fHandle->nxgetattra = NX4getattra;
+      fHandle->nxgetattrainfo = NX4getattrainfo;
 }
 
 #endif /*HDF4*/

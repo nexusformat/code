@@ -23,7 +23,7 @@
   
  ----------------------------------------------------------------------------*/
 /** \file 
- * Documentation for the NeXus-API version 4.3
+ * Documentation for the NeXus-API version @API_VERSION@
  * 2000-2011, the NeXus International Advisory Commitee
  * \defgroup c_main C API 
  * \defgroup c_types Data Types
@@ -57,7 +57,7 @@
 #endif /* __cplusplus */
 
 /* NeXus HDF45 */
-#define NEXUS_VERSION   "4.4.1"                /* major.minor.patch */
+#define NEXUS_VERSION   "@API_VERSION@"                /* major.minor.patch */
 
 #define CONSTCHAR       const char
 
@@ -259,9 +259,9 @@ typedef struct {
  */
 
 #if (defined(__GNUC__) || defined(__clang__))
-#define NEXUS_DEPRECATED_FUNCTION __attribute__((deprecated))
+#define NEXUS_DEPRECATED_FUNCTION(msg) __attribute__((deprecated(msg)))
 #else
-#define NEXUS_DEPRECATED_FUNCTION
+#define NEXUS_DEPRECATED_FUNCTION(msg)
 #endif
 
 #ifdef __cplusplus
@@ -435,7 +435,7 @@ extern  NXstatus NXcompmakedata64 (NXhandle handle, CONSTCHAR* label, int dataty
    * \li NX_COMP_HUF Huffmann encoding (only HDF-4)
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXcompress (NXhandle handle, int compr_type) NEXUS_DEPRECATED_FUNCTION;
+extern  NXstatus  NXcompress (NXhandle handle, int compr_type) NEXUS_DEPRECATED_FUNCTION();
 
   /**
    * Open access to a dataset. After this call it is possible to write and read data or 
@@ -632,7 +632,7 @@ extern  NXstatus  NXgetslab64(NXhandle handle, void* data, const int64_t start[]
    * \return NX_OK on success, NX_ERROR in the case of an error, NX_EOD when there are no more items.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType) NEXUS_DEPRECATED_FUNCTION;
+extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int *iType) NEXUS_DEPRECATED_FUNCTION("Use NXgetnextattra instead");
 
   /**
    * Read an attribute containing a single string or numerical value.
@@ -645,7 +645,7 @@ extern  NXstatus  NXgetnextattr(NXhandle handle, NXname pName, int *iLength, int
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetattr(NXhandle handle, char* name, void* data, int* iDataLen, int* iType);
+extern  NXstatus  NXgetattr(NXhandle handle, const char* name, void* data, int* iDataLen, int* iType);
 
   /**
    * Get the count of attributes in the currently open dataset, group or global attributes when at root level.
@@ -680,7 +680,7 @@ extern  NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int d
    * \return NX_OK on success, NX_ERROR in the case of an error.   
    * \ingroup c_readwrite
    */
-extern  NXstatus  NXgetattra(NXhandle handle, char* name, void* data);
+extern  NXstatus  NXgetattra(NXhandle handle, const char* name, void* data);
 
   /**
    * Get the information about the storage of the named attribute.

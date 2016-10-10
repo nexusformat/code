@@ -6,22 +6,7 @@
 #include <utility>
 #include <vector>
 #include "napi.h"
-
-#ifdef _WIN32
-
-#ifndef _MSC_VER 
-#  define NXDLL_EXPORT
-#else
-#  if IN_NEXUS_CPP_LIBRARY
-#    define NXDLL_EXPORT __declspec(dllexport)
-#  else
-#    define NXDLL_EXPORT __declspec(dllimport)
-#  endif
-#endif /* _MSC_VER */
-
-#else /* _WIN32 */
-#  define NXDLL_EXPORT 
-#endif /* _WIN32 */
+#include "NeXusExport.hpp"
 
 /**
  * \file NeXusFile.hpp Definition of the NeXus C++ API.
@@ -131,7 +116,7 @@ namespace NeXus {
      * This is a deprecated function.
      * \param com The compression type.
      */
-    void compress(NXcompression comp) NEXUS_DEPRECATED_FUNCTION;
+    void compress(NXcompression comp) NEXUS_DEPRECATED_FUNCTION();
 
     /**
      * Initialize the pending group search to start again.

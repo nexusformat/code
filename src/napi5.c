@@ -55,16 +55,16 @@ extern void *NXpData;
 typedef struct __NexusFile5 {
 	struct iStack5 {
 		char irefn[1024];
-		int iVref;
+		hid_t iVref;
 		hsize_t iCurrentIDX;
 	} iStack5[NXMAXSTACK];
 	struct iStack5 iAtt5;
-	int iFID;
-	int iCurrentG;
-	int iCurrentD;
-	int iCurrentS;
-	int iCurrentT;
-	int iCurrentA;
+	hid_t iFID;
+	hid_t iCurrentG;
+	hid_t iCurrentD;
+	hid_t iCurrentS;
+	hid_t iCurrentT;
+	hid_t iCurrentA;
 	int iNX;
 	int iNXID;
 	int iStackPtr;
@@ -135,7 +135,7 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 		}
 
                 iRet = H5Aread(attr, atype, strings[0]);
-		*data = malloc((sdim + 2) * thedims[0] * sizeof(char));
+		*data = calloc((sdim + 2) * thedims[0], sizeof(char));
 		for(i=0; i<thedims[0]; i++) {
 			if (i==0) {
 				strncpy(*data, strings[i], sdim);	
@@ -156,7 +156,7 @@ static herr_t readStringAttribute(hid_t attr, char **data)
 	} 
 
 	H5Tclose(atype);
-	H5Tclose(space);
+	H5Sclose(space);
 	if (iRet < 0)
 		return NX_ERROR;
 	return NX_OK;
@@ -275,31 +275,57 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
 		return NX_ERROR;
 	}
 	memset(pNew, 0, sizeof(NexusFile5));
+	
+    /* create file access property list - required in all cases*/
+    if((fapl = H5Pcreate(H5P_FILE_ACCESS))<0){
+        sprintf(pBuffer,"Error: failed to create file access property "
+                        "list for file %s",filename);
+        NXReportError(pBuffer);
+        free(pNew);
+        return NX_ERROR;
+    }
+	
+    /* set file close policy - need this in all cases*/
+    if(H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG)<0){
+        sprintf(pBuffer,"Error: cannot set close policy for file "
+                        "%s",filename);
+        NXReportError(pBuffer);
+        free(pNew);
+        return NX_ERROR;
+    }
 
 	/* start HDF5 interface */
 	if (am == NXACC_CREATE5) {
-		fapl = H5Pcreate(H5P_FILE_ACCESS);
-		H5Pget_cache(fapl, &mdc_nelmts, &rdcc_nelmts, &rdcc_nbytes,
-			     &rdcc_w0);
+		if(H5Pget_cache(fapl, &mdc_nelmts, &rdcc_nelmts, &rdcc_nbytes,
+                        &rdcc_w0) < 0){
+            sprintf(pBuffer,"Error: cannot obtain HDF5 cache size"
+                            " for file %s",filename);
+            NXReportError(pBuffer);
+            free(pNew);
+            return NX_ERROR;
+        }
+            
 		rdcc_nbytes = (size_t) nx_cacheSize;
-		H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes,
-			     rdcc_w0);
-		H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG);
+		if(H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes,
+			            rdcc_w0) < 0){
+            sprintf(pBuffer,"Error: cannot set cache size "
+                            "for file %s",filename);
+            NXReportError(pBuffer);
+            free(pNew);
+            return NX_ERROR;
+        }
+
 		am1 = H5F_ACC_TRUNC;
 		pNew->iFID = H5Fcreate(filename, am1, H5P_DEFAULT, fapl);
 	} else {
-		if (am == NXACC_READ) {
-			am1 = H5F_ACC_RDONLY;
-		} else {
-			am1 = H5F_ACC_RDWR;
-		}
-		fapl = H5Pcreate(H5P_FILE_ACCESS);
-		H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG);
+		if (am == NXACC_READ) am1 = H5F_ACC_RDONLY;
+		else                  am1 = H5F_ACC_RDWR;
+		
 		pNew->iFID = H5Fopen(filename, am1, fapl);
 	}
-	if (fapl != -1) {
-		H5Pclose(fapl);
-	}
+
+	if (fapl != -1) H5Pclose(fapl); /*close file access property list*/ 
+
 	if (pNew->iFID <= 0) {
 		sprintf(pBuffer, "ERROR: cannot open file: %s", filename);
 		NXReportError(pBuffer);
@@ -477,7 +503,7 @@ NXstatus NX5close(NXhandle * fid)
 NXstatus NX5makegroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 {
 	pNexusFile5 pFile;
-	herr_t iRet;
+	hid_t iRet;
 	hid_t iVID;
 	hid_t attr1, aid1, aid2;
 	char pBuffer[1024] = "";
@@ -489,14 +515,13 @@ NXstatus NX5makegroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 	} else {
 		snprintf(pBuffer, 1023, "/%s/%s", pFile->name_ref, name);
 	}
-	iRet =
+	iVID =
 	    H5Gcreate(pFile->iFID, (const char *)pBuffer, H5P_DEFAULT,
 		      H5P_DEFAULT, H5P_DEFAULT);
-	if (iRet < 0) {
+	if (iVID < 0) {
 		NXReportError("ERROR: could not create Group");
 		return NX_ERROR;
 	}
-	iVID = iRet;
 	aid2 = H5Screate(H5S_SCALAR);
 	aid1 = H5Tcopy(H5T_C_S1);
 	H5Tset_size(aid1, strlen(nxclass));
@@ -534,7 +559,7 @@ NXstatus NX5opengroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 {
 
 	pNexusFile5 pFile;
-	hid_t attr1, atype;
+	hid_t attr1, atype, iVID;
 	herr_t iRet;
 	char pBuffer[1024];
 	char data[128];
@@ -545,14 +570,14 @@ NXstatus NX5opengroup(NXhandle fid, CONSTCHAR * name, CONSTCHAR * nxclass)
 	} else {
 		sprintf(pBuffer, "%s/%s", pFile->name_tmp, name);
 	}
-	iRet = H5Gopen(pFile->iFID, (const char *)pBuffer, H5P_DEFAULT);
-	if (iRet < 0) {
+	iVID = H5Gopen(pFile->iFID, (const char *)pBuffer, H5P_DEFAULT);
+	if (iVID < 0) {
 		sprintf(pBuffer, "ERROR: group %s does not exist",
 			pFile->name_tmp);
 		NXReportError(pBuffer);
 		return NX_ERROR;
 	}
-	pFile->iCurrentG = iRet;
+	pFile->iCurrentG = iVID;
 	strcpy(pFile->name_tmp, pBuffer);
 	strcpy(pFile->name_ref, pBuffer);
 
@@ -711,7 +736,7 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 			   int rank, int64_t dimensions[],
 			   int compress_type, int64_t chunk_size[])
 {
-	hid_t datatype1, dataspace, iNew;
+        hid_t datatype1, dataspace, iNew, dID;
 	herr_t iRet;
 	hid_t type, cparms = -1;
 	pNexusFile5 pFile;
@@ -813,7 +838,7 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 		}
 		H5Pset_shuffle(cparms); // mrt: improves compression
 		H5Pset_deflate(cparms, compress_level);
-		iRet = H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
+		dID = H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
 				 dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 	} else if (compress_type == NX_COMP_NONE) {
 		if (unlimiteddim) {
@@ -824,12 +849,12 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 				    ("ERROR: size of chunks could not be set");
 				return NX_ERROR;
 			}
-			iRet =
+			dID =
 			    H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
 				      dataspace, H5P_DEFAULT, cparms,
 				      H5P_DEFAULT);
 		} else {
-			iRet =
+			dID =
 			    H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
 				      dataspace, H5P_DEFAULT, H5P_DEFAULT,
 				      H5P_DEFAULT);
@@ -841,7 +866,7 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 			NXReportError("ERROR: size of chunks could not be set");
 			return NX_ERROR;
 		}
-		iRet = H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
+		dID = H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
 				 dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
 
 	} else {
@@ -851,11 +876,11 @@ NXstatus NX5compmakedata64(NXhandle fid, CONSTCHAR * name,
 		    H5Dcreate(pFile->iCurrentG, (char *)name, datatype1,
 			      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	}
-	if (iRet < 0) {
+	if (dID < 0) {
 		NXReportError("ERROR: creating chunked dataset failed");
 		return NX_ERROR;
 	} else {
-		pFile->iCurrentD = iRet;
+		pFile->iCurrentD = dID;
 	}
 	if (unlimiteddim) {
 		iNew = H5Dset_extent(pFile->iCurrentD, size);
@@ -1025,9 +1050,9 @@ NXstatus NX5putdata(NXhandle fid, const void *data)
 }
 
 /*------------------------------------------------------------------*/
-static int getAttVID(pNexusFile5 pFile)
+static hid_t getAttVID(pNexusFile5 pFile)
 {
-	int vid;
+	hid_t vid;
 	if (pFile->iCurrentG == 0 && pFile->iCurrentD == 0) {
 		/* global attribute */
 		vid = H5Gopen(pFile->iFID, "/", H5P_DEFAULT);
@@ -1057,8 +1082,9 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 	pNexusFile5 pFile;
 	hid_t attr1, aid1, aid2;
 	hid_t type;
+    hid_t attr_id;
 	herr_t iRet;
-	int vid;
+	hid_t vid, attRet;
 
 	pFile = NXI5assert(fid);
 
@@ -1066,9 +1092,9 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 
 	/* determine vid */
 	vid = getAttVID(pFile);
-	iRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
-	if (iRet > 0) {
-		H5Aclose(iRet);
+	attRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
+	if (attRet > 0) {
+		H5Aclose(attRet);
 		iRet = H5Adelete(vid, name);
 		if (iRet < 0) {
 			NXReportError
@@ -2085,11 +2111,12 @@ NXstatus NX5getnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 
  /*-------------------------------------------------------------------------*/
 
-NXstatus NX5getattr(NXhandle fid, char *name,
+NXstatus NX5getattr(NXhandle fid, const char *name,
 		    void *data, int *datalen, int *iType)
 {
 	pNexusFile5 pFile;
-	int iNew, vid, i;
+	int i;
+	hid_t vid, iNew;
 	hsize_t ndims, dims[H5S_MAX_RANK], totalsize;
 	herr_t iRet;
 	hid_t type, filespace;
@@ -2147,7 +2174,7 @@ NXstatus NX5getattrinfo(NXhandle fid, int *iN)
 {
 	pNexusFile5 pFile;
 	hid_t idx;
-	int vid;
+	hid_t vid;
 	H5O_info_t oinfo;
 
 	pFile = NXI5assert(fid);
@@ -2350,7 +2377,8 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 	hid_t type, cparms = -1;
 	pNexusFile5 pFile;
 	char pBuffer[256];
-	int i, vid;
+	int i;
+	hid_t vid, iATT;
 	herr_t iRet;
 	hsize_t mydim[H5S_MAX_RANK];
 
@@ -2362,9 +2390,9 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 
 	/* determine vid */
 	vid = getAttVID(pFile);
-	iRet = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
-	if (iRet > 0) {
-		H5Aclose(iRet);
+	iATT = H5Aopen_by_name(vid, ".", name, H5P_DEFAULT, H5P_DEFAULT);
+	if (iATT > 0) {
+		H5Aclose(iATT);
 		iRet = H5Adelete(vid, name);
 		if (iRet < 0) {
 			NXReportError("ERROR: old attribute cannot be removed! ");
@@ -2389,14 +2417,14 @@ NXstatus  NX5putattra(NXhandle handle, CONSTCHAR* name, const void* data, const 
 		dataspace = H5Screate_simple(rank, mydim, NULL);
 	}
 
-	iRet = H5Acreate(vid, (char *)name, datatype1,
+	iATT = H5Acreate(vid, (char *)name, datatype1,
 		      dataspace, H5P_DEFAULT, H5P_DEFAULT);
 
-	if (iRet < 0) {
+	if (iATT < 0) {
 		NXReportError("ERROR: creating attribute failed");
 		return NX_ERROR;
 	} else {
-		pFile->iCurrentA = iRet;
+		pFile->iCurrentA = iATT;
 	}
 	if (cparms != -1) {
 		iRet = H5Pclose(cparms);
@@ -2427,7 +2455,7 @@ NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 	herr_t iRet;
 	char *iname = NULL;
 	hsize_t idx, intern_idx = -1;
-	int vid;
+	hid_t vid;
 	H5O_info_t oinfo;
 
 	pFile = NXI5assert(handle);
@@ -2480,10 +2508,11 @@ NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 	return NX5getattrainfo(handle, pName, rank, dim, iType);
 }
 /*------------------------------------------------------------------------*/
-NXstatus  NX5getattra(NXhandle handle, char* name, void* data)
+NXstatus  NX5getattra(NXhandle handle, const char* name, void* data)
 {
 	pNexusFile5 pFile;
-	int i, iStart[H5S_MAX_RANK], status, vid;
+	int i, iStart[H5S_MAX_RANK], status;
+	hid_t vid;
 	hid_t memtype_id, filespace, datatype;
 	H5T_class_t tclass;
 	hsize_t ndims, dims[H5S_MAX_RANK];
@@ -2565,7 +2594,8 @@ return NX_OK;
 NXstatus  NX5getattrainfo(NXhandle handle, NXname name, int *rank, int dim[], int *iType)
 {
 	pNexusFile5 pFile;
-	int i, iRet, mType, vid;
+	int i, iRet, mType;
+	hid_t vid;
 	hid_t filespace, attrt, memtype;
 	hsize_t myDim[H5S_MAX_RANK], myrank;
 	H5T_class_t tclass;

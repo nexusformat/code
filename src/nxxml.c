@@ -1340,7 +1340,7 @@ NXstatus  NXXputattr (NXhandle fid, CONSTCHAR *name, const void *data,
   return NX_OK;
 }
 /*--------------------------------------------------------------------------*/
-NXstatus  NXXgetattr (NXhandle fid, char *name, 
+NXstatus  NXXgetattr (NXhandle fid, const char *name, 
 				   void *data, int* datalen, int* iType){
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
@@ -1968,19 +1968,26 @@ int  NXXcompress(NXhandle fid, int comp){
 /*--------------------------------------------------------------------*/
 NXstatus  NXXputattra(NXhandle handle, CONSTCHAR* name, const void* data, const int rank, const int dim[], const int iType) 
 {
-  NXReportError("This is an XML file, attribute array API is not supported here");
-  return NX_ERROR;
+  if (rank > 1) {
+          NXReportError("This is an XML file, there is only rudimentary support for attribute arrays wirh rank <=1");
+          return NX_ERROR;
+  } 
+
+  return NXXputattr(handle, name, data, dim[0], iType);
 }
 
 /*--------------------------------------------------------------------*/
 NXstatus  NXXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], int *iType)
 {
-  NXReportError("This is an XML file, attribute array API is not supported here");
-  return NX_ERROR;
+  NXstatus ret = NXXgetnextattr(handle, pName, dim, iType);
+  if (ret != NX_OK) return ret;
+  (*rank) = 1;
+  if (dim[0] <= 1 ) (*rank) = 0;
+  return NX_OK;
 }
 
 /*--------------------------------------------------------------------*/
-NXstatus  NXXgetattra(NXhandle handle, char* name, void* data)
+NXstatus  NXXgetattra(NXhandle handle, const char* name, void* data)
 {
   NXReportError("This is an XML file, attribute array API is not supported here");
   return NX_ERROR;
@@ -1996,7 +2003,7 @@ NXstatus  NXXgetattrainfo(NXhandle handle, NXname pName, int *rank, int dim[], i
 /*----------------------------------------------------------------------*/
 void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxclose=NXXclose;
-	  fHandle->nxreopen=NULL;
+      fHandle->nxreopen=NULL;
       fHandle->nxflush=NXXflush;
       fHandle->nxmakegroup=NXXmakegroup;
       fHandle->nxopengroup=NXXopengroup;
@@ -2027,10 +2034,10 @@ void NXXassignFunctions(pNexusFunction fHandle){
       fHandle->nxsetnumberformat=NXXsetnumberformat;
       fHandle->nxprintlink=NXXprintlink;
       fHandle->nxnativeexternallink=NULL;
-        fHandle->nxputattra = NXXputattra;
-        fHandle->nxgetnextattra = NXXgetnextattra;
-        fHandle->nxgetattra = NXXgetattra;
-        fHandle->nxgetattrainfo = NXXgetattrainfo;
+      fHandle->nxputattra = NXXputattra;
+      fHandle->nxgetnextattra = NXXgetnextattra;
+      fHandle->nxgetattra = NXXgetattra;
+      fHandle->nxgetattrainfo = NXXgetattrainfo;
 }
 
 #endif /*NXXML*/

@@ -418,19 +418,19 @@ static int determineFileTypeImpl(CONSTCHAR * filename)
 #ifdef WITH_HDF5
 	iRet = H5Fis_hdf5((const char *)filename);
 	if (iRet > 0) {
-		return 2;
+		return NXACC_CREATE5;
 	}
 #endif
 #ifdef WITH_HDF4
 	iRet = Hishdf((const char *)filename);
 	if (iRet > 0) {
-		return 1;
+		return NXACC_CREATE4;
 	}
 #endif
 #ifdef WITH_MXML
 	iRet = NXisXML(filename);
 	if (iRet == NX_OK) {
-		return 3;
+		return NXACC_CREATEXML;
 	}
 #endif
 	/*
@@ -483,9 +483,8 @@ NXstatus NXopen(CONSTCHAR * userfilename, NXaccess am, NXhandle * gHandle)
 static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 				   pFileStack fileStack)
 {
-	int hdf_type = 0;
+	int backend_type = 0;
 	int iRet = 0;
-	NXhandle hdf5_handle = NULL;
 	pNexusFunction fHandle = NULL;
 	NXstatus retstat = NX_ERROR;
 	char error[1024];
@@ -523,19 +522,19 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 
 	if (my_am == NXACC_CREATE) {
 		/* HDF4 will be used ! */
-		hdf_type = 1;
+		backend_type = NXACC_CREATE4;
 		filename = strdup(userfilename);
 	} else if (my_am == NXACC_CREATE4) {
 		/* HDF4 will be used ! */
-		hdf_type = 1;
+		backend_type = NXACC_CREATE4;
 		filename = strdup(userfilename);
 	} else if (my_am == NXACC_CREATE5) {
 		/* HDF5 will be used ! */
-		hdf_type = 2;
+		backend_type = NXACC_CREATE5;
 		filename = strdup(userfilename);
 	} else if (my_am == NXACC_CREATEXML) {
 		/* XML will be used ! */
-		hdf_type = 3;
+		backend_type = NXACC_CREATEXML;
 		filename = strdup(userfilename);
 	} else {
 		filename = locateNexusFileInPath((char *)userfilename);
@@ -562,14 +561,14 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			free(fHandle);
 			return NX_ERROR;
 		}
-		hdf_type = iRet;
+		backend_type = iRet;
 	}
 	if (filename == NULL) {
 		NXReportError("Out of memory in NeXus-API");
 		return NX_ERROR;
 	}
 
-	if (hdf_type == 1) {
+	if (backend_type == NXACC_CREATE4) {
 		/* HDF4 type */
 #ifdef WITH_HDF4
 		NXhandle hdf4_handle = NULL;
@@ -580,6 +579,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			return retstat;
 		}
 		fHandle->pNexusData = hdf4_handle;
+		fHandle->access_mode = backend_type || (NXACC_READ && am);
 		NX4assignFunctions(fHandle);
 		pushFileStack(fileStack, fHandle, filename);
 #else
@@ -589,9 +589,10 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 #endif				/* HDF4 */
 		free(filename);
 		return retstat;
-	} else if (hdf_type == 2) {
+	} else if (backend_type == NXACC_CREATE5) {
 		/* HDF5 type */
 #ifdef WITH_HDF5
+		NXhandle hdf5_handle = NULL;
 		retstat = NX5open(filename, am, &hdf5_handle);
 		if (retstat != NX_OK) {
 			free(fHandle);
@@ -599,6 +600,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			return retstat;
 		}
 		fHandle->pNexusData = hdf5_handle;
+		fHandle->access_mode = backend_type || (NXACC_READ && am);
 		NX5assignFunctions(fHandle);
 		pushFileStack(fileStack, fHandle, filename);
 #else
@@ -608,7 +610,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 #endif				/* HDF5 */
 		free(filename);
 		return retstat;
-	} else if (hdf_type == 3) {
+	} else if (backend_type == NXACC_CREATEXML) {
 		/*
 		   XML type
 		 */
@@ -621,6 +623,7 @@ static NXstatus NXinternalopenImpl(CONSTCHAR * userfilename, NXaccess am,
 			return retstat;
 		}
 		fHandle->pNexusData = xmlHandle;
+		fHandle->access_mode = backend_type || (NXACC_READ && am);
 		NXXassignFunctions(fHandle);
 		pushFileStack(fileStack, fHandle, filename);
 #else
@@ -1355,7 +1358,7 @@ NXstatus NXgetnextattr(NXhandle fileid, NXname pName, int *iLength, int *iType)
 
   /*-------------------------------------------------------------------------*/
 
-NXstatus NXgetattr(NXhandle fid, char *name, void *data, int *datalen,
+NXstatus NXgetattr(NXhandle fid, const char *name, void *data, int *datalen,
 		   int *iType)
 {
 	pNexusFunction pFunc = handleToNexusFunc(fid);
@@ -1953,7 +1956,7 @@ NXstatus  NXgetnextattra(NXhandle handle, NXname pName, int *rank, int dim[], in
 	pNexusFunction pFunc = handleToNexusFunc(handle);
 	return LOCKED_CALL(pFunc->nxgetnextattra(pFunc->pNexusData, pName, rank, dim, iType));
 }
-NXstatus  NXgetattra(NXhandle handle, char* name, void* data)
+NXstatus  NXgetattra(NXhandle handle, const char* name, void* data)
 {
 	pNexusFunction pFunc = handleToNexusFunc(handle);
 	return LOCKED_CALL(pFunc->nxgetattra(pFunc->pNexusData, name, data));

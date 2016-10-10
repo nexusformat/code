@@ -227,50 +227,35 @@ string toString(const vector<NumT> & data) {
   return result.str();
 }
 
-string get_extension(const string &filename)
-{
-    int dot_pos = filename.find('.');
-    return string(filename,dot_pos);
-}
-
 int readTest(const string & filename) {
   const string SDS("SDS");
   // top level file information
   NeXus::File file(filename);
-
-  string file_extension = get_extension(filename);
   cout << "NXinquirefile found: " << relativePathOf(file.inquireFile()) << endl;
-  vector<NeXus::AttrInfo> attr_infos;
-  if(file_extension==".h5")
-  {
-      attr_infos = file.getAttrInfos();
-      cout << "Number of global attributes: " << attr_infos.size() << endl;
-      for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
-           it != attr_infos.end(); it++) {
-        if (it->name != "file_time" && it->name != "HDF_version" && it->name !=  "HDF5_Version" && it->name != "XML_version") {
-            cout << "   " << it->name << " = ";
-            if (it->type == NeXus::CHAR) {
-              cout << file.getStrAttr(*it);
-            }
-            cout << endl;
-        }
-      }
-  }
-
-  // check group attributes
-  file.openGroup("entry", "NXentry");
-  if(file_extension==".h5")
-  {
-      attr_infos = file.getAttrInfos();
-      cout << "Number of group attributes: " << attr_infos.size() << endl;
-      for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
-           it != attr_infos.end(); it++) {
+  vector<NeXus::AttrInfo> attr_infos = file.getAttrInfos();
+  cout << "Number of global attributes: " << attr_infos.size() << endl;
+  for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
+       it != attr_infos.end(); it++) {
+    if (it->name != "file_time" && it->name != "HDF_version" && it->name !=  "HDF5_Version" && it->name != "XML_version") {
         cout << "   " << it->name << " = ";
         if (it->type == NeXus::CHAR) {
           cout << file.getStrAttr(*it);
         }
         cout << endl;
-      }
+    }
+  }
+
+  // check group attributes
+  file.openGroup("entry", "NXentry");
+  attr_infos = file.getAttrInfos();
+  cout << "Number of group attributes: " << attr_infos.size() << endl;
+  for (vector<NeXus::AttrInfo>::iterator it = attr_infos.begin();
+       it != attr_infos.end(); it++) {
+    cout << "   " << it->name << " = ";
+    if (it->type == NeXus::CHAR) {
+      cout << file.getStrAttr(*it);
+    }
+    cout << endl;
   }
 
   // print out the entry level fields
