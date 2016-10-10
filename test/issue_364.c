@@ -6,6 +6,9 @@
 
 #define MAX_CHAR 255
 
+
+static const char filename[] = "issue_364.nxs";
+
 void write_data()
 {
     NXhandle fid;
@@ -16,7 +19,7 @@ void write_data()
     char *text;
 
     text = calloc(MAX_CHAR, 1);
-    NXopen("issue_364.nxs", NXACC_CREATE5, &fid);
+    NXopen(filename, NXACC_CREATE5, &fid);
 
     NXmakegroup(fid, "test", "NXnote");
     NXopengroup(fid, "test", "NXnote");
@@ -42,7 +45,7 @@ void read_data()
     int shape[2] = {2, 1};
 
     NXmalloc(&buffer, 2, shape, NX_CHAR);
-    NXopen("file.nxs", NXACC_READ, &fid);
+    NXopen(filename, NXACC_READ, &fid);
 
     NXopenpath(fid, "/test/stringarray");
 
