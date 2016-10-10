@@ -66,13 +66,18 @@ include_directories("../include")
 # proceed with building the programs
 #-----------------------------------------------------------------------------
 
-add_subdirectory (NXbrowse)
-#add_subdirectory(c-nxvalidate)
+if (HAVE_LIBREADLINE)
+    add_subdirectory (NXbrowse)
+else()
+    message(WARNING "libreadline not found, not building: nxbrowse")
+endif()
 
 if (ENABLE_CXX)
-  add_subdirectory (NXdir)
-  add_subdirectory (NXconvert)
-  add_subdirectory (NXtraverse)
+    add_subdirectory (NXdir)
+    add_subdirectory (NXconvert)
+    add_subdirectory (NXtraverse)
+else()
+    message(WARNING "C++ bindings not enabled, not building: NXdri, NXconvert, NXtranvers")
 endif()
 
 if (ENABLE_FORTRAN90 AND CMAKE_Fortran_COMPILER_WORKS)
@@ -83,10 +88,14 @@ endif()
 if(LIBXML2_FOUND)
     add_subdirectory (NXsummary)
     add_subdirectory (NXtranslate)
+else()
+    message(WARNING "LIBXML2 library not found, not building: NXsummary, NXtranslate")
 endif(LIBXML2_FOUND)
 
 if (WITH_MXML)
     add_subdirectory (nxingest)
+else()
+    message(WARNING "MXML not enabled, not building: nxingest")
 endif()
 
 #-----------------------------------------------------------------------------
