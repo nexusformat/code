@@ -2015,16 +2015,9 @@ NXstatus NX5getslab64(NXhandle fid, void *data, const int64_t iStart[],
 			mStart[i] = (hsize_t) 0;
 		}
 
-		/* 
-		 * this does not work for multidimensional string arrays. 
-		 */
 		if (tclass == H5T_STRING) {
 			mtype = NX_CHAR;
-			if (mySize[0] == 1) {
-				mySize[0] = H5Tget_size(pFile->iCurrentT);
-			}
-			tmp_data = (char *)malloc((size_t) mySize[0]);
-			memset(tmp_data, 0, sizeof(mySize[0]));
+			mySize[iRank-1] = 1;
 			iRet =
 			    H5Sselect_hyperslab(pFile->iCurrentS,
 						H5S_SELECT_SET, mStart, NULL,
@@ -2050,18 +2043,8 @@ NXstatus NX5getslab64(NXhandle fid, void *data, const int64_t iStart[],
 			return NX_ERROR;
 		}
 		/* read slab */
-		if (mtype == NX_CHAR) {
-			iRet =
-			    H5Dread(pFile->iCurrentD, memtype_id, H5S_ALL,
-				    H5S_ALL, H5P_DEFAULT, tmp_data);
-			data1 = tmp_data + myStart[0];
-			strncpy((char *)data, data1, (size_t) iSize[0]);
-			free(tmp_data);
-		} else {
-			iRet =
-			    H5Dread(pFile->iCurrentD, memtype_id, memspace,
+		iRet = H5Dread(pFile->iCurrentD, memtype_id, memspace,
 				    pFile->iCurrentS, H5P_DEFAULT, data);
-		}
 	}
 	/* cleanup */
 	H5Sclose(memspace);

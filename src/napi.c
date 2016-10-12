@@ -1146,7 +1146,8 @@ NXstatus NXmalloc64(void **data, int rank,
 	if ((datatype == NX_CHAR) || (datatype == NX_INT8)
 	    || (datatype == NX_UINT8)) {
 		/* allow for terminating \0 */
-		size += 2;
+		size += 102;
+		size*=sizeof(char);
 	} else if ((datatype == NX_INT16) || (datatype == NX_UINT16)) {
 		size *= 2;
 	} else if ((datatype == NX_INT32) || (datatype == NX_UINT32)

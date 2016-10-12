@@ -15,43 +15,48 @@ void write_data()
     int start[2] = {0, 0};
     int shape[2] = {-1, MAX_CHAR};
     int n = 5;
-    int i;
+    int i, status;
     char *text;
+    
 
-    text = calloc(MAX_CHAR, 1);
-    NXopen(filename, NXACC_CREATE5, &fid);
+    text = calloc(1,sizeof(char)*MAX_CHAR); 
+    status = NXopen(filename, NXACC_CREATE5, &fid);
 
-    NXmakegroup(fid, "test", "NXnote");
-    NXopengroup(fid, "test", "NXnote");
+    status = NXmakegroup(fid, "test", "NXnote");
+    status = NXopengroup(fid, "test", "NXnote");
 
-    NXmakedata(fid, "stringarray", NX_CHAR, 2, shape);
-    NXopendata(fid, "stringarray");
+    status = NXmakedata(fid, "stringarray", NX_CHAR, 2, shape);
+    status = NXopendata(fid, "stringarray");
 
     shape[0] = 1;
     for (i = 0; i < n; i++) {
         snprintf(text, MAX_CHAR-1, "name%d", i);
         start[0] = i;
-        NXputslab(fid, text, start, shape);
+        status = NXputslab(fid, text, start, shape);
     }
-    NXclose(fid);
-    free(text);
+    status = NXclosedata(fid);
+
+    status = NXclosegroup(fid);
+    status = NXclose(&fid);
+    free(text); 
 }
 
 void read_data()
 {
     NXhandle fid;
     void *buffer;
+    int status;
     int start[2] = {0, 0};
-    int shape[2] = {2, 1};
+    int shape[2] = {2, MAX_CHAR};
 
-    NXmalloc(&buffer, 2, shape, NX_CHAR);
-    NXopen(filename, NXACC_READ, &fid);
+    NXmalloc((void **)&buffer, 2, shape, NX_CHAR);
+    status = NXopen(filename, NXACC_RDWR, &fid);
 
-    NXopenpath(fid, "/test/stringarray");
+    status = NXopenpath(fid, "/test/stringarray");
 
-    NXgetslab(fid, buffer, start, shape);
-    NXclose(fid);
-    NXfree(buffer);
+    status = NXgetslab(fid, buffer, start, shape);
+    status = NXclose(&fid);
+    NXfree(&buffer); 
 }
 
 int main(int argc, char **argv) 
@@ -62,3 +67,4 @@ int main(int argc, char **argv)
     return 0;
 
 }
+
