@@ -263,7 +263,7 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
 	am = (NXaccess) (am & NXACCMASK_REMOVEFLAGS);
 
 	/* turn off the automatic HDF error handling */
-	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
+	H5Eset_auto(H5E_DEFAULT, NULL, NULL); 
 #ifdef USE_FTIME
 	struct timeb timeb_struct;
 #endif
@@ -327,7 +327,7 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
 	if (fapl != -1) H5Pclose(fapl); /*close file access property list*/ 
 
 	if (pNew->iFID <= 0) {
-		sprintf(pBuffer, "ERROR: cannot open file: %s", filename);
+	        snprintf(pBuffer,sizeof(pBuffer)-1, "ERROR: cannot open file: %s", filename);
 		NXReportError(pBuffer);
 		free(pNew);
 		return NX_ERROR;

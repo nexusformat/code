@@ -254,7 +254,9 @@ add_subdirectory (test)        #build the tests
 add_subdirectory (bindings)    #build the language bindings
 add_subdirectory (scripts)     #install pkg-config files
 
-#on user request utility applications will be built
+#------------------------------------------------------------------------------
+# on user request utility applications will be built
+#------------------------------------------------------------------------------
 if(ENABLE_APPS)
     add_subdirectory (applications)
 endif()
@@ -262,6 +264,9 @@ endif()
 add_subdirectory (doc)
 #add_subdirectory (config)
 
+#------------------------------------------------------------------------------
+# on user request contributed applications will be built
+#------------------------------------------------------------------------------
 if(ENABLE_CONTRIB)
     add_subdirectory (contrib)
 endif()
