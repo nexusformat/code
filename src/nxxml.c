@@ -182,6 +182,7 @@ NXstatus  NXXopen(CONSTCHAR *filename, NXaccess am,
     current = mxmlNewElement(xmlHandle->root,"NXroot");
     mxmlElementSetAttr(current,"NeXus_version",NEXUS_VERSION);
     mxmlElementSetAttr(current,"XML_version","mxml");
+    mxmlElementSetAttr(current,"NX_class","NXroot");
     mxmlElementSetAttr(current,"file_name",filename);
     mxmlElementSetAttr(current,"xmlns", NEXUS_SCHEMA_NAMESPACE);
     mxmlElementSetAttr(current,"xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
