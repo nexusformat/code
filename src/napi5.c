@@ -233,28 +233,127 @@ NXstatus NX5reopen(NXhandle pOrigHandle, NXhandle * pNewHandle)
 	return NX_OK;
 }
 
+
+/*---------------------------------------------------------------------
+ * private functions used in NX5open 
+ */
+ 
+pNexusFile5 create_file_struct()
+{
+	pNexusFile5 pNew = (pNexusFile5) malloc(sizeof(NexusFile5));
+	if (!pNew) {
+		NXReportError
+		    ("ERROR: not enough memory to create file structure");
+	}
+    else{
+        memset(pNew, 0, sizeof(NexusFile5));
+    }
+
+    return pNew;
+}
+
+hid_t create_file_access_plist(CONSTCHAR *filename)
+{
+    char pBuffer[512];
+    hid_t fapl = -1;
+    
+    /* create file access property list - required in all cases*/
+    if((fapl = H5Pcreate(H5P_FILE_ACCESS))<0){
+        sprintf(pBuffer,"Error: failed to create file access property "
+                        "list for file %s",filename);
+        NXReportError(pBuffer);
+        return fapl;
+    }
+	
+    /* set file close policy - need this in all cases*/
+    if(H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG)<0){
+        sprintf(pBuffer,"Error: cannot set close policy for file "
+                        "%s",filename);
+        NXReportError(pBuffer);
+        return fapl;
+    }
+
+    return fapl;
+}
+
+
+herr_t set_file_cache(hid_t fapl,CONSTCHAR *filename)
+{
+    char pBuffer[512];
+	int mdc_nelmts;
+	size_t rdcc_nelmts;
+	size_t rdcc_nbytes;
+	double rdcc_w0;
+    herr_t error = -1;
+
+    error =  H5Pget_cache(fapl, &mdc_nelmts, &rdcc_nelmts, 
+                                &rdcc_nbytes,&rdcc_w0);
+
+    if(error < 0){
+        sprintf(pBuffer,"Error: cannot obtain HDF5 cache size"
+                        " for file %s",filename);
+        NXReportError(pBuffer);
+        return error;
+    }
+        
+    rdcc_nbytes = (size_t) nx_cacheSize;
+    error = H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes,rdcc_w0);
+    if(error < 0){
+        sprintf(pBuffer,"Error: cannot set cache size "
+                        "for file %s",filename);
+        NXReportError(pBuffer);
+        return error;
+    }
+    return error;
+}
+
+herr_t set_str_attribute(hid_t parent_id,CONSTCHAR *name,CONSTCHAR *buffer)
+{
+    char pBuffer[512];
+    hid_t attr_id;
+	hid_t space_id = H5Screate(H5S_SCALAR);
+    hid_t type_id = H5Tcopy(H5T_C_S1);
+		
+    H5Tset_size(type_id, strlen(buffer));
+		
+    attr_id = H5Acreate(parent_id,name,type_id,space_id,H5P_DEFAULT,
+                        H5P_DEFAULT);
+    if (attr_id < 0) {
+        sprintf(pBuffer,"ERROR: failed to create %s attribute",name);
+        NXReportError(pBuffer);
+        return -1;
+    }
+
+    if(H5Awrite(attr_id,type_id,buffer) < 0) {
+        sprintf(pBuffer,"ERROR: failed writting %s attribute");
+        NXReportError(pBuffer);
+        return -1;
+    }
+
+    H5Tclose(type_id);
+    H5Sclose(space_id);
+    H5Aclose(attr_id);
+
+    return 0;
+}
+
 NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
 {
-	hid_t attr1, aid1, aid2, iVID;
+	hid_t root_id;
 	pNexusFile5 pNew = NULL;
 	char pBuffer[512];
 	char *time_buffer = NULL;
 	char version_nr[10];
 	unsigned int vers_major, vers_minor, vers_release, am1;
 	hid_t fapl = -1;
-	int mdc_nelmts;
-	size_t rdcc_nelmts;
-	size_t rdcc_nbytes;
-	double rdcc_w0;
-	unsigned hdf5_majnum, hdf5_minnum, hdf5_relnum;
 
 	*pHandle = NULL;
 
-	if (H5get_libversion(&hdf5_majnum, &hdf5_minnum, &hdf5_relnum) < 0) {
+	if (H5get_libversion(&vers_major, &vers_minor, &vers_release) < 0) {
 		NXReportError("ERROR: cannot determine HDF5 library version");
 		return NX_ERROR;
 	}
-	if (hdf5_majnum == 1 && hdf5_minnum < 8) {
+	if (vers_major == 1 && vers_minor < 8) {
 		NXReportError("ERROR: HDF5 library 1.8.0 or higher required");
 		return NX_ERROR;
 	}
@@ -268,49 +367,21 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
 	struct timeb timeb_struct;
 #endif
 
-	pNew = (pNexusFile5) malloc(sizeof(NexusFile5));
-	if (!pNew) {
-		NXReportError
-		    ("ERROR: not enough memory to create file structure");
-		return NX_ERROR;
-	}
-	memset(pNew, 0, sizeof(NexusFile5));
-	
-    /* create file access property list - required in all cases*/
-    if((fapl = H5Pcreate(H5P_FILE_ACCESS))<0){
-        sprintf(pBuffer,"Error: failed to create file access property "
-                        "list for file %s",filename);
-        NXReportError(pBuffer);
-        free(pNew);
-        return NX_ERROR;
-    }
-	
-    /* set file close policy - need this in all cases*/
-    if(H5Pset_fclose_degree(fapl, H5F_CLOSE_STRONG)<0){
-        sprintf(pBuffer,"Error: cannot set close policy for file "
-                        "%s",filename);
-        NXReportError(pBuffer);
+    /* create the new file structure */
+    if(!(pNew = create_file_struct())) return NX_ERROR;
+
+    /* create the file access property list*/
+    if((fapl = create_file_access_plist(filename))<0)
+    {
         free(pNew);
         return NX_ERROR;
     }
 
 	/* start HDF5 interface */
 	if (am == NXACC_CREATE5) {
-		if(H5Pget_cache(fapl, &mdc_nelmts, &rdcc_nelmts, &rdcc_nbytes,
-                        &rdcc_w0) < 0){
-            sprintf(pBuffer,"Error: cannot obtain HDF5 cache size"
-                            " for file %s",filename);
-            NXReportError(pBuffer);
-            free(pNew);
-            return NX_ERROR;
-        }
-            
-		rdcc_nbytes = (size_t) nx_cacheSize;
-		if(H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes,
-			            rdcc_w0) < 0){
-            sprintf(pBuffer,"Error: cannot set cache size "
-                            "for file %s",filename);
-            NXReportError(pBuffer);
+
+        /* set the cache size for the file */
+        if(set_file_cache(fapl,filename)<0) {
             free(pNew);
             return NX_ERROR;
         }
@@ -337,108 +408,53 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
  * need to create global attributes         file_name file_time NeXus_version 
  * at some point for new files
  */
-	if (am1 != H5F_ACC_RDONLY) {
-		iVID = H5Gopen(pNew->iFID, "/", H5P_DEFAULT);
-		aid2 = H5Screate(H5S_SCALAR);
-		aid1 = H5Tcopy(H5T_C_S1);
-		H5Tset_size(aid1, strlen(NEXUS_VERSION));
-		if (am1 == H5F_ACC_RDWR) {
-			H5Adelete(iVID, "NeXus_version");
-		}
-		attr1 =
-		    H5Acreate(iVID, "NeXus_version", aid1, aid2, H5P_DEFAULT,
-			      H5P_DEFAULT);
-		if (attr1 < 0) {
-			NXReportError
-			    ("ERROR: failed to store NeXus_version attribute ");
-			return NX_ERROR;
-		}
-		if (H5Awrite(attr1, aid1, NEXUS_VERSION) < 0) {
-			NXReportError
-			    ("ERROR: failed to store NeXus_version attribute ");
-			return NX_ERROR;
-		}
-		/* Close attribute dataspace  */
-		H5Tclose(aid1);
-		H5Sclose(aid2);
-		/* Close attribute */
-		H5Aclose(attr1);
-		H5Gclose(iVID);
-	}
-	if (am1 == H5F_ACC_TRUNC) {
-		iVID = H5Gopen(pNew->iFID, "/", H5P_DEFAULT);
-		aid2 = H5Screate(H5S_SCALAR);
-		aid1 = H5Tcopy(H5T_C_S1);
-		H5Tset_size(aid1, strlen(filename));
-		attr1 =
-		    H5Acreate(iVID, "file_name", aid1, aid2, H5P_DEFAULT,
-			      H5P_DEFAULT);
-		if (attr1 < 0) {
-			NXReportError
-			    ("ERROR: failed to store file_name attribute ");
-			return NX_ERROR;
-		}
-		if (H5Awrite(attr1, aid1, (char *)filename) < 0) {
-			NXReportError
-			    ("ERROR: failed to store file_name attribute ");
-			return NX_ERROR;
-		}
-		H5Tclose(aid1);
-		H5Sclose(aid2);
-		H5Aclose(attr1);
-		/*  ------- library version ------ */
-		H5get_libversion(&vers_major, &vers_minor, &vers_release);
-		sprintf(version_nr, "%d.%d.%d", vers_major, vers_minor,
-			vers_release);
-		aid2 = H5Screate(H5S_SCALAR);
-		aid1 = H5Tcopy(H5T_C_S1);
-		H5Tset_size(aid1, strlen(version_nr));
-		attr1 =
-		    H5Acreate(iVID, "HDF5_Version", aid1, aid2, H5P_DEFAULT,
-			      H5P_DEFAULT);
-		if (attr1 < 0) {
-			NXReportError
-			    ("ERROR: failed to store file_name attribute ");
-			return NX_ERROR;
-		}
-		if (H5Awrite(attr1, aid1, (char *)version_nr) < 0) {
-			NXReportError
-			    ("ERROR: failed to store file_name attribute ");
-			return NX_ERROR;
-		}
-		H5Tclose(aid1);
-		H5Sclose(aid2);
-		H5Aclose(attr1);
-	/*----------- file time */
-		time_buffer = NXIformatNeXusTime();
-		if (time_buffer != NULL) {
-			aid2 = H5Screate(H5S_SCALAR);
-			aid1 = H5Tcopy(H5T_C_S1);
-			H5Tset_size(aid1, strlen(time_buffer));
-			attr1 =
-			    H5Acreate(iVID, "file_time", aid1, aid2,
-				      H5P_DEFAULT, H5P_DEFAULT);
-			if (attr1 < 0) {
-				NXReportError
-				    ("ERROR: failed to store file_time attribute ");
-				free(time_buffer);
-				return NX_ERROR;
-			}
-			if (H5Awrite(attr1, aid1, time_buffer) < 0) {
-				NXReportError
-				    ("ERROR: failed to store file_time attribute ");
-				free(time_buffer);
-				return NX_ERROR;
-			}
-			/* Close attribute dataspace */
-			H5Tclose(aid1);
-			H5Sclose(aid2);
-			/* Close attribute */
-			H5Aclose(attr1);
-			free(time_buffer);
-		}
-		H5Gclose(iVID);
-	}
+
+    if(am == NXACC_CREATE5)
+    {
+        root_id = H5Gopen(pNew->iFID,"/",H5P_DEFAULT);
+        if(set_str_attribute(root_id,"NeXus_version",NEXUS_VERSION)<0) {
+            H5Gclose(root_id);
+            H5Fclose(pNew->iFID);
+            free(pNew);
+            return NX_ERROR;
+        }
+        
+        if(set_str_attribute(root_id,"file_name",filename)<0) {
+            H5Gclose(root_id);
+            H5Fclose(pNew->iFID);
+            free(pNew);
+            return NX_ERROR;
+        }
+
+        sprintf(version_nr,"%d.%d.%d",vers_major,vers_minor,vers_release);
+        if(set_str_attribute(root_id,"HDF5_Version",version_nr)<0) {
+            H5Gclose(root_id);
+            H5Fclose(pNew->iFID);
+            free(pNew);
+            return NX_ERROR;
+        }
+		
+        time_buffer = NXIformatNeXusTime();
+		if (time_buffer != NULL){
+            if(set_str_attribute(root_id,"file_time",time_buffer)<0) {
+                H5Gclose(root_id);
+                H5Fclose(pNew->iFID);
+                free(pNew);
+                return NX_ERROR;
+            }
+        }
+
+        /*finally we set the NXroot NX_class attribute*/
+        if(set_str_attribute(root_id,"NX_class","NXroot")<0) {
+            H5Gclose(root_id);
+            H5Fclose(pNew->iFID);
+            free(pNew);
+            return NX_ERROR;
+        }
+
+        H5Gclose(root_id);
+    }
+
 	/* Set HDFgroup access mode */
 	if (am1 == H5F_ACC_RDONLY) {
 		strcpy(pNew->iAccess, "r");

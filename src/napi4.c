@@ -452,36 +452,47 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
  * need to create global attributes         file_name file_time NeXus_version 
  * at some point for new files
  */
-    if (am != NXACC_READ) {
-      if (SDsetattr(pNew->iSID, "NeXus_version", DFNT_CHAR8, strlen(NEXUS_VERSION), NEXUS_VERSION) < 0) {
-          NXReportError( "ERROR: HDF failed to store NeXus_version attribute ");
-          return NX_ERROR;
-      }
-      Hgetlibversion(&lmajor, &lminor, &lrelease, HDF_VERSION); 
-      if (SDsetattr(pNew->iSID, "HDF_version", DFNT_CHAR8, strlen(HDF_VERSION), HDF_VERSION) < 0) {
-          NXReportError( "ERROR: HDF failed to store HDF_version attribute ");
-          return NX_ERROR;
-      }
-    }
-
-    time_puffer = NXIformatNeXusTime();
     if (am == NXACC_CREATE || am == NXACC_CREATE4) {
-      if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), (char*)filename) < 0) {
-        NXReportError( "ERROR: HDF failed to store file_name attribute ");
-        return NX_ERROR;
-      }
-      if(time_puffer != NULL){
-	if (SDsetattr(pNew->iSID, "file_time", DFNT_CHAR8, 
-		      strlen(time_puffer), time_puffer) < 0) {
-	  NXReportError( 
-			  "ERROR: HDF failed to store file_time attribute ");
-	  free(time_puffer);
-	  return NX_ERROR;
-	}
-      }
-    }
-    if (time_puffer != NULL) {
-	free(time_puffer);
+        /* set the NeXus_version attribute*/
+        if (SDsetattr(pNew->iSID, "NeXus_version", DFNT_CHAR8,
+                      strlen(NEXUS_VERSION), NEXUS_VERSION) < 0) 
+        {
+            NXReportError( "ERROR: HDF failed to store NeXus_version attribute ");
+            return NX_ERROR;
+        }
+
+        /* set the HDF4 version attribute */
+        Hgetlibversion(&lmajor, &lminor, &lrelease, HDF_VERSION); 
+        if (SDsetattr(pNew->iSID, "HDF_version", DFNT_CHAR8, strlen(HDF_VERSION),HDF_VERSION) < 0)
+        {
+            NXReportError( "ERROR: HDF failed to store HDF_version attribute ");
+            return NX_ERROR;
+        }
+
+        /* set the filename attribute */
+        if (SDsetattr(pNew->iSID, "file_name", DFNT_CHAR8, strlen(filename), (char*)filename) < 0) 
+        {
+            NXReportError( "ERROR: HDF failed to store file_name attribute ");
+            return NX_ERROR;
+        }
+
+        /* set the file_time attribute */
+        time_puffer = NXIformatNeXusTime();
+        if(time_puffer != NULL){
+            if (SDsetattr(pNew->iSID, "file_time", DFNT_CHAR8,strlen(time_puffer),time_puffer) < 0)
+            {
+                NXReportError("ERROR: HDF failed to store file_time attribute ");
+                free(time_puffer);
+                return NX_ERROR;
+	        }
+            free(time_puffer);
+        }
+
+        if (SDsetattr(pNew->iSID,"NX_class",DFNT_CHAR8,7,"NXroot")<0)
+        {
+            NXReportError("ERROR: HDF failed to store NX_class attribute ");
+            return NX_ERROR;
+        }
     }
 
     /* 
