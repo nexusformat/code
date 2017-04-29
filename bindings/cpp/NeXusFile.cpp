@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <typeinfo>
+#include <memory>
 #include "napiconfig.h"
 #include "NeXusFile.hpp"
 #include "NeXusException.hpp"
@@ -1240,7 +1241,8 @@ void File::getAttr(const std::string& name, std::vector<std::string>& array) {
   }
 
   // get attrInfo
-  char attr_name[name.size()+1];
+  char* attr_name = new char[name.size() + 1];
+  std::unique_ptr<char[]> attr_name_deleter(attr_name);
   strcpy(attr_name, name.c_str());
 
   int type;
