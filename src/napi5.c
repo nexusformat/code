@@ -1083,7 +1083,7 @@ static hid_t getAttVID(pNexusFile5 pFile)
 }
 
 /*---------------------------------------------------------------*/
-static void killAttVID(pNexusFile5 pFile, int vid)
+static void killAttVID(pNexusFile5 pFile, hid_t vid)
 {
 	if (pFile->iCurrentG == 0 && pFile->iCurrentD == 0) {
 		H5Gclose(vid);
@@ -1098,7 +1098,6 @@ NXstatus NX5putattr(NXhandle fid, CONSTCHAR * name, const void *data,
 	pNexusFile5 pFile;
 	hid_t attr1, aid1, aid2;
 	hid_t type;
-    hid_t attr_id;
 	herr_t iRet;
 	hid_t vid, attRet;
 
@@ -2189,7 +2188,7 @@ NXstatus NX5getattr(NXhandle fid, const char *name,
 NXstatus NX5getattrinfo(NXhandle fid, int *iN)
 {
 	pNexusFile5 pFile;
-	hid_t idx;
+	int idx;
 	hid_t vid;
 	H5O_info_t oinfo;
 
@@ -2200,7 +2199,7 @@ NXstatus NX5getattrinfo(NXhandle fid, int *iN)
 	vid = getAttVID(pFile);
 
 	H5Oget_info(vid, &oinfo);
-	idx = (hid_t) oinfo.num_attrs;
+	idx = oinfo.num_attrs;
 	if (idx > 0) {
 		if (pFile->iCurrentG > 0 && pFile->iCurrentD == 0) {
 			*iN = idx - 1;
