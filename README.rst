@@ -109,9 +109,12 @@ To build the library and program binaries simply use
 
 .. code-block:: bash 
 
+    $ mkdir build 
+    $ cd build
+    $ cmake -DENABLE_APPS=ON .. # building with tools as example config option
     $ make 
 
-and for installation 
+from the source directoy. For installation run
 
 .. code-block:: bash
 
