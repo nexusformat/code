@@ -2507,6 +2507,8 @@ NXstatus  NX5getnextattra(NXhandle handle, NXname pName, int *rank, int dim[], i
 			/*
 			   skip NXclass attribute which is internal 
 			 */
+			free(iname);
+			iname = NULL;
 			killAttVID(pFile, vid);
 			return NX5getnextattra(handle, pName, rank, dim, iType);
 		}
