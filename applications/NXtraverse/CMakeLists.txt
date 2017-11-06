@@ -30,7 +30,7 @@ include_directories(../../bindings/cpp)
 
 add_executable (nxtraverse nxtraverse.cpp main.cpp nxtraverse.h)
 
-target_link_libraries(nxtraverse NeXus_CPP_Shared_Library )
+target_link_libraries(nxtraverse NeXus_Shared_Library )
 
 install (TARGETS nxtraverse
          DESTINATION ${CMAKE_INSTALL_BINDIR} 
