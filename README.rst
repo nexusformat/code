@@ -83,7 +83,7 @@ Program          Description
 ``nxbrowse``     browse a NeXus file
 ``nxdir``        list the contents of a NeXus file
 ``nxconvert``    convert a NeXus file to whatever?
-``nxtraverse``   no idea what this is good for
+``nxtraverse``   list the contents of a NeXus file
 ``nxdump``      
 ``nxingest``
 ``nxsummary``

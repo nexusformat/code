@@ -75,10 +75,12 @@ endif()
 if (ENABLE_CXX)
     add_subdirectory (NXdir)
     add_subdirectory (NXconvert)
-    add_subdirectory (NXtraverse)
 else()
-    message(WARNING "C++ bindings not enabled, not building: NXdri, NXconvert, NXtranvers")
+    message(WARNING "C++ bindings not enabled, not building: NXdri, NXconvert")
 endif()
+
+#depends only in Nexus C API
+add_subdirectory (NXtraverse)
 
 if (ENABLE_FORTRAN90 AND CMAKE_Fortran_COMPILER_WORKS)
     add_subdirectory (NXdump)
