@@ -33,34 +33,33 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
 
         SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#        MESSAGE(STATUS ${PROJECT_SOURCE_DIR}/bindings/java/)
 
         SET(JAVA_TEST ${PROJECT_SOURCE_DIR}/bindings/java/test/TestJapi.java)
 
-        SET(JAVA_SOURCES ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusException.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NXlink.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/AttributeEntry.java 
-             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java 
+        SET(JAVA_SOURCES ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusException.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NXlink.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/AttributeEntry.java
+             ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java
              ${JAVA_TEST})
 
-         SET(JAVA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NXlink.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/AttributeEntry.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusFile.class 
+         SET(JAVA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.class
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.class
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.class
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.class
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.class
+             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.class
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusException.class
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NXlink.class
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.class
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/AttributeEntry.class
+             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusFile.class
              ${PROJECT_BINARY_DIR}/bindings/java/TestJapi.class)
 
         SET(EXTRA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/ArrayDescriptor.class)
@@ -73,21 +72,31 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
 
         STRING(REPLACE ".java" ".class" javaclass "${JAVA_SOURCES}")
 
-        ADD_CUSTOM_COMMAND( 
-            OUTPUT    ${JAVA_CLASSES}
+        # The javah tool was superseded by functionality added to javac in JDK8
+        # Provide backwards compatability if we have an older version of Java
+        if(Java_JAVAH_EXECUTABLE)
+          set(JAVAC_EXTRA_ARGS)
+          set(JAVAC_EXTRA_OUTPUT)
+        else()
+          set(JAVAC_EXTRA_ARGS "-h" ".")
+          set(JAVAC_EXTRA_OUTPUT ${JNI_HEADER})
+        endif()
+
+        ADD_CUSTOM_COMMAND(
+            OUTPUT    ${JAVA_CLASSES} ${JAVAC_EXTRA_OUTPUT}
             COMMAND   ${Java_JAVAC_EXECUTABLE}
-            ARGS      -d . ${JAVA_SOURCES}
+            ARGS      -d . ${JAVAC_EXTRA_ARGS} ${JAVA_SOURCES}
             COMMENT   "Compile Java"
         )
 
-        ADD_CUSTOM_COMMAND( 
+        ADD_CUSTOM_COMMAND(
             OUTPUT    ${EXTRA_CLASSES}
-            COMMAND   
+            COMMAND
             DEPENDS   ${JAVA_CLASSES}
             COMMENT   "Include Extra Built Classes"
         )
 
-        ADD_CUSTOM_COMMAND( 
+        ADD_CUSTOM_COMMAND(
             OUTPUT    ${JAR_ARCHIVE}
             COMMAND   ${Java_JAR_EXECUTABLE}
             ARGS      cvf ${JAR_ARCHIVE} ${JAVA_CLASSES} ${EXTRA_CLASSES}
@@ -95,18 +104,20 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
             COMMENT   "Build JAR File"
         )
 
-        ADD_CUSTOM_COMMAND( 
-            OUTPUT    ${JNI_HEADER}
-            COMMAND   ${Java_JAVAH_EXECUTABLE}
-            ARGS      -jni -d native -classpath . org.nexusformat.NexusFile
-            DEPENDS   ${JAR_ARCHIVE}
-            COMMENT   "Build JNI Header"
-        )
+        if(Java_JAVAH_EXECUTABLE)
+            ADD_CUSTOM_COMMAND(
+                OUTPUT    ${JNI_HEADER}
+                COMMAND   ${Java_JAVAH_EXECUTABLE}
+                ARGS      -jni -d native -classpath . org.nexusformat.NexusFile
+                DEPENDS   ${JAR_ARCHIVE}
+                COMMENT   "Build JNI Header"
+          )
+        endif()
 
-        ADD_CUSTOM_COMMAND( 
+        ADD_CUSTOM_COMMAND(
             OUTPUT    ${JAVA_DOCS}
             COMMAND   ${Java_JAVADOC_EXECUTABLE}
-            ARGS      -d ${JAVA_DOCS} -windowtitle jnexus -doctitle jnexus -classpath . 
+            ARGS      -d ${JAVA_DOCS} -windowtitle jnexus -doctitle jnexus -classpath .
                       -sourcepath ${PROJECT_SOURCE_DIR}/bindings/java org.nexusformat ncsa.hdf.hdflib
             DEPENDS   ${JNI_HEADER}
             COMMENT   "Build Javadocs"
@@ -115,15 +126,15 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
         ADD_CUSTOM_TARGET(NexusJavaBuild ALL echo
            DEPENDS   ${JAR_ARCHIVE}
         )
-        
+
         ADD_CUSTOM_TARGET(NexusJavadocBuild ALL echo
            DEPENDS   ${JAVA_DOCS}
         )
 
-        ADD_LIBRARY(jnexus SHARED native/hdfnativeImp.c 
-                     native/hdfexceptionImp.c 
-                     native/handle.c 
-                     native/NexusFile.c 
+        ADD_LIBRARY(jnexus SHARED native/hdfnativeImp.c
+                     native/hdfexceptionImp.c
+                     native/handle.c
+                     native/NexusFile.c
                      native/hdfexceptionImp.h)
 
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -134,7 +145,7 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
                       VERSION 1.0 SOVERSION 4)
 		endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-        TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library 
+        TARGET_LINK_LIBRARIES(jnexus NeXus_Shared_Library
                       ${READLINE_LINK} ${M_LINK} ${DF_LINK}
                       ${DL_LINK} ${PTHREAD_LINK} ${TERMCAP_LINK} ${HDF4_LINK}
                       ${HISTORY_LINK} ${JPEG_LIBRARIES} ${ZIP_LIB} ${SZIP_LIB}
@@ -142,19 +153,17 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
 
         INSTALL(TARGETS jnexus
             RUNTIME DESTINATION bin COMPONENT Runtime
-			LIBRARY DESTINATION lib COMPONENT Runtime 
+			LIBRARY DESTINATION lib COMPONENT Runtime
 			ARCHIVE DESTINATION lib COMPONENT Runtime
         )
 
         INSTALL(FILES ${JAR_ARCHIVE} DESTINATION share/java COMPONENT Runtime)
 
         INSTALL(DIRECTORY ${JAVA_DOCS} DESTINATION ${NXDOCDIR}/java COMPONENT Documentation)
-		
+
 		install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/COPYING.NCSA ${CMAKE_CURRENT_SOURCE_DIR}/README.JNEXUS DESTINATION ${NXDOCDIR}/java COMPONENT Documentation)
 
         INSTALL(FILES ${JAVA_TEST} DESTINATION ${NXEXAMPLEDIR}/ COMPONENT Examples)
 
      endif(DEFINED JNI_INCLUDE_DIRS)
 endif(DEFINED Java_JAVAC_EXECUTABLE)
-
-

@@ -45,8 +45,8 @@ add_custom_target(html)
 #-----------------------------------------------------------------------------
 # setup installation directories
 #
-# This is an OS specific task and we need to take care about the target 
-# architecture. 
+# This is an OS specific task and we need to take care about the target
+# architecture.
 #-----------------------------------------------------------------------------
 if(CMAKE_HOST_UNIX)
     #easy on Unix - just follow the GNU standard
@@ -61,7 +61,7 @@ else()
     set(CMAKE_INSTALL_BINDIR bin)
     set(STATIC_LIBRARY_SUFFIX "Static")
     set(NEXUS_INSTALL_SHLIB ${CMAKE_INSTALL_BINDIR})
-endif() 
+endif()
 
 
 #-----------------------------------------------------------------------------
@@ -116,8 +116,6 @@ include(InstallRequiredSystemLibraries)
 include(FindPkgConfig)
 
 #include(cmake_include/FindCBFLib.cmake)
-#include(cmake_include/FindJava.cmake)
-#include(cmake_include/FindJNI.cmake)
 #include(cmake_include/FindGuile.cmake)
 #include(cmake_include/FindMZScheme.cmake)
 #include(cmake_include/FindIDL.cmake)
@@ -170,7 +168,7 @@ if(ENABLE_HDF5)
     else()
         find_package ( HDF5 REQUIRED )
     endif()
-    
+
     find_package(ZLIB)
 
     # Hide annoying and confusing "HDF5_DIR-NOTFOUND" in CMake-GUI
@@ -195,13 +193,13 @@ message(STATUS "Link with: ${NAPI_LINK_LIBS}")
 #------------------------------------------------------------------------------
 if(ENABLE_FORTRAN90 OR ENABLE_FORTRAN77)
     enable_language(Fortran)
-    
+
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -fbacktrace -pedantic -fcheck=all -Wextra")
     message(STATUS ${CMAKE_Fortran_FLAGS})
 endif()
 
 #-----------------------------------------------------------------------------
-# if contributed programs are built we have to add JPEG as a requirement 
+# if contributed programs are built we have to add JPEG as a requirement
 # for nxextract
 #-----------------------------------------------------------------------------
 if(ENABLE_CONTRIB)
@@ -221,20 +219,12 @@ endif()
 find_package(ZLIB)
 find_package(LibXml2)
 #find_package(LATEX)
-#find_package(PythonInterp)
-
-#Find the java runtime and sdk
-#if(ENABLE_JAVA_BINDINGS)
-#    find_package(Java 1.6)
-#    find_package(JNI)
-#endif()
-
 
 find_library(PTHREAD pthread)
 if(PTHREAD)
    set(PTHREAD_LINK "-lpthread")
 
-   #this fixes an issue on OpenSuse 13.2 where the MXML library is not 
+   #this fixes an issue on OpenSuse 13.2 where the MXML library is not
    #prelinked with threads
    if(WITH_MXML)
        list(APPEND NAPI_LINK_LIBS ${PTHREAD_LINK})
@@ -299,11 +289,11 @@ if(WIN32)
 	    file(GLOB_RECURSE MXML_DLLS "${MXML_LIBRARY_DIRS}/*.dll")
         endif()
 	install(FILES ${HDF4_DLLS} ${HDF5_DLLS} ${MXML_DLLS} DESTINATION bin COMPONENT Runtime)
-	INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT Runtime) 
+	INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT Runtime)
 endif()
 
-file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE) 
-file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE) 
+file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE)
+file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE)
 string(REPLACE "\\" "\\\\" PROJECT_SOURCE_DIR_NATIVE_D ${PROJECT_SOURCE_DIR_NATIVE})
 string(REPLACE "\\" "\\\\" PROJECT_BINARY_DIR_NATIVE_D ${PROJECT_BINARY_DIR_NATIVE})
 
@@ -313,12 +303,12 @@ set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 set (CPACK_SOURCE_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 if(WIN32)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};ZIP;NSIS)
-    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};ZIP) 
+    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};ZIP)
 elseif(APPLE)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};PackageMaker)
 elseif(CYGWIN)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};CygwinBinary)
-    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};CygwinSource) 
+    set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};CygwinSource)
 elseif(UNIX)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
 endif()
