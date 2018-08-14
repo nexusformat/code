@@ -194,7 +194,9 @@ File::~File() {
     NXstatus status = NXclose(&(this->m_file_id));
     this->m_file_id = NULL;
     if (status != NX_OK) {
-      throw Exception("NXclose failed", status);
+      stringstream msg;
+      msg << "NXclose failed with status: " << status << "\n";
+      NXReportError(const_cast<char*>(msg.str().c_str()));
     }
   }
 }
