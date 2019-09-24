@@ -546,7 +546,7 @@ columns.</para></listitem></varlistentry>
 <para>The &mime-type for the XML retriever is
 <parameter>text/xml</parameter>. The XML retriever is built on top of
 libxml2's document object model (DOM) parser. Because of this the
-entire file for information to be retrived from is loaded into memory
+entire file for information to be retrieved from is loaded into memory
 as a character arrays. The DOM API was chosen to allow for jumping
 around the source file without needed to parse its contents multiple
 times. The location string will be formatted according to the

@@ -296,7 +296,7 @@ static void my_startElement(void *user_data, const xmlChar *name,
 
   // confirm that maximum node depth is not exceded
   if(((UserData *)user_data)->mime_types.size()>MAX_NODE_DEPTH)
-    throw runtime_error("Exceded maximum node depth");
+    throw runtime_error("Exceeded maximum node depth");
 
   // create a new retriever if necessary
   RetrieverPtr retriever(NULL);

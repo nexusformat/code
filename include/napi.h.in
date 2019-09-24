@@ -878,7 +878,7 @@ extern  NXstatus  NXgetrawinfo64(NXhandle handle, int* rank, int64_t dimension[]
 
 /** \typedef void (*ErrFunc)(void *data, char *text)
  * All NeXus error reporting happens through this special function, the 
- * ErrFunc. The NeXus-API allows to replace this error reporting function
+ * ErrFunc. The NeXus-API allows this error reporting function to be replaced
  * through a user defined implementation. The default error function prints to stderr. User 
  * defined ones may pop up dialog boxes or whatever.
  * \param data A pointer to some user defined data structure

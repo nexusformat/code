@@ -505,7 +505,7 @@ void File::writeCompData(const string & name, const vector<NumT> & value,
 
 void File::compress(NXcompression comp) {
   stringstream msg;
-  msg << "compress(" << comp << ") is depricated - use makeCompData()";
+  msg << "compress(" << comp << ") is deprecated - use makeCompData()";
   throw Exception(msg.str());
 }
 

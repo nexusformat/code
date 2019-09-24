@@ -23,11 +23,11 @@ DESCRIPTION
 	See http://nile.dl.ac.uk/trac/isis/browser/Software/icat_xsd/icatXSD.xsd 
 	NB: This work is ongoing; the schema hasn't been released yet.   
 	 
-	This tool use the NeXus api so any of the supported format (HDF4, HDF5 
-	and XML) can be read. 
+	This tool use the NeXus api so any of the supported format (HDF4, HDF5
+	and XML) can be read.
 	
-	nxingest can retrive metadata from the neXus file, from the mapping file 
-	(fix parameter). it can also retrive the actual time. 
+	nxingest can retrieve metadata from the neXus file, from the mapping file
+	(fix parameter). it can also retrieve the actual time.
 	
 	If the metadata is a date or time, nxingest may modify it to extract only 
 	part of the data (e.g. the year) or reformat it to have consistant dates 

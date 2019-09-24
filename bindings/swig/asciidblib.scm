@@ -12,8 +12,8 @@
 (define currentRow '())
 
 ;------------------------------------------------------------------------
-; functifyFields creates functions for each field which allows to 
-; retrieve the field value by a (fieldName) syntax. This is useful for
+; functifyFields creates functions for each field which allows
+; retrieval of the field value by a (fieldName) syntax. This is useful for
 ; operator doing computations. The row to be accessed must be put into
 ; currentRow however before this can work.
 (define functifyFields (lambda (header)

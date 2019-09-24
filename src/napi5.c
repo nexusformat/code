@@ -1535,7 +1535,7 @@ static int countObjectsInGroup(hid_t loc_id)
 	status = H5Gget_info(loc_id, &numobj);
 	if (status < 0) {
 		NXReportError
-		    ("Internal error, failed to retrive no of objects");
+		    ("Internal error, failed to retrieve no of objects");
 		return 0;
 	}
 
