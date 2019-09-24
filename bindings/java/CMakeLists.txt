@@ -97,8 +97,8 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JNI_HEADER}
-            COMMAND   ${Java_JAVAH_EXECUTABLE}
-            ARGS      -jni -d native -classpath . org.nexusformat.NexusFile
+            COMMAND   ${Java_JAVAC_EXECUTABLE}
+            ARGS      -h native ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java
             DEPENDS   ${JAR_ARCHIVE}
             COMMENT   "Build JNI Header"
         )
