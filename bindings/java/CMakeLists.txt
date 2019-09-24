@@ -113,7 +113,7 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
         )
 
         ADD_CUSTOM_TARGET(NexusJavaBuild ALL echo
-           DEPENDS   ${JAR_ARCHIVE}
+           DEPENDS   ${JAR_ARCHIVE} ${JNI_HEADER}
         )
         
         ADD_CUSTOM_TARGET(NexusJavadocBuild ALL echo
