@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 		     false);
     ValueArg<string> defValueArg("D", "definition",
 		      "Output definition file used for validating NeXus files. Requires a definition name.",
-			    false, EMPTY, "defintion");
+			    false, EMPTY, "definition");
     vector<string> allowedXml;
     allowedXml.push_back("keepws");
     allowedXml.push_back("table");
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
   }
 
   // tell the user that everything went ok
-  std::cout << "Convertion successful." << std::endl;
+  std::cout << "Conversion successful." << std::endl;
   return 0;
 }
 

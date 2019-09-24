@@ -137,7 +137,7 @@ the signature:
 	void NXIReportError(void *pData, char *errorText);
 }}}
 A NeXus-API user now can replace the default error reporting function through an own implementation with the 
-function NXMSetError. NXMSetError also allows to pass in a pointer to a user defined data structure which is 
+function NXMSetError. NXMSetError also allows one to pass in a pointer to a user defined data structure which is
 passed as pData to the error reporting function.  
 
 = NeXus File Drivers =
@@ -145,7 +145,7 @@ passed as pData to the error reporting function.
 == NeXus HDF File Drivers ==
 The NeXus file drivers for the HDF file formats HDF-4 and HDF-5 share common features. I recall that 
 NeXus uses a hierarchy in order to organize information storage. But both HDF-API's are not tree based 
-but use an interface which allows to open and close groups and datasets. This is sensible as HDF is designed 
+but use an interface which allows one to open and close groups and datasets. This is sensible as HDF is designed
 to support very large data sets which may not necessarily fit into a computers memory in one go. But this also 
 implies that the current position in the hierarchy of a given NeXus file has to be maintained by the NeXus-API.
 Such information is maintained in a stack which is pushed an popped while moving through the hierarchy. This 

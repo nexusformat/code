@@ -1167,7 +1167,7 @@ not known to Nexus (but to HDF) both name and class will be set to
 \end{flushleft}
 \subsubsection{NXgetnextattr}
 NXgetnextattr works very much like NXgetnextentry except, that it works on
-SDS attributes and not on Vgroup entries. This function allows to scan the
+SDS attributes and not on Vgroup entries. This function allows one to scan the
 names of attributes available. iLength will be filled with the length of the
 attributes data in byte. iType will be filled with the HDF type of the
 attribute. Be warned: this routine returns global attributes when no SDS is
@@ -1407,7 +1407,7 @@ stdout. However, there are environments where this strategy is not feasible
 because stdout is supported only in a very  strange way. Think about
 operating system like MS-Windows, MAC-OS (going to die anyway) or other
 windowing systems. In order to cater for this there is an inofficial support
-function which allows to set both a pointer to a datastructure and a new
+function which allows one to set both a pointer to a datastructure and a new
 function for error reporting. This is called NXMSetError.
 
 \begin{flushleft} \small

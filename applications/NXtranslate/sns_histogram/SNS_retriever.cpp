@@ -48,7 +48,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
 
   vector<string> decla_def;           //declaration and definition parts
   vector<string> LocGlobArray; //local and global array (declaration part)
-  vector<string> Ope;                //Operators of the defintion part
+  vector<string> Ope;                //Operators of the definition part
   int OperatorNumber; 
   string DefinitionPart;             //use to determine the operators
   vector<int> GrpPriority;           //Vector of priority of each group
@@ -71,7 +71,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
   
   DeclaDef_separator(new_location, decla_def);  //Separate Declaration part from Definition part -> decla_def
   
-  //check if the defintion part has a valid format
+  //check if the definition part has a valid format
   if (decla_def[1].size() > 0 && decla_def[1].size()<7)
     throw runtime_error("Definition part is not valid");
   
@@ -86,7 +86,7 @@ void SnsHistogramRetriever::getData(const string &location, tree<Node> &tr)
       //Work on definition part
       DefinitionPart = decla_def[1];
       
-      //Parse defintion part, separate Tag from Def
+      //Parse definition part, separate Tag from Def
       TagDef_separator(decla_def[1], Tag, Def, definition_version_with_groups);
       
       //check if we have at least one tag
@@ -171,7 +171,7 @@ string SnsHistogramRetriever::toString() const
  * \para GrpPara (OUTPUT) is the list of operators (loop or list of 
  * identifiers
  * \param record (OUTPUT) is a structure Grp_parameters that contains
- * all the information of the different defintion part
+ * all the information of the different definition part
  */
 void store_para_of_definition(vector<string> Def, 
                               int HowManyDef, 
@@ -212,8 +212,8 @@ void store_para_of_definition(vector<string> Def,
  * of the loop definition; the initial value, the final value and the increment
  *
  * \param def (INPUT) the definition part to parse
- * \param i (INPUT) the index of the defintion part to parse
- * \param GrpPara (OUTPUT) the Grp_parameters structre of the defintion part
+ * \param i (INPUT) the index of the definition part to parse
+ * \param GrpPara (OUTPUT) the Grp_parameters structre of the definition part
  */
 void InitLastIncre (string & def, 
                     int i, 
@@ -345,7 +345,7 @@ void parse_declaration_array(vector<string> & LocGlobArray,
  * \param GlobalArray (INPUT) is the list of parameters of the global 
  * declaration part
  * \param GrpPara (INPUT) is a list of structures of all the parameters of the
- * defintion part
+ * definition part
  */
 void calculate_array (vector<int> & GrpPriority, 
                       vector<int> & InverseDef, 
@@ -524,8 +524,8 @@ int FindMaxPriority (vector<int> & GrpPriority)
  * \param MyGrpArray (INPUT) 
  * \param BinaryArray (INPUT) is the array that comes from the binary file
  * \param grp_number (INPUT) is the group index
- * \param InverseDef (INPUT) allows to check if we want or not the inverse
- * of the defintion 
+ * \param InverseDef (INPUT) allows checking if we want or not the inverse
+ * of the definition
  * \param def (INPUT) is the list of definition
  * \param LocalArray (INPUT) ???not used???
  * \param GlobalArray (INPUT) 
@@ -592,8 +592,8 @@ void MakeArray_pixelID (binary_type * MyGrpArray,
  * \param MyGrpArray (INPUT) 
  * \param BinaryArray (INPUT) is the array that comes from the binary file
  * \param grp_number (INPUT) is the group index
- * \param InverseDef (INPUT) allows to check if we want or not the inverse
- * of the defintion 
+ * \param InverseDef (INPUT) allows checking if we want or not the inverse
+ * of the definition
  * \param def (INPUT) is the list of definition
  * \param LocalArray (INPUT) ???not used???
  * \param GlobalArray (INPUT) 
@@ -658,8 +658,8 @@ void MakeArray_pixelX (binary_type* MyGrpArray,
  * \param MyGrpArray (INPUT) 
  * \param BinaryArray (INPUT) is the array that comes from the binary file
  * \param grp_number (INPUT) is the group index
- * \param InverseDef (INPUT) allows to check if we want or not the inverse
- * of the defintion 
+ * \param InverseDef (INPUT) allows checking if we want or not the inverse
+ * of the definition
  * \param def (INPUT) is the list of definition
  * \param LocalArray (INPUT) ???not used???
  * \param GlobalArray (INPUT) 
@@ -724,8 +724,8 @@ void MakeArray_pixelY (binary_type* MyGrpArray,
  * \param MyGrpArray (INPUT) 
  * \param BinaryArray (INPUT) is the array that comes from the binary file
  * \param grp_number (INPUT) is the group index
- * \param InverseDef (INPUT) allows to check if we want or not the inverse
- * of the defintion 
+ * \param InverseDef (INPUT) allows checking if we want or not the inverse
+ * of the definition
  * \param def (INPUT) is the list of definition
  * \param LocalArray (INPUT) ???not used???
  * \param GlobalArray (INPUT) 

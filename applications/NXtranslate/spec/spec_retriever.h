@@ -4,8 +4,8 @@
 //
 // Project:	 Fable data to NeXus translation
 //
-// Description:	definition of a spec_retriever class. The retriever allows to
-//              read data from SPEC file and store in Nexus file format.
+// Description:	definition of a spec_retriever class. The retriever allows
+//              reading data from SPEC file and store in Nexus file format.
 //		It uses SPEClib for reading SPEC files. It is a plugin of NXtranslate
 //              program. 
 //

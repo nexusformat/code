@@ -4,8 +4,8 @@
 //
 // Project:	 Fable data to NeXus translation
 //
-// Description:	definition of a edf_retriever class. The retriever allows to
-//              read data from EDF file and store in Nexus file format.
+// Description:	definition of a edf_retriever class. The retriever allows
+//              reading data from EDF file and store in Nexus file format.
 //		It is a plugin of NXtranslate program. 
 //
 // Author(s):	Jaroslaw Butanowicz

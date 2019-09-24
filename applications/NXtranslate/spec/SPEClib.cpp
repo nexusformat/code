@@ -477,7 +477,7 @@ bool get_values(ifstream &in, int number, double results[], int scan_number){
     //label position must be greater then zero
     //
     if(number == 0){
-        cout<<"Uncorrect number of label\n";
+        cout<<"Incorrect number of label\n";
         exit(1);
     }
     //
@@ -981,7 +981,7 @@ double get_motor_value(ifstream &in, int noMotor, int noValue, int scan){
     //
     int MAX = m_label_counter(in, noMotor);
     if(noValue>MAX || noValue<1){
-        cout<<"Uncorrect number of value\n";
+        cout<<"Incorrect number of value\n";
         exit(1);
     }
     //
@@ -1263,7 +1263,7 @@ void get_motor_name(ifstream &in, char *motor_name, int motor_group, int motor_p
         exit(1);
     }
     if(motor_position>motors_number || motor_position<1){
-        cout<<" Uncorrect number of label\n";
+        cout<<" Incorrect number of label\n";
         exit(1);
     }    
     //
