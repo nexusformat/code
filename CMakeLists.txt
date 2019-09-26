@@ -321,6 +321,8 @@ elseif(CYGWIN)
     set (CPACK_SOURCE_GENERATOR ${CPACK_SOURCE_GENERATOR};CygwinSource) 
 elseif(UNIX)
     set (CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
+    set (CPACK_DEBIAN_PACKAGE_DEPENDS "libhdf5-103, libhdf5-dev")
+    set (CPACK_RPM_PACKAGE_REQUIRES "hdf5, hdf5-devel")
 endif()
 # Include of CPack must always be last
 include(CPack)
