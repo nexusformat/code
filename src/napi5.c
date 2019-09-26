@@ -440,8 +440,10 @@ NXstatus NX5open(CONSTCHAR * filename, NXaccess am, NXhandle * pHandle)
                 H5Gclose(root_id);
                 H5Fclose(pNew->iFID);
                 free(pNew);
+                free(time_buffer);
                 return NX_ERROR;
             }
+            free(time_buffer);
         }
 
         /*finally we set the NXroot NX_class attribute*/
