@@ -463,8 +463,8 @@ static void my_error(void *user_data, const char* msg, ...){
   va_start(args,msg);
 
   // get the position of the error
-  int line=getLineNumber(context);
-  int col =getColumnNumber(context);
+  int line=xmlSAX2GetLineNumber(context);
+  int col =xmlSAX2GetColumnNumber(context);
 
   // print out the result
   char str[70];
@@ -486,8 +486,8 @@ static void my_fatalError(void *user_data, const char* msg, ...){
   va_start(args,msg);
 
   // get the position of the error
-  int line=getLineNumber(context);
-  int col =getColumnNumber(context);
+  int line=xmlSAX2GetLineNumber(context);
+  int col =xmlSAX2GetColumnNumber(context);
 
   // print out the result
   char str[70];
