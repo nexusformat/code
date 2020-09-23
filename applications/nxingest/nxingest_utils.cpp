@@ -74,9 +74,9 @@ char* mxmlGetItem(mxml_node_t *node, char* str){
 	topNode = node;	
 	
 	strcpy(str, "");
-	while( (node = mxmlWalkNext(node, topNode, MXML_DESCEND)) != NULL  && node->type == MXML_TEXT)
+	while( (node = mxmlWalkNext(node, topNode, MXML_DESCEND)) != NULL  && mxmlGetType(node) == MXML_TEXT)
 	{
-		strcat(str, node->value.text.string);
+		strcat(str, mxmlGetText(node, NULL));
 		strcat(str, " ");
 	}
 	while(strlen(str) > 0 && str[strlen(str)-1] == ' ')
@@ -89,9 +89,9 @@ char* mxmlGetItem(mxml_node_t *node){
 	topNode = node;	
 	while( (node = mxmlWalkNext(node, topNode, MXML_DESCEND)) != NULL )
 	{
-		if(node->type == MXML_TEXT && strlen(node->value.text.string) > 0)
+		if(mxmlGetType(node) == MXML_TEXT && strlen(mxmlGetText(node, NULL)) > 0)
 		{
-			return node->value.text.string; 
+			return strdup(mxmlGetText(node, NULL));
 		}
 	}
 	return 0;

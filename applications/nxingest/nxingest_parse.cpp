@@ -73,27 +73,32 @@ mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t *topNode, mxml_node_t **o
 
 	int type_descent = MXML_DESCEND;		
 	const char 		*type;
+	const char 		*attName;
+	const char 		*attValue;
 		
 	while( (inNode = mxmlWalkNext(inNode, topNode, type_descent)) != NULL )
 	{
 		inNextNode = inNode; // Get the last inNode to pass back to the calling function
-		if(inNode->type == MXML_ELEMENT)
+		if(mxmlGetType(inNode) == MXML_ELEMENT)
 		{
 			type_descent = MXML_DESCEND;
 
 			type = mxmlElementGetAttr(inNode, "type");
 			if(type != 0) 
 			{	
-				log.set("parseXml", "Found element : ", inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+				log.set("parseXml", "Found element : ", mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
 				if(strcmp(type, "tbl") == 0 ) // Simple table.
 				{
-					log.set("parseXml", "Get new table", inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
-					outNextNode = mxmlNewElement(*outNode, inNode->value.element.name );
+					log.set("parseXml", "Get new table", mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
+					outNextNode = mxmlNewElement(*outNode, mxmlGetElement(inNode) );
 					// add the attributes of the input node : 
-					if(inNode->value.element.num_attrs > 1)
-						for(int i = 0; i< inNode->value.element.num_attrs; i++)
-							if(strcmp(inNode->value.element.attrs[i].name, "type") != 0)
-								mxmlElementSetAttr(outNextNode, inNode->value.element.attrs[i].name, inNode->value.element.attrs[i].value);
+					if(mxmlElementGetAttrCount(inNode) > 1)
+						for(int i = 0; i< mxmlElementGetAttrCount(inNode); i++) {
+
+							attValue = mxmlElementGetAttrByIndex(inNode, i, &attName);
+							if(strcmp(attName, "type") != 0)
+								mxmlElementSetAttr(outNextNode, attName, attValue);
+						}
 					inNode = parseXml(inNode, inNode, &outNextNode, nx);
 				} 
 				else if(strcmp(type, "user_tbl") == 0 )	// User table. There may be several user. Need to loop over the different NXusers.
@@ -103,50 +108,52 @@ mxml_node_t *parseXml(mxml_node_t *inNode, mxml_node_t *topNode, mxml_node_t **o
 					do{
 						userInNode = inNode;
 
-						log.set("parseXml", type, "Start", inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
-						outNextNode = mxmlNewElement(*userOutNode, userInNode->value.element.name );
-						if(userInNode->value.element.num_attrs > 1)
-							for(int i = 0; i< userInNode->value.element.num_attrs; i++)
-								if(strcmp(userInNode->value.element.attrs[i].name, "type") != 0)
-									mxmlElementSetAttr(outNextNode, userInNode->value.element.attrs[i].name, userInNode->value.element.attrs[i].value);
+						log.set("parseXml", type, "Start", mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
+						outNextNode = mxmlNewElement(*userOutNode, mxmlGetElement(userInNode) );
+						if(mxmlElementGetAttrCount(userInNode) > 1)
+							for(int i = 0; i< mxmlElementGetAttrCount(userInNode); i++) {
+								attValue = mxmlElementGetAttrByIndex(userInNode, i, &attName);
+								if(strcmp(attName, "type") != 0)
+									mxmlElementSetAttr(outNextNode, attName, attValue);
+							}
 
-						log.set("parseXml", type, "Element added",userInNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+						log.set("parseXml", type, "Element added",mxmlGetElement(userInNode)).printLevel(NXING_LOG_DEBUG);
 						parseXml(userInNode, topNode, &outNextNode, nx);
-						log.set("parseXml", type, "Parsed", inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+						log.set("parseXml", type, "Parsed", mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
 
 					}while(nx.nextUser() != -1); 
 					inNode = mxmlWalkNext(inNode, topNode, MXML_NO_DESCEND); 
 				}
 				else if(strcmp(type, "keyword_tag") == 0 ) // simple Tag record
 				{
-					log.set("parseXml", type, "Read",inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+					log.set("parseXml", type, "Read",mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
 					inNode = readKeyword(inNode, outNode, nx);
 					type_descent = MXML_NO_DESCEND;
 				}
 				else if(strcmp(type, "tag") == 0 ) // simple Tag record
 				{
-					log.set("parseXml", type, "Read",inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+					log.set("parseXml", type, "Read",mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
 					inNode = readRecord(inNode, outNode, nx);
 					type_descent = MXML_NO_DESCEND;
 				}
 				else if(strcmp(type, "param_str") == 0 ) // Parameter with a string value
 				{
-					log.set("parseXml", type, "Read", inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+					log.set("parseXml", type, "Read", mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
 					inNode = readParam(inNode, outNode, nx, STR);
 					type_descent = MXML_NO_DESCEND;
 				}
 				else if(strcmp(type, "param_num") == 0 ) // Parameter with a numeric value
 				{
-					log.set("parseXml", type, "Read",inNode->value.element.name).printLevel(NXING_LOG_DEBUG);
+					log.set("parseXml", type, "Read",mxmlGetElement(inNode)).printLevel(NXING_LOG_DEBUG);
 					inNode = readParam(inNode, outNode, nx, NUM);
 					type_descent = MXML_NO_DESCEND;
 
 				}
 			}
 		}
-		if(inNode->type == MXML_TEXT && strlen(inNode->value.text.string) > 0)
+		if(mxmlGetType(inNode) == MXML_TEXT && strlen(mxmlGetText(inNode, NULL)) > 0)
 		{
-			log.set("parseXml", "Unexpected text (may be comments)", inNode->value.text.string).printLevel(NXING_LOG_DEBUG);
+			log.set("parseXml", "Unexpected text (may be comments)", mxmlGetText(inNode, NULL)).printLevel(NXING_LOG_DEBUG);
 		}
 	}
 	return (inNextNode);
@@ -174,15 +181,15 @@ mxml_node_t * readRecord(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx)
 	// 
 	while( (inNode = mxmlWalkNext(inNode, topNode, MXML_DESCEND)) != NULL )
 	{
-		if(inNode->type == MXML_ELEMENT)
+		if(mxmlGetType(inNode) == MXML_ELEMENT)
 		{
-			if(strcmp(inNode->value.element.name, "icat_name") == 0) 
+			if(strcmp(mxmlGetElement(inNode), "icat_name") == 0)
 			{				
 				log.set("readRecord", "ICAT name",mxmlGetItem(inNode, name)).printLevel(NXING_LOG_DEBUG);
 				mxmlGetItem(inNode, name);
 				log.set("readRecord", "ICAT name",name).printLevel(NXING_LOG_DEBUG);
 			} 
-			else if(strcmp(inNode->value.element.name, "value") == 0) 
+			else if(strcmp(mxmlGetElement(inNode), "value") == 0)
 			{
 				getValue(inNode, nx, value);
 			}
@@ -209,19 +216,19 @@ mxml_node_t * readKeyword(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx
 	char keys[] = " ,;";
 
 	// 
-	strcpy(keywordStr , inNode->value.element.name);
+	strcpy(keywordStr , mxmlGetElement(inNode));
 	
 	while( (inNode = mxmlWalkNext(inNode, topNode, MXML_DESCEND)) != NULL )
 	{
-		if(inNode->type == MXML_ELEMENT)
+		if(mxmlGetType(inNode) == MXML_ELEMENT)
 		{
-			if(strcmp(inNode->value.element.name, "icat_name") == 0) 
+			if(strcmp(mxmlGetElement(inNode), "icat_name") == 0)
 			{				
 				log.set("readRecord", "ICAT name",mxmlGetItem(inNode, name)).printLevel(NXING_LOG_DEBUG);
 				mxmlGetItem(inNode, name);
 				log.set("readRecord", "ICAT name",name).printLevel(NXING_LOG_DEBUG);
 			} 
-			else if(strcmp(inNode->value.element.name, "value") == 0) 
+			else if(strcmp(mxmlGetElement(inNode), "value") == 0)
 			{
 				getValue(inNode, nx, value);
 			}
@@ -289,29 +296,29 @@ mxml_node_t * readParam(mxml_node_t *inNode, mxml_node_t **outNode, NxClass nx, 
 	
 	while( (inNode = mxmlWalkNext(inNode, topNode, MXML_DESCEND)) != NULL )
 	{
-		if(inNode->type == MXML_ELEMENT)
+		if(mxmlGetType(inNode) == MXML_ELEMENT)
 		{
-			if(strcmp(inNode->value.element.name, "icat_name") == 0) 
+			if(strcmp(mxmlGetElement(inNode), "icat_name") == 0)
 			{				
 				log.set("readParam", "ICAT name", mxmlGetItem(inNode, str)).printLevel(NXING_LOG_DEBUG);
 				buff = mxmlGetItem(inNode, str);					
 				if(buff != 0) name = buff;
 				else name = "";			} 
-			else if(strcmp(inNode->value.element.name, "value") == 0) 
+			else if(strcmp(mxmlGetElement(inNode), "value") == 0)
 			{
 				log.set("readParam", "Value ", mxmlGetItem(inNode, str)).printLevel(NXING_LOG_DEBUG);
 				buff = getValue(inNode, nx, str);
 				if(buff != 0) value = buff;
 				else value = "";
 			}
-			else if(strcmp(inNode->value.element.name, "units") == 0) 
+			else if(strcmp(mxmlGetElement(inNode), "units") == 0)
 			{
 				log.set("readParam", "Units", mxmlGetItem(inNode, str)).printLevel(NXING_LOG_DEBUG);
 				buff = getValue(inNode, nx, str);
 				if(buff != 0) units = buff;
 				else units = "";
 			} 
-			else if(strcmp(inNode->value.element.name, "description") == 0) 
+			else if(strcmp(mxmlGetElement(inNode), "description") == 0)
 			{
 				log.set("readParam", "Description", mxmlGetItem(inNode, str)).printLevel(NXING_LOG_DEBUG);
 				buff = getValue(inNode, nx, str);
