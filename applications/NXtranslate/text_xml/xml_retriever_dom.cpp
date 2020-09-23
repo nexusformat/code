@@ -1,4 +1,6 @@
 #include <iostream>
+#define LIBXML_LEGACY_ENABLED
+#include <libxml/SAX.h>
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
 #include <stdexcept>
