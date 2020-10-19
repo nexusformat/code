@@ -224,10 +224,10 @@ find_package(LibXml2)
 #find_package(PythonInterp)
 
 #Find the java runtime and sdk
-#if(ENABLE_JAVA_BINDINGS)
-#    find_package(Java 1.6)
-#    find_package(JNI)
-#endif()
+if(ENABLE_JAVA)
+    find_package(Java 1.6)
+    find_package(JNI)
+endif()
 
 
 find_library(PTHREAD pthread)

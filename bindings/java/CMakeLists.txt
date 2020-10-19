@@ -50,20 +50,20 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
              ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java 
              ${JAVA_TEST})
 
-         SET(JAVA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFJavaException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNotImplementedException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFConstants.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFArray.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/HDFNativeData.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusException.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NXlink.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NeXusFileInterface.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/AttributeEntry.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/org/nexusformat/NexusFile.class 
-             ${PROJECT_BINARY_DIR}/bindings/java/TestJapi.class)
+         SET(JAVA_CLASSES ncsa/hdf/hdflib/HDFException.class
+             ncsa/hdf/hdflib/HDFJavaException.class
+             ncsa/hdf/hdflib/HDFNotImplementedException.class
+             ncsa/hdf/hdflib/HDFConstants.class
+             ncsa/hdf/hdflib/HDFArray.class
+             ncsa/hdf/hdflib/HDFNativeData.class
+             org/nexusformat/NexusException.class
+             org/nexusformat/NXlink.class
+             org/nexusformat/NeXusFileInterface.class
+             org/nexusformat/AttributeEntry.class
+             org/nexusformat/NexusFile.class
+             TestJapi.class)
 
-        SET(EXTRA_CLASSES ${PROJECT_BINARY_DIR}/bindings/java/ncsa/hdf/hdflib/ArrayDescriptor.class)
+        SET(EXTRA_CLASSES ncsa/hdf/hdflib/ArrayDescriptor.class)
 
         SET(JNI_HEADER native/org_nexusformat_NexusFile.h)
 
@@ -90,15 +90,15 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JAR_ARCHIVE}
             COMMAND   ${Java_JAR_EXECUTABLE}
-            ARGS      cvf ${JAR_ARCHIVE} ${JAVA_CLASSES} ${EXTRA_CLASSES}
+            ARGS      cvf ${JAR_ARCHIVE} -C ${PROJECT_BINARY_DIR}/bindings/java/ ${JAVA_CLASSES} ${EXTRA_CLASSES}
             DEPENDS   ${EXTRA_CLASSES}
             COMMENT   "Build JAR File"
         )
 
         ADD_CUSTOM_COMMAND( 
             OUTPUT    ${JNI_HEADER}
-            COMMAND   ${Java_JAVAH_EXECUTABLE}
-            ARGS      -jni -d native -classpath . org.nexusformat.NexusFile
+            COMMAND   ${Java_JAVAC_EXECUTABLE}
+            ARGS      -h native ${PROJECT_SOURCE_DIR}/bindings/java/org/nexusformat/NexusFile.java
             DEPENDS   ${JAR_ARCHIVE}
             COMMENT   "Build JNI Header"
         )
@@ -113,7 +113,7 @@ if(DEFINED Java_JAVAC_EXECUTABLE)
         )
 
         ADD_CUSTOM_TARGET(NexusJavaBuild ALL echo
-           DEPENDS   ${JAR_ARCHIVE}
+           DEPENDS   ${JAR_ARCHIVE} ${JNI_HEADER}
         )
         
         ADD_CUSTOM_TARGET(NexusJavadocBuild ALL echo
