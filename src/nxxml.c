@@ -305,7 +305,7 @@ static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name,
     linkTarget = mxmlElementGetAttr(linkNode,"target");
     test = getLinkTarget(xmlHandle,linkTarget);
     if(test != NULL){
-      if(strcmp(test->value.element.name,nxclass) == 0){
+      if(strcmp(mxmlGetElement(test),nxclass) == 0){
 	if(strcmp(mxmlElementGetAttr(test,"name"),name) == 0){
 	  return test;
 	}
@@ -316,7 +316,7 @@ static mxml_node_t *searchGroupLinks(pXMLNexus xmlHandle, CONSTCHAR *name,
     */
     linkName = mxmlElementGetAttr(linkNode,"name");
     if(test != NULL && linkName != NULL){
-      if(strcmp(test->value.element.name,nxclass) == 0){
+      if(strcmp(mxmlGetElement(test),nxclass) == 0){
 	if(strcmp(linkName, name) == 0){
 	  return test;
 	}
@@ -437,6 +437,7 @@ NXstatus  NXXmakedatatable64 (NXhandle fid,
   int i, ndata; 
   char buffer[256];
   static int64_t one = 1;
+  void *contents = NULL;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -486,21 +487,16 @@ NXstatus  NXXmakedatatable64 (NXhandle fid,
           dataNodeRoot = mxmlNewElement(current, DATA_NODE_NAME);
       }
       dataNode = mxmlNewElement(dataNodeRoot,name);
-      newData = (mxml_node_t *)malloc(sizeof(mxml_node_t));
+      contents = createNXDataset(1,datatype,&one);
+      if(!contents){
+        NXReportError("Failed to allocate space for dataset");
+        return NX_ERROR;
+      }
+      newData = mxmlNewCustom(dataNode,contents,destroyDataset);
       if(!newData){
-        NXReportError("Failed to allocate space for dataset");
+        NXReportError("Failed to allocate XML node for dataset");
         return NX_ERROR;
       }
-      memset(newData,0,sizeof(mxml_node_t));
-      mxmlAdd(dataNode, MXML_ADD_AFTER, MXML_ADD_TO_PARENT, newData);
-      newData->type = MXML_CUSTOM;
-/*        newData->value.custom.data = createNXDataset(rank,datatype,dimensions); */
-      newData->value.custom.data = createNXDataset(1,datatype,&one);
-      if(!newData->value.custom.data){
-        NXReportError("Failed to allocate space for dataset");
-        return NX_ERROR;
-      }
-      newData->value.custom.destroy = destroyDataset;
   }
   return NX_OK;
 }
@@ -514,6 +510,7 @@ NXstatus  NXXmakedata64 (NXhandle fid,
   mxml_node_t *current;
   char *typestring;
   char buffer[256];
+  void *contents;
 
 
   xmlHandle = (pXMLNexus)fid;
@@ -555,20 +552,16 @@ NXstatus  NXXmakedata64 (NXhandle fid,
     newData = mxmlNewOpaque(dataNode,"");
     return NX_OK;
   } else {
-    newData = (mxml_node_t *)malloc(sizeof(mxml_node_t));
+    contents = createNXDataset(rank,datatype,dimensions);
+    if(!contents){
+      NXReportError("Failed to allocate space for dataset");
+      return NX_ERROR;
+    }
+    newData = mxmlNewCustom(dataNode,contents,destroyDataset);
     if(!newData){
-      NXReportError("Failed to allocate space for dataset");
+      NXReportError("Failed to allocate XML node for dataset");
       return NX_ERROR;
     }
-    memset(newData,0,sizeof(mxml_node_t));
-    mxmlAdd(dataNode, MXML_ADD_AFTER, MXML_ADD_TO_PARENT, newData);
-    newData->type = MXML_CUSTOM;
-    newData->value.custom.data = createNXDataset(rank,datatype,dimensions);
-    if(!newData->value.custom.data){
-      NXReportError("Failed to allocate space for dataset");
-      return NX_ERROR;
-    }
-    newData->value.custom.destroy = destroyDataset;
   }
   return NX_OK;
 }
@@ -587,7 +580,7 @@ static mxml_node_t *searchSDSLinks(pXMLNexus xmlHandle, CONSTCHAR *name){
     linkTarget = mxmlElementGetAttr(linkNode,"target");
     test = getLinkTarget(xmlHandle,linkTarget);
     if(test != NULL){
-      if(strcmp(test->value.element.name,name) == 0){
+      if(strcmp(mxmlGetElement(test),name) == 0){
 	return test;
       }
     }
@@ -741,7 +734,7 @@ static mxml_node_t *findData(mxml_node_t *node){
   mxml_node_t *baby = node;
   
   while( (baby = mxmlWalkNext(baby,node,MXML_DESCEND_FIRST)) != NULL){
-    if(baby->type == MXML_OPAQUE || baby->type == MXML_CUSTOM){
+    if(mxmlGetType(baby) == MXML_OPAQUE || mxmlGetType(baby) == MXML_CUSTOM){
       return baby;
     }
   }
@@ -763,9 +756,9 @@ NXstatus  NXXputdatatable (NXhandle fid, const void *data){
   assert(xmlHandle);
   /* current points at the Idims node as done in NXXopendatatable */
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
-  name = current->value.element.name;
+  name = mxmlGetElement(current);
   /* we want to walk all Idata nodes and set name */
-  nodeRoot =  current->parent->parent;
+  nodeRoot =  mxmlGetParent(mxmlGetParent(current));
   dataNodeRoot = nodeRoot;
   offset = 0;
   for(i=0; dataNodeRoot != NULL; i++)
@@ -778,7 +771,7 @@ NXstatus  NXXputdatatable (NXhandle fid, const void *data){
 	{
 	    userData = findData(dataNode);
   	    assert(userData != NULL);
-            dataset = (pNXDS)userData->value.custom.data;
+            dataset = (pNXDS)mxmlGetCustom(userData);
             assert(dataset);
             length = getNXDatasetByteLength(dataset);
             memcpy(dataset->u.ptr,(char*)data + offset,length);
@@ -815,7 +808,7 @@ NXstatus  NXXputdata (NXhandle fid, const void *data){
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   userData = findData(current);
   assert(userData != NULL);
-  if(userData->type == MXML_OPAQUE){
+  if(mxmlGetType(userData) == MXML_OPAQUE){
     /*
       Text data. We have to make sure that the text is \0 terminated. 
       Some language bindings do not ensure that this is the case.
@@ -848,7 +841,7 @@ NXstatus  NXXputdata (NXhandle fid, const void *data){
         return NX_ERROR;
     }
   } else {
-    dataset = (pNXDS)userData->value.custom.data;
+    dataset = (pNXDS)mxmlGetCustom(userData);
     assert(dataset);
     length = getNXDatasetByteLength(dataset);
     memcpy(dataset->u.ptr,data,length);
@@ -871,9 +864,9 @@ NXstatus  NXXgetdatatable (NXhandle fid, void *data){
 
   /* current points at the Idims node as done in NXXopendatatable */
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
-  name = current->value.element.name;
+  name = mxmlGetElement(current);
   /* we want to walk all Idata nodes and set name */
-  nodeRoot =  current->parent->parent;
+  nodeRoot =  mxmlGetParent(mxmlGetParent(current));
   dataNodeRoot = nodeRoot;
   offset = 0;
   for(i=0; dataNodeRoot != NULL; i++)
@@ -886,7 +879,7 @@ NXstatus  NXXgetdatatable (NXhandle fid, void *data){
 	{
 	    userData = findData(dataNode);
   	    assert(userData != NULL);
-            dataset = (pNXDS)userData->value.custom.data;
+            dataset = (pNXDS)mxmlGetCustom(userData);
             assert(dataset);
             length = getNXDatasetByteLength(dataset);
             memcpy((char*)data + offset, dataset->u.ptr, length);
@@ -923,7 +916,7 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   userData = findData(current);
   assert(userData != NULL);
-  if(userData->type == MXML_OPAQUE){
+  if(mxmlGetType(userData) == MXML_OPAQUE){
     /*
       text data
     */
@@ -933,13 +926,13 @@ NXstatus  NXXgetdata (NXhandle fid, void *data){
       {
           length *= dim[i];
       }
-      strncpy((char *)data,userData->value.opaque,length);
+      strncpy((char *)data,mxmlGetOpaque(userData),length);
     } else {
-      strcpy((char *)data,nxitrim(userData->value.opaque));
+      strcpy((char *)data,nxitrim(mxmlGetOpaque(userData)));
     }
 
   } else {
-    dataset = (pNXDS)userData->value.custom.data;
+    dataset = (pNXDS)mxmlGetCustom(userData);
     assert(dataset);
     length = getNXDatasetByteLength(dataset);
     memcpy(data,dataset->u.ptr,length);
@@ -967,7 +960,7 @@ NXstatus  NXXgetinfo64 (NXhandle fid, int *rank,
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   userData = findData(current);
   assert(userData != NULL);
-  if(userData->type == MXML_OPAQUE){
+  if(mxmlGetType(userData) == MXML_OPAQUE){
     /*
       text data
     */
@@ -975,18 +968,18 @@ NXstatus  NXXgetinfo64 (NXhandle fid, int *rank,
     if(attr == NULL){
       *rank = 1;
       *iType = NX_CHAR;
-      dimension[0]= strlen(userData->value.opaque);
+      dimension[0]= strlen(mxmlGetOpaque(userData));
     } else {
       *iType = translateTypeCode(attr, "");
       analyzeDim(attr,rank,dimension,iType);
       if (dimension[0] == -1) /* 1D strings are NX_CHAR not NX_CHAR[] so length will not be correct */
       {
-        dimension[0] = strlen(userData->value.opaque);
+        dimension[0] = strlen(mxmlGetOpaque(userData));
       }
       
     }
   } else { 
-    dataset = (pNXDS)userData->value.custom.data;
+    dataset = (pNXDS)mxmlGetCustom(userData);
     assert(dataset);
     myRank = getNXDatasetRank(dataset);
     *rank = myRank;
@@ -1111,11 +1104,11 @@ NXstatus  NXXputslab64 (NXhandle fid, const void *data,
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   userData = findData(current);
   assert(userData != NULL);
-  if(userData->type == MXML_OPAQUE){
+  if(mxmlGetType(userData) == MXML_OPAQUE){
     NXReportError("This API does not support slabs on text data");
     return NX_ERROR;
   }
-  dataset = (pNXDS)userData->value.custom.data;
+  dataset = (pNXDS)mxmlGetCustom(userData);
   assert(dataset);
 
   status = checkAndExtendDataset(current,dataset,iStart,iSize);
@@ -1183,11 +1176,11 @@ NXstatus  NXXgetslab64 (NXhandle fid, void *data,
   current = xmlHandle->stack[xmlHandle->stackPointer].current;
   userData = findData(current);
   assert(userData != NULL);
-  if(userData->type == MXML_OPAQUE){
+  if(mxmlGetType(userData) == MXML_OPAQUE){
     NXReportError("This API does not support slabs on text data");
     return NX_ERROR;
   }
-  dataset = (pNXDS)userData->value.custom.data;
+  dataset = (pNXDS)mxmlGetCustom(userData);
   assert(dataset);
   slabData = makeSlabData(dataset, data, iSize);
   if(slabData == NULL){
@@ -1215,10 +1208,10 @@ static NXstatus  NXXsetnumberformat(NXhandle fid,
     current = xmlHandle->stack[xmlHandle->stackPointer].current;
     userData = findData(current);
     assert(userData != NULL);
-    if(userData->type == MXML_OPAQUE){
+    if(mxmlGetType(userData) == MXML_OPAQUE){
       return NX_OK;
     }
-    dataset = (pNXDS)userData->value.custom.data;
+    dataset = (pNXDS)mxmlGetCustom(userData);
     assert(dataset);
     if(dataset->format != NULL){
       free(dataset->format);
@@ -1440,9 +1433,9 @@ static mxml_node_t* find_node(mxml_node_t* node, int next)
    {
 	return NULL;
    }
-   if ( (node->parent != NULL)  && !strcmp(node->parent->value.element.name, DIMS_NODE_NAME) )
+   if ( (mxmlGetParent(node) != NULL)  && !strcmp(mxmlGetElement(mxmlGetParent(node)), DIMS_NODE_NAME) )
    {
-	parent_next = node->parent->next;
+	parent_next = mxmlGetNextSibling(mxmlGetParent(node));
    }
    else
    {
@@ -1450,9 +1443,9 @@ static mxml_node_t* find_node(mxml_node_t* node, int next)
    }
    if (next)
    {
-       if (node->next != NULL)
+       if (mxmlGetNextSibling(node) != NULL)
        {
-	    node = node->next;
+	    node = mxmlGetNextSibling(node);
        }
        else
        {
@@ -1461,19 +1454,19 @@ static mxml_node_t* find_node(mxml_node_t* node, int next)
    }
    while(node != NULL && !done)
    {
-     if ( (node->parent != NULL)  && !strcmp(node->parent->value.element.name, DIMS_NODE_NAME) )
+     if ( (mxmlGetParent(node) != NULL)  && !strcmp(mxmlGetElement(mxmlGetParent(node)), DIMS_NODE_NAME) )
      {
-	parent_next = node->parent->next;
+	parent_next = mxmlGetNextSibling(mxmlGetParent(node));
      }
      else
      {
         parent_next = NULL;
      }
-     if ( (node->type != MXML_ELEMENT) || !strcmp(node->value.element.name, DATA_NODE_NAME) )
+     if ( (mxmlGetType(node) != MXML_ELEMENT) || !strcmp(mxmlGetElement(node), DATA_NODE_NAME) )
      {
-	if (node->next != NULL)
+	if (mxmlGetNextSibling(node) != NULL)
 	{
-	    node = node->next;
+	    node = mxmlGetNextSibling(node);
 	}
 	else
 	{
@@ -1481,9 +1474,9 @@ static mxml_node_t* find_node(mxml_node_t* node, int next)
 	}
 	continue;
      }
-     if (!strcmp(node->value.element.name, DIMS_NODE_NAME))
+     if (!strcmp(mxmlGetElement(node), DIMS_NODE_NAME))
      {
-	node = node->child;
+	node = mxmlGetFirstChild(node);
 	continue;
      }
      done = 1;
@@ -1517,7 +1510,7 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
     /*
       initialization of search
     */
-      node = find_node(xmlHandle->stack[stackPtr].current->child, 0);
+      node = find_node(mxmlGetFirstChild(xmlHandle->stack[stackPtr].current), 0);
   } else {
     /*
       proceed
@@ -1529,7 +1522,7 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
   if(next == NULL){
     return NX_EOD;
   }
-  if(strcmp(next->value.element.name,"NAPIlink") == 0){
+  if(strcmp(mxmlGetElement(next),"NAPIlink") == 0){
     target = mxmlElementGetAttr(next,"target");
     linkName = mxmlElementGetAttr(next,"name");
     if(target == NULL){
@@ -1544,7 +1537,7 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
   }
 
   if(isDataNode(next)){
-    strcpy(name,next->value.element.name);
+    strcpy(name,mxmlGetElement(next));
     strcpy(nxclass,"SDS");
     userData = findData(next);
     if(userData == NULL){
@@ -1553,15 +1546,15 @@ NXstatus  NXXgetnextentry (NXhandle fid,NXname name,
       NXReportError(pBueffel);
       return NX_ERROR;
     }
-    if(userData->type == MXML_OPAQUE){
+    if(mxmlGetType(userData) == MXML_OPAQUE){
       *datatype = NX_CHAR;
     } else {
-      dataset = (pNXDS)userData->value.custom.data;
+      dataset = (pNXDS)mxmlGetCustom(userData);
       assert(dataset);
       *datatype = getNXDatasetType(dataset);
     }
   } else {
-    strcpy(nxclass,next->value.element.name);
+    strcpy(nxclass,mxmlGetElement(next));
     attname = mxmlElementGetAttr(next,"name");
     strcpy(name,attname);
   }
@@ -1596,7 +1589,8 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
   pXMLNexus xmlHandle = NULL;
   mxml_node_t *current = NULL;
   int stackPtr, currentAtt, nx_type;
-  char *attVal; 
+  const char *attName;
+  const char *attVal;
 
   xmlHandle = (pXMLNexus)fid;
   assert(xmlHandle);
@@ -1605,17 +1599,31 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
 
   current = xmlHandle->stack[stackPtr].current;
   currentAtt = xmlHandle->stack[stackPtr].currentAttribute;
+
+#if MXML_MAJOR_VERSION == 3
+  if(currentAtt >= mxmlElementGetAttrCount(current)){
+    xmlHandle->stack[stackPtr].currentAttribute = 0;
+    return NX_EOD;
+  }
+#else
   if(currentAtt >= 
      current->value.element.num_attrs ){
     xmlHandle->stack[stackPtr].currentAttribute = 0;
     return NX_EOD;
   }
+#endif 
 
   /*
     hide group name attribute
   */
-  if(strcmp(current->value.element.attrs[currentAtt].name,"name") == 0
-     && !isDataNode(current) ){
+#if MXML_MAJOR_VERSION == 3
+  attVal = mxmlElementGetAttrByIndex(current,currentAtt,&attName);
+#else 
+  attName = current->value.element.attrs[currentAtt].name;
+  attVal = current->value.element.attrs[currentAtt].value;
+#endif
+
+  if(strcmp(attName,"name") == 0 && !isDataNode(current) ){
     xmlHandle->stack[stackPtr].currentAttribute++;
     return NXXgetnextattr(fid,pName,iLength,iType);
   }
@@ -1623,14 +1631,12 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
   /*
     hide type attribute
   */
-  if(strcmp(current->value.element.attrs[currentAtt].name,TYPENAME) == 0
-     && isDataNode(current)){
+  if(strcmp(attName,TYPENAME) == 0 && isDataNode(current)){
     xmlHandle->stack[stackPtr].currentAttribute++;
     return NXXgetnextattr(fid,pName,iLength,iType);
   }
 
-  strcpy(pName,current->value.element.attrs[currentAtt].name);
-  attVal = current->value.element.attrs[currentAtt].value;
+  strcpy(pName,attName);
   nx_type = translateTypeCode((char *)attVal, ":");
   if(nx_type < 0 || strcmp(pName,TYPENAME) == 0){
     /*
@@ -1680,37 +1686,37 @@ NXstatus  NXXgetgroupinfo (NXhandle fid, int *iN,
   if(nameAtt !=  NULL){
     strcpy(pName,nameAtt);
   }
-  strcpy(pClass,current->value.element.name);
+  strcpy(pClass,mxmlGetElement(current));
 
 /* count all child nodes, but need to ignore DATA_NODE_NAME and
  * descend into DIMS_NODE_NAME 
  */
   childCount = 0;
-  node = current->child;
+  node = mxmlGetFirstChild(current);
   while(node != NULL)
   {
-	if (!strcmp(node->value.element.name, DATA_NODE_NAME))
+	if (!strcmp(mxmlGetElement(node), DATA_NODE_NAME))
 	{
 	    ;	/* names also exist in DIMS_NODE_NAME so do nothing here */
 	}
-	else if (!strcmp(node->value.element.name, DIMS_NODE_NAME))
+	else if (!strcmp(mxmlGetElement(node), DIMS_NODE_NAME))
 	{
-	    child = node->child;
+	    child = mxmlGetFirstChild(node);
 	    while(child != NULL)
 	    {
 		/* not sure why this check is needed, but you double count otherwise */
-		if (child->type == MXML_ELEMENT) 
+		if (mxmlGetType(child) == MXML_ELEMENT)
 		{
 		    childCount++;
 		}
-		child = child->next;
+		child = mxmlGetNextSibling(child);
 	    }
 	}
 	else
 	{
     	    childCount++;
 	}
-	node = node->next;
+	node = mxmlGetNextSibling(node);
   }
   *iN = childCount;
   return NX_OK;
@@ -1739,7 +1745,11 @@ NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
     /* group nodes (except root) have name */
     if(mxmlElementGetAttr(current,"name") != NULL) skip=1;
   }
+#if MXML_MAJOR_VERSION == 3
+  *iN = mxmlElementGetAttrCount(current) - skip;
+#else
   *iN = current->value.element.num_attrs - skip;
+#endif
   return NX_OK;
 }
 /*================= Linking functions =================================*/
@@ -1749,7 +1759,7 @@ static int countPathChars(mxml_node_t *path[], int stackPtr){
 
   while(stackPtr >= 0) {
     if(isDataNode(path[stackPtr])){
-      count += strlen(path[stackPtr]->value.element.name);
+      count += strlen(mxmlGetElement(path[stackPtr]));
     } else {
       name = mxmlElementGetAttr(path[stackPtr],"name");
       if(name != NULL){
@@ -1777,7 +1787,7 @@ static char *buildPathString(mxml_node_t *path[], int stackPtr){
   while(stackPtr >= 0) {
     if(isDataNode(path[stackPtr])){
       strcat(pathString,"/");
-      strcat(pathString,path[stackPtr]->value.element.name);
+      strcat(pathString,mxmlGetElement(path[stackPtr]));
     } else {
       name = mxmlElementGetAttr(path[stackPtr],"name");
       if(name != NULL){
@@ -1809,10 +1819,10 @@ static char *findLinkPath(mxml_node_t *node){
   current = node;
   stackPtr = 0;
   while(current != NULL && 
-	strcmp(current->value.element.name,"NXroot") != 0){
+	strcmp(mxmlGetElement(current),"NXroot") != 0){
     path[stackPtr] = current;
     stackPtr++;
-    current = current->parent;
+    current = mxmlGetParent(current);
   }
   stackPtr--;
 

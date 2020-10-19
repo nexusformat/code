@@ -1,0 +1,14 @@
+# Docker file for an ubuntu image for testing NAPI with an up-to-date distro
+FROM ubuntu:20.04
+
+RUN apt update && apt-get install -y \
+    gcc \
+    g++ \
+    gfortran \
+    libhdf5-dev \
+    libmxml-dev \
+    cmake \
+    default-jdk 
+
+
+CMD /bin/bash

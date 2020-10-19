@@ -51,10 +51,12 @@ if(WITH_HDF5)
     add_executable(napi_test_hdf5 napi_test.c)
     target_link_libraries(napi_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-test" COMMAND  napi_test_hdf5)
-    
+    set_property(TEST "NAPI-C-HDF5-test" APPEND PROPERTY RUN_SERIAL TRUE)
+
     add_executable(napi_attra_test_hdf5 napi_attra_test.c)
     target_link_libraries(napi_attra_test_hdf5 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF5-attra-test" COMMAND  napi_attra_test_hdf5)
+    set_property(TEST "NAPI-C-HDF5-attra-test" APPEND PROPERTY RUN_SERIAL TRUE)
 
     if (WIN32)
       set_property(TEST "NAPI-C-HDF5-test" "NAPI-C-HDF5-attra-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
@@ -66,11 +68,13 @@ if(WITH_HDF4)
     target_link_libraries(napi_test_hdf4 NeXus_Shared_Library)
     add_test(NAME "NAPI-C-HDF4-test"
              COMMAND  napi_test_hdf4)
-             
+    set_property(TEST "NAPI-C-HDF4-test" APPEND PROPERTY RUN_SERIAL TRUE)
+
     add_executable(napi_attra_test_hdf4 napi_attra_test.c)
     target_link_libraries(napi_attra_test_hdf4 NeXus_Shared_Library) 
     add_test(NAME "NAPI-C-HDF4-attra-test" COMMAND  napi_attra_test_hdf4)
     set_tests_properties("NAPI-C-HDF4-attra-test" PROPERTIES WILL_FAIL TRUE)
+    set_property(TEST "NAPI-C-HDF4-attra-test" APPEND PROPERTY RUN_SERIAL TRUE)
 
     if (WIN32)
       set_property(TEST "NAPI-C-HDF4-test" "NAPI-C-HDF4-attra-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
@@ -82,16 +86,19 @@ if(WITH_MXML)
     target_link_libraries(napi_test-xml NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-test"
              COMMAND  napi_test-xml)
-             
+    set_property(TEST "NAPI-C-MXML-test" APPEND PROPERTY RUN_SERIAL TRUE)
+
     add_executable(napi_test-xml-table napi_test.c)
     target_link_libraries(napi_test-xml-table NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-TABLE-test"
              COMMAND  napi_test-xml-table)
-             
+    set_property(TEST "NAPI-C-MXML-TABLE-test" APPEND PROPERTY RUN_SERIAL TRUE)
+
     add_executable(napi_attra_test_xml napi_attra_test.c)
     target_link_libraries(napi_attra_test_xml NeXus_Shared_Library)
     add_test(NAME "NAPI-C-MXML-attra-test" COMMAND napi_attra_test_xml)
     set_tests_properties("NAPI-C-MXML-attra-test" PROPERTIES WILL_FAIL TRUE)
+    set_property(TEST "NAPI-C-MXML-attra-test" APPEND PROPERTY RUN_SERIAL TRUE)
 
     if (WIN32)
       set_property(TEST "NAPI-C-MXML-test" "NAPI-C-MXML-TABLE-test" "NAPI-C-MXML-attra-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
@@ -105,6 +112,7 @@ add_executable(leak_test1 leak_test1.c)
 target_link_libraries(leak_test1 NeXus_Shared_Library)
 add_test(NAME "NAPI-C-leak-test-1"
          COMMAND  leak_test1)
+set_property(TEST "NAPI-C-leak-test-1" APPEND PROPERTY RUN_SERIAL TRUE)
 if (WIN32)
   set_property(TEST "NAPI-C-leak-test-1" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
 endif(WIN32)
@@ -116,10 +124,11 @@ add_executable(test_nxunlimited test_nxunlimited.c)
 target_link_libraries(test_nxunlimited  NeXus_Shared_Library)
 add_test(NAME "NAPI-C-test-nxunlimited"
          COMMAND  test_nxunlimited)
+set_property(TEST "NAPI-C-test-nxunlimited" APPEND PROPERTY RUN_SERIAL TRUE)
 if (WIN32)
   set_property(TEST "NAPI-C-test-nxunlimited" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
 endif(WIN32)
-         
+
 
 #------------------------------------------------------------------------------
 # Add tests relevant to C++ bindings
@@ -132,6 +141,7 @@ if(ENABLE_CXX)
         add_executable(napi_test_cpp-hdf5 napi_test_cpp.cxx)
         target_link_libraries(napi_test_cpp-hdf5 NeXus_CPP_Shared_Library)
         add_test(NAME "NAPI-C++-HDF5-test" COMMAND  napi_test_cpp-hdf5)
+        set_property(TEST "NAPI-C++-HDF5-test" APPEND PROPERTY RUN_SERIAL TRUE)
         if (WIN32)
             set_property(TEST "NAPI-C++-HDF5-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
         endif(WIN32)
@@ -141,6 +151,7 @@ if(ENABLE_CXX)
         add_executable(napi_test_cpp-hdf4 napi_test_cpp.cxx)
         target_link_libraries(napi_test_cpp-hdf4 NeXus_CPP_Shared_Library)
         add_test(NAME "NAPI-C++-HDF4-test" COMMAND  napi_test_cpp-hdf4)
+        set_property(TEST "NAPI-C++-HDF4-test" APPEND PROPERTY RUN_SERIAL TRUE)
         if (WIN32)
             set_property(TEST "NAPI-C++-HDF4-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
         endif(WIN32)
@@ -150,6 +161,7 @@ if(ENABLE_CXX)
         add_executable(napi_test_cpp-xml napi_test_cpp.cxx)
         target_link_libraries(napi_test_cpp-xml NeXus_CPP_Shared_Library)
         add_test(NAME "NAPI-C++-MXML-test" COMMAND  napi_test_cpp-xml)
+        set_property(TEST "NAPI-C++-MXML-test" APPEND PROPERTY RUN_SERIAL TRUE)
         if (WIN32)
             set_property(TEST "NAPI-C++-MXML-test" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
         endif(WIN32)
@@ -169,6 +181,7 @@ if(ENABLE_CXX)
     target_link_libraries(leak_test2 NeXus_CPP_Shared_Library)
     add_test(NAME "NAPI-C++-leak-test-2" 
              COMMAND  leak_test2)
+    set_property(TEST "NAPI-C++-leak-test-2" APPEND PROPERTY RUN_SERIAL TRUE)
     if (WIN32)
       set_property(TEST "NAPI-C++-leak-test-2" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
     endif(WIN32)
@@ -177,6 +190,7 @@ if(ENABLE_CXX)
     target_link_libraries(leak_test3 NeXus_CPP_Shared_Library)
     add_test(NAME "NAPI-C++-leak-test-3"
              COMMAND  leak_test3)
+    set_property(TEST "NAPI-C++-leak-test-3" APPEND PROPERTY RUN_SERIAL TRUE)
     if (WIN32)
       set_property(TEST "NAPI-C++-leak-test-3" APPEND PROPERTY ENVIRONMENT "PATH=${TESTSPATH}")
     endif(WIN32)
@@ -191,6 +205,7 @@ if(ENABLE_FORTRAN77)
         target_link_libraries(napif4_test NeXus_F77_Shared_Library)
         add_test(NAME "NAPI-F77-HDF4-test"
                  COMMAND  napif4_test)
+        set_property(TEST "NAPI-F77-HDF4-test" APPEND PROPERTY RUN_SERIAL TRUE)
     endif()
     
     if(WITH_HDF5)
@@ -198,6 +213,7 @@ if(ENABLE_FORTRAN77)
         target_link_libraries(napif5_test NeXus_F77_Shared_Library)
         add_test(NAME "NAPI-F77-HDF5-test"
                  COMMAND  napif5_test)
+        set_property(TEST "NAPI-F77-HDF5-test" APPEND PROPERTY RUN_SERIAL TRUE)
     endif()
 
     if(WITH_MXML)
@@ -205,6 +221,7 @@ if(ENABLE_FORTRAN77)
         target_link_libraries(napif_test NeXus_F77_Shared_Library)
         add_test(NAME "NAPI-F77-XML-test"
                  COMMAND  napif_test)
+        set_property(TEST "NAPI-F77-XML-test" APPEND PROPERTY RUN_SERIAL TRUE)
     endif()
 
 endif()
@@ -215,6 +232,6 @@ if(ENABLE_FORTRAN90)
     add_executable(NXtestf90 NXtest.f90)
     target_link_libraries(NXtestf90 NeXus_F90_Shared_Library)
     add_test(NAME "Fortran-90-test" COMMAND  NXtestf90)
+    set_property(TEST "Fortran-90-test" APPEND PROPERTY RUN_SERIAL TRUE)
 endif()
-
 

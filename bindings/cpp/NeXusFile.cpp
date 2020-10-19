@@ -1242,7 +1242,7 @@ void File::getAttr(const std::string& name, std::vector<std::string>& array) {
   }
 
   // get attrInfo
-  char attr_name[name.size()+1];
+  char * attr_name = new char[name.size()+1];
   strcpy(attr_name, name.c_str());
 
   int type;
@@ -1273,6 +1273,7 @@ void File::getAttr(const std::string& name, std::vector<std::string>& array) {
     end = data.find(sep, start);
   }
   array.push_back(data.substr(start));
+  delete [] attr_name;
 }
 
 vector<AttrInfo> File::getAttrInfos() {

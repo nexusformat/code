@@ -43,7 +43,7 @@
     whitespace_cb(mxml_node_t *node,        /* I - Element node */
         	  int         where)        /* I - Open or close tag? */
 {
-	if (strncmp(node->value.element.name, "?xml", 4) == 0)
+	if (strncmp(mxmlGetElement(node), "?xml", 4) == 0)
 		return(NULL);
 	if (where == MXML_WS_BEFORE_OPEN )
 		return ("\n");
@@ -112,11 +112,11 @@ int main (int argc, char *argv[])
 		outFp = fopen(outputFl, "w");
 		if( outFp == 0 ) throw log.set("main", "Can't open the output file!", outputFl, "", NXING_ERR_CANT_OPEN_OUTPUT);
 	
-		if(inTree->type == MXML_ELEMENT  && (strncmp(inTree->value.element.name, "?xml", 4) == 0)){	
-			outTree = mxmlNewElement(MXML_NO_PARENT,  inTree->value.element.name);
+		if(mxmlGetType(inTree) == MXML_ELEMENT  && (strncmp(mxmlGetElement(inTree), "?xml", 4) == 0)){
+			outTree = mxmlNewElement(MXML_NO_PARENT,  mxmlGetElement(inTree));
 		}
 		
-		log.set("main", "Output Created, first tag added!", inTree->value.element.name).printLevel(NXING_LOG_DEBUG);
+		log.set("main", "Output Created, first tag added!", mxmlGetElement(inTree)).printLevel(NXING_LOG_DEBUG);
 		//
 
 		// Open the neXus file.

@@ -319,10 +319,10 @@ int translateTypeCode(const char *code, const char* term){
 static mxml_node_t* findDimsNode(mxml_node_t *node)
 {
     mxml_node_t *tnode = NULL;
-    const char* name = node->value.element.name;
-    if ( (node->parent != NULL) && !strcmp(node->parent->value.element.name, DATA_NODE_NAME) )
+    const char* name = mxmlGetElement(node);
+    if ( (mxmlGetParent(node) != NULL) && !strcmp(mxmlGetElement(mxmlGetParent(node)), DATA_NODE_NAME) )
     {
-	tnode = mxmlFindElement(node->parent->parent, node->parent->parent, DIMS_NODE_NAME, NULL, NULL, MXML_DESCEND_FIRST);
+	tnode = mxmlFindElement(mxmlGetParent(mxmlGetParent(node)), mxmlGetParent(mxmlGetParent(node)), DIMS_NODE_NAME, NULL, NULL, MXML_DESCEND_FIRST);
 	if (tnode != NULL)
 	{
 	    tnode = mxmlFindElement(tnode,tnode,name,NULL,NULL,MXML_DESCEND_FIRST);
@@ -413,18 +413,18 @@ static char *getNextNumber(char *pStart, char pNumber[80]){
 mxml_type_t nexusTypeCallback(mxml_node_t *parent){
   const char *typeString;
 
-  if(strstr(parent->value.element.name,"?xml") != NULL ||
-     !strncmp(parent->value.element.name,"NX",2) ||
-     !strcmp(parent->value.element.name,DATA_NODE_NAME) ||
-     !strcmp(parent->value.element.name,DIMS_NODE_NAME)){
+  if(strstr(mxmlGetElement(parent),"?xml") != NULL ||
+     !strncmp(mxmlGetElement(parent),"NX",2) ||
+     !strcmp(mxmlGetElement(parent),DATA_NODE_NAME) ||
+     !strcmp(mxmlGetElement(parent),DIMS_NODE_NAME)){
     return MXML_ELEMENT;
   } else {
     /* data nodes do not habe TYPENAME in table style but are always CUSTOM */
-    if (parent->parent != NULL && !strcmp(parent->parent->value.element.name, DATA_NODE_NAME))
+    if (mxmlGetParent(parent) != NULL && !strcmp(mxmlGetElement(mxmlGetParent(parent)), DATA_NODE_NAME))
     {
 	return MXML_CUSTOM;
     }
-    if (parent->parent != NULL && !strcmp(parent->parent->value.element.name, DIMS_NODE_NAME))
+    if (mxmlGetParent(parent) != NULL && !strcmp(mxmlGetElement(mxmlGetParent(parent)), DIMS_NODE_NAME))
     {
 	return MXML_OPAQUE;
     }
@@ -453,21 +453,19 @@ int nexusLoadCallback(mxml_node_t *node, const char *buffer){
   long address, maxAddress;
   pNXDS dataset = NULL;
 
-  parent = node->parent;
+  parent = mxmlGetParent(node);
   analyzeDataType(parent,&rank,&type,iDim);
-  if(iDim[0] == -1 || !strcmp(parent->parent->value.element.name, DIMS_NODE_NAME)){
+  if(iDim[0] == -1 || !strcmp(mxmlGetElement(mxmlGetParent(parent)), DIMS_NODE_NAME)){
     iDim[0] = strlen(buffer);
-    node->value.custom.data = strdup(buffer);
-    node->value.custom.destroy = free;
+    mxmlSetCustom(node,strdup(buffer),free);
     return 0;
   } else {
-    node->value.custom.data = createNXDataset(rank,type,iDim);
-    dataset = (pNXDS)node->value.custom.data;
+    dataset = createNXDataset(rank,type,iDim);
     if(dataset == NULL){
       mxml_error("Failed to allocate custom dataset");
       return 1;
     }
-    node->value.custom.destroy = destroyDataset; 
+    mxmlSetCustom(node,dataset,destroyDataset);
   }
 
   /*
@@ -529,7 +527,7 @@ static int countDepth(mxml_node_t *node){
   cur = node;
   while(cur != NULL){
     count++;
-    cur = cur->parent;
+    cur = mxmlGetParent(cur);
   }
   count--;
   return count;
@@ -546,7 +544,7 @@ char *nexusWriteCallback(mxml_node_t *node){
   /* this is set by nxconvert when making a definiton */
   is_definition = (getenv("NX_IS_DEFINITION") != NULL);
 
-  if (!strcmp(node->parent->parent->value.element.name, DATA_NODE_NAME))
+  if (!strcmp(mxmlGetElement(mxmlGetParent(mxmlGetParent(node))), DATA_NODE_NAME))
   {
 	table_style = 1;
   }
@@ -562,7 +560,7 @@ char *nexusWriteCallback(mxml_node_t *node){
   bufPtr = buffer;
   bufsize = 1024;
 
-  dataset = (pNXDS)node->value.custom.data;
+  dataset = (pNXDS)mxmlGetCustom(node);
 
   /*
     prepare indentation level
@@ -626,16 +624,16 @@ int isDataNode(mxml_node_t *node){
   if(mxmlElementGetAttr(node,"name") != NULL){
     return 0;
   }
-  if(strcmp(node->value.element.name,"NXroot") == 0){
+  if(strcmp(mxmlGetElement(node),"NXroot") == 0){
     return 0;
   }
-  if(strcmp(node->value.element.name,DIMS_NODE_NAME) == 0){
+  if(strcmp(mxmlGetElement(node),DIMS_NODE_NAME) == 0){
     return 0;
   }
-  if(strcmp(node->value.element.name,DATA_NODE_NAME) == 0){
+  if(strcmp(mxmlGetElement(node),DATA_NODE_NAME) == 0){
     return 0;
   }
-  if(strcmp(node->value.element.name,"NAPIlink") == 0){
+  if(strcmp(mxmlGetElement(node),"NAPIlink") == 0){
     return 0;
   }
   return 1;
@@ -669,14 +667,14 @@ const char *NXwhitespaceCallback(mxml_node_t *node, int where){
   static char *indent = NULL;
   int len;  
 
-  if(strstr(node->value.element.name,"?xml") != NULL){
+  if(strstr(mxmlGetElement(node),"?xml") != NULL){
     return NULL;
   }
-  if (node->parent != NULL && !strcmp(node->parent->value.element.name, DATA_NODE_NAME))
+  if (mxmlGetParent(node) != NULL && !strcmp(mxmlGetElement(mxmlGetParent(node)), DATA_NODE_NAME))
   {
     return NULL;
   }
-  if (where == MXML_WS_BEFORE_CLOSE && !strcmp(node->value.element.name, DATA_NODE_NAME))
+  if (where == MXML_WS_BEFORE_CLOSE && !strcmp(mxmlGetElement(node), DATA_NODE_NAME))
   {
     return NULL;
   }

@@ -69,7 +69,7 @@ endif()
 #-----------------------------------------------------------------------------
 set (API_VERSION_MAJOR 4)
 set (API_VERSION_MINOR 4)
-set (API_VERSION_PATCH 3)
+set (API_VERSION_PATCH 4)
 set (API_VERSION "${API_VERSION_MAJOR}.${API_VERSION_MINOR}.${API_VERSION_PATCH}")
 set (ABI_CURRENT 1)
 set (ABI_REVISION 0)
@@ -224,10 +224,10 @@ find_package(LibXml2)
 #find_package(PythonInterp)
 
 #Find the java runtime and sdk
-#if(ENABLE_JAVA_BINDINGS)
-#    find_package(Java 1.6)
-#    find_package(JNI)
-#endif()
+if(ENABLE_JAVA)
+    find_package(Java 1.6)
+    find_package(JNI)
+endif()
 
 
 find_library(PTHREAD pthread)
