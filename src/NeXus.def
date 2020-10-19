@@ -1,6 +1,7 @@
 LIBRARY NeXus.dll
 EXPORTS
 NXIReportError
+NXReportError
 NXIprintlink
 NXMDisableErrorReporting
 NXMEnableErrorReporting
