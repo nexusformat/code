@@ -1599,18 +1599,28 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
 
   current = xmlHandle->stack[stackPtr].current;
   currentAtt = xmlHandle->stack[stackPtr].currentAttribute;
+
+#if MXML_MAJOR_VERSION == 3
   if(currentAtt >= mxmlElementGetAttrCount(current)){
     xmlHandle->stack[stackPtr].currentAttribute = 0;
     return NX_EOD;
   }
+#else
+  if(currentAtt >= 
+     current->value.element.num_attrs ){
+    xmlHandle->stack[stackPtr].currentAttribute = 0;
+    return NX_EOD;
+  }
+#endif 
 
   /*
     hide group name attribute
   */
-#ifdef MXML_MAJOR_VERSION > 2
+#if MXML_MAJOR_VERSION == 3
   attVal = mxmlElementGetAttrByIndex(current,currentAtt,&attName);
 #else 
-  attName = current->value.element.attrs[currentAtt].name
+  attName = current->value.element.attrs[currentAtt].name;
+  attVal = current->value.element.attrs[currentAtt].value;
 #endif
 
   if(strcmp(attName,"name") == 0 && !isDataNode(current) ){
@@ -1735,7 +1745,11 @@ NXstatus  NXXgetattrinfo (NXhandle fid, int *iN){
     /* group nodes (except root) have name */
     if(mxmlElementGetAttr(current,"name") != NULL) skip=1;
   }
+#if MXML_MAJOR_VERSION == 3
   *iN = mxmlElementGetAttrCount(current) - skip;
+#else
+  *iN = current->value.element.num_attrs - skip;
+#endif
   return NX_OK;
 }
 /*================= Linking functions =================================*/
