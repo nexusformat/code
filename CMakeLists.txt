@@ -69,7 +69,7 @@ endif()
 #-----------------------------------------------------------------------------
 set (API_VERSION_MAJOR 4)
 set (API_VERSION_MINOR 4)
-set (API_VERSION_PATCH 3)
+set (API_VERSION_PATCH 4)
 set (API_VERSION "${API_VERSION_MAJOR}.${API_VERSION_MINOR}.${API_VERSION_PATCH}")
 set (ABI_CURRENT 1)
 set (ABI_REVISION 0)

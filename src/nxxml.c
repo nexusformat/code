@@ -1607,7 +1607,11 @@ NXstatus  NXXgetnextattr (NXhandle fid, NXname pName,
   /*
     hide group name attribute
   */
+#ifdef MXML_MAJOR_VERSION > 2
   attVal = mxmlElementGetAttrByIndex(current,currentAtt,&attName);
+#else 
+  attName = current->value.element.attrs[currentAtt].name
+#endif
 
   if(strcmp(attName,"name") == 0 && !isDataNode(current) ){
     xmlHandle->stack[stackPtr].currentAttribute++;
