@@ -77,7 +77,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
   int32 tags[2], attID, linkID, groupID;
 
   groupID = Vattach(pFile->iVID,groupRef,"r");
-  Vgetclass(groupID, classText);
+  size_t classBufSize = sizeof(classText);
+  Vgetclass(groupID, classText, &classBufSize);
   if(strcmp(classText,"NAPIlink") != 0)
   {
     /* normal group */
@@ -93,7 +94,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     {
       Vgetattr(groupID,attID, tags);
       linkID = Vattach(pFile->iVID,tags[1],"r");
-      Vgetclass(linkID, linkClass);
+      size_t linkClassBufSize = sizeof(linkClass);
+      Vgetclass(linkID, linkClass, &linkClassBufSize);
       Vdetach(groupID);
       Vdetach(linkID);
       strcpy(nxclass,linkClass);
@@ -135,7 +137,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       /* loop and check */
       for (i = 0; i < iN; i++) {
         iNew = Vattach (pFile->iVID, pArray[i], "r");
-        Vgetname (iNew, pText);
+        size_t bufSize = sizeof(pText);
+        Vgetname (iNew, pText, &bufSize);
         Vdetach(iNew);
         if (strcmp (pText, name) == 0) {
           pArray[i] = findNapiClass(pFile,pArray[i],pText);
@@ -156,7 +159,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
         Vgettagref (pFile->iCurrentVG, i, &iTag, &iRef);
         if (iTag == DFTAG_VG) {
           iNew = Vattach (pFile->iVID, iRef, "r");
-          Vgetname (iNew, pText);
+          size_t bufSize = sizeof(pText);
+          Vgetname (iNew, pText, &bufSize);
           Vdetach(iNew);
           if (strcmp (pText, name) == 0) {
 	    iRef = findNapiClass(pFile,iRef, pText);
@@ -351,7 +355,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
       groupID = Vattach(pFile->iVID,pFile->iStack[i].iVref, "r");
       if (groupID != -1)
       {
-          if (Vgetname(groupID, pText) != -1) {
+          size_t bufSize = sizeof(pText);
+          if (Vgetname(groupID, pText, &bufSize) != -1) {
               strncat(buffer,pText,bufLen-strlen(buffer));
           } else {
               NXReportError( "ERROR: NXIbuildPath cannot get vgroup name");
@@ -1527,7 +1532,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
         NXReportError( "ERROR: HDF cannot attach to Vgroup");
         return NX_ERROR;
       }
-      Vgetname (iTemp, name);
+      size_t bufSize = sizeof(NXname);
+      Vgetname (iTemp, name, &bufSize);
       Vdetach (iTemp);
       findNapiClass(pFile, pFile->iStack[pFile->iStackPtr].iRefDir[iCurDir], nxclass);
       *datatype = DFTAG_VG;
@@ -1541,7 +1547,8 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
           NXReportError( "ERROR: HDF cannot attach to Vgroup");
           return NX_ERROR;
         }
-        Vgetname (iTemp, name);
+        size_t bufSize = sizeof(NXname);
+        Vgetname (iTemp, name, &bufSize);
         Vdetach(iTemp);
 	findNapiClass(pFile, pFile->iStack[pFile->iStackPtr].iRefDir[iCurDir], nxclass);
         *datatype = DFTAG_VG;
@@ -1908,8 +1915,10 @@ static int findNapiClass(pNexusFile pFile, int groupRef, NXname nxclass)
     }
     else {
       *iN = Vntagrefs (pFile->iCurrentVG);
-      Vgetname (pFile->iCurrentVG, pName);
-      Vgetclass (pFile->iCurrentVG, pClass);
+      size_t bufSize = sizeof(NXname);
+      Vgetname (pFile->iCurrentVG, pName, &bufSize);
+      bufSize = sizeof(NXname);
+      Vgetclass (pFile->iCurrentVG, pClass, &bufSize);
     }
     return NX_OK;
   }
