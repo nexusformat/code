@@ -68,8 +68,9 @@ int main (int argc, char *argv[])
   int unlimited_dims[1] = {NX_UNLIMITED};
   int chunk_size[2]={5,4};
   int slab_start[2], slab_size[2];
-  char name[64], char_class[64], char_buffer[128];
-  char group_name[64], class_name[64];
+  NXname name, char_class;
+  char char_buffer[128];
+  NXname group_name, class_name;
   char c1_array[5][4] = {{'a', 'b', 'c' ,'d'}, {'e', 'f', 'g' ,'h'}, 
      {'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p'}, {'q', 'r', 's' , 't'}};
   int unlimited_cdims[2] = {NX_UNLIMITED, 4};
